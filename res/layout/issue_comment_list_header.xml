@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -16,7 +17,8 @@
             android:id="@+id/iv_gravatar"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginRight="16dp" />
+            android:layout_marginRight="16dp"
+            tools:src="@drawable/default_avatar" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_extra"
@@ -25,7 +27,8 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp"
-            android:layout_toRightOf="@id/iv_gravatar" />
+            android:layout_toRightOf="@id/iv_gravatar"
+            tools:text="Username" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_timestamp"
@@ -35,7 +38,8 @@
             android:textColor="?android:attr/textColorSecondary"
             android:layout_marginTop="2dp"
             android:layout_toRightOf="@id/iv_gravatar"
-            android:layout_below="@id/tv_extra"/>
+            android:layout_below="@id/tv_extra"
+            tools:text="yesterday" />
 
     </RelativeLayout>
 
@@ -47,7 +51,8 @@
         android:paddingBottom="@dimen/content_padding"
         android:textIsSelectable="true"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="Description of the issue." />
 
     <RelativeLayout
         android:id="@+id/milestone_container"
