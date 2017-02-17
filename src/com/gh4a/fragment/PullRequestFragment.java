@@ -224,6 +224,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
 
         fillData();
+        fillLabels(mIssue.getLabels());
         updateCommentLockState();
 
         super.onActivityCreated(savedInstanceState);
