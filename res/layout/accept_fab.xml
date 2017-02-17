@@ -7,6 +7,6 @@
     android:layout_marginRight="16dp"
     android:src="@drawable/navigation_accept"
     app:backgroundTint="?attr/colorFab"
+    app:fabSize="mini"
     app:layout_anchor="@+id/header"
-    app:layout_anchorGravity="right|bottom"
-    app:fabSize="mini" />
+    app:layout_anchorGravity="right|bottom" />

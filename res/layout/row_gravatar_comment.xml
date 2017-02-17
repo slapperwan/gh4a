@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?attr/listPreferredItemHeight"
     android:clipToPadding="false"
+    android:minHeight="?attr/listPreferredItemHeight"
     android:padding="@dimen/content_padding">
 
     <FrameLayout
@@ -32,59 +32,59 @@
 
     <ImageView
         android:id="@+id/iv_edit"
+        style="@style/SelectableBorderlessItem"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_marginRight="-8dp"
         android:layout_alignParentRight="true"
+        android:layout_marginRight="-8dp"
         android:src="?attr/contentEditIcon"
-        style="@style/SelectableBorderlessItem"
         tools:src="@drawable/content_edit" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/fl_avatar_container"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
-        android:layout_toRightOf="@id/fl_avatar_container"
-        android:layout_alignParentTop="true"
         tools:text="octopus" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.VerySmall"
-        android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@id/tv_extra"
-        android:layout_toLeftOf="@id/iv_edit"
         android:layout_alignBaseline="@id/tv_extra"
         android:layout_alignWithParentIfMissing="true"
+        android:layout_marginLeft="16dp"
+        android:layout_toLeftOf="@id/iv_edit"
+        android:layout_toRightOf="@id/tv_extra"
+        android:textAppearance="@style/TextAppearance.VerySmall"
         tools:text="5 days ago" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_below="@id/tv_extra"
-        android:layout_toRightOf="@id/fl_avatar_container"
-        android:layout_toLeftOf="@id/iv_edit"
         android:layout_alignWithParentIfMissing="true"
+        android:layout_below="@id/tv_extra"
+        android:layout_toLeftOf="@id/iv_edit"
+        android:layout_toRightOf="@id/fl_avatar_container"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="gone" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_below="@id/tv_file"
+        android:layout_marginTop="2dp"
+        android:layout_toLeftOf="@id/iv_edit"
+        android:layout_toRightOf="@id/fl_avatar_container"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
         android:textIsSelectable="true"
-        android:layout_marginTop="2dp"
-        android:layout_below="@id/tv_file"
-        android:layout_toLeftOf="@id/iv_edit"
-        android:layout_toRightOf="@id/fl_avatar_container"
-        android:layout_alignWithParentIfMissing="true"
         tools:text="Comment text" />
 
 </RelativeLayout>

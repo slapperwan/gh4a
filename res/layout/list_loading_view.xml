@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
     android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
-    android:orientation="horizontal"
     android:paddingTop="8dp"
-    android:paddingBottom="8dp"
     android:visibility="gone">
 
     <ProgressBar
@@ -21,8 +21,8 @@
     <com.gh4a.widget.StyleableTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/loading_msg"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?attr/colorAccent"
-        android:text="@string/loading_msg" />
+        android:textColor="?attr/colorAccent" />
 
 </LinearLayout>

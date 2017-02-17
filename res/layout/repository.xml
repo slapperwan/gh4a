@@ -66,8 +66,8 @@
                     android:id="@+id/tv_private"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
                     android:layout_below="@id/tv_language"
+                    android:layout_marginTop="2dp"
                     android:drawableLeft="?attr/privateSmallIcon"
                     android:drawablePadding="4dp"
                     android:text="@string/repo_type_private"
@@ -227,9 +227,9 @@
                     android:id="@+id/readme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/content_padding"
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
-                    android:paddingBottom="@dimen/content_padding"
                     android:textIsSelectable="true"
                     android:visibility="gone" />
 

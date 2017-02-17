@@ -10,28 +10,28 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:gravity="bottom|center"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:textAppearance="@style/TextAppearance.VerySmall"
-        android:textColor="@color/primary_text_default_material_dark"
-        android:gravity="bottom|center" />
+        android:textColor="@color/primary_text_default_material_dark" />
 
     <!-- right padding is FAB size + FAB right margin -->
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_gravity="center_vertical"
-        android:paddingTop="8dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="2"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="42dp"
-        android:maxLines="2"
-        android:ellipsize="end"
-        android:textIsSelectable="true"
+        android:paddingTop="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        app:font="condensed"
-        android:textColor="@color/primary_text_default_material_dark" />
+        android:textColor="@color/primary_text_default_material_dark"
+        android:textIsSelectable="true"
+        app:font="condensed" />
 
 </LinearLayout>

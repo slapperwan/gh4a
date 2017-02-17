@@ -5,9 +5,9 @@
     android:id="@+id/tabs"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    app:tabMode="scrollable"
     app:tabGravity="fill"
+    app:tabIndicatorColor="@color/tab_indicator_color"
     app:tabMaxWidth="-1dp"
-    app:tabTextColor="@color/tab_text_color"
+    app:tabMode="scrollable"
     app:tabSelectedTextColor="@color/tab_indicator_color"
-    app:tabIndicatorColor="@color/tab_indicator_color" />
+    app:tabTextColor="@color/tab_text_color" />

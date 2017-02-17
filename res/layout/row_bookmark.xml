@@ -4,27 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal"
     android:padding="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding"
-    android:orientation="horizontal" >
+    android:paddingRight="@dimen/content_padding">
+
     <ImageView
         android:id="@+id/iv_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="16dp" />
+
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_gravity="center_vertical"
-        android:orientation="vertical" >
+        android:layout_weight="1"
+        android:orientation="vertical">
+
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.ItemTitle"
-            android:gravity="center_vertical" />
+            android:gravity="center_vertical"
+            android:textAppearance="@style/TextAppearance.ItemTitle" />
+
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_extra"
             android:layout_width="match_parent"

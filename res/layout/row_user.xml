@@ -4,11 +4,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:paddingLeft="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding"
     android:background="?attr/selectableItemBackground"
-    android:orientation="horizontal">
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/content_padding"
+    android:paddingRight="@dimen/content_padding">
 
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_gravatar"
@@ -22,9 +22,9 @@
         android:id="@+id/tv_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:textAppearance="@style/TextAppearance.ItemTitle"
-        app:font="boldCondensed"
-        android:layout_gravity="center_vertical" />
+        app:font="boldCondensed" />
 
 </LinearLayout>

@@ -8,5 +8,5 @@
     android:layout_gravity="bottom|right"
     android:layout_margin="16dp"
     android:src="@drawable/content_new"
-    app:layout_behavior="com.gh4a.widget.ScrollAwareFloatingActionButtonBehavior"
-    app:backgroundTint="?attr/colorFab" />
+    app:backgroundTint="?attr/colorFab"
+    app:layout_behavior="com.gh4a.widget.ScrollAwareFloatingActionButtonBehavior" />

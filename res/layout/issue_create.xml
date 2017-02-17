@@ -2,24 +2,24 @@
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingBottom="@dimen/content_padding"
         android:paddingLeft="@dimen/content_padding"
         android:paddingRight="@dimen/content_padding"
-        android:paddingTop="@dimen/floating_action_button_margin_mini"
-        android:paddingBottom="@dimen/content_padding">
+        android:paddingTop="@dimen/floating_action_button_margin_mini">
 
         <RelativeLayout
             android:id="@+id/milestone_container"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
-            android:background="?attr/selectableItemBackground">
+            android:gravity="center_vertical">
 
             <ImageView
                 android:id="@+id/iv_milestone"
@@ -51,9 +51,9 @@
             android:id="@+id/assignee_container"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
-            android:background="?attr/selectableItemBackground">
+            android:gravity="center_vertical">
 
             <ImageView
                 android:id="@+id/iv_assignee"
@@ -85,9 +85,9 @@
             android:id="@+id/label_container"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
-            android:background="?attr/selectableItemBackground">
+            android:gravity="center_vertical">
 
             <ImageView
                 android:id="@+id/iv_labels"

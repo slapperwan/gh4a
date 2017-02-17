@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="72dp"
     android:background="?attr/selectableItemBackground"
+    android:minHeight="72dp"
     android:padding="@dimen/content_padding">
 
     <LinearLayout
@@ -51,28 +51,28 @@
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/info"
-        android:layout_toRightOf="@id/tv_creator"
         android:layout_alignBaseline="@id/tv_creator"
         android:layout_alignWithParentIfMissing="true"
+        android:layout_toLeftOf="@id/info"
+        android:layout_toRightOf="@id/tv_creator"
         android:textAppearance="@style/TextAppearance.VerySmall" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/info"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/tv_timestamp"
+        android:layout_toLeftOf="@id/info"
         android:textAppearance="@style/TextAppearance.ItemTitle" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_sha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/info"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/tv_title"
+        android:layout_toLeftOf="@id/info"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>

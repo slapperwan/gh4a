@@ -11,12 +11,12 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:visibility="gone"
-        app:spb_sections_count="6"
-        app:spb_speed="1.0"
+        app:spb_interpolator="spb_interpolator_acceleratedecelerate"
         app:spb_progressiveStart_activated="true"
         app:spb_progressiveStart_speed="1.5"
         app:spb_progressiveStop_speed="3.4"
-        app:spb_interpolator="spb_interpolator_acceleratedecelerate" />
+        app:spb_sections_count="6"
+        app:spb_speed="1.0" />
 
     <FrameLayout
         android:id="@+id/content_container"

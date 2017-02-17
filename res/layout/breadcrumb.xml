@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
@@ -11,14 +12,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:textColor="@color/crumb_text"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+        android:textColor="@color/crumb_text" />
 
     <ImageView
         android:layout_width="@dimen/breadcrumb_arrow_size"
         android:layout_height="@dimen/breadcrumb_arrow_size"
-        android:layout_marginLeft="@dimen/breadcrumb_arrow_margin"
         android:layout_gravity="center_vertical"
+        android:layout_marginLeft="@dimen/breadcrumb_arrow_margin"
         android:scaleType="fitXY"
         android:src="@drawable/ic_right_arrow"
         android:visibility="gone" />

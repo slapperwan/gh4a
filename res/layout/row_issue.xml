@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?attr/listPreferredItemHeightLarge"
     android:background="?attr/selectableItemBackground"
+    android:minHeight="?attr/listPreferredItemHeightLarge"
     android:padding="@dimen/content_padding">
 
     <LinearLayout
@@ -22,15 +22,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:maxWidth="80dp"
-            android:singleLine="true"
-            android:ellipsize="end"
             android:drawableLeft="?attr/milestoneSmallIcon"
             android:drawablePadding="4dp"
+            android:ellipsize="end"
+            android:maxWidth="80dp"
+            android:singleLine="true"
             android:textAppearance="@style/TextAppearance.VerySmall"
             android:visibility="gone"
-            tools:visibility="visible"
-            tools:text="v2.10.3" />
+            tools:text="v2.10.3"
+            tools:visibility="visible" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_comments"
@@ -56,8 +56,8 @@
         android:id="@+id/labels"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:layout_below="@id/iv_gravatar"
         android:layout_alignParentBottom="true"
+        android:layout_below="@id/iv_gravatar"
         android:layout_gravity="bottom"
         android:layout_marginTop="8dp" />
 
@@ -65,18 +65,18 @@
         android:id="@+id/tv_creator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
-        android:layout_toRightOf="@id/iv_gravatar"
         tools:text="IssueCreatorUsername" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/tv_creator"
         android:layout_alignBaseline="@id/tv_creator"
         android:layout_marginLeft="16dp"
+        android:layout_toRightOf="@id/tv_creator"
         android:textAppearance="@style/TextAppearance.VerySmall"
         tools:text="yesterday" />
 
@@ -84,22 +84,22 @@
         android:id="@+id/tv_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.ItemTitle"
-        android:layout_toRightOf="@id/iv_gravatar"
         android:layout_below="@id/tv_creator"
         android:layout_toLeftOf="@id/info"
-        android:maxLines="2"
+        android:layout_toRightOf="@id/iv_gravatar"
         android:ellipsize="end"
+        android:maxLines="2"
+        android:textAppearance="@style/TextAppearance.ItemTitle"
         tools:text="Long issue title that is supposed to wrap in the layout preview." />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/iv_gravatar"
         android:layout_below="@id/tv_desc"
         android:layout_toLeftOf="@id/info"
+        android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        tools:text="#999 on LongUsername/LongRepositoryName"/>
+        tools:text="#999 on LongUsername/LongRepositoryName" />
 
 </RelativeLayout>

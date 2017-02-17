@@ -46,8 +46,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_name"
-                        android:layout_toRightOf="@id/iv_gravatar"
                         android:layout_marginTop="2dp"
+                        android:layout_toRightOf="@id/iv_gravatar"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <com.gh4a.widget.StyleableTextView
@@ -55,8 +55,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_created_at"
-                        android:layout_toRightOf="@id/iv_gravatar"
                         android:layout_marginTop="2dp"
+                        android:layout_toRightOf="@id/iv_gravatar"
                         android:autoLink="email"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColorLink="?android:attr/textColorLink" />
@@ -66,8 +66,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_email"
-                        android:layout_toRightOf="@id/iv_gravatar"
                         android:layout_marginTop="2dp"
+                        android:layout_toRightOf="@id/iv_gravatar"
                         android:autoLink="web"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColorLink="?android:attr/textColorLink" />
@@ -77,8 +77,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_website"
-                        android:layout_toRightOf="@id/iv_gravatar"
                         android:layout_marginTop="2dp"
+                        android:layout_toRightOf="@id/iv_gravatar"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
 
                     <com.gh4a.widget.StyleableTextView
@@ -86,8 +86,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tv_company"
-                        android:layout_toRightOf="@id/iv_gravatar"
                         android:layout_marginTop="2dp"
+                        android:layout_toRightOf="@id/iv_gravatar"
                         android:autoLink="map"
                         android:textAppearance="?android:attr/textAppearanceSmall" />
                 </RelativeLayout>
@@ -235,7 +235,7 @@
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/user_pub_repos"/>
+                    android:text="@string/user_pub_repos" />
 
                 <ProgressBar
                     android:id="@+id/pb_top_repos"
@@ -253,9 +253,9 @@
                     style="@style/MoreButton"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
-                    android:gravity="center_horizontal"
                     android:text="@string/view_more"
                     android:visibility="gone" />
 
@@ -284,8 +284,8 @@
                     android:id="@+id/ll_org"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginBottom="@dimen/overview_header_spacing" />
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical" />
 
             </LinearLayout>
         </android.support.v7.widget.CardView>

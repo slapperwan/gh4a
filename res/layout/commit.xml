@@ -44,10 +44,10 @@
                         android:id="@+id/tv_timestamp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextAppearance.VerySmall"
+                        android:layout_below="@id/tv_author"
                         android:layout_marginTop="2dp"
                         android:layout_toRightOf="@id/iv_gravatar"
-                        android:layout_below="@id/tv_author" />
+                        android:textAppearance="@style/TextAppearance.VerySmall" />
 
                 </RelativeLayout>
 
@@ -79,16 +79,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:textIsSelectable="true"
-                    android:textAppearance="@style/TextAppearance.ItemTitle" />
+                    android:textAppearance="@style/TextAppearance.ItemTitle"
+                    android:textIsSelectable="true" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:textIsSelectable="true"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textIsSelectable="true" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_desc"
@@ -104,28 +104,28 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_changed"
+            style="?attr/cardViewTheme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/commit_changed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/HeaderLabel"
-                android:text="@string/commit_changed" />
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/commit_changed"
+                    style="@style/HeaderLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/commit_changed" />
 
-            <LinearLayout
-                android:id="@+id/ll_changed"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing" />
+                <LinearLayout
+                    android:id="@+id/ll_changed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 
@@ -133,9 +133,9 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_added"
+            style="?attr/cardViewTheme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -144,16 +144,17 @@
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/commit_added"
+                    style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/HeaderLabel"
                     android:text="@string/commit_added" />
+
                 <LinearLayout
                     android:id="@+id/ll_added"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/overview_header_spacing" />
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 
@@ -161,9 +162,9 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_renamed"
+            style="?attr/cardViewTheme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -172,16 +173,17 @@
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/commit_renamed"
+                    style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/HeaderLabel"
                     android:text="@string/commit_renamed" />
+
                 <LinearLayout
                     android:id="@+id/ll_renamed"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/overview_header_spacing" />
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 
@@ -189,9 +191,9 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_deleted"
+            style="?attr/cardViewTheme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -200,16 +202,17 @@
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/commit_deleted"
+                    style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/HeaderLabel"
                     android:text="@string/commit_deleted" />
+
                 <LinearLayout
                     android:id="@+id/ll_deleted"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/overview_header_spacing" />
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 
