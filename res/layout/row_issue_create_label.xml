@@ -2,16 +2,19 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
     android:paddingTop="5dp"
-    android:paddingBottom="5dp" >
+    android:paddingBottom="5dp">
+
     <View
         android:id="@+id/view_color"
         android:layout_width="20dp"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:background="@color/light_primary" />
+
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
@@ -20,6 +23,9 @@
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:paddingRight="8dp"
+        android:foreground="?attr/selectableItemBackground"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        app:font="condensed" />
+        app:font="condensed"
+        tools:text="Label title" />
+
 </LinearLayout>

@@ -15,7 +15,8 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginRight="16dp"
-        android:layout_gravity="center_vertical" />
+        android:layout_gravity="center_vertical"
+        android:background="?attr/selectableItemBackgroundBorderless" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"

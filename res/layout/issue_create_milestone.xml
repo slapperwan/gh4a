@@ -13,7 +13,8 @@
         android:paddingTop="@dimen/floating_action_button_margin_mini"
         android:paddingBottom="@dimen/content_padding"
         android:gravity="center_vertical"
-        android:clickable="true">
+        android:clickable="true"
+        android:background="?attr/selectableItemBackground">
 
         <ImageView
             android:id="@+id/iv_due"

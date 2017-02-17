@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
@@ -9,7 +10,8 @@
     <LinearLayout
         android:id="@+id/collapsed"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        tools:visibility="gone">
 
         <View
             android:id="@+id/view_color"
@@ -32,7 +34,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone" >
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <EditText
             android:id="@+id/et_label"
@@ -53,6 +56,7 @@
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="dddddd"
+                android:foreground="?attr/selectableItemBackground"
                 android:background="#dddddd" />
             <View
                 android:layout_width="0dp"
@@ -60,6 +64,7 @@
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="444444"
+                android:foreground="?attr/selectableItemBackground"
                 android:background="#444444" />
             <View
                 android:layout_width="0dp"
@@ -67,6 +72,7 @@
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="e10c02"
+                android:foreground="?attr/selectableItemBackground"
                 android:background="#e10c02" />
             <View
                 android:layout_width="0dp"
@@ -74,6 +80,7 @@
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="d7e102"
+                android:foreground="?attr/selectableItemBackground"
                 android:background="#d7e102" />
             <View
                 android:layout_width="0dp"
@@ -81,6 +88,7 @@
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="02e10c"
+                android:foreground="?attr/selectableItemBackground"
                 android:background="#02e10c" />
             <View
                 android:layout_width="0dp"
@@ -88,6 +96,7 @@
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="02d7e1"
+                android:foreground="?attr/selectableItemBackground"
                 android:background="#02d7e1" />
             <View
                 android:layout_width="0dp"
@@ -95,6 +104,7 @@
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="0b02e1"
+                android:foreground="?attr/selectableItemBackground"
                 android:background="#0b02e1" />
             <View
                 android:layout_width="0dp"
@@ -102,6 +112,7 @@
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
                 android:tag="e102d8"
+                android:foreground="?attr/selectableItemBackground"
                 android:background="#e102d8" />
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/custom"
@@ -109,6 +120,7 @@
                 android:layout_height="40dp"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:foreground="?attr/selectableItemBackground"
                 android:text="@string/ellipse" />
 
         </LinearLayout>

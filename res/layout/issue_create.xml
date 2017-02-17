@@ -18,7 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:gravity="center_vertical"
-            android:clickable="true">
+            android:clickable="true"
+            android:background="?attr/selectableItemBackground">
 
             <ImageView
                 android:id="@+id/iv_milestone"
@@ -51,7 +52,8 @@
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:gravity="center_vertical"
-            android:clickable="true">
+            android:clickable="true"
+            android:background="?attr/selectableItemBackground">
 
             <ImageView
                 android:id="@+id/iv_assignee"
@@ -84,7 +86,8 @@
             android:layout_width="match_parent"
             android:layout_height="72dp"
             android:gravity="center_vertical"
-            android:clickable="true">
+            android:clickable="true"
+            android:background="?attr/selectableItemBackground">
 
             <ImageView
                 android:id="@+id/iv_labels"
