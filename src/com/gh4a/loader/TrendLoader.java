@@ -19,12 +19,10 @@ import java.util.List;
 
 public class TrendLoader extends BaseLoader<List<Trend>> {
     private final String mUrl;
-    private final String mQueryTarget;
 
-    public TrendLoader(Context context, String url, String queryTarget) {
+    public TrendLoader(Context context, String url) {
         super(context);
         mUrl = url;
-        mQueryTarget = queryTarget;
     }
 
     @Override
@@ -35,23 +33,11 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
         HttpURLConnection connection = null;
         CharArrayWriter writer = null;
 
-        JSONObject input = new JSONObject().put("input",
-                new JSONObject().put("webpage/url", mQueryTarget));
-
         try {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoInput(true);
             connection.setDoOutput(true);
-
-            DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
-            try {
-                dos.write(input.toString().getBytes());
-                dos.flush();
-            } finally {
-                dos.close();
-            }
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 return trends;
@@ -61,7 +47,7 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
             InputStreamReader reader = new InputStreamReader(in, "UTF-8");
             int length = connection.getContentLength();
             writer = new CharArrayWriter(Math.max(0, length));
-            char[] tmp = new char[1024];
+            char[] tmp = new char[4096];
 
             int l;
             while ((l = reader.read(tmp)) != -1) {

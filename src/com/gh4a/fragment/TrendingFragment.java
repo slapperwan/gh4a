@@ -32,18 +32,9 @@ import java.util.List;
 import java.util.Locale;
 
 public class TrendingFragment extends ListDataBaseFragment<Trend> {
-    private static final String API_URL_TEMPLATE =
-            "https://api.import.io/store/connector/%s/_query?_user=%s&_apikey=%s";
-    private static final String API_EXTRACTOR_GUID = "f275068d-5237-432d-829c-e37a175270aa";
-    private static final String API_KEY = "41fbbdaa94d045ebb652a065fade27714f92e6fe1cbc2c962ce67"
-            + "e7cfcd20793397fe894275f8b9ecf20141404d95c4a215897f53fde"
-            + "62f3a20bfad968bc5c9fd1af829bd368e46182a92adcbe6f246e";
-    private static final String API_USER_GUID = "41fbbdaa-94d0-45eb-b652-a065fade2771";
+    private static final String URL_TEMPLATE =
+            "http://gh4a.bplaced.net/trending_%s.json";
 
-    private static final String API_URL = String.format(Locale.US, API_URL_TEMPLATE,
-            API_EXTRACTOR_GUID, API_USER_GUID, API_KEY);
-
-    private static final String TREND_URL_TEMPLATE = "https://github.com/trending?since=%s";
     public static final String TYPE_DAILY = "daily";
     public static final String TYPE_WEEKLY = "weekly";
     public static final String TYPE_MONTHLY = "monthly";
@@ -58,7 +49,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
 
         TrendingFragment f = new TrendingFragment();
         Bundle args = new Bundle();
-        args.putString("url", String.format(Locale.US, TREND_URL_TEMPLATE, type));
+        args.putString("url", String.format(Locale.US, URL_TEMPLATE, type));
         switch (type) {
             case TYPE_DAILY: args.putInt("stars_template", R.string.trend_stars_today); break;
             case TYPE_WEEKLY: args.putInt("stars_template", R.string.trend_stars_week); break;
@@ -98,6 +89,6 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
 
     @Override
     public Loader<LoaderResult<List<Trend>>> onCreateLoader() {
-        return new TrendLoader(getActivity(), API_URL, mUrl);
+        return new TrendLoader(getActivity(), mUrl);
     }
 }
