@@ -48,7 +48,7 @@
     </style>
 
     <style name="MoreButton" parent="SelectableLabel">
-        <item name="android:textColor">?attr/colorPrimaryDark</item>
+        <item name="android:textColor">?attr/colorAccent</item>
         <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
         <item name="android:textSize">@dimen/abc_text_size_button_material</item>
         <item name="allCaps">true</item>
@@ -68,7 +68,7 @@
 
     <style name="HeaderLabel">
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorAccent</item>
         <item name="android:paddingLeft">@dimen/content_padding</item>
         <item name="android:paddingRight">@dimen/content_padding</item>
         <item name="android:minHeight">48dp</item>

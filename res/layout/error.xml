@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:text="@string/try_again"
-        android:textColor="?attr/colorPrimary"
+        android:textColor="?attr/colorAccent"
         app:allCaps="true"
         app:font="medium"
         android:background="?attr/selectableItemBackgroundBorderless"
