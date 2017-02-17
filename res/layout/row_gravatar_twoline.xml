@@ -2,10 +2,11 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight"
     android:background="?attr/selectableItemBackground"
+    android:minHeight="?android:attr/listPreferredItemHeight"
     android:padding="@dimen/content_padding">
 
     <com.gh4a.widget.FixedSizeImageView
@@ -14,24 +15,27 @@
         android:layout_height="40dp"
         android:layout_centerVertical="true"
         android:layout_marginRight="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        tools:src="@drawable/default_avatar" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="@style/TextAppearance.ItemTitle"
         app:font="boldCondensed"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_alignParentTop="true" />
+        tools:text="Username" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/iv_gravatar"
         android:layout_below="@id/tv_title"
+        android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="@style/TextAppearance.VerySmall"
-        app:font="italic" />
+        app:font="italic"
+        tools:text="Extra text" />
 
 </RelativeLayout>

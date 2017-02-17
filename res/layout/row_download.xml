@@ -2,38 +2,42 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
     android:minHeight="72dp"
     android:orientation="horizontal"
-    android:background="?attr/selectableItemBackground"
     android:padding="@dimen/content_padding">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_gravity="center_vertical"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.ItemTitle" />
+            android:textAppearance="@style/TextAppearance.ItemTitle"
+            tools:text="filename" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="2"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:maxLines="2" />
+            tools:text="Description" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_created_at"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.VerySmall" />
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="Created yesterday" />
 
     </LinearLayout>
 
@@ -50,7 +54,8 @@
             android:layout_height="wrap_content"
             android:drawableLeft="?attr/sizeSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall" />
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="4.75 MB" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_downloads"
@@ -59,7 +64,8 @@
             android:layout_marginTop="2dp"
             android:drawableLeft="?attr/downloadSmallIcon"
             android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall" />
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="34" />
 
     </LinearLayout>
 

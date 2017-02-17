@@ -9,15 +9,15 @@
     <com.gh4a.widget.StyleableTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="@string/pull_merge_message_description" />
+        android:text="@string/pull_merge_message_description"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText
         android:id="@+id/et_commit_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:imeOptions="flagNoFullscreen|actionNext"
         android:cursorVisible="true"
+        android:imeOptions="flagNoFullscreen|actionNext"
         android:maxLines="5" />
 
 </LinearLayout>

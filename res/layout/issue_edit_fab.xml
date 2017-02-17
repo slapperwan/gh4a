@@ -8,6 +8,6 @@
     android:layout_marginRight="16dp"
     android:src="@drawable/content_edit_white"
     app:backgroundTint="?attr/colorIssueEditFab"
+    app:fabSize="mini"
     app:layout_anchor="@id/header"
-    app:layout_anchorGravity="right|bottom"
-    app:fabSize="mini" />
+    app:layout_anchorGravity="right|bottom" />

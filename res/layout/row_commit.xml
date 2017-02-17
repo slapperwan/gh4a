@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight"
     android:background="?attr/selectableItemBackground"
+    android:minHeight="?android:attr/listPreferredItemHeight"
     android:padding="@dimen/content_padding">
 
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="8dp"
         android:layout_marginRight="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        tools:src="@drawable/default_avatar" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_comments"
@@ -23,49 +25,55 @@
         android:layout_alignParentRight="true"
         android:drawableLeft="?attr/commentsIcon"
         android:drawablePadding="4dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="gone"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        tools:text="10"
+        tools:visibility="visible" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_alignParentTop="true" />
+        tools:text="Username" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.VerySmall"
-        android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@id/tv_extra"
         android:layout_alignBaseline="@id/tv_extra"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_marginLeft="16dp"
         android:layout_toLeftOf="@id/tv_comments"
-        android:layout_alignWithParentIfMissing="true" />
+        android:layout_toRightOf="@id/tv_extra"
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="yesterday" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.ItemTitle"
-        android:maxLines="2"
-        android:ellipsize="end"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_toLeftOf="@id/tv_comments"
         android:layout_alignWithParentIfMissing="true"
-        android:layout_below="@id/tv_extra" />
+        android:layout_below="@id/tv_extra"
+        android:layout_toLeftOf="@id/tv_comments"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:ellipsize="end"
+        android:maxLines="2"
+        android:textAppearance="@style/TextAppearance.ItemTitle"
+        tools:text="Commit title" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_sha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:layout_toLeftOf="@id/tv_comments"
+        android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/tv_desc"
-        android:layout_alignWithParentIfMissing="true" />
+        android:layout_toLeftOf="@id/tv_comments"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="ad65d46d38d" />
 
 </RelativeLayout>

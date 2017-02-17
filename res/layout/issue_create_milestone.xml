@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/due_container"
         android:layout_width="match_parent"
         android:layout_height="72dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:paddingBottom="@dimen/content_padding"
         android:paddingLeft="@dimen/content_padding"
         android:paddingRight="@dimen/content_padding"
-        android:paddingTop="@dimen/floating_action_button_margin_mini"
-        android:paddingBottom="@dimen/content_padding"
-        android:gravity="center_vertical"
-        android:clickable="true"
-        android:background="?attr/selectableItemBackground">
+        android:paddingTop="@dimen/floating_action_button_margin_mini">
 
         <ImageView
             android:id="@+id/iv_due"
@@ -38,7 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_due_label"
             android:layout_toRightOf="@id/iv_due"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            tools:text="1/1/1970" />
 
     </RelativeLayout>
 

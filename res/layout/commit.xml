@@ -2,6 +2,7 @@
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -29,7 +30,8 @@
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_marginRight="16dp"
-                        android:background="?attr/selectableItemBackgroundBorderless" />
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        tools:src="@drawable/default_avatar" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_author"
@@ -38,16 +40,18 @@
                         android:layout_toRightOf="@id/iv_gravatar"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="?android:attr/textColorPrimary"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        tools:text="Username" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_timestamp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textAppearance="@style/TextAppearance.VerySmall"
+                        android:layout_below="@id/tv_author"
                         android:layout_marginTop="2dp"
                         android:layout_toRightOf="@id/iv_gravatar"
-                        android:layout_below="@id/tv_author" />
+                        android:textAppearance="@style/TextAppearance.VerySmall"
+                        tools:text="yesterday" />
 
                 </RelativeLayout>
 
@@ -62,7 +66,8 @@
                         android:id="@+id/iv_commit_gravatar"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_marginRight="8dp" />
+                        android:layout_marginRight="8dp"
+                        tools:src="@drawable/default_avatar" />
 
                     <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_commit_extra"
@@ -70,7 +75,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:textColor="?android:attr/textColorPrimary" />
+                        android:textColor="?android:attr/textColorPrimary"
+                        tools:text="Committed by username2 yesterday" />
 
                 </LinearLayout>
 
@@ -79,16 +85,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:textAppearance="@style/TextAppearance.ItemTitle"
                     android:textIsSelectable="true"
-                    android:textAppearance="@style/TextAppearance.ItemTitle" />
+                    tools:text="Commit title" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textIsSelectable="true"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    tools:text="Commit message" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_desc"
@@ -96,7 +104,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    app:font="italic" />
+                    app:font="italic"
+                    tools:text="10 files added with 42 additions and 32 deletions." />
 
             </LinearLayout>
 
@@ -104,28 +113,28 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_changed"
+            style="?attr/cardViewTheme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/commit_changed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="@style/HeaderLabel"
-                android:text="@string/commit_changed" />
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/commit_changed"
+                    style="@style/HeaderLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/commit_changed" />
 
-            <LinearLayout
-                android:id="@+id/ll_changed"
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing" />
+                <LinearLayout
+                    android:id="@+id/ll_changed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 
@@ -133,9 +142,9 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_added"
+            style="?attr/cardViewTheme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -144,16 +153,17 @@
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/commit_added"
+                    style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/HeaderLabel"
                     android:text="@string/commit_added" />
+
                 <LinearLayout
                     android:id="@+id/ll_added"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/overview_header_spacing" />
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 
@@ -161,9 +171,9 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_renamed"
+            style="?attr/cardViewTheme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -172,16 +182,17 @@
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/commit_renamed"
+                    style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/HeaderLabel"
                     android:text="@string/commit_renamed" />
+
                 <LinearLayout
                     android:id="@+id/ll_renamed"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/overview_header_spacing" />
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 
@@ -189,9 +200,9 @@
 
         <android.support.v7.widget.CardView
             android:id="@+id/card_deleted"
+            style="?attr/cardViewTheme"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="?attr/cardViewTheme">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -200,16 +211,17 @@
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/commit_deleted"
+                    style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    style="@style/HeaderLabel"
                     android:text="@string/commit_deleted" />
+
                 <LinearLayout
                     android:id="@+id/ll_deleted"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/overview_header_spacing" />
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:orientation="vertical" />
 
             </LinearLayout>
 
