@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?attr/colorPrimaryDark"
+            android:textColor="?attr/colorAccent"
             android:text="@string/loading_msg"
             android:paddingTop="8dp"
             android:paddingBottom="8dp" />
