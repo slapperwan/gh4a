@@ -149,6 +149,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         if (event.comment != null) {
             String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
             mImageGetter.bind(holder.tvDesc, body, event.comment.getId());
+
+            holder.ivIssueEvent.setVisibility(View.GONE);
         } else {
             holder.tvDesc.setTag(null);
             holder.tvDesc.setText(formatEvent(event.event, event.getUser(),
@@ -158,6 +160,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             if (issueEventIcon != null) {
                 holder.ivIssueEvent.setVisibility(View.VISIBLE);
                 holder.ivIssueEvent.setImageDrawable(issueEventIcon);
+            } else {
+                holder.ivIssueEvent.setVisibility(View.GONE);
             }
         }
 
