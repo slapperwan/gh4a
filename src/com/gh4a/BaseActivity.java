@@ -28,7 +28,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
@@ -42,9 +41,11 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -75,7 +76,7 @@ import java.util.List;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class BaseActivity extends AppCompatActivity implements
-        SwipeRefreshLayout.OnRefreshListener, DrawerLayout.DrawerListener,
+        SwipeRefreshLayout.OnRefreshListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
         LoaderCallbacks.ParentCallback,
         NavigationView.OnNavigationItemSelectedListener {
@@ -91,8 +92,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private DrawerLayout mDrawerLayout;
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private NavigationView mLeftDrawer;
     private NavigationView mRightDrawer;
     private View mLeftDrawerTitle;
     private View mRightDrawerTitle;
@@ -397,19 +396,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (mDrawerToggle != null) {
-            mDrawerToggle.onConfigurationChanged(newConfig);
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
         if (item.getItemId() == android.R.id.home) {
             Intent intent = navigateUp();
             if (intent != null) {
@@ -422,14 +409,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        if (mDrawerToggle != null) {
-            mDrawerToggle.syncState();
-        }
     }
 
     @Override
@@ -462,34 +441,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public void onRefresh() {
         supportInvalidateOptionsMenu();
         mSwipeLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void onDrawerOpened(View drawerView) {
-        if (mDrawerToggle != null && drawerView == mLeftDrawer) {
-            mDrawerToggle.onDrawerOpened(drawerView);
-        }
-    }
-
-    @Override
-    public void onDrawerClosed(View drawerView) {
-        if (mDrawerToggle != null && drawerView == mLeftDrawer) {
-            mDrawerToggle.onDrawerClosed(drawerView);
-        }
-    }
-
-    @Override
-    public void onDrawerSlide(View drawerView, float slideOffset) {
-        if (mDrawerToggle != null && drawerView == mLeftDrawer) {
-            mDrawerToggle.onDrawerSlide(drawerView, slideOffset);
-        }
-    }
-
-    @Override
-    public void onDrawerStateChanged(int newState) {
-        if (mDrawerToggle != null) {
-            mDrawerToggle.onDrawerStateChanged(newState);
-        }
     }
 
     @Override
@@ -540,7 +491,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         View error = findViewById(R.id.error);
 
         content.setVisibility(visible ? View.GONE : View.VISIBLE);
-        mSwipeLayout.setEnabled(visible ? false : canSwipeToRefresh());
+        mSwipeLayout.setEnabled(!visible && canSwipeToRefresh());
 
         if (error == null) {
             if (!visible) {
@@ -608,8 +559,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void setupNavigationDrawer() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
-        mLeftDrawer = (NavigationView) findViewById(R.id.left_drawer);
-        applyHighlightColor(mLeftDrawer);
+        NavigationView leftDrawer = (NavigationView) findViewById(R.id.left_drawer);
+        applyHighlightColor(leftDrawer);
         mRightDrawer = (NavigationView) findViewById(R.id.right_drawer);
         applyHighlightColor(mRightDrawer);
 
@@ -618,20 +569,28 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         int drawerMenuResId = getLeftNavigationDrawerMenuResource();
         if (drawerMenuResId != 0) {
-            mLeftDrawer.inflateMenu(drawerMenuResId);
-            mLeftDrawer.setNavigationItemSelectedListener(this);
+            leftDrawer.inflateMenu(drawerMenuResId);
+            leftDrawer.setNavigationItemSelectedListener(this);
 
-            mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0) {
+            ActionBar supportActionBar = getSupportActionBar();
+            if (supportActionBar != null) {
+                supportActionBar.setDisplayHomeAsUpEnabled(true);
+            }
+
+            toolBar.setNavigationIcon(new DrawerArrowDrawable(toolBar.getContext()));
+            toolBar.setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onDrawerSlide(View drawerView, float slideOffset) {
-                    super.onDrawerSlide(drawerView, 0f);
+                public void onClick (View v) {
+                    int drawerLockMode = mDrawerLayout.getDrawerLockMode(GravityCompat.START);
+                    if (drawerLockMode != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+                        mDrawerLayout.openDrawer(GravityCompat.START);
+                    }
                 }
-            };
-            mDrawerLayout.addDrawerListener(this);
+            });
 
-            mLeftDrawerTitle = getLeftDrawerTitle(mLeftDrawer);
+            mLeftDrawerTitle = getLeftDrawerTitle(leftDrawer);
             if (mLeftDrawerTitle!= null) {
-                mLeftDrawer.addHeaderView(mLeftDrawerTitle);
+                leftDrawer.addHeaderView(mLeftDrawerTitle);
             }
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);
