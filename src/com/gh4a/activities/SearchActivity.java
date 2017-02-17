@@ -211,7 +211,7 @@ public class SearchActivity extends BaseActivity implements
         private final LayoutInflater mPopupInflater;
 
         private final int[][] mResources = new int[][] {
-            { R.string.search_type_repo, R.drawable.search_repos_dark, R.attr.searchRepoIcon, 0 },
+            { R.string.search_type_repo, R.drawable.icon_repositories_dark, R.attr.searchRepoIcon, 0 },
             { R.string.search_type_user, R.drawable.search_users_dark, R.attr.searchUserIcon, 0 },
             { R.string.search_type_code, R.drawable.search_code_dark, R.attr.searchCodeIcon, 0 }
         };

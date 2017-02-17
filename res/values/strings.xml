@@ -148,7 +148,7 @@
     <string name="no_repos_found">No repositories found.</string>
     <string name="no_search_repos_found">No repositories found matching the criteria.</string>
     <string name="no_search_users_found">No users found matching the criteria.</string>
-    <string name="no_search_code_found">No code occurences found matching the criteria.</string>
+    <string name="no_search_code_found">No code occurrences found matching the criteria.</string>
     <string name="no_starred_repos_found">No repositories were starred yet.</string>
     <string name="no_watched_repos_found">No repositories are being watched yet.</string>
     <string name="no_watchers_found">Nobody is watching this repository yet.</string>

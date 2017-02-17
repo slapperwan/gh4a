@@ -275,6 +275,8 @@ public class IssueLabelListActivity extends BaseActivity implements
             if (mLabel == mAddedLabel) {
                 mAdapter.remove(mLabel);
                 mAddedLabel = null;
+            } else {
+                mLabel.restoreOriginalProperties();
             }
             mAdapter.notifyDataSetChanged();
             updateFabVisibility();
