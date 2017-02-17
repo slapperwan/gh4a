@@ -15,9 +15,6 @@
  */
 package com.gh4a.activities;
 
-import org.eclipse.egit.github.core.Download;
-import org.eclipse.egit.github.core.Release;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -46,6 +43,9 @@ import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
+
+import org.eclipse.egit.github.core.Download;
+import org.eclipse.egit.github.core.Release;
 
 public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
@@ -184,6 +184,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     private void fillData() {
         ImageView gravatar = (ImageView) findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mRelease.getAuthor());
+        gravatar.setOnClickListener(this);
 
         StyleableTextView details = (StyleableTextView) findViewById(R.id.tv_releaseinfo);
         String detailsText = getString(R.string.release_details,
@@ -241,11 +242,20 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     public void onClick(View v) {
+        Intent intent = null;
+
         switch (v.getId()) {
             case R.id.tv_releasetag:
-                startActivity(RepositoryActivity.makeIntent(this,
-                        mRepoOwner, mRepoName, mRelease.getTagName()));
+                intent = RepositoryActivity.makeIntent(this,
+                        mRepoOwner, mRepoName, mRelease.getTagName());
                 break;
+            case R.id.iv_gravatar:
+                intent = UserActivity.makeIntent(this, mRelease.getAuthor());
+                break;
+        }
+
+        if (intent != null) {
+            startActivity(intent);
         }
     }
 }
