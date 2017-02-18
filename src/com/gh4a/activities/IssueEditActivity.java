@@ -61,7 +61,10 @@ import java.util.List;
 
 public class IssueEditActivity extends BaseActivity implements View.OnClickListener {
     public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
-        return makeEditIntent(context, repoOwner, repoName, null);
+        // can't reuse makeEditIntent here, because even a null extra counts for hasExtra()
+        return new Intent(context, IssueEditActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName);
     }
 
     public static Intent makeEditIntent(Context context, String repoOwner,
@@ -71,8 +74,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                 .putExtra("repo", repoName)
                 .putExtra("issue", issue);
     }
-
-    public static final String EXTRA_ISSUE = "issue";
 
     private String mRepoOwner;
     private String mRepoName;
@@ -301,7 +302,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     }
 
     private boolean isInEditMode() {
-        return getIntent().hasExtra(EXTRA_ISSUE);
+        return getIntent().hasExtra("issue");
     }
 
     @Override
