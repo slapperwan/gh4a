@@ -128,7 +128,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         @Override
         protected void onResultReady(Boolean result) {
             mIsCollaborator = result;
-            updateFabVisibility();
+            showContentIfReady();
             supportInvalidateOptionsMenu();
         }
     };
@@ -241,6 +241,14 @@ public class PullRequestActivity extends BasePagerActivity implements
         mPullRequest = null;
         mIsCollaborator = null;
         setContentShown(false);
+        if (mEditFab != null) {
+            mEditFab.post(new Runnable() {
+                @Override
+                public void run() {
+                    updateFabVisibility();
+                }
+            });
+        }
         mHeader.setVisibility(View.GONE);
         mHeaderColorAttrs = null;
         LoaderManager lm = getSupportLoaderManager();
@@ -344,7 +352,8 @@ public class PullRequestActivity extends BasePagerActivity implements
     private void updateFabVisibility() {
         boolean isIssueOwner = mIssue != null
                 && ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
-        boolean shouldHaveFab = (isIssueOwner || mIsCollaborator)
+        boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
+        boolean shouldHaveFab = (isIssueOwner || isCollaborator)
                 && mPullRequest != null && mIssue != null;
         CoordinatorLayout rootLayout = getRootLayout();
 
