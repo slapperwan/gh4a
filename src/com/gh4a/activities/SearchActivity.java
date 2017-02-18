@@ -369,13 +369,16 @@ public class SearchActivity extends BaseActivity implements
     @Override
     public boolean onQueryTextSubmit(String query) {
         LoaderManager lm = getSupportLoaderManager();
-        switch (mSearchType.getSelectedItemPosition()) {
+        int type = mSearchType.getSelectedItemPosition();
+        switch (type) {
             case 1: lm.restartLoader(0, null, mUserCallback); break;
             case 2: lm.restartLoader(0, null, mCodeCallback); break;
             default: lm.restartLoader(0, null, mRepoCallback); break;
         }
         mQuery = query;
-        new SaveSearchSuggestionTask().schedule();
+        if (!StringUtils.isBlank(query)) {
+            new SaveSearchSuggestionTask(query, type).schedule();
+        }
         setContentShown(false);
         mSearch.clearFocus();
         return true;
@@ -455,32 +458,27 @@ public class SearchActivity extends BaseActivity implements
 
 
     private class SaveSearchSuggestionTask extends BackgroundTask<Void> {
+        private String mSuggestion;
+        private int mType;
 
-        public SaveSearchSuggestionTask() {
+        public SaveSearchSuggestionTask(String suggestion, int type) {
             super(SearchActivity.this);
+            mSuggestion = suggestion;
+            mType = type;
         }
 
         @Override
         protected Void run() throws IOException {
-            saveSuggestion(mSearchType.getSelectedItemPosition(), mQuery);
+            ContentValues cv = new ContentValues();
+            cv.put(SuggestionsProvider.Columns.TYPE, mType);
+            cv.put(SuggestionsProvider.Columns.SUGGESTION, mSuggestion);
+            cv.put(SuggestionsProvider.Columns.DATE, System.currentTimeMillis());
+            getContentResolver().insert(SuggestionsProvider.Columns.CONTENT_URI, cv);
             return null;
         }
 
         @Override
         protected void onSuccess(Void result) {
-
-        }
-
-        private void saveSuggestion(int type, String suggestion) {
-            if (StringUtils.isBlank(suggestion)) {
-                return;
-            }
-            ContentValues cv = new ContentValues();
-            cv.put(SuggestionsProvider.Columns.TYPE, type);
-            cv.put(SuggestionsProvider.Columns.SUGGESTION, suggestion);
-            cv.put(SuggestionsProvider.Columns.DATE, System.currentTimeMillis());
-            getContentResolver().insert(SuggestionsProvider.Columns.CONTENT_URI, cv);
         }
     }
-
 }
