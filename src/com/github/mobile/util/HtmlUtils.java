@@ -34,6 +34,7 @@ import android.text.style.BulletSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.text.style.LeadingMarginSpan;
+import android.text.style.LineBackgroundSpan;
 import android.text.style.ParagraphStyle;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.StrikethroughSpan;
@@ -88,6 +89,23 @@ public class HtmlUtils {
 
             p.setStyle(style);
             p.setColor(color);
+        }
+    }
+
+    private static class CodeBlockSpan implements LineBackgroundSpan {
+        private final int color;
+
+        public CodeBlockSpan(int color) {
+            this.color = color;
+        }
+
+        @Override
+        public void drawBackground(Canvas c, Paint p, int left, int right, int top, int baseline,
+                int bottom, CharSequence text, int start, int end, int lnum) {
+            final int paintColor = p.getColor();
+            p.setColor(color);
+            c.drawRect(left, top, right, bottom, p);
+            p.setColor(paintColor);
         }
     }
 
@@ -545,8 +563,10 @@ public class HtmlUtils {
                 startFont(mSpannableStringBuilder, attributes);
             } else if (tag.equalsIgnoreCase("blockquote")) {
                 startBlockquote(mSpannableStringBuilder, attributes);
-            } else if (tag.equalsIgnoreCase("tt") || tag.equalsIgnoreCase("pre")) {
+            } else if (tag.equalsIgnoreCase("tt")) {
                 start(mSpannableStringBuilder, new Monospace());
+            } else if (tag.equalsIgnoreCase("pre")) {
+                start(mSpannableStringBuilder, new Pre());
             } else if (tag.equalsIgnoreCase("a")) {
                 startA(mSpannableStringBuilder, attributes);
             } else if (tag.equalsIgnoreCase("u")) {
@@ -562,7 +582,8 @@ public class HtmlUtils {
             } else if (tag.equalsIgnoreCase("sub")) {
                 start(mSpannableStringBuilder, new Sub());
             } else if (tag.equalsIgnoreCase("code")) {
-                start(mSpannableStringBuilder, new Code());
+                boolean inPre = getLast(mSpannableStringBuilder, Pre.class) != null;
+                start(mSpannableStringBuilder, new Code(inPre));
             } else if (tag.length() == 2 &&
                     Character.toLowerCase(tag.charAt(0)) == 'h' &&
                     tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
@@ -610,8 +631,10 @@ public class HtmlUtils {
                 endFont(mSpannableStringBuilder);
             } else if (tag.equalsIgnoreCase("blockquote")) {
                 endBlockquote(mSpannableStringBuilder);
-            } else if (tag.equalsIgnoreCase("tt") || tag.equalsIgnoreCase("pre")) {
+            } else if (tag.equalsIgnoreCase("tt")) {
                 end(mSpannableStringBuilder, Monospace.class, new TypefaceSpan("monospace"));
+            } else if (tag.equalsIgnoreCase("pre")) {
+                end(mSpannableStringBuilder, Pre.class, new TypefaceSpan("monospace"));
             } else if (tag.equalsIgnoreCase("a")) {
                 endA(mSpannableStringBuilder);
             } else if (tag.equalsIgnoreCase("u")) {
@@ -627,11 +650,15 @@ public class HtmlUtils {
             } else if (tag.equalsIgnoreCase("sub")) {
                 end(mSpannableStringBuilder, Sub.class, new SubscriptSpan());
             } else if (tag.equalsIgnoreCase("code")) {
-                Object code = getLast(mSpannableStringBuilder, Code.class);
+                Code code = getLast(mSpannableStringBuilder, Code.class);
                 if (code != null) {
+                    Object backgroundSpan = code.mInPre
+                            ? new CodeBlockSpan(0x30aaaaaa) : new BackgroundColorSpan(0x30aaaaaa);
+                    if (code.mInPre) {
+                        mSpannableStringBuilder.append("\n");
+                    }
                     setSpanFromMark(mSpannableStringBuilder, code,
-                            new TypefaceSpan("monospace"),
-                            new BackgroundColorSpan(0x30aaaaaa));
+                            new TypefaceSpan("monospace"), backgroundSpan);
                 }
             } else if (tag.length() == 2 &&
                     Character.toLowerCase(tag.charAt(0)) == 'h' &&
@@ -973,7 +1000,15 @@ public class HtmlUtils {
         private static class Blockquote { }
         private static class Super { }
         private static class Sub { }
-        private static class Code { }
+        private static class Pre { }
+
+        private static class Code {
+            public final boolean mInPre;
+
+            public Code(boolean inPre) {
+                mInPre = inPre;
+            }
+        }
 
         private static class List {
             public final boolean mOrdered;
