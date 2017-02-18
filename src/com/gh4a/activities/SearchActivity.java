@@ -192,15 +192,6 @@ public class SearchActivity extends BaseActivity implements
                         new int[]{android.R.id.text1}, 0)
         );
 
-        final SearchView.SearchAutoComplete complete = (SearchView.SearchAutoComplete) mSearch.findViewById(R.id.search_src_text);
-        complete.setThreshold(0);
-        complete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                complete.showDropDown();
-            }
-        });
-
         getSupportLoaderManager().initLoader(1, null, mSuggestionCallback);
 
         updateSelectedSearchType();
