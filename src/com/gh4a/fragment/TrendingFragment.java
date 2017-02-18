@@ -50,6 +50,12 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
         TrendingFragment f = new TrendingFragment();
         Bundle args = new Bundle();
         args.putString("url", String.format(Locale.US, URL_TEMPLATE, type));
+        switch (type) {
+            case TYPE_DAILY: args.putInt("stars_template", R.string.trend_stars_today); break;
+            case TYPE_WEEKLY: args.putInt("stars_template", R.string.trend_stars_week); break;
+            case TYPE_MONTHLY: args.putInt("stars_template", R.string.trend_stars_month); break;
+            default: throw new IllegalArgumentException();
+        }
         f.setArguments(args);
 
         return f;
