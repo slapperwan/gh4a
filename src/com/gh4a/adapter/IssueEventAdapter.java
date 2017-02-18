@@ -169,7 +169,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         } else {
             holder.tvDesc.setTag(null);
             holder.tvDesc.setText(formatEvent(event.event, event.getUser(),
-                    holder.tvExtra.getTypefaceValue()));
+                    holder.tvExtra.getTypefaceValue(), event.isPullRequestEvent));
 
             Integer eventIconAttr = EVENT_ICONS.get(event.event.getEvent());
             if (eventIconAttr != null) {
@@ -192,28 +192,43 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         }
     }
 
-    private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue) {
+    private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue,
+            boolean isPullRequestEvent) {
         String textBase = null;
         int textResId = 0;
 
         switch (event.getEvent()) {
             case IssueEvent.TYPE_CLOSED:
-                textResId = event.getCommitId() != null
-                        ? R.string.issue_event_closed_with_commit
-                        : R.string.issue_event_closed;
+                if (isPullRequestEvent) {
+                    textResId = event.getCommitId() != null
+                            ? R.string.pull_request_event_closed_with_commit
+                            : R.string.pull_request_event_closed;
+                } else {
+                    textResId = event.getCommitId() != null
+                            ? R.string.issue_event_closed_with_commit
+                            : R.string.issue_event_closed;
+                }
                 break;
             case IssueEvent.TYPE_REOPENED:
-                textResId = R.string.issue_event_reopened;
+                textResId = isPullRequestEvent
+                        ? R.string.pull_request_event_reopened
+                        : R.string.issue_event_reopened;
                 break;
             case IssueEvent.TYPE_MERGED:
                 textResId = event.getCommitId() != null
-                        ? R.string.issue_event_merged_with_commit
-                        : R.string.issue_event_merged;
+                        ? R.string.pull_request_event_merged_with_commit
+                        : R.string.pull_request_event_merged;
                 break;
             case IssueEvent.TYPE_REFERENCED:
-                textResId = event.getCommitId() != null
-                        ? R.string.issue_event_referenced_with_commit
-                        : R.string.issue_event_referenced;
+                if (isPullRequestEvent) {
+                    textResId = event.getCommitId() != null
+                            ? R.string.pull_request_event_referenced_with_commit
+                            : R.string.pull_request_event_referenced;
+                } else {
+                    textResId = event.getCommitId() != null
+                            ? R.string.issue_event_referenced_with_commit
+                            : R.string.issue_event_referenced;
+                }
                 break;
             case IssueEvent.TYPE_ASSIGNED:
             case IssueEvent.TYPE_UNASSIGNED: {
@@ -222,13 +237,25 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                 String assigneeLogin = event.getAssignee() != null
                         ? event.getAssignee().getLogin() : null;
                 if (assigneeLogin != null && assigneeLogin.equals(actorLogin)) {
-                    textResId = isAssign
-                            ? R.string.issue_event_assigned_self
-                            : R.string.issue_event_unassigned_self;
+                    if (isPullRequestEvent) {
+                        textResId = isAssign
+                                ? R.string.pull_request_event_assigned_self
+                                : R.string.pull_request_event_unassigned_self;
+                    } else {
+                        textResId = isAssign
+                                ? R.string.issue_event_assigned_self
+                                : R.string.issue_event_unassigned_self;
+                    }
                 } else {
-                    textResId = isAssign
-                            ? R.string.issue_event_assigned
-                            : R.string.issue_event_unassigned;
+                    if (isPullRequestEvent) {
+                        textResId = isAssign
+                                ? R.string.pull_request_event_assigned
+                                : R.string.pull_request_event_unassigned;
+                    } else {
+                        textResId = isAssign
+                                ? R.string.issue_event_assigned
+                                : R.string.issue_event_unassigned;
+                    }
                     textBase = mContext.getString(textResId,
                             ApiHelpers.getUserLogin(mContext, user),
                             ApiHelpers.getUserLogin(mContext, event.getAssignee()));
@@ -242,10 +269,14 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                 textResId = R.string.issue_event_unlabeled;
                 break;
             case IssueEvent.TYPE_LOCKED:
-                textResId = R.string.issue_event_locked;
+                textResId = isPullRequestEvent
+                        ? R.string.pull_request_event_locked
+                        : R.string.issue_event_locked;
                 break;
             case IssueEvent.TYPE_UNLOCKED:
-                textResId = R.string.issue_event_unlocked;
+                textResId = isPullRequestEvent
+                        ? R.string.pull_request_event_unlocked
+                        : R.string.issue_event_unlocked;
                 break;
             case IssueEvent.TYPE_MILESTONED:
             case IssueEvent.TYPE_DEMILESTONED:
