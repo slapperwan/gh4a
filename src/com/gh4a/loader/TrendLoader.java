@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.CharArrayWriter;
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -62,8 +61,7 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
             }
         }
 
-        JSONObject jsonObject = new JSONObject(writer.toString());
-        JSONArray resultArray = jsonObject.getJSONArray("results");
+        JSONArray resultArray = new JSONArray(writer.toString());
         for (int i = 0; i < resultArray.length(); i++) {
             JSONObject repoObject = resultArray.getJSONObject(i);
 
