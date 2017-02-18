@@ -28,11 +28,11 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
 
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        RepositoryId repoId = new RepositoryId(repoOwner, repoName);
-        List<CommitComment> commitComments = pullRequestService.getComments(repoId, issueNumber);
+        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        List<CommitComment> commitComments = pullRequestService.getComments(repoId, mIssueNumber);
         HashMap<String, CommitFile> filesByName = new HashMap<>();
 
-        for (CommitFile file : pullRequestService.getFiles(repoId, issueNumber)) {
+        for (CommitFile file : pullRequestService.getFiles(repoId, mIssueNumber)) {
             filesByName.put(file.getFilename(), file);
         }
 

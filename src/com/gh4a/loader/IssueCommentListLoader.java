@@ -19,9 +19,9 @@ import java.util.List;
 public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
     private final boolean mIsPullRequest;
 
-    protected final String repoOwner;
-    protected final String repoName;
-    protected final int issueNumber;
+    protected final String mRepoOwner;
+    protected final String mRepoName;
+    protected final int mIssueNumber;
 
     private static final List<String> INTERESTING_EVENTS = Arrays.asList(
         IssueEvent.TYPE_CLOSED, IssueEvent.TYPE_REOPENED, IssueEvent.TYPE_MERGED,
@@ -46,9 +46,9 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
     protected IssueCommentListLoader(Context context, String repoOwner, String repoName,
             int issueNumber, boolean isPullRequest) {
         super(context);
-        this.repoOwner = repoOwner;
-        this.repoName = repoName;
-        this.issueNumber = issueNumber;
+        mRepoOwner = repoOwner;
+        mRepoName = repoName;
+        mIssueNumber = issueNumber;
         mIsPullRequest = isPullRequest;
     }
 
@@ -57,8 +57,8 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
         IssueService issueService = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         List<Comment> comments = issueService.getComments(
-                new RepositoryId(repoOwner, repoName), issueNumber);
-        List<IssueEvent> events = issueService.getIssueEvents(repoOwner, repoName, issueNumber);
+                new RepositoryId(mRepoOwner, mRepoName), mIssueNumber);
+        List<IssueEvent> events = issueService.getIssueEvents(mRepoOwner, mRepoName, mIssueNumber);
         List<IssueEventHolder> result = new ArrayList<>();
 
         for (Comment comment : comments) {
