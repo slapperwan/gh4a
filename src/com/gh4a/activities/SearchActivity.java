@@ -27,13 +27,15 @@ import org.eclipse.egit.github.core.client.RequestException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -76,6 +78,14 @@ public class SearchActivity extends BaseActivity implements
     private Spinner mSearchType;
     private SearchView mSearch;
     private String mQuery;
+
+    private static final String[] SUGGESTION_PROJECTION = {
+        SuggestionsProvider.Columns._ID, SuggestionsProvider.Columns.SUGGESTION
+    };
+    private static final String SUGGESTION_SELECTION =
+            SuggestionsProvider.Columns.TYPE + " = ? AND " +
+            SuggestionsProvider.Columns.SUGGESTION + " LIKE ?";
+    private static final String SUGGESTION_ORDER = SuggestionsProvider.Columns.DATE + " DESC";
 
     private static final String STATE_KEY_QUERY = "query";
     private static final String STATE_KEY_SEARCH_MODE = "search_mode";
@@ -136,15 +146,14 @@ public class SearchActivity extends BaseActivity implements
         }
     };
 
-    private LoaderManager.LoaderCallbacks<Cursor> mSuggestionCallback = new LoaderManager.LoaderCallbacks<Cursor>() {
-
+    private LoaderManager.LoaderCallbacks<Cursor> mSuggestionCallback =
+            new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return new CursorLoader(getApplicationContext(), SuggestionsProvider.Columns.CONTENT_URI,
-                    new String[]{SuggestionsProvider.Columns._ID, SuggestionsProvider.Columns.SUGGESTION},
-                    SuggestionsProvider.Columns.TYPE + " = ? and " + SuggestionsProvider.Columns.SUGGESTION + " like ?",
-                    new String[]{String.valueOf(mSearchType.getSelectedItemPosition()), mQuery + "%"},
-                    SuggestionsProvider.Columns.DATE + " desc");
+            int type = mSearchType.getSelectedItemPosition();
+            return new CursorLoader(SearchActivity.this, SuggestionsProvider.Columns.CONTENT_URI,
+                    SUGGESTION_PROJECTION, SUGGESTION_SELECTION,
+                    new String[] { String.valueOf(type), mQuery + "%" }, SUGGESTION_ORDER);
         }
 
         @Override
@@ -186,11 +195,7 @@ public class SearchActivity extends BaseActivity implements
         mSearch.onActionViewExpanded();
 
         mSearch.setOnSuggestionListener(this);
-        mSearch.setSuggestionsAdapter(
-                new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, null,
-                        new String[]{SuggestionsProvider.Columns.SUGGESTION},
-                        new int[]{android.R.id.text1}, 0)
-        );
+        mSearch.setSuggestionsAdapter(new SuggestionAdapter(this));
 
         getSupportLoaderManager().initLoader(1, null, mSuggestionCallback);
 
@@ -377,14 +382,15 @@ public class SearchActivity extends BaseActivity implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        CursorAdapter cursorAdapter = mSearch.getSuggestionsAdapter();
-        if (cursorAdapter != null) {
-            Cursor cursor = cursorAdapter.getCursor();
-            if (newText.startsWith(mQuery) && cursor != null && cursor.getCount() == 0) {
+        CursorAdapter adapter = mSearch.getSuggestionsAdapter();
+        if (adapter != null) {
+            Cursor cursor = adapter.getCursor();
+            int count = cursor != null ? cursor.getCount() - 1 : -1;
+            if (newText.startsWith(mQuery) && count == 0) {
                 // nothing found on previous query
             } else {
                 mQuery = newText;
-                cursorAdapter.changeCursor(null);
+                adapter.changeCursor(null);
                 getSupportLoaderManager().restartLoader(1, null, mSuggestionCallback);
             }
         }
@@ -401,8 +407,12 @@ public class SearchActivity extends BaseActivity implements
     public boolean onSuggestionClick(int position) {
         Cursor cursor = mSearch.getSuggestionsAdapter().getCursor();
         if (cursor.moveToPosition(position)) {
-            mQuery = cursor.getString(1);
-            mSearch.setQuery(mQuery, false);
+            if (position == cursor.getCount() - 1) {
+                new SuggestionDeletionTask(mSearchType.getSelectedItemPosition()).schedule();
+            } else {
+                mQuery = cursor.getString(1);
+                mSearch.setQuery(mQuery, false);
+            }
         }
         return true;
     }
@@ -470,6 +480,77 @@ public class SearchActivity extends BaseActivity implements
 
         @Override
         protected void onSuccess(Void result) {
+        }
+    }
+
+    private class SuggestionDeletionTask extends BackgroundTask<Void> {
+        private int mType;
+
+        public SuggestionDeletionTask(int type) {
+            super(SearchActivity.this);
+            mType = type;
+        }
+
+        @Override
+        protected Void run() throws Exception {
+            getContentResolver().delete(SuggestionsProvider.Columns.CONTENT_URI,
+                    SuggestionsProvider.Columns.TYPE + " = ?",
+                    new String[] { String.valueOf(mType) });
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            mSearch.getSuggestionsAdapter().changeCursor(null);
+        }
+    }
+    private static class SuggestionAdapter extends CursorAdapter {
+        private LayoutInflater mInflater;
+
+        public SuggestionAdapter(Context context) {
+            super(context, null, false);
+            mInflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public Cursor swapCursor(Cursor newCursor) {
+            if (newCursor != null && newCursor.getCount() > 0) {
+                MatrixCursor clearRowCursor = new MatrixCursor(SUGGESTION_PROJECTION);
+                clearRowCursor.addRow(new Object[] {
+                    Long.MAX_VALUE,
+                    mContext.getString(R.string.clear_suggestions)
+                });
+                newCursor = new MergeCursor(new Cursor[] { newCursor, clearRowCursor });
+            }
+            return super.swapCursor(newCursor);
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return isClearRow(position) ? 1 : 0;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 2;
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            @LayoutRes int layoutResId = isClearRow(cursor.getPosition())
+                    ? R.layout.row_suggestion_clear : R.layout.row_suggestion;
+            return mInflater.inflate(layoutResId, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            TextView textView = (TextView) view;
+            int columnIndex = cursor.getColumnIndexOrThrow(SuggestionsProvider.Columns.SUGGESTION);
+            textView.setText(cursor.getString(columnIndex));
+        }
+
+        private boolean isClearRow(int position) {
+            return position == getCount() - 1;
         }
     }
 }
