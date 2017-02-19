@@ -271,6 +271,14 @@ public class IssueActivity extends BaseActivity implements
         if (!StringUtils.isBlank(body)) {
             body = HtmlUtils.format(body).toString();
             mImageGetter.bind(descriptionView, body, mIssue.getNumber());
+
+            descriptionView.setCustomSelectionActionModeCallback(
+                    new UiUtils.QuoteActionModeCallback(descriptionView) {
+                @Override
+                public void onTextQuoted(CharSequence text) {
+                    quoteText(text);
+                }
+            });
         } else {
             SpannableString noDescriptionString = new SpannableString(getString(R.string.issue_no_description));
             noDescriptionString.setSpan(new StyleSpan(Typeface.ITALIC), 0, noDescriptionString.length(), 0);
