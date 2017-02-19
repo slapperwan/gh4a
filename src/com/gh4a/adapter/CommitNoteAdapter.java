@@ -15,9 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.User;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -40,20 +37,24 @@ import com.gh4a.utils.UiUtils;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.User;
+
 public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdapter.ViewHolder>
         implements View.OnClickListener {
-    public interface OnEditComment {
+    public interface OnCommentAction {
         void editComment(CommitComment comment);
+        void quoteText(CharSequence text);
     }
 
     private final String mRepoOwner;
     private final HttpImageGetter mImageGetter;
-    private final OnEditComment mEditCallback;
+    private final OnCommentAction mActionCallback;
 
-    public CommitNoteAdapter(Context context, String repoOwner, OnEditComment editCallback) {
+    public CommitNoteAdapter(Context context, String repoOwner, OnCommentAction actionCallback) {
         super(context);
         mRepoOwner = repoOwner;
-        mEditCallback = editCallback;
+        mActionCallback = actionCallback;
         mImageGetter = new HttpImageGetter(context);
     }
 
@@ -86,11 +87,19 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
         mImageGetter.bind(holder.tvDesc, body, comment.getId());
 
+        holder.tvDesc.setCustomSelectionActionModeCallback(
+                new UiUtils.QuoteActionModeCallback(holder.tvDesc) {
+            @Override
+            public void onTextQuoted(CharSequence text) {
+                mActionCallback.quoteText(text);
+            }
+        });
+
         String ourLogin = Gh4Application.get().getAuthLogin();
         boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
                 || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
 
-        if (mEditCallback != null && canEdit) {
+        if (mActionCallback != null && canEdit) {
             holder.ivEdit.setVisibility(View.VISIBLE);
             holder.ivEdit.setTag(comment);
             holder.ivEdit.setOnClickListener(this);
@@ -123,7 +132,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
             }
         } else if (v.getId() == R.id.iv_edit) {
             CommitComment comment = (CommitComment) v.getTag();
-            mEditCallback.editComment(comment);
+            mActionCallback.editComment(comment);
         } else {
             super.onClick(v);
         }

@@ -70,7 +70,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> implements
-        View.OnClickListener, IssueEventAdapter.OnEditComment, CommentBoxFragment.Callback {
+        View.OnClickListener, IssueEventAdapter.OnCommentAction, CommentBoxFragment.Callback {
     private static final int REQUEST_EDIT = 1000;
 
     private View mListHeaderView;
@@ -460,6 +460,11 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                         mRepoOwner, mRepoName, (CommitComment) comment)
                 : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName, comment);
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
+    public void quoteText(CharSequence text) {
+        mCommentFragment.addQuote(text);
     }
 
     @Override

@@ -40,6 +40,25 @@ public class CommentBoxFragment extends Fragment implements
         updateLockState();
     }
 
+    public void addQuote(CharSequence text) {
+        Editable editable = mCommentEditor.getText();
+        if (editable != null && editable.length() > 0) {
+            String string = editable.toString();
+            if (!string.endsWith("\n\n")) {
+                editable.append('\n');
+
+                if (!string.endsWith("\n")) {
+                    editable.append("\n");
+                }
+            }
+        }
+
+        mCommentEditor.append("> " + text.toString().replace("\n", "\n> ") + "\n\n");
+        mCommentEditor.requestFocus();
+        mCommentEditor.setSelection(mCommentEditor.length());
+        UiUtils.showImeForView(mCommentEditor);
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

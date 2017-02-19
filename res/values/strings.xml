@@ -108,6 +108,7 @@
     <string name="comment_editor_locked_hint">Comments are only available to collaborators</string>
     <string name="org_user_template">%1$s (organization)</string>
     <string name="clear_suggestions">Clear suggestions</string>
+    <string name="quote">Quote</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>

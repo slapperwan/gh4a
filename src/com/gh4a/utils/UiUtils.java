@@ -1,13 +1,5 @@
 package com.gh4a.utils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import com.gh4a.BaseActivity;
-import com.gh4a.Gh4Application;
-import com.gh4a.R;
-
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.DownloadManager;
@@ -31,7 +23,9 @@ import android.text.Editable;
 import android.text.Spannable;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.view.ActionMode;
 import android.view.ContextThemeWrapper;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,6 +35,14 @@ import android.widget.EdgeEffect;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.gh4a.BaseActivity;
+import com.gh4a.Gh4Application;
+import com.gh4a.R;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class UiUtils {
     public static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
@@ -69,6 +71,15 @@ public class UiUtils {
         InputMethodManager imm = (InputMethodManager)
                 view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+
+    public static void showImeForView(View view) {
+        if (view == null) {
+            return;
+        }
+        InputMethodManager imm = (InputMethodManager)
+                view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT);
     }
 
     public static int textColorForBackground(Context context, int backgroundColor) {
@@ -343,5 +354,56 @@ public class UiUtils {
                 mItem.setEnabled(!isEmpty);
             }
         }
+    }
+
+    public static CharSequence getSelectedText(TextView view) {
+        int min = 0;
+        int max = view.length();
+
+        if (view.isFocused()) {
+            int selectionStart = view.getSelectionStart();
+            int selectionEnd = view.getSelectionEnd();
+
+            min = Math.max(0, Math.min(selectionStart, selectionEnd));
+            max = Math.max(0, Math.max(selectionStart, selectionEnd));
+        }
+
+        return view.getText().subSequence(min, max);
+    }
+
+    public static abstract class QuoteActionModeCallback implements ActionMode.Callback {
+        private final TextView mView;
+
+        public QuoteActionModeCallback(TextView view) {
+            mView = view;
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            mode.getMenuInflater().inflate(R.menu.comment_selection_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            if (item.getItemId() != R.id.quote) {
+                return false;
+            }
+
+            onTextQuoted(UiUtils.getSelectedText(mView));
+            mode.finish();
+            return true;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+        }
+
+        public abstract void onTextQuoted(CharSequence text);
     }
 }

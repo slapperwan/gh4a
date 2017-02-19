@@ -75,7 +75,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class IssueActivity extends BaseActivity implements
-        View.OnClickListener, IssueEventAdapter.OnEditComment,
+        View.OnClickListener, IssueEventAdapter.OnCommentAction,
         SwipeRefreshLayout.ChildScrollDelegate, CommentBoxFragment.Callback {
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
         return new Intent(context, IssueActivity.class)
@@ -502,6 +502,11 @@ public class IssueActivity extends BaseActivity implements
     public void editComment(Comment comment) {
         Intent intent = EditIssueCommentActivity.makeIntent(this, mRepoOwner, mRepoName, comment);
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
+    public void quoteText(CharSequence text) {
+        mCommentFragment.addQuote(text);
     }
 
     @Override
