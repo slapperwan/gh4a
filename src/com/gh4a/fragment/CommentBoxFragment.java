@@ -117,8 +117,10 @@ public class CommentBoxFragment extends Fragment implements
             return;
         }
 
+        boolean isEmpty = mCommentEditor.getText() == null || mCommentEditor.getText().length() == 0;
+
         mCommentEditor.setEnabled(!mLocked);
-        mSendButton.setEnabled(!mLocked);
+        mSendButton.setEnabled(!mLocked && !isEmpty);
 
         int hintResId = mLocked
                 ? R.string.comment_editor_locked_hint : mCallback.getCommentEditorHintResId();
