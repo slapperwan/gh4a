@@ -15,11 +15,11 @@
         android:id="@+id/share"
         android:icon="@drawable/social_share"
         android:title="@string/share"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/browser"
         android:icon="@drawable/web_site"
         android:title="@string/open_in_browser"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 </menu>
