@@ -41,6 +41,10 @@ public class CommentBoxFragment extends Fragment implements
     }
 
     public void addQuote(CharSequence text) {
+        if (mLocked) {
+            return;
+        }
+
         Editable editable = mCommentEditor.getText();
         if (editable != null && editable.length() > 0) {
             String string = editable.toString();

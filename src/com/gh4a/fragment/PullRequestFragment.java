@@ -219,6 +219,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     protected RootAdapter<IssueEventHolder, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName,
                 mPullRequest.getNumber(), this);
+        mAdapter.setLocked(isLocked());
         return mAdapter;
     }
 
@@ -255,10 +256,13 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
     }
 
+    private boolean isLocked() {
+        return mPullRequest.isLocked() && !mIsCollaborator;
+    }
+
     private void updateCommentLockState() {
         if (mCommentFragment != null) {
-            boolean locked = mPullRequest.isLocked() && !mIsCollaborator;
-            mCommentFragment.setLocked(locked);
+            mCommentFragment.setLocked(isLocked());
         }
     }
 
@@ -282,13 +286,17 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             body = HtmlUtils.format(body).toString();
             mImageGetter.bind(descriptionView, body, mPullRequest.getId());
 
-            descriptionView.setCustomSelectionActionModeCallback(
-                    new UiUtils.QuoteActionModeCallback(descriptionView) {
-                @Override
-                public void onTextQuoted(CharSequence text) {
-                    quoteText(text);
-                }
-            });
+            if (!isLocked()) {
+                descriptionView.setCustomSelectionActionModeCallback(
+                        new UiUtils.QuoteActionModeCallback(descriptionView) {
+                    @Override
+                    public void onTextQuoted(CharSequence text) {
+                        quoteText(text);
+                    }
+                });
+            } else {
+                descriptionView.setCustomSelectionActionModeCallback(null);
+            }
         } else {
             SpannableString noDescriptionString = new SpannableString(getString(R.string.issue_no_description));
             noDescriptionString.setSpan(new StyleSpan(Typeface.ITALIC), 0, noDescriptionString.length(), 0);

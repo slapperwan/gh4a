@@ -88,6 +88,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     private final String mRepoOwner;
     private final String mRepoName;
     private final int mIssueId;
+    private boolean mLocked;
 
     public IssueEventAdapter(Context context, String repoOwner, String repoName,
             int issueId, OnCommentAction actionCallback) {
@@ -109,6 +110,10 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
 
     public void destroy() {
         mImageGetter.destroy();
+    }
+
+    public void setLocked(boolean locked) {
+        mLocked = locked;
     }
 
     @Override
@@ -166,13 +171,17 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
             mImageGetter.bind(holder.tvDesc, body, event.comment.getId());
 
-            holder.tvDesc.setCustomSelectionActionModeCallback(
-                    new UiUtils.QuoteActionModeCallback(holder.tvDesc) {
-                @Override
-                public void onTextQuoted(CharSequence text) {
-                    mActionCallback.quoteText(text);
-                }
-            });
+            if (!mLocked) {
+                holder.tvDesc.setCustomSelectionActionModeCallback(
+                        new UiUtils.QuoteActionModeCallback(holder.tvDesc) {
+                    @Override
+                    public void onTextQuoted(CharSequence text) {
+                        mActionCallback.quoteText(text);
+                    }
+                });
+            } else {
+                holder.tvDesc.setCustomSelectionActionModeCallback(null);
+            }
 
             holder.ivIssueEvent.setVisibility(View.GONE);
         } else {

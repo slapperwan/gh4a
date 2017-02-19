@@ -271,14 +271,6 @@ public class IssueActivity extends BaseActivity implements
         if (!StringUtils.isBlank(body)) {
             body = HtmlUtils.format(body).toString();
             mImageGetter.bind(descriptionView, body, mIssue.getNumber());
-
-            descriptionView.setCustomSelectionActionModeCallback(
-                    new UiUtils.QuoteActionModeCallback(descriptionView) {
-                @Override
-                public void onTextQuoted(CharSequence text) {
-                    quoteText(text);
-                }
-            });
         } else {
             SpannableString noDescriptionString = new SpannableString(getString(R.string.issue_no_description));
             noDescriptionString.setSpan(new StyleSpan(Typeface.ITALIC), 0, noDescriptionString.length(), 0);
@@ -431,6 +423,20 @@ public class IssueActivity extends BaseActivity implements
     private void updateCommentLockState() {
         boolean locked = mIssue != null && mIssue.isLocked() && !mIsCollaborator;
         mCommentFragment.setLocked(locked);
+        mEventAdapter.setLocked(locked);
+
+        TextView descriptionView = (TextView) mListHeaderView.findViewById(R.id.tv_desc);
+        if (!locked) {
+            descriptionView.setCustomSelectionActionModeCallback(
+                    new UiUtils.QuoteActionModeCallback(descriptionView) {
+                @Override
+                public void onTextQuoted(CharSequence text) {
+                    quoteText(text);
+                }
+            });
+        } else {
+            descriptionView.setCustomSelectionActionModeCallback(null);
+        }
     }
 
     private void updateFabVisibility() {
