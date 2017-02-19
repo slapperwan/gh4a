@@ -114,6 +114,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
 
     public void setLocked(boolean locked) {
         mLocked = locked;
+        notifyDataSetChanged();
     }
 
     @Override
