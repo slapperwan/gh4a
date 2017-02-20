@@ -110,7 +110,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     protected RootAdapter<CommitComment, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        mAdapter = new CommitNoteAdapter(getActivity(), mRepoOwner, this);
+        mAdapter = new CommitNoteAdapter(getActivity(), mRepoOwner, mRepoName, this);
         return mAdapter;
     }
 

@@ -18,10 +18,12 @@ package com.gh4a.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -47,15 +49,44 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         void quoteText(CharSequence text);
     }
 
-    private final String mRepoOwner;
+    private final ViewHolder.OnCommentMenuItemClick mCommentMenuItemClickCallback =
+            new ViewHolder.OnCommentMenuItemClick() {
+        @Override
+        public boolean onCommentMenuItemClick(CommitComment comment, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.edit:
+                    mActionCallback.editComment(comment);
+                    return true;
+
+                case R.id.share:
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT,
+                            mContext.getString(R.string.share_commit_comment_subject,
+                                    comment.getId(),
+                                    mRepoOwner + "/" + mRepoName));
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, comment.getHtmlUrl());
+                    shareIntent = Intent.createChooser(shareIntent,
+                            mContext.getString(R.string.share_title));
+                    mContext.startActivity(shareIntent);
+                    return true;
+            }
+            return false;
+        }
+    };
+
     private final HttpImageGetter mImageGetter;
     private final OnCommentAction mActionCallback;
+    private final String mRepoOwner;
+    private final String mRepoName;
 
-    public CommitNoteAdapter(Context context, String repoOwner, OnCommentAction actionCallback) {
+    public CommitNoteAdapter(Context context, String repoOwner, String repoName,
+            OnCommentAction actionCallback) {
         super(context);
-        mRepoOwner = repoOwner;
-        mActionCallback = actionCallback;
         mImageGetter = new HttpImageGetter(context);
+        mRepoOwner = repoOwner;
+        mRepoName = repoName;
+        mActionCallback = actionCallback;
     }
 
     public void destroy() {
@@ -65,7 +96,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
-        ViewHolder holder = new ViewHolder(v);
+        ViewHolder holder = new ViewHolder(v, mCommentMenuItemClickCallback);
         holder.ivGravatar.setOnClickListener(this);
         return holder;
     }
@@ -95,17 +126,14 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
             }
         });
 
+        holder.ivMenu.setTag(comment);
+
         String ourLogin = Gh4Application.get().getAuthLogin();
         boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
                 || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
+        MenuItem editMenuItem = holder.mPopupMenu.getMenu().findItem(R.id.edit);
 
-        if (mActionCallback != null && canEdit) {
-            holder.ivEdit.setVisibility(View.VISIBLE);
-            holder.ivEdit.setTag(comment);
-            holder.ivEdit.setOnClickListener(this);
-        } else {
-            holder.ivEdit.setVisibility(View.GONE);
-        }
+        editMenuItem.setVisible(mActionCallback != null && canEdit);
     }
 
     public void resume() {
@@ -130,29 +158,53 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
             if (intent != null) {
                 mContext.startActivity(intent);
             }
-        } else if (v.getId() == R.id.iv_edit) {
-            CommitComment comment = (CommitComment) v.getTag();
-            mActionCallback.editComment(comment);
         } else {
             super.onClick(v);
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private ViewHolder(View view) {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+            PopupMenu.OnMenuItemClickListener {
+        private interface OnCommentMenuItemClick {
+            boolean onCommentMenuItemClick(CommitComment comment, MenuItem item);
+        }
+
+        private ViewHolder(View view, OnCommentMenuItemClick commentMenuItemClickCallback) {
             super(view);
+            mCommentMenuItemClickCallback = commentMenuItemClickCallback;
+
             ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
             tvDesc = (TextView) view.findViewById(R.id.tv_desc);
             tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
             tvExtra = (TextView) view.findViewById(R.id.tv_extra);
             tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            ivEdit = (ImageView) view.findViewById(R.id.iv_edit);
+            ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
+            ivMenu.setOnClickListener(this);
+
+            mPopupMenu = new PopupMenu(view.getContext(), ivMenu);
+            mPopupMenu.getMenuInflater().inflate(R.menu.comment_menu, mPopupMenu.getMenu());
+            mPopupMenu.setOnMenuItemClickListener(this);
         }
 
         private final ImageView ivGravatar;
         private final TextView tvDesc;
         private final TextView tvExtra;
         private final TextView tvTimestamp;
-        private final ImageView ivEdit;
+        private final ImageView ivMenu;
+        private final PopupMenu mPopupMenu;
+        private final OnCommentMenuItemClick mCommentMenuItemClickCallback;
+
+        @Override
+        public void onClick(View v) {
+            if (v.getId() == R.id.iv_menu) {
+                mPopupMenu.show();
+            }
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            CommitComment comment = (CommitComment) ivMenu.getTag();
+            return mCommentMenuItemClickCallback.onCommentMenuItemClick(comment, item);
+        }
     }
 }
