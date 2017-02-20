@@ -576,7 +576,7 @@ public class IssueListActivity extends BasePagerActivity implements
             public void onClick(DialogInterface dialog, int which) {
                 mSelectedAssignee = which == 0 ? null
                         : which == 1 ? ""
-                        : mAssignees.get(which - 1).getLogin();
+                        : mAssignees.get(which - 2).getLogin();
                 dialog.dismiss();
                 reloadIssueList();
             }
