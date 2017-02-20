@@ -102,7 +102,8 @@ public class BrowseFilter extends AppCompatActivity {
             } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {
-                        intent = IssueActivity.makeIntent(this, user, repo, Integer.parseInt(id));
+                        intent = IssueActivity.makeIntent(this, user, repo,
+                                Integer.parseInt(id), extractIssueCommentId(uri.getFragment()));
                     } catch (NumberFormatException e) {
                         // ignored
                     }
@@ -115,7 +116,8 @@ public class BrowseFilter extends AppCompatActivity {
                 intent = WikiListActivity.makeIntent(this, user, repo, null);
             } else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
                 try {
-                    intent = PullRequestActivity.makeIntent(this, user, repo, Integer.parseInt(id));
+                    intent = PullRequestActivity.makeIntent(this, user, repo,
+                            Integer.parseInt(id), extractIssueCommentId(uri.getFragment()));
                 } catch (NumberFormatException e) {
                     // ignored
                 }
@@ -133,6 +135,16 @@ public class BrowseFilter extends AppCompatActivity {
             IntentUtils.launchBrowser(this, uri);
         }
         finish();
+    }
+
+    private long extractIssueCommentId(String fragment) {
+        if (fragment != null && fragment.startsWith("issuecomment-")) {
+            try {
+                return Long.parseLong(fragment.substring(13));
+            } catch (NumberFormatException e) {
+            }
+        }
+        return -1;
     }
 
     public static class ProgressDialogFragment extends DialogFragment {

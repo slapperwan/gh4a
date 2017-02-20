@@ -78,6 +78,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     private Issue mIssue;
     private String mRepoOwner;
     private String mRepoName;
+    private long mInitialCommentId;
     private boolean mIsCollaborator;
     private boolean mListShown;
     private CommentBoxFragment mCommentFragment;
@@ -99,13 +100,14 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     };
 
     public static PullRequestFragment newInstance(PullRequest pr, Issue issue,
-            boolean isCollaborator) {
+            boolean isCollaborator, long initialCommentId) {
         PullRequestFragment f = new PullRequestFragment();
 
         Bundle args = new Bundle();
         args.putSerializable("pr", pr);
         args.putSerializable("issue", issue);
         args.putSerializable("collaborator", isCollaborator);
+        args.putLong("initial_comment", initialCommentId);
         f.setArguments(args);
 
         return f;
@@ -126,6 +128,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         mPullRequest = (PullRequest) getArguments().getSerializable("pr");
         mIssue = (Issue) getArguments().getSerializable("issue");
         mIsCollaborator = getArguments().getBoolean("collaborator");
+        mInitialCommentId = getArguments().getLong("initial_comment", -1);
 
         Repository repo = mPullRequest.getBase().getRepo();
         mRepoOwner = repo.getOwner().getLogin();
@@ -221,6 +224,21 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                 mPullRequest.getNumber(), this);
         mAdapter.setLocked(isLocked());
         return mAdapter;
+    }
+
+    @Override
+    protected void onAddData(RootAdapter<IssueEventHolder, ?> adapter, List<IssueEventHolder> data) {
+        super.onAddData(adapter, data);
+        if (mInitialCommentId >= 0) {
+            for (int i = 0; i < data.size(); i++) {
+                IssueEventHolder event = data.get(i);
+                if (event.comment != null && event.comment.getId() == mInitialCommentId) {
+                    getLayoutManager().scrollToPosition(i + 1 /* adjust for header view */);
+                    break;
+                }
+            }
+            mInitialCommentId = -1;
+        }
     }
 
     @Override

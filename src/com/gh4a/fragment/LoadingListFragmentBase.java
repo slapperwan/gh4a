@@ -19,6 +19,7 @@ import com.gh4a.widget.SwipeRefreshLayout;
 public abstract class LoadingListFragmentBase extends LoadingFragmentBase implements
         LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
     private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLayoutManager;
     private TextView mEmptyView;
 
     public interface OnRecyclerViewCreatedListener {
@@ -39,8 +40,9 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
             mEmptyView.setText(emptyTextResId);
         }
 
+        mLayoutManager = new LinearLayoutManager(view.getContext());
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        mRecyclerView.setLayoutManager(mLayoutManager);
         onRecyclerViewInflated(mRecyclerView, inflater);
         if (hasDividers()) {
             mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext()));
@@ -85,7 +87,10 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
     }
 
     protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
+    }
 
+    protected LinearLayoutManager getLayoutManager() {
+        return mLayoutManager;
     }
 
     protected boolean hasDividers() {

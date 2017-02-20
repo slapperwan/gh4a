@@ -80,10 +80,15 @@ public class IssueActivity extends BaseActivity implements
         View.OnClickListener, IssueEventAdapter.OnCommentAction,
         SwipeRefreshLayout.ChildScrollDelegate, CommentBoxFragment.Callback {
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
+        return makeIntent(context, login, repoName, number, -1);
+    }
+    public static Intent makeIntent(Context context, String login, String repoName,
+            int number, long initialCommentId) {
         return new Intent(context, IssueActivity.class)
                 .putExtra("owner", login)
                 .putExtra("repo", repoName)
-                .putExtra("number", number);
+                .putExtra("number", number)
+                .putExtra("initial_comment", initialCommentId);
     }
 
     private static final int REQUEST_EDIT = 1000;
@@ -93,11 +98,13 @@ public class IssueActivity extends BaseActivity implements
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
+    private long mInitialCommentId;
     private ViewGroup mHeader;
     private View mListHeaderView;
     private boolean mEventsLoaded;
     private IssueEventAdapter mEventAdapter;
     private RecyclerView mRecyclerView;
+    private LinearLayoutManager mLayoutManager;
     private boolean mIsCollaborator;
     private IssueStateTrackingFloatingActionButton mEditFab;
     private CommentBoxFragment mCommentFragment;
@@ -132,6 +139,16 @@ public class IssueActivity extends BaseActivity implements
             mEventAdapter.notifyDataSetChanged();
             mEventsLoaded = true;
             fillDataIfDone();
+            if (mInitialCommentId >= 0) {
+                for (int i = 0; i < result.size(); i++) {
+                    IssueEventHolder event = result.get(i);
+                    if (event.comment != null && event.comment.getId() == mInitialCommentId) {
+                        mLayoutManager.scrollToPosition(i + 1 /* adjust for header view */);
+                        break;
+                    }
+                }
+                mInitialCommentId = -1;
+            }
         }
     };
 
@@ -161,8 +178,9 @@ public class IssueActivity extends BaseActivity implements
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
         mImageGetter = new HttpImageGetter(this);
 
@@ -201,6 +219,7 @@ public class IssueActivity extends BaseActivity implements
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
         mIssueNumber = extras.getInt("number");
+        mInitialCommentId = extras.getLong("initial_comment", -1);
     }
 
     @Override

@@ -64,10 +64,15 @@ import java.util.Locale;
 public class PullRequestActivity extends BasePagerActivity implements
         View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
+        return makeIntent(context, repoOwner, repoName, number, -1);
+    }
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            int number, long initialCommentId) {
         return new Intent(context, PullRequestActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
-                .putExtra("number", number);
+                .putExtra("number", number)
+                .putExtra("initial_comment", initialCommentId);
     }
 
     private static final int REQUEST_EDIT_ISSUE = 1001;
@@ -75,6 +80,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
+    private long mInitialCommentId;
     private Boolean mIsCollaborator;
 
     private Issue mIssue;
@@ -236,6 +242,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
         mPullRequestNumber = extras.getInt("number");
+        mInitialCommentId = extras.getLong("initial_comment", -1);
     }
 
     @Override
@@ -282,7 +289,8 @@ public class PullRequestActivity extends BasePagerActivity implements
                     mPullRequestNumber, mPullRequest.getHead().getSha());
         } else {
             mPullRequestFragment = PullRequestFragment.newInstance(mPullRequest,
-                    mIssue, mIsCollaborator);
+                    mIssue, mIsCollaborator, mInitialCommentId);
+            mInitialCommentId = -1;
             return mPullRequestFragment;
         }
     }
