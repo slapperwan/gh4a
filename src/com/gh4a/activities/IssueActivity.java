@@ -19,6 +19,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
@@ -54,6 +55,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
@@ -389,6 +391,9 @@ public class IssueActivity extends BaseActivity implements
                 shareIntent.putExtra(Intent.EXTRA_TEXT,  mIssue.getHtmlUrl());
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
+                return true;
+            case R.id.browser:
+                IntentUtils.launchBrowser(this, Uri.parse(mIssue.getHtmlUrl()));
                 return true;
         }
         return super.onOptionsItemSelected(item);
