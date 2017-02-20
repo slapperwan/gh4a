@@ -8,6 +8,9 @@
             <item
                 android:id="@+id/filter_by_label"
                 android:title="@string/issue_filter_by_labels" />
+            <item
+                android:id="@+id/filter_by_assignee"
+                android:title="@string/issue_filter_by_assignee" />
         </menu>
     </item>
 </menu>

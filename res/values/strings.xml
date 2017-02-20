@@ -351,6 +351,7 @@
     <string name="issue_filter_by_assignee">Filter by assignee</string>
     <string name="issue_filter_by_any_milestone">Any milestone</string>
     <string name="issue_filter_by_any_assignee">Any assignee</string>
+    <string name="issue_filter_by_no_assignee">Unassigned</string>
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
     <string name="issue_no_labels">No labels assigned</string>

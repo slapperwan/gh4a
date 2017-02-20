@@ -43,7 +43,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
-import com.gh4a.loader.CollaboratorListLoader;
+import com.gh4a.loader.AssigneeListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -150,11 +150,11 @@ public class IssueListActivity extends BasePagerActivity implements
         }
     };
 
-    private final LoaderCallbacks<List<User>> mCollaboratorListCallback =
+    private final LoaderCallbacks<List<User>> mAssigneeListCallback =
             new LoaderCallbacks<List<User>>(this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
-            return new CollaboratorListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
+            return new AssigneeListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
 
         @Override
@@ -445,14 +445,16 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private Fragment makeListFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
+        String assigneeQuery = !TextUtils.isEmpty(mSelectedAssignee) ? "assignee:" + mSelectedAssignee
+                : mSelectedAssignee == null ? "" /* null means 'any assignee' */
+                : "no:assignee"; /* empty string means 'unassigned' */
         filterData.put("sort", mSortHelper.getSortMode());
         filterData.put("direction", mSortHelper.getSortDirection());
         filterData.put("q", String.format(Locale.US, LIST_QUERY,
                 position == 1 ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
-                mRepoOwner, mRepoName,
+                mRepoOwner, mRepoName, assigneeQuery,
                 mSelectedLabels != null ? "labels:" + TextUtils.join(",", mSelectedLabels) : "",
-                mSelectedMilestone != null ? "milestone:\"" + mSelectedMilestone + "\"" : "",
-                mSelectedAssignee != null ? "assignee:" + mSelectedAssignee : ""));
+                mSelectedMilestone != null ? "milestone:\"" + mSelectedMilestone + "\"" : ""));
 
         final IssueListFragment f = IssueListFragment.newInstance(filterData,
                 position == 1, R.string.no_issues_found, false);
@@ -555,23 +557,26 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private void showAssigneesDialog() {
-        final String[] assignees = new String[mAssignees.size() + 1];
-        int selected = 0;
+        final String[] assignees = new String[mAssignees.size() + 2];
+        int selected = mSelectedAssignee != null && mSelectedAssignee.isEmpty() ? 1 : 0;
 
         assignees[0] = getResources().getString(R.string.issue_filter_by_any_assignee);
+        assignees[1] = getResources().getString(R.string.issue_filter_by_no_assignee);
 
-        for (int i = 1; i <= mAssignees.size(); i++) {
-            User u = mAssignees.get(i - 1);
-            assignees[i] = u.getLogin();
+        for (int i = 0; i < mAssignees.size(); i++) {
+            User u = mAssignees.get(i);
+            assignees[i + 2] = u.getLogin();
             if (u.getLogin().equalsIgnoreCase(mSelectedAssignee)) {
-                selected = i;
+                selected = i + 2;
             }
         }
 
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSelectedAssignee = which != 0 ? mAssignees.get(which - 1).getLogin() : null;
+                mSelectedAssignee = which == 0 ? null
+                        : which == 1 ? ""
+                        : mAssignees.get(which - 1).getLogin();
                 dialog.dismiss();
                 reloadIssueList();
             }
@@ -588,7 +593,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private void filterAssignee() {
         if (mAssignees == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
-            getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
+            getSupportLoaderManager().initLoader(2, null, mAssigneeListCallback);
         } else {
             showAssigneesDialog();
         }
