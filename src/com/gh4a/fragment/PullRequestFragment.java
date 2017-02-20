@@ -328,6 +328,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         if (assignees != null && !assignees.isEmpty()) {
             ViewGroup assigneeContainer = (ViewGroup) mListHeaderView.findViewById(R.id.assignee_list);
             LayoutInflater inflater = getLayoutInflater(null);
+            assigneeContainer.removeAllViews();
             for (User assignee : assignees) {
                 View row = inflater.inflate(R.layout.row_assignee, assigneeContainer, false);
                 TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
