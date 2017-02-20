@@ -21,6 +21,7 @@ import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.StyleableTextView;
 
@@ -107,6 +108,16 @@ public class StringUtils {
             return DateUtils.getRelativeTimeSpanString(context, time, true);
         }
         return Gh4Application.get().getPrettyTimeInstance().format(date);
+    }
+
+    public static CharSequence formatRelativeTimeWithEditTime(Context context,
+            Date date, Date editDate, boolean showDateIfLongAgo) {
+        final CharSequence time = formatRelativeTime(context, date, showDateIfLongAgo);
+        if (date.equals(editDate)) {
+            return time;
+        }
+        final CharSequence editTime = formatRelativeTime(context, editDate, showDateIfLongAgo);
+        return context.getString(R.string.issue_comment_edited_timestamp_format, time, editTime);
     }
 
     public static void applyBoldTagsAndSetText(StyleableTextView view, String input) {

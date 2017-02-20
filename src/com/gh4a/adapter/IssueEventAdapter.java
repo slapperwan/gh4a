@@ -133,8 +133,8 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         StringUtils.applyBoldTagsAndSetText(holder.tvExtra,
                 mContext.getString(R.string.issue_comment_header,
                         ApiHelpers.getUserLogin(mContext, event.getUser())));
-        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                event.getCreatedAt(), true));
+        holder.tvTimestamp.setText(StringUtils.formatRelativeTimeWithEditTime(mContext,
+                event.getCreatedAt(), event.getUpdatedAt(), true));
 
         if (event.comment instanceof CommitComment) {
             final CommitComment commitComment = (CommitComment) event.comment;

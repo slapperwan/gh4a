@@ -37,6 +37,10 @@ public class IssueEventHolder {
         return comment != null ? comment.getCreatedAt() : event.getCreatedAt();
     }
 
+    public Date getUpdatedAt() {
+        return comment != null ? comment.getUpdatedAt() : event.getCreatedAt();
+    }
+
     public User getUser() {
         if (comment != null) {
             return comment.getUser();

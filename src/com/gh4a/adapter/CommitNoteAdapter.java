@@ -81,8 +81,8 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
 
         holder.ivGravatar.setTag(user);
         holder.tvExtra.setText(userName);
-        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                comment.getCreatedAt(), true));
+        holder.tvTimestamp.setText(StringUtils.formatRelativeTimeWithEditTime(mContext,
+                comment.getCreatedAt(), comment.getUpdatedAt(), true));
 
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
         mImageGetter.bind(holder.tvDesc, body, comment.getId());

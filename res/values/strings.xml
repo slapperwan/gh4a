@@ -366,6 +366,7 @@
     <string name="issue_commit_comment_file">Comment on [b][file][/b]</string>
     <string name="commit_comment_header">%1$s added a note %2$s</string>
     <string name="issue_no_description">No description provided.</string>
+    <string name="issue_comment_edited_timestamp_format">%1$s (edited %2$s)</string>
 
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
