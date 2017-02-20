@@ -69,6 +69,7 @@
     <attr name="issueEventMilestonedIcon" format="reference" />
     <attr name="issueEventDemilestonedIcon" format="reference" />
     <attr name="issueEventRenamedIcon" format="reference" />
+    <attr name="overflowIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension" />
