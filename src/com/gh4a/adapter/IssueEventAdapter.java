@@ -58,8 +58,9 @@ import java.util.regex.Pattern;
 
 public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventAdapter.ViewHolder>
         implements View.OnClickListener {
-    public interface OnEditComment {
+    public interface OnCommentAction {
         void editComment(Comment comment);
+        void quoteText(CharSequence text);
     }
 
     private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
@@ -83,19 +84,20 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     }
 
     private final HttpImageGetter mImageGetter;
-    private final OnEditComment mEditCallback;
+    private final OnCommentAction mActionCallback;
     private final String mRepoOwner;
     private final String mRepoName;
     private final int mIssueId;
+    private boolean mLocked;
 
     public IssueEventAdapter(Context context, String repoOwner, String repoName,
-            int issueId, OnEditComment editCallback) {
+            int issueId, OnCommentAction actionCallback) {
         super(context);
         mImageGetter = new HttpImageGetter(mContext);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mIssueId = issueId;
-        mEditCallback = editCallback;
+        mActionCallback = actionCallback;
     }
 
     public void resume() {
@@ -110,6 +112,11 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         mImageGetter.destroy();
     }
 
+    public void setLocked(boolean locked) {
+        mLocked = locked;
+        notifyDataSetChanged();
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
@@ -119,7 +126,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, IssueEventHolder event) {
+    public void onBindViewHolder(final ViewHolder holder, IssueEventHolder event) {
         AvatarHandler.assignAvatar(holder.ivGravatar, event.getUser());
         holder.ivGravatar.setTag(event);
 
@@ -165,6 +172,18 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
             mImageGetter.bind(holder.tvDesc, body, event.comment.getId());
 
+            if (!mLocked) {
+                holder.tvDesc.setCustomSelectionActionModeCallback(
+                        new UiUtils.QuoteActionModeCallback(holder.tvDesc) {
+                    @Override
+                    public void onTextQuoted(CharSequence text) {
+                        mActionCallback.quoteText(text);
+                    }
+                });
+            } else {
+                holder.tvDesc.setCustomSelectionActionModeCallback(null);
+            }
+
             holder.ivIssueEvent.setVisibility(View.GONE);
         } else {
             holder.tvDesc.setTag(null);
@@ -183,7 +202,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         String ourLogin = Gh4Application.get().getAuthLogin();
         boolean canEdit = ApiHelpers.loginEquals(event.getUser(), ourLogin)
                 || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
-        if (event.comment != null && canEdit && mEditCallback != null) {
+        if (event.comment != null && canEdit && mActionCallback != null) {
             holder.ivEdit.setVisibility(View.VISIBLE);
             holder.ivEdit.setTag(event.comment);
             holder.ivEdit.setOnClickListener(this);
@@ -352,7 +371,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             }
         } else if (v.getId() == R.id.iv_edit) {
             Comment comment = (Comment) v.getTag();
-            mEditCallback.editComment(comment);
+            mActionCallback.editComment(comment);
         } else {
             super.onClick(v);
         }

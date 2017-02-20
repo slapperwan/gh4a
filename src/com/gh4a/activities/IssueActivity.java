@@ -77,7 +77,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class IssueActivity extends BaseActivity implements
-        View.OnClickListener, IssueEventAdapter.OnEditComment,
+        View.OnClickListener, IssueEventAdapter.OnCommentAction,
         SwipeRefreshLayout.ChildScrollDelegate, CommentBoxFragment.Callback {
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
         return new Intent(context, IssueActivity.class)
@@ -428,6 +428,20 @@ public class IssueActivity extends BaseActivity implements
     private void updateCommentLockState() {
         boolean locked = mIssue != null && mIssue.isLocked() && !mIsCollaborator;
         mCommentFragment.setLocked(locked);
+        mEventAdapter.setLocked(locked);
+
+        TextView descriptionView = (TextView) mListHeaderView.findViewById(R.id.tv_desc);
+        if (!locked) {
+            descriptionView.setCustomSelectionActionModeCallback(
+                    new UiUtils.QuoteActionModeCallback(descriptionView) {
+                @Override
+                public void onTextQuoted(CharSequence text) {
+                    quoteText(text);
+                }
+            });
+        } else {
+            descriptionView.setCustomSelectionActionModeCallback(null);
+        }
     }
 
     private void updateFabVisibility() {
@@ -507,6 +521,11 @@ public class IssueActivity extends BaseActivity implements
     public void editComment(Comment comment) {
         Intent intent = EditIssueCommentActivity.makeIntent(this, mRepoOwner, mRepoName, comment);
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
+    public void quoteText(CharSequence text) {
+        mCommentFragment.addQuote(text);
     }
 
     @Override

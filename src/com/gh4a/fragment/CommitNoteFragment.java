@@ -1,12 +1,5 @@
 package com.gh4a.fragment;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.CommitService;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,8 +19,15 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
 
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.CommitService;
+
+import java.io.IOException;
+import java.util.List;
+
 public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
-        CommitNoteAdapter.OnEditComment, CommentBoxFragment.Callback {
+        CommitNoteAdapter.OnCommentAction, CommentBoxFragment.Callback {
     public static CommitNoteFragment newInstance(String repoOwner, String repoName, String commitSha) {
         CommitNoteFragment f = new CommitNoteFragment();
 
@@ -145,6 +145,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         Intent intent = EditCommitCommentActivity.makeIntent(getActivity(),
                 mRepoOwner, mRepoName, comment);
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
+    public void quoteText(CharSequence text) {
+        mCommentFragment.addQuote(text);
     }
 
     @Override

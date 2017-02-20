@@ -70,7 +70,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> implements
-        View.OnClickListener, IssueEventAdapter.OnEditComment, CommentBoxFragment.Callback {
+        View.OnClickListener, IssueEventAdapter.OnCommentAction, CommentBoxFragment.Callback {
     private static final int REQUEST_EDIT = 1000;
 
     private View mListHeaderView;
@@ -219,6 +219,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     protected RootAdapter<IssueEventHolder, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName,
                 mPullRequest.getNumber(), this);
+        mAdapter.setLocked(isLocked());
         return mAdapter;
     }
 
@@ -255,10 +256,13 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         }
     }
 
+    private boolean isLocked() {
+        return mPullRequest.isLocked() && !mIsCollaborator;
+    }
+
     private void updateCommentLockState() {
         if (mCommentFragment != null) {
-            boolean locked = mPullRequest.isLocked() && !mIsCollaborator;
-            mCommentFragment.setLocked(locked);
+            mCommentFragment.setLocked(isLocked());
         }
     }
 
@@ -281,6 +285,18 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         if (!StringUtils.isBlank(body)) {
             body = HtmlUtils.format(body).toString();
             mImageGetter.bind(descriptionView, body, mPullRequest.getId());
+
+            if (!isLocked()) {
+                descriptionView.setCustomSelectionActionModeCallback(
+                        new UiUtils.QuoteActionModeCallback(descriptionView) {
+                    @Override
+                    public void onTextQuoted(CharSequence text) {
+                        quoteText(text);
+                    }
+                });
+            } else {
+                descriptionView.setCustomSelectionActionModeCallback(null);
+            }
         } else {
             SpannableString noDescriptionString = new SpannableString(getString(R.string.issue_no_description));
             noDescriptionString.setSpan(new StyleSpan(Typeface.ITALIC), 0, noDescriptionString.length(), 0);
@@ -460,6 +476,11 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
                         mRepoOwner, mRepoName, (CommitComment) comment)
                 : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName, comment);
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
+    public void quoteText(CharSequence text) {
+        mCommentFragment.addQuote(text);
     }
 
     @Override
