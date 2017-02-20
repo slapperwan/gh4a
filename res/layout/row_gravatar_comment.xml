@@ -32,14 +32,14 @@
     </FrameLayout>
 
     <ImageView
-        android:id="@+id/iv_edit"
+        android:id="@+id/iv_menu"
         style="@style/SelectableBorderlessItem"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_alignParentRight="true"
         android:layout_marginRight="-8dp"
-        android:src="?attr/contentEditIcon"
-        tools:src="@drawable/content_edit" />
+        android:scaleType="center"
+        android:src="?overflowIcon" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
@@ -58,7 +58,7 @@
         android:layout_alignBaseline="@id/tv_extra"
         android:layout_alignWithParentIfMissing="true"
         android:layout_marginLeft="16dp"
-        android:layout_toLeftOf="@id/iv_edit"
+        android:layout_toLeftOf="@id/iv_menu"
         android:layout_toRightOf="@id/tv_extra"
         android:textAppearance="@style/TextAppearance.VerySmall"
         tools:text="5 days ago" />
@@ -69,7 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/tv_extra"
-        android:layout_toLeftOf="@id/iv_edit"
+        android:layout_toLeftOf="@id/iv_menu"
         android:layout_toRightOf="@id/fl_avatar_container"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="gone"
@@ -83,7 +83,7 @@
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/tv_file"
         android:layout_marginTop="2dp"
-        android:layout_toLeftOf="@id/iv_edit"
+        android:layout_toLeftOf="@id/iv_menu"
         android:layout_toRightOf="@id/fl_avatar_container"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"

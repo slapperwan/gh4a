@@ -447,6 +447,8 @@
     <string name="share_commit_subject">Commit #%1$s at %2$s</string>
     <string name="share_user_subject">User %1$s (%2$s)</string>
     <string name="share_user_subject_loginonly">User %1$s</string>
+    <string name="share_comment_subject">Comment #%1$d in issue %2$d at %3$s</string>
+    <string name="share_commit_comment_subject">Commit comment #%1$d at %2$s</string>
 
     <!-- Webview text size -->
     <string name="menu_text_size">Code view text size</string>

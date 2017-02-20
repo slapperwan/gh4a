@@ -17,11 +17,13 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.TypefaceSpan;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -67,6 +69,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             Pattern.compile(".*github.com\\/repos\\/([^\\/]+)\\/([^\\/]+)\\/commits");
 
     private static final HashMap<String, Integer> EVENT_ICONS = new HashMap<>();
+
     static {
         EVENT_ICONS.put(IssueEvent.TYPE_CLOSED, R.attr.issueEventClosedIcon);
         EVENT_ICONS.put(IssueEvent.TYPE_REOPENED, R.attr.issueEventReopenedIcon);
@@ -82,6 +85,32 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         EVENT_ICONS.put(IssueEvent.TYPE_DEMILESTONED, R.attr.issueEventDemilestonedIcon);
         EVENT_ICONS.put(IssueEvent.TYPE_RENAMED, R.attr.issueEventRenamedIcon);
     }
+
+    private final ViewHolder.OnCommentMenuItemClick mCommentMenuItemClickCallback =
+            new ViewHolder.OnCommentMenuItemClick() {
+        @Override
+        public boolean onCommentMenuItemClick(Comment comment, MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.edit:
+                    mActionCallback.editComment(comment);
+                    return true;
+
+                case R.id.share:
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT,
+                            mContext.getString(R.string.share_comment_subject,
+                                    comment.getId(), mIssueId,
+                                    mRepoOwner + "/" + mRepoName));
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, comment.getHtmlUrl());
+                    shareIntent = Intent.createChooser(shareIntent,
+                            mContext.getString(R.string.share_title));
+                    mContext.startActivity(shareIntent);
+                    return true;
+            }
+            return false;
+        }
+    };
 
     private final HttpImageGetter mImageGetter;
     private final OnCommentAction mActionCallback;
@@ -120,7 +149,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
-        ViewHolder holder = new ViewHolder(v);
+        ViewHolder holder = new ViewHolder(v, mCommentMenuItemClickCallback);
         holder.ivGravatar.setOnClickListener(this);
         return holder;
     }
@@ -169,6 +198,9 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         }
 
         if (event.comment != null) {
+            holder.ivMenu.setTag(event.comment);
+            holder.ivMenu.setVisibility(View.VISIBLE);
+
             String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
             mImageGetter.bind(holder.tvDesc, body, event.comment.getId());
 
@@ -186,13 +218,16 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
 
             holder.ivIssueEvent.setVisibility(View.GONE);
         } else {
+            holder.ivMenu.setVisibility(View.GONE);
+
             holder.tvDesc.setTag(null);
             holder.tvDesc.setText(formatEvent(event.event, event.getUser(),
                     holder.tvExtra.getTypefaceValue(), event.isPullRequestEvent));
 
             Integer eventIconAttr = EVENT_ICONS.get(event.event.getEvent());
             if (eventIconAttr != null) {
-                holder.ivIssueEvent.setImageResource(UiUtils.resolveDrawable(mContext, eventIconAttr));
+                holder.ivIssueEvent.setImageResource(
+                        UiUtils.resolveDrawable(mContext, eventIconAttr));
                 holder.ivIssueEvent.setVisibility(View.VISIBLE);
             } else {
                 holder.ivIssueEvent.setVisibility(View.GONE);
@@ -202,13 +237,9 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         String ourLogin = Gh4Application.get().getAuthLogin();
         boolean canEdit = ApiHelpers.loginEquals(event.getUser(), ourLogin)
                 || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
-        if (event.comment != null && canEdit && mActionCallback != null) {
-            holder.ivEdit.setVisibility(View.VISIBLE);
-            holder.ivEdit.setTag(event.comment);
-            holder.ivEdit.setOnClickListener(this);
-        } else {
-            holder.ivEdit.setVisibility(View.GONE);
-        }
+        MenuItem editMenuItem = holder.mPopupMenu.getMenu().findItem(R.id.edit);
+
+        editMenuItem.setVisible(event.comment != null && canEdit && mActionCallback != null);
     }
 
     private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue,
@@ -369,17 +400,21 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             if (intent != null) {
                 mContext.startActivity(intent);
             }
-        } else if (v.getId() == R.id.iv_edit) {
-            Comment comment = (Comment) v.getTag();
-            mActionCallback.editComment(comment);
         } else {
             super.onClick(v);
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private ViewHolder(View view) {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+            PopupMenu.OnMenuItemClickListener {
+        private interface OnCommentMenuItemClick {
+            boolean onCommentMenuItemClick(Comment comment, MenuItem item);
+        }
+
+        private ViewHolder(View view, OnCommentMenuItemClick commentMenuItemClickCallback) {
             super(view);
+            mCommentMenuItemClickCallback = commentMenuItemClickCallback;
+
             ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
             ivIssueEvent = (ImageView) view.findViewById(R.id.iv_issue_event);
             tvDesc = (TextView) view.findViewById(R.id.tv_desc);
@@ -387,7 +422,12 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             tvExtra = (StyleableTextView) view.findViewById(R.id.tv_extra);
             tvFile = (StyleableTextView) view.findViewById(R.id.tv_file);
             tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            ivEdit = (ImageView) view.findViewById(R.id.iv_edit);
+            ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
+            ivMenu.setOnClickListener(this);
+
+            mPopupMenu = new PopupMenu(view.getContext(), ivMenu);
+            mPopupMenu.getMenuInflater().inflate(R.menu.comment_menu, mPopupMenu.getMenu());
+            mPopupMenu.setOnMenuItemClickListener(this);
         }
 
         private final ImageView ivGravatar;
@@ -396,6 +436,21 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         private final StyleableTextView tvExtra;
         private final StyleableTextView tvFile;
         private final TextView tvTimestamp;
-        private final ImageView ivEdit;
+        private final ImageView ivMenu;
+        private final PopupMenu mPopupMenu;
+        private final OnCommentMenuItemClick mCommentMenuItemClickCallback;
+
+        @Override
+        public void onClick(View v) {
+            if (v.getId() == R.id.iv_menu) {
+                mPopupMenu.show();
+            }
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            Comment comment = (Comment) ivMenu.getTag();
+            return mCommentMenuItemClickCallback.onCommentMenuItemClick(comment, item);
+        }
     }
 }
