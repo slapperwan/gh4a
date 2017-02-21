@@ -70,7 +70,8 @@ import java.util.List;
 import java.util.Map;
 
 public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> implements
-        View.OnClickListener, IssueEventAdapter.OnCommentAction, CommentBoxFragment.Callback {
+        View.OnClickListener, IssueEventAdapter.OnCommentAction<IssueEventHolder>,
+        CommentBoxFragment.Callback {
     private static final int REQUEST_EDIT = 1000;
 
     private View mListHeaderView;
@@ -489,11 +490,11 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
-    public void editComment(Comment comment) {
-        Intent intent = comment instanceof CommitComment
+    public void editComment(IssueEventHolder item) {
+        Intent intent = item.comment instanceof CommitComment
                 ? EditPullRequestCommentActivity.makeIntent(getActivity(),
-                        mRepoOwner, mRepoName, (CommitComment) comment)
-                : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName, comment);
+                        mRepoOwner, mRepoName, (CommitComment) item.comment)
+                : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName, item.comment);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 

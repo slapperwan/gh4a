@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
-        CommitNoteAdapter.OnCommentAction, CommentBoxFragment.Callback {
+        CommitNoteAdapter.OnCommentAction<CommitComment>, CommentBoxFragment.Callback {
     public static CommitNoteFragment newInstance(String repoOwner, String repoName, String commitSha) {
         CommitNoteFragment f = new CommitNoteFragment();
 

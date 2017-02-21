@@ -22,7 +22,7 @@
             tools:src="@drawable/default_avatar" />
 
         <com.gh4a.widget.FixedSizeImageView
-            android:id="@+id/iv_issue_event"
+            android:id="@+id/iv_event_icon"
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_gravity="end|bottom"

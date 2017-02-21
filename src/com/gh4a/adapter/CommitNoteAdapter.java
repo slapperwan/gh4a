@@ -16,204 +16,87 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Typeface;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.User;
 
-public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdapter.ViewHolder>
-        implements View.OnClickListener {
-    public interface OnCommentAction {
-        void editComment(CommitComment comment);
-        void quoteText(CharSequence text);
-    }
+import java.util.Date;
 
-    private final ViewHolder.OnCommentMenuItemClick mCommentMenuItemClickCallback =
-            new ViewHolder.OnCommentMenuItemClick() {
-        @Override
-        public boolean onCommentMenuItemClick(CommitComment comment, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.edit:
-                    mActionCallback.editComment(comment);
-                    return true;
-
-                case R.id.share:
-                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("text/plain");
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                            mContext.getString(R.string.share_commit_comment_subject,
-                                    comment.getId(),
-                                    mRepoOwner + "/" + mRepoName));
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, comment.getHtmlUrl());
-                    shareIntent = Intent.createChooser(shareIntent,
-                            mContext.getString(R.string.share_title));
-                    mContext.startActivity(shareIntent);
-                    return true;
-            }
-            return false;
-        }
-    };
-
-    private final HttpImageGetter mImageGetter;
-    private final OnCommentAction mActionCallback;
-    private final String mRepoOwner;
-    private final String mRepoName;
-
+public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     public CommitNoteAdapter(Context context, String repoOwner, String repoName,
             OnCommentAction actionCallback) {
-        super(context);
-        mImageGetter = new HttpImageGetter(context);
-        mRepoOwner = repoOwner;
-        mRepoName = repoName;
-        mActionCallback = actionCallback;
-    }
-
-    public void destroy() {
-        mImageGetter.destroy();
+        super(context, repoOwner, repoName, actionCallback);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
-        ViewHolder holder = new ViewHolder(v, mCommentMenuItemClickCallback);
-        holder.ivGravatar.setOnClickListener(this);
-        return holder;
+    protected User getUser(CommitComment item) {
+        return item.getUser();
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, CommitComment comment) {
-        User user = comment.getUser();
+    protected Date getCreatedAt(CommitComment item) {
+        return item.getCreatedAt();
+    }
 
-        AvatarHandler.assignAvatar(holder.ivGravatar, user);
+    @Override
+    protected Date getUpdatedAt(CommitComment item) {
+        return item.getUpdatedAt();
+    }
 
-        SpannableString userName = new SpannableString(ApiHelpers.getUserLogin(mContext, user));
+    @Override
+    protected String getUrl(CommitComment item) {
+        return item.getHtmlUrl();
+    }
+
+    @Override
+    protected String getShareSubject(CommitComment item) {
+        return mContext.getString(R.string.share_commit_comment_subject,
+                item.getId(), mRepoOwner + "/" + mRepoName);
+    }
+
+    @Override
+    protected void bindBodyView(CommitComment item, StyleableTextView view,
+            HttpImageGetter imageGetter) {
+        String body = HtmlUtils.format(item.getBodyHtml()).toString();
+        imageGetter.bind(view, body, item.getId());
+    }
+
+    @Override
+    protected void bindExtraView(CommitComment item, StyleableTextView view) {
+        String login = ApiHelpers.getUserLogin(mContext, item.getUser());
+        SpannableString userName = new SpannableString(login);
         userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
-
-        holder.ivGravatar.setTag(user);
-        holder.tvExtra.setText(userName);
-        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                comment.getCreatedAt(), true));
-        if (comment.getCreatedAt().equals(comment.getUpdatedAt())) {
-            holder.tvEditTimestamp.setVisibility(View.GONE);
-        } else {
-            holder.tvEditTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                    comment.getUpdatedAt(), true));
-            holder.tvEditTimestamp.setVisibility(View.VISIBLE);
-        }
-
-        String body = HtmlUtils.format(comment.getBodyHtml()).toString();
-        mImageGetter.bind(holder.tvDesc, body, comment.getId());
-
-        holder.tvDesc.setCustomSelectionActionModeCallback(
-                new UiUtils.QuoteActionModeCallback(holder.tvDesc) {
-            @Override
-            public void onTextQuoted(CharSequence text) {
-                mActionCallback.quoteText(text);
-            }
-        });
-
-        holder.ivMenu.setTag(comment);
-
-        String ourLogin = Gh4Application.get().getAuthLogin();
-        boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
-                || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
-        MenuItem editMenuItem = holder.mPopupMenu.getMenu().findItem(R.id.edit);
-
-        editMenuItem.setVisible(mActionCallback != null && canEdit);
-    }
-
-    public void resume() {
-        mImageGetter.resume();
-    }
-
-    public void pause() {
-        mImageGetter.pause();
+        view.setText(userName);
     }
 
     @Override
-    public void clear() {
-        super.clear();
-        mImageGetter.clearHtmlCache();
+    protected void bindFileView(CommitComment item, StyleableTextView view) {
+        view.setVisibility(View.GONE);
     }
 
     @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.iv_gravatar) {
-            User user = (User) v.getTag();
-            Intent intent = UserActivity.makeIntent(mContext, user);
-            if (intent != null) {
-                mContext.startActivity(intent);
-            }
-        } else {
-            super.onClick(v);
-        }
+    protected void bindEventIcon(CommitComment item, ImageView view) {
+        view.setVisibility(View.GONE);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
-            PopupMenu.OnMenuItemClickListener {
-        private interface OnCommentMenuItemClick {
-            boolean onCommentMenuItemClick(CommitComment comment, MenuItem item);
-        }
+    @Override
+    protected boolean hasActionMenu(CommitComment item) {
+        return true;
+    }
 
-        private ViewHolder(View view, OnCommentMenuItemClick commentMenuItemClickCallback) {
-            super(view);
-            mCommentMenuItemClickCallback = commentMenuItemClickCallback;
-
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-            tvExtra = (TextView) view.findViewById(R.id.tv_extra);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            tvEditTimestamp = (TextView) view.findViewById(R.id.tv_edit_timestamp);
-            ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
-            ivMenu.setOnClickListener(this);
-
-            mPopupMenu = new PopupMenu(view.getContext(), ivMenu);
-            mPopupMenu.getMenuInflater().inflate(R.menu.comment_menu, mPopupMenu.getMenu());
-            mPopupMenu.setOnMenuItemClickListener(this);
-        }
-
-        private final ImageView ivGravatar;
-        private final TextView tvDesc;
-        private final TextView tvExtra;
-        private final TextView tvTimestamp;
-        private final TextView tvEditTimestamp;
-        private final ImageView ivMenu;
-        private final PopupMenu mPopupMenu;
-        private final OnCommentMenuItemClick mCommentMenuItemClickCallback;
-
-        @Override
-        public void onClick(View v) {
-            if (v.getId() == R.id.iv_menu) {
-                mPopupMenu.show();
-            }
-        }
-
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            CommitComment comment = (CommitComment) ivMenu.getTag();
-            return mCommentMenuItemClickCallback.onCommentMenuItemClick(comment, item);
-        }
+    @Override
+    protected boolean canQuote(CommitComment item) {
+        return true;
     }
 }

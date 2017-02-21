@@ -17,26 +17,17 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.TypefaceSpan;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
-import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -46,7 +37,6 @@ import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.IssueEvent;
@@ -54,17 +44,12 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Rename;
 import org.eclipse.egit.github.core.User;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventAdapter.ViewHolder>
-        implements View.OnClickListener {
-    public interface OnCommentAction {
-        void editComment(Comment comment);
-        void quoteText(CharSequence text);
-    }
-
+public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
     private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
             Pattern.compile(".*github.com\\/repos\\/([^\\/]+)\\/([^\\/]+)\\/commits");
 
@@ -86,59 +71,13 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         EVENT_ICONS.put(IssueEvent.TYPE_RENAMED, R.attr.issueEventRenamedIcon);
     }
 
-    private final ViewHolder.OnCommentMenuItemClick mCommentMenuItemClickCallback =
-            new ViewHolder.OnCommentMenuItemClick() {
-        @Override
-        public boolean onCommentMenuItemClick(Comment comment, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.edit:
-                    mActionCallback.editComment(comment);
-                    return true;
-
-                case R.id.share:
-                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("text/plain");
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                            mContext.getString(R.string.share_comment_subject,
-                                    comment.getId(), mIssueId,
-                                    mRepoOwner + "/" + mRepoName));
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, comment.getHtmlUrl());
-                    shareIntent = Intent.createChooser(shareIntent,
-                            mContext.getString(R.string.share_title));
-                    mContext.startActivity(shareIntent);
-                    return true;
-            }
-            return false;
-        }
-    };
-
-    private final HttpImageGetter mImageGetter;
-    private final OnCommentAction mActionCallback;
-    private final String mRepoOwner;
-    private final String mRepoName;
     private final int mIssueId;
     private boolean mLocked;
 
     public IssueEventAdapter(Context context, String repoOwner, String repoName,
             int issueId, OnCommentAction actionCallback) {
-        super(context);
-        mImageGetter = new HttpImageGetter(mContext);
-        mRepoOwner = repoOwner;
-        mRepoName = repoName;
+        super(context, repoOwner, repoName, actionCallback);
         mIssueId = issueId;
-        mActionCallback = actionCallback;
-    }
-
-    public void resume() {
-        mImageGetter.resume();
-    }
-
-    public void pause() {
-        mImageGetter.pause();
-    }
-
-    public void destroy() {
-        mImageGetter.destroy();
     }
 
     public void setLocked(boolean locked) {
@@ -147,41 +86,62 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
-        ViewHolder holder = new ViewHolder(v, mCommentMenuItemClickCallback);
-        holder.ivGravatar.setOnClickListener(this);
-        return holder;
+    protected User getUser(IssueEventHolder item) {
+        return item.getUser();
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, IssueEventHolder event) {
-        AvatarHandler.assignAvatar(holder.ivGravatar, event.getUser());
-        holder.ivGravatar.setTag(event);
+    protected Date getCreatedAt(IssueEventHolder item) {
+        return item.getCreatedAt();
+    }
 
-        StringUtils.applyBoldTagsAndSetText(holder.tvExtra,
-                mContext.getString(R.string.issue_comment_header,
-                        ApiHelpers.getUserLogin(mContext, event.getUser())));
-        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                event.getCreatedAt(), true));
-        if (event.getCreatedAt().equals(event.getUpdatedAt())) {
-            holder.tvEditTimestamp.setVisibility(View.GONE);
+    @Override
+    protected Date getUpdatedAt(IssueEventHolder item) {
+        return item.getUpdatedAt();
+    }
+
+    @Override
+    protected String getUrl(IssueEventHolder item) {
+        return item.comment != null ? item.comment.getHtmlUrl() : null;
+    }
+
+    @Override
+    protected String getShareSubject(IssueEventHolder item) {
+        return mContext.getString(R.string.share_comment_subject,
+                item.comment.getId(), mIssueId, mRepoOwner + "/" + mRepoName);
+    }
+
+    @Override
+    protected void bindBodyView(IssueEventHolder item, StyleableTextView view,
+            HttpImageGetter imageGetter) {
+        if (item.comment != null) {
+            String body = HtmlUtils.format(item.comment.getBodyHtml()).toString();
+            imageGetter.bind(view, body, item.comment.getId());
         } else {
-            holder.tvEditTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                    event.getUpdatedAt(), true));
-            holder.tvEditTimestamp.setVisibility(View.VISIBLE);
+            view.setText(formatEvent(item.event, item.getUser(),
+                    view.getTypefaceValue(), item.isPullRequestEvent));
         }
+    }
 
-        if (event.comment instanceof CommitComment) {
-            final CommitComment commitComment = (CommitComment) event.comment;
+    @Override
+    protected void bindExtraView(IssueEventHolder item, StyleableTextView view) {
+        String login = ApiHelpers.getUserLogin(mContext, item.getUser());
+        StringUtils.applyBoldTagsAndSetText(view,
+                mContext.getString(R.string.issue_comment_header, login));
+    }
+
+    @Override
+    protected void bindFileView(IssueEventHolder item, StyleableTextView view) {
+        if (item.comment instanceof CommitComment) {
+            final CommitComment commitComment = (CommitComment) item.comment;
             SpannableStringBuilder text = StringUtils.applyBoldTags(mContext,
                     mContext.getString(R.string.issue_commit_comment_file),
-                    holder.tvFile.getTypefaceValue());
+                    view.getTypefaceValue());
 
             int pos = text.toString().indexOf("[file]");
             if (pos >= 0) {
                 String fileName = FileUtils.getFileName(commitComment.getPath());
-                final CommitFile file = event.file;
+                final CommitFile file = item.file;
 
                 text.replace(pos, pos + 6, fileName);
                 if (file != null) {
@@ -197,56 +157,34 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
                 }
             }
 
-            holder.tvFile.setVisibility(View.VISIBLE);
-            holder.tvFile.setText(text);
-            holder.tvFile.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+            view.setVisibility(View.VISIBLE);
+            view.setText(text);
+            view.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         } else {
-            holder.tvFile.setVisibility(View.GONE);
+            view.setVisibility(View.GONE);
         }
+    }
 
-        if (event.comment != null) {
-            holder.ivMenu.setTag(event.comment);
-            holder.ivMenu.setVisibility(View.VISIBLE);
-
-            String body = HtmlUtils.format(event.comment.getBodyHtml()).toString();
-            mImageGetter.bind(holder.tvDesc, body, event.comment.getId());
-
-            if (!mLocked) {
-                holder.tvDesc.setCustomSelectionActionModeCallback(
-                        new UiUtils.QuoteActionModeCallback(holder.tvDesc) {
-                    @Override
-                    public void onTextQuoted(CharSequence text) {
-                        mActionCallback.quoteText(text);
-                    }
-                });
-            } else {
-                holder.tvDesc.setCustomSelectionActionModeCallback(null);
-            }
-
-            holder.ivIssueEvent.setVisibility(View.GONE);
+    @Override
+    protected void bindEventIcon(IssueEventHolder item, ImageView view) {
+        Integer eventIconAttr = item.event != null
+                ? EVENT_ICONS.get(item.event.getEvent()) : null;
+        if (eventIconAttr != null) {
+            view.setImageResource(UiUtils.resolveDrawable(mContext, eventIconAttr));
+            view.setVisibility(View.VISIBLE);
         } else {
-            holder.ivMenu.setVisibility(View.GONE);
-
-            holder.tvDesc.setTag(null);
-            holder.tvDesc.setText(formatEvent(event.event, event.getUser(),
-                    holder.tvExtra.getTypefaceValue(), event.isPullRequestEvent));
-
-            Integer eventIconAttr = EVENT_ICONS.get(event.event.getEvent());
-            if (eventIconAttr != null) {
-                holder.ivIssueEvent.setImageResource(
-                        UiUtils.resolveDrawable(mContext, eventIconAttr));
-                holder.ivIssueEvent.setVisibility(View.VISIBLE);
-            } else {
-                holder.ivIssueEvent.setVisibility(View.GONE);
-            }
+            view.setVisibility(View.GONE);
         }
+    }
 
-        String ourLogin = Gh4Application.get().getAuthLogin();
-        boolean canEdit = ApiHelpers.loginEquals(event.getUser(), ourLogin)
-                || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
-        MenuItem editMenuItem = holder.mPopupMenu.getMenu().findItem(R.id.edit);
+    @Override
+    protected boolean hasActionMenu(IssueEventHolder item) {
+        return item.comment != null;
+    }
 
-        editMenuItem.setVisible(event.comment != null && canEdit && mActionCallback != null);
+    @Override
+    protected boolean canQuote(IssueEventHolder item) {
+        return item.comment != null && !mLocked;
     }
 
     private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue,
@@ -391,75 +329,5 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         }
 
         return text;
-    }
-
-    @Override
-    public void clear() {
-        super.clear();
-        mImageGetter.clearHtmlCache();
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.iv_gravatar) {
-            IssueEventHolder event = (IssueEventHolder) v.getTag();
-            Intent intent = UserActivity.makeIntent(mContext, event.getUser());
-            if (intent != null) {
-                mContext.startActivity(intent);
-            }
-        } else {
-            super.onClick(v);
-        }
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
-            PopupMenu.OnMenuItemClickListener {
-        private interface OnCommentMenuItemClick {
-            boolean onCommentMenuItemClick(Comment comment, MenuItem item);
-        }
-
-        private ViewHolder(View view, OnCommentMenuItemClick commentMenuItemClickCallback) {
-            super(view);
-            mCommentMenuItemClickCallback = commentMenuItemClickCallback;
-
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            ivIssueEvent = (ImageView) view.findViewById(R.id.iv_issue_event);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-            tvExtra = (StyleableTextView) view.findViewById(R.id.tv_extra);
-            tvFile = (StyleableTextView) view.findViewById(R.id.tv_file);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            tvEditTimestamp = (TextView) view.findViewById(R.id.tv_edit_timestamp);
-            ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
-            ivMenu.setOnClickListener(this);
-
-            mPopupMenu = new PopupMenu(view.getContext(), ivMenu);
-            mPopupMenu.getMenuInflater().inflate(R.menu.comment_menu, mPopupMenu.getMenu());
-            mPopupMenu.setOnMenuItemClickListener(this);
-        }
-
-        private final ImageView ivGravatar;
-        private final ImageView ivIssueEvent;
-        private final TextView tvDesc;
-        private final StyleableTextView tvExtra;
-        private final StyleableTextView tvFile;
-        private final TextView tvTimestamp;
-        private final TextView tvEditTimestamp;
-        private final ImageView ivMenu;
-        private final PopupMenu mPopupMenu;
-        private final OnCommentMenuItemClick mCommentMenuItemClickCallback;
-
-        @Override
-        public void onClick(View v) {
-            if (v.getId() == R.id.iv_menu) {
-                mPopupMenu.show();
-            }
-        }
-
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            Comment comment = (Comment) ivMenu.getTag();
-            return mCommentMenuItemClickCallback.onCommentMenuItemClick(comment, item);
-        }
     }
 }
