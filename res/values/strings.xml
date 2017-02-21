@@ -337,6 +337,7 @@
     <string name="issue_filter_by_labels">Filter by labels</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>
     <string name="issue_filter_by_assignee">Filter by assignee</string>
+    <string name="issue_filter_by_any_label">Any label</string>
     <string name="issue_filter_by_any_milestone">Any milestone</string>
     <string name="issue_filter_by_any_assignee">Any assignee</string>
     <string name="issue_clear_milestone">No milestone</string>

@@ -56,7 +56,6 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -71,7 +70,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private String mRepoOwner;
     private String mRepoName;
 
-    private List<String> mSelectedLabels;
+    private String mSelectedLabel;
     private String mSelectedMilestone;
     private String mSelectedAssignee;
     private String mSearchQuery;
@@ -451,9 +450,9 @@ public class IssueListActivity extends BasePagerActivity implements
         filterData.put("q", String.format(Locale.US, LIST_QUERY,
                 position == 1 ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
                 mRepoOwner, mRepoName,
-                mSelectedLabels != null ? "labels:" + TextUtils.join(",", mSelectedLabels) : "",
-                mSelectedMilestone != null ? "milestone:\"" + mSelectedMilestone + "\"" : "",
-                mSelectedAssignee != null ? "assignee:" + mSelectedAssignee : ""));
+                buildFilterItem("assignee", mSelectedAssignee),
+                buildFilterItem("label", mSelectedLabel),
+                buildFilterItem("milestone", mSelectedMilestone)));
 
         final IssueListFragment f = IssueListFragment.newInstance(filterData,
                 position == 1, R.string.no_issues_found, false);
@@ -464,6 +463,14 @@ public class IssueListActivity extends BasePagerActivity implements
             mOpenFragment = f;
         }
         return f;
+    }
+
+    private String buildFilterItem(String type, String value) {
+        if (!TextUtils.isEmpty(value)) {
+            return type + ":\"" + value + "\"";
+        } else {
+            return "";
+        }
     }
 
     private Fragment makeSearchFragment(int position) {
@@ -487,31 +494,23 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private void showLabelsDialog() {
-        final boolean[] checkedItems = new boolean[mLabels.size()];
-        final String[] allLabelArray = new String[mLabels.size()];
+        final String[] labels = new String[mLabels.size() + 1];
+        int selected = 0;
+
+        labels[0] = getResources().getString(R.string.issue_filter_by_any_label);
 
         for (int i = 0; i < mLabels.size(); i++) {
-            Label l = mLabels.get(i);
-            allLabelArray[i] = l.getName();
-            checkedItems[i] = mSelectedLabels != null && mSelectedLabels.contains(l.getName());
+            labels[i + 1] = mLabels.get(i).getName();
+            if (TextUtils.equals(mSelectedLabel, labels[i + 1])) {
+                selected = i + 1;
+            }
         }
 
-        DialogInterface.OnMultiChoiceClickListener selectCb =
-                new DialogInterface.OnMultiChoiceClickListener() {
+        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
-                checkedItems[whichButton] = isChecked;
-            }
-        };
-        DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                mSelectedLabels = new ArrayList<>();
-                for (int i = 0; i < allLabelArray.length; i++) {
-                    if (checkedItems[i]) {
-                        mSelectedLabels.add(allLabelArray[i]);
-                    }
-                }
+            public void onClick(DialogInterface dialog, int which) {
+                mSelectedLabel = which == 0 ? null : labels[which];
+                dialog.dismiss();
                 reloadIssueList();
             }
         };
@@ -519,8 +518,7 @@ public class IssueListActivity extends BasePagerActivity implements
         new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.issue_filter_by_labels)
-                .setMultiChoiceItems(allLabelArray, checkedItems, selectCb)
-                .setPositiveButton(R.string.ok, okCb)
+                .setSingleChoiceItems(labels, selected, selectCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
