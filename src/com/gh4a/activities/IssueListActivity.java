@@ -56,7 +56,6 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -77,7 +76,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private String mRepoOwner;
     private String mRepoName;
 
-    private List<String> mSelectedLabels;
+    private String mSelectedLabel;
     private String mSelectedMilestone;
     private String mSelectedAssignee;
     private String mSearchQuery;
@@ -445,16 +444,14 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private Fragment makeListFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
-        String assigneeQuery = !TextUtils.isEmpty(mSelectedAssignee) ? "assignee:" + mSelectedAssignee
-                : mSelectedAssignee == null ? "" /* null means 'any assignee' */
-                : "no:assignee"; /* empty string means 'unassigned' */
         filterData.put("sort", mSortHelper.getSortMode());
         filterData.put("direction", mSortHelper.getSortDirection());
         filterData.put("q", String.format(Locale.US, LIST_QUERY,
                 position == 1 ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
-                mRepoOwner, mRepoName, assigneeQuery,
-                mSelectedLabels != null ? "labels:" + TextUtils.join(",", mSelectedLabels) : "",
-                mSelectedMilestone != null ? "milestone:\"" + mSelectedMilestone + "\"" : ""));
+                mRepoOwner, mRepoName,
+                buildFilterItem("assignee", mSelectedAssignee),
+                buildFilterItem("label", mSelectedLabel),
+                buildFilterItem("milestone", mSelectedMilestone)));
 
         final IssueListFragment f = IssueListFragment.newInstance(filterData,
                 position == 1, R.string.no_issues_found, false);
@@ -465,6 +462,18 @@ public class IssueListActivity extends BasePagerActivity implements
             mOpenFragment = f;
         }
         return f;
+    }
+
+    private String buildFilterItem(String type, String value) {
+        if (!TextUtils.isEmpty(value)) {
+            return type + ":\"" + value + "\"";
+        } else if (value == null) {
+            // null means 'any value'
+            return "";
+        } else {
+            // empty string means 'no value set
+            return "no:" + type;
+        }
     }
 
     private Fragment makeSearchFragment(int position) {
@@ -488,31 +497,26 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private void showLabelsDialog() {
-        final boolean[] checkedItems = new boolean[mLabels.size()];
-        final String[] allLabelArray = new String[mLabels.size()];
+        final String[] labels = new String[mLabels.size() + 2];
+        int selected = mSelectedLabel != null && mSelectedLabel.isEmpty() ? 1 : 0;
+
+        labels[0] = getResources().getString(R.string.issue_filter_by_any_label);
+        labels[1] = getResources().getString(R.string.issue_filter_by_no_label);
 
         for (int i = 0; i < mLabels.size(); i++) {
-            Label l = mLabels.get(i);
-            allLabelArray[i] = l.getName();
-            checkedItems[i] = mSelectedLabels != null && mSelectedLabels.contains(l.getName());
+            labels[i + 2] = mLabels.get(i).getName();
+            if (TextUtils.equals(mSelectedLabel, labels[i + 2])) {
+                selected = i + 2;
+            }
         }
 
-        DialogInterface.OnMultiChoiceClickListener selectCb =
-                new DialogInterface.OnMultiChoiceClickListener() {
+        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int whichButton, boolean isChecked) {
-                checkedItems[whichButton] = isChecked;
-            }
-        };
-        DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                mSelectedLabels = new ArrayList<>();
-                for (int i = 0; i < allLabelArray.length; i++) {
-                    if (checkedItems[i]) {
-                        mSelectedLabels.add(allLabelArray[i]);
-                    }
-                }
+            public void onClick(DialogInterface dialog, int which) {
+                mSelectedLabel = which == 0 ? null
+                        : which == 1 ? ""
+                        : labels[which];
+                dialog.dismiss();
                 reloadIssueList();
             }
         };
@@ -520,29 +524,31 @@ public class IssueListActivity extends BasePagerActivity implements
         new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.issue_filter_by_labels)
-                .setMultiChoiceItems(allLabelArray, checkedItems, selectCb)
-                .setPositiveButton(R.string.ok, okCb)
+                .setSingleChoiceItems(labels, selected, selectCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
 
     private void showMilestonesDialog() {
-        final String[] milestones = new String[mMilestones.size() + 1];
-        int selected = 0;
+        final String[] milestones = new String[mMilestones.size() + 2];
+        int selected = mSelectedMilestone != null && mSelectedMilestone.isEmpty() ? 1 : 0;
 
         milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
+        milestones[1] = getResources().getString(R.string.issue_filter_by_no_milestone);
 
-        for (int i = 1; i <= mMilestones.size(); i++) {
-            milestones[i] = mMilestones.get(i - 1).getTitle();
-            if (TextUtils.equals(mSelectedMilestone, milestones[i])) {
-                selected = i;
+        for (int i = 0; i < mMilestones.size(); i++) {
+            milestones[i + 2] = mMilestones.get(i).getTitle();
+            if (TextUtils.equals(mSelectedMilestone, milestones[i + 2])) {
+                selected = i +2;
             }
         }
 
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSelectedMilestone = which != 0 ? milestones[which] : null;
+                mSelectedMilestone = which == 0 ? null
+                        : which == 1 ? ""
+                        : milestones[which];
                 dialog.dismiss();
                 reloadIssueList();
             }
