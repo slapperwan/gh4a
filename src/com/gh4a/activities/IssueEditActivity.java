@@ -523,10 +523,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         @Override
         protected void onSuccess(Void result) {
-            Intent intent = IssueActivity.makeIntent(IssueEditActivity.this,
-                    mRepoOwner, mRepoName, mEditIssue.getNumber());
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
             setResult(RESULT_OK);
             finish();
         }
