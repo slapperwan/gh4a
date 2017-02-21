@@ -48,6 +48,7 @@ import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.github.mobile.util.HtmlUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -359,16 +360,9 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     protected String generateCodeHtml(String data, String fileName,
-            String cssTheme, boolean addTitleHeader) {
-        return generateCodeHtml(data, fileName, null, null, null, -1, -1, cssTheme, addTitleHeader);
-    }
-
-    protected String generateCodeHtml(String data, String fileName,
-                String repoOwner, String repoName, String ref,
                 int highlightStart, int highlightEnd, String cssTheme, boolean addTitleHeader) {
         String ext = FileUtils.getFileExtension(fileName);
         String title = addTitleHeader ? getDocumentTitle() : null;
-        boolean isMarkdown = FileUtils.isMarkdown(fileName);
 
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title>");
@@ -378,60 +372,48 @@ public abstract class WebViewerActivity extends BaseActivity implements
         content.append("</title>");
         writeScriptInclude(content, "codeutils");
 
-        if (isMarkdown) {
-            writeScriptInclude(content, "showdown");
-            writeCssInclude(content, "markdown", cssTheme);
-            content.append("</head>");
-            content.append("<body>");
-            if (title != null) {
-                content.append("<h2>").append(title).append("</h2>");
-            }
-            content.append("<div id='content'>");
-        } else {
-            writeCssInclude(content, "prettify", cssTheme);
-            writeScriptInclude(content, "prettify");
-            loadLanguagePluginListIfNeeded();
-            for (String plugin : sLanguagePlugins) {
-                writeScriptInclude(content, plugin);
-            }
-            content.append("</head>");
-            content.append("<body onload='prettyPrint(function() { highlightLines(");
-            content.append(highlightStart).append(",").append(highlightEnd).append("); ");
-            content.append("NativeClient.onRenderingDone(); })'");
-            content.append(" onresize='scrollToHighlight();'>");
-            if (title != null) {
-                content.append("<h2>").append(title).append("</h2>");
-            }
-            content.append("<pre id='content' class='prettyprint linenums lang-");
-            content.append(ext).append("'>");
+        writeCssInclude(content, "prettify", cssTheme);
+        writeScriptInclude(content, "prettify");
+        loadLanguagePluginListIfNeeded();
+        for (String plugin : sLanguagePlugins) {
+            writeScriptInclude(content, plugin);
         }
+        content.append("</head>");
+        content.append("<body onload='prettyPrint(function() { highlightLines(");
+        content.append(highlightStart).append(",").append(highlightEnd).append("); ");
+        content.append("NativeClient.onRenderingDone(); })'");
+        content.append(" onresize='scrollToHighlight();'>");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
+        content.append("<pre id='content' class='prettyprint linenums lang-");
+        content.append(ext).append("'>");
 
         content.append(TextUtils.htmlEncode(data));
 
-        if (isMarkdown) {
-            content.append("</div>");
+        content.append("</pre></body></html>");
 
-            content.append("<script>");
-            if (repoOwner != null && repoName != null) {
-                content.append("var GitHub = new Object();");
-                content.append("GitHub.nameWithOwner = \"");
-                content.append(repoOwner).append("/").append(repoName).append("\";");
-                if (ref != null) {
-                    content.append("GitHub.branch = \"").append(ref).append("\";");
-                }
-            }
-            content.append("var text = document.getElementById('content').innerHTML;");
-            content.append("var converter = new Showdown.converter();");
-            content.append("var html = converter.makeHtml(text);");
-            content.append("document.getElementById('content').innerHTML = html;");
-            content.append("NativeClient.onRenderingDone();");
-            content.append("</script>");
-        } else {
-            content.append("</pre>");
+        mRequiresJsInterface = true;
+        return content.toString();
+    }
+
+    protected String generateMarkdownHtml(String markdown, String repoOwner, String repoName,
+            String ref, String cssTheme, boolean addTitleHeader) {
+        String title = addTitleHeader ? getDocumentTitle() : null;
+        StringBuilder content = new StringBuilder();
+        content.append("<html><head>");
+        writeCssInclude(content, "markdown", cssTheme);
+        if (title != null) {
+            content.append("<title>").append(title).append("</title>");
+        }
+        content.append("</head><body>");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
         }
 
+        content.append(HtmlUtils.renderMarkdown(markdown, repoOwner, repoName, ref));
         content.append("</body></html>");
-        mRequiresJsInterface = true;
+
         return content.toString();
     }
 

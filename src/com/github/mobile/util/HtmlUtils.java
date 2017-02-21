@@ -45,6 +45,22 @@ import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 
+import com.gh4a.utils.ApiHelpers;
+import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
+import com.vladsch.flexmark.ext.emoji.EmojiExtension;
+import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughSubscriptExtension;
+import com.vladsch.flexmark.ext.wikilink.WikiLinkExtension;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.html.LinkResolver;
+import com.vladsch.flexmark.html.LinkResolverFactory;
+import com.vladsch.flexmark.html.renderer.LinkType;
+import com.vladsch.flexmark.html.renderer.NodeRendererContext;
+import com.vladsch.flexmark.html.renderer.ResolvedLink;
+import com.vladsch.flexmark.parser.ParserEmulationProfile;
+import com.vladsch.flexmark.util.options.MutableDataHolder;
+import com.vladsch.flexmark.util.options.MutableDataSet;
+
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
@@ -56,6 +72,8 @@ import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -155,37 +173,74 @@ public class HtmlUtils {
 
     private static final String CODE_END = "</code>";
 
-    /**
-     * Rewrite relative URLs in HTML fetched e.g. from markdown files.
-     *
-     * @param html
-     * @param repoUser
-     * @param repoName
-     * @param branch
-     * @return
-     */
-    public static String rewriteRelativeUrls(final String html, final String repoUser,
-            final String repoName, final String branch) {
-        final String baseUrl = "https://raw.github.com/" + repoUser + "/" + repoName + "/" + branch;
-        final StringBuffer sb = new StringBuffer();
-        final Pattern p = Pattern.compile("(href|src)=\"(\\S+)\"");
-        final Matcher m = p.matcher(html);
+    public static String renderMarkdown(String markdown, String repoOwner,
+            String repoName, String ref) {
+        final String baseUrl = repoOwner != null && repoName != null
+                ? ApiHelpers.formatRawFileUrl(repoOwner, repoName, ref != null ? ref : "master", "")
+                : null;
+        final MutableDataHolder options = new MutableDataSet()
+                .setFrom(ParserEmulationProfile.GITHUB_DOC)
+                .set(com.vladsch.flexmark.parser.Parser.HEADING_NO_ATX_SPACE, true)
+                .set(com.vladsch.flexmark.parser.Parser.HEADING_NO_LEAD_SPACE, true)
+                .set(com.vladsch.flexmark.parser.Parser.EXTENSIONS, Arrays.asList(
+                        AutolinkExtension.create(),
+                        EmojiExtension.create(),
+                        StrikethroughSubscriptExtension.create(),
+                        WikiLinkExtension.create()
+                ));
+        final Node document = com.vladsch.flexmark.parser.Parser.builder(options)
+                .build()
+                .parse(markdown);
 
-        while (m.find()) {
-            String url = m.group(2);
-            if (!url.contains("://") && !url.startsWith("#")) {
-                if (url.startsWith("/")) {
-                    url = baseUrl + url;
-                } else {
-                    url = baseUrl + "/" + url;
-                }
-            }
-            m.appendReplacement(sb, Matcher.quoteReplacement(m.group(1) + "=\"" + url + "\""));
+        final HtmlRenderer.Builder rendererBuilder = HtmlRenderer.builder(options);
+        if (baseUrl != null) {
+            rendererBuilder.linkResolverFactory(new RelativeLinkRewritingLinkResolverFactory(baseUrl));
         }
-        m.appendTail(sb);
-
-        return sb.toString();
+        return rendererBuilder.build().render(document);
     }
+
+    private static class RelativeLinkRewritingLinkResolverFactory implements LinkResolverFactory {
+        private String mBaseUrl;
+
+        public RelativeLinkRewritingLinkResolverFactory(String baseUrl) {
+            mBaseUrl = baseUrl;
+        }
+
+        @Override
+        public Set<Class<? extends LinkResolverFactory>> getAfterDependents() {
+            return null;
+        }
+
+        @Override
+        public Set<Class<? extends LinkResolverFactory>> getBeforeDependents() {
+            return null;
+        }
+
+        @Override
+        public boolean affectsGlobalScope() {
+            return false;
+        }
+
+        @Override
+        public LinkResolver create(NodeRendererContext context) {
+            return new LinkResolver() {
+                @Override
+                public ResolvedLink resolveLink(Node node, NodeRendererContext context,
+                                                ResolvedLink link) {
+                    if (link.getLinkType() == LinkType.IMAGE) {
+                        String url = link.getUrl();
+                        if (!url.contains("://") && !url.startsWith("#")) {
+                            if (url.startsWith("/")) {
+                                url = url.substring(1);
+                            }
+                            return link.withUrl(mBaseUrl + url);
+                        }
+                    }
+                    return link;
+                }
+            };
+        }
+    };
 
     /**
      * Encode HTML

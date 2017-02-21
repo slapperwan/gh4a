@@ -35,6 +35,7 @@ import com.gh4a.R;
 import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 
@@ -45,7 +46,6 @@ import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import java.util.List;
-import java.util.Locale;
 
 public class FileViewerActivity extends WebViewerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
@@ -73,7 +73,6 @@ public class FileViewerActivity extends WebViewerActivity {
     private RepositoryContents mContent;
 
     private static final int MENU_ITEM_HISTORY = 10;
-    private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
 
     private final LoaderCallbacks<List<RepositoryContents>> mFileCallback =
             new LoaderCallbacks<List<RepositoryContents>>(this) {
@@ -155,15 +154,20 @@ public class FileViewerActivity extends WebViewerActivity {
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         String base64Data = mContent.getContent();
-        String title = addTitleHeader ? getDocumentTitle() : null;
         if (base64Data != null && FileUtils.isImage(mPath)) {
+            String title = addTitleHeader ? getDocumentTitle() : null;
             String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) +
                     ";base64," + base64Data;
-            return highlightImage(imageUrl, cssTheme, addTitleHeader ? getDocumentTitle() : null);
+            return highlightImage(imageUrl, cssTheme, title);
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
-            return generateCodeHtml(data, mPath, mRepoOwner, mRepoName,
-                    mRef, mHighlightStart, mHighlightEnd, cssTheme, addTitleHeader);
+            if (FileUtils.isMarkdown(mPath) && !data.isEmpty()) {
+                return generateMarkdownHtml(data,
+                        mRepoOwner, mRepoName, mRef, cssTheme, addTitleHeader);
+            } else {
+                return generateCodeHtml(data, mPath,
+                        mHighlightStart, mHighlightEnd, cssTheme, addTitleHeader);
+            }
         }
     }
 
@@ -208,8 +212,7 @@ public class FileViewerActivity extends WebViewerActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String url = String.format(Locale.US, "https://github.com/%s/%s/blob/%s/%s",
-                mRepoOwner, mRepoName, mRef, mPath);
+        String url = ApiHelpers.formatRawFileUrl(mRepoOwner, mRepoName, mRef, mPath);
 
         switch (item.getItemId()) {
             case R.id.browser:
@@ -238,7 +241,7 @@ public class FileViewerActivity extends WebViewerActivity {
     }
 
     private void openUnsuitableFileAndFinish() {
-        String url = String.format(Locale.US, RAW_URL_FORMAT, mRepoOwner, mRepoName, mRef, mPath);
+        String url = ApiHelpers.formatRawFileUrl(mRepoOwner, mRepoName, mRef, mPath);
         String mime = FileUtils.getMimeTypeFor(FileUtils.getFileName(mPath));
         Intent intent = IntentUtils.createViewerOrBrowserIntent(this, Uri.parse(url), mime);
         if (intent == null) {

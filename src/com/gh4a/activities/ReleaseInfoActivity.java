@@ -33,7 +33,6 @@ import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.MarkdownLoader;
 import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
@@ -84,18 +83,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
             mRelease = result;
             handleReleaseReady();
             setContentShown(true);
-        }
-    };
-    private final LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>(this) {
-        @Override
-        protected Loader<LoaderResult<String>> onCreateLoader() {
-            return new MarkdownLoader(ReleaseInfoActivity.this,
-                    mRepoOwner, mRepoName, mRelease.getBody());
-        }
-
-        @Override
-        protected void onResultReady(String result) {
-            fillNotes(result);
         }
     };
 
@@ -177,7 +164,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
             name = mRelease.getTagName();
         }
         getSupportActionBar().setTitle(name);
-        getSupportLoaderManager().initLoader(1, null, mBodyCallback);
         fillData();
     }
 
@@ -216,6 +202,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         } else {
             findViewById(R.id.downloads).setVisibility(View.GONE);
         }
+        fillNotes(mRelease.getBody());
     }
 
     @Override
@@ -225,10 +212,11 @@ public class ReleaseInfoActivity extends BaseActivity implements
                 download.getDescription(), "application/octet-stream");
     }
 
-    private void fillNotes(String bodyHtml) {
+    private void fillNotes(String bodyMarkdown) {
         TextView body = (TextView) findViewById(R.id.tv_release_notes);
 
-        if (!StringUtils.isBlank(bodyHtml)) {
+        if (!StringUtils.isBlank(bodyMarkdown)) {
+            String bodyHtml = HtmlUtils.renderMarkdown(bodyMarkdown, mRepoOwner, mRepoName, null);
             bodyHtml = HtmlUtils.format(bodyHtml).toString();
             mImageGetter.bind(body, bodyHtml, mRelease.getId());
             body.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);

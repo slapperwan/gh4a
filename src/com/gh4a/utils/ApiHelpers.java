@@ -84,4 +84,9 @@ public class ApiHelpers {
     public static boolean loginEquals(String user, String login) {
         return user != null && user.equalsIgnoreCase(login);
     }
+
+    public static String formatRawFileUrl(String repoOwner, String repoName, String ref, String path) {
+        return "https://raw.githubusercontent.com/"
+                + repoOwner + "/" + repoName + "/" + ref + "/" + path;
+    }
 }

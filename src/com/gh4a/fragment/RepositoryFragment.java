@@ -83,7 +83,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
             View progress = mContentView.findViewById(R.id.pb_readme);
             AsyncTaskCompat.executeParallel(new FillReadmeTask(
-                    mRepository.getId(), readmeView, progress, mImageGetter), result);
+                    mRepository, mRef, readmeView, progress, mImageGetter), result);
         }
     };
 
@@ -306,14 +306,16 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     private static class FillReadmeTask extends AsyncTask<String, Void, String> {
-        private final Long mId;
+        private final Repository mRepository;
+        private final String mRef;
         private final TextView mReadmeView;
         private final View mProgressView;
         private final HttpImageGetter mImageGetter;
 
-        public FillReadmeTask(long id, TextView readmeView, View progressView,
+        public FillReadmeTask(Repository repo, String ref, TextView readmeView, View progressView,
                 HttpImageGetter imageGetter) {
-            mId = id;
+            mRepository = repo;
+            mRef = ref;
             mReadmeView = readmeView;
             mProgressView = progressView;
             mImageGetter = imageGetter;
@@ -321,19 +323,22 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
         @Override
         protected String doInBackground(String... params) {
-            String readme = params[0];
-            if (readme != null) {
-                readme = HtmlUtils.format(readme).toString();
-                mImageGetter.encode(mId, readme);
+            String readmeMarkdown = params[0];
+            if (readmeMarkdown != null) {
+                String readmeHtml = HtmlUtils.renderMarkdown(readmeMarkdown,
+                        mRepository.getOwner().getLogin(), mRepository.getName(), mRef);
+                String formattedHtml = HtmlUtils.format(readmeHtml).toString();
+                mImageGetter.encode(mRepository.getId(), formattedHtml);
+                return formattedHtml;
             }
-            return readme;
+            return null;
         }
 
         @Override
         protected void onPostExecute(String result) {
             if (result != null) {
                 mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-                mImageGetter.bind(mReadmeView, result, mId);
+                mImageGetter.bind(mReadmeView, result, mRepository.getId());
             } else {
                 mReadmeView.setText(R.string.repo_no_readme);
                 mReadmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);

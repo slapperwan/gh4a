@@ -70,6 +70,11 @@ dependencies {
     compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
+    compile 'com.vladsch.flexmark:flexmark:0.15.3'
+    compile 'com.vladsch.flexmark:flexmark-ext-autolink:0.15.3'
+    compile 'com.vladsch.flexmark:flexmark-ext-emoji:0.15.3'
+    compile 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.15.3'
+    compile 'com.vladsch.flexmark:flexmark-ext-wikilink:0.15.3'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }

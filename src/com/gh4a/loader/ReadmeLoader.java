@@ -2,16 +2,16 @@ package com.gh4a.loader;
 
 import java.io.IOException;
 
+import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.ContentsService;
+import org.eclipse.egit.github.core.util.EncodingUtils;
 
 import android.content.Context;
+import android.text.TextUtils;
 
-import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
-import com.github.mobile.util.HtmlUtils;
 
 public class ReadmeLoader extends BaseLoader<String> {
 
@@ -28,22 +28,22 @@ public class ReadmeLoader extends BaseLoader<String> {
 
     @Override
     public String doLoadInBackground() throws IOException {
-        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
-        GitHubClient client = new DefaultClient("application/vnd.github.v3.html");
-        client.setOAuth2Token(app.getAuthToken());
-
-        ContentsService contentService = new ContentsService(client);
+        ContentsService contentService = (ContentsService)
+                Gh4Application.get().getService(Gh4Application.CONTENTS_SERVICE);
+        RepositoryContents contents = null;
         try {
-            String html = contentService.getReadmeHtml(new RepositoryId(mRepoOwner, mRepoName), mRef);
-            if (html != null) {
-                return HtmlUtils.rewriteRelativeUrls(html, mRepoOwner, mRepoName, mRef);
-            }
+            contents = contentService.getReadme(new RepositoryId(mRepoOwner, mRepoName), mRef);
         } catch (RequestException e) {
             /* don't spam logcat with 404 errors, those are normal */
             if (e.getStatus() != 404) {
                 throw e;
             }
         }
-        return null;
+        String encodedContent = contents != null ? contents.getContent() : null;
+
+        if (TextUtils.isEmpty(encodedContent)) {
+            return null;
+        }
+        return new String(EncodingUtils.fromBase64(encodedContent));
     }
 }

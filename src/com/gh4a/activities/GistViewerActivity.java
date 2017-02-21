@@ -30,6 +30,7 @@ import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Gist;
@@ -93,7 +94,13 @@ public class GistViewerActivity extends WebViewerActivity {
 
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
-        return generateCodeHtml(mGistFile.getContent(), mFileName, cssTheme, addTitleHeader);
+        if (FileUtils.isMarkdown(mFileName)) {
+            return generateMarkdownHtml(mGistFile.getContent(),
+                    null, null, null, cssTheme, addTitleHeader);
+        } else {
+            return generateCodeHtml(mGistFile.getContent(),
+                    mFileName, -1, -1, cssTheme, addTitleHeader);
+        }
     }
 
     @Override
