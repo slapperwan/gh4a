@@ -162,8 +162,15 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         StringUtils.applyBoldTagsAndSetText(holder.tvExtra,
                 mContext.getString(R.string.issue_comment_header,
                         ApiHelpers.getUserLogin(mContext, event.getUser())));
-        holder.tvTimestamp.setText(StringUtils.formatRelativeTimeWithEditTime(mContext,
-                event.getCreatedAt(), event.getUpdatedAt(), true));
+        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                event.getCreatedAt(), true));
+        if (event.getCreatedAt().equals(event.getUpdatedAt())) {
+            holder.tvEditTimestamp.setVisibility(View.GONE);
+        } else {
+            holder.tvEditTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                    event.getUpdatedAt(), true));
+            holder.tvEditTimestamp.setVisibility(View.VISIBLE);
+        }
 
         if (event.comment instanceof CommitComment) {
             final CommitComment commitComment = (CommitComment) event.comment;
@@ -422,6 +429,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
             tvExtra = (StyleableTextView) view.findViewById(R.id.tv_extra);
             tvFile = (StyleableTextView) view.findViewById(R.id.tv_file);
             tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            tvEditTimestamp = (TextView) view.findViewById(R.id.tv_edit_timestamp);
             ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
             ivMenu.setOnClickListener(this);
 
@@ -436,6 +444,7 @@ public class IssueEventAdapter extends RootAdapter<IssueEventHolder, IssueEventA
         private final StyleableTextView tvExtra;
         private final StyleableTextView tvFile;
         private final TextView tvTimestamp;
+        private final TextView tvEditTimestamp;
         private final ImageView ivMenu;
         private final PopupMenu mPopupMenu;
         private final OnCommentMenuItemClick mCommentMenuItemClickCallback;

@@ -64,11 +64,24 @@
         tools:text="5 days ago" />
 
     <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_edit_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_timestamp"
+        android:layout_marginLeft="16dp"
+        android:layout_toLeftOf="@id/iv_menu"
+        android:layout_toRightOf="@id/tv_extra"
+        android:drawableLeft="?attr/commentEditIcon"
+        android:drawablePadding="2dp"
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="5 days ago" />
+
+    <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_file"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
-        android:layout_below="@id/tv_extra"
+        android:layout_below="@id/tv_edit_timestamp"
         android:layout_toLeftOf="@id/iv_menu"
         android:layout_toRightOf="@id/fl_avatar_container"
         android:textAppearance="?android:attr/textAppearanceSmall"

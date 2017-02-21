@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="DarkThemeBase" parent="Theme.AppCompat">
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="windowActionBar">false</item>
@@ -7,10 +8,12 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header</item>
         <item name="alertDialogTheme">@style/DarkAlertDialogTheme</item>
-        <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title</item>
+        <item name="drawerTitleTextAppearance">
+            @style/TextAppearance.AppCompat.Widget.ActionBar.Title
+        </item>
         <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="sendIcon">@drawable/social_send_dark</item>
-        <item name="contentEditIcon">@drawable/content_edit_dark</item>
+        <item name="commentEditIcon">@drawable/comment_edit_dark</item>
         <item name="contentPictureIcon">@drawable/content_picture_dark</item>
         <item name="loadingPictureIcon">@drawable/image_loading_dark</item>
         <item name="searchUserIcon">@drawable/search_users_dark</item>
@@ -108,10 +111,12 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header.Light</item>
         <item name="alertDialogTheme">@style/LightAlertDialogTheme</item>
-        <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
+        <item name="drawerTitleTextAppearance">
+            @style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse
+        </item>
         <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="sendIcon">@drawable/social_send</item>
-        <item name="contentEditIcon">@drawable/content_edit</item>
+        <item name="commentEditIcon">@drawable/comment_edit</item>
         <item name="contentPictureIcon">@drawable/content_picture</item>
         <item name="loadingPictureIcon">@drawable/image_loading</item>
         <item name="searchUserIcon">@drawable/search_users</item>

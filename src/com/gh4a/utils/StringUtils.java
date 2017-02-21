@@ -110,16 +110,6 @@ public class StringUtils {
         return Gh4Application.get().getPrettyTimeInstance().format(date);
     }
 
-    public static CharSequence formatRelativeTimeWithEditTime(Context context,
-            Date date, Date editDate, boolean showDateIfLongAgo) {
-        final CharSequence time = formatRelativeTime(context, date, showDateIfLongAgo);
-        if (date.equals(editDate)) {
-            return time;
-        }
-        final CharSequence editTime = formatRelativeTime(context, editDate, showDateIfLongAgo);
-        return context.getString(R.string.issue_comment_edited_timestamp_format, time, editTime);
-    }
-
     public static void applyBoldTagsAndSetText(StyleableTextView view, String input) {
         SpannableStringBuilder text = applyBoldTags(view.getContext(),
                 input, view.getTypefaceValue());

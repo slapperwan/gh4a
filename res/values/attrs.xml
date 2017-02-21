@@ -20,7 +20,7 @@
     <attr name="colorWebViewBackground" format="color" />
 
     <attr name="sendIcon" format="reference" />
-    <attr name="contentEditIcon" format="reference" />
+    <attr name="commentEditIcon" format="reference" />
     <attr name="sortIcon" format="reference" />
     <attr name="contentPictureIcon" format="reference" />
     <attr name="loadingPictureIcon" format="reference" />

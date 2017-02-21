@@ -112,8 +112,15 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
 
         holder.ivGravatar.setTag(user);
         holder.tvExtra.setText(userName);
-        holder.tvTimestamp.setText(StringUtils.formatRelativeTimeWithEditTime(mContext,
-                comment.getCreatedAt(), comment.getUpdatedAt(), true));
+        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                comment.getCreatedAt(), true));
+        if (comment.getCreatedAt().equals(comment.getUpdatedAt())) {
+            holder.tvEditTimestamp.setVisibility(View.GONE);
+        } else {
+            holder.tvEditTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                    comment.getUpdatedAt(), true));
+            holder.tvEditTimestamp.setVisibility(View.VISIBLE);
+        }
 
         String body = HtmlUtils.format(comment.getBodyHtml()).toString();
         mImageGetter.bind(holder.tvDesc, body, comment.getId());
@@ -178,6 +185,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
             tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
             tvExtra = (TextView) view.findViewById(R.id.tv_extra);
             tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            tvEditTimestamp = (TextView) view.findViewById(R.id.tv_edit_timestamp);
             ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
             ivMenu.setOnClickListener(this);
 
@@ -190,6 +198,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         private final TextView tvDesc;
         private final TextView tvExtra;
         private final TextView tvTimestamp;
+        private final TextView tvEditTimestamp;
         private final ImageView ivMenu;
         private final PopupMenu mPopupMenu;
         private final OnCommentMenuItemClick mCommentMenuItemClickCallback;
