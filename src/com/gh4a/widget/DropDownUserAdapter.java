@@ -18,9 +18,13 @@ import com.gh4a.utils.AvatarHandler;
 import org.eclipse.egit.github.core.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class DropDownUserAdapter extends BaseAdapter implements Filterable {
+
+    private final Object mLock = new Object();
 
     private Context mContext;
     private List<User> mUsers;
@@ -31,13 +35,25 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
     public DropDownUserAdapter(Context context) {
         mContext = context;
         mUsers = new ArrayList<>();
+        mOriginalUsers = new ArrayList<>();
         mInflater = LayoutInflater.from(context);
     }
 
     public void replace(List<User> newUsers) {
-        mUsers.clear();
-        mUsers.addAll(newUsers);
-        mOriginalUsers = new ArrayList<>(mUsers);
+        synchronized (mLock) {
+            mOriginalUsers.clear();
+            mOriginalUsers.addAll(newUsers);
+
+            Collections.sort(mOriginalUsers, new Comparator<User>() {
+                @Override
+                public int compare(User first, User second) {
+                    final String firstUsername = ApiHelpers.getUserLogin(mContext, first);
+                    final String secondUsername = ApiHelpers.getUserLogin(mContext, second);
+
+                    return firstUsername.compareToIgnoreCase(secondUsername);
+                }
+            });
+        }
 
         notifyDataSetChanged();
     }
@@ -87,8 +103,6 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
     }
 
     private class ArrayFilter extends Filter {
-        private final Object mLock = new Object();
-
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
