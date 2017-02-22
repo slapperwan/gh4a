@@ -18,9 +18,11 @@ import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import java.io.IOException;
@@ -112,6 +114,17 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     protected RootAdapter<CommitComment, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new CommitNoteAdapter(getActivity(), mRepoOwner, mRepoName, this);
         return mAdapter;
+    }
+
+    @Override
+    protected void onAddData(RootAdapter<CommitComment, ?> adapter, List<CommitComment> data) {
+        super.onAddData(adapter, data);
+        updateMentionUsers();
+    }
+
+    private void updateMentionUsers() {
+        final List<User> users = ApiHelpers.getUniqueUsers(mAdapter.getUsers());
+        mCommentFragment.setMentionUsers(users);
     }
 
     @Override

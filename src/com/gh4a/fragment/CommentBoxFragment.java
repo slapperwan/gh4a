@@ -11,15 +11,19 @@ import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.MultiAutoCompleteTextView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.DropDownUserAdapter;
 import com.gh4a.widget.SwipeRefreshLayout;
 
+import org.eclipse.egit.github.core.User;
+
 import java.io.IOException;
+import java.util.List;
 
 public class CommentBoxFragment extends Fragment implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
@@ -31,9 +35,10 @@ public class CommentBoxFragment extends Fragment implements
     }
 
     private View mSendButton;
-    private EditText mCommentEditor;
+    private MultiAutoCompleteTextView mCommentEditor;
     private Callback mCallback;
     private boolean mLocked;
+    private DropDownUserAdapter mAdapter;
 
     public void setLocked(boolean locked) {
         mLocked = locked;
@@ -63,6 +68,10 @@ public class CommentBoxFragment extends Fragment implements
         UiUtils.showImeForView(mCommentEditor);
     }
 
+    public void setMentionUsers(List<User> suggestions) {
+        mAdapter.replace(suggestions);
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -89,9 +98,14 @@ public class CommentBoxFragment extends Fragment implements
         mSendButton.setOnClickListener(this);
         mSendButton.setEnabled(false);
 
-        mCommentEditor = (EditText) view.findViewById(R.id.et_comment);
+        mCommentEditor = (MultiAutoCompleteTextView) view.findViewById(R.id.et_comment);
         mCommentEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mCommentEditor, mSendButton));
+
+        mAdapter = new DropDownUserAdapter(getContext());
+        mCommentEditor.setAdapter(mAdapter);
+        mCommentEditor.setTokenizer(new UiUtils.WhitespaceTokenizer());
+        mCommentEditor.setThreshold(1);
 
         Activity activity = getActivity();
         if (activity instanceof BaseActivity) {
