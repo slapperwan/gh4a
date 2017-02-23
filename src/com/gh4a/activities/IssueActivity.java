@@ -144,7 +144,9 @@ public class IssueActivity extends BaseActivity implements
                 for (int i = 0; i < result.size(); i++) {
                     IssueEventHolder event = result.get(i);
                     if (event.comment != null && event.comment.getId() == mInitialCommentId) {
-                        mLayoutManager.scrollToPosition(i + 1 /* adjust for header view */);
+                        int position = i + 1; /* adjust for header view */
+                        mLayoutManager.scrollToPosition(position);
+                        mEventAdapter.highlight(position);
                         break;
                     }
                 }

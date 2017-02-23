@@ -235,12 +235,16 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
         } else if (Event.TYPE_PULL_REQUEST_REVIEW_COMMENT.equals(eventType)) {
             PullRequestReviewCommentPayload payload =
                     (PullRequestReviewCommentPayload) event.getPayload();
-            if (payload.getPullRequest() != null) {
+            PullRequest pr = payload.getPullRequest();
+            CommitComment comment = payload.getComment();
+            long commentId = comment != null ? comment.getId() : -1;
+
+            if (pr != null) {
                 intent = PullRequestActivity.makeIntent(getActivity(),
-                        repoOwner, repoName, payload.getPullRequest().getNumber());
-            } else if (payload.getComment() != null) {
+                        repoOwner, repoName, pr.getNumber(), commentId);
+            } else if (comment != null) {
                 intent = CommitActivity.makeIntent(getActivity(), repoOwner, repoName,
-                        payload.getComment().getCommitId(), payload.getComment().getId());
+                        comment.getCommitId(), commentId);
             }
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
