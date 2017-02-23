@@ -23,7 +23,7 @@ import com.gh4a.widget.SwipeRefreshLayout;
 import org.eclipse.egit.github.core.User;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 public class CommentBoxFragment extends Fragment implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
@@ -68,7 +68,7 @@ public class CommentBoxFragment extends Fragment implements
         UiUtils.showImeForView(mCommentEditor);
     }
 
-    public void setMentionUsers(List<User> suggestions) {
+    public void setMentionUsers(Set<User> suggestions) {
         mAdapter.replace(suggestions);
     }
 

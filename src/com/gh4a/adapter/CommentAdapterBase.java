@@ -39,9 +39,9 @@ import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.User;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.ViewHolder> {
     public interface OnCommentAction<T> {
@@ -154,8 +154,8 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         mImageGetter.pause();
     }
 
-    public List<User> getUsers() {
-        final ArrayList<User> users = new ArrayList<>();
+    public Set<User> getUsers() {
+        final HashSet<User> users = new HashSet<>();
         for (int i = 0; i < getCount(); i++) {
             final T item = getItem(i);
             users.add(getUser(item));

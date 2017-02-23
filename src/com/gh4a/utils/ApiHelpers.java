@@ -87,25 +87,4 @@ public class ApiHelpers {
     public static boolean loginEquals(String user, String login) {
         return user != null && user.equalsIgnoreCase(login);
     }
-
-    public static List<User> getUniqueUsers(List<User> users) {
-        List<User> uniqueUsers = new ArrayList<>();
-
-        for (User user : users) {
-            boolean isUnique = true;
-            for (int i = 0; i < uniqueUsers.size(); i++) {
-                final User existingUser = uniqueUsers.get(i);
-
-                if (existingUser.getId() == user.getId()) {
-                    isUnique = false;
-                    break;
-                }
-            }
-            if (isUnique) {
-                uniqueUsers.add(user);
-            }
-        }
-
-        return uniqueUsers;
-    }
 }

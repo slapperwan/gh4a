@@ -148,14 +148,9 @@ public class IssueActivity extends BaseActivity implements
                 }
                 mInitialCommentId = -1;
             }
-            updateMentionUsers();
+            mCommentFragment.setMentionUsers(mEventAdapter.getUsers());
         }
     };
-
-    private void updateMentionUsers() {
-        final List<User> users = ApiHelpers.getUniqueUsers(mEventAdapter.getUsers());
-        mCommentFragment.setMentionUsers(users);
-    }
 
     private final LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override

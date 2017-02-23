@@ -239,7 +239,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             }
             mInitialCommentId = -1;
         }
-        updateMentionUsers();
+        mCommentFragment.setMentionUsers(mAdapter.getUsers());
     }
 
     @Override
@@ -257,11 +257,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         super.setContentShown(shown);
         mListShown = shown;
         updateCommentSectionVisibility(getView());
-    }
-
-    private void updateMentionUsers() {
-        final List<User> users = ApiHelpers.getUniqueUsers(mAdapter.getUsers());
-        mCommentFragment.setMentionUsers(users);
     }
 
     private void updateCommentSectionVisibility(View v) {

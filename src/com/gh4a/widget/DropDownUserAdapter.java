@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 public class DropDownUserAdapter extends BaseAdapter implements Filterable {
 
@@ -39,7 +40,7 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
         mInflater = LayoutInflater.from(context);
     }
 
-    public void replace(List<User> newUsers) {
+    public void replace(Set<User> newUsers) {
         synchronized (mLock) {
             mOriginalUsers.clear();
             mOriginalUsers.addAll(newUsers);
