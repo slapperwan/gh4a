@@ -30,7 +30,8 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 
-public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> {
+public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> implements
+        RootAdapter.OnItemClickListener<Milestone> {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -54,7 +55,9 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
     @Override
     protected RootAdapter<Milestone, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new MilestoneAdapter(getActivity());
+        MilestoneAdapter adapter = new MilestoneAdapter(getActivity());
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override

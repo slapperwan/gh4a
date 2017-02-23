@@ -33,7 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> {
+public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> implements
+        RootAdapter.OnItemClickListener<RepositoryContents> {
     private Repository mRepository;
     private String mPath;
     private String mRef;
@@ -88,6 +89,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     protected RootAdapter<RepositoryContents, ?> onCreateAdapter() {
         mAdapter = new FileAdapter(getActivity(), mRepository, mRef);
         mAdapter.setSubModuleNames(mCallback.getSubModuleNames(this));
+        mAdapter.setOnItemClickListener(this);
         return mAdapter;
     }
 

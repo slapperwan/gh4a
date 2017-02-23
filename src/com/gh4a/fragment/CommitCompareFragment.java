@@ -32,7 +32,8 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCompareLoader;
 import com.gh4a.loader.LoaderResult;
 
-public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit> {
+public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit> implements
+        RootAdapter.OnItemClickListener<RepositoryCommit> {
     public static CommitCompareFragment newInstance(String repoOwner, String repoName,
             String baseRef, String headRef) {
         Bundle args = new Bundle();
@@ -71,7 +72,9 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
 
     @Override
     protected RootAdapter<RepositoryCommit, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new CommitAdapter(getActivity());
+        CommitAdapter adapter = new CommitAdapter(getActivity());
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override

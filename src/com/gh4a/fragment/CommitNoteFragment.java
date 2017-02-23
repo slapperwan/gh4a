@@ -166,10 +166,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    public void onItemClick(CommitComment comment) {
-    }
-
-    @Override
     public Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
         CommitCommentListLoader loader = new CommitCommentListLoader(getActivity(),
                 mRepoOwner, mRepoName, mObjectSha, true, false);

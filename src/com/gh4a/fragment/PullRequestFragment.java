@@ -493,10 +493,6 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
     }
 
     @Override
-    public void onItemClick(IssueEventHolder event) {
-    }
-
-    @Override
     public void editComment(IssueEventHolder item) {
         Intent intent = item.comment instanceof CommitComment
                 ? EditPullRequestCommentActivity.makeIntent(getActivity(),

@@ -15,7 +15,8 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositorySearchLoader;
 
-public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
+public class RepositorySearchFragment extends ListDataBaseFragment<Repository> implements
+        RootAdapter.OnItemClickListener<Repository> {
     private RepositorySearchLoader mLoader;
 
     public static RepositorySearchFragment newInstance(String userLogin) {
@@ -51,7 +52,9 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> {
 
     @Override
     protected RootAdapter<Repository, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new RepositoryAdapter(getActivity());
+        RepositoryAdapter adapter = new RepositoryAdapter(getActivity());
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override

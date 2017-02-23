@@ -61,6 +61,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     private View mFooterView;
     private OnScrolledToFooterListener mFooterListener;
     private int mHighlightPosition = -1;
+    private boolean mHolderCreated = false;
 
     private static final int VIEW_TYPE_ITEM = 0;
     private static final int VIEW_TYPE_HEADER = 1;
@@ -118,6 +119,9 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     public void setOnItemClickListener(OnItemClickListener<T> listener) {
+        if (mHolderCreated) {
+            throw new IllegalStateException("Must not set item click listener after views are bound");
+        }
         mItemClickListener = listener;
     }
 
@@ -189,6 +193,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        mHolderCreated = true;
         switch (viewType) {
             case VIEW_TYPE_HEADER:
                 return new HeaderViewHolder(mHeaderView);
@@ -196,8 +201,10 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
                 return new FooterViewHolder(mFooterView);
             default:
                 RecyclerView.ViewHolder holder = onCreateViewHolder(mInflater, parent);
-                holder.itemView.setOnClickListener(this);
-                holder.itemView.setTag(holder);
+                if (mItemClickListener != null) {
+                    holder.itemView.setOnClickListener(this);
+                    holder.itemView.setTag(holder);
+                }
                 return holder;
         }
     }
@@ -231,12 +238,10 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
 
     @Override
     public void onClick(View view) {
-        if (mItemClickListener != null) {
-            VH holder = (VH) view.getTag();
-            int position = holder.getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                mItemClickListener.onItemClick(getItemFromAdapterPosition(position));
-            }
+        VH holder = (VH) view.getTag();
+        int position = holder.getAdapterPosition();
+        if (position != RecyclerView.NO_POSITION) {
+            mItemClickListener.onItemClick(getItemFromAdapterPosition(position));
         }
     }
 

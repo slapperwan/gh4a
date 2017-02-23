@@ -16,7 +16,8 @@ import com.gh4a.loader.DownloadsLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.UiUtils;
 
-public class DownloadsFragment extends ListDataBaseFragment<Download> {
+public class DownloadsFragment extends ListDataBaseFragment<Download> implements
+        RootAdapter.OnItemClickListener<Download> {
     private String mRepoOwner;
     private String mRepoName;
 
@@ -38,7 +39,9 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
 
     @Override
     protected RootAdapter<Download, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new DownloadAdapter(getActivity());
+        DownloadAdapter adapter = new DownloadAdapter(getActivity());
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override

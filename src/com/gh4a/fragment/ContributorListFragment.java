@@ -16,7 +16,8 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.ContributorListLoader;
 import com.gh4a.loader.LoaderResult;
 
-public class ContributorListFragment extends ListDataBaseFragment<Contributor> {
+public class ContributorListFragment extends ListDataBaseFragment<Contributor> implements
+        RootAdapter.OnItemClickListener<Contributor> {
     public static ContributorListFragment newInstance(String repoOwner, String repoName) {
         ContributorListFragment f = new ContributorListFragment();
 
@@ -42,7 +43,9 @@ public class ContributorListFragment extends ListDataBaseFragment<Contributor> {
 
     @Override
     protected RootAdapter<Contributor, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new ContributorAdapter(getActivity());
+        ContributorAdapter adapter = new ContributorAdapter(getActivity());
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override

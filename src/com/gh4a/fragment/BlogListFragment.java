@@ -28,7 +28,8 @@ import com.gh4a.holder.Feed;
 import com.gh4a.loader.FeedLoader;
 import com.gh4a.loader.LoaderResult;
 
-public class BlogListFragment extends ListDataBaseFragment<Feed> {
+public class BlogListFragment extends ListDataBaseFragment<Feed> implements
+        RootAdapter.OnItemClickListener<Feed> {
     private static final String BLOG = "https://github.com/blog.atom";
 
     public static BlogListFragment newInstance() {
@@ -37,7 +38,9 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> {
 
     @Override
     protected RootAdapter<Feed, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new CommonFeedAdapter(getActivity(), true);
+        CommonFeedAdapter adapter = new CommonFeedAdapter(getActivity(), true);
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override

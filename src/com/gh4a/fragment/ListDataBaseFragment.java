@@ -10,8 +10,7 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 
-public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase implements
-        RootAdapter.OnItemClickListener<T> {
+public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
 
     private final LoaderCallbacks<List<T>> mLoaderCallback = new LoaderCallbacks<List<T>>(this) {
@@ -60,7 +59,6 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
     protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
         super.onRecyclerViewInflated(view, inflater);
         mAdapter = onCreateAdapter();
-        mAdapter.setOnItemClickListener(this);
         view.setAdapter(mAdapter);
         updateEmptyState();
     }
@@ -72,5 +70,4 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase im
 
     protected abstract Loader<LoaderResult<List<T>>> onCreateLoader();
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
-    public abstract void onItemClick(T item);
 }

@@ -31,7 +31,8 @@ import com.gh4a.loader.TrendLoader;
 import java.util.List;
 import java.util.Locale;
 
-public class TrendingFragment extends ListDataBaseFragment<Trend> {
+public class TrendingFragment extends ListDataBaseFragment<Trend> implements
+        RootAdapter.OnItemClickListener<Trend> {
     private static final String URL_TEMPLATE =
             "http://gh4a.bplaced.net/trending_%s.json";
 
@@ -70,7 +71,9 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
 
     @Override
     protected RootAdapter<Trend, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new TrendAdapter(getActivity(), mStarsTemplate);
+        TrendAdapter adapter = new TrendAdapter(getActivity(), mStarsTemplate);
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override

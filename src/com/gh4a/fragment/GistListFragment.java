@@ -16,7 +16,8 @@ import org.eclipse.egit.github.core.Gist;
 
 import java.util.List;
 
-public class GistListFragment extends ListDataBaseFragment<Gist> {
+public class GistListFragment extends ListDataBaseFragment<Gist> implements
+        RootAdapter.OnItemClickListener<Gist> {
     public static GistListFragment newInstance(String userLogin, boolean starred) {
         Bundle args = new Bundle();
         args.putString("user", userLogin);
@@ -48,7 +49,9 @@ public class GistListFragment extends ListDataBaseFragment<Gist> {
 
     @Override
     protected RootAdapter<Gist, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new GistAdapter(getActivity(), mUserLogin);
+        GistAdapter adapter = new GistAdapter(getActivity(), mUserLogin);
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override
