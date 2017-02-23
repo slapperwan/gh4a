@@ -103,7 +103,7 @@ public class BrowseFilter extends AppCompatActivity {
                 if (!StringUtils.isBlank(id)) {
                     try {
                         intent = IssueActivity.makeIntent(this, user, repo,
-                                Integer.parseInt(id), extractIssueCommentId(uri.getFragment()));
+                                Integer.parseInt(id), extractCommentId(uri.getFragment(), "issue"));
                     } catch (NumberFormatException e) {
                         // ignored
                     }
@@ -117,12 +117,13 @@ public class BrowseFilter extends AppCompatActivity {
             } else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
                 try {
                     intent = PullRequestActivity.makeIntent(this, user, repo,
-                            Integer.parseInt(id), extractIssueCommentId(uri.getFragment()));
+                            Integer.parseInt(id), extractCommentId(uri.getFragment(), "issue"));
                 } catch (NumberFormatException e) {
                     // ignored
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
-                intent = CommitActivity.makeIntent(this, user, repo, id);
+                intent = CommitActivity.makeIntent(this, user, repo, id,
+                        extractCommentId(uri.getFragment(), "commit"));
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 4) {
                 String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
                 new RefPathDisambiguationTask(user, repo, refAndPath, uri.getFragment()).execute();
@@ -137,10 +138,11 @@ public class BrowseFilter extends AppCompatActivity {
         finish();
     }
 
-    private long extractIssueCommentId(String fragment) {
-        if (fragment != null && fragment.startsWith("issuecomment-")) {
+    private long extractCommentId(String fragment, String type) {
+        String prefix = type + "comment-";
+        if (fragment != null && fragment.startsWith(prefix)) {
             try {
-                return Long.parseLong(fragment.substring(13));
+                return Long.parseLong(fragment.substring(prefix.length()));
             } catch (NumberFormatException e) {
                 // fall through
             }

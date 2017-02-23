@@ -33,7 +33,8 @@ import java.util.Set;
 public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
         CommitNoteAdapter.OnCommentAction<CommitComment>, CommentBoxFragment.Callback {
     public static CommitNoteFragment newInstance(String repoOwner, String repoName,
-            String commitSha, RepositoryCommit commit, List<CommitComment> allComments) {
+            String commitSha, RepositoryCommit commit,
+            List<CommitComment> allComments, long initialCommentId) {
         CommitNoteFragment f = new CommitNoteFragment();
 
         ArrayList<CommitComment> comments = new ArrayList<>();
@@ -50,6 +51,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         args.putString("sha", commitSha);
         args.putSerializable("commit", commit);
         args.putSerializable("comments", comments);
+        args.putSerializable("initial_comment", initialCommentId);
+
         f.setArguments(args);
         return f;
     }
@@ -64,6 +67,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private String mRepoName;
     private String mObjectSha;
     private RepositoryCommit mCommit;
+    private long mInitialCommentId;
 
     private CommitNoteAdapter mAdapter;
     private CommentBoxFragment mCommentFragment;
@@ -75,6 +79,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mRepoName = getArguments().getString("repo");
         mObjectSha = getArguments().getString("sha");
         mCommit = (RepositoryCommit) getArguments().getSerializable("commit");
+        mInitialCommentId = getArguments().getLong("initial_comment", -1);
     }
 
     @Override
@@ -144,6 +149,15 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
             users.add(mCommit.getCommitter());
         }
         mCommentFragment.setMentionUsers(users);
+        if (mInitialCommentId >= 0) {
+            for (int i = 0; i < data.size(); i++) {
+                if (data.get(i).getId() == mInitialCommentId) {
+                    getLayoutManager().scrollToPosition(i);
+                    break;
+                }
+            }
+            mInitialCommentId = -1;
+        }
     }
 
     @Override

@@ -156,7 +156,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             CommitComment comment = payload.getComment();
             if (comment != null) {
                 intent = CommitActivity.makeIntent(getActivity(),
-                        repoOwner, repoName, comment.getCommitId());
+                        repoOwner, repoName, comment.getCommitId(), comment.getId());
             }
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
@@ -239,8 +239,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                 intent = PullRequestActivity.makeIntent(getActivity(),
                         repoOwner, repoName, payload.getPullRequest().getNumber());
             } else if (payload.getComment() != null) {
-                intent = CommitActivity.makeIntent(getActivity(),
-                        repoOwner, repoName, payload.getComment().getCommitId());
+                intent = CommitActivity.makeIntent(getActivity(), repoOwner, repoName,
+                        payload.getComment().getCommitId(), payload.getComment().getId());
             }
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {

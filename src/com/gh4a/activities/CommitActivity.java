@@ -44,10 +44,16 @@ import java.util.List;
 public class CommitActivity extends BasePagerActivity implements
         CommitNoteFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
+        return makeIntent(context, repoOwner, repoName, sha, -1);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            String sha, long initialCommentId) {
         return new Intent(context, CommitActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
-                .putExtra("sha", sha);
+                .putExtra("sha", sha)
+                .putExtra("initial_comment", initialCommentId);
     }
 
     private String mRepoOwner;
@@ -56,6 +62,7 @@ public class CommitActivity extends BasePagerActivity implements
 
     private RepositoryCommit mCommit;
     private List<CommitComment> mComments;
+    private long mInitialCommentId;
 
     private static final int[] TITLES = new int[] {
         R.string.commit, R.string.issue_comments
@@ -86,6 +93,18 @@ public class CommitActivity extends BasePagerActivity implements
         @Override
         protected void onResultReady(List<CommitComment> result) {
             mComments = result;
+            boolean foundComment = false;
+            if (mInitialCommentId >= 0) {
+                for (CommitComment comment : result) {
+                    if (comment.getId() == mInitialCommentId) {
+                        foundComment = comment.getPosition() < 0;
+                        break;
+                    }
+                }
+                if (!foundComment) {
+                    mInitialCommentId = -1;
+                }
+            }
             showContentIfReady();
         }
     };
@@ -112,6 +131,7 @@ public class CommitActivity extends BasePagerActivity implements
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
         mObjectSha = extras.getString("sha");
+        mInitialCommentId = extras.getLong("initial_comment", -1);
     }
 
     @Override
@@ -135,8 +155,10 @@ public class CommitActivity extends BasePagerActivity implements
     @Override
     protected Fragment getFragment(int position) {
         if (position == 1) {
-            return CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
-                    mCommit, mComments);
+            Fragment f = CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
+                    mCommit, mComments, mInitialCommentId);
+            mInitialCommentId = -1;
+            return f;
         } else {
             return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
                     mCommit, mComments);
@@ -188,6 +210,9 @@ public class CommitActivity extends BasePagerActivity implements
         if (mCommit != null && mComments != null) {
             setContentShown(true);
             invalidateTabs();
+            if (mInitialCommentId != -1) {
+                getPager().setCurrentItem(1);
+            }
         }
     }
 }
