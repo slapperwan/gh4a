@@ -411,25 +411,22 @@ public class UiUtils {
     public static class WhitespaceTokenizer implements MultiAutoCompleteTextView.Tokenizer {
         @Override
         public int findTokenStart(CharSequence text, int cursor) {
-            int i = cursor;
-
-            while (i > 0 && !Character.isWhitespace(text.charAt(i - 1))) {
-                i--;
+            while (cursor > 0 && !Character.isWhitespace(text.charAt(cursor - 1))) {
+                cursor--;
             }
 
-            return i;
+            return cursor;
         }
 
         @Override
         public int findTokenEnd(CharSequence text, int cursor) {
-            int i = cursor;
             int len = text.length();
 
-            while (i < len) {
-                if (Character.isWhitespace(text.charAt(i))) {
-                    return i;
+            while (cursor < len) {
+                if (Character.isWhitespace(text.charAt(cursor))) {
+                    return cursor;
                 } else {
-                    i++;
+                    cursor++;
                 }
             }
 

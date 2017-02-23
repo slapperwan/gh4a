@@ -2,6 +2,7 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -108,13 +109,7 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
 
-            if (mOriginalUsers == null) {
-                synchronized (mLock) {
-                    mOriginalUsers = new ArrayList<>(mUsers);
-                }
-            }
-
-            if (constraint == null || constraint.length() == 0) {
+            if (TextUtils.isEmpty(constraint)) {
                 final ArrayList<User> list;
                 synchronized (mLock) {
                     list = new ArrayList<>(mOriginalUsers);
@@ -125,8 +120,8 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
                 results.values = new ArrayList<>();
                 results.count = 0;
             } else {
-                final String constraintString = constraint.toString()
-                        .substring(1).toLowerCase();
+                final String constraintString =
+                        constraint.toString().substring(1).toLowerCase();
 
                 final ArrayList<User> values;
                 synchronized (mLock) {
