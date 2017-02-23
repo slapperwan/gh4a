@@ -8,7 +8,6 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
@@ -25,10 +24,6 @@ import com.gh4a.R;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.UserActivity;
-import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.CommitLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.AvatarHandler;
@@ -36,16 +31,20 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommitFragment extends LoadingFragmentBase implements OnClickListener {
-    public static CommitFragment newInstance(String repoOwner, String repoName, String commitSha) {
+    public static CommitFragment newInstance(String repoOwner, String repoName, String commitSha,
+            RepositoryCommit commit, List<CommitComment> comments) {
         CommitFragment f = new CommitFragment();
 
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putString("sha", commitSha);
+        args.putSerializable("commit", commit);
+        args.putSerializable("comments", new ArrayList<>(comments));
         f.setArguments(args);
         return f;
     }
@@ -59,47 +58,14 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     private List<CommitComment> mComments;
     protected View mContentView;
 
-    private final LoaderCallbacks<RepositoryCommit> mCommitCallback =
-            new LoaderCallbacks<RepositoryCommit>(this) {
-        @Override
-        protected Loader<LoaderResult<RepositoryCommit>> onCreateLoader() {
-            return new CommitLoader(getActivity(), mRepoOwner, mRepoName, mObjectSha);
-        }
-
-        @Override
-        protected void onResultReady(RepositoryCommit result) {
-            mCommit = result;
-            fillDataIfReady();
-        }
-    };
-    private final LoaderCallbacks<List<CommitComment>> mCommentCallback =
-            new LoaderCallbacks<List<CommitComment>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
-            return new CommitCommentListLoader(getActivity(), mRepoOwner, mRepoName,
-                    mObjectSha, false, true);
-        }
-
-        @Override
-        protected void onResultReady(List<CommitComment> result) {
-            mComments = result;
-            fillDataIfReady();
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRepoOwner = getArguments().getString("owner");
         mRepoName = getArguments().getString("repo");
         mObjectSha = getArguments().getString("sha");
-    }
-
-    @Override
-    public void onRefresh() {
-        mCommit = null;
-        mComments = null;
-        hideContentAndRestartLoaders(0, 1);
+        mCommit = (RepositoryCommit) getArguments().getSerializable("commit");
+        mComments = (List<CommitComment>) getArguments().getSerializable("comments");
     }
 
     @Override
@@ -109,25 +75,19 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setContentShown(false);
-
-        initLoader();
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        populateViewIfReady();
     }
 
-    protected void initLoader() {
-        getLoaderManager().initLoader(0, null, mCommitCallback);
-        getLoaderManager().initLoader(1, null, mCommentCallback);
+    @Override
+    public void onRefresh() {
+        // we got all our data through arguments
     }
 
-    private void fillDataIfReady() {
-        if (mCommit != null && mComments != null) {
-            fillHeader();
-            fillStats(mCommit.getFiles(), mComments);
-            setContentShown(true);
-        }
+    protected void populateViewIfReady() {
+        fillHeader();
+        fillStats(mCommit.getFiles(), mComments);
     }
 
     private void fillHeader() {

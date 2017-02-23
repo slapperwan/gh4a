@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.EditCommitCommentActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -20,23 +21,42 @@ import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
 
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
         CommitNoteAdapter.OnCommentAction<CommitComment>, CommentBoxFragment.Callback {
-    public static CommitNoteFragment newInstance(String repoOwner, String repoName, String commitSha) {
+    public static CommitNoteFragment newInstance(String repoOwner, String repoName,
+            String commitSha, RepositoryCommit commit, List<CommitComment> allComments) {
         CommitNoteFragment f = new CommitNoteFragment();
+
+        ArrayList<CommitComment> comments = new ArrayList<>();
+        // we're only interested in unpositional comments
+        for (CommitComment comment : allComments) {
+            if (comment.getPosition() < 0) {
+                comments.add(comment);
+            }
+        }
 
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putString("sha", commitSha);
+        args.putSerializable("commit", commit);
+        args.putSerializable("comments", comments);
         f.setArguments(args);
         return f;
+    }
+
+    public interface CommentUpdateListener {
+        void onCommentsUpdated();
     }
 
     private static final int REQUEST_EDIT = 1000;
@@ -44,6 +64,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
+    private RepositoryCommit mCommit;
 
     private CommitNoteAdapter mAdapter;
     private CommentBoxFragment mCommentFragment;
@@ -54,6 +75,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mRepoOwner = getArguments().getString("owner");
         mRepoName = getArguments().getString("repo");
         mObjectSha = getArguments().getString("sha");
+        mCommit = (RepositoryCommit) getArguments().getSerializable("commit");
     }
 
     @Override
@@ -117,7 +139,12 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     @Override
     protected void onAddData(RootAdapter<CommitComment, ?> adapter, List<CommitComment> data) {
         super.onAddData(adapter, data);
-        mCommentFragment.setMentionUsers(mAdapter.getUsers());
+        Set<User> users = mAdapter.getUsers();
+        users.add(mCommit.getAuthor());
+        if (mCommit.getCommitter() != null) {
+            users.add(mCommit.getCommitter());
+        }
+        mCommentFragment.setMentionUsers(users);
     }
 
     @Override
@@ -131,15 +158,17 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
-        return new CommitCommentListLoader(getActivity(), mRepoOwner, mRepoName,
-                mObjectSha, true, false);
+        CommitCommentListLoader loader = new CommitCommentListLoader(getActivity(),
+                mRepoOwner, mRepoName, mObjectSha, true, false);
+        loader.prefillData((List<CommitComment>) getArguments().getSerializable("comments"));
+        return loader;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
-                onRefresh();
+                refreshComments();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -174,8 +203,12 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void onCommentSent() {
-        if (isAdded()) {
-            onRefresh();
+        refreshComments();
+    }
+
+    private void refreshComments() {
+        if (getActivity() instanceof CommentUpdateListener) {
+            ((CommentUpdateListener) getActivity()).onCommentsUpdated();
         }
     }
 }

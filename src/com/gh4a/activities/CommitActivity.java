@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,9 +31,20 @@ import com.gh4a.BasePagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
+import com.gh4a.loader.CommitCommentListLoader;
+import com.gh4a.loader.CommitLoader;
+import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 
-public class CommitActivity extends BasePagerActivity {
+import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.RepositoryCommit;
+
+import java.util.List;
+
+public class CommitActivity extends BasePagerActivity implements
+        CommitNoteFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
         return new Intent(context, CommitActivity.class)
                 .putExtra("owner", repoOwner)
@@ -43,9 +56,42 @@ public class CommitActivity extends BasePagerActivity {
     private String mRepoName;
     private String mObjectSha;
 
+    private RepositoryCommit mCommit;
+    private List<CommitComment> mComments;
+
     private static final int[] TITLES = new int[] {
         R.string.commit, R.string.issue_comments
     };
+
+    private final LoaderCallbacks<RepositoryCommit> mCommitCallback =
+            new LoaderCallbacks<RepositoryCommit>(this) {
+        @Override
+        protected Loader<LoaderResult<RepositoryCommit>> onCreateLoader() {
+            return new CommitLoader(CommitActivity.this, mRepoOwner, mRepoName, mObjectSha);
+        }
+
+        @Override
+        protected void onResultReady(RepositoryCommit result) {
+            mCommit = result;
+            showContentIfReady();
+        }
+    };
+
+    private final LoaderCallbacks<List<CommitComment>> mCommentCallback =
+            new LoaderCallbacks<List<CommitComment>>(this) {
+        @Override
+        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
+            return new CommitCommentListLoader(CommitActivity.this, mRepoOwner, mRepoName,
+                    mObjectSha, true, true);
+        }
+
+        @Override
+        protected void onResultReady(List<CommitComment> result) {
+            mComments = result;
+            showContentIfReady();
+        }
+    };
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,6 +101,11 @@ public class CommitActivity extends BasePagerActivity {
         actionBar.setTitle(getString(R.string.commit_title, mObjectSha.substring(0, 7)));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        setContentShown(false);
+
+        getSupportLoaderManager().initLoader(0, null, mCommitCallback);
+        getSupportLoaderManager().initLoader(1, null, mCommentCallback);
     }
 
     @Override
@@ -67,15 +118,30 @@ public class CommitActivity extends BasePagerActivity {
 
     @Override
     protected int[] getTabTitleResIds() {
-        return TITLES;
+        return mCommit != null && mComments != null ? TITLES : null;
+    }
+
+    @Override
+    public void onRefresh() {
+        mCommit = null;
+        mComments = null;
+        setContentShown(false);
+        invalidateTabs();
+
+        getSupportLoaderManager().getLoader(0).onContentChanged();
+        getSupportLoaderManager().getLoader(1).onContentChanged();
+
+        super.onRefresh();
     }
 
     @Override
     protected Fragment getFragment(int position) {
         if (position == 1) {
-            return CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
+            return CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
+                    mCommit, mComments);
         } else {
-            return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha);
+            return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
+                    mCommit, mComments);
         }
     }
 
@@ -110,5 +176,20 @@ public class CommitActivity extends BasePagerActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCommentsUpdated() {
+        mComments = null;
+        setContentShown(false);
+        invalidateTabs();
+        getSupportLoaderManager().getLoader(1).onContentChanged();
+    }
+
+    private void showContentIfReady() {
+        if (mCommit != null && mComments != null) {
+            setContentShown(true);
+            invalidateTabs();
+        }
     }
 }

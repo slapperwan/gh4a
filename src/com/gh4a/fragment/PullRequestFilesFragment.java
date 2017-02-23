@@ -3,6 +3,7 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.view.View;
 
@@ -56,7 +57,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         @Override
         protected void onResultReady(List<CommitFile> result) {
             mFiles = result;
-            fillDataIfReady();
+            populateViewIfReady();
         }
     };
 
@@ -71,7 +72,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         @Override
         protected void onResultReady(List<CommitComment> result) {
             mComments = result;
-            fillDataIfReady();
+            populateViewIfReady();
         }
     };
 
@@ -98,6 +99,14 @@ public class PullRequestFilesFragment extends CommitFragment {
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setContentShown(false);
+        getLoaderManager().initLoader(0, null, mPullRequestFilesCallback);
+        getLoaderManager().initLoader(1, null, mPullRequestCommentsCallback);
+    }
+
+    @Override
     public void onRefresh() {
         mFiles = null;
         mComments = null;
@@ -105,12 +114,7 @@ public class PullRequestFilesFragment extends CommitFragment {
     }
 
     @Override
-    protected void initLoader() {
-        getLoaderManager().initLoader(0, null, mPullRequestFilesCallback);
-        getLoaderManager().initLoader(1, null, mPullRequestCommentsCallback);
-    }
-
-    private void fillDataIfReady() {
+    protected void populateViewIfReady() {
         if (mComments != null && mFiles != null) {
             fillStats(mFiles, mComments);
             setContentShown(true);
