@@ -12,6 +12,7 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
@@ -43,8 +44,13 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
 
     public void replace(Set<User> newUsers) {
         synchronized (mLock) {
+            String ourLogin = Gh4Application.get().getAuthLogin();
             mOriginalUsers.clear();
-            mOriginalUsers.addAll(newUsers);
+            for (User user : newUsers) {
+                if (!TextUtils.equals(ourLogin, user.getLogin())) {
+                    mOriginalUsers.add(user);
+                }
+            }
 
             Collections.sort(mOriginalUsers, new Comparator<User>() {
                 @Override
