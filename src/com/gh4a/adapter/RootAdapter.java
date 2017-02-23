@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 
 import android.content.Context;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -59,6 +60,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     private View mHeaderView;
     private View mFooterView;
     private OnScrolledToFooterListener mFooterListener;
+    private int mHighlightPosition = -1;
 
     private static final int VIEW_TYPE_ITEM = 0;
     private static final int VIEW_TYPE_HEADER = 1;
@@ -180,6 +182,11 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
+    public void highlight(int position) {
+        mHighlightPosition = position;
+        notifyDataSetChanged();
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         switch (viewType) {
@@ -203,6 +210,22 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
             }
         } else if (!(holder instanceof HeaderViewHolder)) {
             onBindViewHolder((VH) holder, getItemFromAdapterPosition(position));
+            if (position == mHighlightPosition) {
+                final View v = holder.itemView;
+                v.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (v.getBackground() != null) {
+                            final int centerX = v.getWidth() / 2;
+                            final int centerY = v.getHeight() / 2;
+                            DrawableCompat.setHotspot(v.getBackground(), centerX, centerY);
+                        }
+                        v.setPressed(true);
+                        v.setPressed(false);
+                        mHighlightPosition = -1;
+                    }
+                });
+            }
         }
     }
 

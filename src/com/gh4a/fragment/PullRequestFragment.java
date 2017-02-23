@@ -234,7 +234,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             for (int i = 0; i < data.size(); i++) {
                 IssueEventHolder event = data.get(i);
                 if (event.comment != null && event.comment.getId() == mInitialCommentId) {
-                    getLayoutManager().scrollToPosition(i + 1 /* adjust for header view */);
+                    scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
                     break;
                 }
             }

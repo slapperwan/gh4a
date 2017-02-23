@@ -152,7 +152,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         if (mInitialCommentId >= 0) {
             for (int i = 0; i < data.size(); i++) {
                 if (data.get(i).getId() == mInitialCommentId) {
-                    getLayoutManager().scrollToPosition(i);
+                    scrollToAndHighlightPosition(i);
                     break;
                 }
             }

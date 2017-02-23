@@ -89,8 +89,17 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
     protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
     }
 
-    protected LinearLayoutManager getLayoutManager() {
-        return mLayoutManager;
+    protected void scrollToAndHighlightPosition(final int position) {
+        mLayoutManager.scrollToPosition(position);
+        final RecyclerView.Adapter<?> adapter = mRecyclerView.getAdapter();
+        if (adapter instanceof RootAdapter) {
+            mRecyclerView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    ((RootAdapter) adapter).highlight(position);
+                }
+            }, 600);
+        }
     }
 
     protected boolean hasDividers() {
