@@ -583,6 +583,9 @@ public class HtmlUtils {
                 start(mSpannableStringBuilder, new Sub());
             } else if (tag.equalsIgnoreCase("code")) {
                 boolean inPre = getLast(mSpannableStringBuilder, Pre.class) != null;
+                if (inPre) {
+                    appendNewlines(mSpannableStringBuilder, 1);
+                }
                 start(mSpannableStringBuilder, new Code(inPre));
             } else if (tag.length() == 2 &&
                     Character.toLowerCase(tag.charAt(0)) == 'h' &&
@@ -655,7 +658,7 @@ public class HtmlUtils {
                     Object backgroundSpan = code.mInPre
                             ? new CodeBlockSpan(0x30aaaaaa) : new BackgroundColorSpan(0x30aaaaaa);
                     if (code.mInPre) {
-                        mSpannableStringBuilder.append("\n");
+                        appendNewlines(mSpannableStringBuilder, 1);
                     }
                     setSpanFromMark(mSpannableStringBuilder, code,
                             new TypefaceSpan("monospace"), backgroundSpan);
