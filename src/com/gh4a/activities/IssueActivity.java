@@ -442,10 +442,7 @@ public class IssueActivity extends BaseActivity implements
             }
         });
 
-        LoaderManager lm = getSupportLoaderManager();
-        for (int i = 0; i < 3; i++) {
-            lm.getLoader(i).onContentChanged();
-        }
+        forceLoaderReload(0, 1, 2);
         super.onRefresh();
     }
 
@@ -536,12 +533,12 @@ public class IssueActivity extends BaseActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
-                getSupportLoaderManager().getLoader(2).onContentChanged();
+                forceLoaderReload(2);
                 setResult(RESULT_OK);
             }
         } else if (requestCode == REQUEST_EDIT_ISSUE) {
             if (resultCode == Activity.RESULT_OK) {
-                getSupportLoaderManager().getLoader(0).onContentChanged();
+                forceLoaderReload(0);
                 setResult(RESULT_OK);
             }
         } else {
@@ -576,10 +573,7 @@ public class IssueActivity extends BaseActivity implements
     @Override
     public void onCommentSent() {
         //reload comments
-        Loader loader = getSupportLoaderManager().getLoader(2);
-        if (loader != null) {
-            loader.onContentChanged();
-        }
+        forceLoaderReload(2);
         setResult(RESULT_OK);
     }
 
@@ -615,7 +609,7 @@ public class IssueActivity extends BaseActivity implements
             // reload issue state
             fillDataIfDone();
             // reload events, the action will have triggered an additional one
-            getSupportLoaderManager().getLoader(2).onContentChanged();
+            forceLoaderReload(2);
             setResult(RESULT_OK);
             supportInvalidateOptionsMenu();
         }

@@ -227,12 +227,8 @@ public class SearchActivity extends BaseActivity implements
 
     @Override
     public void onRefresh() {
-        Loader loader = getSupportLoaderManager().getLoader(0);
-        if (loader != null) {
-            if (mAdapter != null) {
-                mAdapter.clear();
-            }
-            loader.onContentChanged();
+        if (forceLoaderReload(0) && mAdapter != null) {
+            mAdapter.clear();
         }
         super.onRefresh();
     }

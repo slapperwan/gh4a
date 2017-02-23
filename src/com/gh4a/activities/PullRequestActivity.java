@@ -261,10 +261,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         }
         mHeader.setVisibility(View.GONE);
         mHeaderColorAttrs = null;
-        LoaderManager lm = getSupportLoaderManager();
-        for (int i = 0; i < 3; i++) {
-            lm.getLoader(i).onContentChanged();
-        }
+        forceLoaderReload(0, 1, 2);
         invalidateTabs();
         super.onRefresh();
     }

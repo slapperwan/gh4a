@@ -107,9 +107,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void onRefresh() {
-        LoaderManager lm = getSupportLoaderManager();
-        lm.getLoader(0).onContentChanged();
-        lm.getLoader(1).onContentChanged();
+        forceLoaderReload(0, 1);
         mGist = null;
         mIsStarred = null;
         setContentShown(false);

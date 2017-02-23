@@ -138,11 +138,9 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     public void onRefresh() {
-        Loader loader = getSupportLoaderManager().getLoader(0);
-        if (loader != null) {
+        if (forceLoaderReload(0)) {
             mRelease = null;
             setContentShown(false);
-            loader.onContentChanged();
             getSupportLoaderManager().destroyLoader(1);
         }
         super.onRefresh();

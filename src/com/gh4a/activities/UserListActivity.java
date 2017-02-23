@@ -89,7 +89,7 @@ public abstract class UserListActivity extends BaseActivity implements
     public void onRefresh() {
         mUserAdapter.clear();
         setContentShown(false);
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
         super.onRefresh();
     }
 

@@ -290,14 +290,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mIsCollaborator = false;
         updateLabels();
         updateLabelStates();
-
-        LoaderManager lm = getSupportLoaderManager();
-        for (int i = 0; i < 4; i++) {
-            Loader loader = lm.getLoader(i);
-            if (loader != null) {
-                loader.onContentChanged();
-            }
-        }
+        forceLoaderReload(0, 1, 2, 3);
         super.onRefresh();
     }
 

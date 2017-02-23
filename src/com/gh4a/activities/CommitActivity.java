@@ -145,10 +145,7 @@ public class CommitActivity extends BasePagerActivity implements
         mComments = null;
         setContentShown(false);
         invalidateTabs();
-
-        getSupportLoaderManager().getLoader(0).onContentChanged();
-        getSupportLoaderManager().getLoader(1).onContentChanged();
-
+        forceLoaderReload(0, 1);
         super.onRefresh();
     }
 
@@ -203,7 +200,7 @@ public class CommitActivity extends BasePagerActivity implements
         mComments = null;
         setContentShown(false);
         invalidateTabs();
-        getSupportLoaderManager().getLoader(1).onContentChanged();
+        forceLoaderReload(1);
     }
 
     private void showContentIfReady() {

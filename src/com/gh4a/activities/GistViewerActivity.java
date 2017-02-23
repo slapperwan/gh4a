@@ -86,7 +86,7 @@ public class GistViewerActivity extends WebViewerActivity {
     @Override
     public void onRefresh() {
         setContentShown(false);
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
         mGistFile = null;
         super.onRefresh();
     }

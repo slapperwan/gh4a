@@ -158,7 +158,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     public void onRefresh() {
         setContentShown(false);
         mAdapter.clear();
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
         super.onRefresh();
     }
 
@@ -306,7 +306,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().getLoader(0).onContentChanged();
+            forceLoaderReload(0);
         }
 
         @Override
@@ -348,7 +348,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().getLoader(0).onContentChanged();
+            forceLoaderReload(0);
         }
 
         @Override
@@ -387,7 +387,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().getLoader(0).onContentChanged();
+            forceLoaderReload(0);
             mAddedLabel = null;
         }
 

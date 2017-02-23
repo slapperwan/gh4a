@@ -169,11 +169,9 @@ public class UserActivity extends BasePagerActivity {
 
     @Override
     public void onRefresh() {
-        Loader loader = getSupportLoaderManager().getLoader(4);
-        if (loader != null) {
+        if (forceLoaderReload(4)) {
             mIsFollowing = null;
             supportInvalidateOptionsMenu();
-            loader.onContentChanged();
         }
         super.onRefresh();
     }

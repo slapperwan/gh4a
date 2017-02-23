@@ -146,11 +146,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     @Override
     public void onRefresh() {
-        Loader loader = getSupportLoaderManager().getLoader(0);
-        if (loader != null) {
+        if (forceLoaderReload(0)) {
             mCommitCommentsByPos.clear();
             setContentShown(false);
-            loader.onContentChanged();
         }
         super.onRefresh();
     }

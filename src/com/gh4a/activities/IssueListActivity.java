@@ -233,14 +233,7 @@ public class IssueListActivity extends BasePagerActivity implements
         mLabels = null;
         mIsCollaborator = null;
         updateRightNavigationDrawer();
-
-        LoaderManager lm = getSupportLoaderManager();
-        for (int i = 0; i < 4; i++) {
-            Loader loader = lm.getLoader(i);
-            if (loader != null) {
-                loader.onContentChanged();
-            }
-        }
+        forceLoaderReload(0, 1, 2, 3);
         super.onRefresh();
     }
 

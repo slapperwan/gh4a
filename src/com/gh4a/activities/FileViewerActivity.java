@@ -146,7 +146,7 @@ public class FileViewerActivity extends WebViewerActivity {
 
     @Override
     public void onRefresh() {
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
         setContentShown(false);
         setContentEmpty(false);
         super.onRefresh();

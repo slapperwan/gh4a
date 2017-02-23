@@ -244,7 +244,7 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     public void onRefresh() {
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
         super.onRefresh();
     }
 

@@ -128,7 +128,7 @@ public class ReleaseListActivity extends BaseActivity implements
     public void onRefresh() {
         mAdapter.clear();
         setContentShown(false);
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
         super.onRefresh();
     }
 

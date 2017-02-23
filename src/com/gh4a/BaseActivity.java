@@ -40,7 +40,9 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -484,6 +486,19 @@ public abstract class BaseActivity extends AppCompatActivity implements
             mPendingPermissionCb.onRequestPermissionsResult(0, permissions, grantResults);
             mPendingPermissionCb = null;
         }
+    }
+
+    protected boolean forceLoaderReload(int... ids) {
+        LoaderManager lm = getSupportLoaderManager();
+        boolean reloadedAny = false;
+        for (int id : ids) {
+            Loader loader = lm.getLoader(id);
+            if (loader != null) {
+                loader.onContentChanged();
+                reloadedAny = true;
+            }
+        }
+        return reloadedAny;
     }
 
     protected void setErrorViewVisibility(boolean visible) {
