@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> implements
         View.OnClickListener, IssueEventAdapter.OnCommentAction<IssueEventHolder>,
@@ -239,7 +240,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             }
             mInitialCommentId = -1;
         }
-        mCommentFragment.setMentionUsers(mAdapter.getUsers());
+        updateMentionUsers();
     }
 
     @Override
@@ -277,6 +278,12 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
 
     private boolean isLocked() {
         return mPullRequest.isLocked() && !mIsCollaborator;
+    }
+
+    private void updateMentionUsers() {
+        Set<User> users = mAdapter.getUsers();
+        users.add(mPullRequest.getUser());
+        mCommentFragment.setMentionUsers(users);
     }
 
     private void updateCommentLockState() {

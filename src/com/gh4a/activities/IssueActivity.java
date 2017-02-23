@@ -74,6 +74,7 @@ import org.eclipse.egit.github.core.service.IssueService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, IssueEventAdapter.OnCommentAction<IssueEventHolder>,
@@ -118,6 +119,7 @@ public class IssueActivity extends BaseActivity implements
         @Override
         protected void onResultReady(Issue result) {
             mIssue = result;
+            updateMentionUsers();
             fillDataIfDone();
             supportInvalidateOptionsMenu();
         }
@@ -148,7 +150,7 @@ public class IssueActivity extends BaseActivity implements
                 }
                 mInitialCommentId = -1;
             }
-            mCommentFragment.setMentionUsers(mEventAdapter.getUsers());
+            updateMentionUsers();
         }
     };
 
@@ -443,6 +445,14 @@ public class IssueActivity extends BaseActivity implements
             lm.getLoader(i).onContentChanged();
         }
         super.onRefresh();
+    }
+
+    private void updateMentionUsers() {
+        Set<User> users = mEventAdapter.getUsers();
+        if (mIssue != null) {
+            users.add(mIssue.getUser());
+        }
+        mCommentFragment.setMentionUsers(users);
     }
 
     private void updateCommentLockState() {
