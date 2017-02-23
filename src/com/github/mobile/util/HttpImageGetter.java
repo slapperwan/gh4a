@@ -271,7 +271,7 @@ public class HttpImageGetter implements ImageGetter {
 
     private HttpImageGetter show(final TextView view, final CharSequence html, final Object id) {
         if (TextUtils.isEmpty(html))
-            return hide(view, id);
+            return hide(view);
 
         view.setText(html);
         view.setVisibility(VISIBLE);
@@ -279,7 +279,7 @@ public class HttpImageGetter implements ImageGetter {
         return this;
     }
 
-    private HttpImageGetter hide(final TextView view, final Object id) {
+    private HttpImageGetter hide(final TextView view) {
         view.setText(null);
         view.setVisibility(GONE);
         view.setTag(null);
@@ -319,7 +319,7 @@ public class HttpImageGetter implements ImageGetter {
             final Object id) {
         unbindViewFromGifs(view);
         if (TextUtils.isEmpty(html))
-            return hide(view, id);
+            return hide(view);
 
         CharSequence encoded = fullHtmlCache.get(id);
         if (encoded != null) {
@@ -340,7 +340,7 @@ public class HttpImageGetter implements ImageGetter {
         }
 
         if (TextUtils.isEmpty(encoded))
-            return hide(view, id);
+            return hide(view);
 
         show(view, encoded, id);
         view.setTag(id);

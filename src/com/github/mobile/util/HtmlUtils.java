@@ -732,7 +732,6 @@ public class HtmlUtils {
             endBlockElement(text);
             ListItem item = getLast(text, ListItem.class);
             if (item != null) {
-                int len = text.length();
                 if (item.mOrdered) {
                     int where = text.getSpanStart(item);
                     text.removeSpan(item);
@@ -985,6 +984,7 @@ public class HtmlUtils {
                 try {
                     return Integer.parseInt(value);
                 } catch (NumberFormatException e) {
+                    // fall through
                 }
             }
             return defaultValue;
@@ -1028,7 +1028,7 @@ public class HtmlUtils {
             public final int mPosition;
 
             public ListItem(List list, Attributes attrs) {
-                mOrdered = list != null ? list.mOrdered : false;
+                mOrdered = list != null && list.mOrdered;
                 int position = list != null ? list.mPosition : -1;
                 if (mOrdered) {
                     position = parseIntAttribute(attrs, "value", position);

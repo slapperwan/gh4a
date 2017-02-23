@@ -146,7 +146,7 @@ public class SearchActivity extends BaseActivity implements
         }
     };
 
-    private LoaderManager.LoaderCallbacks<Cursor> mSuggestionCallback =
+    private final LoaderManager.LoaderCallbacks<Cursor> mSuggestionCallback =
             new LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -459,8 +459,8 @@ public class SearchActivity extends BaseActivity implements
 
 
     private class SaveSearchSuggestionTask extends BackgroundTask<Void> {
-        private String mSuggestion;
-        private int mType;
+        private final String mSuggestion;
+        private final int mType;
 
         public SaveSearchSuggestionTask(String suggestion, int type) {
             super(SearchActivity.this);
@@ -484,7 +484,7 @@ public class SearchActivity extends BaseActivity implements
     }
 
     private class SuggestionDeletionTask extends BackgroundTask<Void> {
-        private int mType;
+        private final int mType;
 
         public SuggestionDeletionTask(int type) {
             super(SearchActivity.this);
@@ -505,7 +505,7 @@ public class SearchActivity extends BaseActivity implements
         }
     }
     private static class SuggestionAdapter extends CursorAdapter {
-        private LayoutInflater mInflater;
+        private final LayoutInflater mInflater;
 
         public SuggestionAdapter(Context context) {
             super(context, null, false);

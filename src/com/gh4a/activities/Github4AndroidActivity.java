@@ -173,7 +173,7 @@ public class Github4AndroidActivity extends BaseActivity {
             mOtpCode = otpCode;
         }
 
-        protected LoginTask(BaseActivity activity) {
+        protected LoginTask() {
             this(null, null, null);
         }
 
@@ -273,7 +273,7 @@ public class Github4AndroidActivity extends BaseActivity {
         private final String mPassword;
 
         public DummyPostTask(String userName, String password) {
-            super(Github4AndroidActivity.this);
+            super();
             mUserName = userName;
             mPassword = password;
         }

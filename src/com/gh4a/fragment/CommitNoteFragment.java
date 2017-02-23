@@ -13,7 +13,6 @@ import android.widget.FrameLayout;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.EditCommitCommentActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;

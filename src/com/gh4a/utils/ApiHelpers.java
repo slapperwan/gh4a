@@ -11,9 +11,6 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ApiHelpers {
     public interface IssueState {
         String OPEN = "open";

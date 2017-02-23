@@ -29,10 +29,10 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
 
     private final Object mLock = new Object();
 
-    private Context mContext;
+    private final Context mContext;
     private List<User> mUsers;
-    private ArrayList<User> mOriginalUsers;
-    private LayoutInflater mInflater;
+    private final ArrayList<User> mOriginalUsers;
+    private final LayoutInflater mInflater;
     private ArrayFilter mFilter;
 
     public DropDownUserAdapter(Context context) {

@@ -142,6 +142,7 @@ public class BrowseFilter extends AppCompatActivity {
             try {
                 return Long.parseLong(fragment.substring(13));
             } catch (NumberFormatException e) {
+                // fall through
             }
         }
         return -1;

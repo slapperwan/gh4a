@@ -152,7 +152,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     @Override
-    public void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
+    protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
         super.transitionHeaderToColor(colorAttrId, statusBarColorAttrId);
         mCurrentHeaderColor = UiUtils.resolveColor(this, colorAttrId);
     }

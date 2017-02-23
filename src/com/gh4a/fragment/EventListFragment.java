@@ -128,8 +128,6 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
     @Override
     public void onItemClick(Event event) {
-        Gh4Application context = Gh4Application.get();
-
         if (EventAdapter.hasInvalidPayload(event)) {
             return;
         }

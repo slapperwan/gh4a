@@ -30,7 +30,7 @@ import com.gh4a.R;
 import com.gh4a.holder.Trend;
 
 public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
-    private @StringRes int mStarsTemplate;
+    private final @StringRes int mStarsTemplate;
 
     public TrendAdapter(Context context, @StringRes int starsTemplate) {
         super(context);

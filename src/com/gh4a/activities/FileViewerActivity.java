@@ -155,11 +155,11 @@ public class FileViewerActivity extends WebViewerActivity {
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         String base64Data = mContent.getContent();
-        String title = addTitleHeader ? getDocumentTitle() : null;
         if (base64Data != null && FileUtils.isImage(mPath)) {
+            String title = addTitleHeader ? getDocumentTitle() : null;
             String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) +
                     ";base64," + base64Data;
-            return highlightImage(imageUrl, cssTheme, addTitleHeader ? getDocumentTitle() : null);
+            return highlightImage(imageUrl, cssTheme, title);
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
             return generateCodeHtml(data, mPath, mRepoOwner, mRepoName,

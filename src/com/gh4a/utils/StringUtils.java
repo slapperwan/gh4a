@@ -21,7 +21,6 @@ import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
 
 import com.gh4a.Gh4Application;
-import com.gh4a.R;
 import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.StyleableTextView;
 
