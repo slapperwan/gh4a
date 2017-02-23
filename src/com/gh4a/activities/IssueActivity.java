@@ -65,7 +65,6 @@ import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -149,8 +148,14 @@ public class IssueActivity extends BaseActivity implements
                 }
                 mInitialCommentId = -1;
             }
+            updateMentionUsers();
         }
     };
+
+    private void updateMentionUsers() {
+        final List<User> users = ApiHelpers.getUniqueUsers(mEventAdapter.getUsers());
+        mCommentFragment.setMentionUsers(users);
+    }
 
     private final LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override

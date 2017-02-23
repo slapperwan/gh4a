@@ -53,7 +53,6 @@ import com.gh4a.widget.StyleableTextView;
 import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
-import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitStatus;
 import org.eclipse.egit.github.core.Issue;
@@ -240,6 +239,7 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
             }
             mInitialCommentId = -1;
         }
+        updateMentionUsers();
     }
 
     @Override
@@ -257,6 +257,11 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         super.setContentShown(shown);
         mListShown = shown;
         updateCommentSectionVisibility(getView());
+    }
+
+    private void updateMentionUsers() {
+        final List<User> users = ApiHelpers.getUniqueUsers(mAdapter.getUsers());
+        mCommentFragment.setMentionUsers(users);
     }
 
     private void updateCommentSectionVisibility(View v) {
