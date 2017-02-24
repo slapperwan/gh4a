@@ -180,6 +180,8 @@ public class HomeActivity extends BasePagerActivity implements
         switch (id) {
             case R.id.news_feed:
                 return new NewsFeedFactory(this, mUserLogin);
+            case R.id.notifications:
+                return new NotificationListFactory(this);
             case R.id.my_repos:
                 return new RepositoryFactory(this, mUserLogin, getPrefs());
             case R.id.my_issues:

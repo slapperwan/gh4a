@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/mark_all_as_read"
+        android:icon="@drawable/mark_read_all_white"
+        android:title="@string/mark_all_as_read"
+        app:showAsAction="always" />
+</menu>

@@ -64,6 +64,8 @@
         <item name="issueEventRenamedIcon">@drawable/issue_event_renamed_dark</item>
         <item name="overflowIcon">@drawable/overflow_dark</item>
         <item name="mergedIcon">@drawable/merged_dark</item>
+        <item name="issueIcon">@drawable/issue_dark</item>
+        <item name="markAllAsReadIcon">@drawable/mark_read_all_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
@@ -169,6 +171,8 @@
         <item name="issueEventRenamedIcon">@drawable/issue_event_renamed</item>
         <item name="overflowIcon">@drawable/overflow</item>
         <item name="mergedIcon">@drawable/merged</item>
+        <item name="issueIcon">@drawable/issue</item>
+        <item name="markAllAsReadIcon">@drawable/mark_read_all</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>

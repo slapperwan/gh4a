@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/cv_card"
+        style="?cardViewTheme"
+        android:layout_margin="0dp"
+        app:cardCornerRadius="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.gh4a.widget.FixedSizeImageView
+                android:id="@+id/iv_icon"
+                android:layout_width="56dp"
+                android:layout_height="32dp"
+                android:paddingBottom="4dp"
+                android:paddingLeft="@dimen/content_padding"
+                android:paddingRight="@dimen/content_padding"
+                android:paddingTop="4dp"
+                android:src="@drawable/icon_issues" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="@dimen/content_padding"
+                android:layout_marginRight="@dimen/content_padding"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="?android:textColorPrimary"
+                tools:text="Issue title" />
+
+            <com.gh4a.widget.FixedSizeImageView
+                android:id="@+id/iv_done"
+                android:layout_width="56dp"
+                android:layout_height="32dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:paddingBottom="4dp"
+                android:paddingLeft="@dimen/content_padding"
+                android:paddingRight="@dimen/content_padding"
+                android:paddingTop="4dp"
+                android:src="?overflowIcon" />
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
