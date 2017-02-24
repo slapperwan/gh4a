@@ -23,7 +23,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -300,7 +299,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     public void onCommentsUpdated() {
         if (mPullRequestFragment != null) {
-            mPullRequestFragment.refreshComments();
+            mPullRequestFragment.reloadEvents();
         }
     }
 
@@ -413,7 +412,7 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     private void handlePullRequestUpdate() {
         if (mPullRequestFragment != null) {
-            mPullRequestFragment.update(mPullRequest);
+            mPullRequestFragment.updateState(mPullRequest);
         }
 
         fillHeader();

@@ -23,7 +23,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -47,6 +49,7 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.fragment.CommentBoxFragment;
+import com.gh4a.fragment.IssueFragment;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
@@ -76,9 +79,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-public class IssueActivity extends BaseActivity implements
-        View.OnClickListener, IssueEventAdapter.OnCommentAction<IssueEventHolder>,
-        SwipeRefreshLayout.ChildScrollDelegate, CommentBoxFragment.Callback {
+public class IssueActivity extends BaseActivity implements View.OnClickListener {
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
         return makeIntent(context, login, repoName, number, -1);
     }
@@ -91,8 +92,7 @@ public class IssueActivity extends BaseActivity implements
                 .putExtra("initial_comment", initialCommentId);
     }
 
-    private static final int REQUEST_EDIT = 1000;
-    private static final int REQUEST_EDIT_ISSUE = 1001;
+    private static final int REQUEST_EDIT_ISSUE = 1000;
 
     private Issue mIssue;
     private String mRepoOwner;
@@ -100,16 +100,10 @@ public class IssueActivity extends BaseActivity implements
     private int mIssueNumber;
     private long mInitialCommentId;
     private ViewGroup mHeader;
-    private View mListHeaderView;
-    private boolean mEventsLoaded;
-    private IssueEventAdapter mEventAdapter;
-    private RecyclerView mRecyclerView;
-    private LinearLayoutManager mLayoutManager;
-    private boolean mIsCollaborator;
+    private Boolean mIsCollaborator;
     private IssueStateTrackingFloatingActionButton mEditFab;
-    private CommentBoxFragment mCommentFragment;
-    private HttpImageGetter mImageGetter;
     private final Handler mHandler = new Handler();
+    private IssueFragment mFragment;
 
     private final LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
         @Override
@@ -119,40 +113,8 @@ public class IssueActivity extends BaseActivity implements
         @Override
         protected void onResultReady(Issue result) {
             mIssue = result;
-            updateMentionUsers();
-            fillDataIfDone();
+            showUiIfDone();
             supportInvalidateOptionsMenu();
-        }
-    };
-
-    private final LoaderCallbacks<List<IssueEventHolder>> mEventCallback =
-            new LoaderCallbacks<List<IssueEventHolder>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader() {
-            return new IssueCommentListLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
-        }
-        @Override
-        protected void onResultReady(List<IssueEventHolder> result) {
-            mEventAdapter.clear();
-            if (result != null) {
-                mEventAdapter.addAll(result);
-            }
-            mEventAdapter.notifyDataSetChanged();
-            mEventsLoaded = true;
-            fillDataIfDone();
-            if (mInitialCommentId >= 0) {
-                for (int i = 0; i < result.size(); i++) {
-                    IssueEventHolder event = result.get(i);
-                    if (event.comment != null && event.comment.getId() == mInitialCommentId) {
-                        int position = i + 1; /* adjust for header view */
-                        mLayoutManager.scrollToPosition(position);
-                        mEventAdapter.highlight(position);
-                        break;
-                    }
-                }
-                mInitialCommentId = -1;
-            }
-            updateMentionUsers();
         }
     };
 
@@ -164,8 +126,7 @@ public class IssueActivity extends BaseActivity implements
         @Override
         protected void onResultReady(Boolean result) {
             mIsCollaborator = result;
-            updateFabVisibility();
-            updateCommentLockState();
+            showUiIfDone();
             supportInvalidateOptionsMenu();
         }
     };
@@ -174,19 +135,13 @@ public class IssueActivity extends BaseActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.issue);
+        setContentView(R.layout.frame_layout);
         setContentShown(false);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.issue) + " #" + mIssueNumber);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
-        mImageGetter = new HttpImageGetter(this);
 
         LayoutInflater inflater = getLayoutInflater();
 
@@ -195,26 +150,12 @@ public class IssueActivity extends BaseActivity implements
         mHeader.setVisibility(View.GONE);
         addHeaderView(mHeader, false);
 
-        mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, mRecyclerView, false);
-
-        mEventAdapter = new IssueEventAdapter(this, mRepoOwner, mRepoName, mIssueNumber, this);
-        mEventAdapter.setHeaderView(mListHeaderView);
-        mRecyclerView.setAdapter(mEventAdapter);
-
-        setChildScrollDelegate(this);
-
-        if (!Gh4Application.get().isAuthorized()) {
-            findViewById(R.id.comment_box).setVisibility(View.GONE);
-        }
-
-        FragmentManager fm = getSupportFragmentManager();
-        mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
+        setFragment((IssueFragment) getSupportFragmentManager().findFragmentById(R.id.details));
 
         setToolbarScrollable(true);
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
-        getSupportLoaderManager().initLoader(2, null, mEventCallback);
     }
 
     @Override
@@ -226,51 +167,28 @@ public class IssueActivity extends BaseActivity implements
         mInitialCommentId = extras.getLong("initial_comment", -1);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mImageGetter.destroy();
-        if (mEventAdapter != null) {
-            mEventAdapter.destroy();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mEventAdapter.resume();
-        mImageGetter.resume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mEventAdapter.pause();
-        mImageGetter.pause();
-    }
-
-    @Override
-    public boolean canChildScrollUp() {
-        if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
-            return true;
-        }
-        return UiUtils.canViewScrollUp(mRecyclerView);
-    }
-
-    private void fillDataIfDone() {
-        if (mIssue == null || !mEventsLoaded) {
+    private void showUiIfDone() {
+        if (mIssue == null || mIsCollaborator == null) {
             return;
         }
-        fillData();
+        setFragment(IssueFragment.newInstance(mRepoOwner, mRepoName,
+                mIssue, mIsCollaborator, mInitialCommentId));
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.details, mFragment)
+                .commitAllowingStateLoss();
+        mInitialCommentId = -1;
+
+        updateHeader();
+        updateFabVisibility();
         setContentShown(true);
     }
 
-    private void fillData() {
-        // set details inside listview header
-        ImageView ivGravatar = (ImageView) mListHeaderView.findViewById(R.id.iv_gravatar);
-        AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
-        ivGravatar.setOnClickListener(this);
+    private void setFragment(IssueFragment fragment) {
+        mFragment = fragment;
+        setChildScrollDelegate(fragment);
+    }
 
+    private void updateHeader() {
         TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
         boolean closed = ApiHelpers.IssueState.CLOSED.equals(mIssue.getState());
         int stateTextResId = closed ? R.string.closed : R.string.open;
@@ -279,91 +197,11 @@ public class IssueActivity extends BaseActivity implements
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
         transitionHeaderToColor(stateColorAttributeId,
                 closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
-        UiUtils.trySetListOverscrollColor(mRecyclerView,
-                UiUtils.resolveColor(this, stateColorAttributeId));
-
-        TextView tvExtra = (TextView) mListHeaderView.findViewById(R.id.tv_extra);
-        tvExtra.setText(ApiHelpers.getUserLogin(this, mIssue.getUser()));
-
-        TextView tvTimestamp = (TextView) mListHeaderView.findViewById(R.id.tv_timestamp);
-        tvTimestamp.setText(StringUtils.formatRelativeTime(this, mIssue.getCreatedAt(), true));
 
         TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.getTitle());
 
-        String body = mIssue.getBodyHtml();
-        TextView descriptionView = (TextView) mListHeaderView.findViewById(R.id.tv_desc);
-        if (!StringUtils.isBlank(body)) {
-            body = HtmlUtils.format(body).toString();
-            mImageGetter.bind(descriptionView, body, mIssue.getNumber());
-        } else {
-            SpannableString noDescriptionString = new SpannableString(getString(R.string.issue_no_description));
-            noDescriptionString.setSpan(new StyleSpan(Typeface.ITALIC), 0, noDescriptionString.length(), 0);
-            descriptionView.setText(noDescriptionString);
-        }
-        descriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-
-        View milestoneGroup = mListHeaderView.findViewById(R.id.milestone_container);
-        if (mIssue.getMilestone() != null) {
-            TextView tvMilestone = (TextView) mListHeaderView.findViewById(R.id.tv_milestone);
-            tvMilestone.setText(mIssue.getMilestone().getTitle());
-            milestoneGroup.setVisibility(View.VISIBLE);
-        } else {
-            milestoneGroup.setVisibility(View.GONE);
-        }
-
-        View assigneeGroup = mListHeaderView.findViewById(R.id.assignee_container);
-        List<User> assignees = mIssue.getAssignees();
-        if (assignees != null && !assignees.isEmpty()) {
-            ViewGroup assigneeContainer = (ViewGroup) mListHeaderView.findViewById(R.id.assignee_list);
-            LayoutInflater inflater = getLayoutInflater();
-            assigneeContainer.removeAllViews();
-            for (User assignee : assignees) {
-                View row = inflater.inflate(R.layout.row_assignee, assigneeContainer, false);
-                TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
-                tvAssignee.setText(ApiHelpers.getUserLogin(this, assignee));
-
-                ImageView ivAssignee = (ImageView) row.findViewById(R.id.iv_assignee);
-                AvatarHandler.assignAvatar(ivAssignee, assignee);
-                ivAssignee.setTag(assignee);
-                ivAssignee.setOnClickListener(this);
-
-                assigneeContainer.addView(row);
-            }
-            assigneeGroup.setVisibility(View.VISIBLE);
-        } else {
-            assigneeGroup.setVisibility(View.GONE);
-        }
-
-        List<Label> labels = mIssue.getLabels();
-        View labelGroup = mListHeaderView.findViewById(R.id.label_container);
-        if (labels != null && !labels.isEmpty()) {
-            TextView labelView = (TextView) mListHeaderView.findViewById(R.id.labels);
-            SpannableStringBuilder builder = new SpannableStringBuilder();
-
-            for (Label label : labels) {
-                int pos = builder.length();
-                IssueLabelSpan span = new IssueLabelSpan(this, label, true);
-                builder.append(label.getName());
-                builder.setSpan(span, pos, pos + label.getName().length(), 0);
-            }
-            labelView.setText(builder);
-            labelGroup.setVisibility(View.VISIBLE);
-        } else {
-            labelGroup.setVisibility(View.GONE);
-        }
-
-        TextView tvPull = (TextView) mListHeaderView.findViewById(R.id.tv_pull);
-        if (mIssue.getPullRequest() != null && mIssue.getPullRequest().getDiffUrl() != null) {
-            tvPull.setVisibility(View.VISIBLE);
-            tvPull.setOnClickListener(this);
-        } else {
-            tvPull.setVisibility(View.GONE);
-        }
-
         mHeader.setVisibility(View.VISIBLE);
-        updateFabVisibility();
-        updateCommentLockState();
     }
 
     @Override
@@ -426,11 +264,18 @@ public class IssueActivity extends BaseActivity implements
     @Override
     public void onRefresh() {
         mIssue = null;
-        mEventsLoaded = false;
-        mIsCollaborator = false;
+        mIsCollaborator = null;
         setContentShown(false);
+
         transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
         mHeader.setVisibility(View.GONE);
+
+        if (mFragment != null) {
+            getSupportFragmentManager().beginTransaction()
+                    .remove(mFragment)
+                    .commit();
+            setFragment(null);
+        }
 
         // onRefresh() can be triggered in the draw loop, and CoordinatorLayout doesn't
         // like its child list being changed while drawing
@@ -438,45 +283,18 @@ public class IssueActivity extends BaseActivity implements
             @Override
             public void run() {
                 updateFabVisibility();
-                updateCommentLockState();
             }
         });
 
-        forceLoaderReload(0, 1, 2);
+        forceLoaderReload(0, 1);
         super.onRefresh();
-    }
-
-    private void updateMentionUsers() {
-        Set<User> users = mEventAdapter.getUsers();
-        if (mIssue != null) {
-            users.add(mIssue.getUser());
-        }
-        mCommentFragment.setMentionUsers(users);
-    }
-
-    private void updateCommentLockState() {
-        boolean locked = mIssue != null && mIssue.isLocked() && !mIsCollaborator;
-        mCommentFragment.setLocked(locked);
-        mEventAdapter.setLocked(locked);
-
-        TextView descriptionView = (TextView) mListHeaderView.findViewById(R.id.tv_desc);
-        if (!locked) {
-            descriptionView.setCustomSelectionActionModeCallback(
-                    new UiUtils.QuoteActionModeCallback(descriptionView) {
-                @Override
-                public void onTextQuoted(CharSequence text) {
-                    quoteText(text);
-                }
-            });
-        } else {
-            descriptionView.setCustomSelectionActionModeCallback(null);
-        }
     }
 
     private void updateFabVisibility() {
         boolean isIssueOwner = mIssue != null
                 && ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
-        boolean shouldHaveFab = (isIssueOwner || mIsCollaborator) && mIssue != null && mEventsLoaded;
+        boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
+        boolean shouldHaveFab = (isIssueOwner || isCollaborator) && mIssue != null;
         CoordinatorLayout rootLayout = getRootLayout();
 
         if (shouldHaveFab && mEditFab == null) {
@@ -505,38 +323,16 @@ public class IssueActivity extends BaseActivity implements
 
     @Override
     public void onClick(View v) {
-        Intent intent = null;
-        switch (v.getId()) {
-        case R.id.edit_fab:
-            if (checkForAuthOrExit()) {
-                Intent editIntent = IssueEditActivity.makeEditIntent(this,
-                        mRepoOwner, mRepoName, mIssue);
-                startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
-            }
-            break;
-        case R.id.iv_gravatar:
-            intent = UserActivity.makeIntent(this, mIssue.getUser());
-            break;
-        case R.id.iv_assignee:
-            intent = UserActivity.makeIntent(this, (User) v.getTag());
-            break;
-        case R.id.tv_pull:
-            intent = PullRequestActivity.makeIntent(this, mRepoOwner, mRepoName, mIssueNumber);
-            break;
-        }
-        if (intent != null) {
-            startActivity(intent);
+        if (v.getId() == R.id.edit_fab && checkForAuthOrExit()) {
+            Intent editIntent = IssueEditActivity.makeEditIntent(this,
+                    mRepoOwner, mRepoName, mIssue);
+            startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT) {
-            if (resultCode == Activity.RESULT_OK) {
-                forceLoaderReload(2);
-                setResult(RESULT_OK);
-            }
-        } else if (requestCode == REQUEST_EDIT_ISSUE) {
+        if (requestCode == REQUEST_EDIT_ISSUE) {
             if (resultCode == Activity.RESULT_OK) {
                 forceLoaderReload(0);
                 setResult(RESULT_OK);
@@ -544,37 +340,6 @@ public class IssueActivity extends BaseActivity implements
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @Override
-    public void editComment(IssueEventHolder comment) {
-        Intent intent = EditIssueCommentActivity.makeIntent(this,
-                mRepoOwner, mRepoName, comment.comment);
-        startActivityForResult(intent, REQUEST_EDIT);
-    }
-
-    @Override
-    public void quoteText(CharSequence text) {
-        mCommentFragment.addQuote(text);
-    }
-
-    @Override
-    public int getCommentEditorHintResId() {
-        return R.string.issue_comment_hint;
-    }
-
-    @Override
-    public void onSendCommentInBackground(String comment) throws IOException {
-        IssueService issueService = (IssueService)
-                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        issueService.createComment(mRepoOwner, mRepoName, mIssueNumber, comment);
-    }
-
-    @Override
-    public void onCommentSent() {
-        //reload comments
-        forceLoaderReload(2);
-        setResult(RESULT_OK);
     }
 
     private class IssueOpenCloseTask extends ProgressDialogTask<Issue> {
@@ -606,10 +371,10 @@ public class IssueActivity extends BaseActivity implements
         protected void onSuccess(Issue result) {
             mIssue = result;
 
-            // reload issue state
-            fillDataIfDone();
-            // reload events, the action will have triggered an additional one
-            forceLoaderReload(2);
+            updateHeader();
+            if (mFragment != null) {
+                mFragment.updateState(mIssue);
+            }
             setResult(RESULT_OK);
             supportInvalidateOptionsMenu();
         }
