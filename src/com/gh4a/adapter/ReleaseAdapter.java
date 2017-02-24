@@ -19,7 +19,7 @@ public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHold
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_release, parent, false);
         return new ViewHolder(v);
     }

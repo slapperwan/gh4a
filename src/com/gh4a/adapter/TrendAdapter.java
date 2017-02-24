@@ -38,7 +38,7 @@ public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_trend, parent, false);
         return new ViewHolder(v);
     }

@@ -57,7 +57,7 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_file_manager, parent, false);
         v.setOnCreateContextMenuListener(this);
         return new ViewHolder(v);

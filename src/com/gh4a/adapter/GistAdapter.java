@@ -39,7 +39,7 @@ public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gist, parent, false);
         return new ViewHolder(v);
     }

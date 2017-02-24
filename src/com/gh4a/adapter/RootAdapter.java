@@ -15,10 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import android.content.Context;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +24,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The Root adapter.
@@ -140,7 +140,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         } else if (mFooterView != null && position == itemStart + mObjects.size()) {
             return VIEW_TYPE_FOOTER;
         } else {
-            return VIEW_TYPE_ITEM;
+            return getItemViewType(getItem(position));
         }
     }
 
@@ -200,7 +200,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
             case VIEW_TYPE_FOOTER:
                 return new FooterViewHolder(mFooterView);
             default:
-                RecyclerView.ViewHolder holder = onCreateViewHolder(mInflater, parent);
+                RecyclerView.ViewHolder holder = onCreateViewHolder(mInflater, parent, viewType);
                 if (mItemClickListener != null) {
                     holder.itemView.setOnClickListener(this);
                     holder.itemView.setTag(holder);
@@ -245,10 +245,14 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         }
     }
 
-    protected abstract VH onCreateViewHolder(LayoutInflater inflater, ViewGroup parent);
+    protected abstract VH onCreateViewHolder(LayoutInflater inflater, ViewGroup parent,
+            int viewType);
     protected abstract void onBindViewHolder(VH holder, T item);
     protected boolean isFiltered(CharSequence filter, T object) {
         return true;
+    }
+    protected int getItemViewType(T item) {
+        return VIEW_TYPE_ITEM;
     }
 
     @Override

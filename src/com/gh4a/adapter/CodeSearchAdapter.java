@@ -25,7 +25,7 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_code_search, parent, false);
         return new ViewHolder(v);
     }

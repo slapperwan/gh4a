@@ -54,7 +54,7 @@ public class IssueLabelAdapter extends
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_issue_label, parent, false);
         final ViewHolder holder = new ViewHolder(v);
 
