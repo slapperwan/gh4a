@@ -2,18 +2,22 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 
 import com.gh4a.R;
 import com.gh4a.loader.NotificationHolder;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 
+import org.eclipse.egit.github.core.Notification;
 import org.eclipse.egit.github.core.NotificationSubject;
 import org.eclipse.egit.github.core.Repository;
 
@@ -23,16 +27,39 @@ public class NotificationAdapter extends
     private static final String SUBJECT_ISSUE = "Issue";
     private static final String SUBJECT_PULL_REQUEST = "PullRequest";
 
+    public interface OnNotificationActionCallback {
+        void markAsRead(NotificationHolder notificationHolder);
+
+        void unsubscribe(NotificationHolder notificationHolder);
+    }
+
     private final int mTopBottomMargin;
     private final int mBottomPadding;
     private final Context mContext;
+    private final OnNotificationActionCallback mActionCallback;
 
-    public NotificationAdapter(Context context) {
+    public NotificationAdapter(Context context, OnNotificationActionCallback actionCallback) {
         super(context);
         mContext = context;
+        mActionCallback = actionCallback;
+
         Resources resources = context.getResources();
         mTopBottomMargin = resources.getDimensionPixelSize(R.dimen.card_top_bottom_margin);
         mBottomPadding = resources.getDimensionPixelSize(R.dimen.notification_card_padding_bottom);
+    }
+
+    public void markAsRead(@Nullable Repository repository, @Nullable Notification notification) {
+        for (int i = 0; i < getCount(); i++) {
+            NotificationHolder item = getItem(i);
+            // Passing both repository and notification as null will mark everything as read
+            if ((repository == null && notification == null) ||
+                    (repository != null && item.repository.equals(repository)) ||
+                    (item.notification != null && item.notification.equals(notification))) {
+                item.setIsRead(true);
+            }
+        }
+
+        notifyDataSetChanged();
     }
 
     @Override
@@ -42,9 +69,7 @@ public class NotificationAdapter extends
                 ? R.layout.row_notification_header
                 : R.layout.row_notification;
         View v = inflater.inflate(layoutResId, parent, false);
-        ViewHolder holder = new ViewHolder(v);
-        holder.ivDone.setOnClickListener(this);
-        return holder;
+        return new ViewHolder(v, mActionCallback);
     }
 
     @Override
@@ -57,11 +82,22 @@ public class NotificationAdapter extends
 
     @Override
     protected void onBindViewHolder(ViewHolder holder, NotificationHolder item) {
+        holder.ivAction.setTag(item);
+
+        float alpha = item.isRead() ? 0.5f : 1f;
+        holder.tvTitle.setAlpha(alpha);
+
         if (item.notification == null) {
+            holder.ivAction.setVisibility(item.isRead() ? View.GONE : View.VISIBLE);
+
             Repository repository = item.repository;
             holder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
             return;
         }
+
+        holder.ivIcon.setAlpha(alpha);
+
+        holder.mPopupMenu.getMenu().findItem(R.id.mark_as_read).setVisible(!item.isRead());
 
         NotificationSubject subject = item.notification.getSubject();
 
@@ -69,7 +105,8 @@ public class NotificationAdapter extends
             holder.ivIcon.setImageResource(UiUtils.resolveDrawable(mContext, R.attr.issueIcon));
             holder.ivIcon.setVisibility(View.VISIBLE);
         } else if (SUBJECT_PULL_REQUEST.equals(subject.getType())) {
-            holder.ivIcon.setImageResource(UiUtils.resolveDrawable(mContext, R.attr.pullRequestIcon));
+            holder.ivIcon.setImageResource(
+                    UiUtils.resolveDrawable(mContext, R.attr.pullRequestIcon));
             holder.ivIcon.setVisibility(View.VISIBLE);
         } else {
             holder.ivIcon.setVisibility(View.GONE);
@@ -87,27 +124,57 @@ public class NotificationAdapter extends
         holder.cvCard.setLayoutParams(layoutParams);
     }
 
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.iv_done) {
-            return;
-        }
-
-        super.onClick(view);
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ViewHolder(View view) {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+            PopupMenu.OnMenuItemClickListener {
+        public ViewHolder(View view, OnNotificationActionCallback actionCallback) {
             super(view);
-            ivDone = (ImageView) view.findViewById(R.id.iv_done);
+            mActionCallback = actionCallback;
+
+            ivAction = (ImageView) view.findViewById(R.id.iv_action);
+            ivAction.setOnClickListener(this);
             ivIcon = (ImageView) view.findViewById(R.id.iv_icon);
             tvTitle = (StyleableTextView) view.findViewById(R.id.tv_title);
             cvCard = (CardView) view.findViewById(R.id.cv_card);
+
+            mPopupMenu = new PopupMenu(view.getContext(), ivAction);
+            mPopupMenu.getMenuInflater().inflate(R.menu.notification_menu, mPopupMenu.getMenu());
+            mPopupMenu.setOnMenuItemClickListener(this);
         }
 
-        final ImageView ivIcon;
-        final ImageView ivDone;
-        final StyleableTextView tvTitle;
-        final CardView cvCard;
+        private final ImageView ivIcon;
+        private final ImageView ivAction;
+        private final StyleableTextView tvTitle;
+        private final CardView cvCard;
+        private final PopupMenu mPopupMenu;
+        private final OnNotificationActionCallback mActionCallback;
+
+        @Override
+        public void onClick(View v) {
+            if (v.getId() == R.id.iv_action) {
+                NotificationHolder notificationHolder = (NotificationHolder) v.getTag();
+
+                if (notificationHolder.notification == null) {
+                    mActionCallback.markAsRead(notificationHolder);
+                } else {
+                    mPopupMenu.show();
+                }
+            }
+        }
+
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            NotificationHolder notificationHolder = (NotificationHolder) ivAction.getTag();
+
+            switch (item.getItemId()) {
+                case R.id.mark_as_read:
+                    mActionCallback.markAsRead(notificationHolder);
+                    return true;
+                case R.id.unsubscribe:
+                    mActionCallback.unsubscribe(notificationHolder);
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

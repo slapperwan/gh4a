@@ -44,7 +44,7 @@
                 tools:text="Issue title" />
 
             <com.gh4a.widget.FixedSizeImageView
-                android:id="@+id/iv_done"
+                android:id="@+id/iv_action"
                 android:layout_width="56dp"
                 android:layout_height="32dp"
                 android:background="?selectableItemBackgroundBorderless"

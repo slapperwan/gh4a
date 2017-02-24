@@ -115,6 +115,8 @@
     <string name="fork">Fork</string>
     <string name="notifications">Notifications</string>
     <string name="mark_all_as_read">Mark all as read</string>
+    <string name="mark_as_read">Mark as read</string>
+    <string name="unsubscribe">Unsubscribe</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>

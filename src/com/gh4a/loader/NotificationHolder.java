@@ -14,6 +14,7 @@ public class NotificationHolder {
     public final Repository repository;
 
     private boolean mLastRepositoryNotification;
+    private boolean mRead;
 
     public NotificationHolder(@NonNull Repository repository) {
         notification = null;
@@ -31,5 +32,13 @@ public class NotificationHolder {
 
     public void setIsLastRepositoryNotification(boolean value) {
         mLastRepositoryNotification = value;
+    }
+
+    public boolean isRead() {
+        return mRead;
+    }
+
+    public void setIsRead(boolean value) {
+        mRead = value;
     }
 }
