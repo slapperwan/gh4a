@@ -49,6 +49,10 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         return f;
     }
 
+    public interface CommentUpdateListener {
+        void onCommentsUpdated();
+    }
+
     private static final int REQUEST_DIFF_VIEWER = 1000;
 
     private String mRepoOwner;
@@ -277,8 +281,9 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         if (requestCode == REQUEST_DIFF_VIEWER) {
             if (resultCode == Activity.RESULT_OK) {
                 // reload comments
-                getLoaderManager().getLoader(1).onContentChanged();
-                getActivity().setResult(Activity.RESULT_OK);
+                if (getActivity() instanceof CommentUpdateListener) {
+                    ((CommentUpdateListener) getActivity()).onCommentsUpdated();
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

@@ -42,7 +42,7 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 import java.util.List;
 
 public class CommitActivity extends BasePagerActivity implements
-        CommitNoteFragment.CommentUpdateListener {
+        CommitFragment.CommentUpdateListener, CommitNoteFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
         return makeIntent(context, repoOwner, repoName, sha, -1);
     }
@@ -198,6 +198,7 @@ public class CommitActivity extends BasePagerActivity implements
     @Override
     public void onCommentsUpdated() {
         mComments = null;
+        setResult(RESULT_OK);
         setContentShown(false);
         invalidateTabs();
         forceLoaderReload(1);
