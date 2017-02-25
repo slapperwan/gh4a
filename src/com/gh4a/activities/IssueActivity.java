@@ -212,7 +212,8 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         boolean authorized = Gh4Application.get().isAuthorized();
         boolean isCreator = mIssue != null && authorized &&
                 ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
-        boolean canOpenOrClose = mIssue != null && authorized && (isCreator || mIsCollaborator);
+        boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
+        boolean canOpenOrClose = mIssue != null && authorized && (isCreator || isCollaborator);
 
         if (!canOpenOrClose) {
             menu.removeItem(R.id.issue_close);
