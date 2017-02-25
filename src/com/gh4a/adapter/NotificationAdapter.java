@@ -11,11 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.loader.NotificationHolder;
+import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.StyleableTextView;
 
 import org.eclipse.egit.github.core.Notification;
 import org.eclipse.egit.github.core.NotificationSubject;
@@ -96,7 +97,7 @@ public class NotificationAdapter extends
         }
 
         holder.ivIcon.setAlpha(alpha);
-
+        holder.tvTimestamp.setAlpha(alpha);
         holder.mPopupMenu.getMenu().findItem(R.id.mark_as_read).setVisible(!item.isRead());
 
         NotificationSubject subject = item.notification.getSubject();
@@ -113,6 +114,8 @@ public class NotificationAdapter extends
         }
 
         holder.tvTitle.setText(subject.getTitle());
+        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
+                item.notification.getUpdatedAt(), true));
 
         int bottomPadding = item.isLastRepositoryNotification() ? mBottomPadding : 0;
         holder.cvCard.setContentPadding(0, 0, 0, bottomPadding);
@@ -133,8 +136,9 @@ public class NotificationAdapter extends
             ivAction = (ImageView) view.findViewById(R.id.iv_action);
             ivAction.setOnClickListener(this);
             ivIcon = (ImageView) view.findViewById(R.id.iv_icon);
-            tvTitle = (StyleableTextView) view.findViewById(R.id.tv_title);
+            tvTitle = (TextView) view.findViewById(R.id.tv_title);
             cvCard = (CardView) view.findViewById(R.id.cv_card);
+            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
 
             mPopupMenu = new PopupMenu(view.getContext(), ivAction);
             mPopupMenu.getMenuInflater().inflate(R.menu.notification_menu, mPopupMenu.getMenu());
@@ -143,8 +147,9 @@ public class NotificationAdapter extends
 
         private final ImageView ivIcon;
         private final ImageView ivAction;
-        private final StyleableTextView tvTitle;
+        private final TextView tvTitle;
         private final CardView cvCard;
+        private final TextView tvTimestamp;
         private final PopupMenu mPopupMenu;
         private final OnNotificationActionCallback mActionCallback;
 

@@ -13,48 +13,58 @@
         android:layout_margin="0dp"
         app:cardCornerRadius="0dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content">
 
             <com.gh4a.widget.FixedSizeImageView
                 android:id="@+id/iv_icon"
                 android:layout_width="56dp"
-                android:layout_height="32dp"
-                android:paddingBottom="4dp"
+                android:layout_height="24dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
                 android:paddingLeft="@dimen/content_padding"
                 android:paddingRight="@dimen/content_padding"
-                android:paddingTop="4dp"
                 android:src="@drawable/icon_issues" />
-
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_title"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="@dimen/content_padding"
-                android:layout_marginRight="@dimen/content_padding"
-                android:layout_marginTop="8dp"
-                android:layout_weight="1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="?android:textColorPrimary"
-                tools:text="Issue title" />
 
             <com.gh4a.widget.FixedSizeImageView
                 android:id="@+id/iv_action"
                 android:layout_width="56dp"
-                android:layout_height="32dp"
+                android:layout_height="56dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_centerVertical="true"
                 android:background="?selectableItemBackgroundBorderless"
-                android:paddingBottom="4dp"
                 android:paddingLeft="@dimen/content_padding"
                 android:paddingRight="@dimen/content_padding"
-                android:paddingTop="4dp"
-                android:src="?overflowIcon" />
+                android:src="?overflowIcon"
+                tools:layout_alignParentBottom="false"
+                tools:layout_alignParentTop="false" />
 
-        </LinearLayout>
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_toLeftOf="@id/iv_action"
+                android:layout_toRightOf="@id/iv_icon"
+                android:textAppearance="@style/TextAppearance.VerySmall"
+                tools:text="yesterday" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_timestamp"
+                android:layout_marginBottom="8dp"
+                android:layout_toLeftOf="@id/iv_action"
+                android:layout_toRightOf="@id/iv_icon"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="?android:textColorPrimary"
+                tools:text="Issue title" />
+
+        </RelativeLayout>
 
     </android.support.v7.widget.CardView>
 
