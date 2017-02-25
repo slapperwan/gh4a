@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class NotificationListLoader extends BaseLoader<List<NotificationHolder>> {
+public class NotificationListLoader extends BaseLoader<NotificationListLoadResult> {
 
     private static final Comparator<Notification> SORTER = new Comparator<Notification>() {
         @Override
@@ -42,7 +42,7 @@ public class NotificationListLoader extends BaseLoader<List<NotificationHolder>>
     }
 
     @Override
-    protected List<NotificationHolder> doLoadInBackground() throws Exception {
+    protected NotificationListLoadResult doLoadInBackground() throws Exception {
         NotificationService notificationService = (NotificationService)
                 Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
         List<Notification> notifications = notificationService.getNotifications();
@@ -69,6 +69,6 @@ public class NotificationListLoader extends BaseLoader<List<NotificationHolder>>
             result.get(size - 1).setIsLastRepositoryNotification(true);
         }
 
-        return result;
+        return new NotificationListLoadResult(result);
     }
 }

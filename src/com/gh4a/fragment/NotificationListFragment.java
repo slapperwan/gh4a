@@ -19,6 +19,7 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.NotificationHolder;
+import com.gh4a.loader.NotificationListLoadResult;
 import com.gh4a.loader.NotificationListLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -28,32 +29,34 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.NotificationService;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Date;
 
 public class NotificationListFragment extends LoadingListFragmentBase implements
         RootAdapter.OnItemClickListener<NotificationHolder>,NotificationAdapter.OnNotificationActionCallback {
-    private NotificationAdapter mAdapter;
-
     public static NotificationListFragment newInstance() {
         return new NotificationListFragment();
     }
 
-    private final LoaderCallbacks<List<NotificationHolder>> mNotificationsCallback =
-            new LoaderCallbacks<List<NotificationHolder>>(this) {
+    private final LoaderCallbacks<NotificationListLoadResult> mNotificationsCallback =
+            new LoaderCallbacks<NotificationListLoadResult>(this) {
         @Override
-        protected Loader<LoaderResult<List<NotificationHolder>>> onCreateLoader() {
+        protected Loader<LoaderResult<NotificationListLoadResult>> onCreateLoader() {
             return new NotificationListLoader(getContext());
         }
 
         @Override
-        protected void onResultReady(List<NotificationHolder> result) {
+        protected void onResultReady(NotificationListLoadResult result) {
+            mNotificationsLoadTime = result.loadTime;
             mAdapter.clear();
-            mAdapter.addAll(result);
+            mAdapter.addAll(result.notifications);
             setContentShown(true);
             mAdapter.notifyDataSetChanged();
             updateEmptyState();
         }
     };
+
+    private NotificationAdapter mAdapter;
+    private Date mNotificationsLoadTime;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -187,9 +190,9 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             if (mNotification != null) {
                 notificationService.markThreadAsRead(mNotification.getId());
             } else if (mRepository != null) {
-                notificationService.markNotificationsAsRead(mRepository);
+                notificationService.markNotificationsAsRead(mRepository, mNotificationsLoadTime);
             } else {
-                notificationService.markNotificationsAsRead();
+                notificationService.markNotificationsAsRead(mNotificationsLoadTime);
             }
 
             return null;
