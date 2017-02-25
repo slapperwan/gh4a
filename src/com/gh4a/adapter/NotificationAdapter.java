@@ -24,7 +24,7 @@ import org.eclipse.egit.github.core.Repository;
 
 public class NotificationAdapter extends
         RootAdapter<NotificationHolder, NotificationAdapter.ViewHolder> {
-    private static final int VIEW_TYPE_NOTIFICATION_HEADER = 3;
+    private static final int VIEW_TYPE_NOTIFICATION_HEADER = RootAdapter.CUSTOM_VIEW_TYPE_START + 1;
     private static final String SUBJECT_ISSUE = "Issue";
     private static final String SUBJECT_PULL_REQUEST = "PullRequest";
 
@@ -110,7 +110,7 @@ public class NotificationAdapter extends
                     UiUtils.resolveDrawable(mContext, R.attr.pullRequestIcon));
             holder.ivIcon.setVisibility(View.VISIBLE);
         } else {
-            holder.ivIcon.setVisibility(View.GONE);
+            holder.ivIcon.setVisibility(View.INVISIBLE);
         }
 
         holder.tvTitle.setText(subject.getTitle());

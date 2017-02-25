@@ -25,6 +25,8 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 
+import com.gh4a.IllegalReturnValueException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -63,9 +65,11 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     private int mHighlightPosition = -1;
     private boolean mHolderCreated = false;
 
-    private static final int VIEW_TYPE_ITEM = 0;
-    private static final int VIEW_TYPE_HEADER = 1;
-    private static final int VIEW_TYPE_FOOTER = 2;
+    private static final int VIEW_TYPE_HEADER = 0;
+    private static final int VIEW_TYPE_FOOTER = 1;
+    private static final int VIEW_TYPE_ITEM = 2;
+
+    public static final int CUSTOM_VIEW_TYPE_START = VIEW_TYPE_ITEM;
 
     private final Filter mFilter = new Filter() {
         @Override
@@ -140,7 +144,12 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         } else if (mFooterView != null && position == itemStart + mObjects.size()) {
             return VIEW_TYPE_FOOTER;
         } else {
-            return getItemViewType(getItem(position));
+            int viewType = getItemViewType(getItem(position - itemStart));
+            if (viewType < CUSTOM_VIEW_TYPE_START) {
+                throw new IllegalReturnValueException(
+                        "Custom view types must have id equal to or higher than CUSTOM_VIEW_TYPE_START");
+            }
+            return viewType;
         }
     }
 
