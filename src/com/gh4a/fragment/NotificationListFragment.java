@@ -1,8 +1,10 @@
 package com.gh4a.fragment;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +20,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Notification;
@@ -117,7 +120,17 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.mark_all_as_read:
-                new MarkReadTask(null, null).schedule();
+                new AlertDialog.Builder(getActivity())
+                        .setMessage(R.string.mark_all_as_read_question)
+                        .setPositiveButton(R.string.mark_all_as_read,
+                                new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new MarkReadTask(null, null).schedule();
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, null)
+                        .show();
                 return true;
         }
 
@@ -127,7 +140,23 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     @Override
     public void markAsRead(NotificationHolder notificationHolder) {
         if (notificationHolder.notification == null) {
-            new MarkReadTask(notificationHolder.repository, null).schedule();
+            final Repository repository = notificationHolder.repository;
+
+            String login = ApiHelpers.getUserLogin(getActivity(), repository.getOwner());
+            String title = getString(R.string.mark_repository_as_read_question,
+                    login + "/" + repository.getName());
+
+            new AlertDialog.Builder(getActivity())
+                    .setMessage(title)
+                    .setPositiveButton(R.string.mark_as_read,
+                            new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            new MarkReadTask(repository, null).schedule();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .show();
         } else {
             new MarkReadTask(null, notificationHolder.notification).schedule();
         }
