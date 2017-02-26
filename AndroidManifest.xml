@@ -21,12 +21,19 @@
         android:theme="@style/LightTheme">
         <activity
             android:name=".activities.Github4AndroidActivity"
+            android:launchMode="singleTop"
             android:configChanges="orientation|screenSize" >
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN" />
                 <category
                     android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <data android:scheme="gh4a" android:host="oauth" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
         </activity>
 

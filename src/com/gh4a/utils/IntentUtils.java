@@ -31,8 +31,13 @@ public class IntentUtils {
     }
 
     public static void launchBrowser(Context context, Uri uri) {
+        launchBrowser(context, uri, 0);
+    }
+
+    public static void launchBrowser(Context context, Uri uri, int flags) {
         Intent intent = createBrowserIntent(context, uri);
         if (intent != null) {
+            intent.addFlags(flags);
             context.startActivity(intent);
         } else {
             Toast.makeText(context, R.string.no_browser_found, Toast.LENGTH_LONG).show();
