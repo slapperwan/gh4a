@@ -1,9 +1,7 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -35,8 +33,7 @@ public class NotificationAdapter extends
         void unsubscribe(NotificationHolder notificationHolder);
     }
 
-    private final int mTopBottomMargin;
-    private final int mBottomPadding;
+    private final int mBottomMargin;
     private final Context mContext;
     private final OnNotificationActionCallback mActionCallback;
 
@@ -45,9 +42,7 @@ public class NotificationAdapter extends
         mContext = context;
         mActionCallback = actionCallback;
 
-        Resources resources = context.getResources();
-        mTopBottomMargin = resources.getDimensionPixelSize(R.dimen.card_top_bottom_margin);
-        mBottomPadding = resources.getDimensionPixelSize(R.dimen.notification_card_padding_bottom);
+        mBottomMargin = context.getResources().getDimensionPixelSize(R.dimen.card_margin);
     }
 
     public void markAsRead(@Nullable Repository repository, @Nullable Notification notification) {
@@ -142,14 +137,14 @@ public class NotificationAdapter extends
         holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 item.notification.getUpdatedAt(), true));
 
-        int bottomPadding = item.isLastRepositoryNotification() ? mBottomPadding : 0;
-        holder.cvCard.setContentPadding(0, 0, 0, bottomPadding);
-
         ViewGroup.MarginLayoutParams layoutParams =
-                (ViewGroup.MarginLayoutParams) holder.cvCard.getLayoutParams();
-        int bottomMargin = item.isLastRepositoryNotification() ? mTopBottomMargin : 0;
+                (ViewGroup.MarginLayoutParams) holder.vNotificationContent.getLayoutParams();
+        int bottomMargin = item.isLastRepositoryNotification() ? mBottomMargin : 0;
         layoutParams.setMargins(0, 0, 0, bottomMargin);
-        holder.cvCard.setLayoutParams(layoutParams);
+        holder.vNotificationContent.setLayoutParams(layoutParams);
+
+        holder.vBottomShadow.setVisibility(
+                item.isLastRepositoryNotification() ? View.VISIBLE : View.GONE);
     }
 
     private int getIconResId(String subjectType) {
@@ -176,8 +171,9 @@ public class NotificationAdapter extends
             ivAction.setOnClickListener(this);
             ivIcon = (ImageView) view.findViewById(R.id.iv_icon);
             tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            cvCard = (CardView) view.findViewById(R.id.cv_card);
             tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            vNotificationContent = view.findViewById(R.id.v_notification_content);
+            vBottomShadow = view.findViewById(R.id.v_bottom_shadow);
 
             mPopupMenu = new PopupMenu(view.getContext(), ivAction);
             mPopupMenu.getMenuInflater().inflate(R.menu.notification_menu, mPopupMenu.getMenu());
@@ -187,8 +183,9 @@ public class NotificationAdapter extends
         private final ImageView ivIcon;
         private final ImageView ivAction;
         private final TextView tvTitle;
-        private final CardView cvCard;
         private final TextView tvTimestamp;
+        private final View vNotificationContent;
+        private final View vBottomShadow;
         private final PopupMenu mPopupMenu;
         private final OnNotificationActionCallback mActionCallback;
 

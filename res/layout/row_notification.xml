@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/cv_card"
-        style="?cardViewTheme"
-        android:layout_margin="0dp"
-        app:cardCornerRadius="0dp">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?cardBackground">
 
         <RelativeLayout
+            android:id="@+id/v_notification_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground">
 
             <com.gh4a.widget.FixedSizeImageView
                 android:id="@+id/iv_icon"
@@ -66,6 +66,14 @@
 
         </RelativeLayout>
 
-    </android.support.v7.widget.CardView>
+    </FrameLayout>
+
+    <View
+        android:id="@+id/v_bottom_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/bottom_shadow"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </LinearLayout>
