@@ -74,6 +74,7 @@
     <attr name="mergedIcon" format="reference" />
     <attr name="issueIcon" format="reference" />
     <attr name="markAllAsReadIcon" format="reference" />
+    <attr name="commitIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension" />

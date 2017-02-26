@@ -27,6 +27,7 @@ public class NotificationAdapter extends
     private static final int VIEW_TYPE_NOTIFICATION_HEADER = RootAdapter.CUSTOM_VIEW_TYPE_START + 1;
     private static final String SUBJECT_ISSUE = "Issue";
     private static final String SUBJECT_PULL_REQUEST = "PullRequest";
+    private static final String SUBJECT_COMMIT = "Commit";
 
     public interface OnNotificationActionCallback {
         void markAsRead(NotificationHolder notificationHolder);
@@ -101,13 +102,9 @@ public class NotificationAdapter extends
         holder.mPopupMenu.getMenu().findItem(R.id.mark_as_read).setVisible(!item.isRead());
 
         NotificationSubject subject = item.notification.getSubject();
-
-        if (SUBJECT_ISSUE.equals(subject.getType())) {
-            holder.ivIcon.setImageResource(UiUtils.resolveDrawable(mContext, R.attr.issueIcon));
-            holder.ivIcon.setVisibility(View.VISIBLE);
-        } else if (SUBJECT_PULL_REQUEST.equals(subject.getType())) {
-            holder.ivIcon.setImageResource(
-                    UiUtils.resolveDrawable(mContext, R.attr.pullRequestIcon));
+        int iconResId = getIconResId(subject.getType());
+        if (iconResId > 0) {
+            holder.ivIcon.setImageResource(iconResId);
             holder.ivIcon.setVisibility(View.VISIBLE);
         } else {
             holder.ivIcon.setVisibility(View.INVISIBLE);
@@ -125,6 +122,20 @@ public class NotificationAdapter extends
         int bottomMargin = item.isLastRepositoryNotification() ? mTopBottomMargin : 0;
         layoutParams.setMargins(0, 0, 0, bottomMargin);
         holder.cvCard.setLayoutParams(layoutParams);
+    }
+
+    private int getIconResId(String subjectType) {
+        if (SUBJECT_ISSUE.equals(subjectType)) {
+            return UiUtils.resolveDrawable(mContext, R.attr.issueIcon);
+        }
+        if (SUBJECT_PULL_REQUEST.equals(subjectType)) {
+            return UiUtils.resolveDrawable(mContext, R.attr.pullRequestIcon);
+        }
+        if (SUBJECT_COMMIT.equals(subjectType)) {
+            return UiUtils.resolveDrawable(mContext, R.attr.commitIcon);
+        }
+
+        return -1;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
