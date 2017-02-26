@@ -116,6 +116,11 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
+    protected int getInitialLeftDrawerSelection() {
+        return mSelectedFactoryId;
+    }
+
+    @Override
     protected int[] getRightNavigationDrawerMenuResources() {
         return mFactory.getToolDrawerMenuResIds();
     }

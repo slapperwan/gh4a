@@ -34,6 +34,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -158,6 +159,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     protected int getLeftNavigationDrawerMenuResource() {
+        return 0;
+    }
+
+    @IdRes
+    protected int getInitialLeftDrawerSelection() {
         return 0;
     }
 
@@ -586,6 +592,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (drawerMenuResId != 0) {
             leftDrawer.inflateMenu(drawerMenuResId);
             leftDrawer.setNavigationItemSelectedListener(this);
+
+            int initialLeftDrawerSelection = getInitialLeftDrawerSelection();
+            if (initialLeftDrawerSelection != 0) {
+                leftDrawer.setCheckedItem(initialLeftDrawerSelection);
+            }
 
             ActionBar supportActionBar = getSupportActionBar();
             if (supportActionBar != null) {
