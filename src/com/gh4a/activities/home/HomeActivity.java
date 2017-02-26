@@ -45,6 +45,7 @@ public class HomeActivity extends BasePagerActivity implements
     private static final SparseArray<String> START_PAGE_MAPPING = new SparseArray<>();
     static {
         START_PAGE_MAPPING.put(R.id.news_feed, "newsfeed");
+        START_PAGE_MAPPING.put(R.id.notifications, "notifications");
         START_PAGE_MAPPING.put(R.id.my_repos, "repos");
         START_PAGE_MAPPING.put(R.id.my_issues, "issues");
         START_PAGE_MAPPING.put(R.id.my_prs, "prs");

@@ -11,6 +11,7 @@
     <string-array name="start_page_items" translatable="false">
         <item>@string/start_page_last_selected</item>
         <item>@string/user_news_feed</item>
+        <item>@string/notifications</item>
         <item>@string/my_repositories</item>
         <item>@string/my_issues</item>
         <item>@string/my_pull_requests</item>
@@ -22,6 +23,7 @@
     <string-array name="start_page_values" translatable="false">
         <item>last</item>
         <item>newsfeed</item>
+        <item>notifications</item>
         <item>repos</item>
         <item>issues</item>
         <item>prs</item>
