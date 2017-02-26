@@ -2,6 +2,7 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,7 +21,7 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
         LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
-    private TextView mEmptyView;
+    private NestedScrollView mEmptyViewContainer;
 
     public interface OnRecyclerViewCreatedListener {
         void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView);
@@ -34,10 +35,11 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
     protected View onCreateContentView(LayoutInflater inflater, ViewGroup parent) {
         View view = inflater.inflate(R.layout.list_fragment_content, parent, false);
 
-        mEmptyView = (TextView) view.findViewById(android.R.id.empty);
+        mEmptyViewContainer = (NestedScrollView) view.findViewById(R.id.empty_view_container);
+        TextView emptyView = (TextView) view.findViewById(android.R.id.empty);
         int emptyTextResId = getEmptyTextResId();
         if (emptyTextResId != 0) {
-            mEmptyView.setText(emptyTextResId);
+            emptyView.setText(emptyTextResId);
         }
 
         mLayoutManager = new LinearLayoutManager(view.getContext());
@@ -83,7 +85,7 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
         }
 
         mRecyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
-        mEmptyView.setVisibility(empty ? View.VISIBLE : View.GONE);
+        mEmptyViewContainer.setVisibility(empty ? View.VISIBLE : View.GONE);
     }
 
     protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
