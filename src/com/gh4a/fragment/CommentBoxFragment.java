@@ -8,6 +8,7 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -101,6 +102,10 @@ public class CommentBoxFragment extends Fragment implements
         mCommentEditor = (MultiAutoCompleteTextView) view.findViewById(R.id.et_comment);
         mCommentEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mCommentEditor, mSendButton));
+
+        int inputType = (mCommentEditor.getInputType() | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT)
+                & ~InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE;
+        mCommentEditor.setInputType(inputType);
 
         mAdapter = new DropDownUserAdapter(getContext());
         mCommentEditor.setAdapter(mAdapter);
