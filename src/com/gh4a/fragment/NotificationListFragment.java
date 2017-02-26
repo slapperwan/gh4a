@@ -1,6 +1,8 @@
 package com.gh4a.fragment;
 
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
@@ -12,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.gh4a.BackgroundTask;
+import com.gh4a.BrowseFilter;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.NotificationAdapter;
@@ -25,6 +28,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Notification;
+import org.eclipse.egit.github.core.NotificationSubject;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.service.NotificationService;
 
@@ -107,9 +111,16 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     public void onItemClick(NotificationHolder item) {
         if (item.notification == null) {
             IntentUtils.openRepositoryInfoActivity(getActivity(), item.repository);
-        } else {
-            // TODO: Parse url
+            return;
         }
+
+        new MarkReadTask(null, item.notification).schedule();
+
+        NotificationSubject subject = item.notification.getSubject();
+        Uri uri = ApiHelpers.normalizeUri(Uri.parse(subject.getUrl()));
+        Intent intent = new Intent(getActivity(), BrowseFilter.class);
+        intent.setData(uri);
+        startActivity(intent);
     }
 
     @Override
