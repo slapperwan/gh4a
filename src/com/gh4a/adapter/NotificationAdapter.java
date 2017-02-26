@@ -51,14 +51,42 @@ public class NotificationAdapter extends
     }
 
     public void markAsRead(@Nullable Repository repository, @Nullable Notification notification) {
+        NotificationHolder previousRepoItem = null;
+        int notificationsInSameRepoCount = 0;
+
+        boolean isMarkingSingleNotification = repository == null && notification != null;
+
         for (int i = 0; i < getCount(); i++) {
             NotificationHolder item = getItem(i);
+
             // Passing both repository and notification as null will mark everything as read
-            if ((repository == null && notification == null) ||
-                    (repository != null && item.repository.equals(repository)) ||
-                    (item.notification != null && item.notification.equals(notification))) {
+            if ((repository == null && notification == null)
+                    || (repository != null && item.repository.equals(repository))
+                    || (item.notification != null && item.notification.equals(notification))) {
                 item.setIsRead(true);
             }
+
+            // When marking single notification as read also mark the repository if it contained
+            // only 1 notification
+            if (isMarkingSingleNotification) {
+                if (item.notification == null) {
+                    if (previousRepoItem != null && notificationsInSameRepoCount == 1
+                            && previousRepoItem.repository.equals(notification.getRepository())) {
+                        previousRepoItem.setIsRead(true);
+                    }
+                    previousRepoItem = item;
+                    notificationsInSameRepoCount = 0;
+                } else {
+                    notificationsInSameRepoCount += 1;
+                }
+            }
+        }
+
+        // Additional check for the very last notification
+        if (isMarkingSingleNotification && previousRepoItem != null
+                && notificationsInSameRepoCount == 1
+                && previousRepoItem.repository.equals(notification.getRepository())) {
+            previousRepoItem.setIsRead(true);
         }
 
         notifyDataSetChanged();
