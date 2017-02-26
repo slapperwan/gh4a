@@ -56,11 +56,13 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             setContentShown(true);
             mAdapter.notifyDataSetChanged();
             updateEmptyState();
+            updateMenuItemVisibility();
         }
     };
 
     private NotificationAdapter mAdapter;
     private Date mNotificationsLoadTime;
+    private MenuItem mMarkAllAsReadMenuItem;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,6 +88,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             mAdapter.clear();
         }
         hideContentAndRestartLoaders(0);
+        updateMenuItemVisibility();
     }
 
     @Override
@@ -126,6 +129,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.notification_list_menu, menu);
+        mMarkAllAsReadMenuItem = menu.findItem(R.id.mark_all_as_read);
+        updateMenuItemVisibility();
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -179,6 +184,14 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     @Override
     public void unsubscribe(NotificationHolder notificationHolder) {
         new UnsubscribeTask(notificationHolder.notification).schedule();
+    }
+
+    private void updateMenuItemVisibility() {
+        if (mMarkAllAsReadMenuItem == null) {
+            return;
+        }
+
+        mMarkAllAsReadMenuItem.setVisible(isContentShown() && mAdapter.getCount() > 0);
     }
 
     private class MarkReadTask extends BackgroundTask<Void> {

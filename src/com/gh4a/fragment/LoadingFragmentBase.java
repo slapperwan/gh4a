@@ -92,6 +92,10 @@ public abstract class LoadingFragmentBase extends Fragment implements
         }
     }
 
+    protected boolean isContentShown() {
+        return mContentShown;
+    }
+
     protected void setContentShown(boolean shown) {
         if (mContentShown != shown) {
             mContentShown = shown;
