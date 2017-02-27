@@ -326,14 +326,16 @@ public class IssueActivity extends BaseActivity implements
         boolean authorized = Gh4Application.get().isAuthorized();
         boolean isCreator = mIssue != null && authorized &&
                 ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
-        boolean canOpenOrClose = mIssue != null && authorized && (isCreator || mIsCollaborator);
+        boolean isClosed = mIssue != null && Constants.Issue.STATE_CLOSED.equals(mIssue.getState());
+        boolean closerIsCreator = mIssue != null
+                && ApiHelpers.userEquals(mIssue.getUser(), mIssue.getClosedBy());
+        boolean canClose = mIssue != null && authorized && (isCreator || mIsCollaborator);
+        boolean canOpen = canClose && (mIsCollaborator || closerIsCreator);
 
-        if (!canOpenOrClose) {
+        if (!canClose || isClosed) {
             menu.removeItem(R.id.issue_close);
-            menu.removeItem(R.id.issue_reopen);
-        } else if (Constants.Issue.STATE_CLOSED.equals(mIssue.getState())) {
-            menu.removeItem(R.id.issue_close);
-        } else {
+        }
+        if (!canOpen || !isClosed) {
             menu.removeItem(R.id.issue_reopen);
         }
 

@@ -157,21 +157,23 @@ public class PullRequestFragment extends ListDataBaseFragment<IssueEventHolder> 
         boolean authorized = app.isAuthorized();
 
         boolean isCreator = ApiHelpers.loginEquals(mPullRequest.getUser(), app.getAuthLogin());
-        boolean canOpenOrClose = authorized && (isCreator || mIsCollaborator);
-        boolean canMerge = authorized && mIsCollaborator;
+        boolean isClosed = Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState());
+        boolean closerIsCreator = ApiHelpers.userEquals(mIssue.getUser(), mIssue.getClosedBy());
+        boolean canClose = authorized && (isCreator || mIsCollaborator);
+        boolean canOpen = canClose && (mIsCollaborator || closerIsCreator);
+        boolean canMerge = canClose && mIsCollaborator;
 
-        if (!canOpenOrClose) {
+        if (!canClose) {
             menu.removeItem(R.id.pull_close);
-            menu.removeItem(R.id.pull_reopen);
-        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+        } else if (isClosed) {
             menu.removeItem(R.id.pull_close);
             if (mPullRequest.isMerged()) {
                 menu.findItem(R.id.pull_reopen).setEnabled(false);
             }
-        } else {
+        }
+        if (!canOpen) {
             menu.removeItem(R.id.pull_reopen);
         }
-
         if (!canMerge) {
             menu.removeItem(R.id.pull_merge);
         } else if (mPullRequest.isMerged() || !mPullRequest.isMergeable()) {
