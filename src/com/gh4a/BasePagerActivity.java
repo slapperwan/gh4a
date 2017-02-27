@@ -220,7 +220,12 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            Fragment f = getFragment(position);
+            return getFragment(position);
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment f = (Fragment) super.instantiateItem(container, position);
             mFragments.put(position, f);
             return f;
         }
