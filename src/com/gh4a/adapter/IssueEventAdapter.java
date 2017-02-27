@@ -34,7 +34,6 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.StyleableTextView;
-import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -115,8 +114,7 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
     protected void bindBodyView(IssueEventHolder item, StyleableTextView view,
             HttpImageGetter imageGetter) {
         if (item.comment != null) {
-            String body = HtmlUtils.format(item.comment.getBodyHtml()).toString();
-            imageGetter.bind(view, body, item.comment.getId());
+            imageGetter.bind(view, item.comment.getBodyHtml(), item.comment.getId());
         } else {
             view.setText(formatEvent(item.event, item.getUser(),
                     view.getTypefaceValue(), item.isPullRequestEvent));

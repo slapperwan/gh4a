@@ -42,7 +42,6 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueLabelSpan;
-import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.Issue;
@@ -261,7 +260,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         TextView descriptionView = (TextView) mListHeaderView.findViewById(R.id.tv_desc);
         descriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         if (!StringUtils.isBlank(body)) {
-            body = HtmlUtils.format(body).toString();
             mImageGetter.bind(descriptionView, body, mIssue.getId());
 
             if (!isLocked()) {

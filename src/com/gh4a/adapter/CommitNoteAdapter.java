@@ -25,7 +25,6 @@ import android.widget.ImageView;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.widget.StyleableTextView;
-import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -68,8 +67,7 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     @Override
     protected void bindBodyView(CommitComment item, StyleableTextView view,
             HttpImageGetter imageGetter) {
-        String body = HtmlUtils.format(item.getBodyHtml()).toString();
-        imageGetter.bind(view, body, item.getId());
+        imageGetter.bind(view, item.getBodyHtml(), item.getId());
     }
 
     @Override

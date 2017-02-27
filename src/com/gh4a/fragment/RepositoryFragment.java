@@ -323,7 +323,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         protected String doInBackground(String... params) {
             String readme = params[0];
             if (readme != null) {
-                readme = HtmlUtils.format(readme).toString();
                 mImageGetter.encode(mId, readme);
             }
             return readme;

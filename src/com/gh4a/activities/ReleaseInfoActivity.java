@@ -41,7 +41,6 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.SwipeRefreshLayout;
-import com.github.mobile.util.HtmlUtils;
 import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.Download;
@@ -227,7 +226,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
         TextView body = (TextView) findViewById(R.id.tv_release_notes);
 
         if (!StringUtils.isBlank(bodyHtml)) {
-            bodyHtml = HtmlUtils.format(bodyHtml).toString();
             mImageGetter.bind(body, bodyHtml, mRelease.getId());
             body.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         } else {
