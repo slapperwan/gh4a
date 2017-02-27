@@ -74,6 +74,13 @@ public class ApiHelpers {
         return Color.parseColor("#" + label.getColor());
     }
 
+    public static boolean userEquals(User lhs, User rhs) {
+        if (lhs == null || rhs == null) {
+            return false;
+        }
+        return loginEquals(lhs.getLogin(), rhs.getLogin());
+    }
+
     public static boolean loginEquals(User user, String login) {
         if (user == null) {
             return false;

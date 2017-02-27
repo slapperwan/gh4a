@@ -170,23 +170,27 @@ public class PullRequestActivity extends BasePagerActivity implements
 
         boolean isCreator = mPullRequest != null
                 && ApiHelpers.loginEquals(mPullRequest.getUser(), app.getAuthLogin());
+        boolean isClosed = mPullRequest != null
+                && ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState());
         boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
-        boolean canOpenOrClose = authorized && (isCreator || isCollaborator);
-        boolean canMerge = authorized && isCollaborator;
+        boolean closerIsCreator = mIssue != null
+                && ApiHelpers.userEquals(mIssue.getUser(), mIssue.getClosedBy());
+        boolean canClose = mPullRequest != null && authorized && (isCreator || isCollaborator);
+        boolean canOpen = canClose && (isCollaborator || closerIsCreator);
+        boolean canMerge = canClose && isCollaborator;
 
-        if (!canOpenOrClose || mPullRequest == null) {
+        if (!canClose) {
             menu.removeItem(R.id.pull_close);
-            menu.removeItem(R.id.pull_reopen);
-        } else if (ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())) {
+        } else if (isClosed) {
             menu.removeItem(R.id.pull_close);
             if (mPullRequest.isMerged()) {
                 menu.findItem(R.id.pull_reopen).setEnabled(false);
             }
-        } else {
+        }
+        if (!canOpen) {
             menu.removeItem(R.id.pull_reopen);
         }
-
-        if (!canMerge || mPullRequest == null) {
+        if (!canMerge) {
             menu.removeItem(R.id.pull_merge);
         } else if (mPullRequest.isMerged() || !mPullRequest.isMergeable()) {
             MenuItem mergeItem = menu.findItem(R.id.pull_merge);
@@ -414,7 +418,14 @@ public class PullRequestActivity extends BasePagerActivity implements
         if (mPullRequestFragment != null) {
             mPullRequestFragment.updateState(mPullRequest);
         }
-
+        if (mIssue != null) {
+            mIssue.setState(mPullRequest.getState());
+            if (ApiHelpers.IssueState.CLOSED.equals(mIssue.getState())) {
+                // if we came here, we either closed or merged the PR ourselves,
+                // so set the 'closed by' field accordingly
+                mIssue.setClosedBy(new User().setLogin(Gh4Application.get().getAuthLogin()));
+            }
+        }
         fillHeader();
         updateFabVisibility();
         transitionHeaderToColor(mHeaderColorAttrs[0], mHeaderColorAttrs[1]);
