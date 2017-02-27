@@ -935,13 +935,19 @@ public class HtmlUtils {
         }
 
         public void characters(char ch[], int start, int length) throws SAXException {
+            if (getLast(mSpannableStringBuilder, Pre.class) != null) {
+                /* We're in a pre block, so keep whitespace intact. */
+                for (int i = 0; i < length; i++) {
+                    mSpannableStringBuilder.append(ch[i + start]);
+                }
+                return;
+            }
+
             StringBuilder sb = new StringBuilder();
-
-        /*
-         * Ignore whitespace that immediately follows other whitespace;
-         * newlines count as spaces.
-         */
-
+            /*
+             * Ignore whitespace that immediately follows other whitespace;
+             * newlines count as spaces.
+             */
             for (int i = 0; i < length; i++) {
                 char c = ch[i + start];
 
