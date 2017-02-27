@@ -377,6 +377,9 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             mIssue = result;
 
             updateHeader();
+            if (mEditFab != null) {
+                mEditFab.setState(mIssue.getState());
+            }
             if (mFragment != null) {
                 mFragment.updateState(mIssue);
             }
