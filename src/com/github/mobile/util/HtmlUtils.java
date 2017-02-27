@@ -689,7 +689,7 @@ public class HtmlUtils {
 
         private static void startBlockElement(Editable text, Attributes attributes) {
             appendNewlines(text, 2);
-            start(text, new Newline(1));
+            start(text, new Newline(2));
 
             String style = attributes.getValue("", "style");
             if (style != null) {
