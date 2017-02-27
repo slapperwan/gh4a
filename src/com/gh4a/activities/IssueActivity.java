@@ -22,6 +22,7 @@ import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -382,7 +383,9 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
         @Override
         protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_close, mIssueNumber);
+            @StringRes int messageResId = mOpen
+                    ? R.string.issue_error_reopen : R.string.issue_error_close;
+            return getContext().getString(messageResId, mIssueNumber);
         }
     }
 }
