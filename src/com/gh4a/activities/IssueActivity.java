@@ -17,68 +17,43 @@ package com.gh4a.activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.StyleSpan;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.adapter.IssueEventAdapter;
-import com.gh4a.fragment.CommentBoxFragment;
 import com.gh4a.fragment.IssueFragment;
 import com.gh4a.loader.IsCollaboratorLoader;
-import com.gh4a.loader.IssueCommentListLoader;
-import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.DividerItemDecoration;
-import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
-import com.gh4a.widget.SwipeRefreshLayout;
-import com.github.mobile.util.HtmlUtils;
-import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 public class IssueActivity extends BaseActivity implements View.OnClickListener {
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
@@ -247,7 +222,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             case R.id.issue_close:
             case R.id.issue_reopen:
                 if (checkForAuthOrExit()) {
-                    new IssueOpenCloseTask(itemId == R.id.issue_reopen).schedule();
+                    showOpenCloseConfirmDialog(itemId == R.id.issue_reopen);
                 }
                 return true;
             case R.id.share:
@@ -293,6 +268,23 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
         forceLoaderReload(0, 1);
         super.onRefresh();
+    }
+
+    private void showOpenCloseConfirmDialog(final boolean reopen) {
+        new AlertDialog.Builder(this)
+                .setTitle(reopen ? R.string.reopen_issue : R.string.close_issue)
+                .setMessage(reopen ? R.string.reopen_issue_confirm : R.string.close_issue_confirm)
+                .setIconAttribute(android.R.attr.alertDialogIcon)
+                .setCancelable(false)
+                .setPositiveButton(reopen ? R.string.reopen_issue : R.string.close_issue,
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new IssueOpenCloseTask(reopen).schedule();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     private void updateFabVisibility() {
