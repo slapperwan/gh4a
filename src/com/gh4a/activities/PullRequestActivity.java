@@ -246,6 +246,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         mRepoName = extras.getString("repo");
         mPullRequestNumber = extras.getInt("number");
         mInitialCommentId = extras.getLong("initial_comment", -1);
+        extras.remove("initial_comment");
     }
 
     @Override

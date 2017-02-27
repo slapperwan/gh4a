@@ -132,6 +132,7 @@ public class CommitActivity extends BasePagerActivity implements
         mRepoName = extras.getString("repo");
         mObjectSha = extras.getString("sha");
         mInitialCommentId = extras.getLong("initial_comment", -1);
+        extras.remove("initial_comment");
     }
 
     @Override

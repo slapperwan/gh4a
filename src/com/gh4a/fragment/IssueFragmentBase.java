@@ -85,11 +85,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepoOwner = getArguments().getString("owner");
-        mRepoName = getArguments().getString("repo");
-        mIssue = (Issue) getArguments().getSerializable("issue");
-        mIsCollaborator = getArguments().getBoolean("collaborator");
-        mInitialCommentId = getArguments().getLong("initial_comment", -1);
+        Bundle args = getArguments();
+        mRepoOwner = args.getString("owner");
+        mRepoName = args.getString("repo");
+        mIssue = (Issue) args.getSerializable("issue");
+        mIsCollaborator = args.getBoolean("collaborator");
+        mInitialCommentId = args.getLong("initial_comment", -1);
+        args.remove("initial_comment");
 
         updateCommentLockState();
     }

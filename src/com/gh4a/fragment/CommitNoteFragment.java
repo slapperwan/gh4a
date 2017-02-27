@@ -75,11 +75,13 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString("owner");
-        mRepoName = getArguments().getString("repo");
-        mObjectSha = getArguments().getString("sha");
-        mCommit = (RepositoryCommit) getArguments().getSerializable("commit");
-        mInitialCommentId = getArguments().getLong("initial_comment", -1);
+        Bundle args = getArguments();
+        mRepoOwner = args.getString("owner");
+        mRepoName = args.getString("repo");
+        mObjectSha = args.getString("sha");
+        mCommit = (RepositoryCommit) args.getSerializable("commit");
+        mInitialCommentId = args.getLong("initial_comment", -1);
+        args.remove("initial_comment");
     }
 
     @Override

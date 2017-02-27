@@ -166,6 +166,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         mRepoName = extras.getString("repo");
         mIssueNumber = extras.getInt("number");
         mInitialCommentId = extras.getLong("initial_comment", -1);
+        extras.remove("initial_comment");
     }
 
     private void showUiIfDone() {
