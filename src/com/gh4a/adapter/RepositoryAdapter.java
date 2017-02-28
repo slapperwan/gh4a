@@ -15,10 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.Locale;
-
-import org.eclipse.egit.github.core.Repository;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Formatter;
@@ -30,6 +26,10 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
+
+import org.eclipse.egit.github.core.Repository;
+
+import java.util.Locale;
 
 public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter.ViewHolder>
         implements Filterable {
@@ -60,6 +60,7 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
         holder.tvStars.setText(String.valueOf(repository.getWatchers()));
         holder.tvSize.setText(Formatter.formatFileSize(mContext, 1024L * repository.getSize()));
         holder.tvPrivate.setVisibility(repository.isPrivate() ? View.VISIBLE : View.GONE);
+        holder.tvFork.setVisibility(repository.isFork() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -79,6 +80,7 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
             tvStars = (TextView) view.findViewById(R.id.tv_stars);
             tvSize = (TextView) view.findViewById(R.id.tv_size);
             tvPrivate = (TextView) view.findViewById(R.id.tv_private);
+            tvFork = (TextView) view.findViewById(R.id.tv_fork);
         }
 
         private final TextView tvTitle;
@@ -88,5 +90,6 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
         private final TextView tvStars;
         private final TextView tvSize;
         private final TextView tvPrivate;
+        private final TextView tvFork;
     }
 }
