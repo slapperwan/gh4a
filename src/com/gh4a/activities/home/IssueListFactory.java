@@ -19,7 +19,7 @@ public class IssueListFactory extends FragmentFactory {
     private static final String STATE_KEY_SHOWING_CLOSED = "issue:showing_closed";
 
     private static final int[] TAB_TITLES = new int[] {
-            R.string.created, R.string.assigned, R.string.mentioned
+            R.string.created, R.string.assigned, R.string.mentioned, R.string.participating
     };
 
     private boolean mShowingClosed;
@@ -66,6 +66,8 @@ public class IssueListFactory extends FragmentFactory {
             action = "assignee";
         } else if (position == 2) {
             action = "mentions";
+        } else if (position == 3) {
+            action = "involves";
         } else {
             action = "author";
         }
