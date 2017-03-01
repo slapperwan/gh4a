@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    tools:background="@color/issue_open_light">
+    tools:background="@color/issue_open_light"
+    tools:theme="@style/Theme.Header.Light">
 
     <com.gh4a.widget.VerticalTextView
         android:id="@+id/tv_state"
@@ -16,26 +17,31 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:textAppearance="@style/TextAppearance.VerySmall"
-        android:textColor="@color/primary_text_default_material_dark"
+        android:textColor="?android:attr/textColorPrimary"
         tools:text="OPEN" />
 
-    <!-- right padding is FAB size + FAB right margin -->
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_title"
+    <HorizontalScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:ellipsize="end"
-        android:maxLines="2"
+        android:overScrollMode="never"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
-        android:paddingRight="42dp"
-        android:paddingTop="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/primary_text_default_material_dark"
-        android:textIsSelectable="true"
-        app:font="condensed"
-        tools:text="Issue title" />
+        android:paddingRight="16dp"
+        android:paddingTop="8dp">
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textIsSelectable="true"
+            app:font="condensed"
+            tools:text="Issue title that is long enought to make the content scrollable nice" />
+
+    </HorizontalScrollView>
 
 </LinearLayout>

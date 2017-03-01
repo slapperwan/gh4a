@@ -64,6 +64,7 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.IssueLabelSpan;
+import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.github.mobile.util.HtmlUtils;
@@ -144,8 +145,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        LayoutInflater inflater = getLayoutInflater();
-
+        LayoutInflater inflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
