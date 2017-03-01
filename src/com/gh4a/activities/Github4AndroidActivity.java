@@ -84,7 +84,8 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
     @Override
     protected void onNewIntent(Intent intent) {
         Uri data = intent.getData();
-        if (data.getScheme().equals(CALLBACK_URI.getScheme())
+        if (data != null
+                && data.getScheme().equals(CALLBACK_URI.getScheme())
                 && data.getHost().equals(CALLBACK_URI.getHost())) {
             Uri uri = Uri.parse(TOKEN_URL)
                     .buildUpon()
