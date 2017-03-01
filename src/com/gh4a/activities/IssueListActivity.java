@@ -606,25 +606,6 @@ public class IssueListActivity extends BasePagerActivity implements
                 .show();
     }
 
-    private void showParticipatingDialog() {
-        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSelectedParticipatingStatus = which;
-                dialog.dismiss();
-                reloadIssueList();
-            }
-        };
-
-        new AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle(R.string.issue_filter_by_participating)
-                .setSingleChoiceItems(R.array.filter_participating, mSelectedParticipatingStatus,
-                        selectCb)
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
-
     private void filterAssignee() {
         if (mAssignees == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
@@ -653,6 +634,21 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private void filterParticipating() {
-        showParticipatingDialog();
+        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mSelectedParticipatingStatus = which;
+                dialog.dismiss();
+                reloadIssueList();
+            }
+        };
+
+        new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setTitle(R.string.issue_filter_by_participating)
+                .setSingleChoiceItems(R.array.filter_participating, mSelectedParticipatingStatus,
+                        selectCb)
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 }
