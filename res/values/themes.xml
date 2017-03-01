@@ -27,6 +27,7 @@
         <item name="commentsIcon">@drawable/comments_dark</item>
         <item name="languageSmallIcon">@drawable/language_small_dark</item>
         <item name="forkSmallIcon">@drawable/fork_small_dark</item>
+        <item name="forkSmallBoldIcon">@drawable/fork_small_bold_dark</item>
         <item name="starSmallIcon">@drawable/star_small_dark</item>
         <item name="sizeSmallIcon">@drawable/size_small_dark</item>
         <item name="dueSmallIcon">@drawable/due_small_dark</item>
@@ -130,6 +131,7 @@
         <item name="commentsIcon">@drawable/comments</item>
         <item name="languageSmallIcon">@drawable/language_small</item>
         <item name="forkSmallIcon">@drawable/fork_small</item>
+        <item name="forkSmallBoldIcon">@drawable/fork_small_bold</item>
         <item name="starSmallIcon">@drawable/star_small</item>
         <item name="sizeSmallIcon">@drawable/size_small</item>
         <item name="dueSmallIcon">@drawable/due_small</item>
