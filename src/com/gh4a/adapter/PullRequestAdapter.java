@@ -15,9 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.User;
-
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -32,6 +29,10 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
+
+import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.User;
 
 public class PullRequestAdapter extends RootAdapter<PullRequest, PullRequestAdapter.ViewHolder> {
     public PullRequestAdapter(Context context) {
@@ -54,6 +55,12 @@ public class PullRequestAdapter extends RootAdapter<PullRequest, PullRequestAdap
 
         AvatarHandler.assignAvatar(holder.ivGravatar, user);
         holder.ivGravatar.setTag(pullRequest.getUser());
+
+        int mergedResId = 0;
+        if (pullRequest.getMergedAt() != null) {
+            mergedResId = UiUtils.resolveDrawable(mContext, R.attr.mergedIcon);
+        }
+        holder.tvNumber.setCompoundDrawablesWithIntrinsicBounds(mergedResId, 0, 0, 0);
 
         holder.tvNumber.setText("#" + pullRequest.getNumber());
         holder.tvDesc.setText(pullRequest.getTitle());
