@@ -4,8 +4,7 @@
 
     <!-- Common -->
     <string name="welcome">Welcome to OctoDroid</string>
-    <string name="introduction">To be able to use the app to its full potential, please log in to GitHub using the button below.</string>
-    <string name="introduction_anon">Alternatively, you can explore some parts of GitHub using the swipe-out menu on the left.</string>
+    <string name="introduction">To be able to use the app to its full potential, please log in to GitHub using the button below.\n\nAlternatively, you can explore some parts of GitHub using the swipe-out menu on the left.</string>
     <string name="repo_not_found_toast">Repository was not found</string>
     <string name="loading_msg">Loading\u2026</string>
     <string name="saving_msg">Saving\u2026</string>
