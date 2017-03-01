@@ -246,6 +246,7 @@
     <string name="repo_no_readme">No README file found</string>
     <string name="repo_issue_on">#%1$d on %2$s</string>
     <string name="repo_no_data">Data for this repository can\'t be loaded.</string>
+    <string name="repo_activity">Activity</string>
 
     <!-- Issue events -->
     <string name="issue_event_closed">Issue was closed by %1$s</string>

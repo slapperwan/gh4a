@@ -1,23 +1,11 @@
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.RepositoryTag;
-import org.eclipse.egit.github.core.service.StarService;
-import org.eclipse.egit.github.core.service.WatcherService;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
@@ -41,6 +29,7 @@ import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListContainerFragment;
+import com.gh4a.fragment.RepositoryEventListFragment;
 import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.loader.BaseLoader;
 import com.gh4a.loader.BranchListLoader;
@@ -51,6 +40,17 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.UiUtils;
+
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.RepositoryTag;
+import org.eclipse.egit.github.core.service.StarService;
+import org.eclipse.egit.github.core.service.WatcherService;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RepositoryActivity extends BasePagerActivity {
     public static Intent makeIntent(Context context, Repository repo) {
@@ -86,9 +86,10 @@ public class RepositoryActivity extends BasePagerActivity {
     public static final int PAGE_REPO_OVERVIEW = 0;
     public static final int PAGE_FILES = 1;
     public static final int PAGE_COMMITS = 2;
+    public static final int PAGE_ACTIVITY = 3;
 
     private static final int[] TITLES = new int[] {
-        R.string.about, R.string.repo_files, R.string.commits
+        R.string.about, R.string.repo_files, R.string.commits, R.string.repo_activity
     };
 
     private final LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>(this) {
@@ -103,7 +104,7 @@ public class RepositoryActivity extends BasePagerActivity {
             updateTitle();
             invalidateTabs();
             // Apply initial page selection first time the repo is loaded
-            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_COMMITS) {
+            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
                 getPager().setCurrentItem(mInitialPage);
                 mInitialPage = -1;
             }
@@ -181,6 +182,7 @@ public class RepositoryActivity extends BasePagerActivity {
     private RepositoryFragment mRepositoryFragment;
     private ContentListContainerFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
+    private RepositoryEventListFragment mActivityFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -241,6 +243,9 @@ public class RepositoryActivity extends BasePagerActivity {
             case 2:
                 mCommitListFragment = CommitListFragment.newInstance(mRepository, mSelectedRef);
                 return mCommitListFragment;
+            case 3:
+                mActivityFragment = RepositoryEventListFragment.newInstance(mRepository);
+                return mActivityFragment;
         }
         return null;
     }
@@ -254,6 +259,8 @@ public class RepositoryActivity extends BasePagerActivity {
             return true;
         } else if (fragment instanceof RepositoryFragment && mRepositoryFragment == null) {
             return true;
+        } else if (fragment instanceof RepositoryEventListFragment && mActivityFragment == null) {
+            return true;
         }
         return false;
     }
@@ -262,6 +269,7 @@ public class RepositoryActivity extends BasePagerActivity {
     public void onRefresh() {
         mRepositoryFragment = null;
         mContentListFragment = null;
+        mActivityFragment = null;
         mRepository = null;
         mIsStarring = null;
         mIsWatching = null;
