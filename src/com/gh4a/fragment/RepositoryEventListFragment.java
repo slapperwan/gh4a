@@ -10,6 +10,8 @@ import org.eclipse.egit.github.core.event.Event;
 import org.eclipse.egit.github.core.service.EventService;
 
 public class RepositoryEventListFragment extends EventListFragment {
+    private Repository mRepository;
+
     public static RepositoryEventListFragment newInstance(Repository repository) {
         RepositoryEventListFragment f = new RepositoryEventListFragment();
         Bundle args = new Bundle();
@@ -17,8 +19,6 @@ public class RepositoryEventListFragment extends EventListFragment {
         f.setArguments(args);
         return f;
     }
-
-    private Repository mRepository;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
