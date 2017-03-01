@@ -25,7 +25,6 @@ import android.os.PersistableBundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
@@ -75,12 +74,14 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private String mRepoOwner;
     private String mRepoName;
+    private String mUserLogin;
 
     private String mSelectedLabel;
     private String mSelectedMilestone;
     private String mSelectedAssignee;
     private String mSearchQuery;
     private boolean mSearchMode;
+    private int mSelectedParticipatingStatus = 0;
 
     private FloatingActionButton mCreateFab;
     private IssueListFragment mOpenFragment;
@@ -98,7 +99,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private static final String STATE_KEY_SEARCH_QUERY = "search_query";
     private static final String STATE_KEY_SEARCH_MODE = "search_mode";
 
-    private static final String LIST_QUERY = "is:issue is:%s repo:%s/%s %s %s %s";
+    private static final String LIST_QUERY = "is:issue is:%s repo:%s/%s %s %s %s %s";
     private static final String SEARCH_QUERY = "is:%s repo:%s/%s %s";
 
     private static final int[] TITLES = new int[] {
@@ -197,6 +198,8 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mUserLogin = Gh4Application.get().getAuthLogin();
 
         if (savedInstanceState != null) {
             mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
@@ -343,6 +346,9 @@ public class IssueListActivity extends BasePagerActivity implements
             case R.id.filter_by_milestone:
                 filterMilestone();
                 return true;
+            case R.id.filter_by_participating:
+                filterParticipating();
+                return true;
             case R.id.manage_labels:
                 startActivity(IssueLabelListActivity.makeIntent(this, mRepoOwner, mRepoName));
                 return true;
@@ -444,7 +450,8 @@ public class IssueListActivity extends BasePagerActivity implements
                 mRepoOwner, mRepoName,
                 buildFilterItem("assignee", mSelectedAssignee),
                 buildFilterItem("label", mSelectedLabel),
-                buildFilterItem("milestone", mSelectedMilestone)));
+                buildFilterItem("milestone", mSelectedMilestone),
+                buildParticipatingFilterItem()));
 
         final IssueListFragment f = IssueListFragment.newInstance(filterData,
                 position == 1, R.string.no_issues_found, false);
@@ -455,6 +462,16 @@ public class IssueListActivity extends BasePagerActivity implements
             mOpenFragment = f;
         }
         return f;
+    }
+
+    private String buildParticipatingFilterItem() {
+        if (mSelectedParticipatingStatus == 1) {
+            return "involves:" + mUserLogin;
+        } else if (mSelectedParticipatingStatus == 2) {
+            return "-involves:" + mUserLogin;
+        } else {
+            return "";
+        }
     }
 
     private String buildFilterItem(String type, String value) {
@@ -589,6 +606,25 @@ public class IssueListActivity extends BasePagerActivity implements
                 .show();
     }
 
+    private void showParticipatingDialog() {
+        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mSelectedParticipatingStatus = which;
+                dialog.dismiss();
+                reloadIssueList();
+            }
+        };
+
+        new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setTitle(R.string.issue_filter_by_participating)
+                .setSingleChoiceItems(R.array.filter_participating, mSelectedParticipatingStatus,
+                        selectCb)
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
     private void filterAssignee() {
         if (mAssignees == null) {
             mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
@@ -614,5 +650,9 @@ public class IssueListActivity extends BasePagerActivity implements
         } else {
             showLabelsDialog();
         }
+    }
+
+    private void filterParticipating() {
+        showParticipatingDialog();
     }
 }

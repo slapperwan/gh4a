@@ -11,6 +11,9 @@
             <item
                 android:id="@+id/filter_by_assignee"
                 android:title="@string/issue_filter_by_assignee" />
+            <item
+                android:id="@+id/filter_by_participating"
+                android:title="@string/issue_filter_by_participating" />
         </menu>
     </item>
     <group>
