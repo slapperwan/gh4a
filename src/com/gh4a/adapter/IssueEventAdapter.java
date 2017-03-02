@@ -29,12 +29,12 @@ import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.StyleableTextView;
-import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;

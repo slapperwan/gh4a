@@ -37,11 +37,11 @@ import com.gh4a.loader.MarkdownLoader;
 import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.SwipeRefreshLayout;
-import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.Download;
 import org.eclipse.egit.github.core.Release;

@@ -32,10 +32,10 @@ import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
-import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.User;
 

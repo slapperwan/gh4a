@@ -39,10 +39,10 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueLabelSpan;
-import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
