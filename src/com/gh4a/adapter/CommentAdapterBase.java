@@ -91,7 +91,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
         ViewHolder holder = new ViewHolder(v, mCommentMenuItemClickCallback);
         holder.ivGravatar.setOnClickListener(this);

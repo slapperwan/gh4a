@@ -45,6 +45,7 @@ public class HomeActivity extends BasePagerActivity implements
     private static final SparseArray<String> START_PAGE_MAPPING = new SparseArray<>();
     static {
         START_PAGE_MAPPING.put(R.id.news_feed, "newsfeed");
+        START_PAGE_MAPPING.put(R.id.notifications, "notifications");
         START_PAGE_MAPPING.put(R.id.my_repos, "repos");
         START_PAGE_MAPPING.put(R.id.my_issues, "issues");
         START_PAGE_MAPPING.put(R.id.my_prs, "prs");
@@ -180,6 +181,8 @@ public class HomeActivity extends BasePagerActivity implements
         switch (id) {
             case R.id.news_feed:
                 return new NewsFeedFactory(this, mUserLogin);
+            case R.id.notifications:
+                return new NotificationListFactory(this);
             case R.id.my_repos:
                 return new RepositoryFactory(this, mUserLogin, getPrefs());
             case R.id.my_issues:

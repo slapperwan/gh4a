@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?cardBackground">
+
+        <RelativeLayout
+            android:id="@+id/v_notification_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground">
+
+            <com.gh4a.widget.FixedSizeImageView
+                android:id="@+id/iv_icon"
+                android:layout_width="56dp"
+                android:layout_height="24dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:paddingLeft="@dimen/content_padding"
+                android:paddingRight="@dimen/content_padding"
+                android:src="@drawable/icon_issues" />
+
+            <com.gh4a.widget.FixedSizeImageView
+                android:id="@+id/iv_action"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_centerVertical="true"
+                android:background="?selectableItemBackgroundBorderless"
+                android:paddingLeft="@dimen/content_padding"
+                android:paddingRight="@dimen/content_padding"
+                android:src="?overflowIcon"
+                tools:layout_alignParentBottom="false"
+                tools:layout_alignParentTop="false" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_toLeftOf="@id/iv_action"
+                android:layout_toRightOf="@id/iv_icon"
+                android:textAppearance="@style/TextAppearance.VerySmall"
+                tools:text="yesterday" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_timestamp"
+                android:layout_marginBottom="8dp"
+                android:layout_toLeftOf="@id/iv_action"
+                android:layout_toRightOf="@id/iv_icon"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="?android:textColorPrimary"
+                tools:text="Issue title" />
+
+        </RelativeLayout>
+
+    </FrameLayout>
+
+    <View
+        android:id="@+id/v_bottom_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/bottom_shadow"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</LinearLayout>

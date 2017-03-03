@@ -9,6 +9,11 @@
             android:icon="@drawable/icon_news_feed"
             android:checked="true" />
         <item
+            android:id="@+id/notifications"
+            android:title="@string/notifications"
+            android:icon="@drawable/icon_notifications"
+            android:checked="false" />
+        <item
             android:id="@+id/my_repos"
             android:title="@string/my_repositories"
             android:icon="@drawable/icon_repositories"/>

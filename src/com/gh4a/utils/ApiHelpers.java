@@ -2,6 +2,7 @@ package com.gh4a.utils;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
 import android.text.TextUtils;
 
 import com.gh4a.R;
@@ -90,5 +91,30 @@ public class ApiHelpers {
 
     public static boolean loginEquals(String user, String login) {
         return user != null && user.equalsIgnoreCase(login);
+    }
+
+    public static Uri normalizeUri(Uri uri) {
+        if (uri == null || uri.getAuthority() == null) {
+            return uri;
+        }
+
+        // Only normalize API links
+        if (!uri.getPath().contains("/api/v3/") && !uri.getAuthority().contains("api.")) {
+            return uri;
+        }
+
+        String path = uri.getPath()
+                .replace("/api/v3/", "/")
+                .replace("repos/", "")
+                .replace("commits/", "commit/")
+                .replace("pulls/", "pull/");
+
+        String authority = uri.getAuthority()
+                .replace("api.", "");
+
+        return uri.buildUpon()
+                .path(path)
+                .authority(authority)
+                .build();
     }
 }

@@ -44,7 +44,7 @@ public class PullRequestAdapter extends RootAdapter<PullRequest, PullRequestAdap
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_issue, parent, false);
         v.findViewById(R.id.labels).setVisibility(View.GONE);
 

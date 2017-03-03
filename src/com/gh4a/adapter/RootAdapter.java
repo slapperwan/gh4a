@@ -15,10 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import android.content.Context;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
@@ -28,6 +24,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+
+import com.gh4a.IllegalReturnValueException;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The Root adapter.
@@ -63,9 +65,11 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     private int mHighlightPosition = -1;
     private boolean mHolderCreated = false;
 
-    private static final int VIEW_TYPE_ITEM = 0;
-    private static final int VIEW_TYPE_HEADER = 1;
-    private static final int VIEW_TYPE_FOOTER = 2;
+    private static final int VIEW_TYPE_HEADER = 0;
+    private static final int VIEW_TYPE_FOOTER = 1;
+    private static final int VIEW_TYPE_ITEM = 2;
+
+    public static final int CUSTOM_VIEW_TYPE_START = VIEW_TYPE_ITEM;
 
     private final Filter mFilter = new Filter() {
         @Override
@@ -140,7 +144,12 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         } else if (mFooterView != null && position == itemStart + mObjects.size()) {
             return VIEW_TYPE_FOOTER;
         } else {
-            return VIEW_TYPE_ITEM;
+            int viewType = getItemViewType(getItem(position - itemStart));
+            if (viewType < CUSTOM_VIEW_TYPE_START) {
+                throw new IllegalReturnValueException(
+                        "Custom view types must have id equal to or higher than CUSTOM_VIEW_TYPE_START");
+            }
+            return viewType;
         }
     }
 
@@ -200,7 +209,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
             case VIEW_TYPE_FOOTER:
                 return new FooterViewHolder(mFooterView);
             default:
-                RecyclerView.ViewHolder holder = onCreateViewHolder(mInflater, parent);
+                RecyclerView.ViewHolder holder = onCreateViewHolder(mInflater, parent, viewType);
                 if (mItemClickListener != null) {
                     holder.itemView.setOnClickListener(this);
                     holder.itemView.setTag(holder);
@@ -245,10 +254,14 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         }
     }
 
-    protected abstract VH onCreateViewHolder(LayoutInflater inflater, ViewGroup parent);
+    protected abstract VH onCreateViewHolder(LayoutInflater inflater, ViewGroup parent,
+            int viewType);
     protected abstract void onBindViewHolder(VH holder, T item);
     protected boolean isFiltered(CharSequence filter, T object) {
         return true;
+    }
+    protected int getItemViewType(T item) {
+        return VIEW_TYPE_ITEM;
     }
 
     @Override

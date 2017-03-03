@@ -38,7 +38,7 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_repo, parent, false);
         return new ViewHolder(v);
     }

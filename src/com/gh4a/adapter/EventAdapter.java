@@ -76,7 +76,8 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
     }
 
     @Override
-    public EventViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public EventViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent,
+            int viewType) {
         View v = inflater.inflate(R.layout.row_event, parent, false);
         EventViewHolder holder = new EventViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
