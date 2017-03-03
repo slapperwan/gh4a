@@ -116,6 +116,9 @@ public class GistViewerActivity extends WebViewerActivity {
         inflater.inflate(R.menu.file_viewer_menu, menu);
 
         menu.removeItem(R.id.share);
+        if (mGistFile == null || FileUtils.isMarkdown(mGistFile.getFilename())) {
+            menu.removeItem(R.id.wrap);
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
