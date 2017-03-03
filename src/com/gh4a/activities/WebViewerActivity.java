@@ -300,17 +300,16 @@ public abstract class WebViewerActivity extends BaseActivity implements
             content.append("</div>");
 
             content.append("<script>");
-            if (repoOwner != null && repoName != null) {
-                content.append("var GitHub = new Object();");
-                content.append("GitHub.nameWithOwner = \"");
-                content.append(repoOwner).append("/").append(repoName).append("\";");
-                if (ref != null) {
-                    content.append("GitHub.branch = \"").append(ref).append("\";");
-                }
-            }
             content.append("var text = document.getElementById('content').innerHTML;");
             content.append("var converter = new showdown.Converter();");
             content.append("converter.setFlavor('github');");
+            if (repoOwner != null && repoName != null) {
+                String urlPrefix = "https://raw.github.com/"
+                        + repoOwner + "/" + repoName + "/" + (ref != null ? ref : "master");
+                content.append("converter.setOption('fixupRelativeUrls', true);");
+                content.append("converter.setOption('relativeUrlFixupPrefix','");
+                content.append(urlPrefix).append("');");
+            }
             content.append("var html = converter.makeHtml(text);");
             content.append("document.getElementById('content').innerHTML = html;");
             content.append("</script>");
