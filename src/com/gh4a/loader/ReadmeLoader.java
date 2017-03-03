@@ -11,7 +11,7 @@ import android.content.Context;
 
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
-import com.github.mobile.util.HtmlUtils;
+import com.gh4a.utils.HtmlUtils;
 
 public class ReadmeLoader extends BaseLoader<String> {
 

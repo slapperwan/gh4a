@@ -99,7 +99,9 @@
         android:layout_below="@id/tv_desc"
         android:layout_toLeftOf="@id/info"
         android:layout_toRightOf="@id/iv_gravatar"
+        android:drawablePadding="4dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:drawableLeft="@drawable/merged"
         tools:text="#999 on LongUsername/LongRepositoryName" />
 
 </RelativeLayout>

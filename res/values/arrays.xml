@@ -54,4 +54,9 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <string-array name="filter_participating">
+        <item>Any</item>
+        <item>Participating</item>
+        <item>Not participating</item>
+    </string-array>
 </resources>

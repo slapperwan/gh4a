@@ -45,12 +45,11 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCountLoader;
 import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
-import com.github.mobile.util.HtmlUtils;
-import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;

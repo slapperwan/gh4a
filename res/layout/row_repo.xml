@@ -45,6 +45,18 @@
             tools:visibility="visible" />
 
         <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_fork"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:drawableLeft="?attr/forkSmallBoldIcon"
+            android:drawablePadding="4dp"
+            android:text="@string/fork"
+            android:textAppearance="@style/TextAppearance.VerySmall.Bold"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_language"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

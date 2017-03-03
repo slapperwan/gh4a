@@ -27,6 +27,7 @@
         <item name="commentsIcon">@drawable/comments_dark</item>
         <item name="languageSmallIcon">@drawable/language_small_dark</item>
         <item name="forkSmallIcon">@drawable/fork_small_dark</item>
+        <item name="forkSmallBoldIcon">@drawable/fork_small_bold_dark</item>
         <item name="starSmallIcon">@drawable/star_small_dark</item>
         <item name="sizeSmallIcon">@drawable/size_small_dark</item>
         <item name="dueSmallIcon">@drawable/due_small_dark</item>
@@ -62,6 +63,7 @@
         <item name="issueEventDemilestonedIcon">@drawable/issue_event_milestone_dark</item>
         <item name="issueEventRenamedIcon">@drawable/issue_event_renamed_dark</item>
         <item name="overflowIcon">@drawable/overflow_dark</item>
+        <item name="mergedIcon">@drawable/merged_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
@@ -130,6 +132,7 @@
         <item name="commentsIcon">@drawable/comments</item>
         <item name="languageSmallIcon">@drawable/language_small</item>
         <item name="forkSmallIcon">@drawable/fork_small</item>
+        <item name="forkSmallBoldIcon">@drawable/fork_small_bold</item>
         <item name="starSmallIcon">@drawable/star_small</item>
         <item name="sizeSmallIcon">@drawable/size_small</item>
         <item name="dueSmallIcon">@drawable/due_small</item>
@@ -165,6 +168,7 @@
         <item name="issueEventDemilestonedIcon">@drawable/issue_event_milestone</item>
         <item name="issueEventRenamedIcon">@drawable/issue_event_renamed</item>
         <item name="overflowIcon">@drawable/overflow</item>
+        <item name="mergedIcon">@drawable/merged</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.mobile.util;
+package com.gh4a.utils;
 
 import android.graphics.Canvas;
 import android.graphics.Color;

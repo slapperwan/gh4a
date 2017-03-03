@@ -31,9 +31,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
@@ -75,16 +77,24 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
             finish();
         } else {
             setContentView(R.layout.main);
+
+            AppBarLayout abl = (AppBarLayout) findViewById(R.id.header);
+            abl.setEnabled(false);
+
+            FrameLayout contentContainer = (FrameLayout) findViewById(R.id.content).getParent();
+            contentContainer.setForeground(null);
+
             findViewById(R.id.login_button).setOnClickListener(this);
-            mContent = findViewById(R.id.content);
-            mProgress = findViewById(R.id.content_progress);
+            mContent = findViewById(R.id.welcome_container);
+            mProgress = findViewById(R.id.login_progress_container);
         }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         Uri data = intent.getData();
-        if (data.getScheme().equals(CALLBACK_URI.getScheme())
+        if (data != null
+                && data.getScheme().equals(CALLBACK_URI.getScheme())
                 && data.getHost().equals(CALLBACK_URI.getHost())) {
             Uri uri = Uri.parse(TOKEN_URL)
                     .buildUpon()

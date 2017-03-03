@@ -35,6 +35,7 @@
     <attr name="commentsIcon" format="reference" />
     <attr name="languageSmallIcon" format="reference" />
     <attr name="forkSmallIcon" format="reference" />
+    <attr name="forkSmallBoldIcon" format="reference" />
     <attr name="starSmallIcon" format="reference" />
     <attr name="sizeSmallIcon" format="reference" />
     <attr name="dueSmallIcon" format="reference" />
@@ -70,6 +71,7 @@
     <attr name="issueEventDemilestonedIcon" format="reference" />
     <attr name="issueEventRenamedIcon" format="reference" />
     <attr name="overflowIcon" format="reference" />
+    <attr name="mergedIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension" />

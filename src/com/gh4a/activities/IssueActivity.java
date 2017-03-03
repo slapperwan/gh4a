@@ -46,6 +46,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
 import org.eclipse.egit.github.core.Issue;
@@ -119,8 +120,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        LayoutInflater inflater = getLayoutInflater();
-
+        LayoutInflater inflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
