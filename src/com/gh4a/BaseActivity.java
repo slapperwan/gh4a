@@ -671,8 +671,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void updateViewVisibility(boolean animate) {
         ensureContent();
-        updateViewVisibility(mProgress, animate, !mContentEmpty && !mContentShown);
-        updateViewVisibility(mEmptyView, animate, mContentEmpty);
+        updateViewVisibility(mProgress, animate, !mContentShown);
+        updateViewVisibility(mEmptyView, animate, mContentEmpty && mContentShown);
         updateViewVisibility(mContentContainer, animate, !mContentEmpty && mContentShown);
     }
 

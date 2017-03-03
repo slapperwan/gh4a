@@ -138,7 +138,7 @@ public class SearchActivity extends BaseActivity implements
                 if (error != null && error.getErrors() != null && !error.getErrors().isEmpty()) {
                     setEmptyText(R.string.code_search_too_broad);
                     setContentEmpty(true);
-                    setContentShown(false);
+                    setContentShown(true);
                     return true;
                 }
             }
