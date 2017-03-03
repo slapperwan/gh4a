@@ -164,7 +164,7 @@ public class HomeActivity extends BasePagerActivity implements
 
         switch (id) {
             case R.id.search:
-                startActivity(new Intent(this, SearchActivity.class));
+                startActivity(SearchActivity.makeIntent(this));
                 return true;
             case R.id.bookmarks:
                 startActivity(new Intent(this, BookmarkListActivity.class));

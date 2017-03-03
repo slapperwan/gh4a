@@ -440,8 +440,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public boolean onSearchRequested() {
-        Intent intent = new Intent(this, SearchActivity.class);
-        startActivity(intent);
+        startActivity(SearchActivity.makeIntent(this));
         return true;
     }
 

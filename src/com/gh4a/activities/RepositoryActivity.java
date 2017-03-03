@@ -373,6 +373,10 @@ public class RepositoryActivity extends BasePagerActivity {
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
+            case R.id.search:
+                String initialSearch = "repo:" + mRepoOwner + "/" + mRepoName + " ";
+                startActivity(SearchActivity.makeIntent(this, initialSearch, 2));
+                return true;
             case R.id.bookmark:
                 Intent bookmarkIntent = makeIntent(this, mRepoOwner, mRepoName, mSelectedRef);
                 saveBookmark(mActionBar.getTitle().toString(), BookmarksProvider.Columns.TYPE_REPO,

@@ -15,17 +15,9 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.eclipse.egit.github.core.CodeSearchResult;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RequestError;
-import org.eclipse.egit.github.core.SearchUser;
-import org.eclipse.egit.github.core.client.RequestException;
-
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
@@ -68,9 +60,27 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 
+import org.eclipse.egit.github.core.CodeSearchResult;
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RequestError;
+import org.eclipse.egit.github.core.SearchUser;
+import org.eclipse.egit.github.core.client.RequestException;
+
+import java.io.IOException;
+import java.util.List;
+
 public class SearchActivity extends BaseActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener, SearchView.OnSuggestionListener,
         AdapterView.OnItemSelectedListener, RootAdapter.OnItemClickListener {
+    public static Intent makeIntent(Context context, String initialSearch, int searchType) {
+        return makeIntent(context)
+                .putExtra("initial_search", initialSearch)
+                .putExtra("search_type", searchType);
+    }
+
+    public static Intent makeIntent(Context context) {
+        return new Intent(context, SearchActivity.class);
+    }
 
     private RootAdapter<?, ?> mAdapter;
     private RecyclerView mResultsView;
@@ -215,6 +225,16 @@ public class SearchActivity extends BaseActivity implements
                 case SEARCH_MODE_REPO: lm.initLoader(0, null, mRepoCallback); break;
                 case SEARCH_MODE_USER: lm.initLoader(0, null, mUserCallback); break;
                 case SEARCH_MODE_CODE: lm.initLoader(0, null, mCodeCallback); break;
+            }
+        } else {
+            Intent intent = getIntent();
+            if (intent.hasExtra("search_type")) {
+                int searchType = intent.getIntExtra("search_type", 0);
+                mSearchType.setSelection(searchType);
+            }
+            if (intent.hasExtra("initial_search")) {
+                String initialSearch = intent.getStringExtra("initial_search");
+                mSearch.setQuery(initialSearch, false);
             }
         }
     }
