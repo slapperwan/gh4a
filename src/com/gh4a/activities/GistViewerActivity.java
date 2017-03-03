@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,10 +30,12 @@ import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
+import org.eclipse.egit.github.core.util.EncodingUtils;
 
 public class GistViewerActivity extends WebViewerActivity {
     private String mFileName;
@@ -47,7 +50,12 @@ public class GistViewerActivity extends WebViewerActivity {
         @Override
         protected void onResultReady(Gist result) {
             mGistFile = result.getFiles().get(mFileName);
-            loadCode(mGistFile.getContent(), mFileName);
+            if (FileUtils.isMarkdown(mGistFile.getFilename())) {
+                String base64Data = EncodingUtils.toBase64(mGistFile.getContent());
+                loadMarkdown(base64Data, null, null, null);
+            } else {
+                loadCode(mGistFile.getContent(), mFileName, -1, -1);
+            }
             supportInvalidateOptionsMenu();
         }
     };

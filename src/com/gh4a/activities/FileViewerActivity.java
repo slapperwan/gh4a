@@ -140,9 +140,11 @@ public class FileViewerActivity extends WebViewerActivity {
             String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) +
                     ";base64," + base64Data;
             loadThemedHtml(highlightImage(imageUrl));
-        } else {
+        } else if (base64Data != null && FileUtils.isMarkdown(mPath)) {
+            loadMarkdown(base64Data, mRepoOwner, mRepoName, mRef);
+         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
-            loadCode(data, mPath, mRepoOwner, mRepoName, mRef, mHighlightStart, mHighlightEnd);
+            loadCode(data, mPath, mHighlightStart, mHighlightEnd);
         }
     }
 

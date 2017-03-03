@@ -237,10 +237,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         return false;
     }
 
-    protected void loadCode(String data, String fileName) {
-        loadCode(data, fileName, null, null, null, -1, -1);
-    }
-
     private void loadLanguagePluginListIfNeeded() {
         if (!sLanguagePlugins.isEmpty()) {
             return;
@@ -263,61 +259,60 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
+    protected void loadMarkdown(String base64Data,
+            String repoOwner, String repoName, String ref) {
+        StringBuilder content = new StringBuilder();
+        content.append("<html><head>");
+        writeScriptInclude(content, "showdown");
+        writeCssInclude(content, "markdown");
+        content.append("</head>");
+
+        content.append("<body><div id='content'></div>");
+
+        content.append("<script>");
+        content.append("var text = window.atob('");
+        content.append(base64Data.replaceAll("\\n", ""));
+        content.append("');\n");
+        content.append("var converter = new showdown.Converter();\n");
+        content.append("converter.setFlavor('github');\n");
+        if (repoOwner != null && repoName != null) {
+            String urlPrefix = "https://raw.github.com/"
+                    + repoOwner + "/" + repoName + "/" + (ref != null ? ref : "master");
+            content.append("converter.setOption('fixupRelativeUrls', true);\n");
+            content.append("converter.setOption('relativeUrlFixupPrefix','");
+            content.append(urlPrefix).append("');\n");
+        }
+        content.append("var html = converter.makeHtml(text);\n");
+        content.append("document.getElementById('content').innerHTML = html;");
+        content.append("</script>");
+
+        content.append("</body></html>");
+
+        loadThemedHtml(content.toString());
+    }
+
     protected void loadCode(String data, String fileName,
-            String repoOwner, String repoName, String ref,
             int highlightStart, int highlightEnd) {
         String ext = FileUtils.getFileExtension(fileName);
-        boolean isMarkdown = FileUtils.isMarkdown(fileName);
 
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title></title>");
         writeScriptInclude(content, "codeutils");
 
-        if (isMarkdown) {
-            writeScriptInclude(content, "showdown");
-            writeCssInclude(content, "markdown");
-            content.append("</head>");
-            content.append("<body>");
-            content.append("<div id='content'>");
-        } else {
-            writeCssInclude(content, "prettify");
-            writeScriptInclude(content, "prettify");
-            loadLanguagePluginListIfNeeded();
-            for (String plugin : sLanguagePlugins) {
-                writeScriptInclude(content, plugin);
-            }
-            content.append("</head>");
-            content.append("<body onload='prettyPrint(function() { highlightLines(");
-            content.append(highlightStart).append(",").append(highlightEnd).append("); })'");
-            content.append(" onresize='scrollToHighlight();'>");
-            content.append("<pre id='content' class='prettyprint linenums lang-");
-            content.append(ext).append("'>");
+        writeCssInclude(content, "prettify");
+        writeScriptInclude(content, "prettify");
+        loadLanguagePluginListIfNeeded();
+        for (String plugin : sLanguagePlugins) {
+            writeScriptInclude(content, plugin);
         }
-
+        content.append("</head>");
+        content.append("<body onload='prettyPrint(function() { highlightLines(");
+        content.append(highlightStart).append(",").append(highlightEnd).append("); })'");
+        content.append(" onresize='scrollToHighlight();'>");
+        content.append("<pre id='content' class='prettyprint linenums lang-");
+        content.append(ext).append("'>");
         content.append(TextUtils.htmlEncode(data));
-
-        if (isMarkdown) {
-            content.append("</div>");
-
-            content.append("<script>");
-            content.append("var text = document.getElementById('content').innerHTML;");
-            content.append("var converter = new showdown.Converter();");
-            content.append("converter.setFlavor('github');");
-            if (repoOwner != null && repoName != null) {
-                String urlPrefix = "https://raw.github.com/"
-                        + repoOwner + "/" + repoName + "/" + (ref != null ? ref : "master");
-                content.append("converter.setOption('fixupRelativeUrls', true);");
-                content.append("converter.setOption('relativeUrlFixupPrefix','");
-                content.append(urlPrefix).append("');");
-            }
-            content.append("var html = converter.makeHtml(text);");
-            content.append("document.getElementById('content').innerHTML = html;");
-            content.append("</script>");
-        } else {
-            content.append("</pre>");
-        }
-
-        content.append("</body></html>");
+        content.append("</pre></body></html>");
 
         loadThemedHtml(content.toString());
     }
