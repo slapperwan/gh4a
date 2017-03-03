@@ -103,6 +103,16 @@ function getDefaultOpts(simple) {
       description: 'Makes adding a space between `#` and the header text mandatory (GFM Style)',
       type: 'boolean'
     },
+    fixupRelativeUrls: {
+      defaultValue: false,
+      description: 'Rewrite relative URLs to absolute ones',
+      type: 'boolean'
+    },
+    relativeUrlFixupPrefix: {
+      defaultValue: '',
+      description: 'URL prefix to prepend to relative URLs. Only applies if fixupRelativeUrls option is enabled.',
+      type: 'string'
+    },
     ghMentions: {
       defaultValue: false,
       description: 'Enables github @mentions',
@@ -640,6 +650,17 @@ showdown.helper.escapeCharacters = function (text, charsToEscape, afterBackslash
   text = text.replace(regex, escapeCharactersCallback);
 
   return text;
+};
+
+showdown.helper.fixUpRelativeUrl = function (url, prefix) {
+  if (url.indexOf("://") != -1 || url.indexOf("#") == 0) {
+    return url;
+  }
+  if (url.indexOf("/") == 0) {
+    return prefix + url;
+  }
+
+  return prefix + "/" + url;
 };
 
 var rgxFindMatchPos = function (str, left, right, flags) {
@@ -1316,7 +1337,7 @@ showdown.subParser('anchors', function (text, options, globals) {
 
     //url = showdown.helper.escapeCharacters(url, '*_', false); // replaced line to improve performance
     url = url.replace(showdown.helper.regexes.asteriskAndDash, showdown.helper.escapeCharactersCallback);
-
+    if (options.fixupRelativeUrls) url = showdown.helper.fixUpRelativeUrl(url, options.relativeUrlFixupPrefix);
     var result = '<a href="' + url + '"';
 
     if (title !== '' && title !== null) {
@@ -2051,6 +2072,7 @@ showdown.subParser('images', function (text, options, globals) {
       .replace(showdown.helper.regexes.asteriskAndDash, showdown.helper.escapeCharactersCallback);
     //url = showdown.helper.escapeCharacters(url, '*_', false);
     url = url.replace(showdown.helper.regexes.asteriskAndDash, showdown.helper.escapeCharactersCallback);
+    if (options.fixupRelativeUrls) url = showdown.helper.fixUpRelativeUrl(url, options.relativeUrlFixupPrefix);
     var result = '<img src="' + url + '" alt="' + altText + '"';
 
     if (title) {
