@@ -101,6 +101,9 @@ public class GistViewerActivity extends WebViewerActivity {
         if (mGistFile == null) {
             menu.removeItem(R.id.browser);
         }
+        if (mGistFile == null || FileUtils.isMarkdown(mGistFile.getFilename())) {
+            menu.removeItem(R.id.wrap);
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
