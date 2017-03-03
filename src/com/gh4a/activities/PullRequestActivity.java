@@ -208,7 +208,7 @@ public class PullRequestActivity extends BasePagerActivity implements
                 break;
             case R.id.pull_close:
             case R.id.pull_reopen:
-                new PullRequestOpenCloseTask(item.getItemId() == R.id.pull_reopen).schedule();
+                showOpenCloseConfirmDialog(item.getItemId() == R.id.pull_reopen);
                 break;
             case R.id.share:
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
@@ -327,6 +327,25 @@ public class PullRequestActivity extends BasePagerActivity implements
             invalidateTabs();
             updateFabVisibility();
         }
+    }
+
+    private void showOpenCloseConfirmDialog(final boolean reopen) {
+        new AlertDialog.Builder(this)
+                .setTitle(reopen ? R.string.reopen_pull_request : R.string.close_pull_request)
+                .setMessage(reopen ? R.string.reopen_pull_request_confirm
+                        : R.string.close_pull_request_confirm)
+                .setIconAttribute(android.R.attr.alertDialogIcon)
+                .setCancelable(false)
+                .setPositiveButton(
+                        reopen ? R.string.reopen_pull_request : R.string.close_pull_request,
+                        new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new PullRequestOpenCloseTask(reopen).schedule();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     private void showMergeDialog() {

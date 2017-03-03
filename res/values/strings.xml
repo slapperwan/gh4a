@@ -376,6 +376,10 @@
     <string name="issue_commit_comment_file">Comment on [b][file][/b]</string>
     <string name="commit_comment_header">%1$s added a note %2$s</string>
     <string name="issue_no_description">No description provided.</string>
+    <string name="close_issue">Close issue</string>
+    <string name="close_issue_confirm">Do you really want to close this issue?</string>
+    <string name="reopen_issue">Reopen issue</string>
+    <string name="reopen_issue_confirm">Do you really want to reopen this issue?</string>
 
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
@@ -400,6 +404,10 @@
     <string name="pull_no_commit_status">No additional checks are attached to this pull request</string>
     <string name="pull_request_from">From [b]%1$s[/b]</string>
     <string name="pull_request_to">Into [b]%1$s[/b]</string>
+    <string name="close_pull_request">Close pull request</string>
+    <string name="close_pull_request_confirm">Do you really want to close this pull request?</string>
+    <string name="reopen_pull_request">Reopen pull request</string>
+    <string name="reopen_pull_request_confirm">Do you really want to reopen this pull request?</string>
 
     <!-- Object -->
     <string name="object_view_file_at">View file @ %1$s</string>
