@@ -358,18 +358,53 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    protected String generateCodeHtml(String data, String fileName,
+    protected String generateMarkdownHtml(String base64Data,
+            String repoOwner, String repoName, String ref,
             String cssTheme, boolean addTitleHeader) {
-        return generateCodeHtml(data, fileName, null, null, null, -1, -1, cssTheme, addTitleHeader);
+        String title = addTitleHeader ? getDocumentTitle() : null;
+        StringBuilder content = new StringBuilder();
+        content.append("<html><head><title>");
+        if (title != null) {
+            content.append(title);
+        }
+        content.append("</title>");
+        writeScriptInclude(content, "showdown");
+        writeCssInclude(content, "markdown", cssTheme);
+        content.append("</head>");
+
+        content.append("<body>");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
+        content.append("<div id='content'></div>");
+
+        content.append("<script>");
+        content.append("var text = window.atob('");
+        content.append(base64Data.replaceAll("\\n", ""));
+        content.append("');\n");
+        content.append("var converter = new showdown.Converter();\n");
+        content.append("converter.setFlavor('github');\n");
+        if (repoOwner != null && repoName != null) {
+            String urlPrefix = "https://raw.github.com/"
+                    + repoOwner + "/" + repoName + "/" + (ref != null ? ref : "master");
+            content.append("converter.setOption('fixupRelativeUrls', true);\n");
+            content.append("converter.setOption('relativeUrlFixupPrefix','");
+            content.append(urlPrefix).append("');\n");
+        }
+        content.append("var html = converter.makeHtml(text);\n");
+        content.append("document.getElementById('content').innerHTML = html;");
+        content.append("</script>");
+
+        content.append("</body></html>");
+
+        return content.toString();
     }
 
     protected String generateCodeHtml(String data, String fileName,
-                String repoOwner, String repoName, String ref,
-                int highlightStart, int highlightEnd, String cssTheme, boolean addTitleHeader) {
+                int highlightStart, int highlightEnd,
+                String cssTheme, boolean addTitleHeader) {
         String ext = FileUtils.getFileExtension(fileName);
         String title = addTitleHeader ? getDocumentTitle() : null;
-        boolean isMarkdown = FileUtils.isMarkdown(fileName);
-
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title>");
         if (title != null) {
@@ -378,59 +413,26 @@ public abstract class WebViewerActivity extends BaseActivity implements
         content.append("</title>");
         writeScriptInclude(content, "codeutils");
 
-        if (isMarkdown) {
-            writeScriptInclude(content, "showdown");
-            writeCssInclude(content, "markdown", cssTheme);
-            content.append("</head>");
-            content.append("<body>");
-            if (title != null) {
-                content.append("<h2>").append(title).append("</h2>");
-            }
-            content.append("<div id='content'>");
-        } else {
-            writeCssInclude(content, "prettify", cssTheme);
-            writeScriptInclude(content, "prettify");
-            loadLanguagePluginListIfNeeded();
-            for (String plugin : sLanguagePlugins) {
-                writeScriptInclude(content, plugin);
-            }
-            content.append("</head>");
-            content.append("<body onload='prettyPrint(function() { highlightLines(");
-            content.append(highlightStart).append(",").append(highlightEnd).append("); ");
-            content.append("NativeClient.onRenderingDone(); })'");
-            content.append(" onresize='scrollToHighlight();'>");
-            if (title != null) {
-                content.append("<h2>").append(title).append("</h2>");
-            }
-            content.append("<pre id='content' class='prettyprint linenums lang-");
-            content.append(ext).append("'>");
+        writeCssInclude(content, "prettify", cssTheme);
+        writeScriptInclude(content, "prettify");
+        loadLanguagePluginListIfNeeded();
+        for (String plugin : sLanguagePlugins) {
+            writeScriptInclude(content, plugin);
         }
+        content.append("</head>");
+        content.append("<body onload='prettyPrint(function() { highlightLines(");
+        content.append(highlightStart).append(",").append(highlightEnd).append("); ");
+        content.append("NativeClient.onRenderingDone(); })'");
+        content.append(" onresize='scrollToHighlight();'>");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
+        content.append("<pre id='content' class='prettyprint linenums lang-");
+        content.append(ext).append("'>");
 
         content.append(TextUtils.htmlEncode(data));
+        content.append("</pre></body></html>");
 
-        if (isMarkdown) {
-            content.append("</div>");
-
-            content.append("<script>");
-            content.append("var text = document.getElementById('content').innerHTML;");
-            content.append("var converter = new showdown.Converter();");
-            content.append("converter.setFlavor('github');");
-            if (repoOwner != null && repoName != null) {
-                String urlPrefix = "https://raw.github.com/"
-                        + repoOwner + "/" + repoName + "/" + (ref != null ? ref : "master");
-                content.append("converter.setOption('fixupRelativeUrls', true);");
-                content.append("converter.setOption('relativeUrlFixupPrefix','");
-                content.append(urlPrefix).append("');");
-            }
-            content.append("var html = converter.makeHtml(text);");
-            content.append("document.getElementById('content').innerHTML = html;");
-            content.append("NativeClient.onRenderingDone();");
-            content.append("</script>");
-        } else {
-            content.append("</pre>");
-        }
-
-        content.append("</body></html>");
         mRequiresJsInterface = true;
         return content.toString();
     }
