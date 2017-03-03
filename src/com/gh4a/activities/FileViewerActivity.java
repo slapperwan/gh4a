@@ -70,8 +70,8 @@ public class FileViewerActivity extends WebViewerActivity {
                 loadContent(result.get(0));
                 dataLoaded = true;
             }
+            setContentEmpty(!dataLoaded);
             if (!dataLoaded) {
-                setContentEmpty(true);
                 setContentShown(true);
             }
         }
@@ -131,7 +131,6 @@ public class FileViewerActivity extends WebViewerActivity {
     public void onRefresh() {
         getSupportLoaderManager().getLoader(0).onContentChanged();
         setContentShown(false);
-        setContentEmpty(false);
         super.onRefresh();
     }
 

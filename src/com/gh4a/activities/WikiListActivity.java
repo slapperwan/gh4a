@@ -115,7 +115,6 @@ public class WikiListActivity extends BaseActivity
     public void onRefresh() {
         mAdapter.clear();
         setContentShown(false);
-        setContentEmpty(false);
         getSupportLoaderManager().getLoader(0).onContentChanged();
         super.onRefresh();
     }
