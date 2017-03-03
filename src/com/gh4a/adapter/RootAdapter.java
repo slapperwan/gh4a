@@ -25,8 +25,6 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 
-import com.gh4a.IllegalReturnValueException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -145,10 +143,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
             return VIEW_TYPE_FOOTER;
         } else {
             int viewType = getItemViewType(getItem(position - itemStart));
-            if (viewType < CUSTOM_VIEW_TYPE_START) {
-                throw new IllegalReturnValueException(
-                        "Custom view types must have id equal to or higher than CUSTOM_VIEW_TYPE_START");
-            }
+            assert viewType >= CUSTOM_VIEW_TYPE_START;
             return viewType;
         }
     }
