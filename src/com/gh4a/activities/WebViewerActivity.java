@@ -421,7 +421,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
                 }
             }
             content.append("var text = document.getElementById('content').innerHTML;");
-            content.append("var converter = new Showdown.converter();");
+            content.append("var converter = new showdown.Converter();");
+            content.append("converter.setFlavor('github');");
             content.append("var html = converter.makeHtml(text);");
             content.append("document.getElementById('content').innerHTML = html;");
             content.append("NativeClient.onRenderingDone();");
