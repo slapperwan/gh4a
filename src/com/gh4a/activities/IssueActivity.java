@@ -272,13 +272,15 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void showOpenCloseConfirmDialog(final boolean reopen) {
+        @StringRes int messageResId = reopen
+                ? R.string.reopen_issue_confirm : R.string.close_issue_confirm;
+        @StringRes int buttonResId = reopen
+                ? R.string.pull_request_reopen : R.string.pull_request_reopen;
         new AlertDialog.Builder(this)
-                .setTitle(reopen ? R.string.reopen_issue : R.string.close_issue)
-                .setMessage(reopen ? R.string.reopen_issue_confirm : R.string.close_issue_confirm)
+                .setMessage(messageResId)
                 .setIconAttribute(android.R.attr.alertDialogIcon)
                 .setCancelable(false)
-                .setPositiveButton(reopen ? R.string.reopen_issue : R.string.close_issue,
-                        new DialogInterface.OnClickListener() {
+                .setPositiveButton(buttonResId, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         new IssueOpenCloseTask(reopen).schedule();

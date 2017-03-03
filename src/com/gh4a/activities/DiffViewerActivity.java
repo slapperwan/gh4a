@@ -303,14 +303,14 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+        AlertDialog d = new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(getString(R.string.commit_comment_dialog_title, position))
                 .setView(commentDialog)
                 .setPositiveButton(saveButtonResId, saveCb)
-                .setNegativeButton(R.string.cancel, null);
+                .setNegativeButton(R.string.cancel, null)
+                .show();
 
-        AlertDialog d = builder.show();
         body.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(
                 body, d.getButton(DialogInterface.BUTTON_POSITIVE)));
     }
@@ -385,9 +385,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (position == 2) {
                 new AlertDialog.Builder(DiffViewerActivity.this)
-                        .setTitle(R.string.delete_comment_message)
-                        .setMessage(R.string.confirmation)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setMessage(R.string.delete_comment_message)
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 new DeleteCommentTask(mId).schedule();

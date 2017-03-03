@@ -197,10 +197,9 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         switch (item.getItemId()) {
             case R.id.delete:
                 new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.issue_dialog_delete_title,
+                        .setMessage(getString(R.string.issue_dialog_delete_message,
                                 mMilestone.getTitle()))
-                        .setMessage(R.string.issue_dialog_delete_message)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 new DeleteIssueMilestoneTask(mMilestone.getNumber()).schedule();

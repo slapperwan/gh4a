@@ -91,7 +91,6 @@
 	<string name="auth_code">Authentication Code</string>
 	<string name="two_factor_auth">Two-factor Authentication</string>
 	<string name="verify">Verify</string>
-    <string name="confirmation">Are you sure?</string>
     <string name="unset">Unset</string>
     <string name="logout_pref_summary_logged_in">Currently logged in as %1$s</string>
     <string name="logout_pref_summary_logged_out">Currently not logged in</string>
@@ -341,8 +340,7 @@
     <string name="issue_manage_milestones">Manage Milestones</string>
     <string name="issue_labels">Labels</string>
     <string name="issue_milestones">Milestones</string>
-    <string name="issue_dialog_delete_title">Delete %1$s?</string>
-    <string name="issue_dialog_delete_message">Are you sure?</string>
+    <string name="issue_dialog_delete_message">Do you really want to delete %1$s?</string>
     <string name="issue_error_comment">Comment creation failed.</string>
     <string name="issue_error_create">Issue creation failed.</string>
     <string name="issue_error_edit">Editing issue #%1$d failed.</string>
@@ -383,9 +381,7 @@
     <string name="issue_commit_comment_file">Comment on [b][file][/b]</string>
     <string name="commit_comment_header">%1$s added a note %2$s</string>
     <string name="issue_no_description">No description provided.</string>
-    <string name="close_issue">Close issue</string>
     <string name="close_issue_confirm">Do you really want to close this issue?</string>
-    <string name="reopen_issue">Reopen issue</string>
     <string name="reopen_issue_confirm">Do you really want to reopen this issue?</string>
 
     <!-- Pull Request -->
@@ -411,9 +407,7 @@
     <string name="pull_no_commit_status">No additional checks are attached to this pull request</string>
     <string name="pull_request_from">From [b]%1$s[/b]</string>
     <string name="pull_request_to">Into [b]%1$s[/b]</string>
-    <string name="close_pull_request">Close pull request</string>
     <string name="close_pull_request_confirm">Do you really want to close this pull request?</string>
-    <string name="reopen_pull_request">Reopen pull request</string>
     <string name="reopen_pull_request_confirm">Do you really want to reopen this pull request?</string>
 
     <!-- Object -->
@@ -447,7 +441,7 @@
     <string name="recent_wiki">Recent Wiki Updates</string>
 
     <!-- Bookmarks -->
-    <string name="remove_bookmark">Remove bookmark</string>
+    <string name="remove">Remove</string>
     <string name="remove_bookmark_confirm">Do you really want to remove this bookmark?</string>
     <string name="bookmark_saved">Bookmark saved</string>
 

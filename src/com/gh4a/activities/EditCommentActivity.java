@@ -90,13 +90,13 @@ public abstract class EditCommentActivity extends BaseActivity {
             case R.id.delete:
                 new AlertDialog.Builder(this)
                         .setMessage(R.string.delete_comment_message)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 new DeleteCommentTask(mCommentId).schedule();
                             }
                         })
-                        .setNegativeButton(R.string.no, null)
+                        .setNegativeButton(R.string.cancel, null)
                         .show();
                 return true;
         }

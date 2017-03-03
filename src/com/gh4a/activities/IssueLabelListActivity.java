@@ -249,9 +249,8 @@ public class IssueLabelListActivity extends BaseActivity implements
                 break;
             case Menu.FIRST + 1:
                 new AlertDialog.Builder(IssueLabelListActivity.this)
-                        .setTitle(getString(R.string.issue_dialog_delete_title, mLabel.getName()))
-                        .setMessage(R.string.issue_dialog_delete_message)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.getName()))
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 new DeleteIssueLabelTask(mLabel.getName()).schedule();

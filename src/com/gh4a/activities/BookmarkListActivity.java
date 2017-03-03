@@ -73,11 +73,10 @@ public class BookmarkListActivity extends BaseActivity implements
     @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, final long id) {
         new AlertDialog.Builder(this)
-                .setTitle(R.string.remove_bookmark)
                 .setMessage(R.string.remove_bookmark_confirm)
                 .setIconAttribute(android.R.attr.alertDialogIcon)
                 .setCancelable(false)
-                .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.remove), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         Uri uri = ContentUris.withAppendedId(Columns.CONTENT_URI, id);
                         getContentResolver().delete(uri, null, null);

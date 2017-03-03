@@ -21,6 +21,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
@@ -330,15 +331,15 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     private void showOpenCloseConfirmDialog(final boolean reopen) {
+        @StringRes int messageResId = reopen
+                ? R.string.reopen_pull_request_confirm : R.string.close_pull_request_confirm;
+        @StringRes int buttonResId = reopen
+                ? R.string.pull_request_reopen : R.string.pull_request_close;
         new AlertDialog.Builder(this)
-                .setTitle(reopen ? R.string.reopen_pull_request : R.string.close_pull_request)
-                .setMessage(reopen ? R.string.reopen_pull_request_confirm
-                        : R.string.close_pull_request_confirm)
+                .setMessage(messageResId)
                 .setIconAttribute(android.R.attr.alertDialogIcon)
                 .setCancelable(false)
-                .setPositiveButton(
-                        reopen ? R.string.reopen_pull_request : R.string.close_pull_request,
-                        new DialogInterface.OnClickListener() {
+                .setPositiveButton(buttonResId, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         new PullRequestOpenCloseTask(reopen).schedule();
