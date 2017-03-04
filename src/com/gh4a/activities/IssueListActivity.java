@@ -460,7 +460,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private Fragment makeListFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("direction", mSortHelper.getSortDirection());
+        filterData.put("order", mSortHelper.getSortOrder());
         filterData.put("q", String.format(Locale.US, LIST_QUERY,
                 mIsPullRequest ? "pr" : "issue",
                 getIssueType(position), mRepoOwner, mRepoName,
@@ -526,7 +526,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private Fragment makeSearchFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("direction", mSortHelper.getSortDirection());
+        filterData.put("order", mSortHelper.getSortOrder());
         filterData.put("q", String.format(Locale.US, SEARCH_QUERY,
                 mIsPullRequest ? "pr" : "issue",
                 getIssueType(position), mRepoOwner, mRepoName, mSearchQuery));

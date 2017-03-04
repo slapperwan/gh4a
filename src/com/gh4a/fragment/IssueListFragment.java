@@ -160,7 +160,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
             return mSortMode;
         }
 
-        public String getSortDirection() {
+        public String getSortOrder() {
             return mSortAscending ? "asc" : "desc";
         }
 
