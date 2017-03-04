@@ -46,7 +46,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
@@ -275,7 +274,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         @StringRes int messageResId = reopen
                 ? R.string.reopen_issue_confirm : R.string.close_issue_confirm;
         @StringRes int buttonResId = reopen
-                ? R.string.pull_request_reopen : R.string.pull_request_reopen;
+                ? R.string.pull_request_reopen : R.string.pull_request_close;
         new AlertDialog.Builder(this)
                 .setMessage(messageResId)
                 .setIconAttribute(android.R.attr.alertDialogIcon)
