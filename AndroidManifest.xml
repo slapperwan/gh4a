@@ -77,7 +77,6 @@
         <activity android:name=".activities.IssueMilestoneListActivity" android:exported="false" />
         <activity android:name=".activities.OrganizationMemberListActivity" android:exported="false" />
         <activity android:name=".activities.PullRequestActivity" android:exported="false" />
-        <activity android:name=".activities.PullRequestListActivity" android:exported="false" />
         <activity android:name=".activities.PullRequestDiffViewerActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize" />

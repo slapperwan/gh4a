@@ -195,7 +195,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     protected void onPageMoved(int position, float fraction) {
         if (mTabHeaderColors != null) {
-            int nextIndex = Math.max(position, mTabHeaderColors.length - 1);
+            int nextIndex = Math.max(0, Math.min(position + 1, mTabHeaderColors.length - 1));
             int headerColor = UiUtils.mixColors(mTabHeaderColors[position][0],
                     mTabHeaderColors[nextIndex][0], fraction);
             int statusBarColor = UiUtils.mixColors(mTabHeaderColors[position][1],

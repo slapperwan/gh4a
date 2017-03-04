@@ -65,9 +65,15 @@ public class IssueListActivity extends BasePagerActivity implements
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItemCompat.OnActionExpandListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+        return makeIntent(context, repoOwner, repoName, false);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            boolean isPullRequest) {
         return new Intent(context, IssueListActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
+                .putExtra("repo", repoName)
+                .putExtra("is_pull_request", isPullRequest);
     }
 
     private static final int REQUEST_ISSUE_CREATE = 1001;
@@ -75,6 +81,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private String mRepoOwner;
     private String mRepoName;
     private String mUserLogin;
+    private boolean mIsPullRequest;
 
     private String mSelectedLabel;
     private String mSelectedMilestone;
@@ -99,11 +106,15 @@ public class IssueListActivity extends BasePagerActivity implements
     private static final String STATE_KEY_SEARCH_QUERY = "search_query";
     private static final String STATE_KEY_SEARCH_MODE = "search_mode";
 
-    private static final String LIST_QUERY = "is:issue is:%s repo:%s/%s %s %s %s %s";
-    private static final String SEARCH_QUERY = "is:%s repo:%s/%s %s";
+    private static final String LIST_QUERY = "is:%s %s repo:%s/%s %s %s %s %s";
+    private static final String SEARCH_QUERY = "is:%s %s repo:%s/%s %s";
 
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
+    };
+
+    private static final int[] PULL_REQUEST_TITLES = new int[] {
+        R.string.open, R.string.closed, R.string.merged
     };
 
     private final LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
@@ -206,7 +217,7 @@ public class IssueListActivity extends BasePagerActivity implements
             mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
         }
 
-        if (Gh4Application.get().isAuthorized()) {
+        if (!mIsPullRequest && Gh4Application.get().isAuthorized()) {
             CoordinatorLayout rootLayout = getRootLayout();
             mCreateFab = (FloatingActionButton) getLayoutInflater().inflate(
                     R.layout.add_fab, rootLayout, false);
@@ -217,7 +228,7 @@ public class IssueListActivity extends BasePagerActivity implements
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issues);
+        actionBar.setTitle(mIsPullRequest ? R.string.pull_requests : R.string.issues);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
@@ -227,6 +238,7 @@ public class IssueListActivity extends BasePagerActivity implements
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
+        mIsPullRequest = extras.getBoolean("is_pull_request");
     }
 
     @Override
@@ -249,7 +261,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     protected int[] getTabTitleResIds() {
-        return TITLES;
+        return mIsPullRequest ? PULL_REQUEST_TITLES : TITLES;
     }
 
     @Override
@@ -280,6 +292,10 @@ public class IssueListActivity extends BasePagerActivity implements
             {
                 UiUtils.resolveColor(this, R.attr.colorIssueClosed),
                 UiUtils.resolveColor(this, R.attr.colorIssueClosedDark)
+            },
+            {
+                UiUtils.resolveColor(this, R.attr.colorPullRequestMerged),
+                UiUtils.resolveColor(this, R.attr.colorPullRequestMergedDark)
             }
         };
     }
@@ -325,6 +341,11 @@ public class IssueListActivity extends BasePagerActivity implements
                     ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
         }
         return menuResIds;
+    }
+
+    @Override
+    protected int getInitialRightDrawerSelection() {
+        return R.id.sort_created_desc;
     }
 
     @Override
@@ -444,17 +465,19 @@ public class IssueListActivity extends BasePagerActivity implements
     private Fragment makeListFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("direction", mSortHelper.getSortDirection());
+        filterData.put("order", mSortHelper.getSortOrder());
         filterData.put("q", String.format(Locale.US, LIST_QUERY,
-                position == 1 ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
-                mRepoOwner, mRepoName,
+                mIsPullRequest ? "pr" : "issue",
+                getIssueType(position), mRepoOwner, mRepoName,
                 buildFilterItem("assignee", mSelectedAssignee),
                 buildFilterItem("label", mSelectedLabel),
                 buildFilterItem("milestone", mSelectedMilestone),
                 buildParticipatingFilterItem()));
 
         final IssueListFragment f = IssueListFragment.newInstance(filterData,
-                position == 1, R.string.no_issues_found, false);
+                getIssueState(position),
+                mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
+                false);
 
         if (position == 1) {
             mClosedFragment = f;
@@ -462,6 +485,25 @@ public class IssueListActivity extends BasePagerActivity implements
             mOpenFragment = f;
         }
         return f;
+    }
+
+    private String getIssueState(int position) {
+        switch (position) {
+            case 1:
+                return ApiHelpers.IssueState.CLOSED;
+            case 2:
+                return ApiHelpers.IssueState.MERGED;
+            default:
+                return ApiHelpers.IssueState.OPEN;
+        }
+    }
+
+    private String getIssueType(int position) {
+        String type = "is:" + getIssueState(position);
+        if (position == 1) {
+            type += " is:" + ApiHelpers.IssueState.UNMERGED;
+        }
+        return type;
     }
 
     private String buildParticipatingFilterItem() {
@@ -487,16 +529,18 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private Fragment makeSearchFragment(int position) {
-        boolean closed = position == 1;
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("direction", mSortHelper.getSortDirection());
+        filterData.put("order", mSortHelper.getSortOrder());
         filterData.put("q", String.format(Locale.US, SEARCH_QUERY,
-                closed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
-                mRepoOwner, mRepoName, mSearchQuery));
+                mIsPullRequest ? "pr" : "issue",
+                getIssueType(position), mRepoOwner, mRepoName, mSearchQuery));
 
-        mSearchFragment = IssueListFragment.newInstance(filterData, closed,
-                R.string.no_search_issues_found, false);
+        int emptyTextResId = mIsPullRequest
+                ? R.string.no_search_pull_requests_found
+                : R.string.no_search_issues_found;
+        mSearchFragment = IssueListFragment.newInstance(filterData, getIssueState(position),
+                emptyTextResId, false);
         return mSearchFragment;
     }
 

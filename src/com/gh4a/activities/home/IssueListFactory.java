@@ -59,7 +59,7 @@ public class IssueListFactory extends FragmentFactory {
     protected Fragment getFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mDrawerHelper.getSortMode());
-        filterData.put("order", mDrawerHelper.getSortDirection());
+        filterData.put("order", mDrawerHelper.getSortOrder());
 
         final String action;
         if (position == 1) {
@@ -76,7 +76,8 @@ public class IssueListFactory extends FragmentFactory {
                 mShowingClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 action, mLogin));
 
-        return IssueListFragment.newInstance(filterData, mShowingClosed,
+        return IssueListFragment.newInstance(filterData,
+                mShowingClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
                 true);
     }
@@ -111,6 +112,11 @@ public class IssueListFactory extends FragmentFactory {
     @Override
     protected int[] getToolDrawerMenuResIds() {
         return new int[] { IssueListFragment.SortDrawerHelper.getMenuResId() };
+    }
+
+    @Override
+    protected int getInitialToolDrawerSelection() {
+        return R.id.sort_created_desc;
     }
 
     @Override

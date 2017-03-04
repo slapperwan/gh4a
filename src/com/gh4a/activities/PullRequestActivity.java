@@ -299,7 +299,7 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return PullRequestListActivity.makeIntent(this, mRepoOwner, mRepoName);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName, true);
     }
 
     @Override

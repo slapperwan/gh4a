@@ -1,15 +1,5 @@
 package com.gh4a;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.RepositoryTag;
-import org.eclipse.egit.github.core.client.IGitHubConstants;
-import org.eclipse.egit.github.core.service.RepositoryService;
-
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -31,7 +21,6 @@ import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.PullRequestActivity;
-import com.gh4a.activities.PullRequestListActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.TrendingActivity;
@@ -39,6 +28,16 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+
+import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.RepositoryTag;
+import org.eclipse.egit.github.core.client.IGitHubConstants;
+import org.eclipse.egit.github.core.service.RepositoryService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class BrowseFilter extends AppCompatActivity {
     private static final Pattern SHA1_PATTERN = Pattern.compile("[a-z0-9]{40}");
@@ -113,7 +112,7 @@ public class BrowseFilter extends AppCompatActivity {
                     intent = IssueListActivity.makeIntent(this, user, repo);
                 }
             } else if ("pulls".equals(action)) {
-                intent = PullRequestListActivity.makeIntent(this, user, repo);
+                intent = IssueListActivity.makeIntent(this, user, repo, true);
             } else if ("wiki".equals(action)) {
                 intent = WikiListActivity.makeIntent(this, user, repo, null);
             } else if ("pull".equals(action) && !StringUtils.isBlank(id)) {

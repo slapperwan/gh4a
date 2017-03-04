@@ -5,8 +5,7 @@
             <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/sort_created_desc"
-                    android:title="@string/issue_sort_created_desc"
-                    android:checked="true" />
+                    android:title="@string/issue_sort_created_desc" />
                 <item
                     android:id="@+id/sort_created_asc"
                     android:title="@string/issue_sort_created_asc" />
