@@ -34,7 +34,7 @@ import java.util.Locale;
 public class TrendingFragment extends ListDataBaseFragment<Trend> implements
         RootAdapter.OnItemClickListener<Trend> {
     private static final String URL_TEMPLATE =
-            "http://gh4a.bplaced.net/trending_%s.json";
+            "http://gh4a.bplaced.net/trending_%s-all.json";
 
     public static final String TYPE_DAILY = "daily";
     public static final String TYPE_WEEKLY = "weekly";
