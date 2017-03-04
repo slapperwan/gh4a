@@ -35,7 +35,6 @@ import com.gh4a.activities.ContributorListActivity;
 import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.ForkListActivity;
 import com.gh4a.activities.IssueListActivity;
-import com.gh4a.activities.PullRequestListActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WatcherListActivity;
@@ -277,7 +276,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         Intent intent = null;
 
         if (id == R.id.cell_pull_requests) {
-            intent = PullRequestListActivity.makeIntent(getActivity(), owner, name);
+            intent = IssueListActivity.makeIntent(getActivity(), owner, name, true);
         } else if (id == R.id.tv_contributors_label) {
             intent = ContributorListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.tv_collaborators_label) {

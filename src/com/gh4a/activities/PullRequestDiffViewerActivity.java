@@ -56,7 +56,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return PullRequestListActivity.makeIntent(this, mRepoOwner, mRepoName);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName, true);
     }
 
     @Override

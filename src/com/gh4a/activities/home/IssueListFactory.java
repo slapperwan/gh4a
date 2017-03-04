@@ -76,7 +76,8 @@ public class IssueListFactory extends FragmentFactory {
                 mShowingClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 action, mLogin));
 
-        return IssueListFragment.newInstance(filterData, mShowingClosed,
+        return IssueListFragment.newInstance(filterData,
+                mShowingClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
                 true);
     }

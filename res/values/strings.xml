@@ -43,6 +43,7 @@
     <string name="members">Members</string>
     <string name="open">Open</string>
     <string name="closed">Closed</string>
+    <string name="merged">Merged</string>
     <string name="theme">Theme</string>
     <string name="pub_timeline">Public Timeline</string>
     <string name="load_failure_explanation">Loading the data from Github failed. Please verify you have a working network connection and try again.</string>
@@ -154,6 +155,7 @@
     <string name="no_forks_found">This repository wasn\'t forked yet.</string>
     <string name="no_issues_found">No issues were reported so far.</string>
     <string name="no_search_issues_found">No issues found matching the criteria.</string>
+    <string name="no_search_pull_requests_found">No pull requests found matching the criteria.</string>
     <string name="no_events_found">No events found.</string>
     <string name="no_pull_requests_found">No pull requests were opened so far.</string>
     <string name="no_repos_found">No repositories found.</string>

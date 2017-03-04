@@ -16,6 +16,8 @@ public class ApiHelpers {
     public interface IssueState {
         String OPEN = "open";
         String CLOSED = "closed";
+        String MERGED = "merged";
+        String UNMERGED = "unmerged";
     }
 
     public interface UserType {
