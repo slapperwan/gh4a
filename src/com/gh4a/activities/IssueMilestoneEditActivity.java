@@ -173,7 +173,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
     @Override
     protected Intent navigateUp() {
-        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
+        return IssueMilestoneListActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     @Override
