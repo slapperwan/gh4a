@@ -127,6 +127,11 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
+    protected int getInitialRightDrawerSelection() {
+        return mFactory.getInitialToolDrawerSelection();
+    }
+
+    @Override
     protected void onPrepareRightNavigationDrawerMenu(Menu menu) {
         super.onPrepareRightNavigationDrawerMenu(menu);
         mFactory.prepareToolDrawerMenu(menu);

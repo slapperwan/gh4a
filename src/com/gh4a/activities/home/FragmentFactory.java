@@ -1,6 +1,7 @@
 package com.gh4a.activities.home;
 
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,4 +46,9 @@ public abstract class FragmentFactory {
     protected void onRestoreInstanceState(Bundle state) {}
 
     protected void onDestroy() {}
+
+    @IdRes
+    protected int getInitialToolDrawerSelection() {
+        return 0;
+    }
 }

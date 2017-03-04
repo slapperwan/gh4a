@@ -171,6 +171,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return null;
     }
 
+    @IdRes
+    protected int getInitialRightDrawerSelection() {
+        return 0;
+    }
+
     protected boolean closeDrawers() {
         boolean result = false;
         if (mDrawerLayout.isDrawerOpen(Gravity.LEFT)) {
@@ -321,6 +326,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 mRightDrawer.inflateMenu(id);
             }
             mRightDrawer.setNavigationItemSelectedListener(this);
+
+            int initialRightDrawerSelection = getInitialRightDrawerSelection();
+            if (initialRightDrawerSelection != 0) {
+                mRightDrawer.setCheckedItem(initialRightDrawerSelection);
+            }
+
             onPrepareRightNavigationDrawerMenu(mRightDrawer.getMenu());
 
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);

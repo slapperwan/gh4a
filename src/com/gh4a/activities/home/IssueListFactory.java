@@ -115,6 +115,11 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
+    protected int getInitialToolDrawerSelection() {
+        return R.id.sort_created_desc;
+    }
+
+    @Override
     protected boolean onDrawerItemSelected(MenuItem item) {
         if (mDrawerHelper.handleItemSelection(item)) {
             reloadIssueList();

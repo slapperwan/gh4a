@@ -344,6 +344,11 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     @Override
+    protected int getInitialRightDrawerSelection() {
+        return R.id.sort_created_desc;
+    }
+
+    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         super.onNavigationItemSelected(item);
 
