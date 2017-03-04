@@ -15,18 +15,6 @@
  */
 package com.gh4a.activities;
 
-import java.io.BufferedInputStream;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.UserService;
-import org.json.JSONObject;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,6 +34,18 @@ import com.gh4a.R;
 import com.gh4a.utils.CustomTabsHelper;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
+
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.service.UserService;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * The Github4Android activity.
@@ -121,7 +121,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
             case R.id.search:
-                startActivity(new Intent(this, SearchActivity.class));
+                startActivity(SearchActivity.makeIntent(this));
                 return true;
             case R.id.bookmarks:
                 startActivity(new Intent(this, BookmarkListActivity.class));

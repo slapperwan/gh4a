@@ -13,6 +13,10 @@
         android:title="@string/share"
         android:icon="@drawable/social_share"
         app:showAsAction="never" />
+    <item android:id="@+id/search"
+        android:title="@string/search"
+        android:icon="@drawable/action_search"
+        app:showAsAction="never"/>
     <item android:id="@+id/watch"
         android:title="@string/repo_watch_action"
         app:showAsAction="never" />
