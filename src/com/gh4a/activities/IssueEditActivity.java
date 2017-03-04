@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -324,7 +323,14 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     protected Intent navigateUp() {
-        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
+        if (mEditIssue.getNumber() == 0) {
+            return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
+        }
+        if (mEditIssue.getPullRequest() != null) {
+            return PullRequestActivity.makeIntent(this, mRepoOwner, mRepoName,
+                    mEditIssue.getNumber());
+        }
+        return IssueActivity.makeIntent(this, mRepoOwner, mRepoName, mEditIssue.getNumber());
     }
 
     private void showMilestonesDialog() {
