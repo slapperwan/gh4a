@@ -357,6 +357,10 @@
     <string name="issue_milestone_edit">Edit Milestone</string>
     <string name="issue_milestone_open_issues">%d open</string>
     <string name="issue_milestone_closed_issues">%d closed</string>
+    <string name="issue_milestone_close_message">Do you really want to close this milestone?</string>
+    <string name="issue_milestone_reopen_message">Do you really want to reopen this milestone?</string>
+    <string name="issue_milestone_close_error">Closing milestone failed.</string>
+    <string name="issue_milestone_reopen_error">Reopening milestone failed.</string>
     <string name="issue_filter">Filter</string>
     <string name="issue_filter_by_labels">Filter by labels</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>

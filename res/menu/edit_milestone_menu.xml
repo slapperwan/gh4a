@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/milestone_reopen"
+        android:title="@string/pull_request_reopen"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/milestone_close"
+        android:title="@string/pull_request_close"
+        app:showAsAction="ifRoom|withText" />
+
+    <item android:id="@+id/delete"
+        android:icon="@drawable/content_discard"
+        android:title="@string/delete"
+        app:showAsAction="always" />
+</menu>
