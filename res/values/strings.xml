@@ -411,6 +411,7 @@
     <string name="pull_request_to">Into [b]%1$s[/b]</string>
     <string name="close_pull_request_confirm">Do you really want to close this pull request?</string>
     <string name="reopen_pull_request_confirm">Do you really want to reopen this pull request?</string>
+    <string name="pull_request_edit_title">Edit Pull Request #%1$d</string>
 
     <!-- Object -->
     <string name="object_view_file_at">View file @ %1$s</string>
