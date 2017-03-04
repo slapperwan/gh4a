@@ -254,10 +254,14 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             }
         });
 
+        boolean isPullRequest = mEditIssue.getPullRequest() != null;
+
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(isInEditMode()
-                ? getString(R.string.issue_edit_title, mEditIssue.getNumber())
-                : getString(R.string.issue_create));
+        actionBar.setTitle(!isInEditMode()
+                ? getString(R.string.issue_create)
+                : isPullRequest
+                        ? getString(R.string.pull_request_edit_title, mEditIssue.getNumber())
+                        : getString(R.string.issue_edit_title, mEditIssue.getNumber()));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
