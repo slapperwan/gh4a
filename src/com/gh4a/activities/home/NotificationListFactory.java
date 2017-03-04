@@ -1,5 +1,6 @@
 package com.gh4a.activities.home;
 
+import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 
 import com.gh4a.R;
@@ -15,7 +16,7 @@ public class NotificationListFactory extends FragmentFactory {
     }
 
     @Override
-    protected int getTitleResId() {
+    protected @IdRes int getTitleResId() {
         return R.string.notifications;
     }
 

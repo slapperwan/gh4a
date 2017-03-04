@@ -2,6 +2,7 @@ package com.gh4a.activities.home;
 
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,7 +14,7 @@ public abstract class FragmentFactory {
         mActivity = activity;
     }
 
-    protected abstract int getTitleResId();
+    protected abstract @StringRes int getTitleResId();
     protected abstract int[] getTabTitleResIds();
     protected abstract Fragment getFragment(int position);
 
@@ -47,8 +48,7 @@ public abstract class FragmentFactory {
 
     protected void onDestroy() {}
 
-    @IdRes
-    protected int getInitialToolDrawerSelection() {
+    protected @IdRes int getInitialToolDrawerSelection() {
         return 0;
     }
 }

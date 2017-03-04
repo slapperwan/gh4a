@@ -1,6 +1,7 @@
 package com.gh4a.activities.home;
 
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
@@ -37,7 +38,7 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
-    protected int getTitleResId() {
+    protected @IdRes int getTitleResId() {
         if (mShowingClosed) {
             return mIsPullRequest ? R.string.pull_requests_closed : R.string.issues_closed;
         } else {
@@ -115,7 +116,7 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
-    protected int getInitialToolDrawerSelection() {
+    protected @IdRes int getInitialToolDrawerSelection() {
         return R.id.sort_created_desc;
     }
 
