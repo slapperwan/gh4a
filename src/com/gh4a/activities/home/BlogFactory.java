@@ -1,6 +1,6 @@
 package com.gh4a.activities.home;
 
-import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 
 import com.gh4a.R;
@@ -16,7 +16,7 @@ public class BlogFactory extends FragmentFactory {
     }
 
     @Override
-    protected @IdRes int getTitleResId() {
+    protected @StringRes int getTitleResId() {
         return R.string.blog;
     }
 

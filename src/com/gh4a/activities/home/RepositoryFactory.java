@@ -2,7 +2,7 @@ package com.gh4a.activities.home;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,7 +36,7 @@ public class RepositoryFactory extends FragmentFactory {
     }
 
     @Override
-    protected @IdRes int getTitleResId() {
+    protected @StringRes int getTitleResId() {
         return R.string.my_repositories;
     }
 

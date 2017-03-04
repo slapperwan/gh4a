@@ -2,6 +2,7 @@ package com.gh4a.activities.home;
 
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
@@ -38,7 +39,7 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
-    protected @IdRes int getTitleResId() {
+    protected @StringRes int getTitleResId() {
         if (mShowingClosed) {
             return mIsPullRequest ? R.string.pull_requests_closed : R.string.issues_closed;
         } else {

@@ -1,6 +1,6 @@
 package com.gh4a.activities.home;
 
-import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 
 import com.gh4a.R;
@@ -19,7 +19,7 @@ public class NewsFeedFactory extends FragmentFactory {
     }
 
     @Override
-    public @IdRes int getTitleResId() {
+    public @StringRes int getTitleResId() {
         return R.string.user_news_feed;
     }
 
