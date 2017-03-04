@@ -446,7 +446,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private Fragment makeListFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("direction", mSortHelper.getSortDirection());
+        filterData.put("order", mSortHelper.getSortOrder());
         filterData.put("q", String.format(Locale.US, LIST_QUERY,
                 position == 1 ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
                 mRepoOwner, mRepoName,
@@ -477,7 +477,7 @@ public class IssueListActivity extends BasePagerActivity implements
         boolean closed = position == 1;
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("direction", mSortHelper.getSortDirection());
+        filterData.put("order", mSortHelper.getSortOrder());
         filterData.put("q", String.format(Locale.US, SEARCH_QUERY,
                 closed ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
                 mRepoOwner, mRepoName, mSearchQuery));

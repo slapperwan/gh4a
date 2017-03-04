@@ -60,7 +60,7 @@ public class IssueListFactory extends FragmentFactory {
     protected Fragment getFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mDrawerHelper.getSortMode());
-        filterData.put("order", mDrawerHelper.getSortDirection());
+        filterData.put("order", mDrawerHelper.getSortOrder());
 
         final String action;
         if (position == 1) {
