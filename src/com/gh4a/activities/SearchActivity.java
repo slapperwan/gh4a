@@ -72,6 +72,10 @@ import java.util.List;
 public class SearchActivity extends BaseActivity implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener, SearchView.OnSuggestionListener,
         AdapterView.OnItemSelectedListener, RootAdapter.OnItemClickListener {
+    public static final int SEARCH_TYPE_REPO = 0;
+    public static final int SEARCH_TYPE_USER = 1;
+    public static final int SEARCH_TYPE_CODE = 2;
+
     public static Intent makeIntent(Context context, String initialSearch, int searchType) {
         return makeIntent(context)
                 .putExtra("initial_search", initialSearch)
@@ -229,7 +233,7 @@ public class SearchActivity extends BaseActivity implements
         } else {
             Intent intent = getIntent();
             if (intent.hasExtra("search_type")) {
-                int searchType = intent.getIntExtra("search_type", 0);
+                int searchType = intent.getIntExtra("search_type", SEARCH_TYPE_REPO);
                 mSearchType.setSelection(searchType);
             }
             if (intent.hasExtra("initial_search")) {

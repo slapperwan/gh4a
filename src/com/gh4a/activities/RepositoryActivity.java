@@ -375,7 +375,8 @@ public class RepositoryActivity extends BasePagerActivity {
                 return true;
             case R.id.search:
                 String initialSearch = "repo:" + mRepoOwner + "/" + mRepoName + " ";
-                startActivity(SearchActivity.makeIntent(this, initialSearch, 2));
+                startActivity(SearchActivity.makeIntent(this,
+                        initialSearch, SearchActivity.SEARCH_TYPE_CODE));
                 return true;
             case R.id.bookmark:
                 Intent bookmarkIntent = makeIntent(this, mRepoOwner, mRepoName, mSelectedRef);
