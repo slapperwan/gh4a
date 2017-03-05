@@ -21,16 +21,19 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
+import com.gh4a.utils.UiUtils;
 
-public class IssueMilestoneListActivity extends FragmentContainerActivity implements
+public class IssueMilestoneListActivity extends BasePagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return new Intent(context, IssueMilestoneListActivity.class)
@@ -38,24 +41,47 @@ public class IssueMilestoneListActivity extends FragmentContainerActivity implem
                 .putExtra("repo", repoName);
     }
 
+    private static final int[] TITLES = new int[] {
+        R.string.open, R.string.closed
+    };
+
     private String mRepoOwner;
     private String mRepoName;
+
+    private FloatingActionButton mCreateFab;
+    private IssueMilestoneListFragment mOpenFragment;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (Gh4Application.get().isAuthorized()) {
             CoordinatorLayout rootLayout = getRootLayout();
-            FloatingActionButton fab = (FloatingActionButton)
+            mCreateFab = (FloatingActionButton)
                     getLayoutInflater().inflate(R.layout.add_fab, rootLayout, false);
-            fab.setOnClickListener(this);
-            rootLayout.addView(fab);
+            mCreateFab.setOnClickListener(this);
+            rootLayout.addView(mCreateFab);
         }
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.issue_milestones);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected int[] getTabTitleResIds() {
+        return TITLES;
+    }
+
+    @Override
+    protected Fragment getFragment(int position) {
+        final IssueMilestoneListFragment f = IssueMilestoneListFragment.newInstance(mRepoOwner,
+                mRepoName, position == 1);
+
+        if (position == 0) {
+            mOpenFragment = f;
+        }
+        return f;
     }
 
     @Override
@@ -66,13 +92,35 @@ public class IssueMilestoneListActivity extends FragmentContainerActivity implem
     }
 
     @Override
-    protected Fragment onCreateFragment() {
-        return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName);
+    public void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView) {
+        if (fragment == mOpenFragment) {
+            recyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
+        }
     }
 
     @Override
-    public void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView) {
-        recyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
+    protected void onPageMoved(int position, float fraction) {
+        super.onPageMoved(position, fraction);
+        if (mCreateFab != null) {
+            float openFraction = 1 - position - fraction;
+            ViewCompat.setScaleX(mCreateFab, openFraction);
+            ViewCompat.setScaleY(mCreateFab, openFraction);
+            mCreateFab.setVisibility(openFraction == 0 ? View.INVISIBLE : View.VISIBLE);
+        }
+    }
+
+    @Override
+    protected int[][] getTabHeaderColors() {
+        return new int[][] {
+            {
+                UiUtils.resolveColor(this, R.attr.colorIssueOpen),
+                UiUtils.resolveColor(this, R.attr.colorIssueOpenDark)
+            },
+            {
+                UiUtils.resolveColor(this, R.attr.colorIssueClosed),
+                UiUtils.resolveColor(this, R.attr.colorIssueClosedDark)
+            }
+        };
     }
 
     @Override
@@ -83,5 +131,11 @@ public class IssueMilestoneListActivity extends FragmentContainerActivity implem
     @Override
     public void onClick(View view) {
         startActivity(IssueMilestoneEditActivity.makeCreateIntent(this, mRepoOwner, mRepoName));
+    }
+
+    @Override
+    protected void invalidateFragments() {
+        mOpenFragment = null;
+        super.invalidateFragments();
     }
 }

@@ -15,10 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.util.List;
-
-import org.eclipse.egit.github.core.Milestone;
-
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
@@ -29,18 +25,26 @@ import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.utils.ApiHelpers;
+
+import org.eclipse.egit.github.core.Milestone;
+
+import java.util.List;
 
 public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> implements
         RootAdapter.OnItemClickListener<Milestone> {
     private String mRepoOwner;
     private String mRepoName;
+    private boolean mShowClosed;
 
-    public static IssueMilestoneListFragment newInstance(String repoOwner, String repoName) {
+    public static IssueMilestoneListFragment newInstance(String repoOwner, String repoName,
+            boolean showClosed) {
         IssueMilestoneListFragment f = new IssueMilestoneListFragment();
 
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
+        args.putBoolean("closed", showClosed);
         f.setArguments(args);
 
         return f;
@@ -49,8 +53,10 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString("owner");
-        mRepoName = getArguments().getString("repo");
+        Bundle args = getArguments();
+        mRepoOwner = args.getString("owner");
+        mRepoName = args.getString("repo");
+        mShowClosed = args.getBoolean("closed");
     }
 
     @Override
@@ -62,7 +68,9 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
     @Override
     protected int getEmptyTextResId() {
-        return R.string.no_milestones_found;
+        return mShowClosed
+                ? R.string.no_closed_milestones_found
+                : R.string.no_open_milestones_found;
     }
 
     @Override
@@ -73,6 +81,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
     @Override
     public Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
-        return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName);
+        return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName,
+                mShowClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN);
     }
 }
