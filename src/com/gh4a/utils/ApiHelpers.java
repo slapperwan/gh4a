@@ -25,6 +25,11 @@ public class ApiHelpers {
         String ORG = "Organization";
     }
 
+    public interface MilestoneState {
+        String OPEN = "open";
+        String CLOSED = "closed";
+    }
+
     //RepositoryCommit
     public static String getAuthorName(Context context, RepositoryCommit commit) {
         if (commit.getAuthor() != null) {
