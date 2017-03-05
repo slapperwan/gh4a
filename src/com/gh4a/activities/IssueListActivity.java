@@ -500,7 +500,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private String getIssueType(int position) {
         String type = "is:" + getIssueState(position);
-        if (position == 1) {
+        if (position == 1 && mIsPullRequest) {
             type += " is:" + ApiHelpers.IssueState.UNMERGED;
         }
         return type;
