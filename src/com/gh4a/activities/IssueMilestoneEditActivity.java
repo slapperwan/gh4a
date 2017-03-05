@@ -54,16 +54,16 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class IssueMilestoneEditActivity extends BaseActivity implements View.OnClickListener {
-    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
-        return makeEditIntent(context, repoOwner, repoName, null);
+    public static Intent makeEditIntent(Context context, String repoOwner, String repoName,
+            Milestone milestone) {
+        return makeCreateIntent(context, repoOwner, repoName)
+                .putExtra("milestone", milestone);
     }
 
-    public static Intent makeEditIntent(Context context, String repoOwner,
-            String repoName, Milestone milestone) {
+    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
         return new Intent(context, IssueMilestoneEditActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("milestone", milestone);
+                .putExtra("repo", repoName);
     }
 
     private String mRepoOwner;
