@@ -148,7 +148,8 @@
     <string name="no_files_found">No files found.</string>
     <string name="no_trends_found">No trending repositories found.</string>
     <string name="no_downloads_found">This repository doesn\'t provide any downloads.</string>
-    <string name="no_milestones_found">This repository doesn\'t have any configured milestone.</string>
+    <string name="no_open_milestones_found">This repository doesn\'t have any open milestones.</string>
+    <string name="no_closed_milestones_found">This repository doesn\'t have any closed milestones.</string>
     <string name="no_commits_found">No commits found.</string>
     <string name="no_followers_found">No followers found.</string>
     <string name="no_following_found">No users are followed so far.</string>
