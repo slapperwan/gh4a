@@ -327,7 +327,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     protected Intent navigateUp() {
-        if (mEditIssue.getNumber() == 0) {
+        if (!isInEditMode()) {
             return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
         }
         if (mEditIssue.getPullRequest() != null) {
