@@ -140,6 +140,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         if (forceLoaderReload(0)) {
             mRelease = null;
             setContentShown(false);
+            mImageGetter.clearHtmlCache();
             getSupportLoaderManager().destroyLoader(1);
         }
         super.onRefresh();

@@ -133,6 +133,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
             mContentView.findViewById(R.id.pull_requests_progress).setVisibility(View.VISIBLE);
         }
+        if (mImageGetter != null) {
+            mImageGetter.clearHtmlCache();
+        }
         hideContentAndRestartLoaders(0, 1);
     }
 
