@@ -87,6 +87,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private TextView mEmptyView;
     private boolean mContentShown;
     private boolean mContentEmpty;
+    private boolean mErrorShown;
 
     private AppBarLayout mHeader;
     private ToggleableAppBarLayoutBehavior mHeaderBehavior;
@@ -220,6 +221,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected void setContentShown(boolean shown) {
         mContentShown = shown;
+        updateSwipeToRefreshState();
         updateViewVisibility(true);
     }
 
@@ -522,7 +524,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         View error = findViewById(R.id.error);
 
         content.setVisibility(visible ? View.GONE : View.VISIBLE);
-        mSwipeLayout.setEnabled(!visible && canSwipeToRefresh());
+        mErrorShown = visible;
+        updateSwipeToRefreshState();
 
         if (error == null) {
             if (!visible) {
@@ -542,6 +545,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
             });
         }
         error.setVisibility(visible ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateSwipeToRefreshState() {
+        ensureContent();
+        mSwipeLayout.setEnabled(mContentShown && !mErrorShown && canSwipeToRefresh());
     }
 
     private void setupHeaderDrawable() {
@@ -583,9 +591,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
                     UiUtils.resolveColor(this, R.attr.colorPrimary), 0,
                     UiUtils.resolveColor(this, R.attr.colorPrimaryDark), 0
             );
-        } else {
-            mSwipeLayout.setEnabled(false);
         }
+        updateSwipeToRefreshState();
     }
 
     private void setupNavigationDrawer() {
