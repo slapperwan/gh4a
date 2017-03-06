@@ -47,6 +47,8 @@ import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 
+import com.gh4a.R;
+
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
 import org.xml.sax.Attributes;
@@ -66,16 +68,19 @@ import static android.graphics.Paint.Style.FILL;
 public class HtmlUtils {
 
     private static class ReplySpan implements LeadingMarginSpan {
+        private final int mColor;
+        private final int mMargin;
+        private final int mSize;
 
-        private final int color;
-
-        public ReplySpan() {
-            color = 0xffDDDDDD;
+        public ReplySpan(int margin, int size, int color) {
+            mColor = color;
+            mMargin = margin;
+            mSize = size;
         }
 
         @Override
         public int getLeadingMargin(boolean first) {
-            return 18;
+            return mMargin;
         }
 
         public void drawLeadingMargin(Canvas c, Paint p, int x, int dir,
@@ -85,9 +90,9 @@ public class HtmlUtils {
             final int color = p.getColor();
 
             p.setStyle(FILL);
-            p.setColor(this.color);
+            p.setColor(mColor);
 
-            c.drawRect(x, top, x + dir * 6, bottom, p);
+            c.drawRect(x, top, x + dir * mSize, bottom, p);
 
             p.setStyle(style);
             p.setColor(color);
@@ -95,29 +100,29 @@ public class HtmlUtils {
     }
 
     private static class CodeBlockSpan implements LineBackgroundSpan {
-        private final int color;
+        private final int mColor;
 
         public CodeBlockSpan(int color) {
-            this.color = color;
+            mColor = color;
         }
 
         @Override
         public void drawBackground(Canvas c, Paint p, int left, int right, int top, int baseline,
                 int bottom, CharSequence text, int start, int end, int lnum) {
             final int paintColor = p.getColor();
-            p.setColor(color);
+            p.setColor(mColor);
             c.drawRect(left, top, right, bottom, p);
             p.setColor(paintColor);
         }
     }
 
     private static class HorizontalLineSpan implements LineBackgroundSpan {
-        private final int color;
-        private final float height;
+        private final int mColor;
+        private final float mHeight;
 
         public HorizontalLineSpan(float height, int color) {
-            this.color = color;
-            this.height = height;
+            mColor = color;
+            mHeight = height;
         }
 
         @Override
@@ -125,8 +130,8 @@ public class HtmlUtils {
                                    int bottom, CharSequence text, int start, int end, int lnum) {
             final int paintColor = p.getColor();
             final float centerY = (top + bottom) / 2;
-            p.setColor(color);
-            c.drawRect(left, centerY - height / 2, right, centerY + height / 2, p);
+            p.setColor(mColor);
+            c.drawRect(left, centerY - mHeight / 2, right, centerY + mHeight / 2, p);
             p.setColor(paintColor);
         }
     }
@@ -213,7 +218,11 @@ public class HtmlUtils {
             1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,
         };
 
-        private Resources mResources;
+        private float mDividerHeight;
+        private int mBulletMargin;
+        private int mReplyMargin;
+        private int mReplyMarkerSize;
+
         private String mSource;
         private XMLReader mReader;
         private SpannableStringBuilder mSpannableStringBuilder;
@@ -255,9 +264,13 @@ public class HtmlUtils {
             return sTextDecorationPattern;
         }
 
-        public HtmlToSpannedConverter(Resources resources, String source,
+        public HtmlToSpannedConverter(Resources res, String source,
                 android.text.Html.ImageGetter imageGetter, Parser parser) {
-            mResources = resources;
+            mDividerHeight = res.getDimension(R.dimen.divider_span_height);
+            mBulletMargin = res.getDimensionPixelSize(R.dimen.bullet_span_margin);
+            mReplyMargin = res.getDimensionPixelSize(R.dimen.reply_span_margin);
+            mReplyMarkerSize = res.getDimensionPixelSize(R.dimen.reply_span_size);
+
             mSource = source;
             mSpannableStringBuilder = new SpannableStringBuilder();
             mImageGetter = imageGetter;
@@ -347,8 +360,7 @@ public class HtmlUtils {
             } else if (tag.equalsIgnoreCase("span")) {
                 startCssStyle(mSpannableStringBuilder, attributes);
             } else if (tag.equalsIgnoreCase("hr")) {
-                HorizontalLineSpan span = new HorizontalLineSpan(
-                        mResources.getDisplayMetrics().density /* 1dp */, 0x60aaaaaa);
+                HorizontalLineSpan span = new HorizontalLineSpan(mDividerHeight, 0x60aaaaaa);
                 appendNewlines(mSpannableStringBuilder, 2);
                 int len = mSpannableStringBuilder.length();
                 mSpannableStringBuilder.setSpan(span, len - 1, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -539,7 +551,7 @@ public class HtmlUtils {
             startCssStyle(text, attributes);
         }
 
-        private static void endLi(Editable text) {
+        private void endLi(Editable text) {
             endCssStyle(text);
             endBlockElement(text);
             ListItem item = getLast(text, ListItem.class);
@@ -549,7 +561,7 @@ public class HtmlUtils {
                     text.removeSpan(item);
                     text.insert(where, "" + item.mPosition + ". ");
                 } else {
-                    setSpanFromMark(text, item, new BulletSpan());
+                    setSpanFromMark(text, item, new BulletSpan(mBulletMargin));
                 }
             }
         }
@@ -559,9 +571,9 @@ public class HtmlUtils {
             start(text, new Blockquote());
         }
 
-        private static void endBlockquote(Editable text) {
+        private void endBlockquote(Editable text) {
             endBlockElement(text);
-            end(text, Blockquote.class, new ReplySpan());
+            end(text, Blockquote.class, new ReplySpan(mReplyMargin, mReplyMarkerSize, 0xffdddddd));
         }
 
         private void startHeading(Editable text, Attributes attributes, int level) {
