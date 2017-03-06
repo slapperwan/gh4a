@@ -509,8 +509,12 @@ public class HtmlUtils {
         }
 
         private static void startBlockElement(Editable text, Attributes attributes) {
-            appendNewlines(text, 2);
-            start(text, new Newline(2));
+            startBlockElement(text, attributes, 2);
+        }
+
+        private static void startBlockElement(Editable text, Attributes attributes, int newlines) {
+            appendNewlines(text, newlines);
+            start(text, new Newline(newlines));
 
             String style = attributes.getValue("", "style");
             if (style != null) {
@@ -546,7 +550,7 @@ public class HtmlUtils {
         }
 
         private void startLi(Editable text, Attributes attributes) {
-            startBlockElement(text, attributes);
+            startBlockElement(text, attributes, 1);
             start(text, new ListItem(getLast(text, List.class), attributes));
             startCssStyle(text, attributes);
         }
