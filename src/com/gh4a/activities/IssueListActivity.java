@@ -457,7 +457,9 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        mSearchQuery = newText;
+        if (mSearchMode) {
+            mSearchQuery = newText;
+        }
         return false;
     }
 
