@@ -276,8 +276,22 @@ public class HtmlUtils {
                 throw new RuntimeException(e);
             }
 
+            // Replace the placeholders for leading margin spans in reverse order, so the leading
+            // margins are drawn in order of tag start
+            Object[] obj = mSpannableStringBuilder.getSpans(0,
+                    mSpannableStringBuilder.length(), NeedsReversingSpan.class);
+            for (int i = obj.length - 1; i >= 0; i--) {
+                NeedsReversingSpan span = (NeedsReversingSpan) obj[i];
+                int start = mSpannableStringBuilder.getSpanStart(span);
+                int end = mSpannableStringBuilder.getSpanEnd(span);
+
+                mSpannableStringBuilder.removeSpan(span);
+                mSpannableStringBuilder.setSpan(span.mActualSpan, start, end,
+                        Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+            }
+
             // Fix flags and range for paragraph-type markup.
-            Object[] obj = mSpannableStringBuilder.getSpans(0, mSpannableStringBuilder.length(), ParagraphStyle.class);
+            obj = mSpannableStringBuilder.getSpans(0, mSpannableStringBuilder.length(), ParagraphStyle.class);
             for (int i = 0; i < obj.length; i++) {
                 int start = mSpannableStringBuilder.getSpanStart(obj[i]);
                 int end = mSpannableStringBuilder.getSpanEnd(obj[i]);
@@ -587,6 +601,9 @@ public class HtmlUtils {
             int len = text.length();
             if (where != len) {
                 for (Object span : spans) {
+                    if (span instanceof LeadingMarginSpan) {
+                        span = new NeedsReversingSpan(span);
+                    }
                     text.setSpan(span, where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }
@@ -805,6 +822,13 @@ public class HtmlUtils {
         private static class Super { }
         private static class Sub { }
         private static class Pre { }
+
+        private static class NeedsReversingSpan {
+            public final Object mActualSpan;
+            public NeedsReversingSpan(Object actualSpan) {
+                mActualSpan = actualSpan;
+            }
+        }
 
         private static class Code {
             public final boolean mInPre;
