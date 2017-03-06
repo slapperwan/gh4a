@@ -481,34 +481,6 @@ public class HttpImageGetter implements ImageGetter {
         }
     }
 
-    private static Bitmap getBitmap(final String imagePath, BitmapFactory.Options opts)
-            throws IOException {
-        RandomAccessFile file = null;
-        try {
-            file = new RandomAccessFile(imagePath, "r");
-            return BitmapFactory.decodeFileDescriptor(file.getFD(), null, opts);
-        } finally {
-            if (file != null) {
-                try {
-                    file.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
-    private static Point getImageSize(final String imagePath) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-
-        try {
-            getBitmap(imagePath, options);
-            return new Point(options.outWidth, options.outHeight);
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
     private static Bitmap getBitmap(final File image, int width, int height) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         String imagePath = image.getAbsolutePath();
