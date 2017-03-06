@@ -305,9 +305,9 @@ public class HtmlUtils {
 
             // Fix flags and range for paragraph-type markup.
             obj = mSpannableStringBuilder.getSpans(0, mSpannableStringBuilder.length(), ParagraphStyle.class);
-            for (int i = 0; i < obj.length; i++) {
-                int start = mSpannableStringBuilder.getSpanStart(obj[i]);
-                int end = mSpannableStringBuilder.getSpanEnd(obj[i]);
+            for (Object span : obj) {
+                int start = mSpannableStringBuilder.getSpanStart(span);
+                int end = mSpannableStringBuilder.getSpanEnd(span);
 
                 // If the last line of the range is blank, back off by one.
                 if (end - 2 >= 0 && (end - start) >= 2) {
@@ -318,9 +318,9 @@ public class HtmlUtils {
                 }
 
                 if (end == start) {
-                    mSpannableStringBuilder.removeSpan(obj[i]);
+                    mSpannableStringBuilder.removeSpan(span);
                 } else {
-                    mSpannableStringBuilder.setSpan(obj[i], start, end, Spannable.SPAN_PARAGRAPH);
+                    mSpannableStringBuilder.setSpan(span, start, end, Spannable.SPAN_PARAGRAPH);
                 }
             }
 
