@@ -74,14 +74,22 @@ public class IssueMilestoneListActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected Fragment getFragment(int position) {
-        final IssueMilestoneListFragment f = IssueMilestoneListFragment.newInstance(mRepoOwner,
-                mRepoName, position == 1);
+    protected Fragment makeFragment(int position) {
+        return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName, position == 1);
+    }
 
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
         if (position == 0) {
-            mOpenFragment = f;
+            mOpenFragment = (IssueMilestoneListFragment) f;
         }
-        return f;
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mOpenFragment) {
+            mOpenFragment = null;
+        }
     }
 
     @Override

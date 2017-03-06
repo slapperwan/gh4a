@@ -230,24 +230,44 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         switch (position) {
             case 0:
-                mRepositoryFragment = RepositoryFragment.newInstance(mRepository, mSelectedRef);
-                return mRepositoryFragment;
+                return RepositoryFragment.newInstance(mRepository, mSelectedRef);
             case 1:
-                mContentListFragment = ContentListContainerFragment.newInstance(mRepository,
+                Fragment f = ContentListContainerFragment.newInstance(mRepository,
                         mSelectedRef, mInitialPath);
                 mInitialPath = null;
-                return mContentListFragment;
+                return f;
             case 2:
-                mCommitListFragment = CommitListFragment.newInstance(mRepository, mSelectedRef);
-                return mCommitListFragment;
+                return CommitListFragment.newInstance(mRepository, mSelectedRef);
             case 3:
-                mActivityFragment = RepositoryEventListFragment.newInstance(mRepository);
-                return mActivityFragment;
+                return RepositoryEventListFragment.newInstance(mRepository);
         }
         return null;
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        switch (position) {
+            case 0: mRepositoryFragment = (RepositoryFragment) f; break;
+            case 1: mContentListFragment = (ContentListContainerFragment) f; break;
+            case 2: mCommitListFragment = (CommitListFragment) f; break;
+            case 3: mActivityFragment = (RepositoryEventListFragment) f; break;
+        }
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mRepositoryFragment) {
+            mRepositoryFragment = null;
+        } else if (f == mContentListFragment) {
+            mContentListFragment = null;
+        } else if (f == mCommitListFragment) {
+            mCommitListFragment = null;
+        } else if (f == mActivityFragment) {
+            mActivityFragment = null;
+        }
     }
 
     @Override

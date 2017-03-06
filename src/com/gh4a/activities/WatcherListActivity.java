@@ -62,7 +62,7 @@ public class WatcherListActivity extends BasePagerActivity {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         switch (position) {
             case 0: return StargazerListFragment.newInstance(mRepoOwner, mRepoName);
             case 1: return WatcherListFragment.newInstance(mRepoOwner, mRepoName);

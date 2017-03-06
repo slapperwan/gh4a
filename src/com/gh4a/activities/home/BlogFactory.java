@@ -26,7 +26,7 @@ public class BlogFactory extends FragmentFactory {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         return BlogListFragment.newInstance();
     }
 }

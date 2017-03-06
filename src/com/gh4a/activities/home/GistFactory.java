@@ -29,7 +29,7 @@ public class GistFactory extends FragmentFactory {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         return GistListFragment.newInstance(mUserLogin, position == 1);
     }
 }

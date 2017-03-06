@@ -158,9 +158,15 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     protected abstract int[] getTabTitleResIds();
-    protected abstract Fragment getFragment(int position);
+    protected abstract Fragment makeFragment(int position);
     protected boolean fragmentNeedsRefresh(Fragment object) {
         return false;
+    }
+
+    protected void onFragmentInstantiated(Fragment f, int position) {
+    }
+
+    protected void onFragmentDestroyed(Fragment f) {
     }
 
     /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
@@ -220,13 +226,14 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            return getFragment(position);
+            return makeFragment(position);
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             Fragment f = (Fragment) super.instantiateItem(container, position);
             mFragments.put(position, f);
+            onFragmentInstantiated(f, position);
             return f;
         }
 
@@ -247,6 +254,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         public void destroyItem(ViewGroup container, int position, Object object) {
             super.destroyItem(container, position, object);
             mFragments.remove(position);
+            onFragmentDestroyed((Fragment) object);
             if (object == mCurrentFragment) {
                 mCurrentFragment = null;
             }

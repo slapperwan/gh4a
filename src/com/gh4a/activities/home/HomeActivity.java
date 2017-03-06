@@ -217,8 +217,18 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected Fragment getFragment(int position) {
-        return mFactory.getFragment(position);
+    protected Fragment makeFragment(int position) {
+        return mFactory.makeFragment(position);
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        mFactory.onFragmentInstantiated(f, position);
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        mFactory.onFragmentDestroyed(f);
     }
 
     @Override

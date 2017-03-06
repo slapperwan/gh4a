@@ -151,7 +151,7 @@ public class CommitActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         if (position == 1) {
             Fragment f = CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
                     mCommit, mComments, mInitialCommentId);

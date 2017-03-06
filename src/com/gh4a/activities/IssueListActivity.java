@@ -301,11 +301,33 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         if (mSearchMode) {
             return makeSearchFragment(position);
         } else {
             return makeListFragment(position);
+        }
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        if (mSearchMode) {
+            mSearchFragment = (IssueListFragment) f;
+        } else if (position == 1) {
+            mClosedFragment = (IssueListFragment) f;
+        } else {
+            mOpenFragment = (IssueListFragment) f;
+        }
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mSearchFragment) {
+            mSearchFragment = null;
+        } else if (f == mOpenFragment) {
+            mOpenFragment = null;
+        } else if (f == mClosedFragment) {
+            mClosedFragment = null;
         }
     }
 
@@ -474,17 +496,10 @@ public class IssueListActivity extends BasePagerActivity implements
                 buildFilterItem("milestone", mSelectedMilestone),
                 buildParticipatingFilterItem()));
 
-        final IssueListFragment f = IssueListFragment.newInstance(filterData,
+        return IssueListFragment.newInstance(filterData,
                 getIssueState(position),
                 mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
                 false);
-
-        if (position == 1) {
-            mClosedFragment = f;
-        } else {
-            mOpenFragment = f;
-        }
-        return f;
     }
 
     private String getIssueState(int position) {
@@ -539,9 +554,8 @@ public class IssueListActivity extends BasePagerActivity implements
         int emptyTextResId = mIsPullRequest
                 ? R.string.no_search_pull_requests_found
                 : R.string.no_search_issues_found;
-        mSearchFragment = IssueListFragment.newInstance(filterData, getIssueState(position),
+        return IssueListFragment.newInstance(filterData, getIssueState(position),
                 emptyTextResId, false);
-        return mSearchFragment;
     }
 
     private void reloadIssueList() {
