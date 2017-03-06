@@ -15,6 +15,8 @@
  */
 package com.gh4a.utils;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -109,6 +111,26 @@ public class HtmlUtils {
         }
     }
 
+    private static class HorizontalLineSpan implements LineBackgroundSpan {
+        private final int color;
+        private final float height;
+
+        public HorizontalLineSpan(float height, int color) {
+            this.color = color;
+            this.height = height;
+        }
+
+        @Override
+        public void drawBackground(Canvas c, Paint p, int left, int right, int top, int baseline,
+                                   int bottom, CharSequence text, int start, int end, int lnum) {
+            final int paintColor = p.getColor();
+            final float centerY = (top + bottom) / 2;
+            p.setColor(color);
+            c.drawRect(left, centerY - height / 2, right, centerY + height / 2, p);
+            p.setColor(paintColor);
+        }
+    }
+
     /**
      * Rewrite relative URLs in HTML fetched e.g. from markdown files.
      *
@@ -148,12 +170,12 @@ public class HtmlUtils {
      * @param imageGetter
      * @return html
      */
-    public static CharSequence encode(final String html,
-            final ImageGetter imageGetter) {
+    public static CharSequence encode(final Context context, final String html,
+                                      final ImageGetter imageGetter) {
         if (TextUtils.isEmpty(html))
             return "";
 
-        return Html.fromHtml(html, imageGetter);
+        return Html.fromHtml(context, html, imageGetter);
     }
 
     /* a copy of the framework's HTML class, stripped down and extended for our use cases */
@@ -167,7 +189,8 @@ public class HtmlUtils {
             private static final HTMLSchema schema = new HTMLSchema();
         }
 
-        public static Spanned fromHtml(String source, android.text.Html.ImageGetter imageGetter) {
+        public static Spanned fromHtml(Context context,
+                String source, android.text.Html.ImageGetter imageGetter) {
             Parser parser = new Parser();
             try {
                 parser.setProperty(Parser.schemaProperty, HtmlParser.schema);
@@ -180,7 +203,7 @@ public class HtmlUtils {
             }
 
             HtmlToSpannedConverter converter =
-                    new HtmlToSpannedConverter(source, imageGetter, parser);
+                    new HtmlToSpannedConverter(context.getResources(), source, imageGetter, parser);
             return converter.convert();
         }
     }
@@ -190,6 +213,7 @@ public class HtmlUtils {
             1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,
         };
 
+        private Resources mResources;
         private String mSource;
         private XMLReader mReader;
         private SpannableStringBuilder mSpannableStringBuilder;
@@ -231,8 +255,9 @@ public class HtmlUtils {
             return sTextDecorationPattern;
         }
 
-        public HtmlToSpannedConverter(String source,
+        public HtmlToSpannedConverter(Resources resources, String source,
                 android.text.Html.ImageGetter imageGetter, Parser parser) {
+            mResources = resources;
             mSource = source;
             mSpannableStringBuilder = new SpannableStringBuilder();
             mImageGetter = imageGetter;
@@ -258,7 +283,7 @@ public class HtmlUtils {
                 int end = mSpannableStringBuilder.getSpanEnd(obj[i]);
 
                 // If the last line of the range is blank, back off by one.
-                if (end - 2 >= 0) {
+                if (end - 2 >= 0 && (end - start) >= 2) {
                     if (mSpannableStringBuilder.charAt(end - 1) == '\n' &&
                             mSpannableStringBuilder.charAt(end - 2) == '\n') {
                         end--;
@@ -307,6 +332,12 @@ public class HtmlUtils {
                 startBlockElement(mSpannableStringBuilder, attributes);
             } else if (tag.equalsIgnoreCase("span")) {
                 startCssStyle(mSpannableStringBuilder, attributes);
+            } else if (tag.equalsIgnoreCase("hr")) {
+                HorizontalLineSpan span = new HorizontalLineSpan(
+                        mResources.getDisplayMetrics().density /* 1dp */, 0x60aaaaaa);
+                appendNewlines(mSpannableStringBuilder, 2);
+                int len = mSpannableStringBuilder.length();
+                mSpannableStringBuilder.setSpan(span, len - 1, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
             } else if (tag.equalsIgnoreCase("strong")) {
                 start(mSpannableStringBuilder, new Bold());
             } else if (tag.equalsIgnoreCase("b")) {
