@@ -157,8 +157,10 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     public Set<User> getUsers() {
         final HashSet<User> users = new HashSet<>();
         for (int i = 0; i < getCount(); i++) {
-            final T item = getItem(i);
-            users.add(getUser(item));
+            final User user = getUser(getItem(i));
+            if (user != null) {
+                users.add(user);
+            }
         }
         return users;
     }

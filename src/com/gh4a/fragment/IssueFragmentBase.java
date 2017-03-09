@@ -236,7 +236,9 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
 
     private void updateMentionUsers() {
         Set<User> users = mAdapter.getUsers();
-        users.add(mIssue.getUser());
+        if (mIssue.getUser() != null) {
+            users.add(mIssue.getUser());
+        }
         mCommentFragment.setMentionUsers(users);
     }
 

@@ -146,7 +146,9 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     protected void onAddData(RootAdapter<CommitComment, ?> adapter, List<CommitComment> data) {
         super.onAddData(adapter, data);
         Set<User> users = mAdapter.getUsers();
-        users.add(mCommit.getAuthor());
+        if (mCommit.getAuthor() != null) {
+            users.add(mCommit.getAuthor());
+        }
         if (mCommit.getCommitter() != null) {
             users.add(mCommit.getCommitter());
         }
