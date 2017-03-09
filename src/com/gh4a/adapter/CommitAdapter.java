@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.RepositoryCommit;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -32,6 +30,8 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
+
+import org.eclipse.egit.github.core.RepositoryCommit;
 
 public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.ViewHolder> {
     public CommitAdapter(Context context) {
@@ -59,6 +59,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
 
         holder.tvDesc.setText(message);
         holder.tvSha.setText(commit.getSha().substring(0, 10));
+        holder.ivDescriptionIndicator.setVisibility(pos > 0 ? View.VISIBLE : View.GONE);
 
         int comments = commit.getCommit().getCommentCount();
         if (comments > 0) {
@@ -98,6 +99,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
             tvComments = (TextView) view.findViewById(R.id.tv_comments);
 
             ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            ivDescriptionIndicator = (ImageView) view.findViewById(R.id.iv_description_indicator);
         }
 
         private final ImageView ivGravatar;
@@ -106,5 +108,6 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
         private final TextView tvTimestamp;
         private final TextView tvSha;
         private final TextView tvComments;
+        private final ImageView ivDescriptionIndicator;
     }
 }

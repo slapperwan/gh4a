@@ -17,18 +17,34 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         tools:src="@drawable/default_avatar" />
 
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_comments"
+    <LinearLayout
+        android:id="@+id/info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:drawableLeft="?attr/commentsIcon"
-        android:drawablePadding="4dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:visibility="gone"
-        tools:text="10"
-        tools:visibility="visible" />
+        android:layout_marginLeft="8dp"
+        android:orientation="vertical">
+
+        <com.gh4a.widget.FixedSizeImageView
+            android:id="@+id/iv_description_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitStart"
+            android:src="?descriptionIcon"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_comments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableLeft="?attr/commentsIcon"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="324" />
+
+    </LinearLayout>
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
@@ -47,7 +63,7 @@
         android:layout_alignBaseline="@id/tv_extra"
         android:layout_alignWithParentIfMissing="true"
         android:layout_marginLeft="16dp"
-        android:layout_toLeftOf="@id/tv_comments"
+        android:layout_toLeftOf="@id/info"
         android:layout_toRightOf="@id/tv_extra"
         android:textAppearance="@style/TextAppearance.VerySmall"
         tools:text="yesterday" />
@@ -58,7 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/tv_extra"
-        android:layout_toLeftOf="@id/tv_comments"
+        android:layout_toLeftOf="@id/info"
         android:layout_toRightOf="@id/iv_gravatar"
         android:ellipsize="end"
         android:maxLines="2"
@@ -71,7 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
         android:layout_below="@id/tv_desc"
-        android:layout_toLeftOf="@id/tv_comments"
+        android:layout_toLeftOf="@id/info"
         android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="?android:attr/textAppearanceSmall"
         tools:text="ad65d46d38d" />
