@@ -77,6 +77,7 @@
     <attr name="markAllAsReadIcon" format="reference" />
     <attr name="commitIcon" format="reference" />
     <attr name="descriptionIcon" format="reference" />
+    <attr name="releaseIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension" />

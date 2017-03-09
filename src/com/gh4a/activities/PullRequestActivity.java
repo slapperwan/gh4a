@@ -282,7 +282,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         if (position == 1) {
             return CommitCompareFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequest.getBase().getSha(), mPullRequest.getHead().getSha());
@@ -290,10 +290,24 @@ public class PullRequestActivity extends BasePagerActivity implements
             return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequestNumber, mPullRequest.getHead().getSha());
         } else {
-            mPullRequestFragment = PullRequestFragment.newInstance(mPullRequest,
+            Fragment f = PullRequestFragment.newInstance(mPullRequest,
                     mIssue, mIsCollaborator, mInitialCommentId);
             mInitialCommentId = -1;
-            return mPullRequestFragment;
+            return f;
+        }
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        if (position == 0) {
+            mPullRequestFragment = (PullRequestFragment) f;
+        }
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mPullRequestFragment) {
+            mPullRequestFragment = null;
         }
     }
 

@@ -15,6 +15,7 @@
  */
 package com.gh4a.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -131,6 +132,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
             mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
             mContentView.findViewById(R.id.pull_requests_progress).setVisibility(View.VISIBLE);
+        }
+        if (mImageGetter != null) {
+            mImageGetter.clearHtmlCache();
         }
         hideContentAndRestartLoaders(0, 1);
     }
@@ -305,6 +309,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
     private static class FillReadmeTask extends AsyncTask<String, Void, String> {
         private final Long mId;
+        private final Context mContext;
         private final TextView mReadmeView;
         private final View mProgressView;
         private final HttpImageGetter mImageGetter;
@@ -312,6 +317,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         public FillReadmeTask(long id, TextView readmeView, View progressView,
                 HttpImageGetter imageGetter) {
             mId = id;
+            mContext = readmeView.getContext();
             mReadmeView = readmeView;
             mProgressView = progressView;
             mImageGetter = imageGetter;
@@ -321,7 +327,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         protected String doInBackground(String... params) {
             String readme = params[0];
             if (readme != null) {
-                mImageGetter.encode(mId, readme);
+                mImageGetter.encode(mContext, mId, readme);
             }
             return readme;
         }

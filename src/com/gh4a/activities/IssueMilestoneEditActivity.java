@@ -22,6 +22,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
@@ -54,16 +55,16 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class IssueMilestoneEditActivity extends BaseActivity implements View.OnClickListener {
-    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
-        return makeEditIntent(context, repoOwner, repoName, null);
+    public static Intent makeEditIntent(Context context, String repoOwner, String repoName,
+            Milestone milestone) {
+        return makeCreateIntent(context, repoOwner, repoName)
+                .putExtra("milestone", milestone);
     }
 
-    public static Intent makeEditIntent(Context context, String repoOwner,
-            String repoName, Milestone milestone) {
+    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
         return new Intent(context, IssueMilestoneEditActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("milestone", milestone);
+                .putExtra("repo", repoName);
     }
 
     private String mRepoOwner;
@@ -165,8 +166,13 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
     public boolean onCreateOptionsMenu(Menu menu) {
         if (isInEditMode()) {
             MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.accept_delete, menu);
-            menu.removeItem(R.id.accept);
+            inflater.inflate(R.menu.edit_milestone_menu, menu);
+
+            if (mMilestone.getState().equals(ApiHelpers.MilestoneState.OPEN)) {
+                menu.removeItem(R.id.milestone_reopen);
+            } else if (mMilestone.getState().equals(ApiHelpers.MilestoneState.CLOSED)) {
+                menu.removeItem(R.id.milestone_close);
+            }
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -195,6 +201,10 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.milestone_close:
+            case R.id.milestone_reopen:
+                showOpenCloseConfirmDialog(item.getItemId() == R.id.milestone_reopen);
+                return true;
             case R.id.delete:
                 new AlertDialog.Builder(this)
                         .setMessage(getString(R.string.issue_dialog_delete_message,
@@ -211,6 +221,26 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showOpenCloseConfirmDialog(final boolean reopen) {
+        @StringRes int messageResId = reopen
+                ? R.string.issue_milestone_reopen_message : R.string.issue_milestone_close_message;
+        @StringRes int buttonResId = reopen
+                ? R.string.pull_request_reopen : R.string.pull_request_close;
+        new AlertDialog.Builder(this)
+                .setMessage(messageResId)
+                .setPositiveButton(buttonResId, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mMilestone.setState(reopen
+                                ? ApiHelpers.MilestoneState.OPEN
+                                : ApiHelpers.MilestoneState.CLOSED);
+                        new OpenCloseIssueMilestoneTask(mMilestone, reopen).schedule();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     private void setDueOn(int year, int month, int day) {
@@ -310,6 +340,47 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         @Override
         protected String getErrorMessage() {
             return getContext().getString(R.string.issue_error_delete_milestone);
+        }
+    }
+
+    private class OpenCloseIssueMilestoneTask extends ProgressDialogTask<Void> {
+        private final Milestone mMilestone;
+        private final boolean mOpen;
+
+        public OpenCloseIssueMilestoneTask(Milestone milestone, boolean open) {
+            super(IssueMilestoneEditActivity.this, 0,
+                    open ? R.string.opening_msg : R.string.closing_msg);
+            mMilestone = milestone;
+            mOpen = open;
+        }
+
+        @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new OpenCloseIssueMilestoneTask(mMilestone, mOpen);
+        }
+
+        @Override
+        protected Void run() throws IOException {
+            MilestoneService milestoneService = (MilestoneService)
+                    Gh4Application.get().getService(Gh4Application.MILESTONE_SERVICE);
+
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+            milestoneService.editMilestone(repoId, mMilestone);
+
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            supportInvalidateOptionsMenu();
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(mOpen
+                            ? R.string.issue_milestone_reopen_error
+                            : R.string.issue_milestone_close_error,
+                    mMilestone.getTitle());
         }
     }
 

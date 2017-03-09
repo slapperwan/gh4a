@@ -58,7 +58,7 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mDrawerHelper.getSortMode());
         filterData.put("order", mDrawerHelper.getSortOrder());

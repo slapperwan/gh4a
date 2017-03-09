@@ -1,18 +1,18 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.service.MilestoneService;
-
 import android.content.Context;
 import android.text.TextUtils;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
+
+import org.eclipse.egit.github.core.Milestone;
+import org.eclipse.egit.github.core.service.MilestoneService;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class MilestoneListLoader extends BaseLoader<List<Milestone>> {
     private final String mRepoOwner;
@@ -34,7 +34,7 @@ public class MilestoneListLoader extends BaseLoader<List<Milestone>> {
     public List<Milestone> doLoadInBackground() throws IOException {
         MilestoneService milestoneService = (MilestoneService)
                 Gh4Application.get().getService(Gh4Application.MILESTONE_SERVICE);
-        List<Milestone> milestones = milestoneService.getMilestones(mRepoOwner, mRepoName, null);
+        List<Milestone> milestones = milestoneService.getMilestones(mRepoOwner, mRepoName, mState);
 
         if (milestones != null && mState == null) {
             Collections.sort(milestones, new Comparator<Milestone>() {

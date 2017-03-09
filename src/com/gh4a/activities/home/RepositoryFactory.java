@@ -117,10 +117,22 @@ public class RepositoryFactory extends FragmentFactory {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
-        mFragment = RepositoryListContainerFragment.newInstance(mUserLogin, false);
+    protected Fragment makeFragment(int position) {
+        return RepositoryListContainerFragment.newInstance(mUserLogin, false);
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        mFragment = (RepositoryListContainerFragment) f;
         restorePreviouslySelectedFilterAndSort();
-        return mFragment;
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mFragment) {
+            mFragment.destroyChildren();
+            mFragment = null;
+        }
     }
 
     private void restorePreviouslySelectedFilterAndSort() {

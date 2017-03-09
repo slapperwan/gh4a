@@ -155,7 +155,8 @@ public class HttpImageGetter implements ImageGetter {
             }
 
             if (mRawHtml == null) {
-                CharSequence encoded = HtmlUtils.encode(html, getter.mLoadingGetter);
+                CharSequence encoded = HtmlUtils.encode(view.getContext(),
+                        html, getter.mLoadingGetter);
                 if (containsImages(html)) {
                     mRawHtml = encoded;
                 } else {
@@ -177,8 +178,8 @@ public class HttpImageGetter implements ImageGetter {
             removeView(view);
         }
 
-        void encode(String html, ImageGetter loadingGetter) {
-            CharSequence encoded = HtmlUtils.encode(html, loadingGetter);
+        void encode(Context context, String html, ImageGetter loadingGetter) {
+            CharSequence encoded = HtmlUtils.encode(context, html, loadingGetter);
             synchronized (this) {
                 if (containsImages(html)) {
                     mRawHtml = encoded;
@@ -351,8 +352,8 @@ public class HttpImageGetter implements ImageGetter {
         mDestroyed = true;
     }
 
-    public void encode(final Object id, final String html) {
-        findOrCreateInfo(id).encode(html, mLoadingGetter);
+    public void encode(final Context context, final Object id, final String html) {
+        findOrCreateInfo(id).encode(context, html, mLoadingGetter);
     }
 
     public void bind(final TextView view, final String html, final Object id) {
@@ -384,7 +385,7 @@ public class HttpImageGetter implements ImageGetter {
 
         @Override
         protected CharSequence doInBackground(Void... params) {
-            return HtmlUtils.encode(mHtml, mImageGetter);
+            return HtmlUtils.encode(mImageGetter.mContext, mHtml, mImageGetter);
         }
 
         protected void onPostExecute(CharSequence result) {
@@ -477,34 +478,6 @@ public class HttpImageGetter implements ImageGetter {
                 return true;
             default:
                 return false;
-        }
-    }
-
-    private static Bitmap getBitmap(final String imagePath, BitmapFactory.Options opts)
-            throws IOException {
-        RandomAccessFile file = null;
-        try {
-            file = new RandomAccessFile(imagePath, "r");
-            return BitmapFactory.decodeFileDescriptor(file.getFD(), null, opts);
-        } finally {
-            if (file != null) {
-                try {
-                    file.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
-    private static Point getImageSize(final String imagePath) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-
-        try {
-            getBitmap(imagePath, options);
-            return new Point(options.outWidth, options.outHeight);
-        } catch (IOException e) {
-            return null;
         }
     }
 

@@ -26,6 +26,7 @@ public class NotificationAdapter extends
     private static final String SUBJECT_ISSUE = "Issue";
     private static final String SUBJECT_PULL_REQUEST = "PullRequest";
     private static final String SUBJECT_COMMIT = "Commit";
+    private static final String SUBJECT_RELEASE = "Release";
 
     public interface OnNotificationActionCallback {
         void markAsRead(NotificationHolder notificationHolder);
@@ -156,6 +157,9 @@ public class NotificationAdapter extends
         }
         if (SUBJECT_COMMIT.equals(subjectType)) {
             return UiUtils.resolveDrawable(mContext, R.attr.commitIcon);
+        }
+        if (SUBJECT_RELEASE.equals(subjectType)) {
+            return UiUtils.resolveDrawable(mContext, R.attr.releaseIcon);
         }
 
         return -1;

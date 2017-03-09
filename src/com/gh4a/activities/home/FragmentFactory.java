@@ -16,7 +16,13 @@ public abstract class FragmentFactory {
 
     protected abstract @StringRes int getTitleResId();
     protected abstract int[] getTabTitleResIds();
-    protected abstract Fragment getFragment(int position);
+    protected abstract Fragment makeFragment(int position);
+
+    protected void onFragmentInstantiated(Fragment f, int position) {
+    }
+
+    protected void onFragmentDestroyed(Fragment f) {
+    }
 
     protected int[] getHeaderColors() {
         return null;

@@ -148,7 +148,8 @@
     <string name="no_files_found">No files found.</string>
     <string name="no_trends_found">No trending repositories found.</string>
     <string name="no_downloads_found">This repository doesn\'t provide any downloads.</string>
-    <string name="no_milestones_found">This repository doesn\'t have any configured milestone.</string>
+    <string name="no_open_milestones_found">This repository doesn\'t have any open milestones.</string>
+    <string name="no_closed_milestones_found">This repository doesn\'t have any closed milestones.</string>
     <string name="no_commits_found">No commits found.</string>
     <string name="no_followers_found">No followers found.</string>
     <string name="no_following_found">No users are followed so far.</string>
@@ -357,6 +358,10 @@
     <string name="issue_milestone_edit">Edit Milestone</string>
     <string name="issue_milestone_open_issues">%d open</string>
     <string name="issue_milestone_closed_issues">%d closed</string>
+    <string name="issue_milestone_close_message">Do you really want to close this milestone?</string>
+    <string name="issue_milestone_reopen_message">Do you really want to reopen this milestone?</string>
+    <string name="issue_milestone_close_error">Closing milestone failed.</string>
+    <string name="issue_milestone_reopen_error">Reopening milestone failed.</string>
     <string name="issue_filter">Filter</string>
     <string name="issue_filter_by_labels">Filter by labels</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>

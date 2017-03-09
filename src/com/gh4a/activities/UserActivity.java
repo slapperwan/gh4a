@@ -96,15 +96,26 @@ public class UserActivity extends BasePagerActivity {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         switch (position) {
-            case 0:
-                mUserFragment = UserFragment.newInstance(mUserLogin);
-                return mUserFragment;
-            case 1:
-                return PublicEventListFragment.newInstance(mUserLogin);
+            case 0: return UserFragment.newInstance(mUserLogin);
+            case 1: return PublicEventListFragment.newInstance(mUserLogin);
         }
         return null;
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        if (position == 0) {
+            mUserFragment = (UserFragment) f;
+        }
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mUserFragment) {
+            mUserFragment = null;
+        }
     }
 
     @Override

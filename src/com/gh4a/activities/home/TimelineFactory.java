@@ -26,7 +26,7 @@ public class TimelineFactory extends FragmentFactory {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         return PublicTimelineFragment.newInstance();
     }
 }

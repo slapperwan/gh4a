@@ -147,6 +147,9 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
             getActivity().supportInvalidateOptionsMenu();
             fillLabels(null);
         }
+        if (mImageGetter != null) {
+            mImageGetter.clearHtmlCache();
+        }
         super.onRefresh();
     }
 
