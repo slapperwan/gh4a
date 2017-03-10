@@ -4,12 +4,9 @@ This application provides access to [GitHub](https://github.com/) and lets you s
 
 ![Octodroid](https://raw.githubusercontent.com/slapperwan/gh4a/master/res/drawable-xxhdpi/octodroid.png)
 
-[![Build Status](https://drone.io/github.com/slapperwan/gh4a/status.png)](https://drone.io/github.com/slapperwan/gh4a/latest)
-
 Download
 --------
-[![Download OctoDroid from Google Play](http://www.android.com/images/brand/android_app_on_play_large.png)](https://play.google.com/store/apps/details?id=com.gh4a) [![Download OctoDroid from F-Droid.org](https://raw.githubusercontent.com/kageiit/images-host/master/badges/fdroid-badge.png)](http://f-droid.org/repository/browse/?fdfilter=octodroid&fdid=com.gh4a) [![Download latest debug from drone.io](https://raw.githubusercontent.com/kageiit/images-host/master/badges/drone-io-badge.png)](https://drone.io/github.com/slapperwan/gh4a/files/build/outputs/apk/gh4a-debug.apk)
-
+[![Download OctoDroid from Google Play](http://www.android.com/images/brand/android_app_on_play_large.png)](https://play.google.com/store/apps/details?id=com.gh4a) [![Download OctoDroid from F-Droid.org](https://raw.githubusercontent.com/kageiit/images-host/master/badges/fdroid-badge.png)](http://f-droid.org/repository/browse/?fdfilter=octodroid&fdid=com.gh4a)
 
 Main features
 -------------
