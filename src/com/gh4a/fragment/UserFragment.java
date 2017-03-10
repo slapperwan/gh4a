@@ -194,7 +194,11 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         fillTextView(R.id.tv_location, mUser.getLocation());
 
         getLoaderManager().initLoader(1, null, mRepoListCallback);
-        getLoaderManager().initLoader(2, null, mOrganizationCallback);
+        if (User.TYPE_USER.equals(mUser.getType())) {
+            getLoaderManager().initLoader(2, null, mOrganizationCallback);
+        } else {
+            fillOrganizations(null);
+        }
     }
 
     private void fillCountIfUser(int layoutId, int countId, int count) {
