@@ -65,15 +65,16 @@ import java.util.Locale;
 public class PullRequestActivity extends BasePagerActivity implements
         View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
-        return makeIntent(context, repoOwner, repoName, number, -1);
+        return makeIntent(context, repoOwner, repoName, number, -1, null);
     }
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            int number, long initialCommentId) {
+            int number, long initialCommentId, String targetScreen) {
         return new Intent(context, PullRequestActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("number", number)
-                .putExtra("initial_comment", initialCommentId);
+                .putExtra("initial_comment", initialCommentId)
+                .putExtra("target_screen", targetScreen);
     }
 
     private static final int REQUEST_EDIT_ISSUE = 1001;
@@ -83,6 +84,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     private int mPullRequestNumber;
     private long mInitialCommentId;
     private Boolean mIsCollaborator;
+    private String mTargetScreen;
 
     private Issue mIssue;
     private PullRequest mPullRequest;
@@ -247,7 +249,9 @@ public class PullRequestActivity extends BasePagerActivity implements
         mRepoName = extras.getString("repo");
         mPullRequestNumber = extras.getInt("number");
         mInitialCommentId = extras.getLong("initial_comment", -1);
+        mTargetScreen = extras.getString("target_screen");
         extras.remove("initial_comment");
+        extras.remove("target_screen");
     }
 
     @Override
@@ -341,6 +345,15 @@ public class PullRequestActivity extends BasePagerActivity implements
             setContentShown(true);
             invalidateTabs();
             updateFabVisibility();
+
+            switch (mTargetScreen) {
+                case "commits":
+                    getPager().setCurrentItem(1);
+                    break;
+                case "files":
+                    getPager().setCurrentItem(2);
+                    break;
+            }
         }
     }
 

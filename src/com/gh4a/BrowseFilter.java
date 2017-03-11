@@ -117,8 +117,10 @@ public class BrowseFilter extends AppCompatActivity {
                 intent = WikiListActivity.makeIntent(this, user, repo, null);
             } else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
                 try {
+                    String targetScreen = parts.size() >= 5 ? parts.get(4) : null;
                     intent = PullRequestActivity.makeIntent(this, user, repo,
-                            Integer.parseInt(id), extractCommentId(uri.getFragment(), "issue"));
+                            Integer.parseInt(id), extractCommentId(uri.getFragment(), "issue"),
+                            targetScreen);
                 } catch (NumberFormatException e) {
                     // ignored
                 }
