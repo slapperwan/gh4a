@@ -42,3 +42,7 @@ pre > div {
     margin-top: 3px;
     margin-bottom: 3px;
 }
+
+.highlighted {
+    background: #555512;
+}
