@@ -65,22 +65,28 @@ import java.util.Locale;
 public class PullRequestActivity extends BasePagerActivity implements
         View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
-        return makeIntent(context, repoOwner, repoName, number, -1);
+        return makeIntent(context, repoOwner, repoName, number, -1, -1);
     }
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            int number, long initialCommentId) {
+            int number, int initialPage, long initialCommentId) {
         return new Intent(context, PullRequestActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("number", number)
+                .putExtra("initial_page", initialPage)
                 .putExtra("initial_comment", initialCommentId);
     }
+
+    public static final int PAGE_CONVERSATION = 0;
+    public static final int PAGE_COMMITS = 1;
+    public static final int PAGE_FILES = 2;
 
     private static final int REQUEST_EDIT_ISSUE = 1001;
 
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
+    private int mInitialPage;
     private long mInitialCommentId;
     private Boolean mIsCollaborator;
 
@@ -247,7 +253,9 @@ public class PullRequestActivity extends BasePagerActivity implements
         mRepoName = extras.getString("repo");
         mPullRequestNumber = extras.getInt("number");
         mInitialCommentId = extras.getLong("initial_comment", -1);
+        mInitialPage = extras.getInt("initial_page", -1);
         extras.remove("initial_comment");
+        extras.remove("initial_page");
     }
 
     @Override
@@ -341,6 +349,11 @@ public class PullRequestActivity extends BasePagerActivity implements
             setContentShown(true);
             invalidateTabs();
             updateFabVisibility();
+
+            if (mInitialPage >= 0 && mInitialPage < TITLES.length) {
+                getPager().setCurrentItem(mInitialPage);
+                mInitialPage = -1;
+            }
         }
     }
 
