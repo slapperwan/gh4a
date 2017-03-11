@@ -12,6 +12,9 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.User;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class ApiHelpers {
     public interface IssueState {
         String OPEN = "open";
@@ -123,5 +126,26 @@ public class ApiHelpers {
                 .path(path)
                 .authority(authority)
                 .build();
+    }
+
+    public static String md5(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(input.getBytes());
+            byte[] messageDigest = digest.digest();
+
+            StringBuilder builder = new StringBuilder();
+            for (byte b : messageDigest) {
+                String hexString = Integer.toHexString(0xFF & b);
+                while (hexString.length() < 2) {
+                    hexString = "0" + hexString;
+                }
+                builder.append(hexString);
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

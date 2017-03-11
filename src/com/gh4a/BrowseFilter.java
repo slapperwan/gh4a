@@ -11,10 +11,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 
 import com.gh4a.activities.BlogListActivity;
 import com.gh4a.activities.CommitActivity;
+import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.GistActivity;
@@ -26,13 +28,19 @@ import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
 import org.eclipse.egit.github.core.client.IGitHubConstants;
+import org.eclipse.egit.github.core.service.CommitService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import java.util.ArrayList;
@@ -127,8 +135,14 @@ public class BrowseFilter extends AppCompatActivity {
                     // ignored
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
-                intent = CommitActivity.makeIntent(this, user, repo, id,
-                        extractCommentId(uri.getFragment(), "commit"));
+                String diffId = extractCommitDiffId(uri.getFragment());
+                if (TextUtils.isEmpty(diffId)) {
+                    intent = CommitActivity.makeIntent(this, user, repo, id,
+                            extractCommentId(uri.getFragment(), "commit"));
+                } else {
+                    new CommitDiffLoadTask(user, repo, id, diffId).execute();
+                    return; // avoid finish() for now
+                }
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 4) {
                 String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
                 new RefPathDisambiguationTask(user, repo, refAndPath, uri.getFragment()).execute();
@@ -155,6 +169,14 @@ public class BrowseFilter extends AppCompatActivity {
         return -1;
     }
 
+    private String extractCommitDiffId(String fragment) {
+        String prefix = "diff-";
+        if (fragment != null && fragment.startsWith(prefix)) {
+            return fragment.substring(prefix.length());
+        }
+        return "";
+    }
+
     public static class ProgressDialogFragment extends DialogFragment {
         @NonNull
         @Override
@@ -170,6 +192,117 @@ public class BrowseFilter extends AppCompatActivity {
             if (activity != null) {
                 activity.finish();
             }
+        }
+    }
+
+    private class CommitDiffLoadTask extends BackgroundTask<CommitFile> {
+        private static final int MD5_HASH_LENGTH = 32;
+
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final String mSha;
+        private final String mFileHash;
+
+        private List<CommitComment> mComments = null;
+        private boolean mIsImage = false;
+        private String mLineNumberType = null;
+        private int mHighlightStart = -1;
+        private int mHighlightEnd = -1;
+
+        public CommitDiffLoadTask(String repoOwner, String repoName, String sha,
+                String diffId) {
+            super(BrowseFilter.this);
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mSha = sha;
+            mFileHash = diffId.substring(0, MD5_HASH_LENGTH);
+
+            if (diffId.length() > MD5_HASH_LENGTH) {
+                extractHighlight(diffId);
+            }
+
+            // TODO: Remove
+            Log.d("CommitDiff", "File hash: " + mFileHash);
+            Log.d("CommitDiff", "Line number type: " + mLineNumberType);
+            Log.d("CommitDiff", "Highlight start: " + mHighlightStart);
+            Log.d("CommitDiff", "Highlight end: " + mHighlightEnd);
+        }
+
+        private void extractHighlight(String diffId) {
+            String lineNumbers = diffId.substring(MD5_HASH_LENGTH);
+            mLineNumberType = lineNumbers.substring(0, 1);
+            try {
+                int dashPos = lineNumbers.indexOf("-");
+                if (dashPos > 0) {
+                    mHighlightStart = Integer.valueOf(lineNumbers.substring(1, dashPos));
+                    mHighlightEnd = Integer.valueOf(lineNumbers.substring(dashPos + 2));
+                } else {
+                    mHighlightStart = Integer.valueOf(lineNumbers.substring(1));
+                }
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            new ProgressDialogFragment().show(getSupportFragmentManager(), "progress");
+        }
+
+        @Override
+        protected CommitFile run() throws Exception {
+            CommitService commitService = (CommitService)
+                    Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
+            RepositoryCommit commit = commitService.getCommit(
+                    new RepositoryId(mRepoOwner, mRepoName), mSha);
+
+            CommitFile file = null;
+            for (CommitFile commitFile : commit.getFiles()) {
+                if (ApiHelpers.md5(commitFile.getFilename()).equals(mFileHash)) {
+                    file = commitFile;
+                    break;
+                }
+            }
+
+            if (file == null || isFinishing()) {
+                return null;
+            }
+
+            mIsImage = FileUtils.isImage(file.getFilename());
+            if (!mIsImage) {
+                mComments = commitService.getComments(new RepositoryId(mRepoOwner, mRepoName),
+                        mSha);
+            }
+            return file;
+        }
+
+        @Override
+        protected void onSuccess(CommitFile result) {
+            if (isFinishing()) {
+                // dialog was dismissed
+                return;
+            }
+
+            if (result != null) {
+                final Intent intent;
+                if (mIsImage) {
+                    intent = FileViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                            mSha, result.getFilename());
+                } else {
+                    // TODO: Implement highlighting for diff files
+                    intent = CommitDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner,
+                            mRepoName, mSha, result.getFilename(), result.getPatch(), mComments);
+                }
+                startActivity(intent);
+            }
+            finish();
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
+            finish();
         }
     }
 
