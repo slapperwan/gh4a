@@ -34,11 +34,13 @@ import java.util.List;
 public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number,
                 String commitSha, String path, String diff,
-                List<CommitComment> comments, int initialLine) {
+                List<CommitComment> comments, int initialLine,
+                int highlightStartLine, int highlightEndLine, boolean highlightIsRight) {
         Intent intent = new Intent(context, PullRequestDiffViewerActivity.class)
                 .putExtra("number", number);
         return DiffViewerActivity.fillInIntent(intent, repoOwner, repoName, commitSha, path,
-                diff, comments, initialLine);
+                diff, comments, initialLine, highlightStartLine, highlightEndLine,
+                highlightIsRight);
     }
 
     private int mPullRequestNumber;

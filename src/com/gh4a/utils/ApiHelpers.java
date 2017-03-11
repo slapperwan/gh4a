@@ -3,6 +3,8 @@ package com.gh4a.utils;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.gh4a.R;
@@ -147,5 +149,84 @@ public class ApiHelpers {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static class DiffHighlightId implements Parcelable {
+        public final String fileHash;
+        public final int startLine;
+        public final int endLine;
+        public final boolean right;
+
+        private DiffHighlightId(String fileHash, int startLine, int endLine, boolean right) {
+            this.fileHash = fileHash;
+            this.startLine = startLine;
+            this.endLine = endLine;
+            this.right = right;
+        }
+
+        public DiffHighlightId(Parcel p) {
+            this.fileHash = p.readString();
+            this.startLine = p.readInt();
+            this.endLine = p.readInt();
+            this.right = p.readInt() != 0;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel p, int flags) {
+            p.writeString(fileHash);
+            p.writeInt(startLine);
+            p.writeInt(endLine);
+            p.writeInt(right ? 1 : 0);
+        }
+
+        public static final Parcelable.Creator<DiffHighlightId> CREATOR
+                = new Parcelable.Creator<DiffHighlightId>() {
+            public DiffHighlightId createFromParcel(Parcel in) {
+                return new DiffHighlightId(in);
+            }
+
+            public DiffHighlightId[] newArray(int size) {
+                return new DiffHighlightId[size];
+            }
+        };
+
+        public static DiffHighlightId fromUriFragment(String fragment) {
+            boolean right = false;
+
+            int typePos = fragment.indexOf('L');
+            if (typePos < 0) {
+                right = true;
+                typePos = fragment.indexOf('R');
+            }
+
+            String fileHash = typePos > 0 ? fragment.substring(0, typePos) : fragment;
+            if (fileHash.length() != 32) { // MD5 hash length
+                return null;
+            }
+            if (typePos < 0) {
+                return new DiffHighlightId(fileHash, -1, -1, false);
+            }
+
+            try {
+                char type = fragment.charAt(typePos);
+                String linePart = fragment.substring(typePos + 1);
+                int startLine, endLine, dashPos = linePart.indexOf("-" + type);
+                if (dashPos > 0) {
+                    startLine = Integer.valueOf(linePart.substring(0, dashPos));
+                    endLine = Integer.valueOf(linePart.substring(dashPos + 2));
+                } else {
+                    startLine = Integer.valueOf(linePart);
+                    endLine = startLine;
+                }
+                return new DiffHighlightId(fileHash, startLine, endLine, right);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
     }
 }

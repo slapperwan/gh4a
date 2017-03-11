@@ -77,6 +77,16 @@ public class PullRequestActivity extends BasePagerActivity implements
                 .putExtra("initial_comment", initialCommentId);
     }
 
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            int number, ApiHelpers.DiffHighlightId diffHighlight) {
+        return new Intent(context, PullRequestActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("number", number)
+                .putExtra("initial_page", PAGE_FILES)
+                .putExtra("initial_diff", diffHighlight);
+    }
+
     public static final int PAGE_CONVERSATION = 0;
     public static final int PAGE_COMMITS = 1;
     public static final int PAGE_FILES = 2;
@@ -88,6 +98,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     private int mPullRequestNumber;
     private int mInitialPage;
     private long mInitialCommentId;
+    private ApiHelpers.DiffHighlightId mInitialDiff;
     private Boolean mIsCollaborator;
 
     private Issue mIssue;
@@ -254,8 +265,10 @@ public class PullRequestActivity extends BasePagerActivity implements
         mPullRequestNumber = extras.getInt("number");
         mInitialCommentId = extras.getLong("initial_comment", -1);
         mInitialPage = extras.getInt("initial_page", -1);
+        mInitialDiff = extras.getParcelable("initial_diff");
         extras.remove("initial_comment");
         extras.remove("initial_page");
+        extras.remove("initial_diff");
     }
 
     @Override
@@ -295,8 +308,10 @@ public class PullRequestActivity extends BasePagerActivity implements
             return CommitCompareFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequest.getBase().getSha(), mPullRequest.getHead().getSha());
         } else if (position == 2) {
-            return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
-                    mPullRequestNumber, mPullRequest.getHead().getSha());
+            Fragment f = PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
+                    mPullRequestNumber, mPullRequest.getHead().getSha(), mInitialDiff);
+            mInitialDiff = null;
+            return f;
         } else {
             Fragment f = PullRequestFragment.newInstance(mPullRequest,
                     mIssue, mIsCollaborator, mInitialCommentId);

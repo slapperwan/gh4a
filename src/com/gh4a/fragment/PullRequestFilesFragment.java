@@ -14,6 +14,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.loader.PullRequestFilesLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -23,7 +24,7 @@ import java.util.List;
 
 public class PullRequestFilesFragment extends CommitFragment {
     public static PullRequestFilesFragment newInstance(String repoOwner, String repoName,
-                                                       int pullRequestNumber, String headSha) {
+            int pullRequestNumber, String headSha, ApiHelpers.DiffHighlightId initialDiff) {
         PullRequestFilesFragment f = new PullRequestFilesFragment();
 
         Bundle args = new Bundle();
@@ -31,6 +32,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         args.putString("repo", repoName);
         args.putInt("number", pullRequestNumber);
         args.putString("head", headSha);
+        args.putParcelable("initial_diff", initialDiff);
         f.setArguments(args);
         return f;
     }
@@ -47,6 +49,7 @@ public class PullRequestFilesFragment extends CommitFragment {
     private String mHeadSha;
     private List<CommitFile> mFiles;
     private List<CommitComment> mComments;
+    private ApiHelpers.DiffHighlightId mInitialDiff;
 
     private final LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>(this) {
         @Override
@@ -84,6 +87,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         mRepoName = args.getString("repo");
         mPullRequestNumber = args.getInt("number");
         mHeadSha = args.getString("head");
+        mInitialDiff = args.getParcelable("initial_diff");
     }
 
     @Override
@@ -118,13 +122,13 @@ public class PullRequestFilesFragment extends CommitFragment {
         if (mComments != null && mFiles != null) {
             fillStats(mFiles, mComments);
             setContentShown(true);
+            goToInitialDiff(mInitialDiff, mFiles);
+            mInitialDiff = null;
         }
     }
 
     @Override
-    public void onClick(View v) {
-        CommitFile file = (CommitFile) v.getTag();
-
+    protected void handleFileClick(CommitFile file, int startLine, int endLine, boolean rightDiff) {
         final Intent intent;
         if (FileUtils.isImage(file.getFilename())) {
             intent = FileViewerActivity.makeIntent(getActivity(),
@@ -132,7 +136,8 @@ public class PullRequestFilesFragment extends CommitFragment {
         } else {
             intent = PullRequestDiffViewerActivity.makeIntent(getActivity(),
                     mRepoOwner, mRepoName, mPullRequestNumber, mHeadSha,
-                    file.getFilename(), file.getPatch(), mComments, -1);
+                    file.getFilename(), file.getPatch(), mComments, -1,
+                    startLine, endLine, rightDiff);
         }
 
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);

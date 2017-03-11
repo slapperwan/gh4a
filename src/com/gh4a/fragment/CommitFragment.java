@@ -36,7 +36,8 @@ import java.util.List;
 
 public class CommitFragment extends LoadingFragmentBase implements OnClickListener {
     public static CommitFragment newInstance(String repoOwner, String repoName, String commitSha,
-            RepositoryCommit commit, List<CommitComment> comments) {
+            RepositoryCommit commit, List<CommitComment> comments,
+            ApiHelpers.DiffHighlightId initialDiff) {
         CommitFragment f = new CommitFragment();
 
         Bundle args = new Bundle();
@@ -45,6 +46,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         args.putString("sha", commitSha);
         args.putSerializable("commit", commit);
         args.putSerializable("comments", new ArrayList<>(comments));
+        args.putParcelable("initial_diff", initialDiff);
         f.setArguments(args);
         return f;
     }
@@ -60,6 +62,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     private String mObjectSha;
     private RepositoryCommit mCommit;
     private List<CommitComment> mComments;
+    private ApiHelpers.DiffHighlightId mInitialDiff;
     protected View mContentView;
 
     @Override
@@ -70,6 +73,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         mObjectSha = getArguments().getString("sha");
         mCommit = (RepositoryCommit) getArguments().getSerializable("commit");
         mComments = (List<CommitComment>) getArguments().getSerializable("comments");
+        mInitialDiff = getArguments().getParcelable("initial_diff");
+        getArguments().remove("initial_diff");
     }
 
     @Override
@@ -92,6 +97,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     protected void populateViewIfReady() {
         fillHeader();
         fillStats(mCommit.getFiles(), mComments);
+        goToInitialDiff(mInitialDiff, mCommit.getFiles());
+        mInitialDiff = null;
     }
 
     private void fillHeader() {
@@ -264,16 +271,37 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             }
         } else {
             CommitFile file = (CommitFile) v.getTag();
-            final Intent intent;
-            if (FileUtils.isImage(file.getFilename())) {
-                intent = FileViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mObjectSha, file.getFilename());
-            } else {
-                intent = CommitDiffViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mObjectSha, file.getFilename(), file.getPatch(), mComments);
-            }
-            startActivityForResult(intent, REQUEST_DIFF_VIEWER);
+            handleFileClick(file);
         }
+    }
+
+    protected void goToInitialDiff(ApiHelpers.DiffHighlightId initialDiff, List<CommitFile> files) {
+        if (initialDiff == null) {
+            return;
+        }
+        for (CommitFile file : mCommit.getFiles()) {
+            if (mInitialDiff.fileHash.equals(ApiHelpers.md5(file.getFilename()))) {
+                handleFileClick(file, initialDiff.startLine, initialDiff.endLine, initialDiff.right);
+                break;
+            }
+        }
+    }
+
+    protected void handleFileClick(CommitFile file) {
+        handleFileClick(file, -1, -1, false);
+    }
+
+    protected void handleFileClick(CommitFile file, int startLine, int endLine, boolean rightDiff) {
+        final Intent intent;
+        if (FileUtils.isImage(file.getFilename())) {
+            intent = FileViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                    mObjectSha, file.getFilename());
+        } else {
+            intent = CommitDiffViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                    mObjectSha, file.getFilename(), file.getPatch(), mComments,
+                    startLine, endLine, rightDiff);
+        }
+        startActivityForResult(intent, REQUEST_DIFF_VIEWER);
     }
 
     @Override

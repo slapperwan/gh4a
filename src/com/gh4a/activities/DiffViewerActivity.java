@@ -64,15 +64,19 @@ import java.util.List;
 public abstract class DiffViewerActivity extends WebViewerActivity implements
         View.OnTouchListener {
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
-            String commitSha, String path, String diff,
-            List<CommitComment> comments, int initialLine) {
+            String commitSha, String path, String diff, List<CommitComment> comments,
+            int initialLine, int highlightStartLine, int highlightEndLine,
+            boolean highlightisRight) {
         return baseIntent.putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("sha", commitSha)
                 .putExtra("path", path)
                 .putExtra("diff", diff)
                 .putExtra("comments", comments != null ? new ArrayList<>(comments) : null)
-                .putExtra("initial_line", initialLine);
+                .putExtra("initial_line", initialLine)
+                .putExtra("highlight_start", highlightStartLine)
+                .putExtra("highlight_end", highlightEndLine)
+                .putExtra("highlight_right", highlightisRight);
     }
 
     protected String mRepoOwner;
