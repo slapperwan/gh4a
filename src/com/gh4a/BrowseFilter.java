@@ -23,6 +23,7 @@ import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
+import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.TrendingActivity;
@@ -33,6 +34,7 @@ import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.loader.PullRequestFilesLoader;
 import com.gh4a.loader.PullRequestLoader;
+import com.gh4a.loader.ReleaseListLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
@@ -41,6 +43,7 @@ import com.gh4a.utils.StringUtils;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.Release;
 import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -94,13 +97,13 @@ public class BrowseFilter extends AppCompatActivity {
             } else if ("downloads".equals(action)) {
                 intent = DownloadsActivity.makeIntent(this, user, repo);
             } else if ("releases".equals(action)) {
-                final String release;
                 if ("tag".equals(id)) {
-                    release = parts.size() >= 5 ? parts.get(4) : null;
+                    final String release = parts.size() >= 5 ? parts.get(4) : null;
+                    new ReleaseLoadTask(user, repo, release).execute();
+                    return; // avoid finish() for now
                 } else {
-                    release = id;
+                    intent = ReleaseListActivity.makeIntent(this, user, repo);
                 }
-                intent = ReleaseListActivity.makeIntent(this, user, repo, release);
             } else if ("tree".equals(action) || "commits".equals(action)) {
                 int page = "tree".equals(action)
                         ? RepositoryActivity.PAGE_FILES : RepositoryActivity.PAGE_COMMITS;
@@ -212,6 +215,57 @@ public class BrowseFilter extends AppCompatActivity {
             if (activity != null) {
                 activity.finish();
             }
+        }
+    }
+
+    private class ReleaseLoadTask extends BackgroundTask<Release> {
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final String mTagName;
+
+        public ReleaseLoadTask(String repoOwner, String repoName, String tagName) {
+            super(BrowseFilter.this);
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mTagName = tagName;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            new ProgressDialogFragment().show(getSupportFragmentManager(), "progress");
+        }
+
+        @Override
+        protected Release run() throws Exception {
+            List<Release> releases = ReleaseListLoader.loadReleases(mRepoOwner, mRepoName);
+
+            if (releases != null) {
+                for (Release release : releases) {
+                    if (TextUtils.equals(release.getTagName(), mTagName)) {
+                        return release;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Release result) {
+            if (isFinishing() || result == null) {
+                return;
+            }
+
+            startActivity(ReleaseInfoActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                    result));
+            finish();
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
+            finish();
         }
     }
 
