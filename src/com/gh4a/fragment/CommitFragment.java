@@ -1,10 +1,5 @@
 package com.gh4a.fragment;
 
-import org.eclipse.egit.github.core.Commit;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.RepositoryCommit;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,19 +20,23 @@ import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
+
+import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
+import org.eclipse.egit.github.core.RepositoryCommit;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommitFragment extends LoadingFragmentBase implements OnClickListener {
     public static CommitFragment newInstance(String repoOwner, String repoName, String commitSha,
-            RepositoryCommit commit, List<CommitComment> comments,
-            ApiHelpers.DiffHighlightId initialDiff) {
+            RepositoryCommit commit, List<CommitComment> comments) {
         CommitFragment f = new CommitFragment();
 
         Bundle args = new Bundle();
@@ -46,7 +45,6 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         args.putString("sha", commitSha);
         args.putSerializable("commit", commit);
         args.putSerializable("comments", new ArrayList<>(comments));
-        args.putParcelable("initial_diff", initialDiff);
         f.setArguments(args);
         return f;
     }
@@ -62,7 +60,6 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     private String mObjectSha;
     private RepositoryCommit mCommit;
     private List<CommitComment> mComments;
-    private ApiHelpers.DiffHighlightId mInitialDiff;
     protected View mContentView;
 
     @Override
@@ -73,8 +70,6 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         mObjectSha = getArguments().getString("sha");
         mCommit = (RepositoryCommit) getArguments().getSerializable("commit");
         mComments = (List<CommitComment>) getArguments().getSerializable("comments");
-        mInitialDiff = getArguments().getParcelable("initial_diff");
-        getArguments().remove("initial_diff");
     }
 
     @Override
@@ -97,8 +92,6 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     protected void populateViewIfReady() {
         fillHeader();
         fillStats(mCommit.getFiles(), mComments);
-        goToInitialDiff(mInitialDiff, mCommit.getFiles());
-        mInitialDiff = null;
     }
 
     private void fillHeader() {
@@ -275,31 +268,14 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         }
     }
 
-    protected void goToInitialDiff(ApiHelpers.DiffHighlightId initialDiff, List<CommitFile> files) {
-        if (initialDiff == null) {
-            return;
-        }
-        for (CommitFile file : mCommit.getFiles()) {
-            if (mInitialDiff.fileHash.equals(ApiHelpers.md5(file.getFilename()))) {
-                handleFileClick(file, initialDiff.startLine, initialDiff.endLine, initialDiff.right);
-                break;
-            }
-        }
-    }
-
     protected void handleFileClick(CommitFile file) {
-        handleFileClick(file, -1, -1, false);
-    }
-
-    protected void handleFileClick(CommitFile file, int startLine, int endLine, boolean rightDiff) {
         final Intent intent;
         if (FileUtils.isImage(file.getFilename())) {
             intent = FileViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
                     mObjectSha, file.getFilename());
         } else {
             intent = CommitDiffViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mObjectSha, file.getFilename(), file.getPatch(), mComments,
-                    startLine, endLine, rightDiff);
+                    mObjectSha, file.getFilename(), file.getPatch(), mComments, -1, -1, false);
         }
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);
     }

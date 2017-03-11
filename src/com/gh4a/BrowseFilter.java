@@ -15,22 +15,34 @@ import android.util.Pair;
 
 import com.gh4a.activities.BlogListActivity;
 import com.gh4a.activities.CommitActivity;
+import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.PullRequestActivity;
+import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
+import com.gh4a.loader.CommitCommentListLoader;
+import com.gh4a.loader.CommitLoader;
+import com.gh4a.loader.PullRequestCommentsLoader;
+import com.gh4a.loader.PullRequestFilesLoader;
+import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
+import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
 import org.eclipse.egit.github.core.client.IGitHubConstants;
@@ -128,8 +140,9 @@ public class BrowseFilter extends AppCompatActivity {
                     ApiHelpers.DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
 
                     if (diffId != null) {
-                        intent = PullRequestActivity.makeIntent(this, user, repo,
-                                pullRequestNumber, diffId);
+                        new PullRequestDiffLoadTask(user, repo, diffId, pullRequestNumber)
+                                .execute();
+                        return; // avoid finish() for now
                     } else {
                         String target = parts.size() >= 5 ? parts.get(4) : null;
                         int page = "commits".equals(action) ? PullRequestActivity.PAGE_COMMITS
@@ -142,7 +155,8 @@ public class BrowseFilter extends AppCompatActivity {
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
                 ApiHelpers.DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
                 if (diffId != null) {
-                    intent = CommitActivity.makeIntent(this, user, repo, id, diffId);
+                    new CommitDiffLoadTask(user, repo, diffId, id).execute();
+                    return; // avoid finish() for now
                 } else {
                     intent = CommitActivity.makeIntent(this, user, repo, id,
                             extractCommentId(uri.getFragment(), "commit"));
@@ -198,6 +212,159 @@ public class BrowseFilter extends AppCompatActivity {
             if (activity != null) {
                 activity.finish();
             }
+        }
+    }
+
+    private abstract class DiffLoadTask extends BackgroundTask<CommitFile> {
+        protected final String mRepoOwner;
+        protected final String mRepoName;
+        protected final ApiHelpers.DiffHighlightId mDiffId;
+
+        private boolean mIsImage;
+        private String mSha;
+        private List<CommitComment> mComments;
+
+        public DiffLoadTask(String repoOwner, String repoName, ApiHelpers.DiffHighlightId diffId) {
+            super(BrowseFilter.this);
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mDiffId = diffId;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            new ProgressDialogFragment().show(getSupportFragmentManager(), "progress");
+        }
+
+        @Override
+        protected CommitFile run() throws Exception {
+            List<CommitFile> files = getFiles();
+            CommitFile file = null;
+            for (CommitFile commitFile : files) {
+                if (ApiHelpers.md5(commitFile.getFilename()).equals(mDiffId.fileHash)) {
+                    file = commitFile;
+                    break;
+                }
+            }
+
+            if (file == null || isFinishing()) {
+                return null;
+            }
+
+            mSha = getSha();
+
+            if (isFinishing()) {
+                return null;
+            }
+
+            mIsImage = FileUtils.isImage(file.getFilename());
+            if (!mIsImage) {
+                mComments = getComments();
+            }
+            return file;
+        }
+
+        @Override
+        protected void onSuccess(CommitFile result) {
+            if (isFinishing()) {
+                // dialog was dismissed
+                return;
+            }
+
+            if (result != null && mSha != null) {
+                final Intent intent;
+                if (mIsImage) {
+                    intent = FileViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                            mSha, result.getFilename());
+                } else {
+                    intent = getLaunchIntent(mSha, result, mComments, mDiffId);
+                }
+                startActivity(intent);
+            }
+            finish();
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
+            finish();
+        }
+
+        protected abstract List<CommitFile> getFiles() throws Exception;
+        protected abstract String getSha() throws Exception;
+        protected abstract List<CommitComment> getComments() throws Exception;
+        protected abstract Intent getLaunchIntent(String sha, CommitFile file,
+                List<CommitComment> comments, ApiHelpers.DiffHighlightId diffId);
+    }
+
+    private class PullRequestDiffLoadTask extends DiffLoadTask {
+        private final int mPullRequestNumber;
+
+        public PullRequestDiffLoadTask(String repoOwner, String repoName,
+                ApiHelpers.DiffHighlightId diffId, int pullRequestNumber) {
+            super(repoOwner, repoName, diffId);
+            mPullRequestNumber = pullRequestNumber;
+        }
+
+        @Override
+        protected Intent getLaunchIntent(String sha, CommitFile file,
+                List<CommitComment> comments, ApiHelpers.DiffHighlightId diffId) {
+            return PullRequestDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner,
+                    mRepoName, mPullRequestNumber, sha, file.getFilename(), file.getPatch(),
+                    comments, -1, diffId.startLine, diffId.endLine, diffId.right);
+        }
+
+        @Override
+        protected String getSha() throws Exception {
+            PullRequest pullRequest = PullRequestLoader.loadPullRequest(mRepoOwner, mRepoName,
+                    mPullRequestNumber);
+            return pullRequest.getHead().getSha();
+        }
+
+        @Override
+        protected List<CommitFile> getFiles() throws Exception {
+            return PullRequestFilesLoader.loadFiles(mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+
+        @Override
+        protected List<CommitComment> getComments() throws Exception {
+            return PullRequestCommentsLoader.loadComments(mRepoOwner, mRepoName,
+                    mPullRequestNumber);
+        }
+    }
+
+    private class CommitDiffLoadTask extends DiffLoadTask {
+        private String mSha;
+
+        public CommitDiffLoadTask(String repoOwner, String repoName,
+                ApiHelpers.DiffHighlightId diffId, String sha) {
+            super(repoOwner, repoName, diffId);
+            mSha = sha;
+        }
+
+        @Override
+        protected Intent getLaunchIntent(String sha, CommitFile file, List<CommitComment> comments,
+                ApiHelpers.DiffHighlightId diffId) {
+            return CommitDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                    sha, file.getFilename(), file.getPatch(), comments, diffId.startLine,
+                    diffId.endLine, diffId.right);
+        }
+
+        @Override
+        public String getSha() throws Exception {
+            return mSha;
+        }
+
+        @Override
+        protected List<CommitFile> getFiles() throws Exception {
+            RepositoryCommit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mSha);
+            return commit.getFiles();
+        }
+
+        @Override
+        protected List<CommitComment> getComments() throws Exception {
+            return CommitCommentListLoader.loadComments(mRepoOwner, mRepoName, mSha);
         }
     }
 

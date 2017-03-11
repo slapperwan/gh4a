@@ -1,14 +1,14 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
+import android.content.Context;
+
+import com.gh4a.Gh4Application;
 
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
-import android.content.Context;
-
-import com.gh4a.Gh4Application;
+import java.io.IOException;
 
 public class PullRequestLoader extends BaseLoader<PullRequest> {
 
@@ -25,8 +25,14 @@ public class PullRequestLoader extends BaseLoader<PullRequest> {
 
     @Override
     public PullRequest doLoadInBackground() throws IOException {
+        return loadPullRequest(mRepoOwner, mRepoName, mPullRequestNumber);
+    }
+
+    public static PullRequest loadPullRequest(String repoOwner, String repoName,
+            int pullRequestNumber) throws IOException {
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        return pullRequestService.getPullRequest(new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
+        return pullRequestService.getPullRequest(new RepositoryId(repoOwner, repoName),
+                pullRequestNumber);
     }
 }

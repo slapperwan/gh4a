@@ -34,7 +34,6 @@ import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -57,22 +56,12 @@ public class CommitActivity extends BasePagerActivity implements
                 .putExtra("initial_comment", initialCommentId);
     }
 
-    public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            String sha, ApiHelpers.DiffHighlightId initialDiff) {
-        return new Intent(context, CommitActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("sha", sha)
-                .putExtra("initial_diff", initialDiff);
-    }
-
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
 
     private RepositoryCommit mCommit;
     private List<CommitComment> mComments;
-    private ApiHelpers.DiffHighlightId mInitialDiff;
     private long mInitialCommentId;
 
     private static final int[] TITLES = new int[] {
@@ -143,9 +132,7 @@ public class CommitActivity extends BasePagerActivity implements
         mRepoName = extras.getString("repo");
         mObjectSha = extras.getString("sha");
         mInitialCommentId = extras.getLong("initial_comment", -1);
-        mInitialDiff = extras.getParcelable("initial_diff");
         extras.remove("initial_comment");
-        extras.remove("initial_diff");
     }
 
     @Override
@@ -171,10 +158,8 @@ public class CommitActivity extends BasePagerActivity implements
             mInitialCommentId = -1;
             return f;
         } else {
-            Fragment f = CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
-                    mCommit, mComments, mInitialDiff);
-            mInitialDiff = null;
-            return f;
+            return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
+                    mCommit, mComments);
         }
     }
 
