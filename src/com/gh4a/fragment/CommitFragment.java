@@ -1,10 +1,5 @@
 package com.gh4a.fragment;
 
-import org.eclipse.egit.github.core.Commit;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.RepositoryCommit;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,11 +20,16 @@ import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
+
+import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
+import org.eclipse.egit.github.core.RepositoryCommit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -264,16 +264,20 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             }
         } else {
             CommitFile file = (CommitFile) v.getTag();
-            final Intent intent;
-            if (FileUtils.isImage(file.getFilename())) {
-                intent = FileViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mObjectSha, file.getFilename());
-            } else {
-                intent = CommitDiffViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mObjectSha, file.getFilename(), file.getPatch(), mComments);
-            }
-            startActivityForResult(intent, REQUEST_DIFF_VIEWER);
+            handleFileClick(file);
         }
+    }
+
+    protected void handleFileClick(CommitFile file) {
+        final Intent intent;
+        if (FileUtils.isImage(file.getFilename())) {
+            intent = FileViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                    mObjectSha, file.getFilename());
+        } else {
+            intent = CommitDiffViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                    mObjectSha, file.getFilename(), file.getPatch(), mComments, -1, -1, false);
+        }
+        startActivityForResult(intent, REQUEST_DIFF_VIEWER);
     }
 
     @Override

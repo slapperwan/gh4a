@@ -23,7 +23,7 @@ import java.util.List;
 
 public class PullRequestFilesFragment extends CommitFragment {
     public static PullRequestFilesFragment newInstance(String repoOwner, String repoName,
-                                                       int pullRequestNumber, String headSha) {
+            int pullRequestNumber, String headSha) {
         PullRequestFilesFragment f = new PullRequestFilesFragment();
 
         Bundle args = new Bundle();
@@ -122,17 +122,15 @@ public class PullRequestFilesFragment extends CommitFragment {
     }
 
     @Override
-    public void onClick(View v) {
-        CommitFile file = (CommitFile) v.getTag();
-
+    protected void handleFileClick(CommitFile file) {
         final Intent intent;
         if (FileUtils.isImage(file.getFilename())) {
             intent = FileViewerActivity.makeIntent(getActivity(),
                     mRepoOwner, mRepoName, mHeadSha, file.getFilename());
         } else {
             intent = PullRequestDiffViewerActivity.makeIntent(getActivity(),
-                    mRepoOwner, mRepoName, mPullRequestNumber, mHeadSha,
-                    file.getFilename(), file.getPatch(), mComments, -1);
+                    mRepoOwner, mRepoName, mPullRequestNumber, mHeadSha, file.getFilename(),
+                    file.getPatch(), mComments, -1, -1, -1, false);
         }
 
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);

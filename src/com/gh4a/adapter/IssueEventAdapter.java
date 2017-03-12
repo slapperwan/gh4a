@@ -149,7 +149,8 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
                             return PullRequestDiffViewerActivity.makeIntent(mContext,
                                     mRepoOwner, mRepoName, mIssueId,
                                     commitComment.getCommitId(), commitComment.getPath(),
-                                    file.getPatch(), null, commitComment.getPosition());
+                                    file.getPatch(), null, commitComment.getPosition(),
+                                    -1, -1, false);
                         }
                     }, pos, pos + fileName.length(), 0);
                 }

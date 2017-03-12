@@ -27,10 +27,15 @@ public class PullRequestCommentsLoader extends BaseLoader<List<CommitComment>> {
 
     @Override
     public List<CommitComment> doLoadInBackground() throws IOException {
+        return loadComments(mRepoOwner, mRepoName, mPullRequestNumber);
+    }
+
+    public static List<CommitComment> loadComments(String repoOwner, String repoName,
+            int pullRequestNumber) throws IOException {
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
         List<CommitComment> comments = pullRequestService.getComments(
-                new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
+                new RepositoryId(repoOwner, repoName), pullRequestNumber);
         List<CommitComment> result = new ArrayList<>();
         for (CommitComment comment : comments) {
             if (comment.getPosition() >= 0) {

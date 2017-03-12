@@ -60,26 +60,38 @@ import org.eclipse.egit.github.core.CommitComment;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class DiffViewerActivity extends WebViewerActivity implements
         View.OnTouchListener {
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
-            String commitSha, String path, String diff,
-            List<CommitComment> comments, int initialLine) {
+            String commitSha, String path, String diff, List<CommitComment> comments,
+            int initialLine, int highlightStartLine, int highlightEndLine,
+            boolean highlightisRight) {
         return baseIntent.putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("sha", commitSha)
                 .putExtra("path", path)
                 .putExtra("diff", diff)
                 .putExtra("comments", comments != null ? new ArrayList<>(comments) : null)
-                .putExtra("initial_line", initialLine);
+                .putExtra("initial_line", initialLine)
+                .putExtra("highlight_start", highlightStartLine)
+                .putExtra("highlight_end", highlightEndLine)
+                .putExtra("highlight_right", highlightisRight);
     }
+
+    private static final Pattern HUNK_START_PATTERN =
+            Pattern.compile("@@ -(\\d+),\\d+ \\+(\\d+),\\d+.*");
 
     protected String mRepoOwner;
     protected String mRepoName;
     protected String mPath;
     protected String mSha;
     private int mInitialLine;
+    private int mHighlightStartLine;
+    private int mHighlightEndLine;
+    private boolean mHighlightIsRight;
 
     private String mDiff;
     private String[] mDiffLines;
@@ -136,6 +148,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         mSha = extras.getString("sha");
         mDiff = extras.getString("diff");
         mInitialLine = extras.getInt("initial_line", -1);
+        mHighlightStartLine = extras.getInt("highlight_start", -1);
+        mHighlightEndLine = extras.getInt("highlight_end", -1);
+        mHighlightIsRight = extras.getBoolean("highlight_right", false);
     }
 
     @Override
@@ -165,6 +180,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         return super.onCreateOptionsMenu(menu);
     }
 
+
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         StringBuilder content = new StringBuilder();
@@ -179,10 +195,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         writeCssInclude(content, "text", cssTheme);
         writeScriptInclude(content, "codeutils");
         content.append("</head><body");
-        if (mInitialLine > 0) {
-            content.append(" onload='scrollToElement(\"line");
-            content.append(mInitialLine).append("\")' onresize='scrollToHighlight();'");
-        }
+
+        int highlightInsertPos = content.length();
         content.append(">");
         if (title != null) {
             content.append("<h2>").append(title).append("</h2>");
@@ -192,15 +206,36 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         String encoded = TextUtils.htmlEncode(mDiff);
         mDiffLines = encoded.split("\n");
 
+        int highlightStartLine = -1, highlightEndLine = -1;
+        int leftDiffPosition = -1, rightDiffPosition = -1;
+
         for (int i = 0; i < mDiffLines.length; i++) {
             String line = mDiffLines[i];
             String cssClass = null;
             if (line.startsWith("@@")) {
+                Matcher matcher = HUNK_START_PATTERN.matcher(line);
+                if (matcher.matches()) {
+                    leftDiffPosition = Integer.parseInt(matcher.group(1)) - 1;
+                    rightDiffPosition = Integer.parseInt(matcher.group(2)) - 1;
+                }
                 cssClass = "change";
             } else if (line.startsWith("+")) {
+                ++rightDiffPosition;
                 cssClass = "add";
             } else if (line.startsWith("-")) {
+                ++leftDiffPosition;
                 cssClass = "remove";
+            } else {
+                ++leftDiffPosition;
+                ++rightDiffPosition;
+            }
+
+            int pos = mHighlightIsRight ? rightDiffPosition : leftDiffPosition;
+            if (pos != -1 && pos == mHighlightStartLine) {
+                highlightStartLine = i;
+            }
+            if (pos != -1 && pos == mHighlightEndLine) {
+                highlightEndLine = i;
             }
 
             content.append("<div id=\"line").append(i).append("\"");
@@ -231,6 +266,16 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 }
             }
         }
+
+        if (mInitialLine > 0) {
+            content.insert(highlightInsertPos, " onload='scrollToElement(\"line"
+                    + mInitialLine + "\")' onresize='scrollToHighlight();'");
+        } else if (highlightStartLine != -1 && highlightEndLine != -1) {
+            content.insert(highlightInsertPos, " onload='highlightDiffLines("
+                    + highlightStartLine + "," + highlightEndLine
+                    + ")' onresize='scrollToHighlight();'");
+        }
+
         content.append("</pre></body></html>");
         return content.toString();
     }
