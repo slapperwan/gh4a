@@ -140,7 +140,7 @@ public class BrowseFilter extends AppCompatActivity {
                 }
 
                 if (pullRequestNumber > 0) {
-                    ApiHelpers.DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
+                    DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
 
                     if (diffId != null) {
                         new PullRequestDiffLoadTask(user, repo, diffId, pullRequestNumber)
@@ -156,7 +156,7 @@ public class BrowseFilter extends AppCompatActivity {
                     }
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
-                ApiHelpers.DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
+                DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
                 if (diffId != null) {
                     new CommitDiffLoadTask(user, repo, diffId, id).execute();
                     return; // avoid finish() for now
@@ -190,13 +190,44 @@ public class BrowseFilter extends AppCompatActivity {
         return -1;
     }
 
-    private ApiHelpers.DiffHighlightId extractCommitDiffId(String fragment) {
+    private DiffHighlightId extractCommitDiffId(String fragment) {
         String prefix = "diff-";
         if (fragment == null || !fragment.startsWith(prefix)) {
             return null;
         }
 
-        return ApiHelpers.DiffHighlightId.fromUriFragment(fragment.substring(prefix.length()));
+        boolean right = false;
+        int typePos = fragment.indexOf('L', prefix.length());
+        if (typePos < 0) {
+            right = true;
+            typePos = fragment.indexOf('R', prefix.length());
+        }
+
+        String fileHash = typePos > 0
+                ? fragment.substring(prefix.length(), typePos)
+                : fragment.substring(prefix.length());
+        if (fileHash.length() != 32) { // MD5 hash length
+            return null;
+        }
+        if (typePos < 0) {
+            return new DiffHighlightId(fileHash, -1, -1, false);
+        }
+
+        try {
+            char type = fragment.charAt(typePos);
+            String linePart = fragment.substring(typePos + 1);
+            int startLine, endLine, dashPos = linePart.indexOf("-" + type);
+            if (dashPos > 0) {
+                startLine = Integer.valueOf(linePart.substring(0, dashPos));
+                endLine = Integer.valueOf(linePart.substring(dashPos + 2));
+            } else {
+                startLine = Integer.valueOf(linePart);
+                endLine = startLine;
+            }
+            return new DiffHighlightId(fileHash, startLine, endLine, right);
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     public static class ProgressDialogFragment extends DialogFragment {
@@ -215,6 +246,21 @@ public class BrowseFilter extends AppCompatActivity {
             if (activity != null) {
                 activity.finish();
             }
+        }
+    }
+
+
+    public static class DiffHighlightId {
+        public final String fileHash;
+        public final int startLine;
+        public final int endLine;
+        public final boolean right;
+
+        public DiffHighlightId(String fileHash, int startLine, int endLine, boolean right) {
+            this.fileHash = fileHash;
+            this.startLine = startLine;
+            this.endLine = endLine;
+            this.right = right;
         }
     }
 
@@ -282,9 +328,9 @@ public class BrowseFilter extends AppCompatActivity {
     private abstract class DiffLoadTask extends UrlLoadTask {
         protected final String mRepoOwner;
         protected final String mRepoName;
-        protected final ApiHelpers.DiffHighlightId mDiffId;
+        protected final DiffHighlightId mDiffId;
 
-        public DiffLoadTask(String repoOwner, String repoName, ApiHelpers.DiffHighlightId diffId) {
+        public DiffLoadTask(String repoOwner, String repoName, DiffHighlightId diffId) {
             super();
             mRepoOwner = repoOwner;
             mRepoName = repoName;
@@ -323,21 +369,21 @@ public class BrowseFilter extends AppCompatActivity {
         protected abstract String getSha() throws Exception;
         protected abstract List<CommitComment> getComments() throws Exception;
         protected abstract Intent getLaunchIntent(String sha, CommitFile file,
-                List<CommitComment> comments, ApiHelpers.DiffHighlightId diffId);
+                List<CommitComment> comments, DiffHighlightId diffId);
     }
 
     private class PullRequestDiffLoadTask extends DiffLoadTask {
         private final int mPullRequestNumber;
 
         public PullRequestDiffLoadTask(String repoOwner, String repoName,
-                ApiHelpers.DiffHighlightId diffId, int pullRequestNumber) {
+                DiffHighlightId diffId, int pullRequestNumber) {
             super(repoOwner, repoName, diffId);
             mPullRequestNumber = pullRequestNumber;
         }
 
         @Override
         protected Intent getLaunchIntent(String sha, CommitFile file,
-                List<CommitComment> comments, ApiHelpers.DiffHighlightId diffId) {
+                List<CommitComment> comments, DiffHighlightId diffId) {
             return PullRequestDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner,
                     mRepoName, mPullRequestNumber, sha, file.getFilename(), file.getPatch(),
                     comments, -1, diffId.startLine, diffId.endLine, diffId.right);
@@ -366,14 +412,14 @@ public class BrowseFilter extends AppCompatActivity {
         private String mSha;
 
         public CommitDiffLoadTask(String repoOwner, String repoName,
-                ApiHelpers.DiffHighlightId diffId, String sha) {
+                DiffHighlightId diffId, String sha) {
             super(repoOwner, repoName, diffId);
             mSha = sha;
         }
 
         @Override
-        protected Intent getLaunchIntent(String sha, CommitFile file, List<CommitComment> comments,
-                ApiHelpers.DiffHighlightId diffId) {
+        protected Intent getLaunchIntent(String sha, CommitFile file,
+                List<CommitComment> comments, DiffHighlightId diffId) {
             return CommitDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
                     sha, file.getFilename(), file.getPatch(), comments, diffId.startLine,
                     diffId.endLine, diffId.right);
