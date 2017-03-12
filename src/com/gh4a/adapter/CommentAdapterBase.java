@@ -105,6 +105,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         Date updatedAt = getUpdatedAt(item);
 
         AvatarHandler.assignAvatar(holder.ivGravatar, user);
+        holder.ivGravatar.setTag(user);
 
         holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext, createdAt, true));
         if (createdAt.equals(updatedAt)) {
