@@ -15,18 +15,22 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TrendLoader extends BaseLoader<List<Trend>> {
-    private final String mUrl;
+    private static final String URL_TEMPLATE =
+            "http://octodroid.s3.amazonaws.com/trends/trending_%s-all.json";
 
-    public TrendLoader(Context context, String url) {
+    private final String mType;
+
+    public TrendLoader(Context context, String type) {
         super(context);
-        mUrl = url;
+        mType = type;
     }
 
     @Override
     public List<Trend> doLoadInBackground() throws Exception {
-        URL url = new URL(mUrl);
+        URL url = new URL(String.format(Locale.US, URL_TEMPLATE, mType));
         List<Trend> trends = new ArrayList<>();
 
         HttpURLConnection connection = null;
@@ -34,9 +38,8 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
 
         try {
             connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
+            connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
 
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 return trends;

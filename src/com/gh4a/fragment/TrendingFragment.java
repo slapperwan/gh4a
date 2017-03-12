@@ -28,17 +28,13 @@ import com.gh4a.loader.TrendLoader;
 import com.gh4a.utils.IntentUtils;
 
 import java.util.List;
-import java.util.Locale;
 
 public class TrendingFragment extends ListDataBaseFragment<Trend> {
-    private static final String URL_TEMPLATE =
-            "http://gh4a.bplaced.net/trending_%s-all.json";
-
     public static final String TYPE_DAILY = "daily";
     public static final String TYPE_WEEKLY = "weekly";
     public static final String TYPE_MONTHLY = "monthly";
 
-    private String mUrl;
+    private String mType;
 
     public static TrendingFragment newInstance(String type) {
         if (type == null) {
@@ -47,7 +43,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
 
         TrendingFragment f = new TrendingFragment();
         Bundle args = new Bundle();
-        args.putString("url", String.format(Locale.US, URL_TEMPLATE, type));
+        args.putString("type", type);
         f.setArguments(args);
 
         return f;
@@ -56,7 +52,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUrl = getArguments().getString("url");
+        mType = getArguments().getString("type");
     }
 
     @Override
@@ -80,6 +76,6 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
 
     @Override
     public Loader<LoaderResult<List<Trend>>> onCreateLoader() {
-        return new TrendLoader(getActivity(), mUrl);
+        return new TrendLoader(getActivity(), mType);
     }
 }
