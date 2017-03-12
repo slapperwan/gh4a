@@ -218,16 +218,9 @@ public class BrowseFilter extends AppCompatActivity {
         }
     }
 
-    private class ReleaseLoadTask extends BackgroundTask<Release> {
-        private final String mRepoOwner;
-        private final String mRepoName;
-        private final String mTagName;
-
-        public ReleaseLoadTask(String repoOwner, String repoName, String tagName) {
+    private abstract class UrlLoadTask extends BackgroundTask<Intent> {
+        public UrlLoadTask() {
             super(BrowseFilter.this);
-            mRepoOwner = repoOwner;
-            mRepoName = repoName;
-            mTagName = tagName;
         }
 
         @Override
@@ -237,28 +230,16 @@ public class BrowseFilter extends AppCompatActivity {
         }
 
         @Override
-        protected Release run() throws Exception {
-            List<Release> releases = ReleaseListLoader.loadReleases(mRepoOwner, mRepoName);
-
-            if (releases != null) {
-                for (Release release : releases) {
-                    if (TextUtils.equals(release.getTagName(), mTagName)) {
-                        return release;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Release result) {
-            if (isFinishing() || result == null) {
+        protected void onSuccess(Intent result) {
+            if (isFinishing()) {
                 return;
             }
 
-            startActivity(ReleaseInfoActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
-                    result));
+            if (result != null) {
+                startActivity(result);
+            } else {
+                IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
+            }
             finish();
         }
 
@@ -269,30 +250,49 @@ public class BrowseFilter extends AppCompatActivity {
         }
     }
 
-    private abstract class DiffLoadTask extends BackgroundTask<CommitFile> {
+    private class ReleaseLoadTask extends UrlLoadTask {
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final String mTagName;
+
+        public ReleaseLoadTask(String repoOwner, String repoName, String tagName) {
+            super();
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mTagName = tagName;
+        }
+
+        @Override
+        protected Intent run() throws Exception {
+            List<Release> releases = ReleaseListLoader.loadReleases(mRepoOwner, mRepoName);
+
+            if (releases != null) {
+                for (Release release : releases) {
+                    if (TextUtils.equals(release.getTagName(), mTagName)) {
+                        return ReleaseInfoActivity.makeIntent(BrowseFilter.this,
+                                mRepoOwner, mRepoName, release);
+                    }
+                }
+            }
+
+            return null;
+        }
+    }
+
+    private abstract class DiffLoadTask extends UrlLoadTask {
         protected final String mRepoOwner;
         protected final String mRepoName;
         protected final ApiHelpers.DiffHighlightId mDiffId;
 
-        private boolean mIsImage;
-        private String mSha;
-        private List<CommitComment> mComments;
-
         public DiffLoadTask(String repoOwner, String repoName, ApiHelpers.DiffHighlightId diffId) {
-            super(BrowseFilter.this);
+            super();
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mDiffId = diffId;
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            new ProgressDialogFragment().show(getSupportFragmentManager(), "progress");
-        }
-
-        @Override
-        protected CommitFile run() throws Exception {
+        protected Intent run() throws Exception {
             List<CommitFile> files = getFiles();
             CommitFile file = null;
             for (CommitFile commitFile : files) {
@@ -306,43 +306,17 @@ public class BrowseFilter extends AppCompatActivity {
                 return null;
             }
 
-            mSha = getSha();
-
-            if (isFinishing()) {
+            String sha = getSha();
+            if (sha == null || isFinishing()) {
                 return null;
             }
 
-            mIsImage = FileUtils.isImage(file.getFilename());
-            if (!mIsImage) {
-                mComments = getComments();
-            }
-            return file;
-        }
-
-        @Override
-        protected void onSuccess(CommitFile result) {
-            if (isFinishing()) {
-                // dialog was dismissed
-                return;
+            if (FileUtils.isImage(file.getFilename())) {
+                return FileViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                        sha, file.getFilename());
             }
 
-            if (result != null && mSha != null) {
-                final Intent intent;
-                if (mIsImage) {
-                    intent = FileViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
-                            mSha, result.getFilename());
-                } else {
-                    intent = getLaunchIntent(mSha, result, mComments, mDiffId);
-                }
-                startActivity(intent);
-            }
-            finish();
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
-            finish();
+            return getLaunchIntent(sha, file, getComments(), mDiffId);
         }
 
         protected abstract List<CommitFile> getFiles() throws Exception;
@@ -422,7 +396,7 @@ public class BrowseFilter extends AppCompatActivity {
         }
     }
 
-    private class RefPathDisambiguationTask extends BackgroundTask<Pair<String, String>> {
+    private class RefPathDisambiguationTask extends UrlLoadTask {
         private final String mRepoOwner;
         private final String mRepoName;
         private final String mRefAndPath;
@@ -432,7 +406,7 @@ public class BrowseFilter extends AppCompatActivity {
 
         public RefPathDisambiguationTask(String repoOwner, String repoName,
                 String refAndPath, int initialPage) {
-            super(BrowseFilter.this);
+            super();
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mRefAndPath = refAndPath;
@@ -443,7 +417,7 @@ public class BrowseFilter extends AppCompatActivity {
 
         public RefPathDisambiguationTask(String repoOwner, String repoName,
                 String refAndPath, String fragment) {
-            super(BrowseFilter.this);
+            super();
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mRefAndPath = refAndPath;
@@ -453,14 +427,43 @@ public class BrowseFilter extends AppCompatActivity {
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            new ProgressDialogFragment().show(getSupportFragmentManager(), "progress");
+        protected Intent run() throws Exception {
+            Pair<String, String> refAndPath = resolve();
+            if (refAndPath == null) {
+                return null;
+            }
+
+            if (mGoToFileViewer && refAndPath.second != null) {
+                // parse line numbers from fragment
+                int highlightStart = -1, highlightEnd = -1;
+                // Line numbers are encoded either in the form #L12 or #L12-14
+                if (mFragment != null && mFragment.startsWith("L")) {
+                    try {
+                        int dashPos = mFragment.indexOf("-L");
+                        if (dashPos > 0) {
+                            highlightStart = Integer.valueOf(mFragment.substring(1, dashPos));
+                            highlightEnd = Integer.valueOf(mFragment.substring(dashPos + 2));
+                        } else {
+                            highlightStart = Integer.valueOf(mFragment.substring(1));
+                        }
+                    } catch (NumberFormatException e) {
+                        // ignore
+                    }
+                }
+
+                return FileViewerActivity.makeIntentWithHighlight(BrowseFilter.this,
+                        mRepoOwner, mRepoName, refAndPath.first, refAndPath.second,
+                        highlightStart, highlightEnd);
+            } else if (!mGoToFileViewer) {
+                return RepositoryActivity.makeIntent(BrowseFilter.this,
+                        mRepoOwner, mRepoName, refAndPath.first, refAndPath.second, mInitialPage);
+            }
+
+            return null;
         }
 
-        @Override
         // returns ref, path
-        protected Pair<String, String> run() throws Exception {
+        private Pair<String, String> resolve() throws Exception {
             RepositoryService repoService = (RepositoryService)
                     Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
             RepositoryId repo = new RepositoryId(mRepoOwner, mRepoName);
@@ -510,54 +513,6 @@ public class BrowseFilter extends AppCompatActivity {
             }
 
             return null;
-        }
-
-        @Override
-        protected void onSuccess(Pair<String, String> result) {
-            if (isFinishing()) {
-                // dialog was dismissed
-                return;
-            }
-            Intent intent = null;
-            if (result != null) {
-                if (mGoToFileViewer && result.second != null) {
-                    // parse line numbers from fragment
-                    int highlightStart = -1, highlightEnd = -1;
-                    // Line numbers are encoded either in the form #L12 or #L12-14
-                    if (mFragment != null && mFragment.startsWith("L")) {
-                        try {
-                            int dashPos = mFragment.indexOf("-L");
-                            if (dashPos > 0) {
-                                highlightStart = Integer.valueOf(mFragment.substring(1, dashPos));
-                                highlightEnd = Integer.valueOf(mFragment.substring(dashPos + 2));
-                            } else {
-                                highlightStart = Integer.valueOf(mFragment.substring(1));
-                            }
-                        } catch (NumberFormatException e) {
-                            // ignore
-                        }
-                    }
-
-                    intent = FileViewerActivity.makeIntentWithHighlight(BrowseFilter.this,
-                            mRepoOwner, mRepoName, result.first, result.second,
-                            highlightStart, highlightEnd);
-                } else if (!mGoToFileViewer) {
-                    intent = RepositoryActivity.makeIntent(BrowseFilter.this,
-                            mRepoOwner, mRepoName, result.first, result.second, mInitialPage);
-                }
-            }
-            if (intent != null) {
-                startActivity(intent);
-            } else {
-                IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
-            }
-            finish();
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
-            finish();
         }
     }
 }
