@@ -44,14 +44,25 @@ import java.util.List;
 public class CommitActivity extends BasePagerActivity implements
         CommitFragment.CommentUpdateListener, CommitNoteFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
-        return makeIntent(context, repoOwner, repoName, sha, -1);
+        return makeIntent(context, repoOwner, repoName, -1, sha, -1);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            int pullRequestNumber, String sha) {
+        return makeIntent(context, repoOwner, repoName, pullRequestNumber, sha, -1);
     }
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             String sha, long initialCommentId) {
+        return makeIntent(context, repoOwner, repoName, -1, sha, initialCommentId);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            int pullRequestNumber, String sha, long initialCommentId) {
         return new Intent(context, CommitActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
+                .putExtra("pr", pullRequestNumber)
                 .putExtra("sha", sha)
                 .putExtra("initial_comment", initialCommentId);
     }
@@ -59,6 +70,7 @@ public class CommitActivity extends BasePagerActivity implements
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
+    private int mPullRequestNumber;
 
     private RepositoryCommit mCommit;
     private List<CommitComment> mComments;
@@ -131,6 +143,7 @@ public class CommitActivity extends BasePagerActivity implements
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
         mObjectSha = extras.getString("sha");
+        mPullRequestNumber = extras.getInt("pr", -1);
         mInitialCommentId = extras.getLong("initial_comment", -1);
         extras.remove("initial_comment");
     }
@@ -173,6 +186,9 @@ public class CommitActivity extends BasePagerActivity implements
 
     @Override
     protected Intent navigateUp() {
+        if (mPullRequestNumber > 0) {
+            return PullRequestActivity.makeIntent(this, mRepoOwner, mRepoName, mPullRequestNumber);
+        }
         return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 

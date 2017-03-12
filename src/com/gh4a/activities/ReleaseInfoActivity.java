@@ -166,7 +166,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
+        return ReleaseListActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     private void handleReleaseReady() {

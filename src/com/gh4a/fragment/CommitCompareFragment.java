@@ -36,11 +36,17 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
         RootAdapter.OnItemClickListener<RepositoryCommit> {
     public static CommitCompareFragment newInstance(String repoOwner, String repoName,
             String baseRef, String headRef) {
+        return newInstance(repoOwner, repoName, -1, baseRef, headRef);
+    }
+
+    public static CommitCompareFragment newInstance(String repoOwner, String repoName,
+            int pullRequestNumber, String baseRef, String headRef) {
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putString("base", baseRef);
         args.putString("head", headRef);
+        args.putInt("pr", pullRequestNumber);
 
         CommitCompareFragment f = new CommitCompareFragment();
         f.setArguments(args);
@@ -53,6 +59,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     private String mRepoName;
     private String mBase;
     private String mHead;
+    private int mPullRequestNumber;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,6 +70,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
         mRepoName = args.getString("repo");
         mBase = args.getString("base");
         mHead = args.getString("head");
+        mPullRequestNumber = args.getInt("pr", -1);
     }
 
     @Override
@@ -80,7 +88,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     @Override
     public void onItemClick(RepositoryCommit commit) {
         Intent intent = CommitActivity.makeIntent(getActivity(),
-                mRepoOwner, mRepoName, commit.getSha());
+                mRepoOwner, mRepoName, mPullRequestNumber, commit.getSha());
         startActivityForResult(intent, REQUEST_COMMIT);
     }
 
