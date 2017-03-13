@@ -301,7 +301,7 @@
     <string name="commit_compare">Compare View</string>
     <string name="commit_comment_hint">Comment on this commit</string>
     <string name="commit_details">Committed by [b]%1$s[/b] %2$s</string>
-    <string name="commit_comment_dialog_title">Comment on line %1$d</string>
+    <string name="commit_comment_dialog_title">Comment on line -%1$d +%2$d</string>
     <string name="error_edit_commit_comment">Saving comment on line %1$d failed.</string>
     <string name="error_delete_commit_comment">Deletion of commit comment failed.</string>
     <string name="error_edit_comment">Saving comment failed.</string>

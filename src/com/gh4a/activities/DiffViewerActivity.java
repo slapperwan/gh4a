@@ -27,7 +27,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.ListPopupWindow;
-import android.text.Html;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -60,6 +59,7 @@ import org.eclipse.egit.github.core.CommitComment;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -83,6 +83,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     private static final Pattern HUNK_START_PATTERN =
             Pattern.compile("@@ -(\\d+),\\d+ \\+(\\d+),\\d+.*");
+    private static final String COMMENT_URI_FORMAT = "comment://%s?position=%d&l=%d&r=%d";
 
     protected String mRepoOwner;
     protected String mRepoName;
@@ -203,8 +204,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
         content.append("<pre>");
 
-        String encoded = TextUtils.htmlEncode(mDiff);
-        mDiffLines = encoded.split("\n");
+        mDiffLines = mDiff.split("\n");
 
         int highlightStartLine = -1, highlightEndLine = -1;
         int leftDiffPosition = -1, rightDiffPosition = -1;
@@ -243,10 +243,12 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 content.append("class=\"").append(cssClass).append("\"");
             }
             if (authorized) {
-                content.append(" onclick=\"javascript:location.href='comment://add");
-                content.append("?position=").append(i).append("'\"");
+                String uri = String.format(Locale.US, COMMENT_URI_FORMAT,
+                        "add", i, leftDiffPosition, rightDiffPosition);
+                content.append(" onclick=\"javascript:location.href='");
+                content.append(uri).append("'\"");
             }
-            content.append(">").append(line).append("</div>");
+            content.append(">").append(TextUtils.htmlEncode(line)).append("</div>");
 
             List<CommitComment> comments = mCommitCommentsByPos.get(i);
             if (comments != null) {
@@ -254,9 +256,10 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     mCommitComments.put(comment.getId(), comment);
                     content.append("<div class=\"comment\"");
                     if (authorized) {
-                        content.append(" onclick=\"javascript:location.href='comment://edit");
-                        content.append("?position=").append(i);
-                        content.append("&id=").append(comment.getId()).append("'\"");
+                        String uri = String.format(Locale.US, COMMENT_URI_FORMAT,
+                                "edit", i, leftDiffPosition, rightDiffPosition);
+                        content.append(" onclick=\"javascript:location.href='");
+                        content.append(uri).append("'\"");
                     }
                     content.append("><div class=\"change\">");
                     content.append(getString(R.string.commit_comment_header,
@@ -325,7 +328,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
     }
 
-    private void openCommentDialog(final long id, String line, final int position) {
+    private void openCommentDialog(final long id, String line, final int position,
+            final int leftLine, final int rightLine) {
         final boolean isEdit = id != 0L;
         LayoutInflater inflater = LayoutInflater.from(this);
         View commentDialog = inflater.inflate(R.layout.commit_comment_dialog, null);
@@ -350,7 +354,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         AlertDialog d = new AlertDialog.Builder(this)
                 .setCancelable(true)
-                .setTitle(getString(R.string.commit_comment_dialog_title, position))
+                .setTitle(getString(R.string.commit_comment_dialog_title, leftLine, rightLine))
                 .setView(commentDialog)
                 .setPositiveButton(saveButtonResId, saveCb)
                 .setNegativeButton(R.string.cancel, null)
@@ -368,14 +372,16 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
 
         int line = Integer.parseInt(uri.getQueryParameter("position"));
-        String lineText = Html.fromHtml(mDiffLines[line]).toString();
+        int leftLine = Integer.parseInt(uri.getQueryParameter("l"));
+        int rightLine = Integer.parseInt(uri.getQueryParameter("r"));
+        String lineText = mDiffLines[line];
         String idParam = uri.getQueryParameter("id");
         long id = idParam != null ? Long.parseLong(idParam) : 0L;
 
         if (idParam == null) {
-            openCommentDialog(id, lineText, line);
+            openCommentDialog(id, lineText, line, leftLine, rightLine);
         } else {
-            CommentActionPopup p = new CommentActionPopup(id, line, lineText,
+            CommentActionPopup p = new CommentActionPopup(id, line, lineText, leftLine, rightLine,
                     mLastTouchDown.x, mLastTouchDown.y);
             p.show();
         }
@@ -404,13 +410,18 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             AdapterView.OnItemClickListener {
         private final long mId;
         private final int mPosition;
+        private final int mLeftLine;
+        private final int mRightLine;
         private final String mLineText;
 
-        public CommentActionPopup(long id, int position, String lineText, int x, int y) {
+        public CommentActionPopup(long id, int position, String lineText,
+                int leftLine, int rightLine, int x, int y) {
             super(DiffViewerActivity.this, null, R.attr.listPopupWindowStyle);
 
             mId = id;
             mPosition = position;
+            mLeftLine = leftLine;
+            mRightLine = rightLine;
             mLineText = lineText;
 
             ArrayAdapter<String> adapter = new ArrayAdapter<>(DiffViewerActivity.this,
@@ -440,7 +451,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                         .setNegativeButton(R.string.cancel, null)
                         .show();
             } else {
-                openCommentDialog(position == 0 ? 0 : mId, mLineText, mPosition);
+                openCommentDialog(position == 0 ? 0 : mId, mLineText,
+                        mPosition, mLeftLine, mRightLine);
             }
             dismiss();
         }
