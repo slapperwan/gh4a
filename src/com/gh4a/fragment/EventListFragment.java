@@ -25,7 +25,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
@@ -45,6 +44,7 @@ import com.gh4a.adapter.EventAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.ContextMenuAwareRecyclerView;
 
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.CommitComment;
@@ -111,6 +111,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     @Override
     protected RootAdapter<Event, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new EventAdapter(getActivity());
+        mAdapter.setContextMenuSupported(true);
         return mAdapter;
     }
 
@@ -288,8 +289,9 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        Event event = mAdapter.getItem(info.position);
+        ContextMenuAwareRecyclerView.RecyclerContextMenuInfo info =
+                (ContextMenuAwareRecyclerView.RecyclerContextMenuInfo) menuInfo;
+        Event event = mAdapter.getItemFromAdapterPosition(info.position);
 
         if (EventAdapter.hasInvalidPayload(event)) {
             return;
@@ -395,8 +397,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info =
-                (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        ContextMenuAwareRecyclerView.RecyclerContextMenuInfo info =
+                (ContextMenuAwareRecyclerView.RecyclerContextMenuInfo) item.getMenuInfo();
         if (info.position >= mAdapter.getItemCount()) {
             return false;
         }
