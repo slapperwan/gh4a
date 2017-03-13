@@ -35,10 +35,12 @@ import com.gh4a.utils.UiUtils;
 
 public class IssueMilestoneListActivity extends BasePagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
-    public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            boolean fromPullRequest) {
         return new Intent(context, IssueMilestoneListActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
+                .putExtra("repo", repoName)
+                .putExtra("from_pr", fromPullRequest);
     }
 
     private static final int[] TITLES = new int[] {
@@ -47,6 +49,7 @@ public class IssueMilestoneListActivity extends BasePagerActivity implements
 
     private String mRepoOwner;
     private String mRepoName;
+    private boolean mParentIsPullRequest;
 
     private FloatingActionButton mCreateFab;
     private IssueMilestoneListFragment mOpenFragment;
@@ -75,7 +78,8 @@ public class IssueMilestoneListActivity extends BasePagerActivity implements
 
     @Override
     protected Fragment makeFragment(int position) {
-        return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName, position == 1);
+        return IssueMilestoneListFragment.newInstance(mRepoOwner, mRepoName,
+                position == 1, mParentIsPullRequest);
     }
 
     @Override
@@ -97,6 +101,7 @@ public class IssueMilestoneListActivity extends BasePagerActivity implements
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
+        mParentIsPullRequest = extras.getBoolean("from_pr", false);
     }
 
     @Override
@@ -133,12 +138,13 @@ public class IssueMilestoneListActivity extends BasePagerActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName, mParentIsPullRequest);
     }
 
     @Override
     public void onClick(View view) {
-        startActivity(IssueMilestoneEditActivity.makeCreateIntent(this, mRepoOwner, mRepoName));
+        startActivity(IssueMilestoneEditActivity.makeCreateIntent(this,
+                mRepoOwner, mRepoName, mParentIsPullRequest));
     }
 
     @Override

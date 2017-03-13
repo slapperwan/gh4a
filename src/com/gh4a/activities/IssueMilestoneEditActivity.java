@@ -56,19 +56,22 @@ import java.util.Date;
 
 public class IssueMilestoneEditActivity extends BaseActivity implements View.OnClickListener {
     public static Intent makeEditIntent(Context context, String repoOwner, String repoName,
-            Milestone milestone) {
-        return makeCreateIntent(context, repoOwner, repoName)
+            Milestone milestone, boolean fromPullRequest) {
+        return makeCreateIntent(context, repoOwner, repoName, fromPullRequest)
                 .putExtra("milestone", milestone);
     }
 
-    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
+    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName,
+            boolean fromPullRequest) {
         return new Intent(context, IssueMilestoneEditActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
+                .putExtra("repo", repoName)
+                .putExtra("from_pr", fromPullRequest);
     }
 
     private String mRepoOwner;
     private String mRepoName;
+    private boolean mFromPullRequest;
 
     private Milestone mMilestone;
 
@@ -142,6 +145,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
+        mFromPullRequest = extras.getBoolean("from_pr", false);
         mMilestone = (Milestone) extras.getSerializable("milestone");
     }
 
@@ -150,8 +154,9 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
     }
 
     private void openIssueMilestones() {
-        Intent intent = IssueMilestoneListActivity.makeIntent(this, mRepoOwner, mRepoName)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Intent intent = IssueMilestoneListActivity.makeIntent(this,
+                mRepoOwner, mRepoName, mFromPullRequest);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
@@ -179,7 +184,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
     @Override
     protected Intent navigateUp() {
-        return IssueMilestoneListActivity.makeIntent(this, mRepoOwner, mRepoName);
+        return IssueMilestoneListActivity.makeIntent(this, mRepoOwner, mRepoName, mFromPullRequest);
     }
 
     @Override

@@ -36,15 +36,17 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     private String mRepoOwner;
     private String mRepoName;
     private boolean mShowClosed;
+    private boolean mFromPullRequest;
 
     public static IssueMilestoneListFragment newInstance(String repoOwner, String repoName,
-            boolean showClosed) {
+            boolean showClosed, boolean fromPullRequest) {
         IssueMilestoneListFragment f = new IssueMilestoneListFragment();
 
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putBoolean("closed", showClosed);
+        args.putBoolean("from_pr", fromPullRequest);
         f.setArguments(args);
 
         return f;
@@ -57,6 +59,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         mRepoOwner = args.getString("owner");
         mRepoName = args.getString("repo");
         mShowClosed = args.getBoolean("closed");
+        mFromPullRequest = args.getBoolean("from_pr", false);
     }
 
     @Override
@@ -76,7 +79,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     @Override
     public void onItemClick(Milestone milestone) {
         startActivity(IssueMilestoneEditActivity.makeEditIntent(
-                getActivity(), mRepoOwner, mRepoName, milestone));
+                getActivity(), mRepoOwner, mRepoName, milestone, mFromPullRequest));
     }
 
     @Override

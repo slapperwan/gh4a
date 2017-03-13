@@ -393,10 +393,12 @@ public class IssueListActivity extends BasePagerActivity implements
                 filterParticipating();
                 return true;
             case R.id.manage_labels:
-                startActivity(IssueLabelListActivity.makeIntent(this, mRepoOwner, mRepoName));
+                startActivity(IssueLabelListActivity.makeIntent(this,
+                        mRepoOwner, mRepoName, mIsPullRequest));
                 return true;
             case R.id.manage_milestones:
-                startActivity(IssueMilestoneListActivity.makeIntent(this, mRepoOwner, mRepoName));
+                startActivity(IssueMilestoneListActivity.makeIntent(this,
+                        mRepoOwner, mRepoName, mIsPullRequest));
                 return true;
         }
 

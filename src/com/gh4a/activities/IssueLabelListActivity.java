@@ -54,14 +54,17 @@ import java.util.List;
 
 public class IssueLabelListActivity extends BaseActivity implements
         RootAdapter.OnItemClickListener<IssueLabelAdapter.EditableLabel>, View.OnClickListener {
-    public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            boolean fromPullRequest) {
         return new Intent(context, IssueLabelListActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
+                .putExtra("repo", repoName)
+                .putExtra("from_pr", fromPullRequest);
     }
 
     private String mRepoOwner;
     private String mRepoName;
+    private boolean mParentIsPullRequest;
     private EditActionMode mActionMode;
     private IssueLabelAdapter.EditableLabel mAddedLabel;
 
@@ -145,6 +148,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
+        mParentIsPullRequest = extras.getBoolean("from_pr", false);
     }
 
     @Override
@@ -183,7 +187,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName, mParentIsPullRequest);
     }
 
     @Override
