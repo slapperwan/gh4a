@@ -99,6 +99,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
+    private boolean mShouldRefresh;
 
     private final IssueListFragment.SortDrawerHelper mSortHelper =
             new IssueListFragment.SortDrawerHelper();
@@ -317,6 +318,11 @@ public class IssueListActivity extends BasePagerActivity implements
             mClosedFragment = (IssueListFragment) f;
         } else {
             mOpenFragment = (IssueListFragment) f;
+
+            if (mShouldRefresh) {
+                mOpenFragment.onRefresh();
+                mShouldRefresh = false;
+            }
         }
     }
 
@@ -346,8 +352,12 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ISSUE_CREATE) {
-            if (resultCode == Activity.RESULT_OK && mOpenFragment != null) {
-                mOpenFragment.onRefresh();
+            if (resultCode == Activity.RESULT_OK) {
+                if (mOpenFragment != null) {
+                    mOpenFragment.onRefresh();
+                } else {
+                    mShouldRefresh = true;
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
