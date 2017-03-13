@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.egit.github.core.CodeSearchResult;
@@ -23,11 +24,16 @@ import org.eclipse.egit.github.core.RequestError;
 import org.eclipse.egit.github.core.SearchUser;
 import org.eclipse.egit.github.core.client.RequestException;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -43,23 +49,26 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.CodeSearchAdapter;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.SearchUserAdapter;
+import com.gh4a.db.SuggestionsProvider;
 import com.gh4a.loader.CodeSearchLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositorySearchLoader;
 import com.gh4a.loader.UserSearchLoader;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 
 public class SearchActivity extends BaseActivity implements
-        SearchView.OnQueryTextListener, SearchView.OnCloseListener,
+        SearchView.OnQueryTextListener, SearchView.OnCloseListener, SearchView.OnSuggestionListener,
         AdapterView.OnItemSelectedListener, RootAdapter.OnItemClickListener {
 
     private RootAdapter<?, ?> mAdapter;
@@ -128,6 +137,28 @@ public class SearchActivity extends BaseActivity implements
         }
     };
 
+    private LoaderManager.LoaderCallbacks<Cursor> mSuggestionCallback = new LoaderManager.LoaderCallbacks<Cursor>() {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(getApplicationContext(), SuggestionsProvider.Columns.CONTENT_URI,
+                    new String[]{SuggestionsProvider.Columns._ID, SuggestionsProvider.Columns.SUGGESTION},
+                    SuggestionsProvider.Columns.TYPE + " = ? and " + SuggestionsProvider.Columns.SUGGESTION + " like ?",
+                    new String[]{String.valueOf(mSearchType.getSelectedItemPosition()), mQuery + "%"},
+                    SuggestionsProvider.Columns.DATE + " desc");
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            mSearch.getSuggestionsAdapter().changeCursor(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            mSearch.getSuggestionsAdapter().changeCursor(null);
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,6 +185,24 @@ public class SearchActivity extends BaseActivity implements
         mSearch.setOnQueryTextListener(this);
         mSearch.setOnCloseListener(this);
         mSearch.onActionViewExpanded();
+
+        mSearch.setOnSuggestionListener(this);
+        mSearch.setSuggestionsAdapter(
+                new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, null,
+                        new String[]{SuggestionsProvider.Columns.SUGGESTION},
+                        new int[]{android.R.id.text1}, 0)
+        );
+
+        final SearchView.SearchAutoComplete complete = (SearchView.SearchAutoComplete) mSearch.findViewById(R.id.search_src_text);
+        complete.setThreshold(0);
+        complete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                complete.showDropDown();
+            }
+        });
+
+        getSupportLoaderManager().initLoader(1, null, mSuggestionCallback);
 
         updateSelectedSearchType();
 
@@ -314,6 +363,8 @@ public class SearchActivity extends BaseActivity implements
                 setEmptyText(null);
                 break;
         }
+        mSearch.getSuggestionsAdapter().changeCursor(null);
+        getSupportLoaderManager().restartLoader(1, null, mSuggestionCallback);
     }
 
     @Override
@@ -324,6 +375,8 @@ public class SearchActivity extends BaseActivity implements
             case 2: lm.restartLoader(0, null, mCodeCallback); break;
             default: lm.restartLoader(0, null, mRepoCallback); break;
         }
+        mQuery = query;
+        new SaveSearchSuggestionTask().schedule();
         setContentShown(false);
         mSearch.clearFocus();
         return true;
@@ -331,8 +384,34 @@ public class SearchActivity extends BaseActivity implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        CursorAdapter cursorAdapter = mSearch.getSuggestionsAdapter();
+        if (cursorAdapter != null) {
+            Cursor cursor = cursorAdapter.getCursor();
+            if (newText.startsWith(mQuery) && cursor != null && cursor.getCount() == 0) {
+                // nothing found on previous query
+            } else {
+                mQuery = newText;
+                cursorAdapter.changeCursor(null);
+                getSupportLoaderManager().restartLoader(1, null, mSuggestionCallback);
+            }
+        }
         mQuery = newText;
+        return true;
+    }
+
+    @Override
+    public boolean onSuggestionSelect(int position) {
         return false;
+    }
+
+    @Override
+    public boolean onSuggestionClick(int position) {
+        Cursor cursor = mSearch.getSuggestionsAdapter().getCursor();
+        if (cursor.moveToPosition(position)) {
+            mQuery = cursor.getString(1);
+            mSearch.setQuery(mQuery, false);
+        }
+        return true;
     }
 
     @Override
@@ -375,4 +454,35 @@ public class SearchActivity extends BaseActivity implements
             startActivity(IntentUtils.getUserActivityIntent(this, user.getLogin(), user.getName()));
         }
     }
+
+
+    private class SaveSearchSuggestionTask extends BackgroundTask<Void> {
+
+        public SaveSearchSuggestionTask() {
+            super(SearchActivity.this);
+        }
+
+        @Override
+        protected Void run() throws IOException {
+            saveSuggestion(mSearchType.getSelectedItemPosition(), mQuery);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+
+        }
+
+        private void saveSuggestion(int type, String suggestion) {
+            if (StringUtils.isBlank(suggestion)) {
+                return;
+            }
+            ContentValues cv = new ContentValues();
+            cv.put(SuggestionsProvider.Columns.TYPE, type);
+            cv.put(SuggestionsProvider.Columns.SUGGESTION, suggestion);
+            cv.put(SuggestionsProvider.Columns.DATE, System.currentTimeMillis());
+            getContentResolver().insert(SuggestionsProvider.Columns.CONTENT_URI, cv);
+        }
+    }
+
 }
