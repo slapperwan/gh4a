@@ -357,6 +357,14 @@ public class HtmlUtils {
                 startLi(mSpannableStringBuilder, attributes);
             } else if (tag.equalsIgnoreCase("div")) {
                 startBlockElement(mSpannableStringBuilder, attributes);
+                String cssClass = attributes.getValue("", "class");
+                if (cssClass != null && cssClass.indexOf("highlight") == 0) {
+                    start(mSpannableStringBuilder, new CodeDiv());
+                }
+                CodeDiv code = getLast(mSpannableStringBuilder, CodeDiv.class);
+                if (code != null) {
+                    code.mLevel++;
+                }
             } else if (tag.equalsIgnoreCase("span")) {
                 startCssStyle(mSpannableStringBuilder, attributes);
             } else if (tag.equalsIgnoreCase("hr")) {
@@ -388,6 +396,10 @@ public class HtmlUtils {
                 start(mSpannableStringBuilder, new Monospace());
             } else if (tag.equalsIgnoreCase("pre")) {
                 start(mSpannableStringBuilder, new Pre());
+                CodeDiv div = getLast(mSpannableStringBuilder, CodeDiv.class);
+                if (div != null) {
+                    div.mHasPre = true;
+                }
             } else if (tag.equalsIgnoreCase("a")) {
                 startA(mSpannableStringBuilder, attributes);
             } else if (tag.equalsIgnoreCase("u")) {
@@ -433,6 +445,14 @@ public class HtmlUtils {
                 endLi(mSpannableStringBuilder);
             } else if (tag.equalsIgnoreCase("div")) {
                 endBlockElement(mSpannableStringBuilder);
+                CodeDiv code = getLast(mSpannableStringBuilder, CodeDiv.class);
+                if (code != null && --code.mLevel == 0) {
+                    if (code.mHasPre) {
+                        setSpanFromMark(mSpannableStringBuilder, code, new CodeBlockSpan(0x30aaaaaa));
+                    } else {
+                        mSpannableStringBuilder.removeSpan(code);
+                    }
+                }
             } else if (tag.equalsIgnoreCase("span")) {
                 endCssStyle(mSpannableStringBuilder);
             } else if (tag.equalsIgnoreCase("strong")) {
@@ -838,6 +858,11 @@ public class HtmlUtils {
         private static class Super { }
         private static class Sub { }
         private static class Pre { }
+
+        private static class CodeDiv {
+            public boolean mHasPre;
+            public int mLevel;
+        }
 
         private static class NeedsReversingSpan {
             public final Object mActualSpan;
