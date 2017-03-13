@@ -22,6 +22,7 @@ import android.support.v4.content.Loader;
 import com.gh4a.Gh4Application;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -42,6 +43,12 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
     @Override
     protected Intent navigateUp() {
         return CommitActivity.makeIntent(this, mRepoOwner, mRepoName, mSha);
+    }
+
+    @Override
+    protected String createUrl() {
+        return "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha
+                + "#diff-" + ApiHelpers.md5(mPath);
     }
 
     @Override
