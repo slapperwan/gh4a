@@ -23,6 +23,7 @@ import android.support.v4.content.Loader;
 import com.gh4a.Gh4Application;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentsLoader;
+import com.gh4a.utils.ApiHelpers;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -54,6 +55,12 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     @Override
     protected Loader<LoaderResult<List<CommitComment>>> createCommentLoader() {
         return new PullRequestCommentsLoader(this, mRepoOwner, mRepoName, mPullRequestNumber);
+    }
+
+    @Override
+    protected String createUrl() {
+        return "https://github.com/" + mRepoOwner + "/" + mRepoName + "/pull/" + mPullRequestNumber
+                + "/files#diff-" + ApiHelpers.md5(mPath);
     }
 
     @Override

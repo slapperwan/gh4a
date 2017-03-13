@@ -291,7 +291,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha;
+        String url = createUrl();
 
         switch (item.getItemId()) {
             case R.id.browser:
@@ -405,6 +405,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     protected abstract Loader<LoaderResult<List<CommitComment>>> createCommentLoader();
     protected abstract void updateComment(long id, String body, int position) throws IOException;
     protected abstract void deleteComment(long id) throws IOException;
+    protected abstract String createUrl();
 
     private class CommentActionPopup extends ListPopupWindow implements
             AdapterView.OnItemClickListener {
