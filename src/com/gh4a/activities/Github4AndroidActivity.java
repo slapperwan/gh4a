@@ -87,11 +87,19 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
             findViewById(R.id.login_button).setOnClickListener(this);
             mContent = findViewById(R.id.welcome_container);
             mProgress = findViewById(R.id.login_progress_container);
+
+            handleIntent(getIntent());
         }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
+        if (!handleIntent(intent)) {
+            super.onNewIntent(intent);
+        }
+    }
+
+    private boolean handleIntent(Intent intent) {
         Uri data = intent.getData();
         if (data != null
                 && data.getScheme().equals(CALLBACK_URI.getScheme())
@@ -103,9 +111,10 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                     .appendQueryParameter(PARAM_CODE, data.getQueryParameter(PARAM_CODE))
                     .build();
             new FetchTokenTask(uri).schedule();
-        } else {
-            super.onNewIntent(intent);
+            return true;
         }
+
+        return false;
     }
 
     @Override
