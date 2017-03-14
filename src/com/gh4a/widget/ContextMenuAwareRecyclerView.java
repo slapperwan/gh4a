@@ -28,14 +28,17 @@ public class ContextMenuAwareRecyclerView extends RecyclerView {
     }
 
     @Override
-    public boolean showContextMenuForChild(View originalView) {
-        final int position = getChildAdapterPosition(originalView);
-        if (position != NO_POSITION) {
+    public boolean showContextMenuForChild(View view) {
+        if (view.getLayoutParams() instanceof RecyclerView.LayoutParams) {
+            RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) view.getLayoutParams();
+            final int position = params.getViewAdapterPosition();
+            if (position == NO_POSITION) {
+                return false;
+            }
             final long id = getAdapter().getItemId(position);
             mContextMenuInfo = new RecyclerContextMenuInfo(position, id);
-            return super.showContextMenuForChild(originalView);
         }
-        return false;
+        return super.showContextMenuForChild(view);
     }
 
     public static class RecyclerContextMenuInfo implements ContextMenu.ContextMenuInfo {
