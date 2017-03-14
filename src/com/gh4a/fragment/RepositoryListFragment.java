@@ -29,10 +29,10 @@ import android.text.TextUtils;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.IntentUtils;
 
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
@@ -95,7 +95,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
 
     @Override
     public void onItemClick(Repository repository) {
-        IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
+        startActivity(RepositoryActivity.makeIntent(getActivity(), repository));
     }
 
     @Override

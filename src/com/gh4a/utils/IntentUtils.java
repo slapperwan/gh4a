@@ -18,18 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class IntentUtils {
-
-
-    public static void openRepositoryInfoActivity(Context context, Repository repository) {
-        if (repository != null) {
-            Intent intent = RepositoryActivity.makeIntent(context,
-                    repository.getOwner().getLogin(), repository.getName());
-            context.startActivity(intent);
-        } else {
-            Toast.makeText(context, R.string.repo_not_found_toast, Toast.LENGTH_LONG).show();
-        }
-    }
-
     public static void launchBrowser(Context context, Uri uri) {
         launchBrowser(context, uri, 0);
     }

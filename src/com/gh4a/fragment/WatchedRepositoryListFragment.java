@@ -24,9 +24,9 @@ import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
 
 public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Repository> {
     public static WatchedRepositoryListFragment newInstance(String login) {
@@ -59,7 +59,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
 
     @Override
     public void onItemClick(Repository repository) {
-        IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
+        startActivity(RepositoryActivity.makeIntent(getActivity(), repository));
     }
 
     @Override

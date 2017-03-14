@@ -17,6 +17,7 @@ import com.gh4a.BackgroundTask;
 import com.gh4a.BrowseFilter;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
@@ -112,17 +113,19 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
 
     @Override
     public void onItemClick(NotificationHolder item) {
+        final Intent intent;
+
         if (item.notification == null) {
-            IntentUtils.openRepositoryInfoActivity(getActivity(), item.repository);
-            return;
+            intent = RepositoryActivity.makeIntent(getActivity(), item.repository);
+        } else {
+            new MarkReadTask(null, item.notification).schedule();
+
+            NotificationSubject subject = item.notification.getSubject();
+            Uri uri = ApiHelpers.normalizeUri(Uri.parse(subject.getUrl()));
+            intent = new Intent(getActivity(), BrowseFilter.class);
+            intent.setData(uri);
         }
 
-        new MarkReadTask(null, item.notification).schedule();
-
-        NotificationSubject subject = item.notification.getSubject();
-        Uri uri = ApiHelpers.normalizeUri(Uri.parse(subject.getUrl()));
-        Intent intent = new Intent(getActivity(), BrowseFilter.class);
-        intent.setData(uri);
         startActivity(intent);
     }
 

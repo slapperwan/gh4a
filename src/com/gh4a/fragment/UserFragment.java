@@ -31,6 +31,7 @@ import com.gh4a.R;
 import com.gh4a.activities.FollowerFollowingListActivity;
 import com.gh4a.activities.GistListActivity;
 import com.gh4a.activities.OrganizationMemberListActivity;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.RepositoryListActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.LoaderCallbacks;
@@ -40,7 +41,6 @@ import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.Repository;
@@ -243,7 +243,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         } else if (id == R.id.cell_org_members) {
             intent = OrganizationMemberListActivity.makeIntent(getActivity(), mUserLogin);
         } else if (view.getTag() instanceof Repository) {
-            IntentUtils.openRepositoryInfoActivity(getActivity(), (Repository) view.getTag());
+            intent = RepositoryActivity.makeIntent(getActivity(), (Repository) view.getTag());
         } else if (view.getTag() instanceof User) {
             intent = UserActivity.makeIntent(getActivity(), (User) view.getTag());
         }

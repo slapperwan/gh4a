@@ -186,7 +186,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             ForkPayload payload = (ForkPayload) event.getPayload();
             Repository forkee = payload.getForkee();
             if (forkee != null) {
-                IntentUtils.openRepositoryInfoActivity(getActivity(), forkee);
+                intent = RepositoryActivity.makeIntent(getActivity(), forkee);
             } else {
                 Toast.makeText(getActivity(), R.string.repo_not_found_toast, Toast.LENGTH_LONG).show();
             }
