@@ -78,7 +78,7 @@ public class BrowseFilter extends AppCompatActivity {
             if (!parts.isEmpty()) {
                 intent = GistActivity.makeIntent(this, parts.get(parts.size() - 1));
             }
-        } else if ("login".equals(first)) {
+        } else if ("login".equals(first) || "sessions".equals(first)) {
             // may happen during login -> forward to browser
         } else if ("explore".equals(first)) {
             intent = new Intent(this, TrendingActivity.class);
