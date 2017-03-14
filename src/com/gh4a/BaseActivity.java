@@ -396,11 +396,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
         view.setLayoutParams(lp);
     }
 
-    protected void saveBookmark(String name, int type, Intent intent, String extraData) {
+    // url must be resolvable by BrowseFilter!
+    protected void saveBookmark(String name, int type, String url, String extraData) {
         ContentValues cv = new ContentValues();
         cv.put(BookmarksProvider.Columns.NAME, name);
         cv.put(BookmarksProvider.Columns.TYPE, type);
-        cv.put(BookmarksProvider.Columns.URI, intent.toUri(0));
+        cv.put(BookmarksProvider.Columns.URI, url);
         cv.put(BookmarksProvider.Columns.EXTRA, extraData);
         if (getContentResolver().insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
             Toast.makeText(this, R.string.bookmark_saved, Toast.LENGTH_LONG).show();

@@ -365,6 +365,7 @@ public class RepositoryActivity extends BasePagerActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName;
         switch (item.getItemId()) {
             case R.id.watch:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
@@ -389,7 +390,7 @@ public class RepositoryActivity extends BasePagerActivity {
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, mRepoOwner + "/" + mRepoName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  "https://github.com/" + mRepoOwner + "/" + mRepoName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  url);
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
@@ -399,13 +400,14 @@ public class RepositoryActivity extends BasePagerActivity {
                         initialSearch, SearchActivity.SEARCH_TYPE_CODE));
                 return true;
             case R.id.bookmark:
-                Intent bookmarkIntent = makeIntent(this, mRepoOwner, mRepoName, mSelectedRef);
+                String ref = getCurrentRef();
+                String bookmarkUrl = ref.equals(mRepository.getDefaultBranch())
+                        ? url : url + "/tree/" + ref;
                 saveBookmark(mActionBar.getTitle().toString(), BookmarksProvider.Columns.TYPE_REPO,
-                        bookmarkIntent, mActionBar.getSubtitle().toString());
+                        bookmarkUrl, ref);
                 return true;
             case R.id.zip_download:
-                String zipUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName
-                        + "/archive/" + getCurrentRef() + ".zip";
+                String zipUrl = url + "/archive/" + getCurrentRef() + ".zip";
                 UiUtils.enqueueDownloadWithPermissionCheck(this, zipUrl, "application/zip",
                         mRepoName + "-" + getCurrentRef() + ".zip", null, null);
                 return true;

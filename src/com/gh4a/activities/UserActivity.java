@@ -154,6 +154,7 @@ public class UserActivity extends BasePagerActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String url = "https://github.com/" + mUserLogin;
         switch (item.getItemId()) {
             case R.id.follow:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
@@ -166,13 +167,12 @@ public class UserActivity extends BasePagerActivity {
                         ? R.string.share_user_subject_loginonly : R.string.share_user_subject;
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(subjectId, mUserLogin, mUserName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  "https://github.com/" + mUserLogin);
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  url);
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
             case R.id.bookmark:
-                Intent bookmarkIntent = makeIntent(this, mUserLogin, mUserName);
-                saveBookmark(mUserLogin, BookmarksProvider.Columns.TYPE_USER, bookmarkIntent, mUserName);
+                saveBookmark(mUserLogin, BookmarksProvider.Columns.TYPE_USER, url, mUserName);
                 return true;
         }
         return super.onOptionsItemSelected(item);

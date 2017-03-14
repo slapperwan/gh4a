@@ -1,7 +1,5 @@
 package com.gh4a.activities;
 
-import java.net.URISyntaxException;
-
 import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,12 +11,12 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.BrowseFilter;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
 import com.gh4a.db.BookmarksProvider.Columns;
@@ -26,8 +24,6 @@ import com.gh4a.db.BookmarksProvider.Columns;
 public class BookmarkListActivity extends BaseActivity implements
         AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener,
         LoaderCallbacks<Cursor> {
-    private static final String TAG = "BookmarkListActivity";
-
     private BookmarkAdapter mAdapter;
 
     @Override
@@ -62,12 +58,9 @@ public class BookmarkListActivity extends BaseActivity implements
         Cursor cursor = (Cursor) mAdapter.getItem(position);
         String uri = cursor.getString(cursor.getColumnIndexOrThrow(Columns.URI));
 
-        try {
-            Intent intent = Intent.parseUri(uri, 0);
-            startActivity(intent);
-        } catch (URISyntaxException e) {
-            Log.e(TAG, "Couldn't parse bookmark URI " + uri);
-        }
+        Intent intent = new Intent(this, BrowseFilter.class);
+        intent.setData(Uri.parse(uri));
+        startActivity(intent);
     }
 
     @Override
