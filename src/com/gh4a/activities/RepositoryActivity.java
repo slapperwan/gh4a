@@ -403,8 +403,8 @@ public class RepositoryActivity extends BasePagerActivity {
                 String ref = getCurrentRef();
                 String bookmarkUrl = ref.equals(mRepository.getDefaultBranch())
                         ? url : url + "/tree/" + ref;
-                saveBookmark(mActionBar.getTitle().toString(), BookmarksProvider.Columns.TYPE_REPO,
-                        bookmarkUrl, ref);
+                BookmarksProvider.saveBookmark(this, mActionBar.getTitle().toString(),
+                        BookmarksProvider.Columns.TYPE_REPO, bookmarkUrl, ref);
                 return true;
             case R.id.zip_download:
                 String zipUrl = url + "/archive/" + getCurrentRef() + ".zip";

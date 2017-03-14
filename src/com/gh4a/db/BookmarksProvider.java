@@ -1,8 +1,10 @@
 package com.gh4a.db;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -11,6 +13,9 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.gh4a.R;
 
 public class BookmarksProvider extends ContentProvider {
     private static final String TAG = "BookmarksProvider";
@@ -39,6 +44,20 @@ public class BookmarksProvider extends ContentProvider {
     }
 
     private DbHelper mDbHelper;
+
+    // url must be resolvable by BrowseFilter!
+    public static void saveBookmark(Context context, String name,
+                                    int type, String url, String extraData) {
+        ContentResolver cr = context.getContentResolver();
+        ContentValues cv = new ContentValues();
+        cv.put(BookmarksProvider.Columns.NAME, name);
+        cv.put(BookmarksProvider.Columns.TYPE, type);
+        cv.put(BookmarksProvider.Columns.URI, url);
+        cv.put(BookmarksProvider.Columns.EXTRA, extraData);
+        if (cr.insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
+            Toast.makeText(context, R.string.bookmark_saved, Toast.LENGTH_LONG).show();
+        }
+    }
 
     @Override
     public boolean onCreate() {

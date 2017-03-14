@@ -23,7 +23,6 @@ import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -61,12 +60,10 @@ import android.view.ViewStub;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.home.HomeActivity;
-import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
@@ -394,18 +391,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
             lp.setScrollFlags(0);
         }
         view.setLayoutParams(lp);
-    }
-
-    // url must be resolvable by BrowseFilter!
-    protected void saveBookmark(String name, int type, String url, String extraData) {
-        ContentValues cv = new ContentValues();
-        cv.put(BookmarksProvider.Columns.NAME, name);
-        cv.put(BookmarksProvider.Columns.TYPE, type);
-        cv.put(BookmarksProvider.Columns.URI, url);
-        cv.put(BookmarksProvider.Columns.EXTRA, extraData);
-        if (getContentResolver().insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
-            Toast.makeText(this, R.string.bookmark_saved, Toast.LENGTH_LONG).show();
-        }
     }
 
     @Override

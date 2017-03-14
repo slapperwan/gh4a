@@ -172,7 +172,8 @@ public class UserActivity extends BasePagerActivity {
                 startActivity(shareIntent);
                 return true;
             case R.id.bookmark:
-                saveBookmark(mUserLogin, BookmarksProvider.Columns.TYPE_USER, url, mUserName);
+                BookmarksProvider.saveBookmark(this, mUserLogin,
+                        BookmarksProvider.Columns.TYPE_USER, url, mUserName);
                 return true;
         }
         return super.onOptionsItemSelected(item);
