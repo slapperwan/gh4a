@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -82,6 +83,9 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             new ReactionBar.ReactionDetailsCache(this);
     private TimelineItemAdapter mAdapter;
     private HttpImageGetter mImageGetter;
+    private View mBottomSheet;
+    private BottomSheetBehavior<View> mBottomSheetBehavior;
+    private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
 
     protected static Bundle buildArgs(String repoOwner, String repoName,
             Issue issue, boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
@@ -114,15 +118,26 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         View listContent = super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.issue, container, false);
+        View v = inflater.inflate(R.layout.comment_list, container, false);
 
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
+
+        mBottomSheet = v.findViewById(R.id.bottom_sheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
+        mBottomSheetOnOffsetChangedListener =
+                new UiUtils.BottomSheetOnOffsetChangedListener(mBottomSheet);
 
         mImageGetter = new HttpImageGetter(inflater.getContext());
         updateCommentSectionVisibility(v);
 
         return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getBaseActivity().addAppBarOffsetListener(mBottomSheetOnOffsetChangedListener);
     }
 
     @Override
@@ -134,6 +149,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             mAdapter.destroy();
             mAdapter = null;
         }
+
+        getBaseActivity().removeAppBarOffsetListener(mBottomSheetOnOffsetChangedListener);
     }
 
     @Override
@@ -185,6 +202,10 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public boolean canChildScrollUp() {
+        if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            return true;
+        }
+
         if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
             return true;
         }
@@ -282,7 +303,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
         int commentVisibility = mListShown && Gh4Application.get().isAuthorized()
                 ? View.VISIBLE : View.GONE;
-        v.findViewById(R.id.comment_box).setVisibility(commentVisibility);
+        mBottomSheet.setVisibility(commentVisibility);
     }
 
     private boolean isLocked() {

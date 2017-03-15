@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
@@ -23,6 +24,7 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -76,6 +78,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     private CommitNoteAdapter mAdapter;
     private CommentBoxFragment mCommentFragment;
+    private BottomSheetBehavior<View> mBottomSheetBehavior;
+    private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,16 +96,27 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View listContent = super.onCreateView(inflater, container, savedInstanceState);
-        View v = inflater.inflate(R.layout.commit_comment_list, container, false);
+        View v = inflater.inflate(R.layout.comment_list, container, false);
 
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
+        View bottomSheet = v.findViewById(R.id.bottom_sheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        mBottomSheetOnOffsetChangedListener =
+                new UiUtils.BottomSheetOnOffsetChangedListener(bottomSheet);
+
         if (!Gh4Application.get().isAuthorized()) {
-            v.findViewById(R.id.comment_box).setVisibility(View.GONE);
+            bottomSheet.setVisibility(View.GONE);
         }
 
         return v;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        getBaseActivity().addAppBarOffsetListener(mBottomSheetOnOffsetChangedListener);
     }
 
     @Override
@@ -111,6 +126,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
             mAdapter.destroy();
             mAdapter = null;
         }
+
+        getBaseActivity().removeAppBarOffsetListener(mBottomSheetOnOffsetChangedListener);
     }
 
     @Override
@@ -135,6 +152,10 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public boolean canChildScrollUp() {
+        if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            return true;
+        }
+
         if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
             return true;
         }
