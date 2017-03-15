@@ -13,6 +13,7 @@
     <dimen name="issue_label_margin">2dp</dimen>
     <dimen name="mini_fab_size_with_margin">56dp</dimen> <!-- 40dp FAB + 16dp margin -->
     <dimen name="reaction_details_popup_width">200dp</dimen>
+    <dimen name="comment_box_peek_height">52dp</dimen>
 
     <dimen name="breadcrumb_height">42dp</dimen>
     <dimen name="breadcrumb_padding_side">8dp</dimen>
@@ -21,7 +22,6 @@
 
     <integer name="issue_edit_body_min_lines">3</integer>
     <integer name="issue_edit_body_max_lines">5</integer>
-    <integer name="comment_box_max_lines">4</integer>
     <integer name="event_description_max_lines">6</integer>
 
     <dimen name="reply_span_size">2dp</dimen>

@@ -1,11 +1,9 @@
 package com.gh4a.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
@@ -27,8 +25,7 @@ import java.io.IOException;
 import java.util.Set;
 
 public class CommentBoxFragment extends Fragment implements
-        View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
-        AppBarLayout.OnOffsetChangedListener {
+        View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate {
     public interface Callback {
         @StringRes int getCommentEditorHintResId();
         void onSendCommentInBackground(String comment) throws IOException;
@@ -112,21 +109,7 @@ public class CommentBoxFragment extends Fragment implements
         mCommentEditor.setTokenizer(new UiUtils.WhitespaceTokenizer());
         mCommentEditor.setThreshold(1);
 
-        Activity activity = getActivity();
-        if (activity instanceof BaseActivity) {
-            ((BaseActivity) activity).addAppBarOffsetListener(this);
-        }
         updateLockState();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-
-        Activity activity = getActivity();
-        if (activity instanceof BaseActivity) {
-            ((BaseActivity) activity).removeAppBarOffsetListener(this);
-        }
     }
 
     @Override
@@ -134,18 +117,6 @@ public class CommentBoxFragment extends Fragment implements
         Editable comment = mCommentEditor.getText();
         new CommentTask(comment.toString()).schedule();
         UiUtils.hideImeForView(getActivity().getCurrentFocus());
-    }
-
-    @Override
-    public void onOffsetChanged(AppBarLayout abl, int verticalOffset) {
-        View v = getView();
-        if (v != null) {
-            int offset = abl.getTotalScrollRange() + verticalOffset;
-            if (offset >= 0) {
-                v.setPadding(v.getPaddingLeft(), v.getPaddingTop(),
-                        v.getPaddingRight(), offset);
-            }
-        }
     }
 
     @Override

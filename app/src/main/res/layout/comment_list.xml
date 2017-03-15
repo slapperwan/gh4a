@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.gh4a.widget.NestedCoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/list_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/comment_box_peek_height" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:colorBackground"
+        app:behavior_peekHeight="@dimen/comment_box_peek_height"
+        app:layout_behavior="com.gh4a.widget.FixedBottomSheetBehavior">
+
+        <fragment
+            android:id="@+id/comment_box"
+            android:name="com.gh4a.fragment.CommentBoxFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:layout="@layout/comment_edit_box" />
+    </android.support.v4.widget.NestedScrollView>
+
+</com.gh4a.widget.NestedCoordinatorLayout>

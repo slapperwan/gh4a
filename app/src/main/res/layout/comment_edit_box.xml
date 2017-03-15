@@ -29,7 +29,6 @@
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:inputType="textMultiLine|textCapSentences"
-            android:maxLines="@integer/comment_box_max_lines"
             android:padding="8dp"
             tools:text="Enter comment" />
 
@@ -38,7 +37,7 @@
             style="@style/SelectableBorderlessItem"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_gravity="bottom"
+            android:layout_gravity="top"
             android:scaleType="centerInside"
             android:src="?attr/sendIcon" />
 

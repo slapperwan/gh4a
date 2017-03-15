@@ -16,6 +16,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
@@ -458,5 +460,36 @@ public class UiUtils {
             builder.setSpan(span, pos, pos + label.getName().length(), 0);
         }
         return builder;
+    }
+
+    /**
+     * AppBarLayout.OnOffsetChangedListener used to keep the bottom sheet at the same position
+     * while the AppBarLayout is being collapsed or expanded.
+     */
+    public static class BottomSheetOnOffsetChangedListener implements
+            AppBarLayout.OnOffsetChangedListener {
+
+        private final View mBottomSheet;
+        private final BottomSheetBehavior mBottomSheetBehavior;
+        private final int mDefaultPeekHeight;
+
+        public BottomSheetOnOffsetChangedListener(View bottomSheet) {
+            mBottomSheet = bottomSheet;
+            mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
+            mDefaultPeekHeight = mBottomSheetBehavior.getPeekHeight();
+        }
+
+        @Override
+        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+            int offset = appBarLayout.getTotalScrollRange() + verticalOffset;
+            if (offset >= 0) {
+                // Set the bottom padding to make the bottom appear as not moving while the
+                // AppBarLayout pushes it down or up.
+                mBottomSheet.setPadding(mBottomSheet.getPaddingLeft(),
+                        mBottomSheet.getPaddingTop(), mBottomSheet.getPaddingRight(), offset);
+                // Update peek height to stay at the same offset
+                mBottomSheetBehavior.setPeekHeight(mDefaultPeekHeight + offset);
+            }
+        }
     }
 }
