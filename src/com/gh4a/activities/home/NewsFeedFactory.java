@@ -121,7 +121,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        mSelectedOrganization = position != 0 ? mUserScopes.get(position) : null;
+        mSelectedOrganization = position != 0 ? mUserScopes.get(position - 1) : null;
         mActivity.invalidateFragments();
 
     }
