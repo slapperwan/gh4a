@@ -38,6 +38,7 @@ public class HomeActivity extends BasePagerActivity implements
     private FragmentFactory mFactory;
     private ImageView mAvatarView;
     private String mUserLogin;
+    private User mUserInfo;
     private int mSelectedFactoryId;
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
@@ -62,8 +63,8 @@ public class HomeActivity extends BasePagerActivity implements
         }
         @Override
         protected void onResultReady(User result) {
-            mAvatarView.setTag(result);
-            AvatarHandler.assignAvatar(mAvatarView, result);
+            mUserInfo = result;
+            updateUserInfo();
         }
     };
 
@@ -84,6 +85,8 @@ public class HomeActivity extends BasePagerActivity implements
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mFactory.getTitleResId());
+
+        getSupportLoaderManager().initLoader(0, null, mUserCallback);
     }
 
     @Override
@@ -142,8 +145,7 @@ public class HomeActivity extends BasePagerActivity implements
         View view = getLayoutInflater().inflate(R.layout.drawer_title_home, container, false);
         mAvatarView = (ImageView) view.findViewById(R.id.avatar);
         mAvatarView.setOnClickListener(this);
-
-        getSupportLoaderManager().initLoader(0, null, mUserCallback);
+        updateUserInfo();
 
         TextView nameView = (TextView) view.findViewById(R.id.user_name);
         nameView.setText(mUserLogin);
@@ -268,6 +270,7 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     public void onRefresh() {
         forceLoaderReload(0);
+        mFactory.onRefresh();
         super.onRefresh();
     }
 
@@ -336,12 +339,24 @@ public class HomeActivity extends BasePagerActivity implements
         return R.id.news_feed;
     }
 
+    private void updateUserInfo() {
+        if (mUserInfo == null) {
+            return;
+        }
+        if (mAvatarView != null) {
+            mAvatarView.setTag(mUserInfo);
+            AvatarHandler.assignAvatar(mAvatarView, mUserInfo);
+        }
+        mFactory.setUserInfo(mUserInfo);
+    }
+
     private void switchTo(int itemId, FragmentFactory factory) {
         if (mFactory != null) {
             mFactory.onDestroy();
         }
         mFactory = factory;
         mSelectedFactoryId = itemId;
+        mFactory.setUserInfo(mUserInfo);
 
         getPrefs().edit()
                 .putString("last_selected_home_page", START_PAGE_MAPPING.get(mSelectedFactoryId))

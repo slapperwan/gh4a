@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.eclipse.egit.github.core.User;
+
 public abstract class FragmentFactory {
     protected final HomeActivity mActivity;
 
@@ -52,9 +54,13 @@ public abstract class FragmentFactory {
 
     protected void onRestoreInstanceState(Bundle state) {}
 
+    protected void onRefresh() {}
+
     protected void onDestroy() {}
 
     protected @IdRes int getInitialToolDrawerSelection() {
         return 0;
     }
+
+    protected void setUserInfo(User user) { }
 }
