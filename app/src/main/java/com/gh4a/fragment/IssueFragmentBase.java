@@ -88,6 +88,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     private HttpImageGetter mImageGetter;
     private ViewPagerBottomSheet mBottomSheet;
     private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
+    private CommentBoxFragmentAdapter mCommentBoxAdapter;
 
     protected static Bundle buildArgs(String repoOwner, String repoName,
             Issue issue, boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
@@ -126,8 +127,9 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         listContainer.addView(listContent);
 
         mBottomSheet = (ViewPagerBottomSheet) v.findViewById(R.id.bottom_sheet);
-        mBottomSheet.setPagerAdapter(
-                new CommentBoxFragmentAdapter(getActivity(), getFragmentManager()));
+        mCommentBoxAdapter = new CommentBoxFragmentAdapter(getActivity(),
+                getChildFragmentManager());
+        mBottomSheet.setPagerAdapter(mCommentBoxAdapter);
         mBottomSheetOnOffsetChangedListener =
                 new UiUtils.BottomSheetOnOffsetChangedListener(mBottomSheet);
 
@@ -312,9 +314,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         if (mIssue.getUser() != null) {
             users.add(mIssue.getUser());
         }
+        mCommentBoxAdapter.getCommentFragment().setMentionUsers(users);
     }
 
     private void updateCommentLockState() {
+        if (mCommentBoxAdapter != null) {
+            mCommentBoxAdapter.getCommentFragment().setLocked(isLocked());
+        }
     }
 
     private void fillData() {
@@ -510,6 +516,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public void quoteText(CharSequence text) {
+        mCommentBoxAdapter.getCommentFragment().addQuote(text);
     }
 
     @Override

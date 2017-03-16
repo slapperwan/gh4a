@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -81,6 +80,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private CommitNoteAdapter mAdapter;
     private ViewPagerBottomSheet mBottomSheet;
     private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
+    private CommentBoxFragmentAdapter mCommentBoxAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -103,8 +103,9 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         listContainer.addView(listContent);
 
         mBottomSheet = (ViewPagerBottomSheet) v.findViewById(R.id.bottom_sheet);
-        mBottomSheet.setPagerAdapter(
-                new CommentBoxFragmentAdapter(getActivity(), getFragmentManager()));
+        mCommentBoxAdapter = new CommentBoxFragmentAdapter(getActivity(),
+                getChildFragmentManager());
+        mBottomSheet.setPagerAdapter(mCommentBoxAdapter);
         mBottomSheetOnOffsetChangedListener =
                 new UiUtils.BottomSheetOnOffsetChangedListener(mBottomSheet);
 
@@ -130,13 +131,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         }
 
         getBaseActivity().removeAppBarOffsetListener(mBottomSheetOnOffsetChangedListener);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        FragmentManager fm = getChildFragmentManager();
     }
 
     @Override
@@ -176,7 +170,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         if (mCommit.getCommitter() != null) {
             users.add(mCommit.getCommitter());
         }
-
+        mCommentBoxAdapter.getCommentFragment().setMentionUsers(users);
         if (mInitialComment != null) {
             for (int i = 0; i < data.size(); i++) {
                 if (mInitialComment.matches(data.get(i).getId(), data.get(i).getCreatedAt())) {
@@ -235,6 +229,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void quoteText(CharSequence text) {
+        mCommentBoxAdapter.getCommentFragment().addQuote(text);
     }
 
     @Override

@@ -11,15 +11,17 @@ import com.gh4a.fragment.CommentPreviewFragment;
 
 public class CommentBoxFragmentAdapter extends FragmentStatePagerAdapter {
 
-    private static final int[] TITLES = new int[] {
+    private static final int[] TITLES = new int[]{
         R.string.edit, R.string.preview
     };
 
     private final Context mContext;
+    private final CommentBoxFragment mCommentFragment;
 
     public CommentBoxFragmentAdapter(Context context, FragmentManager fm) {
         super(fm);
         mContext = context;
+        mCommentFragment = new CommentBoxFragment();
     }
 
     @Override
@@ -28,7 +30,7 @@ public class CommentBoxFragmentAdapter extends FragmentStatePagerAdapter {
             return new CommentPreviewFragment();
         }
 
-        return new CommentBoxFragment();
+        return mCommentFragment;
     }
 
     @Override
@@ -39,5 +41,9 @@ public class CommentBoxFragmentAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return TITLES.length;
+    }
+
+    public CommentBoxFragment getCommentFragment() {
+        return mCommentFragment;
     }
 }
