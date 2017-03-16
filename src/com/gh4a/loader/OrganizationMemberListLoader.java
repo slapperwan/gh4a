@@ -23,6 +23,6 @@ public class OrganizationMemberListLoader extends BaseLoader<List<User>> {
     public List<User> doLoadInBackground() throws IOException {
         OrganizationService orgService = (OrganizationService)
                 Gh4Application.get().getService(Gh4Application.ORG_SERVICE);
-        return orgService.getPublicMembers(mUserLogin);
+        return orgService.getMembers(mUserLogin);
     }
 }
