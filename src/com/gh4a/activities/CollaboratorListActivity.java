@@ -15,20 +15,16 @@
  */
 package com.gh4a.activities;
 
-import java.util.List;
-
-import org.eclipse.egit.github.core.User;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 
 import com.gh4a.R;
-import com.gh4a.loader.CollaboratorListLoader;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.fragment.CollaboratorListFragment;
 
-public class CollaboratorListActivity extends UserListActivity {
+public class CollaboratorListActivity extends FragmentContainerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return new Intent(context, CollaboratorListActivity.class)
                 .putExtra("owner", repoOwner)
@@ -39,24 +35,24 @@ public class CollaboratorListActivity extends UserListActivity {
     private String mRepoName;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(R.string.repo_collaborators);
+        actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
+
+    }
+
+    @Override
     protected void onInitExtras(Bundle extras) {
         mUserLogin = extras.getString("owner");
         mRepoName = extras.getString("repo");
     }
 
     @Override
-    protected String getActionBarTitle() {
-        return getString(R.string.repo_collaborators);
-    }
-
-    @Override
-    protected String getSubTitle() {
-        return mUserLogin + "/" + mRepoName;
-    }
-
-    @Override
-    protected Loader<LoaderResult<List<User>>> getUserListLoader() {
-        return new CollaboratorListLoader(this, mUserLogin, mRepoName);
+    protected Fragment onCreateFragment() {
+        return CollaboratorListFragment.newInstance(mUserLogin, mRepoName);
     }
 
     @Override

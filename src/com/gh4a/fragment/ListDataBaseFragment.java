@@ -27,6 +27,11 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
             updateEmptyState();
             getActivity().supportInvalidateOptionsMenu();
         }
+
+        @Override
+        protected boolean onError(Exception e) {
+            return onLoaderError(e);
+        }
     };
 
     @Override
@@ -70,4 +75,8 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
 
     protected abstract Loader<LoaderResult<List<T>>> onCreateLoader();
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
+
+    protected boolean onLoaderError(Exception e) {
+        return false;
+    }
 }

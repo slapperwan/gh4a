@@ -18,28 +18,13 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.R;
-import com.gh4a.adapter.ReleaseAdapter;
-import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.ReleaseListLoader;
-import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.DividerItemDecoration;
-import com.gh4a.widget.SwipeRefreshLayout;
+import com.gh4a.fragment.ReleaseListFragment;
 
-import org.eclipse.egit.github.core.Release;
-
-import java.util.List;
-
-public class ReleaseListActivity extends BaseActivity implements
-        SwipeRefreshLayout.ChildScrollDelegate, RootAdapter.OnItemClickListener<Release> {
+public class ReleaseListActivity extends FragmentContainerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return new Intent(context, ReleaseListActivity.class)
                 .putExtra("owner", repoOwner)
@@ -48,45 +33,15 @@ public class ReleaseListActivity extends BaseActivity implements
 
     private String mUserLogin;
     private String mRepoName;
-    private RecyclerView mRecyclerView;
-    private ReleaseAdapter mAdapter;
-
-    private final LoaderCallbacks<List<Release>> mReleaseCallback = new LoaderCallbacks<List<Release>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<Release>>> onCreateLoader() {
-            return new ReleaseListLoader(ReleaseListActivity.this, mUserLogin, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(List<Release> result) {
-            fillData(result);
-            setContentShown(true);
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.generic_list);
-        setContentShown(false);
-        setEmptyText(R.string.no_releases_found);
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.releases);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        mAdapter = new ReleaseAdapter(this);
-        mAdapter.setOnItemClickListener(this);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
-        mRecyclerView.setAdapter(mAdapter);
-        setChildScrollDelegate(this);
-
-        getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
     }
 
     @Override
@@ -97,30 +52,12 @@ public class ReleaseListActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean canChildScrollUp() {
-        return UiUtils.canViewScrollUp(mRecyclerView);
-    }
-
-    @Override
-    public void onRefresh() {
-        mAdapter.clear();
-        setContentShown(false);
-        forceLoaderReload(0);
-        super.onRefresh();
-    }
-
-    private void fillData(List<Release> result) {
-        setContentEmpty(result == null || result.isEmpty());
-        mAdapter.addAll(result);
+    protected Fragment onCreateFragment() {
+        return ReleaseListFragment.newInstance(mUserLogin, mRepoName);
     }
 
     @Override
     protected Intent navigateUp() {
         return RepositoryActivity.makeIntent(this, mUserLogin, mRepoName);
-    }
-
-    @Override
-    public void onItemClick(Release release) {
-        startActivity(ReleaseInfoActivity.makeIntent(this, mUserLogin, mRepoName, release));
     }
 }

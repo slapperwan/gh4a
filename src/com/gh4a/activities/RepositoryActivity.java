@@ -192,7 +192,6 @@ public class RepositoryActivity extends BasePagerActivity {
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        setEmptyText(R.string.repo_no_data);
         setContentShown(false);
 
         getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
