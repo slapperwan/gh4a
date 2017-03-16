@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.gh4a.R;
+import com.gh4a.utils.UiUtils;
 
 public class ViewPagerBottomSheet extends NestedScrollView {
 
@@ -60,5 +61,9 @@ public class ViewPagerBottomSheet extends NestedScrollView {
             mBehavior = BottomSheetBehavior.from(this);
         }
         return mBehavior;
+    }
+
+    public void setPagerColors(int colorAttrId) {
+        mTabs.setBackgroundColor(UiUtils.resolveColor(getContext(), colorAttrId));
     }
 }
