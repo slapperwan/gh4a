@@ -78,7 +78,6 @@ public class CommentBoxFragment extends Fragment implements
         } else if (context instanceof Callback) {
             mCallback = (Callback) context;
         } else {
-            throw new IllegalStateException("No callback provided");
         }
     }
 
@@ -134,10 +133,6 @@ public class CommentBoxFragment extends Fragment implements
 
         mCommentEditor.setEnabled(!mLocked);
         mSendButton.setEnabled(!mLocked && !isEmpty);
-
-        int hintResId = mLocked
-                ? R.string.comment_editor_locked_hint : mCallback.getCommentEditorHintResId();
-        mCommentEditor.setHint(hintResId);
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
