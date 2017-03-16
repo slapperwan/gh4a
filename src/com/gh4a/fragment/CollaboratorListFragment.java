@@ -5,6 +5,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.CollaboratorListLoader;
@@ -14,7 +15,8 @@ import org.eclipse.egit.github.core.User;
 
 import java.util.List;
 
-public class CollaboratorListFragment extends ListDataBaseFragment<User> {
+public class CollaboratorListFragment extends ListDataBaseFragment<User> implements
+        RootAdapter.OnItemClickListener<User> {
     public static CollaboratorListFragment newInstance(String owner, String repo) {
         CollaboratorListFragment f = new CollaboratorListFragment();
         Bundle args = new Bundle();
@@ -33,11 +35,18 @@ public class CollaboratorListFragment extends ListDataBaseFragment<User> {
 
     @Override
     protected RootAdapter<User, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new UserAdapter(getActivity());
+        UserAdapter adapter = new UserAdapter(getActivity());
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override
     protected int getEmptyTextResId() {
         return R.string.no_collaborators_found;
+    }
+
+    @Override
+    public void onItemClick(User item) {
+        startActivity(UserActivity.makeIntent(getActivity(), item));
     }
 }
