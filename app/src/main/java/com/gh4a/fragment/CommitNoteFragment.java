@@ -25,6 +25,8 @@ import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.CommentBoxFragmentAdapter;
+import com.gh4a.widget.ViewPagerBottomSheet;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -77,7 +79,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private IntentUtils.InitialCommentMarker mInitialComment;
 
     private CommitNoteAdapter mAdapter;
-    private BottomSheetBehavior<View> mBottomSheetBehavior;
+    private ViewPagerBottomSheet mBottomSheet;
     private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
 
     @Override
@@ -100,13 +102,14 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
-        View bottomSheet = v.findViewById(R.id.bottom_sheet);
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        mBottomSheet = (ViewPagerBottomSheet) v.findViewById(R.id.bottom_sheet);
+        mBottomSheet.setPagerAdapter(
+                new CommentBoxFragmentAdapter(getActivity(), getFragmentManager()));
         mBottomSheetOnOffsetChangedListener =
-                new UiUtils.BottomSheetOnOffsetChangedListener(bottomSheet);
+                new UiUtils.BottomSheetOnOffsetChangedListener(mBottomSheet);
 
         if (!Gh4Application.get().isAuthorized()) {
-            bottomSheet.setVisibility(View.GONE);
+            mBottomSheet.setVisibility(View.GONE);
         }
 
         return v;
@@ -150,7 +153,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public boolean canChildScrollUp() {
-        if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+        if (mBottomSheet.getBehavior().getState() == BottomSheetBehavior.STATE_EXPANDED) {
             return true;
         }
 
