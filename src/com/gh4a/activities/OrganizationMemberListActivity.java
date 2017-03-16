@@ -39,6 +39,7 @@ public class OrganizationMemberListActivity extends FragmentContainerActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.members);
         actionBar.setSubtitle(mUserLogin);
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override

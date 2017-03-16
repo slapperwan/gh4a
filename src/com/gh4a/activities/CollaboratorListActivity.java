@@ -41,7 +41,7 @@ public class CollaboratorListActivity extends FragmentContainerActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.repo_collaborators);
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
-
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
