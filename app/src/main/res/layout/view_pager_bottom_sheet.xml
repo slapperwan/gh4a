@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/comment_editor"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/listBackground"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="2dp"
+        android:background="@color/divider_bg" />
+
+    <com.gh4a.widget.WrapContentHeightViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/top_shadow" />
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorPrimary"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/tab_indicator_color"
+        app:tabMaxWidth="-1dp"
+        app:tabMode="scrollable"
+        app:tabSelectedTextColor="@color/tab_indicator_color"
+        app:tabTextColor="@color/tab_text_color" />
+
+</LinearLayout>

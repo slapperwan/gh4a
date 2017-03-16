@@ -21,12 +21,10 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AlertDialog;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -38,7 +36,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
@@ -56,6 +53,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
+import com.gh4a.widget.ViewPagerBottomSheet;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
@@ -87,8 +85,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             new ReactionBar.ReactionDetailsCache(this);
     private TimelineItemAdapter mAdapter;
     private HttpImageGetter mImageGetter;
-    private View mBottomSheet;
-    private BottomSheetBehavior<View> mBottomSheetBehavior;
+    private ViewPagerBottomSheet mBottomSheet;
     private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
 
     protected static Bundle buildArgs(String repoOwner, String repoName,
@@ -127,28 +124,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
-        mBottomSheet = v.findViewById(R.id.bottom_sheet);
-        mBottomSheetBehavior = BottomSheetBehavior.from(mBottomSheet);
+        mBottomSheet = (ViewPagerBottomSheet) v.findViewById(R.id.bottom_sheet);
+        mBottomSheet.setPagerAdapter(new FragmentAdapter(getFragmentManager()));
+
         mBottomSheetOnOffsetChangedListener =
                 new UiUtils.BottomSheetOnOffsetChangedListener(mBottomSheet);
 
         mImageGetter = new HttpImageGetter(inflater.getContext());
         updateCommentSectionVisibility(v);
-
-        ViewPager editorPager = (ViewPager) v.findViewById(R.id.editor_pager);
-        editorPager.setAdapter(new FragmentAdapter(getFragmentManager()));
-
-        TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
-        tabs.setupWithViewPager(editorPager);
-
-        LinearLayout tabStrip = (LinearLayout) tabs.getChildAt(0);
-        for (int i = 0; i < tabStrip.getChildCount(); i++) {
-            View tab = tabStrip.getChildAt(i);
-            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) tab.getLayoutParams();
-            lp.width = LinearLayout.LayoutParams.WRAP_CONTENT;
-            lp.weight = 1;
-            tab.setLayoutParams(lp);
-        }
 
         return v;
     }
@@ -248,7 +231,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public boolean canChildScrollUp() {
-        if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+        if (mBottomSheet.getBehavior().getState() == BottomSheetBehavior.STATE_EXPANDED) {
             return true;
         }
 
