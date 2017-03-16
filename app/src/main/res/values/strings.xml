@@ -127,6 +127,7 @@
     <string name="reply_to_review_comments">Reply to review comments</string>
     <string name="reviewed_files">Reviewed files:</string>
     <string name="show_details">Show details</string>
+    <string name="preview">Preview</string>
 
     <string name="reaction_plus_one" translatable="false">+1</string>
     <string name="reaction_minus_one" translatable="false">-1</string>

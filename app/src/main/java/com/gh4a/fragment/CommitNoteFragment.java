@@ -77,7 +77,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private IntentUtils.InitialCommentMarker mInitialComment;
 
     private CommitNoteAdapter mAdapter;
-    private CommentBoxFragment mCommentFragment;
     private BottomSheetBehavior<View> mBottomSheetBehavior;
     private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
 
@@ -135,7 +134,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         super.onActivityCreated(savedInstanceState);
 
         FragmentManager fm = getChildFragmentManager();
-        mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
     }
 
     @Override
@@ -156,9 +154,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
             return true;
         }
 
-        if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
-            return true;
-        }
         return super.canChildScrollUp();
     }
 
@@ -178,7 +173,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         if (mCommit.getCommitter() != null) {
             users.add(mCommit.getCommitter());
         }
-        mCommentFragment.setMentionUsers(users);
 
         if (mInitialComment != null) {
             for (int i = 0; i < data.size(); i++) {
@@ -238,7 +232,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void quoteText(CharSequence text) {
-        mCommentFragment.addQuote(text);
     }
 
     @Override

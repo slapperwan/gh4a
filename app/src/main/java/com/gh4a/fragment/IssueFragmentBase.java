@@ -21,8 +21,12 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AlertDialog;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -34,6 +38,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
@@ -77,7 +82,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     private IntentUtils.InitialCommentMarker mInitialComment;
     private boolean mIsCollaborator;
     private boolean mListShown;
-    private CommentBoxFragment mCommentFragment;
     private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
     private ReactionBar.ReactionDetailsCache mReactionDetailsCache =
             new ReactionBar.ReactionDetailsCache(this);
@@ -131,7 +135,52 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         mImageGetter = new HttpImageGetter(inflater.getContext());
         updateCommentSectionVisibility(v);
 
+        ViewPager editorPager = (ViewPager) v.findViewById(R.id.editor_pager);
+        editorPager.setAdapter(new FragmentAdapter(getFragmentManager()));
+
+        TabLayout tabs = (TabLayout) v.findViewById(R.id.tabs);
+        tabs.setupWithViewPager(editorPager);
+
+        LinearLayout tabStrip = (LinearLayout) tabs.getChildAt(0);
+        for (int i = 0; i < tabStrip.getChildCount(); i++) {
+            View tab = tabStrip.getChildAt(i);
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) tab.getLayoutParams();
+            lp.width = LinearLayout.LayoutParams.WRAP_CONTENT;
+            lp.weight = 1;
+            tab.setLayoutParams(lp);
+        }
+
         return v;
+    }
+
+    private class FragmentAdapter extends FragmentStatePagerAdapter {
+
+        private final int[] TITLES = new int[] {
+            R.string.edit, R.string.preview
+        };
+
+        public FragmentAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            if (position == 1) {
+                return new CommentPreviewFragment();
+            }
+
+            return new CommentBoxFragment();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return getString(TITLES[position]);
+        }
+
+        @Override
+        public int getCount() {
+            return TITLES.length;
+        }
     }
 
     @Override
@@ -163,9 +212,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        FragmentManager fm = getChildFragmentManager();
-        mCommentFragment = (CommentBoxFragment) fm.findFragmentById(R.id.comment_box);
-
         fillData();
         fillLabels(mIssue.getLabels());
         updateCommentLockState();
@@ -206,9 +252,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             return true;
         }
 
-        if (mCommentFragment != null && mCommentFragment.canChildScrollUp()) {
-            return true;
-        }
         return super.canChildScrollUp();
     }
 
@@ -315,13 +358,9 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         if (mIssue.getUser() != null) {
             users.add(mIssue.getUser());
         }
-        mCommentFragment.setMentionUsers(users);
     }
 
     private void updateCommentLockState() {
-        if (mCommentFragment != null) {
-            mCommentFragment.setLocked(isLocked());
-        }
     }
 
     private void fillData() {
@@ -517,7 +556,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public void quoteText(CharSequence text) {
-        mCommentFragment.addQuote(text);
     }
 
     @Override
