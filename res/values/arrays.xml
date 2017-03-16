@@ -16,6 +16,7 @@
         <item>@string/my_issues</item>
         <item>@string/my_pull_requests</item>
         <item>@string/my_gists</item>
+        <item>@string/bookmarks</item>
         <item>@string/pub_timeline</item>
         <item>@string/trend</item>
         <item>@string/blog</item>
@@ -28,6 +29,7 @@
         <item>issues</item>
         <item>prs</item>
         <item>gists</item>
+        <item>bookmarks</item>
         <item>timeline</item>
         <item>trends</item>
         <item>blog</item>

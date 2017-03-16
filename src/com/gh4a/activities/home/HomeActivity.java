@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.BookmarkListActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.SettingsActivity;
 import com.gh4a.activities.UserActivity;
@@ -54,6 +53,7 @@ public class HomeActivity extends BasePagerActivity implements
         START_PAGE_MAPPING.put(R.id.pub_timeline, "timeline");
         START_PAGE_MAPPING.put(R.id.trend, "trends");
         START_PAGE_MAPPING.put(R.id.blog, "blog");
+        START_PAGE_MAPPING.put(R.id.bookmarks, "bookmarks");
     }
 
     private final LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
@@ -173,9 +173,6 @@ public class HomeActivity extends BasePagerActivity implements
             case R.id.search:
                 startActivity(SearchActivity.makeIntent(this));
                 return true;
-            case R.id.bookmarks:
-                startActivity(new Intent(this, BookmarkListActivity.class));
-                return true;
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
@@ -198,6 +195,8 @@ public class HomeActivity extends BasePagerActivity implements
                 return new IssueListFactory(this, mUserLogin, true);
             case R.id.my_gists:
                 return new GistFactory(this, mUserLogin);
+            case R.id.bookmarks:
+                return new BookmarkFactory(this);
             case R.id.pub_timeline:
                 return new TimelineFactory(this);
             case R.id.blog:
