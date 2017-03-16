@@ -37,6 +37,7 @@ public class CommentBoxFragment extends Fragment implements
     private Callback mCallback;
     private boolean mLocked;
     private DropDownUserAdapter mAdapter;
+    private Set<User> mInitialMentionUsers;
 
     public void setLocked(boolean locked) {
         mLocked = locked;
@@ -67,7 +68,11 @@ public class CommentBoxFragment extends Fragment implements
     }
 
     public void setMentionUsers(Set<User> suggestions) {
-        mAdapter.replace(suggestions);
+        if (mAdapter == null) {
+            mInitialMentionUsers = suggestions;
+        } else {
+            mAdapter.replace(suggestions);
+        }
     }
 
     @Override
@@ -78,6 +83,7 @@ public class CommentBoxFragment extends Fragment implements
         } else if (context instanceof Callback) {
             mCallback = (Callback) context;
         } else {
+            throw new IllegalStateException("No callback provided");
         }
     }
 
@@ -104,6 +110,10 @@ public class CommentBoxFragment extends Fragment implements
         mCommentEditor.setInputType(inputType);
 
         mAdapter = new DropDownUserAdapter(getContext());
+        if (mInitialMentionUsers != null) {
+            mAdapter.replace(mInitialMentionUsers);
+            mInitialMentionUsers = null;
+        }
         mCommentEditor.setAdapter(mAdapter);
         mCommentEditor.setTokenizer(new UiUtils.WhitespaceTokenizer());
         mCommentEditor.setThreshold(1);
@@ -133,6 +143,10 @@ public class CommentBoxFragment extends Fragment implements
 
         mCommentEditor.setEnabled(!mLocked);
         mSendButton.setEnabled(!mLocked && !isEmpty);
+
+        int hintResId = mLocked
+                ? R.string.comment_editor_locked_hint : mCallback.getCommentEditorHintResId();
+        mCommentEditor.setHint(hintResId);
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
