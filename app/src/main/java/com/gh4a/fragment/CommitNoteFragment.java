@@ -207,6 +207,12 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
+    protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
+        super.setHighlightColors(colorAttrId, statusBarColorAttrId);
+        mBottomSheet.setPagerColors(colorAttrId);
+    }
+
+    @Override
     public void editComment(CommitComment comment) {
         Intent intent = EditCommitCommentActivity.makeIntent(getActivity(),
                 mRepoOwner, mRepoName, mObjectSha, comment);
