@@ -52,6 +52,7 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.CommentBoxFragmentAdapter;
 import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.ViewPagerBottomSheet;
 
@@ -125,8 +126,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         listContainer.addView(listContent);
 
         mBottomSheet = (ViewPagerBottomSheet) v.findViewById(R.id.bottom_sheet);
-        mBottomSheet.setPagerAdapter(new FragmentAdapter(getFragmentManager()));
-
+        mBottomSheet.setPagerAdapter(
+                new CommentBoxFragmentAdapter(getActivity(), getFragmentManager()));
         mBottomSheetOnOffsetChangedListener =
                 new UiUtils.BottomSheetOnOffsetChangedListener(mBottomSheet);
 
@@ -134,36 +135,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         updateCommentSectionVisibility(v);
 
         return v;
-    }
-
-    private class FragmentAdapter extends FragmentStatePagerAdapter {
-
-        private final int[] TITLES = new int[] {
-            R.string.edit, R.string.preview
-        };
-
-        public FragmentAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            if (position == 1) {
-                return new CommentPreviewFragment();
-            }
-
-            return new CommentBoxFragment();
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return getString(TITLES[position]);
-        }
-
-        @Override
-        public int getCount() {
-            return TITLES.length;
-        }
     }
 
     @Override

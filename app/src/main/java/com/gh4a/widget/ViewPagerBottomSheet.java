@@ -40,10 +40,6 @@ public class ViewPagerBottomSheet extends NestedScrollView {
 
         mTabs = (TabLayout) view.findViewById(R.id.tabs);
         mTabs.setupWithViewPager(mViewPager);
-
-        if (!isInEditMode()) {
-            mBehavior = BottomSheetBehavior.from(this);
-        }
     }
 
     public void setPagerAdapter(PagerAdapter adapter) {
@@ -60,6 +56,9 @@ public class ViewPagerBottomSheet extends NestedScrollView {
     }
 
     public BottomSheetBehavior getBehavior() {
+        if (mBehavior == null) {
+            mBehavior = BottomSheetBehavior.from(this);
+        }
         return mBehavior;
     }
 }
