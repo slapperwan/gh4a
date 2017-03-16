@@ -9,4 +9,8 @@
         android:id="@+id/edit"
         android:title="@string/edit"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/delete"
+        android:title="@string/delete"
+        app:showAsAction="never" />
 </menu>

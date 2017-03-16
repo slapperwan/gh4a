@@ -1,22 +1,27 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditCommitCommentActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
+import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderResult;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -196,6 +201,20 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
+    public void deleteComment(final CommitComment comment) {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.delete_comment_message)
+                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new DeleteCommentTask(getBaseActivity(), comment.getId()).schedule();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    @Override
     public void quoteText(CharSequence text) {
         mCommentFragment.addQuote(text);
     }
@@ -222,6 +241,41 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private void refreshComments() {
         if (getActivity() instanceof CommentUpdateListener) {
             ((CommentUpdateListener) getActivity()).onCommentsUpdated();
+        }
+    }
+
+    private class DeleteCommentTask extends ProgressDialogTask<Void> {
+        private final long mId;
+
+        public DeleteCommentTask(BaseActivity activity, long id) {
+            super(activity, 0, R.string.deleting_msg);
+            mId = id;
+        }
+
+        @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new DeleteCommentTask(getBaseActivity(), mId);
+        }
+
+        @Override
+        protected Void run() throws Exception {
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+            Gh4Application app = Gh4Application.get();
+            CommitService commitService =
+                    (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
+
+            commitService.deleteComment(repoId, mId);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            refreshComments();
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.error_delete_comment);
         }
     }
 }

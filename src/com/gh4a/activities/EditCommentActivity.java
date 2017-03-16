@@ -1,13 +1,10 @@
 package com.gh4a.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.text.TextWatcher;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.EditText;
 
@@ -67,14 +64,14 @@ public abstract class EditCommentActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.accept_delete, menu);
+        MenuItem acceptItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
+                .setIcon(R.drawable.navigation_accept)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         if (mTextWatcher != null) {
             mEditText.removeTextChangedListener(mTextWatcher);
         }
-        mTextWatcher = new UiUtils.ButtonEnableTextWatcher(mEditText,
-                menu.findItem(R.id.accept));
+        mTextWatcher = new UiUtils.ButtonEnableTextWatcher(mEditText, acceptItem);
         mEditText.addTextChangedListener(mTextWatcher);
 
         return super.onCreateOptionsMenu(menu);
@@ -82,29 +79,15 @@ public abstract class EditCommentActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.accept:
-                String text = mEditText.getText().toString();
-                new EditCommentTask(mCommentId, text).schedule();
-                return true;
-            case R.id.delete:
-                new AlertDialog.Builder(this)
-                        .setMessage(R.string.delete_comment_message)
-                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteCommentTask(mCommentId).schedule();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
-                return true;
+        if (item.getItemId() == Menu.FIRST) {
+            String text = mEditText.getText().toString();
+            new EditCommentTask(mCommentId, text).schedule();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     protected abstract void editComment(RepositoryId repoId, long id, String body) throws IOException;
-    protected abstract void deleteComment(RepositoryId repoId, long id) throws IOException;
 
     private class EditCommentTask extends ProgressDialogTask<Void> {
         private final long mId;
@@ -137,38 +120,6 @@ public abstract class EditCommentActivity extends BaseActivity {
         @Override
         protected String getErrorMessage() {
             return getContext().getString(R.string.error_edit_comment);
-        }
-    }
-
-    private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private final long mId;
-
-        public DeleteCommentTask(long id) {
-            super(EditCommentActivity.this, 0, R.string.deleting_msg);
-            mId = id;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteCommentTask(mId);
-        }
-
-        @Override
-        protected Void run() throws Exception {
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            deleteComment(repoId, mId);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            setResult(RESULT_OK);
-            finish();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.error_delete_comment);
         }
     }
 }

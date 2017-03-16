@@ -5,6 +5,7 @@ import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.PullRequestActivity;
@@ -14,6 +15,8 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.IssueService;
 
 import java.util.List;
 
@@ -71,6 +74,14 @@ public class IssueFragment extends IssueFragmentBase {
         Intent intent = EditIssueCommentActivity.makeIntent(getActivity(),
                 mRepoOwner, mRepoName, item.comment);
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
+    protected void deleteCommentInBackground(RepositoryId repoId, long commentId) throws Exception {
+        Gh4Application app = Gh4Application.get();
+        IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
+
+        issueService.deleteComment(repoId, commentId);
     }
 
     @Override

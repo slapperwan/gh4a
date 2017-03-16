@@ -16,10 +16,12 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -31,8 +33,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
+import com.gh4a.activities.EditCommentActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -44,8 +49,10 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueLabelSpan;
 
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
 
@@ -379,6 +386,54 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         }
     }
 
+    @Override
+    public void deleteComment(final IssueEventHolder comment) {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.delete_comment_message)
+                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new DeleteCommentTask(getBaseActivity(), comment.comment.getId()).schedule();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
     protected abstract void bindSpecialViews(View headerView);
     protected abstract void assignHighlightColor();
+    protected abstract void deleteCommentInBackground(RepositoryId repoId, long commentId)
+            throws Exception;
+
+    private class DeleteCommentTask extends ProgressDialogTask<Void> {
+        private final long mId;
+
+        public DeleteCommentTask(BaseActivity activity, long id) {
+            super(activity, 0, R.string.deleting_msg);
+            mId = id;
+        }
+
+        @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new DeleteCommentTask(getBaseActivity(), mId);
+        }
+
+        @Override
+        protected Void run() throws Exception {
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+            deleteCommentInBackground(repoId, mId);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            reloadEvents();
+            getActivity().setResult(Activity.RESULT_OK);
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.error_delete_comment);
+        }
+    }
 }

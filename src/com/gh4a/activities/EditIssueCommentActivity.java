@@ -28,12 +28,4 @@ public class EditIssueCommentActivity extends EditCommentActivity {
         comment.setBody(body);
         issueService.editComment(repoId, comment);
     }
-
-    @Override
-    protected void deleteComment(RepositoryId repoId, long id) throws IOException {
-        Gh4Application app = Gh4Application.get();
-        IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
-
-        issueService.deleteComment(repoId, id);
-    }
 }

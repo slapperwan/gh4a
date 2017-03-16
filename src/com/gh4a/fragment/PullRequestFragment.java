@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
@@ -42,7 +43,10 @@ import org.eclipse.egit.github.core.CommitStatus;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.PullRequestService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -219,6 +223,15 @@ public class PullRequestFragment extends IssueFragmentBase {
                         mRepoOwner, mRepoName, (CommitComment) item.comment)
                 : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName, item.comment);
         startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
+    protected void deleteCommentInBackground(RepositoryId repoId, long commentId) throws Exception {
+        Gh4Application app = Gh4Application.get();
+        PullRequestService pullService =
+                (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
+
+        pullService.deleteComment(repoId, commentId);
     }
 
     @Override

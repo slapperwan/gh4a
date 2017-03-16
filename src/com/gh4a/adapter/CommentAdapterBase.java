@@ -46,6 +46,7 @@ import java.util.Set;
 abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.ViewHolder> {
     public interface OnCommentAction<T> {
         void editComment(T comment);
+        void deleteComment(T comment);
         void quoteText(CharSequence text);
     }
 
@@ -56,6 +57,10 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
             switch (menuItem.getItemId()) {
                 case R.id.edit:
                     mActionCallback.editComment(item);
+                    return true;
+
+                case R.id.delete:
+                    mActionCallback.deleteComment(item);
                     return true;
 
                 case R.id.share:
@@ -143,8 +148,10 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
                 || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
         MenuItem editMenuItem = holder.mPopupMenu.getMenu().findItem(R.id.edit);
+        MenuItem deleteMenuItem = holder.mPopupMenu.getMenu().findItem(R.id.delete);
 
         editMenuItem.setVisible(mActionCallback != null && canEdit);
+        deleteMenuItem.setVisible(mActionCallback != null && canEdit);
     }
 
     public void resume() {
