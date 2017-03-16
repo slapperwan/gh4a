@@ -333,7 +333,6 @@ public class UiUtils {
 
     public static class ButtonEnableTextWatcher extends EmptinessWatchingTextWatcher {
         private View mView;
-        private MenuItem mItem;
 
         public ButtonEnableTextWatcher(EditText editor, View view) {
             super(editor);
@@ -341,18 +340,10 @@ public class UiUtils {
             afterTextChanged(editor.getText());
         }
 
-        public ButtonEnableTextWatcher(EditText editor, MenuItem item) {
-            super(editor);
-            mItem = item;
-            afterTextChanged(editor.getText());
-        }
-
         @Override
         public void onIsEmpty(boolean isEmpty) {
             if (mView != null) {
                 mView.setEnabled(!isEmpty);
-            } else if (mItem != null) {
-                mItem.setEnabled(!isEmpty);
             }
         }
     }

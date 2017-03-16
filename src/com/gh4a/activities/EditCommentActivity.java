@@ -2,10 +2,12 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.Space;
 import android.support.v7.app.ActionBar;
 import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 
 import com.gh4a.BaseActivity;
@@ -17,7 +19,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 
 import java.io.IOException;
 
-public abstract class EditCommentActivity extends BaseActivity {
+public abstract class EditCommentActivity extends BaseActivity implements View.OnClickListener {
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
             long id, String body) {
         return baseIntent.putExtra("owner", repoOwner)
@@ -38,12 +40,25 @@ public abstract class EditCommentActivity extends BaseActivity {
 
         setContentView(R.layout.edit_text);
 
+        CoordinatorLayout rootLayout = getRootLayout();
+        FloatingActionButton fab = (FloatingActionButton)
+                getLayoutInflater().inflate(R.layout.accept_fab, rootLayout, false);
+        fab.setOnClickListener(this);
+        rootLayout.addView(fab);
+
+        Space spacer = new Space(this);
+        spacer.setMinimumHeight(fab.getHeight() / 2);
+        addHeaderView(spacer, false);
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.issue_comment_title) + " " + mCommentId);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mEditText = (EditText) findViewById(R.id.et_text);
         mEditText.setText(getIntent().getStringExtra("body"));
+
+        mTextWatcher = new UiUtils.ButtonEnableTextWatcher(mEditText, fab);
+        mEditText.addTextChangedListener(mTextWatcher);
 
         setResult(RESULT_CANCELED);
     }
@@ -63,28 +78,9 @@ public abstract class EditCommentActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem acceptItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
-                .setIcon(R.drawable.navigation_accept)
-                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-        if (mTextWatcher != null) {
-            mEditText.removeTextChangedListener(mTextWatcher);
-        }
-        mTextWatcher = new UiUtils.ButtonEnableTextWatcher(mEditText, acceptItem);
-        mEditText.addTextChangedListener(mTextWatcher);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == Menu.FIRST) {
-            String text = mEditText.getText().toString();
-            new EditCommentTask(mCommentId, text).schedule();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    public void onClick(View view) {
+        String text = mEditText.getText().toString();
+        new EditCommentTask(mCommentId, text).schedule();
     }
 
     protected abstract void editComment(RepositoryId repoId, long id, String body) throws IOException;
