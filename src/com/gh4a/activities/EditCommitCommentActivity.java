@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -13,9 +14,17 @@ import java.io.IOException;
 
 public class EditCommitCommentActivity extends EditCommentActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            CommitComment comment) {
-        return EditCommentActivity.fillInIntent(new Intent(context, EditCommitCommentActivity.class),
+            String commitSha, CommitComment comment) {
+        Intent intent = new Intent(context, EditCommitCommentActivity.class)
+                .putExtra("commit", commitSha);
+        return EditCommentActivity.fillInIntent(intent,
                 repoOwner, repoName, comment.getId(), comment.getBody());
+    }
+
+    @Override
+    protected CharSequence getSubtitle() {
+        String commitSha = getIntent().getStringExtra("commit").substring(0, 7);
+        return getString(R.string.commit_in_repo, commitSha, mRepoOwner, mRepoName);
     }
 
     @Override

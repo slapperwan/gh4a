@@ -28,8 +28,8 @@ public abstract class EditCommentActivity extends BaseActivity implements View.O
                 .putExtra("body", body);
     }
 
-    private String mRepoOwner;
-    private String mRepoName;
+    protected String mRepoOwner;
+    protected String mRepoName;
     private long mCommentId;
     private EditText mEditText;
     private TextWatcher mTextWatcher;
@@ -52,6 +52,7 @@ public abstract class EditCommentActivity extends BaseActivity implements View.O
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getString(R.string.issue_comment_title) + " " + mCommentId);
+        actionBar.setSubtitle(getSubtitle());
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         mEditText = (EditText) findViewById(R.id.et_text);
@@ -83,6 +84,7 @@ public abstract class EditCommentActivity extends BaseActivity implements View.O
         new EditCommentTask(mCommentId, text).schedule();
     }
 
+    protected abstract CharSequence getSubtitle();
     protected abstract void editComment(RepositoryId repoId, long id, String body) throws IOException;
 
     private class EditCommentTask extends ProgressDialogTask<Void> {

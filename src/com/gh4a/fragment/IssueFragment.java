@@ -72,7 +72,7 @@ public class IssueFragment extends IssueFragmentBase {
     @Override
     public void editComment(IssueEventHolder item) {
         Intent intent = EditIssueCommentActivity.makeIntent(getActivity(),
-                mRepoOwner, mRepoName, item.comment);
+                mRepoOwner, mRepoName, mIssue.getNumber(), item.comment);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 

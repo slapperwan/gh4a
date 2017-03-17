@@ -196,7 +196,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     @Override
     public void editComment(CommitComment comment) {
         Intent intent = EditCommitCommentActivity.makeIntent(getActivity(),
-                mRepoOwner, mRepoName, comment);
+                mRepoOwner, mRepoName, mObjectSha, comment);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 

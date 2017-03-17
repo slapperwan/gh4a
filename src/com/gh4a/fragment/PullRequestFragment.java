@@ -219,9 +219,10 @@ public class PullRequestFragment extends IssueFragmentBase {
     @Override
     public void editComment(IssueEventHolder item) {
         Intent intent = item.comment instanceof CommitComment
-                ? EditPullRequestCommentActivity.makeIntent(getActivity(),
-                        mRepoOwner, mRepoName, (CommitComment) item.comment)
-                : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName, item.comment);
+                ? EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                        mPullRequest.getNumber(), (CommitComment) item.comment)
+                : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                        mIssue.getNumber(), item.comment);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 

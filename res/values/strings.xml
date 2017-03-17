@@ -252,7 +252,7 @@
     <string name="repo_files">Files</string>
     <string name="repo_short">Repos</string>
     <string name="repo_no_readme">No README file found</string>
-    <string name="repo_issue_on">#%1$d on %2$s</string>
+    <string name="repo_issue_on">#%1$d on %2$s/%3$s</string>
     <string name="repo_activity">Activity</string>
 
     <!-- Issue events -->
@@ -290,6 +290,7 @@
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>
+    <string name="commit_in_repo">Commit %1$s in %2$s/%3$s</string>
     <string name="commit">Commit</string>
     <string name="commits">Commits</string>
     <string name="commit_changed">Files Changed</string>
