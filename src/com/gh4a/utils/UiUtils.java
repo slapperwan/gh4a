@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.DownloadManager;
-import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +27,7 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.ActionMode;
 import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -223,10 +223,13 @@ public class UiUtils {
     }
 
     public static Dialog createProgressDialog(Context context, @StringRes int messageResId) {
-        ProgressDialog d = new ProgressDialog(context);
-        d.setMessage(context.getString(messageResId));
-        d.setIndeterminate(true);
-        return d;
+        View content = LayoutInflater.from(context).inflate(R.layout.progress_dialog, null);
+        TextView message = (TextView) content.findViewById(R.id.message);
+
+        message.setText(messageResId);
+        return new AlertDialog.Builder(context)
+                .setView(content)
+                .create();
     }
 
     public static int resolveDrawable(Context context, int styledAttributeId) {
