@@ -26,8 +26,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -105,19 +103,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private final Handler mHandler = new Handler();
 
     private final Runnable mUpdateTaskDescriptionRunnable = new Runnable() {
-        private String mLabel;
-        private Bitmap mIcon;
-
         @TargetApi(21)
         @Override
         public void run() {
-            if (mIcon == null) {
-                mLabel = getString(R.string.app_name);
-                mIcon = BitmapFactory.decodeResource(getResources(), R.drawable.octodroid);
-            }
-            ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(
-                    mLabel, mIcon, mProgressColors[0]);
-            setTaskDescription(desc);
+            setTaskDescription(new ActivityManager.TaskDescription(null, null, mProgressColors[0]));
         }
     };
 
