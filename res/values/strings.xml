@@ -172,7 +172,7 @@
     <string name="no_bookmarks">No bookmarks were created so far.</string>
     <string name="no_wiki_updates_found">No recent Wiki updates found.</string>
     <string name="no_notifications_found">No notifications found.</string>
-    <string name="no_org_members_found">This organizations does not have any members.</string>
+    <string name="no_org_members_found">This organization does not have any members.</string>
     <string name="no_collaborators_found">This repository does not have any collaborators.</string>
 
     <!-- Activity event -->
