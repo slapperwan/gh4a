@@ -7,6 +7,7 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ public class CommentBoxFragment extends Fragment implements
         @StringRes int getCommentEditorHintResId();
         void onSendCommentInBackground(String comment) throws IOException;
         void onCommentSent();
+        void updatePreview(String content);
     }
 
     private View mSendButton;
@@ -104,6 +106,20 @@ public class CommentBoxFragment extends Fragment implements
         mCommentEditor = (MultiAutoCompleteTextView) view.findViewById(R.id.et_comment);
         mCommentEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mCommentEditor, mSendButton));
+        mCommentEditor.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mCallback.updatePreview(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         int inputType = (mCommentEditor.getInputType() | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT)
                 & ~InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE;

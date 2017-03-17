@@ -257,6 +257,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         refreshComments();
     }
 
+    @Override
+    public void updatePreview(String content) {
+        mCommentBoxAdapter.getPreviewFragment().setContent(content);
+    }
+
     private void refreshComments() {
         if (getActivity() instanceof CommentUpdateListener) {
             ((CommentUpdateListener) getActivity()).onCommentsUpdated();

@@ -1,0 +1,28 @@
+body {
+    background-color: #303030;
+    color: #ffffff;
+    font-size: 14px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+a {
+    color: #559639;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+}
+
+h1 {
+    font-size: 21px;
+}
+
+h2 {
+    font-size: 20px;
+}
+
+blockquote {
+    border-left: 4px solid #ffffff;
+    color: #ffffff;
+}

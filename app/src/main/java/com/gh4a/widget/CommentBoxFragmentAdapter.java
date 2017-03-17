@@ -17,17 +17,19 @@ public class CommentBoxFragmentAdapter extends FragmentStatePagerAdapter {
 
     private final Context mContext;
     private final CommentBoxFragment mCommentFragment;
+    private final CommentPreviewFragment mPreviewFragment;
 
     public CommentBoxFragmentAdapter(Context context, FragmentManager fm) {
         super(fm);
         mContext = context;
         mCommentFragment = new CommentBoxFragment();
+        mPreviewFragment = new CommentPreviewFragment();
     }
 
     @Override
     public Fragment getItem(int position) {
         if (position == 1) {
-            return new CommentPreviewFragment();
+            return mPreviewFragment;
         }
 
         return mCommentFragment;
@@ -45,5 +47,9 @@ public class CommentBoxFragmentAdapter extends FragmentStatePagerAdapter {
 
     public CommentBoxFragment getCommentFragment() {
         return mCommentFragment;
+    }
+
+    public CommentPreviewFragment getPreviewFragment() {
+        return mPreviewFragment;
     }
 }
