@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -98,6 +99,16 @@ public class IssueListActivity extends BasePagerActivity implements
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
+
+    private Handler mHandler = new Handler();
+    private Runnable mRefreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mOpenFragment != null) {
+                mOpenFragment.onRefresh();
+            }
+        }
+    };
 
     private final IssueListFragment.SortDrawerHelper mSortHelper =
             new IssueListFragment.SortDrawerHelper();
@@ -221,11 +232,18 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacks(mRefreshRunnable);
+    }
+
+    @Override
     public void onRefresh() {
         mAssignees = null;
         mMilestones = null;
         mLabels = null;
         mIsCollaborator = null;
+        mHandler.removeCallbacks(mRefreshRunnable);
         updateRightNavigationDrawer();
         forceLoaderReload(0, 1, 2, 3);
         super.onRefresh();
@@ -312,8 +330,11 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ISSUE_CREATE) {
-            if (resultCode == Activity.RESULT_OK && mOpenFragment != null) {
-                mOpenFragment.onRefresh();
+            if (resultCode == Activity.RESULT_OK) {
+                // delay refresh for a bit, as
+                // - the fragment might not be created yet
+                // - Github seems to need some time to reflect new issues in their response
+                mHandler.postDelayed(mRefreshRunnable, 500);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
