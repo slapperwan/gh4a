@@ -25,7 +25,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.CommentBoxFragmentAdapter;
-import com.gh4a.widget.ViewPagerBottomSheet;
+import com.gh4a.widget.EditorBottomSheet;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -39,7 +39,11 @@ import java.util.List;
 import java.util.Set;
 
 public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
-        CommitNoteAdapter.OnCommentAction<CommitComment>, CommentBoxFragment.Callback {
+        CommitNoteAdapter.OnCommentAction<CommitComment>, CommentBoxFragment.Callback,
+        View.OnClickListener {
+
+    private View mCommentFab;
+
     public static CommitNoteFragment newInstance(String repoOwner, String repoName,
             String commitSha, RepositoryCommit commit,
             List<CommitComment> allComments, IntentUtils.InitialCommentMarker initialComment) {
@@ -78,7 +82,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private IntentUtils.InitialCommentMarker mInitialComment;
 
     private CommitNoteAdapter mAdapter;
-    private ViewPagerBottomSheet mBottomSheet;
+    private EditorBottomSheet mBottomSheet;
     private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
     private CommentBoxFragmentAdapter mCommentBoxAdapter;
 
@@ -102,7 +106,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
-        mBottomSheet = (ViewPagerBottomSheet) v.findViewById(R.id.bottom_sheet);
+        mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
         mCommentBoxAdapter = new CommentBoxFragmentAdapter(getActivity(),
                 getChildFragmentManager());
         mBottomSheet.setPagerAdapter(mCommentBoxAdapter);
@@ -193,6 +197,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
                 mRepoOwner, mRepoName, mObjectSha, true, false);
         loader.prefillData((List<CommitComment>) getArguments().getSerializable("comments"));
         return loader;
+    }
+
+    @Override
+    public void onClick(View v) {
+        mCommentBoxAdapter.getCommentFragment().sendComment();
     }
 
     @Override

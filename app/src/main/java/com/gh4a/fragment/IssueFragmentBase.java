@@ -53,8 +53,8 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.CommentBoxFragmentAdapter;
+import com.gh4a.widget.EditorBottomSheet;
 import com.gh4a.widget.ReactionBar;
-import com.gh4a.widget.ViewPagerBottomSheet;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
@@ -86,7 +86,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             new ReactionBar.ReactionDetailsCache(this);
     private TimelineItemAdapter mAdapter;
     private HttpImageGetter mImageGetter;
-    private ViewPagerBottomSheet mBottomSheet;
+    private EditorBottomSheet mBottomSheet;
     private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
     private CommentBoxFragmentAdapter mCommentBoxAdapter;
 
@@ -126,7 +126,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
-        mBottomSheet = (ViewPagerBottomSheet) v.findViewById(R.id.bottom_sheet);
+        mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
         mCommentBoxAdapter = new CommentBoxFragmentAdapter(getActivity(),
                 getChildFragmentManager());
         mBottomSheet.setPagerAdapter(mCommentBoxAdapter);

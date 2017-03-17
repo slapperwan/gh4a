@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/advanced_editor"
+    android:background="?android:colorBackground"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/comment_bottom_sheet_height">
+
+        <com.gh4a.widget.WrapContentHeightViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?colorPrimary"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/tab_indicator_color"
+        app:tabMaxWidth="-1dp"
+        app:tabMode="scrollable"
+        app:tabSelectedTextColor="@color/tab_indicator_color"
+        app:tabTextColor="@color/tab_text_color"/>
+</LinearLayout>

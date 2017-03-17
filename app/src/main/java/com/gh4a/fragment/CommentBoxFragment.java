@@ -25,8 +25,7 @@ import org.eclipse.egit.github.core.User;
 import java.io.IOException;
 import java.util.Set;
 
-public class CommentBoxFragment extends Fragment implements
-        View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate {
+public class CommentBoxFragment extends Fragment implements SwipeRefreshLayout.ChildScrollDelegate {
     public interface Callback {
         @StringRes int getCommentEditorHintResId();
         void onSendCommentInBackground(String comment) throws IOException;
@@ -34,7 +33,6 @@ public class CommentBoxFragment extends Fragment implements
         void updatePreview(String content);
     }
 
-    private View mSendButton;
     private MultiAutoCompleteTextView mCommentEditor;
     private Callback mCallback;
     private boolean mLocked;
@@ -77,6 +75,17 @@ public class CommentBoxFragment extends Fragment implements
         }
     }
 
+    public boolean isEditorEmpty() {
+        return mCommentEditor == null || mCommentEditor.getText() == null ||
+                mCommentEditor.getText().length() == 0;
+    }
+
+    public void sendComment() {
+        Editable comment = mCommentEditor.getText();
+        new CommentTask(comment.toString()).schedule();
+        UiUtils.hideImeForView(getActivity().getCurrentFocus());
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -99,13 +108,7 @@ public class CommentBoxFragment extends Fragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mSendButton = view.findViewById(R.id.iv_comment);
-        mSendButton.setOnClickListener(this);
-        mSendButton.setEnabled(false);
-
         mCommentEditor = (MultiAutoCompleteTextView) view.findViewById(R.id.et_comment);
-        mCommentEditor.addTextChangedListener(
-                new UiUtils.ButtonEnableTextWatcher(mCommentEditor, mSendButton));
         mCommentEditor.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -138,13 +141,6 @@ public class CommentBoxFragment extends Fragment implements
     }
 
     @Override
-    public void onClick(View view) {
-        Editable comment = mCommentEditor.getText();
-        new CommentTask(comment.toString()).schedule();
-        UiUtils.hideImeForView(getActivity().getCurrentFocus());
-    }
-
-    @Override
     public boolean canChildScrollUp() {
         return mCommentEditor != null && mCommentEditor.hasFocus()
                 && UiUtils.canViewScrollUp(mCommentEditor);
@@ -155,10 +151,7 @@ public class CommentBoxFragment extends Fragment implements
             return;
         }
 
-        boolean isEmpty = mCommentEditor.getText() == null || mCommentEditor.getText().length() == 0;
-
         mCommentEditor.setEnabled(!mLocked);
-        mSendButton.setEnabled(!mLocked && !isEmpty);
 
         int hintResId = mLocked
                 ? R.string.comment_editor_locked_hint : mCallback.getCommentEditorHintResId();
