@@ -285,7 +285,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int[] getHeaderColors() {
+    protected int[] getHeaderColorAttrs() {
         return mHeaderColorAttrs;
     }
 
@@ -438,18 +438,18 @@ public class PullRequestActivity extends BasePagerActivity implements
 
         if (mPullRequest.isMerged()) {
             stateTextResId = R.string.pull_request_merged;
-            mHeaderColorAttrs = new int[]{
-                    R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark
+            mHeaderColorAttrs = new int[] {
+                R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark
             };
         } else if (ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())) {
             stateTextResId = R.string.closed;
-            mHeaderColorAttrs = new int[]{
-                    R.attr.colorIssueClosed, R.attr.colorIssueClosedDark
+            mHeaderColorAttrs = new int[] {
+                R.attr.colorIssueClosed, R.attr.colorIssueClosedDark
             };
         } else {
             stateTextResId = R.string.open;
-            mHeaderColorAttrs = new int[]{
-                    R.attr.colorIssueOpen, R.attr.colorIssueOpenDark
+            mHeaderColorAttrs = new int[] {
+                R.attr.colorIssueOpen, R.attr.colorIssueOpenDark
             };
         }
 

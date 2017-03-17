@@ -26,7 +26,7 @@ public abstract class FragmentFactory {
     protected void onFragmentDestroyed(Fragment f) {
     }
 
-    protected int[] getHeaderColors() {
+    protected int[] getHeaderColorAttrs() {
         return null;
     }
 

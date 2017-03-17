@@ -116,6 +116,12 @@ public class IssueListActivity extends BasePagerActivity implements
         R.string.open, R.string.closed, R.string.merged
     };
 
+    private static final int[][] HEADER_COLOR_ATTRS = new int[][] {
+        { R.attr.colorIssueOpen, R.attr.colorIssueOpenDark },
+        { R.attr.colorIssueClosed, R.attr.colorIssueClosedDark },
+        { R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark }
+    };
+
     private final LoaderCallbacks<List<Label>> mLabelCallback =
             new ProgressDialogLoaderCallbacks<List<Label>>(this, this) {
         @Override
@@ -256,21 +262,8 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int[][] getTabHeaderColors() {
-        return new int[][] {
-            {
-                UiUtils.resolveColor(this, R.attr.colorIssueOpen),
-                UiUtils.resolveColor(this, R.attr.colorIssueOpenDark)
-            },
-            {
-                UiUtils.resolveColor(this, R.attr.colorIssueClosed),
-                UiUtils.resolveColor(this, R.attr.colorIssueClosedDark)
-            },
-            {
-                UiUtils.resolveColor(this, R.attr.colorPullRequestMerged),
-                UiUtils.resolveColor(this, R.attr.colorPullRequestMergedDark)
-            }
-        };
+    protected int[][] getTabHeaderColorAttrs() {
+        return HEADER_COLOR_ATTRS;
     }
 
     @Override

@@ -31,7 +31,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
-import com.gh4a.utils.UiUtils;
 
 public class IssueMilestoneListActivity extends BasePagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
@@ -45,6 +44,10 @@ public class IssueMilestoneListActivity extends BasePagerActivity implements
 
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
+    };
+    private static final int[][] HEADER_COLOR_ATTRS = new int[][] {
+        { R.attr.colorIssueOpen, R.attr.colorIssueOpenDark },
+        { R.attr.colorIssueClosed, R.attr.colorIssueClosedDark }
     };
 
     private String mRepoOwner;
@@ -123,17 +126,8 @@ public class IssueMilestoneListActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int[][] getTabHeaderColors() {
-        return new int[][] {
-            {
-                UiUtils.resolveColor(this, R.attr.colorIssueOpen),
-                UiUtils.resolveColor(this, R.attr.colorIssueOpenDark)
-            },
-            {
-                UiUtils.resolveColor(this, R.attr.colorIssueClosed),
-                UiUtils.resolveColor(this, R.attr.colorIssueClosedDark)
-            }
-        };
+    protected int[][] getTabHeaderColorAttrs() {
+        return HEADER_COLOR_ATTRS;
     }
 
     @Override

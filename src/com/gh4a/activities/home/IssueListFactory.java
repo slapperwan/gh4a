@@ -29,7 +29,7 @@ public class IssueListFactory extends FragmentFactory {
     private final boolean mIsPullRequest;
     private final IssueListFragment.SortDrawerHelper mDrawerHelper =
             new IssueListFragment.SortDrawerHelper();
-    private int[] mHeaderColors;
+    private int[] mHeaderColorAttrs;
 
     public IssueListFactory(HomeActivity activity, String userLogin, boolean pr) {
         super(activity);
@@ -53,8 +53,8 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
-    protected int[] getHeaderColors() {
-        return mHeaderColors;
+    protected int[] getHeaderColorAttrs() {
+        return mHeaderColorAttrs;
     }
 
     @Override
@@ -161,7 +161,7 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     private void updateHeaderColor() {
-        mHeaderColors = new int[] {
+        mHeaderColorAttrs = new int[] {
             mShowingClosed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
             mShowingClosed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark
         };

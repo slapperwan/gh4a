@@ -213,8 +213,8 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int[] getHeaderColors() {
-        return mFactory.getHeaderColors();
+    protected int[] getHeaderColorAttrs() {
+        return mFactory.getHeaderColorAttrs();
     }
 
     @Override

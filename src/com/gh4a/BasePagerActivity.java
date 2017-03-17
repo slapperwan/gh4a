@@ -40,7 +40,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         setContentView(R.layout.view_pager);
 
         mCurrentHeaderColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        mTabHeaderColors = getTabHeaderColors();
+        updateTabHeaderColors();
         mPager = setupPager();
         updateTabVisibility();
 
@@ -60,11 +60,11 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     protected void invalidateTabs() {
         invalidateFragments();
-        mTabHeaderColors = getTabHeaderColors();
+        updateTabHeaderColors();
         if (mTabHeaderColors != null) {
             onPageMoved(0, 0);
         } else {
-            int[] colorAttrs = getHeaderColors();
+            int[] colorAttrs = getHeaderColorAttrs();
             if (colorAttrs != null) {
                 transitionHeaderToColor(colorAttrs[0], colorAttrs[1]);
             } else {
@@ -103,6 +103,20 @@ public abstract class BasePagerActivity extends BaseActivity implements
             return ((SwipeRefreshLayout.ChildScrollDelegate) item).canChildScrollUp();
         }
         return false;
+    }
+
+    private void updateTabHeaderColors() {
+        int[][] colorAttrs = getTabHeaderColorAttrs();
+        if (colorAttrs == null) {
+            mTabHeaderColors = null;
+            return;
+        }
+
+        mTabHeaderColors = new int[colorAttrs.length][2];
+        for (int i = 0; i < mTabHeaderColors.length; i++) {
+            mTabHeaderColors[i][0] = UiUtils.resolveColor(this, colorAttrs[i][0]);
+            mTabHeaderColors[i][1] = UiUtils.resolveColor(this, colorAttrs[i][1]);
+        }
     }
 
     private ViewPager setupPager() {
@@ -170,12 +184,12 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
-    protected int[][] getTabHeaderColors() {
+    protected int[][] getTabHeaderColorAttrs() {
         return null;
     }
 
     /* expected format: int[2] - 0 is header, 1 is status bar */
-    protected int[] getHeaderColors() {
+    protected int[] getHeaderColorAttrs() {
         return null;
     }
 
