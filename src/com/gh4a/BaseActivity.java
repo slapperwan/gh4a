@@ -24,8 +24,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -105,20 +103,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private Animator mHeaderTransition;
     private Handler mHandler = new Handler();
 
-    private Runnable mUpdateTaskDescriptionRunnable = new Runnable() {
-        private String mLabel;
-        private Bitmap mIcon;
-
+    private final Runnable mUpdateTaskDescriptionRunnable = new Runnable() {
         @TargetApi(21)
         @Override
         public void run() {
-            if (mIcon == null) {
-                mLabel = getString(R.string.app_name);
-                mIcon = BitmapFactory.decodeResource(getResources(), R.drawable.octodroid);
-            }
-            ActivityManager.TaskDescription desc = new ActivityManager.TaskDescription(
-                    mLabel, mIcon, mProgressColors[0]);
-            setTaskDescription(desc);
+            setTaskDescription(new ActivityManager.TaskDescription(null, null, mProgressColors[0]));
         }
     };
 
