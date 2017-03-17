@@ -16,7 +16,6 @@
 package com.gh4a.activities;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -48,6 +47,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
 
@@ -95,7 +95,6 @@ public class IssueListActivity extends BasePagerActivity implements
     private IssueListFragment mClosedFragment;
     private IssueListFragment mSearchFragment;
     private Boolean mIsCollaborator;
-    private ProgressDialog mProgressDialog;
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
@@ -117,7 +116,8 @@ public class IssueListActivity extends BasePagerActivity implements
         R.string.open, R.string.closed, R.string.merged
     };
 
-    private final LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
+    private final LoaderCallbacks<List<Label>> mLabelCallback =
+            new ProgressDialogLoaderCallbacks<List<Label>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
@@ -125,21 +125,14 @@ public class IssueListActivity extends BasePagerActivity implements
 
         @Override
         protected void onResultReady(List<Label> result) {
-            stopProgressDialog(mProgressDialog);
             mLabels = result;
             showLabelsDialog();
             getSupportLoaderManager().destroyLoader(0);
         }
-
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
     private final LoaderCallbacks<List<Milestone>> mMilestoneCallback =
-            new LoaderCallbacks<List<Milestone>>(this) {
+            new ProgressDialogLoaderCallbacks<List<Milestone>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName,
@@ -148,21 +141,14 @@ public class IssueListActivity extends BasePagerActivity implements
 
         @Override
         protected void onResultReady(List<Milestone> result) {
-            stopProgressDialog(mProgressDialog);
             mMilestones = result;
             showMilestonesDialog();
             getSupportLoaderManager().destroyLoader(1);
         }
-
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
     private final LoaderCallbacks<List<User>> mAssigneeListCallback =
-            new LoaderCallbacks<List<User>>(this) {
+            new ProgressDialogLoaderCallbacks<List<User>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new AssigneeListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
@@ -170,16 +156,9 @@ public class IssueListActivity extends BasePagerActivity implements
 
         @Override
         protected void onResultReady(List<User> result) {
-            stopProgressDialog(mProgressDialog);
             mAssignees = result;
             showAssigneesDialog();
             getSupportLoaderManager().destroyLoader(2);
-        }
-
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
         }
     };
 
@@ -197,12 +176,6 @@ public class IssueListActivity extends BasePagerActivity implements
                     updateRightNavigationDrawer();
                 }
             }
-        }
-
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
         }
     };
 
@@ -670,7 +643,6 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private void filterAssignee() {
         if (mAssignees == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(2, null, mAssigneeListCallback);
         } else {
             showAssigneesDialog();
@@ -679,7 +651,6 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private void filterMilestone() {
         if (mMilestones == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         } else {
             showMilestonesDialog();
@@ -688,7 +659,6 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private void filterLabel() {
         if (mLabels == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(0, null, mLabelCallback);
         } else {
             showLabelsDialog();

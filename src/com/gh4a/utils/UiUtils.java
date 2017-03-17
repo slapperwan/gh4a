@@ -2,7 +2,9 @@ package com.gh4a.utils;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +16,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
@@ -217,6 +220,13 @@ public class UiUtils {
             return new ContextThemeWrapper(context, themeResId);
         }
         return context;
+    }
+
+    public static Dialog createProgressDialog(Context context, @StringRes int messageResId) {
+        ProgressDialog d = new ProgressDialog(context);
+        d.setMessage(context.getString(messageResId));
+        d.setIndeterminate(true);
+        return d;
     }
 
     public static int resolveDrawable(Context context, int styledAttributeId) {

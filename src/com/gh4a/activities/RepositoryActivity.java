@@ -37,6 +37,7 @@ import com.gh4a.loader.IsStarringLoader;
 import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.UiUtils;
@@ -114,7 +115,7 @@ public class RepositoryActivity extends BasePagerActivity {
     };
 
     private final LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>> mBranchesAndTagsCallback =
-            new LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(this) {
+            new ProgressDialogLoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(this, this) {
         @Override
         protected Loader<LoaderResult<Pair<List<RepositoryBranch>, List<RepositoryTag>>>> onCreateLoader() {
             return new BaseLoader<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(RepositoryActivity.this) {
@@ -127,16 +128,10 @@ public class RepositoryActivity extends BasePagerActivity {
         }
         @Override
         protected void onResultReady(Pair<List<RepositoryBranch>, List<RepositoryTag>> result) {
-            stopProgressDialog(mProgressDialog);
             mBranches = result.first;
             mTags = result.second;
             showRefSelectionDialog();
             getSupportLoaderManager().destroyLoader(LOADER_BRANCHES_AND_TAGS);
-        }
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
         }
     };
 
@@ -167,7 +162,6 @@ public class RepositoryActivity extends BasePagerActivity {
     private String mRepoOwner;
     private String mRepoName;
     private ActionBar mActionBar;
-    private ProgressDialog mProgressDialog;
     private int mInitialPage;
     private String mInitialPath;
 
@@ -378,7 +372,6 @@ public class RepositoryActivity extends BasePagerActivity {
                 return true;
             case R.id.ref:
                 if (mBranches == null) {
-                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
                     getSupportLoaderManager().initLoader(LOADER_BRANCHES_AND_TAGS,
                             null, mBranchesAndTagsCallback);
                 } else {

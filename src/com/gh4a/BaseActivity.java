@@ -22,7 +22,6 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -229,16 +228,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected Intent navigateUp() {
         return null;
-    }
-
-    protected ProgressDialog showProgressDialog(String message) {
-        return ProgressDialog.show(this, "", message, true);
-    }
-
-    protected void stopProgressDialog(ProgressDialog progressDialog) {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
     }
 
     public CoordinatorLayout getRootLayout() {

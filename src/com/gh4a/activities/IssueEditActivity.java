@@ -15,7 +15,6 @@
  */
 package com.gh4a.activities;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -45,6 +44,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
 
@@ -95,30 +95,24 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     private View mAssigneeContainer;
     private View mLabelContainer;
 
-    private ProgressDialog mProgressDialog;
-
     private static final String STATE_KEY_ISSUE = "issue";
 
-    private final LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
+    private final LoaderCallbacks<List<Label>> mLabelCallback =
+            new ProgressDialogLoaderCallbacks<List<Label>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         protected void onResultReady(List<Label> result) {
-            stopProgressDialog(mProgressDialog);
             mAllLabels = result;
             showLabelDialog();
             getSupportLoaderManager().destroyLoader(0);
         }
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
-    private final LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>(this) {
+    private final LoaderCallbacks<List<Milestone>> mMilestoneCallback =
+            new ProgressDialogLoaderCallbacks<List<Milestone>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueEditActivity.this,
@@ -126,34 +120,23 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
         @Override
         protected void onResultReady(List<Milestone> result) {
-            stopProgressDialog(mProgressDialog);
             mAllMilestone = result;
             showMilestonesDialog();
             getSupportLoaderManager().destroyLoader(1);
         }
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
-    private final LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>(this) {
+    private final LoaderCallbacks<List<User>> mCollaboratorListCallback =
+            new ProgressDialogLoaderCallbacks<List<User>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new CollaboratorListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         protected void onResultReady(List<User> result) {
-            stopProgressDialog(mProgressDialog);
             mAllAssignee = result;
             showAssigneesDialog();
             getSupportLoaderManager().destroyLoader(2);
-        }
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
         }
     };
 
@@ -339,7 +322,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private void showMilestonesDialog() {
         if (mAllMilestone == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         } else {
             final String[] milestones = new String[mAllMilestone.size() + 1];
@@ -379,7 +361,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private void showAssigneesDialog() {
         if (mAllAssignee == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         } else {
             final String[] assigneeNames = new String[mAllAssignee.size()];
@@ -430,7 +411,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private void showLabelDialog() {
         if (mAllLabels == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg));
             getSupportLoaderManager().initLoader(0, null, mLabelCallback);
         } else {
             LayoutInflater inflater = getLayoutInflater();
