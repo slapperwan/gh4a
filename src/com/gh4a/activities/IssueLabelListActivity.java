@@ -290,7 +290,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         private final String mLabelName;
 
         public DeleteIssueLabelTask(String labelName) {
-            super(IssueLabelListActivity.this, 0, R.string.deleting_msg);
+            super(IssueLabelListActivity.this, R.string.deleting_msg);
             mLabelName = labelName;
         }
 
@@ -324,7 +324,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         private final String mColor;
 
         public EditIssueLabelTask(String oldLabelName, String newLabelName, String color) {
-            super(IssueLabelListActivity.this, 0, R.string.saving_msg);
+            super(IssueLabelListActivity.this, R.string.saving_msg);
             mOldLabelName = oldLabelName;
             mNewLabelName = newLabelName;
             mColor = color;
@@ -365,7 +365,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         private final String mColor;
 
         public AddIssueLabelTask(String labelName, String color) {
-            super(IssueLabelListActivity.this, 0, R.string.saving_msg);
+            super(IssueLabelListActivity.this, R.string.saving_msg);
             mLabelName = labelName;
             mColor = color;
         }

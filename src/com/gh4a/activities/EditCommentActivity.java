@@ -92,7 +92,7 @@ public abstract class EditCommentActivity extends BaseActivity implements View.O
         private final String mBody;
 
         public EditCommentTask(long id, String body) {
-            super(EditCommentActivity.this, 0, R.string.saving_msg);
+            super(EditCommentActivity.this, R.string.saving_msg);
             mId = id;
             mBody = body;
         }

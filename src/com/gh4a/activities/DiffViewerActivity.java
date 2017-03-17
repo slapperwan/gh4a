@@ -496,7 +496,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         private final long mId;
 
         public CommentTask(long id, String body, int position) {
-            super(DiffViewerActivity.this, 0, R.string.saving_msg);
+            super(DiffViewerActivity.this, R.string.saving_msg);
             mBody = body;
             mPosition = position;
             mId = id;
@@ -529,7 +529,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         private final long mId;
 
         public DeleteCommentTask(long id) {
-            super(DiffViewerActivity.this, 0, R.string.deleting_msg);
+            super(DiffViewerActivity.this, R.string.deleting_msg);
             mId = id;
         }
 

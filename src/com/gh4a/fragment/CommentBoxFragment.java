@@ -173,7 +173,7 @@ public class CommentBoxFragment extends Fragment implements
         private final String mText;
 
         public CommentTask(String text) {
-            super((BaseActivity) getActivity(), 0, R.string.saving_comment);
+            super((BaseActivity) getActivity(), R.string.saving_comment);
             mText = text;
         }
 

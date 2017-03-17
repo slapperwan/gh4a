@@ -2,7 +2,6 @@ package com.gh4a;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -39,6 +38,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
@@ -234,9 +234,7 @@ public class BrowseFilter extends AppCompatActivity {
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            ProgressDialog pd = new ProgressDialog(getActivity());
-            pd.setMessage(getString(R.string.loading_msg));
-            return pd;
+            return UiUtils.createProgressDialog(getActivity(), R.string.loading_msg);
         }
 
         @Override

@@ -280,7 +280,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         private final Milestone mMilestone;
 
         public SaveIssueMilestoneTask(Milestone milestone) {
-            super(IssueMilestoneEditActivity.this, 0, R.string.saving_msg);
+            super(IssueMilestoneEditActivity.this, R.string.saving_msg);
             mMilestone = milestone;
         }
 
@@ -320,7 +320,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         private final int mNumber;
 
         public DeleteIssueMilestoneTask(int number) {
-            super(IssueMilestoneEditActivity.this, 0, R.string.deleting_msg);
+            super(IssueMilestoneEditActivity.this, R.string.deleting_msg);
             mNumber = number;
         }
 
@@ -353,8 +353,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         private final boolean mOpen;
 
         public OpenCloseIssueMilestoneTask(Milestone milestone, boolean open) {
-            super(IssueMilestoneEditActivity.this, 0,
-                    open ? R.string.opening_msg : R.string.closing_msg);
+            super(IssueMilestoneEditActivity.this, open ? R.string.opening_msg : R.string.closing_msg);
             mMilestone = milestone;
             mOpen = open;
         }

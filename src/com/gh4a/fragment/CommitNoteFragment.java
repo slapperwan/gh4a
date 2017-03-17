@@ -248,7 +248,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         private final long mId;
 
         public DeleteCommentTask(BaseActivity activity, long id) {
-            super(activity, 0, R.string.deleting_msg);
+            super(activity, R.string.deleting_msg);
             mId = id;
         }
 

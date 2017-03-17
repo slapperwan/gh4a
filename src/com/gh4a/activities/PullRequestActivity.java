@@ -484,7 +484,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         private final boolean mOpen;
 
         public PullRequestOpenCloseTask(boolean open) {
-            super(getBaseActivity(), 0, open ? R.string.opening_msg : R.string.closing_msg);
+            super(getBaseActivity(), open ? R.string.opening_msg : R.string.closing_msg);
             mOpen = open;
         }
 
@@ -524,7 +524,7 @@ public class PullRequestActivity extends BasePagerActivity implements
         private final String mCommitMessage;
 
         public PullRequestMergeTask(String commitMessage) {
-            super(getBaseActivity(), 0, R.string.merging_msg);
+            super(getBaseActivity(), R.string.merging_msg);
             mCommitMessage = commitMessage;
         }
 

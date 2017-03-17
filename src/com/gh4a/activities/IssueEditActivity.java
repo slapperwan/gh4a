@@ -482,7 +482,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         private final Issue mIssue;
 
         public SaveIssueTask(Issue issue) {
-            super(IssueEditActivity.this, 0, R.string.saving_msg);
+            super(IssueEditActivity.this, R.string.saving_msg);
             mIssue = issue;
         }
 

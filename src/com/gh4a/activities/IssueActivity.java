@@ -345,7 +345,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         private final boolean mOpen;
 
         public IssueOpenCloseTask(boolean open) {
-            super(IssueActivity.this, 0, open ? R.string.opening_msg : R.string.closing_msg);
+            super(IssueActivity.this, open ? R.string.opening_msg : R.string.closing_msg);
             mOpen = open;
         }
 
