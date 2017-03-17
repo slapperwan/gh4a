@@ -1,40 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/comment_editor"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/listBackground"
-    android:descendantFocusability="beforeDescendants"
-    android:focusableInTouchMode="true"
-    android:orientation="vertical">
+    android:minHeight="@dimen/comment_bottom_sheet_height">
 
-    <LinearLayout
-        android:id="@+id/comment_box_container"
+    <MultiAutoCompleteTextView
+        android:id="@+id/et_comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:inputType="textMultiLine|textCapSentences"
+        android:padding="8dp"
+        tools:text="Enter comment"/>
 
-        <MultiAutoCompleteTextView
-            android:id="@+id/et_comment"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:inputType="textMultiLine|textCapSentences"
-            android:padding="8dp"
-            tools:text="Enter comment" />
-
-        <ImageView
-            android:id="@+id/iv_comment"
-            style="@style/SelectableBorderlessItem"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="top"
-            android:scaleType="centerInside"
-            android:src="?attr/sendIcon" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

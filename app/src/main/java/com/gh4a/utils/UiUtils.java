@@ -487,7 +487,7 @@ public class UiUtils {
                 // AppBarLayout pushes it down or up.
                 mBottomSheet.setPadding(mBottomSheet.getPaddingLeft(),
                         mBottomSheet.getPaddingTop(), mBottomSheet.getPaddingRight(), offset);
-                // Update peek height to stay at the same offset
+                // Update peek height to keep the bottom sheet at unchanged position
                 mBottomSheetBehavior.setPeekHeight(mDefaultPeekHeight + offset);
             }
         }

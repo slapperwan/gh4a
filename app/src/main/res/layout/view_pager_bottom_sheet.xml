@@ -1,39 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/comment_editor"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="2dp"
-        android:background="@color/divider_bg" />
-
-    <com.gh4a.widget.WrapContentHeightViewPager
-        android:id="@+id/view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <View
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:background="@drawable/top_shadow" />
+        android:background="@drawable/top_shadow"/>
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabs"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?colorPrimary"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="@color/tab_indicator_color"
-        app:tabMaxWidth="-1dp"
-        app:tabMode="scrollable"
-        app:tabSelectedTextColor="@color/tab_indicator_color"
-        app:tabTextColor="@color/tab_text_color" />
+        android:background="?android:colorBackground"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/iv_advanced_editor"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="?commentEditIcon"/>
+
+        <HorizontalScrollView
+            android:id="@+id/markdown_buttons"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:visibility="gone">
+
+        </HorizontalScrollView>
+
+        <MultiAutoCompleteTextView
+            android:id="@+id/et_comment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:inputType="textMultiLine|textCapSentences"
+            android:minHeight="48dp"
+            android:padding="8dp"
+            tools:text="Enter comment"/>
+
+        <ImageView
+            android:id="@+id/send_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="?sendIcon"/>
+
+    </LinearLayout>
+
+    <include layout="@layout/advanced_editor"/>
 
 </LinearLayout>
