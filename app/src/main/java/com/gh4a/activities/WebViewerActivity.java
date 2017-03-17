@@ -69,9 +69,9 @@ public abstract class WebViewerActivity extends BaseActivity implements
     private boolean mRenderingDone;
     private final Handler mHandler = new Handler();
 
-    private static final String DARK_CSS_THEME = "dark";
-    private static final String LIGHT_CSS_THEME = "light";
-    private static final String PRINT_CSS_THEME = "print";
+    public static final String DARK_CSS_THEME = "dark";
+    public static final String LIGHT_CSS_THEME = "light";
+    public static final String PRINT_CSS_THEME = "print";
 
     private static final ArrayList<String> sLanguagePlugins = new ArrayList<>();
 

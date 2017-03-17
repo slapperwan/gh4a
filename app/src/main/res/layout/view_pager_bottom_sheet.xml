@@ -5,9 +5,6 @@
     android:id="@+id/comment_editor"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/listBackground"
-    android:descendantFocusability="beforeDescendants"
-    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <View

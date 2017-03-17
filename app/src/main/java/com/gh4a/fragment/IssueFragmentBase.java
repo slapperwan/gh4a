@@ -501,11 +501,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         }
     }
 
-    protected abstract void bindSpecialViews(View headerView);
-    protected abstract void assignHighlightColor();
-    protected abstract void deleteCommentInBackground(RepositoryId repoId, Comment comment)
-            throws Exception;
-
     @Override
     public void deleteComment(final Comment comment) {
         new AlertDialog.Builder(getActivity())
@@ -530,6 +525,15 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         return getString(R.string.share_comment_subject, comment.getId(), mIssue.getNumber(),
                 mRepoOwner + "/" + mRepoName);
     }
+
+    public void updatePreview(String content) {
+        mCommentBoxAdapter.getPreviewFragment().setContent(content);
+    }
+
+    protected abstract void bindSpecialViews(View headerView);
+    protected abstract void assignHighlightColor();
+    protected abstract void deleteCommentInBackground(RepositoryId repoId, Comment comment)
+            throws Exception;
 
     private class DeleteCommentTask extends ProgressDialogTask<Void> {
         private final Comment mComment;
