@@ -534,14 +534,6 @@ public class IssueListActivity extends BasePagerActivity implements
         }
     }
 
-    private String buildFilterItem(String type, String value) {
-        if (!TextUtils.isEmpty(value)) {
-            return type + ":\"" + value + "\"";
-        } else {
-            return "";
-        }
-    }
-
     private Fragment makeSearchFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortHelper.getSortMode());
