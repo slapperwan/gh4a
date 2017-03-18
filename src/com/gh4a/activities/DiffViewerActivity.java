@@ -27,7 +27,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.ListPopupWindow;
-import android.text.Html;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -44,7 +43,6 @@ import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -61,27 +59,51 @@ import org.eclipse.egit.github.core.CommitComment;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class DiffViewerActivity extends WebViewerActivity implements
         View.OnTouchListener {
+    protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
+            String commitSha, String path, String diff, List<CommitComment> comments,
+            int initialLine, int highlightStartLine, int highlightEndLine,
+            boolean highlightisRight) {
+        return baseIntent.putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("sha", commitSha)
+                .putExtra("path", path)
+                .putExtra("diff", diff)
+                .putExtra("comments", comments != null ? new ArrayList<>(comments) : null)
+                .putExtra("initial_line", initialLine)
+                .putExtra("highlight_start", highlightStartLine)
+                .putExtra("highlight_end", highlightEndLine)
+                .putExtra("highlight_right", highlightisRight);
+    }
+
+    private static final Pattern HUNK_START_PATTERN =
+            Pattern.compile("@@ -(\\d+),\\d+ \\+(\\d+),\\d+.*");
+    private static final String COMMENT_URI_FORMAT = "comment://%s?position=%d&l=%d&r=%d";
+
     protected String mRepoOwner;
     protected String mRepoName;
     protected String mPath;
     protected String mSha;
     private int mInitialLine;
-
-    public static final String EXTRA_INITIAL_LINE = "initial_line";
+    private int mHighlightStartLine;
+    private int mHighlightEndLine;
+    private boolean mHighlightIsRight;
 
     private String mDiff;
     private String[] mDiffLines;
-    private SparseArray<List<CommitComment>> mCommitCommentsByPos = new SparseArray<>();
-    private LongSparseArray<CommitComment> mCommitComments = new LongSparseArray<>();
+    private final SparseArray<List<CommitComment>> mCommitCommentsByPos = new SparseArray<>();
+    private final LongSparseArray<CommitComment> mCommitComments = new LongSparseArray<>();
 
-    private Point mLastTouchDown = new Point();
+    private final Point mLastTouchDown = new Point();
 
     private static final int MENU_ITEM_VIEW = 10;
 
-    private LoaderCallbacks<List<CommitComment>> mCommentCallback =
+    private final LoaderCallbacks<List<CommitComment>> mCommentCallback =
             new LoaderCallbacks<List<CommitComment>>(this) {
         @Override
         protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
@@ -91,7 +113,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         @Override
         protected void onResultReady(List<CommitComment> result) {
             addCommentsToMap(result);
-            showDiff();
+            onDataReady();
         }
     };
 
@@ -108,11 +130,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         mWebView.setOnTouchListener(this);
 
         List<CommitComment> comments = (ArrayList<CommitComment>)
-                getIntent().getSerializableExtra(Constants.Commit.COMMENTS);
+                getIntent().getSerializableExtra("comments");
 
         if (comments != null) {
             addCommentsToMap(comments);
-            showDiff();
+            onDataReady();
         } else {
             getSupportLoaderManager().initLoader(0, null, mCommentCallback);
         }
@@ -121,27 +143,28 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mPath = extras.getString(Constants.Object.PATH);
-        mSha = extras.getString(Constants.Object.OBJECT_SHA);
-        mDiff = extras.getString(Constants.Commit.DIFF);
-        mInitialLine = extras.getInt(EXTRA_INITIAL_LINE, -1);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mPath = extras.getString("path");
+        mSha = extras.getString("sha");
+        mDiff = extras.getString("diff");
+        mInitialLine = extras.getInt("initial_line", -1);
+        mHighlightStartLine = extras.getInt("highlight_start", -1);
+        mHighlightEndLine = extras.getInt("highlight_end", -1);
+        mHighlightIsRight = extras.getBoolean("highlight_right", false);
     }
 
     @Override
     protected boolean canSwipeToRefresh() {
         // no need for pull-to-refresh if everything was passed in the intent extras
-        return !getIntent().hasExtra(Constants.Commit.COMMENTS);
+        return !getIntent().hasExtra("comments");
     }
 
     @Override
     public void onRefresh() {
-        Loader loader = getSupportLoaderManager().getLoader(0);
-        if (loader != null) {
+        if (forceLoaderReload(0)) {
             mCommitCommentsByPos.clear();
             setContentShown(false);
-            loader.onContentChanged();
         }
         super.onRefresh();
     }
@@ -149,9 +172,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.download_menu, menu);
-
-        menu.removeItem(R.id.download);
+        inflater.inflate(R.menu.file_viewer_menu, menu);
 
         String viewAtTitle = getString(R.string.object_view_file_at, mSha.substring(0, 7));
         MenuItem item = menu.add(0, MENU_ITEM_VIEW, Menu.NONE, viewAtTitle);
@@ -160,9 +181,117 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         return super.onCreateOptionsMenu(menu);
     }
 
+
+    @Override
+    protected String generateHtml(String cssTheme, boolean addTitleHeader) {
+        StringBuilder content = new StringBuilder();
+        boolean authorized = Gh4Application.get().isAuthorized();
+        String title = addTitleHeader ? getDocumentTitle() : null;
+
+        content.append("<html><head><title>");
+        if (title != null) {
+            content.append(title);
+        }
+        content.append("</title>");
+        writeCssInclude(content, "text", cssTheme);
+        writeScriptInclude(content, "codeutils");
+        content.append("</head><body");
+
+        int highlightInsertPos = content.length();
+        content.append(">");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
+        content.append("<pre>");
+
+        mDiffLines = mDiff.split("\n");
+
+        int highlightStartLine = -1, highlightEndLine = -1;
+        int leftDiffPosition = -1, rightDiffPosition = -1;
+
+        for (int i = 0; i < mDiffLines.length; i++) {
+            String line = mDiffLines[i];
+            String cssClass = null;
+            if (line.startsWith("@@")) {
+                Matcher matcher = HUNK_START_PATTERN.matcher(line);
+                if (matcher.matches()) {
+                    leftDiffPosition = Integer.parseInt(matcher.group(1)) - 1;
+                    rightDiffPosition = Integer.parseInt(matcher.group(2)) - 1;
+                }
+                cssClass = "change";
+            } else if (line.startsWith("+")) {
+                ++rightDiffPosition;
+                cssClass = "add";
+            } else if (line.startsWith("-")) {
+                ++leftDiffPosition;
+                cssClass = "remove";
+            } else {
+                ++leftDiffPosition;
+                ++rightDiffPosition;
+            }
+
+            int pos = mHighlightIsRight ? rightDiffPosition : leftDiffPosition;
+            if (pos != -1 && pos == mHighlightStartLine) {
+                highlightStartLine = i;
+            }
+            if (pos != -1 && pos == mHighlightEndLine) {
+                highlightEndLine = i;
+            }
+
+            content.append("<div id=\"line").append(i).append("\"");
+            if (cssClass != null) {
+                content.append("class=\"").append(cssClass).append("\"");
+            }
+            if (authorized) {
+                String uri = String.format(Locale.US, COMMENT_URI_FORMAT,
+                        "add", i, leftDiffPosition, rightDiffPosition);
+                content.append(" onclick=\"javascript:location.href='");
+                content.append(uri).append("'\"");
+            }
+            content.append(">").append(TextUtils.htmlEncode(line)).append("</div>");
+
+            List<CommitComment> comments = mCommitCommentsByPos.get(i);
+            if (comments != null) {
+                for (CommitComment comment : comments) {
+                    mCommitComments.put(comment.getId(), comment);
+                    content.append("<div class=\"comment\"");
+                    if (authorized) {
+                        String uri = String.format(Locale.US, COMMENT_URI_FORMAT,
+                                "edit", i, leftDiffPosition, rightDiffPosition);
+                        content.append(" onclick=\"javascript:location.href='");
+                        content.append(uri).append("'\"");
+                    }
+                    content.append("><div class=\"change\">");
+                    content.append(getString(R.string.commit_comment_header,
+                            "<b>" + ApiHelpers.getUserLogin(this, comment.getUser()) + "</b>",
+                            StringUtils.formatRelativeTime(DiffViewerActivity.this, comment.getCreatedAt(), true)));
+                    content.append("</div>").append(comment.getBodyHtml()).append("</div>");
+                }
+            }
+        }
+
+        if (mInitialLine > 0) {
+            content.insert(highlightInsertPos, " onload='scrollToElement(\"line"
+                    + mInitialLine + "\")' onresize='scrollToHighlight();'");
+        } else if (highlightStartLine != -1 && highlightEndLine != -1) {
+            content.insert(highlightInsertPos, " onload='highlightDiffLines("
+                    + highlightStartLine + "," + highlightEndLine
+                    + ")' onresize='scrollToHighlight();'");
+        }
+
+        content.append("</pre></body></html>");
+        return content.toString();
+    }
+
+    @Override
+    protected String getDocumentTitle() {
+        return getString(R.string.diff_print_document_title,
+                FileUtils.getFileName(mPath), mSha.substring(0, 7), mRepoOwner, mRepoName);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha;
+        String url = createUrl();
 
         switch (item.getItemId()) {
             case R.id.browser:
@@ -178,8 +307,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 startActivity(shareIntent);
                 return true;
             case MENU_ITEM_VIEW:
-                startActivity(IntentUtils.getFileViewerActivityIntent(this,
-                        mRepoOwner, mRepoName, mSha, mPath));
+                startActivity(FileViewerActivity.makeIntent(this, mRepoOwner, mRepoName, mSha, mPath));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -200,67 +328,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
     }
 
-    protected void showDiff() {
-        StringBuilder content = new StringBuilder();
-        boolean authorized = Gh4Application.get().isAuthorized();
-
-        content.append("<html><head><title></title>");
-        writeCssInclude(content, "text");
-        writeScriptInclude(content, "codeutils");
-        content.append("</head><body");
-        if (mInitialLine > 0) {
-            content.append(" onload='scrollToElement(\"line");
-            content.append(mInitialLine).append("\")' onresize='scrollToHighlight();'");
-        }
-        content.append("><pre>");
-
-        String encoded = TextUtils.htmlEncode(mDiff);
-        mDiffLines = encoded.split("\n");
-
-        for (int i = 0; i < mDiffLines.length; i++) {
-            String line = mDiffLines[i];
-            String cssClass = null;
-            if (line.startsWith("@@")) {
-                cssClass = "change";
-            } else if (line.startsWith("+")) {
-                cssClass = "add";
-            } else if (line.startsWith("-")) {
-                cssClass = "remove";
-            }
-
-            content.append("<div id=\"line").append(i).append("\"");
-            if (cssClass != null) {
-                content.append("class=\"").append(cssClass).append("\"");
-            }
-            if (authorized) {
-                content.append(" onclick=\"javascript:location.href='comment://add");
-                content.append("?position=").append(i).append("'\"");
-            }
-            content.append(">").append(line).append("</div>");
-
-            List<CommitComment> comments = mCommitCommentsByPos.get(i);
-            if (comments != null) {
-                for (CommitComment comment : comments) {
-                    mCommitComments.put(comment.getId(), comment);
-                    content.append("<div class=\"comment\"");
-                    if (authorized) {
-                        content.append(" onclick=\"javascript:location.href='comment://edit");
-                        content.append("?position=").append(i);
-                        content.append("&id=").append(comment.getId()).append("'\"");
-                    }
-                    content.append("><div class=\"change\">");
-                    content.append(getString(R.string.commit_comment_header,
-                            "<b>" + ApiHelpers.getUserLogin(this, comment.getUser()) + "</b>",
-                            StringUtils.formatRelativeTime(DiffViewerActivity.this, comment.getCreatedAt(), true)));
-                    content.append("</div>").append(comment.getBodyHtml()).append("</div>");
-                }
-            }
-        }
-        content.append("</pre></body></html>");
-        loadThemedHtml(content.toString());
-    }
-
-    private void openCommentDialog(final long id, String line, final int position) {
+    private void openCommentDialog(final long id, String line, final int position,
+            final int leftLine, final int rightLine) {
         final boolean isEdit = id != 0L;
         LayoutInflater inflater = LayoutInflater.from(this);
         View commentDialog = inflater.inflate(R.layout.commit_comment_dialog, null);
@@ -283,38 +352,39 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             }
         };
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+        AlertDialog d = new AlertDialog.Builder(this)
                 .setCancelable(true)
-                .setTitle(getString(R.string.commit_comment_dialog_title, position))
+                .setTitle(getString(R.string.commit_comment_dialog_title, leftLine, rightLine))
                 .setView(commentDialog)
                 .setPositiveButton(saveButtonResId, saveCb)
-                .setNegativeButton(R.string.cancel, null);
+                .setNegativeButton(R.string.cancel, null)
+                .show();
 
-        AlertDialog d = builder.show();
         body.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(
                 body, d.getButton(DialogInterface.BUTTON_POSITIVE)));
     }
 
     @Override
-    protected boolean handleUrlLoad(String url) {
-        if (!url.startsWith("comment://")) {
-            return false;
+    protected void handleUrlLoad(Uri uri) {
+        if (!uri.getScheme().equals("comment")) {
+            super.handleUrlLoad(uri);
+            return;
         }
 
-        Uri uri = Uri.parse(url);
         int line = Integer.parseInt(uri.getQueryParameter("position"));
-        String lineText = Html.fromHtml(mDiffLines[line]).toString();
+        int leftLine = Integer.parseInt(uri.getQueryParameter("l"));
+        int rightLine = Integer.parseInt(uri.getQueryParameter("r"));
+        String lineText = mDiffLines[line];
         String idParam = uri.getQueryParameter("id");
         long id = idParam != null ? Long.parseLong(idParam) : 0L;
 
         if (idParam == null) {
-            openCommentDialog(id, lineText, line);
+            openCommentDialog(id, lineText, line, leftLine, rightLine);
         } else {
-            CommentActionPopup p = new CommentActionPopup(id, line, lineText,
+            CommentActionPopup p = new CommentActionPopup(id, line, lineText, leftLine, rightLine,
                     mLastTouchDown.x, mLastTouchDown.y);
             p.show();
         }
-        return true;
     }
 
     @Override
@@ -325,7 +395,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         return false;
     }
 
-    protected void refresh() {
+    private void refresh() {
         mCommitComments.clear();
         mCommitCommentsByPos.clear();
         getSupportLoaderManager().restartLoader(0, null, mCommentCallback);
@@ -335,18 +405,24 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     protected abstract Loader<LoaderResult<List<CommitComment>>> createCommentLoader();
     protected abstract void updateComment(long id, String body, int position) throws IOException;
     protected abstract void deleteComment(long id) throws IOException;
+    protected abstract String createUrl();
 
     private class CommentActionPopup extends ListPopupWindow implements
             AdapterView.OnItemClickListener {
-        private long mId;
-        private int mPosition;
-        private String mLineText;
+        private final long mId;
+        private final int mPosition;
+        private final int mLeftLine;
+        private final int mRightLine;
+        private final String mLineText;
 
-        public CommentActionPopup(long id, int position, String lineText, int x, int y) {
+        public CommentActionPopup(long id, int position, String lineText,
+                int leftLine, int rightLine, int x, int y) {
             super(DiffViewerActivity.this, null, R.attr.listPopupWindowStyle);
 
             mId = id;
             mPosition = position;
+            mLeftLine = leftLine;
+            mRightLine = rightLine;
             mLineText = lineText;
 
             ArrayAdapter<String> adapter = new ArrayAdapter<>(DiffViewerActivity.this,
@@ -366,9 +442,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             if (position == 2) {
                 new AlertDialog.Builder(DiffViewerActivity.this)
-                        .setTitle(R.string.delete_comment_message)
-                        .setMessage(R.string.confirmation)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setMessage(R.string.delete_comment_message)
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 new DeleteCommentTask(mId).schedule();
@@ -377,7 +452,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                         .setNegativeButton(R.string.cancel, null)
                         .show();
             } else {
-                openCommentDialog(position == 0 ? 0 : mId, mLineText, mPosition);
+                openCommentDialog(position == 0 ? 0 : mId, mLineText,
+                        mPosition, mLeftLine, mRightLine);
             }
             dismiss();
         }
@@ -415,12 +491,12 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
-        private String mBody;
-        private int mPosition;
-        private long mId;
+        private final String mBody;
+        private final int mPosition;
+        private final long mId;
 
         public CommentTask(long id, String body, int position) {
-            super(DiffViewerActivity.this, 0, R.string.saving_msg);
+            super(DiffViewerActivity.this, R.string.saving_msg);
             mBody = body;
             mPosition = position;
             mId = id;
@@ -450,10 +526,10 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private long mId;
+        private final long mId;
 
         public DeleteCommentTask(long id) {
-            super(DiffViewerActivity.this, 0, R.string.deleting_msg);
+            super(DiffViewerActivity.this, R.string.deleting_msg);
             mId = id;
         }
 

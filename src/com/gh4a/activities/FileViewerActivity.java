@@ -16,10 +16,14 @@
 package com.gh4a.activities;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v4.print.PrintHelper;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
@@ -27,7 +31,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -45,17 +48,34 @@ import java.util.List;
 import java.util.Locale;
 
 public class FileViewerActivity extends WebViewerActivity {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            String ref, String fullPath) {
+        return makeIntentWithHighlight(context, repoOwner, repoName, ref, fullPath, -1, -1);
+    }
+
+    public static Intent makeIntentWithHighlight(Context context, String repoOwner, String repoName,
+            String ref, String fullPath, int highlightStart, int highlightEnd) {
+        return new Intent(context, FileViewerActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("path", fullPath)
+                .putExtra("ref", ref)
+                .putExtra("highlight_start", highlightStart)
+                .putExtra("highlight_end", highlightEnd);
+    }
+
     private String mRepoName;
     private String mRepoOwner;
     private String mPath;
     private String mRef;
     private int mHighlightStart;
     private int mHighlightEnd;
+    private RepositoryContents mContent;
 
     private static final int MENU_ITEM_HISTORY = 10;
     private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
 
-    private LoaderCallbacks<List<RepositoryContents>> mFileCallback =
+    private final LoaderCallbacks<List<RepositoryContents>> mFileCallback =
             new LoaderCallbacks<List<RepositoryContents>>(this) {
         @Override
         protected Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader() {
@@ -64,14 +84,12 @@ public class FileViewerActivity extends WebViewerActivity {
 
         @Override
         protected void onResultReady(List<RepositoryContents> result) {
-            boolean dataLoaded = false;
-
             if (result != null && !result.isEmpty()) {
-                loadContent(result.get(0));
-                dataLoaded = true;
-            }
-            setContentEmpty(!dataLoaded);
-            if (!dataLoaded) {
+                mContent = result.get(0);
+                onDataReady();
+                setContentEmpty(false);
+            } else {
+                setContentEmpty(true);
                 setContentShown(true);
             }
         }
@@ -114,12 +132,12 @@ public class FileViewerActivity extends WebViewerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mPath = extras.getString(Constants.Object.PATH);
-        mRef = extras.getString(Constants.Object.REF);
-        mHighlightStart = extras.getInt(Constants.Object.HIGHLIGHT_START, -1);
-        mHighlightEnd = extras.getInt(Constants.Object.HIGHLIGHT_END, -1);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mPath = extras.getString("path");
+        mRef = extras.getString("ref");
+        mHighlightStart = extras.getInt("highlight_start", -1);
+        mHighlightEnd = extras.getInt("highlight_end", -1);
     }
 
     @Override
@@ -129,35 +147,62 @@ public class FileViewerActivity extends WebViewerActivity {
 
     @Override
     public void onRefresh() {
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
         setContentShown(false);
         super.onRefresh();
     }
 
-    private void loadContent(RepositoryContents content) {
-        String base64Data = content.getContent();
+    @Override
+    protected String generateHtml(String cssTheme, boolean addTitleHeader) {
+        String base64Data = mContent.getContent();
         if (base64Data != null && FileUtils.isImage(mPath)) {
+            String title = addTitleHeader ? getDocumentTitle() : null;
             String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) +
                     ";base64," + base64Data;
-            loadThemedHtml(highlightImage(imageUrl));
+            return highlightImage(imageUrl, cssTheme, title);
         } else if (base64Data != null && FileUtils.isMarkdown(mPath)) {
-            loadMarkdown(base64Data, mRepoOwner, mRepoName, mRef);
-         } else {
+            return generateMarkdownHtml(base64Data,
+                    mRepoOwner, mRepoName, mRef, cssTheme, addTitleHeader);
+        } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
-            loadCode(data, mPath, mHighlightStart, mHighlightEnd);
+            return generateCodeHtml(data, mPath,
+                    mHighlightStart, mHighlightEnd, cssTheme, addTitleHeader);
         }
+    }
+
+    @Override
+    protected String getDocumentTitle() {
+        return getString(R.string.file_print_document_title, FileUtils.getFileName(mPath),
+                mRepoOwner, mRepoName);
+    }
+
+    @Override
+    protected boolean handlePrintRequest() {
+        if (!FileUtils.isImage(mPath)) {
+            return false;
+        }
+        String base64Data = mContent != null ? mContent.getContent() : null;
+        if (base64Data == null) {
+            return false;
+        }
+        byte[] decodedData = EncodingUtils.fromBase64(base64Data);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedData, 0, decodedData.length);
+
+        PrintHelper printHelper = new PrintHelper(this);
+        printHelper.setScaleMode(PrintHelper.SCALE_MODE_FIT);
+        printHelper.printBitmap(getDocumentTitle(), bitmap);
+        return true;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.download_menu, menu);
+        inflater.inflate(R.menu.file_viewer_menu, menu);
 
         if (FileUtils.isImage(mPath) || FileUtils.isMarkdown(mPath)) {
             menu.removeItem(R.id.wrap);
         }
 
-        menu.removeItem(R.id.download);
         MenuItem item = menu.add(0, MENU_ITEM_HISTORY, Menu.NONE, R.string.history);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_NEVER);
 
@@ -183,12 +228,8 @@ public class FileViewerActivity extends WebViewerActivity {
                 startActivity(shareIntent);
                 return true;
             case MENU_ITEM_HISTORY:
-                Intent historyIntent = new Intent(this, CommitHistoryActivity.class);
-                historyIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                historyIntent.putExtra(Constants.Repository.NAME, mRepoName);
-                historyIntent.putExtra(Constants.Object.PATH, mPath);
-                historyIntent.putExtra(Constants.Object.REF, mRef);
-                startActivity(historyIntent);
+                startActivity(CommitHistoryActivity.makeIntent(this,
+                        mRepoOwner, mRepoName, mRef, mPath));
                 return true;
          }
          return super.onOptionsItemSelected(item);
@@ -196,7 +237,7 @@ public class FileViewerActivity extends WebViewerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     private void openUnsuitableFileAndFinish() {
@@ -212,11 +253,15 @@ public class FileViewerActivity extends WebViewerActivity {
         }
     }
 
-    private static String highlightImage(String imageUrl) {
+    private static String highlightImage(String imageUrl, String cssTheme, String title) {
         StringBuilder content = new StringBuilder();
         content.append("<html><head>");
-        writeCssInclude(content, "text");
-        content.append("</head><body><div class='image'>");
+        writeCssInclude(content, "text", cssTheme);
+        content.append("</head><body>");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
+        content.append("<div class='image'>");
         content.append("<img src='").append(imageUrl).append("' />");
         content.append("</div></body></html>");
         return content.toString();

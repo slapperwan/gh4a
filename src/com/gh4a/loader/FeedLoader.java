@@ -18,7 +18,7 @@ import com.gh4a.feeds.FeedHandler;
 import com.gh4a.holder.Feed;
 
 public class FeedLoader extends BaseLoader<List<Feed>> {
-    private String mUrl;
+    private final String mUrl;
 
     private static final HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
         public boolean verify(String hostname, SSLSession session) {

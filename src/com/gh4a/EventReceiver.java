@@ -22,7 +22,6 @@ import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 public class EventReceiver extends BroadcastReceiver {
     @SuppressLint("InlinedApi")
@@ -31,15 +30,12 @@ public class EventReceiver extends BroadcastReceiver {
         if (DownloadManager.ACTION_NOTIFICATION_CLICKED.equals(intent.getAction())) {
             try {
                 Intent downloadManagerIntent = new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS);
-                downloadManagerIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                    downloadManagerIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                }
+                downloadManagerIntent.addFlags(
+                        Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 context.startActivity(downloadManagerIntent);
             } catch (ActivityNotFoundException e) {
                 // ignore, there's nothing we can do about this
             }
         }
     }
-
 }

@@ -13,7 +13,7 @@ import org.eclipse.egit.github.core.client.RequestException;
 import com.gh4a.utils.StringUtils;
 
 public class ClientForAuthorization extends GitHubClient {
-    private String mOtpCode;
+    private final String mOtpCode;
 
     public ClientForAuthorization(String otpCode) {
         mOtpCode = otpCode;

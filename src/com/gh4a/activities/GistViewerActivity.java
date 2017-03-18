@@ -15,21 +15,21 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.loader.GistLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 
@@ -38,25 +38,27 @@ import org.eclipse.egit.github.core.GistFile;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 public class GistViewerActivity extends WebViewerActivity {
+    public static Intent makeIntent(Context context, String id, String fileName) {
+        return new Intent(context, GistViewerActivity.class)
+                .putExtra("id", id)
+                .putExtra("file", fileName);
+    }
+
     private String mFileName;
     private String mGistId;
     private GistFile mGistFile;
+    private String mGistOwner;
 
-    private LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
+    private final LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
         @Override
         protected Loader<LoaderResult<Gist>> onCreateLoader() {
             return new GistLoader(GistViewerActivity.this, mGistId);
         }
         @Override
         protected void onResultReady(Gist result) {
+            mGistOwner = ApiHelpers.getUserLogin(GistViewerActivity.this, result.getOwner());
             mGistFile = result.getFiles().get(mFileName);
-            if (FileUtils.isMarkdown(mGistFile.getFilename())) {
-                String base64Data = EncodingUtils.toBase64(mGistFile.getContent());
-                loadMarkdown(base64Data, null, null, null);
-            } else {
-                loadCode(mGistFile.getContent(), mFileName, -1, -1);
-            }
-            supportInvalidateOptionsMenu();
+            onDataReady();
         }
     };
 
@@ -74,8 +76,8 @@ public class GistViewerActivity extends WebViewerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mFileName = extras.getString(Constants.Gist.FILENAME);
-        mGistId = extras.getString(Constants.Gist.ID);
+        mFileName = extras.getString("file");
+        mGistId = extras.getString("id");
     }
 
     @Override
@@ -86,21 +88,33 @@ public class GistViewerActivity extends WebViewerActivity {
     @Override
     public void onRefresh() {
         setContentShown(false);
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
         mGistFile = null;
         super.onRefresh();
     }
 
     @Override
+    protected String generateHtml(String cssTheme, boolean addTitleHeader) {
+        if (FileUtils.isMarkdown(mGistFile.getFilename())) {
+            String base64Data = EncodingUtils.toBase64(mGistFile.getContent());
+            return generateMarkdownHtml(base64Data, null, null, null, cssTheme, addTitleHeader);
+        } else {
+            return generateCodeHtml(mGistFile.getContent(), mFileName,
+                    -1, -1, cssTheme, addTitleHeader);
+        }
+    }
+
+    @Override
+    protected String getDocumentTitle() {
+        return getString(R.string.gist_print_document_title, mFileName, mGistId, mGistOwner);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.download_menu, menu);
+        inflater.inflate(R.menu.file_viewer_menu, menu);
 
-        menu.removeItem(R.id.download);
         menu.removeItem(R.id.share);
-        if (mGistFile == null) {
-            menu.removeItem(R.id.browser);
-        }
         if (mGistFile == null || FileUtils.isMarkdown(mGistFile.getFilename())) {
             menu.removeItem(R.id.wrap);
         }
@@ -110,7 +124,7 @@ public class GistViewerActivity extends WebViewerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getGistActivityIntent(this, mGistId);
+        return GistActivity.makeIntent(this, mGistId);
     }
 
     @Override

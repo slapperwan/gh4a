@@ -51,7 +51,7 @@ public class AvatarHandler {
     private static HandlerThread sWorkerThread = null;
     private static Handler sWorkerHandler = null;
 
-    private static Handler sHandler = new Handler() {
+    private static final Handler sHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -146,7 +146,7 @@ public class AvatarHandler {
             @Override
             protected int sizeOf(Integer key, Bitmap value) {
                 final long sizeInBytes;
-                if (Build.VERSION.SDK_INT >= 19) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     sizeInBytes = value.getAllocationByteCount();
                 } else {
                     sizeInBytes = value.getRowBytes() * value.getHeight();

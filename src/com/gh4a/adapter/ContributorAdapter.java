@@ -12,8 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdapter.ViewHolder> {
@@ -22,7 +22,7 @@ public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdap
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gravatar_twoline, parent, false);
         ViewHolder holder = new ViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
@@ -44,7 +44,7 @@ public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdap
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Contributor contributor = (Contributor) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext,
+            Intent intent = UserActivity.makeIntent(mContext,
                     contributor.getLogin(), contributor.getName());
             if (intent != null) {
                 mContext.startActivity(intent);
@@ -62,8 +62,8 @@ public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdap
             tvExtra = (TextView) view.findViewById(R.id.tv_extra);
         }
 
-        private TextView tvTitle;
-        private ImageView ivGravatar;
-        private TextView tvExtra;
+        private final TextView tvTitle;
+        private final ImageView ivGravatar;
+        private final TextView tvExtra;
     }
 }

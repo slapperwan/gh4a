@@ -2,6 +2,7 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.util.AttributeSet;
 
@@ -39,7 +40,7 @@ public class InvalidatingDrawerLayout extends DrawerLayout {
     }
 
     @Override
-    protected boolean verifyDrawable(Drawable who) {
+    protected boolean verifyDrawable(@NonNull Drawable who) {
         return super.verifyDrawable(who) || who == mStatusBarBackground;
     }
 

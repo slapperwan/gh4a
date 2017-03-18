@@ -11,13 +11,13 @@ import android.content.Context;
 
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
-import com.github.mobile.util.HtmlUtils;
+import com.gh4a.utils.HtmlUtils;
 
 public class ReadmeLoader extends BaseLoader<String> {
 
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mRef;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mRef;
 
     public ReadmeLoader(Context context, String repoOwner, String repoName, String ref) {
         super(context);

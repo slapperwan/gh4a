@@ -25,13 +25,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
 public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.ViewHolder> {
-    private int mTextColorPrimary, mTextColorSecondary;
+    private final int mTextColorPrimary;
+    private final int mTextColorSecondary;
 
     public MilestoneAdapter(Context context) {
         super(context);
@@ -40,7 +41,7 @@ public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.Vi
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_milestone, parent, false);
         return new ViewHolder(v);
     }
@@ -48,7 +49,7 @@ public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.Vi
     @Override
     public void onBindViewHolder(ViewHolder holder, Milestone milestone) {
         holder.tvTitle.setText(milestone.getTitle());
-        holder.tvTitle.setTextColor(Constants.Issue.STATE_CLOSED.equals(milestone.getState())
+        holder.tvTitle.setTextColor(ApiHelpers.IssueState.CLOSED.equals(milestone.getState())
                 ? mTextColorSecondary : mTextColorPrimary);
 
         if (!StringUtils.isBlank(milestone.getDescription())) {
@@ -82,10 +83,10 @@ public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.Vi
             tvDue = (TextView) view.findViewById(R.id.tv_due);
         }
 
-        private TextView tvTitle;
-        private TextView tvDesc;
-        private TextView tvOpen;
-        private TextView tvClosed;
-        private TextView tvDue;
+        private final TextView tvTitle;
+        private final TextView tvDesc;
+        private final TextView tvOpen;
+        private final TextView tvClosed;
+        private final TextView tvDue;
     }
 }

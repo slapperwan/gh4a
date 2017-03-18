@@ -1,18 +1,7 @@
 package com.gh4a;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-
-import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.RepositoryTag;
-import org.eclipse.egit.github.core.client.IGitHubConstants;
-import org.eclipse.egit.github.core.service.RepositoryService;
-
 import android.app.Activity;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,13 +13,47 @@ import android.text.TextUtils;
 import android.util.Pair;
 
 import com.gh4a.activities.BlogListActivity;
+import com.gh4a.activities.CommitActivity;
+import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.DownloadsActivity;
+import com.gh4a.activities.FileViewerActivity;
+import com.gh4a.activities.GistActivity;
+import com.gh4a.activities.IssueActivity;
+import com.gh4a.activities.IssueListActivity;
+import com.gh4a.activities.PullRequestActivity;
+import com.gh4a.activities.PullRequestDiffViewerActivity;
+import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.TrendingActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
+import com.gh4a.loader.CommitCommentListLoader;
+import com.gh4a.loader.CommitLoader;
+import com.gh4a.loader.PullRequestCommentsLoader;
+import com.gh4a.loader.PullRequestFilesLoader;
+import com.gh4a.loader.PullRequestLoader;
+import com.gh4a.loader.ReleaseListLoader;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
+
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
+import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.Release;
+import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryCommit;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.RepositoryTag;
+import org.eclipse.egit.github.core.client.IGitHubConstants;
+import org.eclipse.egit.github.core.service.RepositoryService;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class BrowseFilter extends AppCompatActivity {
     private static final Pattern SHA1_PATTERN = Pattern.compile("[a-z0-9]{40}");
@@ -53,8 +76,10 @@ public class BrowseFilter extends AppCompatActivity {
         String first = parts.isEmpty() ? null : parts.get(0);
         if (IGitHubConstants.HOST_GISTS.equals(uri.getHost())) {
             if (!parts.isEmpty()) {
-                intent = IntentUtils.getGistActivityIntent(this, parts.get(parts.size() - 1));
+                intent = GistActivity.makeIntent(this, parts.get(parts.size() - 1));
             }
+        } else if ("login".equals(first) || "sessions".equals(first)) {
+            // may happen during login -> forward to browser
         } else if ("explore".equals(first)) {
             intent = new Intent(this, TrendingActivity.class);
         } else if ("blog".equals(first)) {
@@ -66,25 +91,19 @@ public class BrowseFilter extends AppCompatActivity {
             String id = parts.size() >= 4 ? parts.get(3) : null;
 
             if (repo == null && action == null) {
-                intent = IntentUtils.getUserActivityIntent(this, user);
+                intent = UserActivity.makeIntent(this, user);
             } else if (action == null) {
-                intent = IntentUtils.getRepoActivityIntent(this, user, repo, null);
+                intent = RepositoryActivity.makeIntent(this, user, repo);
             } else if ("downloads".equals(action)) {
-                intent = new Intent(this, DownloadsActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, user);
-                intent.putExtra(Constants.Repository.NAME, repo);
+                intent = DownloadsActivity.makeIntent(this, user, repo);
             } else if ("releases".equals(action)) {
-                final String release;
                 if ("tag".equals(id)) {
-                    release = parts.size() >= 5 ? parts.get(4) : null;
+                    final String release = parts.size() >= 5 ? parts.get(4) : null;
+                    new ReleaseLoadTask(user, repo, release).execute();
+                    return; // avoid finish() for now
                 } else {
-                    release = id;
+                    intent = ReleaseListActivity.makeIntent(this, user, repo);
                 }
-
-                intent = new Intent(this, ReleaseListActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, user);
-                intent.putExtra(Constants.Repository.NAME, repo);
-                intent.putExtra(ReleaseListActivity.EXTRA_INITIAL_SELECTION, release);
             } else if ("tree".equals(action) || "commits".equals(action)) {
                 int page = "tree".equals(action)
                         ? RepositoryActivity.PAGE_FILES : RepositoryActivity.PAGE_COMMITS;
@@ -100,32 +119,51 @@ public class BrowseFilter extends AppCompatActivity {
             } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
                     try {
-                        intent = IntentUtils.getIssueActivityIntent(this, user, repo,
-                                Integer.parseInt(id));
+                        intent = IssueActivity.makeIntent(this, user, repo,
+                                Integer.parseInt(id), extractCommentId(uri.getFragment(), "issue"));
                     } catch (NumberFormatException e) {
                         // ignored
                     }
                 } else {
-                    intent = IntentUtils.getIssueListActivityIntent(this, user, repo,
-                            Constants.Issue.STATE_OPEN);
+                    intent = IssueListActivity.makeIntent(this, user, repo);
                 }
             } else if ("pulls".equals(action)) {
-                intent = IntentUtils.getPullRequestListActivityIntent(this, user, repo,
-                        Constants.Issue.STATE_OPEN);
+                intent = IssueListActivity.makeIntent(this, user, repo, true);
             } else if ("wiki".equals(action)) {
-                intent = new Intent(this, WikiListActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, user);
-                intent.putExtra(Constants.Repository.NAME, repo);
+                intent = WikiListActivity.makeIntent(this, user, repo, null);
             } else if ("pull".equals(action) && !StringUtils.isBlank(id)) {
+                int pullRequestNumber = -1;
                 try {
-                    intent = IntentUtils.getPullRequestActivityIntent(this,
-                            user, repo, Integer.parseInt(id));
+                    pullRequestNumber = Integer.parseInt(id);
                 } catch (NumberFormatException e) {
                     // ignored
                 }
+
+                if (pullRequestNumber > 0) {
+                    DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
+
+                    if (diffId != null) {
+                        new PullRequestDiffLoadTask(user, repo, diffId, pullRequestNumber)
+                                .execute();
+                        return; // avoid finish() for now
+                    } else {
+                        String target = parts.size() >= 5 ? parts.get(4) : null;
+                        int page = "commits".equals(action) ? PullRequestActivity.PAGE_COMMITS
+                                : "files".equals(target) ? PullRequestActivity.PAGE_FILES
+                                : -1;
+                        intent = PullRequestActivity.makeIntent(this, user, repo, pullRequestNumber,
+                                page, extractCommentId(uri.getFragment(), "issue"));
+                    }
+                }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
-                intent = IntentUtils.getCommitInfoActivityIntent(this, user, repo, id);
-                addLineNumbersToIntentIfPresent(intent, uri.getFragment());
+                DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
+                if (diffId != null) {
+                    new CommitDiffLoadTask(user, repo, diffId, id).execute();
+                    return; // avoid finish() for now
+                } else {
+                    intent = CommitActivity.makeIntent(this, user, repo, id,
+                            extractCommentId(uri.getFragment(), "commit"));
+                }
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 4) {
                 String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
                 new RefPathDisambiguationTask(user, repo, refAndPath, uri.getFragment()).execute();
@@ -140,28 +178,55 @@ public class BrowseFilter extends AppCompatActivity {
         finish();
     }
 
-    private void addLineNumbersToIntentIfPresent(Intent intent, String fragment) {
-        if (intent == null || TextUtils.isEmpty(fragment)) {
-            return;
+    private long extractCommentId(String fragment, String type) {
+        String prefix = type + "comment-";
+        if (fragment != null && fragment.startsWith(prefix)) {
+            try {
+                return Long.parseLong(fragment.substring(prefix.length()));
+            } catch (NumberFormatException e) {
+                // fall through
+            }
+        }
+        return -1;
+    }
+
+    private DiffHighlightId extractCommitDiffId(String fragment) {
+        String prefix = "diff-";
+        if (fragment == null || !fragment.startsWith(prefix)) {
+            return null;
         }
 
-        // Line numbers are encoded either in the form #L12 or #L12-14
-        if (!fragment.startsWith("L")) {
-            return;
+        boolean right = false;
+        int typePos = fragment.indexOf('L', prefix.length());
+        if (typePos < 0) {
+            right = true;
+            typePos = fragment.indexOf('R', prefix.length());
         }
+
+        String fileHash = typePos > 0
+                ? fragment.substring(prefix.length(), typePos)
+                : fragment.substring(prefix.length());
+        if (fileHash.length() != 32) { // MD5 hash length
+            return null;
+        }
+        if (typePos < 0) {
+            return new DiffHighlightId(fileHash, -1, -1, false);
+        }
+
         try {
-            int dashPos = fragment.indexOf("-L");
+            char type = fragment.charAt(typePos);
+            String linePart = fragment.substring(typePos + 1);
+            int startLine, endLine, dashPos = linePart.indexOf("-" + type);
             if (dashPos > 0) {
-                intent.putExtra(Constants.Object.HIGHLIGHT_START,
-                        Integer.valueOf(fragment.substring(1, dashPos)));
-                intent.putExtra(Constants.Object.HIGHLIGHT_END,
-                        Integer.valueOf(fragment.substring(dashPos + 2)));
+                startLine = Integer.valueOf(linePart.substring(0, dashPos));
+                endLine = Integer.valueOf(linePart.substring(dashPos + 2));
             } else {
-                intent.putExtra(Constants.Object.HIGHLIGHT_START,
-                        Integer.valueOf(fragment.substring(1)));
+                startLine = Integer.valueOf(linePart);
+                endLine = startLine;
             }
+            return new DiffHighlightId(fileHash, startLine, endLine, right);
         } catch (NumberFormatException e) {
-            // ignore
+            return null;
         }
     }
 
@@ -169,10 +234,9 @@ public class BrowseFilter extends AppCompatActivity {
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            ProgressDialog pd = new ProgressDialog(getActivity());
-            pd.setMessage(getString(R.string.loading_msg));
-            return pd;
+            return UiUtils.createProgressDialog(getActivity(), R.string.loading_msg);
         }
+
         @Override
         public void onDismiss(DialogInterface dialog) {
             super.onDismiss(dialog);
@@ -183,32 +247,24 @@ public class BrowseFilter extends AppCompatActivity {
         }
     }
 
-    private class RefPathDisambiguationTask extends BackgroundTask<Pair<String, String>> {
-        private String mRepoOwner;
-        private String mRepoName;
-        private String mRefAndPath;
-        private int mInitialPage;
-        private String mFragment;
-        private boolean mGoToFileViewer;
 
-        public RefPathDisambiguationTask(String repoOwner, String repoName,
-                String refAndPath, int initialPage) {
-            super(BrowseFilter.this);
-            mRepoOwner = repoOwner;
-            mRepoName = repoName;
-            mRefAndPath = refAndPath;
-            mInitialPage = initialPage;
-            mGoToFileViewer = false;
+    public static class DiffHighlightId {
+        public final String fileHash;
+        public final int startLine;
+        public final int endLine;
+        public final boolean right;
+
+        public DiffHighlightId(String fileHash, int startLine, int endLine, boolean right) {
+            this.fileHash = fileHash;
+            this.startLine = startLine;
+            this.endLine = endLine;
+            this.right = right;
         }
+    }
 
-        public RefPathDisambiguationTask(String repoOwner, String repoName,
-                String refAndPath, String fragment) {
+    private abstract class UrlLoadTask extends BackgroundTask<Intent> {
+        public UrlLoadTask() {
             super(BrowseFilter.this);
-            mRepoOwner = repoOwner;
-            mRepoName = repoName;
-            mRefAndPath = refAndPath;
-            mFragment = fragment;
-            mGoToFileViewer = true;
         }
 
         @Override
@@ -218,8 +274,240 @@ public class BrowseFilter extends AppCompatActivity {
         }
 
         @Override
+        protected void onSuccess(Intent result) {
+            if (isFinishing()) {
+                return;
+            }
+
+            if (result != null) {
+                startActivity(result);
+            } else {
+                IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
+            }
+            finish();
+        }
+
+        @Override
+        protected void onError(Exception e) {
+            IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
+            finish();
+        }
+    }
+
+    private class ReleaseLoadTask extends UrlLoadTask {
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final String mTagName;
+
+        public ReleaseLoadTask(String repoOwner, String repoName, String tagName) {
+            super();
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mTagName = tagName;
+        }
+
+        @Override
+        protected Intent run() throws Exception {
+            List<Release> releases = ReleaseListLoader.loadReleases(mRepoOwner, mRepoName);
+
+            if (releases != null) {
+                for (Release release : releases) {
+                    if (TextUtils.equals(release.getTagName(), mTagName)) {
+                        return ReleaseInfoActivity.makeIntent(BrowseFilter.this,
+                                mRepoOwner, mRepoName, release);
+                    }
+                }
+            }
+
+            return null;
+        }
+    }
+
+    private abstract class DiffLoadTask extends UrlLoadTask {
+        protected final String mRepoOwner;
+        protected final String mRepoName;
+        protected final DiffHighlightId mDiffId;
+
+        public DiffLoadTask(String repoOwner, String repoName, DiffHighlightId diffId) {
+            super();
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mDiffId = diffId;
+        }
+
+        @Override
+        protected Intent run() throws Exception {
+            List<CommitFile> files = getFiles();
+            CommitFile file = null;
+            for (CommitFile commitFile : files) {
+                if (ApiHelpers.md5(commitFile.getFilename()).equals(mDiffId.fileHash)) {
+                    file = commitFile;
+                    break;
+                }
+            }
+
+            if (file == null || isFinishing()) {
+                return null;
+            }
+
+            String sha = getSha();
+            if (sha == null || isFinishing()) {
+                return null;
+            }
+
+            if (FileUtils.isImage(file.getFilename())) {
+                return FileViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                        sha, file.getFilename());
+            }
+
+            return getLaunchIntent(sha, file, getComments(), mDiffId);
+        }
+
+        protected abstract List<CommitFile> getFiles() throws Exception;
+        protected abstract String getSha() throws Exception;
+        protected abstract List<CommitComment> getComments() throws Exception;
+        protected abstract Intent getLaunchIntent(String sha, CommitFile file,
+                List<CommitComment> comments, DiffHighlightId diffId);
+    }
+
+    private class PullRequestDiffLoadTask extends DiffLoadTask {
+        private final int mPullRequestNumber;
+
+        public PullRequestDiffLoadTask(String repoOwner, String repoName,
+                DiffHighlightId diffId, int pullRequestNumber) {
+            super(repoOwner, repoName, diffId);
+            mPullRequestNumber = pullRequestNumber;
+        }
+
+        @Override
+        protected Intent getLaunchIntent(String sha, CommitFile file,
+                List<CommitComment> comments, DiffHighlightId diffId) {
+            return PullRequestDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner,
+                    mRepoName, mPullRequestNumber, sha, file.getFilename(), file.getPatch(),
+                    comments, -1, diffId.startLine, diffId.endLine, diffId.right);
+        }
+
+        @Override
+        protected String getSha() throws Exception {
+            PullRequest pullRequest = PullRequestLoader.loadPullRequest(mRepoOwner, mRepoName,
+                    mPullRequestNumber);
+            return pullRequest.getHead().getSha();
+        }
+
+        @Override
+        protected List<CommitFile> getFiles() throws Exception {
+            return PullRequestFilesLoader.loadFiles(mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+
+        @Override
+        protected List<CommitComment> getComments() throws Exception {
+            return PullRequestCommentsLoader.loadComments(mRepoOwner, mRepoName,
+                    mPullRequestNumber);
+        }
+    }
+
+    private class CommitDiffLoadTask extends DiffLoadTask {
+        private String mSha;
+
+        public CommitDiffLoadTask(String repoOwner, String repoName,
+                DiffHighlightId diffId, String sha) {
+            super(repoOwner, repoName, diffId);
+            mSha = sha;
+        }
+
+        @Override
+        protected Intent getLaunchIntent(String sha, CommitFile file,
+                List<CommitComment> comments, DiffHighlightId diffId) {
+            return CommitDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                    sha, file.getFilename(), file.getPatch(), comments, diffId.startLine,
+                    diffId.endLine, diffId.right);
+        }
+
+        @Override
+        public String getSha() throws Exception {
+            return mSha;
+        }
+
+        @Override
+        protected List<CommitFile> getFiles() throws Exception {
+            RepositoryCommit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mSha);
+            return commit.getFiles();
+        }
+
+        @Override
+        protected List<CommitComment> getComments() throws Exception {
+            return CommitCommentListLoader.loadComments(mRepoOwner, mRepoName, mSha);
+        }
+    }
+
+    private class RefPathDisambiguationTask extends UrlLoadTask {
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final String mRefAndPath;
+        private final int mInitialPage;
+        private final String mFragment;
+        private final boolean mGoToFileViewer;
+
+        public RefPathDisambiguationTask(String repoOwner, String repoName,
+                String refAndPath, int initialPage) {
+            super();
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mRefAndPath = refAndPath;
+            mInitialPage = initialPage;
+            mFragment = null;
+            mGoToFileViewer = false;
+        }
+
+        public RefPathDisambiguationTask(String repoOwner, String repoName,
+                String refAndPath, String fragment) {
+            super();
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mRefAndPath = refAndPath;
+            mFragment = fragment;
+            mInitialPage = -1;
+            mGoToFileViewer = true;
+        }
+
+        @Override
+        protected Intent run() throws Exception {
+            Pair<String, String> refAndPath = resolve();
+            if (refAndPath == null) {
+                return null;
+            }
+
+            if (mGoToFileViewer && refAndPath.second != null) {
+                // parse line numbers from fragment
+                int highlightStart = -1, highlightEnd = -1;
+                // Line numbers are encoded either in the form #L12 or #L12-14
+                if (mFragment != null && mFragment.startsWith("L")) {
+                    try {
+                        int dashPos = mFragment.indexOf("-L");
+                        if (dashPos > 0) {
+                            highlightStart = Integer.valueOf(mFragment.substring(1, dashPos));
+                            highlightEnd = Integer.valueOf(mFragment.substring(dashPos + 2));
+                        } else {
+                            highlightStart = Integer.valueOf(mFragment.substring(1));
+                        }
+                    } catch (NumberFormatException e) {
+                        // ignore
+                    }
+                }
+
+                return FileViewerActivity.makeIntentWithHighlight(BrowseFilter.this,
+                        mRepoOwner, mRepoName, refAndPath.first, refAndPath.second,
+                        highlightStart, highlightEnd);
+            } else if (!mGoToFileViewer) {
+                return RepositoryActivity.makeIntent(BrowseFilter.this,
+                        mRepoOwner, mRepoName, refAndPath.first, refAndPath.second, mInitialPage);
+            }
+
+            return null;
+        }
+
         // returns ref, path
-        protected Pair<String, String> run() throws Exception {
+        private Pair<String, String> resolve() throws Exception {
             RepositoryService repoService = (RepositoryService)
                     Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
             RepositoryId repo = new RepositoryId(mRepoOwner, mRepoName);
@@ -269,37 +557,6 @@ public class BrowseFilter extends AppCompatActivity {
             }
 
             return null;
-        }
-
-        @Override
-        protected void onSuccess(Pair<String, String> result) {
-            if (isFinishing()) {
-                // dialog was dismissed
-                return;
-            }
-            Intent intent = null;
-            if (result != null) {
-                if (mGoToFileViewer && result.second != null) {
-                    intent = IntentUtils.getFileViewerActivityIntent(BrowseFilter.this,
-                            mRepoOwner, mRepoName, result.first, result.second);
-                    addLineNumbersToIntentIfPresent(intent, mFragment);
-                } else if (!mGoToFileViewer) {
-                    intent = IntentUtils.getRepoActivityIntent(BrowseFilter.this,
-                            mRepoOwner, mRepoName, result.first, result.second, mInitialPage);
-                }
-            }
-            if (intent != null) {
-                startActivity(intent);
-            } else {
-                IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
-            }
-            finish();
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
-            finish();
         }
     }
 }

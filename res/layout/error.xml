@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/error"
     android:layout_width="match_parent"
@@ -16,28 +17,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal|top"
-        android:text="@string/load_failure_explanation"
-        android:textSize="16sp"
-        android:textColor="?android:attr/textColorSecondary"
+        android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp" />
+        android:text="@string/load_failure_explanation"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="16sp" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/retry_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="@string/try_again"
-        android:textColor="?attr/colorAccent"
-        app:allCaps="true"
-        app:font="medium"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="8dp"
-        android:paddingBottom="8dp" />
+        android:text="@string/try_again"
+        android:textColor="?attr/colorAccent"
+        app:allCaps="true"
+        app:font="medium" />
 
     <View
         android:layout_width="match_parent"

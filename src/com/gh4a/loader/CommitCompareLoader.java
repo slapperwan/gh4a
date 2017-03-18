@@ -13,11 +13,10 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class CommitCompareLoader extends BaseLoader<List<RepositoryCommit>> {
-
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mBase;
-    private String mHead;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mBase;
+    private final String mHead;
 
     public CommitCompareLoader(Context context, String repoOwner, String repoName,
             String base, String head) {

@@ -24,10 +24,12 @@ import android.view.View;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.IssueActivity;
+import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.ApiHelpers;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.client.PageIterator;
@@ -42,10 +44,10 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     private Map<String, String> mFilterData;
     private int mEmptyTextResId;
     private boolean mShowRepository;
-    private boolean mShowingClosed;
+    private String mIssueState;
 
-    public static IssueListFragment newInstance(Map<String, String> filterData,
-            boolean showingClosed, int emptyTextResId, boolean showRepository) {
+    public static IssueListFragment newInstance(Map<String, String> filterData, String state,
+            int emptyTextResId, boolean showRepository) {
         IssueListFragment f = new IssueListFragment();
 
         Bundle args = new Bundle();
@@ -55,7 +57,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
             }
         }
         args.putInt("emptytext", emptyTextResId);
-        args.putBoolean("closed", showingClosed);
+        args.putString("state", state);
         args.putBoolean("withrepo", showRepository);
 
         f.setArguments(args);
@@ -75,7 +77,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
             }
         }
         mEmptyTextResId = args.getInt("emptytext");
-        mShowingClosed = args.getBoolean("closed");
+        mIssueState = args.getString("state");
         mShowRepository = args.getBoolean("withrepo");
     }
 
@@ -83,10 +85,17 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (mShowingClosed) {
-            setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
-        } else {
-            setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
+        switch (mIssueState) {
+            case ApiHelpers.IssueState.CLOSED:
+                setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
+                break;
+            case ApiHelpers.IssueState.MERGED:
+                setHighlightColors(R.attr.colorPullRequestMerged,
+                        R.attr.colorPullRequestMergedDark);
+                break;
+            default:
+                setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
+                break;
         }
     }
 
@@ -94,10 +103,8 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     public void onItemClick(Issue issue) {
         String[] urlPart = issue.getUrl().split("/");
         Intent intent = issue.getPullRequest() != null
-                ? IntentUtils.getPullRequestActivityIntent(getActivity(),
-                        urlPart[4], urlPart[5], issue.getNumber())
-                : IntentUtils.getIssueActivityIntent(getActivity(),
-                        urlPart[4], urlPart[5], issue.getNumber());
+                ? PullRequestActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.getNumber())
+                : IssueActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.getNumber());
         startActivityForResult(intent, REQUEST_ISSUE);
     }
 

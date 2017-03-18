@@ -1,14 +1,8 @@
 package com.gh4a.fragment;
 
-import org.eclipse.egit.github.core.Commit;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.RepositoryCommit;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
@@ -20,27 +14,45 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.FileViewerActivity;
-import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.CommitLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
+
+import org.eclipse.egit.github.core.Commit;
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
+import org.eclipse.egit.github.core.RepositoryCommit;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommitFragment extends LoadingFragmentBase implements OnClickListener {
+    public static CommitFragment newInstance(String repoOwner, String repoName, String commitSha,
+            RepositoryCommit commit, List<CommitComment> comments) {
+        CommitFragment f = new CommitFragment();
+
+        Bundle args = new Bundle();
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
+        args.putString("sha", commitSha);
+        args.putSerializable("commit", commit);
+        args.putSerializable("comments", new ArrayList<>(comments));
+        f.setArguments(args);
+        return f;
+    }
+
+    public interface CommentUpdateListener {
+        void onCommentsUpdated();
+    }
+
     private static final int REQUEST_DIFF_VIEWER = 1000;
 
     private String mRepoOwner;
@@ -50,88 +62,36 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     private List<CommitComment> mComments;
     protected View mContentView;
 
-    private LoaderCallbacks<RepositoryCommit> mCommitCallback = new LoaderCallbacks<RepositoryCommit>(this) {
-        @Override
-        protected Loader<LoaderResult<RepositoryCommit>> onCreateLoader() {
-            return new CommitLoader(getActivity(), mRepoOwner, mRepoName, mObjectSha);
-        }
-
-        @Override
-        protected void onResultReady(RepositoryCommit result) {
-            mCommit = result;
-            fillDataIfReady();
-        }
-    };
-    private LoaderCallbacks<List<CommitComment>> mCommentCallback =
-            new LoaderCallbacks<List<CommitComment>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
-            return new CommitCommentListLoader(getActivity(), mRepoOwner, mRepoName,
-                    mObjectSha, false, true);
-        }
-
-        @Override
-        protected void onResultReady(List<CommitComment> result) {
-            mComments = result;
-            fillDataIfReady();
-        }
-    };
-
-    public static CommitFragment newInstance(String repoOwner, String repoName, String objectSha) {
-        CommitFragment f = new CommitFragment();
-
-        Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
-        args.putString(Constants.Object.OBJECT_SHA, objectSha);
-        f.setArguments(args);
-        return f;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
-        mObjectSha = getArguments().getString(Constants.Object.OBJECT_SHA);
+        mRepoOwner = getArguments().getString("owner");
+        mRepoName = getArguments().getString("repo");
+        mObjectSha = getArguments().getString("sha");
+        mCommit = (RepositoryCommit) getArguments().getSerializable("commit");
+        mComments = (List<CommitComment>) getArguments().getSerializable("comments");
+    }
+
+    @Override
+    protected View onCreateContentView(LayoutInflater inflater, ViewGroup parent) {
+        mContentView = inflater.inflate(R.layout.commit, parent, false);
+        return mContentView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        populateViewIfReady();
     }
 
     @Override
     public void onRefresh() {
-        mCommit = null;
-        mComments = null;
-        hideContentAndRestartLoaders(0, 1);
+        // we got all our data through arguments
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        mContentView = inflater.inflate(R.layout.commit, null);
-
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        setContentView(mContentView);
-        setContentShown(false);
-
-        initLoader();
-    }
-
-    protected void initLoader() {
-        getLoaderManager().initLoader(0, null, mCommitCallback);
-        getLoaderManager().initLoader(1, null, mCommentCallback);
-    }
-
-    private void fillDataIfReady() {
-        if (mCommit != null && mComments != null) {
-            fillHeader();
-            fillStats(mCommit.getFiles(), mComments);
-            setContentShown(true);
-        }
+    protected void populateViewIfReady() {
+        fillHeader();
+        fillStats(mCommit.getFiles(), mComments);
     }
 
     private void fillHeader() {
@@ -298,25 +258,26 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
-            String login = (String) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(getActivity(), login);
+            Intent intent = UserActivity.makeIntent(getActivity(), (String) v.getTag());
             if (intent != null) {
                 startActivity(intent);
             }
         } else {
             CommitFile file = (CommitFile) v.getTag();
-
-            Intent intent = new Intent(getActivity(), FileUtils.isImage(file.getFilename())
-                    ? FileViewerActivity.class : CommitDiffViewerActivity.class);
-            intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-            intent.putExtra(Constants.Repository.NAME, mRepoName);
-            intent.putExtra(Constants.Object.REF, mObjectSha);
-            intent.putExtra(Constants.Object.OBJECT_SHA, mObjectSha);
-            intent.putExtra(Constants.Commit.DIFF, file.getPatch());
-            intent.putExtra(Constants.Commit.COMMENTS, new ArrayList<>(mComments));
-            intent.putExtra(Constants.Object.PATH, file.getFilename());
-            startActivityForResult(intent, REQUEST_DIFF_VIEWER);
+            handleFileClick(file);
         }
+    }
+
+    protected void handleFileClick(CommitFile file) {
+        final Intent intent;
+        if (FileUtils.isImage(file.getFilename())) {
+            intent = FileViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                    mObjectSha, file.getFilename());
+        } else {
+            intent = CommitDiffViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                    mObjectSha, file.getFilename(), file.getPatch(), mComments, -1, -1, false);
+        }
+        startActivityForResult(intent, REQUEST_DIFF_VIEWER);
     }
 
     @Override
@@ -324,8 +285,9 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         if (requestCode == REQUEST_DIFF_VIEWER) {
             if (resultCode == Activity.RESULT_OK) {
                 // reload comments
-                getLoaderManager().getLoader(1).onContentChanged();
-                getActivity().setResult(Activity.RESULT_OK);
+                if (getActivity() instanceof CommentUpdateListener) {
+                    ((CommentUpdateListener) getActivity()).onCommentsUpdated();
+                }
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);

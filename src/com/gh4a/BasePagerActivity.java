@@ -40,7 +40,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         setContentView(R.layout.view_pager);
 
         mCurrentHeaderColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        mTabHeaderColors = getTabHeaderColors();
+        updateTabHeaderColors();
         mPager = setupPager();
         updateTabVisibility();
 
@@ -60,11 +60,11 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     protected void invalidateTabs() {
         invalidateFragments();
-        mTabHeaderColors = getTabHeaderColors();
+        updateTabHeaderColors();
         if (mTabHeaderColors != null) {
             onPageMoved(0, 0);
         } else {
-            int[] colorAttrs = getHeaderColors();
+            int[] colorAttrs = getHeaderColorAttrs();
             if (colorAttrs != null) {
                 transitionHeaderToColor(colorAttrs[0], colorAttrs[1]);
             } else {
@@ -103,6 +103,20 @@ public abstract class BasePagerActivity extends BaseActivity implements
             return ((SwipeRefreshLayout.ChildScrollDelegate) item).canChildScrollUp();
         }
         return false;
+    }
+
+    private void updateTabHeaderColors() {
+        int[][] colorAttrs = getTabHeaderColorAttrs();
+        if (colorAttrs == null) {
+            mTabHeaderColors = null;
+            return;
+        }
+
+        mTabHeaderColors = new int[colorAttrs.length][2];
+        for (int i = 0; i < mTabHeaderColors.length; i++) {
+            mTabHeaderColors[i][0] = UiUtils.resolveColor(this, colorAttrs[i][0]);
+            mTabHeaderColors[i][1] = UiUtils.resolveColor(this, colorAttrs[i][1]);
+        }
     }
 
     private ViewPager setupPager() {
@@ -152,24 +166,30 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     @Override
-    public void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
+    protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
         super.transitionHeaderToColor(colorAttrId, statusBarColorAttrId);
         mCurrentHeaderColor = UiUtils.resolveColor(this, colorAttrId);
     }
 
     protected abstract int[] getTabTitleResIds();
-    protected abstract Fragment getFragment(int position);
+    protected abstract Fragment makeFragment(int position);
     protected boolean fragmentNeedsRefresh(Fragment object) {
         return false;
     }
 
+    protected void onFragmentInstantiated(Fragment f, int position) {
+    }
+
+    protected void onFragmentDestroyed(Fragment f) {
+    }
+
     /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
-    protected int[][] getTabHeaderColors() {
+    protected int[][] getTabHeaderColorAttrs() {
         return null;
     }
 
     /* expected format: int[2] - 0 is header, 1 is status bar */
-    protected int[] getHeaderColors() {
+    protected int[] getHeaderColorAttrs() {
         return null;
     }
 
@@ -195,7 +215,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     protected void onPageMoved(int position, float fraction) {
         if (mTabHeaderColors != null) {
-            int nextIndex = Math.max(position, mTabHeaderColors.length - 1);
+            int nextIndex = Math.max(0, Math.min(position + 1, mTabHeaderColors.length - 1));
             int headerColor = UiUtils.mixColors(mTabHeaderColors[position][0],
                     mTabHeaderColors[nextIndex][0], fraction);
             int statusBarColor = UiUtils.mixColors(mTabHeaderColors[position][1],
@@ -205,7 +225,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     private class FragmentAdapter extends FragmentStatePagerAdapter {
-        private SparseArray<Fragment> mFragments = new SparseArray<>();
+        private final SparseArray<Fragment> mFragments = new SparseArray<>();
         private Fragment mCurrentFragment;
 
         public FragmentAdapter() {
@@ -220,13 +240,14 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
         @Override
         public Fragment getItem(int position) {
-            return getFragment(position);
+            return makeFragment(position);
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             Fragment f = (Fragment) super.instantiateItem(container, position);
             mFragments.put(position, f);
+            onFragmentInstantiated(f, position);
             return f;
         }
 
@@ -247,6 +268,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         public void destroyItem(ViewGroup container, int position, Object object) {
             super.destroyItem(container, position, object);
             mFragments.remove(position);
+            onFragmentDestroyed((Fragment) object);
             if (object == mCurrentFragment) {
                 mCurrentFragment = null;
             }
@@ -281,7 +303,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     @TargetApi(21)
     private static class ViewPagerEdgeColorHelper {
-        private ViewPager mPager;
+        private final ViewPager mPager;
         private int mColor;
         private EdgeEffect mLeftEffect, mRightEffect;
 

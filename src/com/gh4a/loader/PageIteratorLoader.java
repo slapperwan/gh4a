@@ -10,13 +10,13 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 
-public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIteratorLoader<T>.LoadedPage<T>>> {
-    private PageIterator<T> mPageIterator;
+public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIteratorLoader<T>.LoadedPage>> {
+    private final PageIterator<T> mPageIterator;
     private ArrayList<T> mPreviouslyLoadedData;
 
-    public class LoadedPage<T> {
+    public class LoadedPage {
         public final Collection<T> results;
         public final boolean hasMoreData;
         private LoadedPage(Collection<T> r, boolean hmd) {
@@ -47,7 +47,7 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIter
     }
 
     @Override
-    public LoaderResult<LoadedPage<T>> loadInBackground() {
+    public LoaderResult<LoadedPage> loadInBackground() {
         if (mPageIterator.hasNext()) {
             try {
                 Collection<T> newData = mPageIterator.next();
@@ -55,14 +55,14 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIter
                 mPreviouslyLoadedData.addAll(newData);
             } catch (NoSuchPageException e) {
                 // should only happen in case of an empty repo
-                return new LoaderResult<>(new LoadedPage<>(mPreviouslyLoadedData, false));
+                return new LoaderResult<>(new LoadedPage(mPreviouslyLoadedData, false));
             } catch (Exception e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                Log.e(Gh4Application.LOG_TAG, e.getMessage(), e);
                 return new LoaderResult<>(e);
             }
         }
 
-        return new LoaderResult<>(new LoadedPage<>(mPreviouslyLoadedData, mPageIterator.hasNext()));
+        return new LoaderResult<>(new LoadedPage(mPreviouslyLoadedData, mPageIterator.hasNext()));
     }
 
     @Override

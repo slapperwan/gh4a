@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:orientation="vertical">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@drawable/top_shadow" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?cardBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_title"
+                style="@style/HeaderLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                tools:text="owner/repository" />
+
+            <com.gh4a.widget.FixedSizeImageView
+                android:id="@+id/iv_action"
+                android:layout_width="56dp"
+                android:layout_height="48dp"
+                android:background="?selectableItemBackgroundBorderless"
+                android:paddingLeft="@dimen/content_padding"
+                android:paddingRight="@dimen/content_padding"
+                android:src="?markAllAsReadIcon" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

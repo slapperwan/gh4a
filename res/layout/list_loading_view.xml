@@ -1,36 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:paddingBottom="8dp"
+    android:paddingLeft="@dimen/content_padding"
+    android:paddingRight="@dimen/content_padding"
+    android:paddingTop="8dp"
+    android:visibility="gone">
 
-    <LinearLayout
-        android:id="@+id/loading"
+    <ProgressBar
+        android:id="@+id/ab_pb"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginRight="8dp"
+        android:indeterminate="true" />
+
+    <com.gh4a.widget.StyleableTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:paddingLeft="@dimen/content_padding"
-        android:paddingRight="@dimen/content_padding"
-        android:orientation="horizontal">
+        android:text="@string/loading_msg"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?attr/colorAccent" />
 
-        <ProgressBar
-            android:id="@+id/ab_pb"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginRight="8dp"
-            android:layout_gravity="center_vertical"
-            android:indeterminate="true" />
-
-        <com.gh4a.widget.StyleableTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?attr/colorAccent"
-            android:text="@string/loading_msg"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp" />
-
-    </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>

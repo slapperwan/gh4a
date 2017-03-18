@@ -13,8 +13,8 @@ import java.util.Locale;
 
 public class PullRequestCountLoader extends BaseLoader<Integer> {
 
-    private Repository mRepository;
-    private String mState;
+    private final Repository mRepository;
+    private final String mState;
 
     private static final String QUERY_FORMAT = "type:pr repo:%s/%s state:%s";
 

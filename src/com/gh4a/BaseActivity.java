@@ -15,28 +15,36 @@
  */
 package com.gh4a;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.Loader;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -49,23 +57,15 @@ import android.view.ViewStub;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.home.HomeActivity;
-import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.ColorDrawable;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.AnimatorSet;
-import com.nineoldandroids.animation.ArgbEvaluator;
-import com.nineoldandroids.animation.ObjectAnimator;
-import com.nineoldandroids.animation.ValueAnimator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +73,7 @@ import java.util.List;
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 
 public abstract class BaseActivity extends AppCompatActivity implements
-        SwipeRefreshLayout.OnRefreshListener, DrawerLayout.DrawerListener,
+        SwipeRefreshLayout.OnRefreshListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
         LoaderCallbacks.ParentCallback,
         NavigationView.OnNavigationItemSelectedListener {
@@ -81,6 +81,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private TextView mEmptyView;
     private boolean mContentShown;
     private boolean mContentEmpty;
+    private boolean mErrorShown;
 
     private AppBarLayout mHeader;
     private ToggleableAppBarLayoutBehavior mHeaderBehavior;
@@ -89,8 +90,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private DrawerLayout mDrawerLayout;
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private NavigationView mLeftDrawer;
     private NavigationView mRightDrawer;
     private View mLeftDrawerTitle;
     private View mRightDrawerTitle;
@@ -101,7 +100,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
     private final int[] mProgressColors = new int[2];
     private Animator mHeaderTransition;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
     private final Runnable mUpdateTaskDescriptionRunnable = new Runnable() {
         @TargetApi(21)
@@ -149,8 +148,18 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return 0;
     }
 
+    @IdRes
+    protected int getInitialLeftDrawerSelection() {
+        return 0;
+    }
+
     protected int[] getRightNavigationDrawerMenuResources() {
         return null;
+    }
+
+    @IdRes
+    protected int getInitialRightDrawerSelection() {
+        return 0;
     }
 
     protected boolean closeDrawers() {
@@ -196,7 +205,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     protected void setContentShown(boolean shown) {
-        setContentShown(shown, true);
+        mContentShown = shown;
+        updateSwipeToRefreshState();
+        updateViewVisibility(true);
     }
 
     protected void setContentEmpty(boolean isEmpty) {
@@ -206,16 +217,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected Intent navigateUp() {
         return null;
-    }
-
-    protected ProgressDialog showProgressDialog(String message, boolean cancelable) {
-        return ProgressDialog.show(this, "", message, cancelable);
-    }
-
-    protected void stopProgressDialog(ProgressDialog progressDialog) {
-        if (progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
-        }
     }
 
     public CoordinatorLayout getRootLayout() {
@@ -242,7 +243,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         scheduleTaskDescriptionUpdate();
     }
 
-    public void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
+    protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
         final AnimatorSet animation = new AnimatorSet();
         List<Animator> animators = new ArrayList<>();
         int color = UiUtils.resolveColor(this, colorAttrId);
@@ -302,6 +303,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 mRightDrawer.inflateMenu(id);
             }
             mRightDrawer.setNavigationItemSelectedListener(this);
+
+            int initialRightDrawerSelection = getInitialRightDrawerSelection();
+            if (initialRightDrawerSelection != 0) {
+                mRightDrawer.setCheckedItem(initialRightDrawerSelection);
+            }
+
             onPrepareRightNavigationDrawerMenu(mRightDrawer.getMenu());
 
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, Gravity.RIGHT);
@@ -364,17 +371,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         view.setLayoutParams(lp);
     }
 
-    protected void saveBookmark(String name, int type, Intent intent, String extraData) {
-        ContentValues cv = new ContentValues();
-        cv.put(BookmarksProvider.Columns.NAME, name);
-        cv.put(BookmarksProvider.Columns.TYPE, type);
-        cv.put(BookmarksProvider.Columns.URI, intent.toUri(0));
-        cv.put(BookmarksProvider.Columns.EXTRA, extraData);
-        if (getContentResolver().insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
-            Toast.makeText(this, R.string.bookmark_saved, Toast.LENGTH_LONG).show();
-        }
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -385,19 +381,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (mDrawerToggle != null) {
-            mDrawerToggle.onConfigurationChanged(newConfig);
-        }
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
         if (item.getItemId() == android.R.id.home) {
             Intent intent = navigateUp();
             if (intent != null) {
@@ -410,14 +394,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        if (mDrawerToggle != null) {
-            mDrawerToggle.syncState();
-        }
     }
 
     @Override
@@ -441,8 +417,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public boolean onSearchRequested() {
-        Intent intent = new Intent(this, SearchActivity.class);
-        startActivity(intent);
+        startActivity(SearchActivity.makeIntent(this));
         return true;
     }
 
@@ -450,34 +425,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public void onRefresh() {
         supportInvalidateOptionsMenu();
         mSwipeLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void onDrawerOpened(View drawerView) {
-        if (mDrawerToggle != null && drawerView == mLeftDrawer) {
-            mDrawerToggle.onDrawerOpened(drawerView);
-        }
-    }
-
-    @Override
-    public void onDrawerClosed(View drawerView) {
-        if (mDrawerToggle != null && drawerView == mLeftDrawer) {
-            mDrawerToggle.onDrawerClosed(drawerView);
-        }
-    }
-
-    @Override
-    public void onDrawerSlide(View drawerView, float slideOffset) {
-        if (mDrawerToggle != null && drawerView == mLeftDrawer) {
-            mDrawerToggle.onDrawerSlide(drawerView, slideOffset);
-        }
-    }
-
-    @Override
-    public void onDrawerStateChanged(int newState) {
-        if (mDrawerToggle != null) {
-            mDrawerToggle.onDrawerStateChanged(newState);
-        }
     }
 
     @Override
@@ -523,12 +470,26 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
+    protected boolean forceLoaderReload(int... ids) {
+        LoaderManager lm = getSupportLoaderManager();
+        boolean reloadedAny = false;
+        for (int id : ids) {
+            Loader loader = lm.getLoader(id);
+            if (loader != null) {
+                loader.onContentChanged();
+                reloadedAny = true;
+            }
+        }
+        return reloadedAny;
+    }
+
     protected void setErrorViewVisibility(boolean visible) {
         View content = findViewById(R.id.content);
         View error = findViewById(R.id.error);
 
         content.setVisibility(visible ? View.GONE : View.VISIBLE);
-        mSwipeLayout.setEnabled(visible ? false : canSwipeToRefresh());
+        mErrorShown = visible;
+        updateSwipeToRefreshState();
 
         if (error == null) {
             if (!visible) {
@@ -550,6 +511,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
         error.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    private void updateSwipeToRefreshState() {
+        ensureContent();
+        mSwipeLayout.setEnabled(mContentShown && !mErrorShown && canSwipeToRefresh());
+    }
+
     private void setupHeaderDrawable() {
         ensureContent();
 
@@ -559,7 +525,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         assignBackground(mHeader, primaryColor);
 
         int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
-        ColorDrawable d = ColorDrawable.create(primaryDarkColor);
+        ColorDrawable d = new ColorDrawable(primaryDarkColor);
         mDrawerLayout.setStatusBarBackground(d);
         mStatusBarDrawables.add(d);
     }
@@ -576,12 +542,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (view == null) {
             return;
         }
-        ColorDrawable background = ColorDrawable.create(color);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-            view.setBackground(background);
-        } else {
-            view.setBackgroundDrawable(background);
-        }
+        ColorDrawable background = new ColorDrawable(color);
+        view.setBackground(background);
         mHeaderDrawables.add(background);
     }
 
@@ -593,15 +555,14 @@ public abstract class BaseActivity extends AppCompatActivity implements
                     UiUtils.resolveColor(this, R.attr.colorPrimary), 0,
                     UiUtils.resolveColor(this, R.attr.colorPrimaryDark), 0
             );
-        } else {
-            mSwipeLayout.setEnabled(false);
         }
+        updateSwipeToRefreshState();
     }
 
     private void setupNavigationDrawer() {
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
-        mLeftDrawer = (NavigationView) findViewById(R.id.left_drawer);
-        applyHighlightColor(mLeftDrawer);
+        NavigationView leftDrawer = (NavigationView) findViewById(R.id.left_drawer);
+        applyHighlightColor(leftDrawer);
         mRightDrawer = (NavigationView) findViewById(R.id.right_drawer);
         applyHighlightColor(mRightDrawer);
 
@@ -610,15 +571,33 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         int drawerMenuResId = getLeftNavigationDrawerMenuResource();
         if (drawerMenuResId != 0) {
-            mLeftDrawer.inflateMenu(drawerMenuResId);
-            mLeftDrawer.setNavigationItemSelectedListener(this);
+            leftDrawer.inflateMenu(drawerMenuResId);
+            leftDrawer.setNavigationItemSelectedListener(this);
 
-            mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolBar, 0, 0);
-            mDrawerLayout.setDrawerListener(this);
+            int initialLeftDrawerSelection = getInitialLeftDrawerSelection();
+            if (initialLeftDrawerSelection != 0) {
+                leftDrawer.setCheckedItem(initialLeftDrawerSelection);
+            }
 
-            mLeftDrawerTitle = getLeftDrawerTitle(mLeftDrawer);
+            ActionBar supportActionBar = getSupportActionBar();
+            if (supportActionBar != null) {
+                supportActionBar.setDisplayHomeAsUpEnabled(true);
+            }
+
+            toolBar.setNavigationIcon(new DrawerArrowDrawable(toolBar.getContext()));
+            toolBar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick (View v) {
+                    int drawerLockMode = mDrawerLayout.getDrawerLockMode(GravityCompat.START);
+                    if (drawerLockMode != DrawerLayout.LOCK_MODE_LOCKED_CLOSED) {
+                        mDrawerLayout.openDrawer(GravityCompat.START);
+                    }
+                }
+            });
+
+            mLeftDrawerTitle = getLeftDrawerTitle(leftDrawer);
             if (mLeftDrawerTitle!= null) {
-                mLeftDrawer.addHeaderView(mLeftDrawerTitle);
+                leftDrawer.addHeaderView(mLeftDrawerTitle);
             }
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);
@@ -631,11 +610,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mRightDrawerTitle = mRightDrawer.inflateHeaderView(R.layout.drawer_title_right);
 
         updateRightNavigationDrawer();
-    }
-
-    private void setContentShown(boolean shown, boolean animate) {
-        mContentShown = shown;
-        updateViewVisibility(animate);
     }
 
     private void applyHighlightColor(NavigationView view) {

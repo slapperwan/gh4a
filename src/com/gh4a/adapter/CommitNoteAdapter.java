@@ -15,140 +15,86 @@
  */
 package com.gh4a.adapter;
 
+import android.content.Context;
+import android.graphics.Typeface;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.view.View;
+import android.widget.ImageView;
+
+import com.gh4a.R;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.widget.StyleableTextView;
+
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.User;
 
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Typeface;
-import android.support.v7.widget.RecyclerView;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import java.util.Date;
 
-import com.gh4a.Gh4Application;
-import com.gh4a.R;
-import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
-import com.github.mobile.util.HtmlUtils;
-import com.github.mobile.util.HttpImageGetter;
-
-public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdapter.ViewHolder>
-        implements View.OnClickListener {
-    public interface OnEditComment {
-        void editComment(CommitComment comment);
-    }
-
-    private String mRepoOwner;
-    private HttpImageGetter mImageGetter;
-    private OnEditComment mEditCallback;
-
-    public CommitNoteAdapter(Context context, String repoOwner, OnEditComment editCallback) {
-        super(context);
-        mRepoOwner = repoOwner;
-        mEditCallback = editCallback;
-        mImageGetter = new HttpImageGetter(context);
-    }
-
-    public void destroy() {
-        mImageGetter.destroy();
+public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
+    public CommitNoteAdapter(Context context, String repoOwner, String repoName,
+            OnCommentAction actionCallback) {
+        super(context, repoOwner, repoName, actionCallback);
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
-        View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
-        ViewHolder holder = new ViewHolder(v);
-        holder.ivGravatar.setOnClickListener(this);
-        return holder;
+    protected User getUser(CommitComment item) {
+        return item.getUser();
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, CommitComment comment) {
-        User user = comment.getUser();
+    protected Date getCreatedAt(CommitComment item) {
+        return item.getCreatedAt();
+    }
 
-        AvatarHandler.assignAvatar(holder.ivGravatar, user);
+    @Override
+    protected Date getUpdatedAt(CommitComment item) {
+        return item.getUpdatedAt();
+    }
 
-        SpannableString userName = new SpannableString(ApiHelpers.getUserLogin(mContext, user));
+    @Override
+    protected String getUrl(CommitComment item) {
+        return item.getHtmlUrl();
+    }
+
+    @Override
+    protected String getShareSubject(CommitComment item) {
+        return mContext.getString(R.string.share_commit_comment_subject,
+                item.getId(), mRepoOwner + "/" + mRepoName);
+    }
+
+    @Override
+    protected void bindBodyView(CommitComment item, StyleableTextView view,
+            HttpImageGetter imageGetter) {
+        imageGetter.bind(view, item.getBodyHtml(), item.getId());
+    }
+
+    @Override
+    protected void bindExtraView(CommitComment item, StyleableTextView view) {
+        String login = ApiHelpers.getUserLogin(mContext, item.getUser());
+        SpannableString userName = new SpannableString(login);
         userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
-
-        holder.ivGravatar.setTag(user);
-        holder.tvExtra.setText(userName);
-        holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                comment.getCreatedAt(), true));
-
-        String body = HtmlUtils.format(comment.getBodyHtml()).toString();
-        mImageGetter.bind(holder.tvDesc, body, comment.getId());
-
-        String ourLogin = Gh4Application.get().getAuthLogin();
-        boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
-                || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
-
-        if (mEditCallback != null && canEdit) {
-            holder.ivEdit.setVisibility(View.VISIBLE);
-            holder.ivEdit.setTag(comment);
-            holder.ivEdit.setOnClickListener(this);
-        } else {
-            holder.ivEdit.setVisibility(View.GONE);
-        }
-    }
-
-    public void resume() {
-        mImageGetter.resume();
-    }
-
-    public void pause() {
-        mImageGetter.pause();
+        view.setText(userName);
     }
 
     @Override
-    public void clear() {
-        super.clear();
-        boolean resumed = mImageGetter.isResumed();
-        mImageGetter.destroy();
-        mImageGetter = new HttpImageGetter(mContext);
-        if (resumed) {
-            mImageGetter.resume();
-        }
+    protected void bindFileView(CommitComment item, StyleableTextView view) {
+        view.setVisibility(View.GONE);
     }
 
     @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.iv_gravatar) {
-            User user = (User) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, user);
-            if (intent != null) {
-                mContext.startActivity(intent);
-            }
-        } else if (v.getId() == R.id.iv_edit) {
-            CommitComment comment = (CommitComment) v.getTag();
-            mEditCallback.editComment(comment);
-        } else {
-            super.onClick(v);
-        }
+    protected void bindEventIcon(CommitComment item, ImageView view) {
+        view.setVisibility(View.GONE);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        private ViewHolder(View view) {
-            super(view);
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-            tvExtra = (TextView) view.findViewById(R.id.tv_extra);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            ivEdit = (ImageView) view.findViewById(R.id.iv_edit);
-        }
+    @Override
+    protected boolean hasActionMenu(CommitComment item) {
+        return true;
+    }
 
-        private ImageView ivGravatar;
-        private TextView tvDesc;
-        private TextView tvExtra;
-        private TextView tvTimestamp;
-        private ImageView ivEdit;
+    @Override
+    protected boolean canQuote(CommitComment item) {
+        return true;
     }
 }

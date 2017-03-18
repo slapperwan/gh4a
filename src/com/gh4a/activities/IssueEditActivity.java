@@ -15,7 +15,7 @@
  */
 package com.gh4a.activities;
 
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -35,7 +34,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -46,8 +44,8 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Issue;
@@ -61,7 +59,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IssueEditActivity extends BaseActivity implements View.OnClickListener {
-    public static final String EXTRA_ISSUE = "issue";
+    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
+        // can't reuse makeEditIntent here, because even a null extra counts for hasExtra()
+        return new Intent(context, IssueEditActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName);
+    }
+
+    public static Intent makeEditIntent(Context context, String repoOwner,
+            String repoName, Issue issue) {
+        return new Intent(context, IssueEditActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("issue", issue);
+    }
 
     private String mRepoOwner;
     private String mRepoName;
@@ -84,69 +95,52 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     private View mAssigneeContainer;
     private View mLabelContainer;
 
-    private ProgressDialog mProgressDialog;
-
     private static final String STATE_KEY_ISSUE = "issue";
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
+    private final LoaderCallbacks<List<Label>> mLabelCallback =
+            new ProgressDialogLoaderCallbacks<List<Label>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         protected void onResultReady(List<Label> result) {
-            stopProgressDialog(mProgressDialog);
             mAllLabels = result;
             showLabelDialog();
             getSupportLoaderManager().destroyLoader(0);
         }
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
-    private LoaderCallbacks<List<Milestone>> mMilestoneCallback = new LoaderCallbacks<List<Milestone>>(this) {
+    private final LoaderCallbacks<List<Milestone>> mMilestoneCallback =
+            new ProgressDialogLoaderCallbacks<List<Milestone>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueEditActivity.this,
-                    mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+                    mRepoOwner, mRepoName, ApiHelpers.IssueState.OPEN);
         }
         @Override
         protected void onResultReady(List<Milestone> result) {
-            stopProgressDialog(mProgressDialog);
             mAllMilestone = result;
             showMilestonesDialog();
             getSupportLoaderManager().destroyLoader(1);
         }
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
-    private LoaderCallbacks<List<User>> mCollaboratorListCallback = new LoaderCallbacks<List<User>>(this) {
+    private final LoaderCallbacks<List<User>> mCollaboratorListCallback =
+            new ProgressDialogLoaderCallbacks<List<User>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new CollaboratorListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
         @Override
         protected void onResultReady(List<User> result) {
-            stopProgressDialog(mProgressDialog);
             mAllAssignee = result;
             showAssigneesDialog();
             getSupportLoaderManager().destroyLoader(2);
         }
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
-    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
@@ -159,7 +153,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     };
 
-    private LoaderCallbacks<String> mIssueTemplateCallback = new LoaderCallbacks<String>(this) {
+    private final LoaderCallbacks<String> mIssueTemplateCallback = new LoaderCallbacks<String>(this) {
         @Override
         protected Loader<LoaderResult<String>> onCreateLoader() {
             return new IssueTemplateLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
@@ -243,10 +237,14 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             }
         });
 
+        boolean isPullRequest = mEditIssue.getPullRequest() != null;
+
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(isInEditMode()
-                ? getString(R.string.issue_edit_title, mEditIssue.getNumber())
-                : getString(R.string.issue_create));
+        actionBar.setTitle(!isInEditMode()
+                ? getString(R.string.issue_create)
+                : isPullRequest
+                        ? getString(R.string.pull_request_edit_title, mEditIssue.getNumber())
+                        : getString(R.string.issue_edit_title, mEditIssue.getNumber()));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -258,9 +256,9 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mEditIssue = (Issue) extras.getSerializable(EXTRA_ISSUE);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mEditIssue = (Issue) extras.getSerializable("issue");
     }
 
     @Override
@@ -278,19 +276,12 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mIsCollaborator = false;
         updateLabels();
         updateLabelStates();
-
-        LoaderManager lm = getSupportLoaderManager();
-        for (int i = 0; i < 4; i++) {
-            Loader loader = lm.getLoader(i);
-            if (loader != null) {
-                loader.onContentChanged();
-            }
-        }
+        forceLoaderReload(0, 1, 2, 3);
         super.onRefresh();
     }
 
     private boolean isInEditMode() {
-        return getIntent().hasExtra(EXTRA_ISSUE);
+        return getIntent().hasExtra("issue");
     }
 
     @Override
@@ -319,13 +310,18 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getIssueListActivityIntent(this,
-                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+        if (!isInEditMode()) {
+            return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
+        }
+        if (mEditIssue.getPullRequest() != null) {
+            return PullRequestActivity.makeIntent(this, mRepoOwner, mRepoName,
+                    mEditIssue.getNumber());
+        }
+        return IssueActivity.makeIntent(this, mRepoOwner, mRepoName, mEditIssue.getNumber());
     }
 
     private void showMilestonesDialog() {
         if (mAllMilestone == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         } else {
             final String[] milestones = new String[mAllMilestone.size() + 1];
@@ -365,32 +361,39 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private void showAssigneesDialog() {
         if (mAllAssignee == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
         } else {
-            final String[] assignees = new String[mAllAssignee.size() + 1];
-            User selectedAssignee = mEditIssue.getAssignee();
-            int selected = 0;
-
-            assignees[0] = getResources().getString(R.string.issue_clear_assignee);
-
-            for (int i = 1; i <= mAllAssignee.size(); i++) {
-                User u = mAllAssignee.get(i - 1);
-                assignees[i] = u.getLogin();
-                if (selectedAssignee != null
-                        && u.getLogin().equalsIgnoreCase(selectedAssignee.getLogin())) {
-                    selected = i;
-                }
+            final String[] assigneeNames = new String[mAllAssignee.size()];
+            final boolean[] selection = new boolean[mAllAssignee.size()];
+            final List<User> oldAssigneeList = mEditIssue.getAssignees() != null
+                    ? mEditIssue.getAssignees() : new ArrayList<User>();
+            List<String> assigneeLogins = new ArrayList<>();
+            for (User assignee : oldAssigneeList) {
+                assigneeLogins.add(assignee.getLogin());
             }
 
-            DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
+            for (int i = 0; i < mAllAssignee.size(); i++) {
+                String login = mAllAssignee.get(i).getLogin();
+                assigneeNames[i] = login;
+                selection[i] = assigneeLogins.contains(login);
+            }
+
+            DialogInterface.OnMultiChoiceClickListener selectCb = new DialogInterface.OnMultiChoiceClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int which, boolean isChecked) {
+                    selection[which] = isChecked;
+                }
+            };
+            DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (which == 0) {
-                        mEditIssue.setAssignee(null);
-                    } else {
-                        mEditIssue.setAssignee(mAllAssignee.get(which - 1));
+                    List<User> newAssigneeList = new ArrayList<>();
+                    for (int i = 0; i < selection.length; i++) {
+                        if (selection[i]) {
+                            newAssigneeList.add(mAllAssignee.get(i));
+                        }
                     }
+                    mEditIssue.setAssignees(newAssigneeList);
                     updateLabels();
                     dialog.dismiss();
                 }
@@ -399,7 +402,8 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             new AlertDialog.Builder(this)
                     .setCancelable(true)
                     .setTitle(R.string.issue_assignee_hint)
-                    .setSingleChoiceItems(assignees, selected, selectCb)
+                    .setMultiChoiceItems(assigneeNames, selection, selectCb)
+                    .setPositiveButton(R.string.ok, okCb)
                     .setNegativeButton(R.string.cancel, null)
                     .show();
         }
@@ -407,7 +411,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private void showLabelDialog() {
         if (mAllLabels == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(0, null, mLabelCallback);
         } else {
             LayoutInflater inflater = getLayoutInflater();
@@ -476,10 +479,10 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     }
 
     private class SaveIssueTask extends ProgressDialogTask<Void> {
-        private Issue mIssue;
+        private final Issue mIssue;
 
         public SaveIssueTask(Issue issue) {
-            super(IssueEditActivity.this, 0, R.string.saving_msg);
+            super(IssueEditActivity.this, R.string.saving_msg);
             mIssue = issue;
         }
 
@@ -503,10 +506,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         @Override
         protected void onSuccess(Void result) {
-            Intent intent = IntentUtils.getIssueActivityIntent(IssueEditActivity.this,
-                    mRepoOwner, mRepoName, mEditIssue.getNumber());
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
             setResult(RESULT_OK);
             finish();
         }
@@ -530,8 +529,16 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             mTvSelectedMilestone.setText(R.string.issue_clear_milestone);
         }
 
-        if (mEditIssue.getAssignee() != null) {
-            mTvSelectedAssignee.setText(mEditIssue.getAssignee().getLogin());
+        List<User> assignees = mEditIssue.getAssignees();
+        if (assignees != null && !assignees.isEmpty()) {
+            StringBuilder assigneeText = new StringBuilder();
+            for (int i = 0; i < assignees.size(); i++) {
+                if (i != 0) {
+                    assigneeText.append(", ");
+                }
+                assigneeText.append(ApiHelpers.getUserLogin(this, assignees.get(i)));
+            }
+            mTvSelectedAssignee.setText(assigneeText);
         } else if (!mIsCollaborator && !isInEditMode()) {
             mTvSelectedAssignee.setText(R.string.issue_assignee_collab_only);
         } else {

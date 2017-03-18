@@ -18,16 +18,15 @@ import android.widget.TextView;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.BookmarkListActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.SettingsActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.User;
 
@@ -38,14 +37,15 @@ public class HomeActivity extends BasePagerActivity implements
     private FragmentFactory mFactory;
     private ImageView mAvatarView;
     private String mUserLogin;
+    private User mUserInfo;
     private int mSelectedFactoryId;
-    private boolean mStarted;
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
 
     private static final SparseArray<String> START_PAGE_MAPPING = new SparseArray<>();
     static {
         START_PAGE_MAPPING.put(R.id.news_feed, "newsfeed");
+        START_PAGE_MAPPING.put(R.id.notifications, "notifications");
         START_PAGE_MAPPING.put(R.id.my_repos, "repos");
         START_PAGE_MAPPING.put(R.id.my_issues, "issues");
         START_PAGE_MAPPING.put(R.id.my_prs, "prs");
@@ -53,17 +53,18 @@ public class HomeActivity extends BasePagerActivity implements
         START_PAGE_MAPPING.put(R.id.pub_timeline, "timeline");
         START_PAGE_MAPPING.put(R.id.trend, "trends");
         START_PAGE_MAPPING.put(R.id.blog, "blog");
+        START_PAGE_MAPPING.put(R.id.bookmarks, "bookmarks");
     }
 
-    private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
+    private final LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
         @Override
         protected Loader<LoaderResult<User>> onCreateLoader() {
             return new UserLoader(HomeActivity.this, mUserLogin);
         }
         @Override
         protected void onResultReady(User result) {
-            mAvatarView.setTag(result);
-            AvatarHandler.assignAvatar(mAvatarView, result);
+            mUserInfo = result;
+            updateUserInfo();
         }
     };
 
@@ -84,6 +85,8 @@ public class HomeActivity extends BasePagerActivity implements
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(mFactory.getTitleResId());
+
+        getSupportLoaderManager().initLoader(0, null, mUserCallback);
     }
 
     @Override
@@ -104,7 +107,7 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     public void onClick(View view) {
         User user = (User) view.getTag();
-        Intent intent = IntentUtils.getUserActivityIntent(this, user);
+        Intent intent = UserActivity.makeIntent(this, user);
         if (intent != null) {
             closeDrawers();
             startActivity(intent);
@@ -117,8 +120,18 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
+    protected int getInitialLeftDrawerSelection() {
+        return mSelectedFactoryId;
+    }
+
+    @Override
     protected int[] getRightNavigationDrawerMenuResources() {
         return mFactory.getToolDrawerMenuResIds();
+    }
+
+    @Override
+    protected int getInitialRightDrawerSelection() {
+        return mFactory.getInitialToolDrawerSelection();
     }
 
     @Override
@@ -132,8 +145,7 @@ public class HomeActivity extends BasePagerActivity implements
         View view = getLayoutInflater().inflate(R.layout.drawer_title_home, container, false);
         mAvatarView = (ImageView) view.findViewById(R.id.avatar);
         mAvatarView.setOnClickListener(this);
-
-        getSupportLoaderManager().initLoader(0, null, mUserCallback);
+        updateUserInfo();
 
         TextView nameView = (TextView) view.findViewById(R.id.user_name);
         nameView.setText(mUserLogin);
@@ -159,10 +171,7 @@ public class HomeActivity extends BasePagerActivity implements
 
         switch (id) {
             case R.id.search:
-                startActivity(new Intent(this, SearchActivity.class));
-                return true;
-            case R.id.bookmarks:
-                startActivity(new Intent(this, BookmarkListActivity.class));
+                startActivity(SearchActivity.makeIntent(this));
                 return true;
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
@@ -176,6 +185,8 @@ public class HomeActivity extends BasePagerActivity implements
         switch (id) {
             case R.id.news_feed:
                 return new NewsFeedFactory(this, mUserLogin);
+            case R.id.notifications:
+                return new NotificationListFactory(this);
             case R.id.my_repos:
                 return new RepositoryFactory(this, mUserLogin, getPrefs());
             case R.id.my_issues:
@@ -184,6 +195,8 @@ public class HomeActivity extends BasePagerActivity implements
                 return new IssueListFactory(this, mUserLogin, true);
             case R.id.my_gists:
                 return new GistFactory(this, mUserLogin);
+            case R.id.bookmarks:
+                return new BookmarkFactory(this);
             case R.id.pub_timeline:
                 return new TimelineFactory(this);
             case R.id.blog:
@@ -200,31 +213,23 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int[][] getTabHeaderColors() {
-        return mFactory.getTabHeaderColors();
+    protected int[] getHeaderColorAttrs() {
+        return mFactory.getHeaderColorAttrs();
     }
 
     @Override
-    protected int[] getHeaderColors() {
-        return mFactory.getHeaderColors();
+    protected Fragment makeFragment(int position) {
+        return mFactory.makeFragment(position);
     }
 
     @Override
-    protected Fragment getFragment(int position) {
-        return mFactory.getFragment(position);
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        mFactory.onFragmentInstantiated(f, position);
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mStarted = true;
-        mFactory.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mStarted = false;
+    protected void onFragmentDestroyed(Fragment f) {
+        mFactory.onFragmentDestroyed(f);
     }
 
     @Override
@@ -263,7 +268,8 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     public void onRefresh() {
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
+        mFactory.onRefresh();
         super.onRefresh();
     }
 
@@ -332,12 +338,24 @@ public class HomeActivity extends BasePagerActivity implements
         return R.id.news_feed;
     }
 
+    private void updateUserInfo() {
+        if (mUserInfo == null) {
+            return;
+        }
+        if (mAvatarView != null) {
+            mAvatarView.setTag(mUserInfo);
+            AvatarHandler.assignAvatar(mAvatarView, mUserInfo);
+        }
+        mFactory.setUserInfo(mUserInfo);
+    }
+
     private void switchTo(int itemId, FragmentFactory factory) {
         if (mFactory != null) {
             mFactory.onDestroy();
         }
         mFactory = factory;
         mSelectedFactoryId = itemId;
+        mFactory.setUserInfo(mUserInfo);
 
         getPrefs().edit()
                 .putString("last_selected_home_page", START_PAGE_MAPPING.get(mSelectedFactoryId))
@@ -349,8 +367,5 @@ public class HomeActivity extends BasePagerActivity implements
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
         invalidateTitle();
         invalidateTabs();
-        if (mStarted) {
-            mFactory.onStart();
-        }
     }
 }

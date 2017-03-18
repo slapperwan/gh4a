@@ -104,6 +104,16 @@ public class StyleableTextView extends TextView {
         }
     }
 
+    // workaround for https://code.google.com/p/android/issues/detail?id=208169
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (isTextSelectable() && isEnabled()) {
+            setEnabled(false);
+            setEnabled(true);
+        }
+    }
+
     @Override
     public void setText(CharSequence text, BufferType type) {
         super.setText(text, type);

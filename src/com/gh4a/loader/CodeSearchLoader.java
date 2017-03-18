@@ -14,7 +14,7 @@ import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 
 public class CodeSearchLoader extends BaseLoader<List<CodeSearchResult>> {
-    private String mQuery;
+    private final String mQuery;
 
     public CodeSearchLoader(Context context, String query) {
         super(context);

@@ -15,13 +15,23 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.Constants;
+import com.gh4a.R;
+import com.gh4a.holder.Feed;
 
 public class WikiActivity extends WebViewerActivity {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, Feed feed) {
+        return new Intent(context, WikiActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("title", feed.getTitle())
+                .putExtra("content", feed.getContent());
+    }
+
     private String mUserLogin;
     private String mRepoName;
 
@@ -30,18 +40,30 @@ public class WikiActivity extends WebViewerActivity {
         super.onCreate(savedInstanceState);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getIntent().getStringExtra(Constants.Blog.TITLE));
+        actionBar.setTitle(getIntent().getStringExtra("title"));
         actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        loadUnthemedHtml(getIntent().getStringExtra(Constants.Blog.CONTENT));
+        onDataReady();
     }
 
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
+        mUserLogin = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+    }
+
+    @Override
+    protected String generateHtml(String cssTheme, boolean addTitleHeader) {
+        String title = addTitleHeader ? getDocumentTitle() : null;
+        return wrapUnthemedHtml(getIntent().getStringExtra("content"), cssTheme, title);
+    }
+
+    @Override
+    protected String getDocumentTitle() {
+        return getString(R.string.wiki_print_document_title,
+                getIntent().getStringExtra("title"), mUserLogin, mRepoName);
     }
 
     @Override
@@ -52,9 +74,6 @@ public class WikiActivity extends WebViewerActivity {
 
     @Override
     protected Intent navigateUp() {
-        Intent intent = new Intent(this, WikiListActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mUserLogin);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        return intent;
+        return WikiListActivity.makeIntent(this, mUserLogin, mRepoName, null);
     }
 }

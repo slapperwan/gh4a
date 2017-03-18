@@ -4,26 +4,23 @@ import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.activities.GistActivity;
 import com.gh4a.adapter.GistAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.GistListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.StarredGistListLoader;
-import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Gist;
 
 import java.util.List;
 
-public class GistListFragment extends ListDataBaseFragment<Gist> {
-    private String mUserLogin;
-    private boolean mShowStarred;
-
+public class GistListFragment extends ListDataBaseFragment<Gist> implements
+        RootAdapter.OnItemClickListener<Gist> {
     public static GistListFragment newInstance(String userLogin, boolean starred) {
         Bundle args = new Bundle();
-        args.putString(Constants.User.LOGIN, userLogin);
+        args.putString("user", userLogin);
         args.putBoolean("starred", starred);
 
         GistListFragment f = new GistListFragment();
@@ -31,11 +28,14 @@ public class GistListFragment extends ListDataBaseFragment<Gist> {
         return f;
     }
 
+    private String mUserLogin;
+    private boolean mShowStarred;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getArguments().getString(Constants.User.LOGIN);
+        mUserLogin = getArguments().getString("user");
         mShowStarred = getArguments().getBoolean("starred");
     }
 
@@ -49,7 +49,9 @@ public class GistListFragment extends ListDataBaseFragment<Gist> {
 
     @Override
     protected RootAdapter<Gist, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new GistAdapter(getActivity(), mUserLogin);
+        GistAdapter adapter = new GistAdapter(getActivity(), mUserLogin);
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override
@@ -59,6 +61,6 @@ public class GistListFragment extends ListDataBaseFragment<Gist> {
 
     @Override
     public void onItemClick(Gist gist) {
-        startActivity(IntentUtils.getGistActivityIntent(getActivity(), gist.getId()));
+        startActivity(GistActivity.makeIntent(getActivity(), gist.getId()));
     }
 }

@@ -15,17 +15,21 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.GistListFragment;
-import com.gh4a.utils.IntentUtils;
 
 public class GistListActivity extends FragmentContainerActivity {
+    public static Intent makeIntent(Context context, String user) {
+        return new Intent(context, GistListActivity.class)
+                .putExtra("user", user);
+    }
+
     private String mUserLogin;
 
     @Override
@@ -41,7 +45,7 @@ public class GistListActivity extends FragmentContainerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString(Constants.User.LOGIN);
+        mUserLogin = extras.getString("user");
     }
 
     @Override
@@ -51,6 +55,6 @@ public class GistListActivity extends FragmentContainerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getUserActivityIntent(this, mUserLogin);
+        return UserActivity.makeIntent(this, mUserLogin);
     }
 }

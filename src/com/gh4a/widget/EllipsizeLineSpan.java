@@ -3,14 +3,15 @@ package com.gh4a.widget;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.text.style.LineBackgroundSpan;
 import android.text.style.LineHeightSpan;
 import android.text.style.ReplacementSpan;
 
 public class EllipsizeLineSpan extends ReplacementSpan implements
         LineBackgroundSpan, LineHeightSpan {
-    private Rect mClipRect = new Rect();
-    private int mBottomMargin;
+    private final Rect mClipRect = new Rect();
+    private final int mBottomMargin;
 
     public EllipsizeLineSpan(int bottomMargin) {
         mBottomMargin = bottomMargin;
@@ -23,8 +24,8 @@ public class EllipsizeLineSpan extends ReplacementSpan implements
     }
 
     @Override
-    public int getSize(Paint paint, CharSequence text,
-            int start, int end, Paint.FontMetricsInt fm) {
+    public int getSize(@NonNull Paint paint, CharSequence text,
+                       int start, int end, Paint.FontMetricsInt fm) {
         if (fm != null) {
             paint.getFontMetricsInt(fm);
         }
@@ -33,8 +34,8 @@ public class EllipsizeLineSpan extends ReplacementSpan implements
     }
 
     @Override
-    public void draw(Canvas canvas, CharSequence text, int start, int end,
-            float x, int top, int y, int bottom, Paint paint) {
+    public void draw(@NonNull Canvas canvas, CharSequence text, int start, int end,
+            float x, int top, int y, int bottom, @NonNull Paint paint) {
         float textWidth = paint.measureText(text, start, end);
 
         if (x + (int) Math.ceil(textWidth) < mClipRect.right) {

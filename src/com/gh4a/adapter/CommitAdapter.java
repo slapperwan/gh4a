@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.RepositoryCommit;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -28,10 +26,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+
+import org.eclipse.egit.github.core.RepositoryCommit;
 
 public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.ViewHolder> {
     public CommitAdapter(Context context) {
@@ -39,7 +39,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_commit, parent, false);
         ViewHolder holder = new ViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
@@ -59,6 +59,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
 
         holder.tvDesc.setText(message);
         holder.tvSha.setText(commit.getSha().substring(0, 10));
+        holder.ivDescriptionIndicator.setVisibility(pos > 0 ? View.VISIBLE : View.GONE);
 
         int comments = commit.getCommit().getCommentCount();
         if (comments > 0) {
@@ -77,8 +78,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             RepositoryCommit commit = (RepositoryCommit) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext,
-                    ApiHelpers.getAuthorLogin(commit));
+            Intent intent = UserActivity.makeIntent(mContext, ApiHelpers.getAuthorLogin(commit));
             if (intent != null) {
                 mContext.startActivity(intent);
             }
@@ -99,13 +99,15 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
             tvComments = (TextView) view.findViewById(R.id.tv_comments);
 
             ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
+            ivDescriptionIndicator = (ImageView) view.findViewById(R.id.iv_description_indicator);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvDesc;
-        private TextView tvExtra;
-        private TextView tvTimestamp;
-        private TextView tvSha;
-        private TextView tvComments;
+        private final ImageView ivGravatar;
+        private final TextView tvDesc;
+        private final TextView tvExtra;
+        private final TextView tvTimestamp;
+        private final TextView tvSha;
+        private final TextView tvComments;
+        private final ImageView ivDescriptionIndicator;
     }
 }

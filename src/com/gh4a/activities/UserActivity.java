@@ -1,5 +1,6 @@
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,7 +13,6 @@ import android.view.MenuItem;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.BasePagerActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
@@ -24,21 +24,41 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.UserService;
 
 public class UserActivity extends BasePagerActivity {
+    public static Intent makeIntent(Context context, String login) {
+        return makeIntent(context, login, null);
+    }
+
+    public static Intent makeIntent(Context context, User user) {
+        if (user == null) {
+            return null;
+        }
+        return makeIntent(context, user.getLogin(), user.getName());
+    }
+
+    public static Intent makeIntent(Context context, String login, String name) {
+        if (login == null) {
+            return null;
+        }
+        return new Intent(context, UserActivity.class)
+                .putExtra("login", login)
+                .putExtra("name", name);
+    }
+
     private String mUserLogin;
     private String mUserName;
     private boolean mIsSelf;
     private UserFragment mUserFragment;
-    private PublicEventListFragment mPublicEventListFragment;
     private Boolean mIsFollowing;
 
     private static final int[] TAB_TITLES = new int[] {
         R.string.about, R.string.user_public_activity
     };
 
-    private LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsFollowingUserLoader(UserActivity.this, mUserLogin);
@@ -65,8 +85,8 @@ public class UserActivity extends BasePagerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString(Constants.User.LOGIN);
-        mUserName = extras.getString(Constants.User.NAME);
+        mUserLogin = extras.getString("login");
+        mUserName = extras.getString("name");
         mIsSelf = ApiHelpers.loginEquals(mUserLogin, Gh4Application.get().getAuthLogin());
     }
 
@@ -76,17 +96,26 @@ public class UserActivity extends BasePagerActivity {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         switch (position) {
-            case 0:
-                mUserFragment = UserFragment.newInstance(mUserLogin, mUserName);
-                return mUserFragment;
-            case 1:
-                mPublicEventListFragment =
-                        PublicEventListFragment.newInstance(mUserLogin);
-                return mPublicEventListFragment;
+            case 0: return UserFragment.newInstance(mUserLogin);
+            case 1: return PublicEventListFragment.newInstance(mUserLogin);
         }
         return null;
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        if (position == 0) {
+            mUserFragment = (UserFragment) f;
+        }
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mUserFragment) {
+            mUserFragment = null;
+        }
     }
 
     @Override
@@ -125,6 +154,7 @@ public class UserActivity extends BasePagerActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String url = "https://github.com/" + mUserLogin;
         switch (item.getItemId()) {
             case R.id.follow:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
@@ -137,15 +167,13 @@ public class UserActivity extends BasePagerActivity {
                         ? R.string.share_user_subject_loginonly : R.string.share_user_subject;
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(subjectId, mUserLogin, mUserName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  "https://github.com/" + mUserLogin);
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  url);
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
             case R.id.bookmark:
-                Intent bookmarkIntent = new Intent(this, getClass());
-                bookmarkIntent.putExtra(Constants.User.LOGIN, mUserLogin);
-                bookmarkIntent.putExtra(Constants.User.NAME, mUserName);
-                saveBookmark(mUserLogin, BookmarksProvider.Columns.TYPE_USER, bookmarkIntent, mUserName);
+                BookmarksProvider.saveBookmark(this, mUserLogin,
+                        BookmarksProvider.Columns.TYPE_USER, url, mUserName);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -153,11 +181,9 @@ public class UserActivity extends BasePagerActivity {
 
     @Override
     public void onRefresh() {
-        Loader loader = getSupportLoaderManager().getLoader(4);
-        if (loader != null) {
+        if (forceLoaderReload(4)) {
             mIsFollowing = null;
             supportInvalidateOptionsMenu();
-            loader.onContentChanged();
         }
         super.onRefresh();
     }

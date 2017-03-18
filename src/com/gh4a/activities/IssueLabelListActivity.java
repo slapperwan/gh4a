@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,7 +33,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -41,7 +41,6 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 
@@ -55,19 +54,27 @@ import java.util.List;
 
 public class IssueLabelListActivity extends BaseActivity implements
         RootAdapter.OnItemClickListener<IssueLabelAdapter.EditableLabel>, View.OnClickListener {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            boolean fromPullRequest) {
+        return new Intent(context, IssueLabelListActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("from_pr", fromPullRequest);
+    }
+
     private String mRepoOwner;
     private String mRepoName;
+    private boolean mParentIsPullRequest;
     private EditActionMode mActionMode;
     private IssueLabelAdapter.EditableLabel mAddedLabel;
 
     private FloatingActionButton mFab;
-    private RecyclerView mRecyclerView;
     private IssueLabelAdapter mAdapter;
 
     private static final String STATE_KEY_ADDED_LABEL = "added_label";
     private static final String STATE_KEY_EDITING_LABEL = "editing_label";
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
+    private final LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
         @Override
         protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueLabelListActivity.this, mRepoOwner, mRepoName);
@@ -97,11 +104,12 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         mAdapter = new IssueLabelAdapter(this);
         mAdapter.setOnItemClickListener(this);
-        mRecyclerView = (RecyclerView) findViewById(R.id.list);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this));
-        mRecyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
-        mRecyclerView.setAdapter(mAdapter);
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.addItemDecoration(new DividerItemDecoration(this));
+        recyclerView.setTag(R.id.FloatingActionButtonScrollEnabled, new Object());
+        recyclerView.setAdapter(mAdapter);
 
         CoordinatorLayout rootLayout = getRootLayout();
         mFab = (FloatingActionButton) getLayoutInflater().inflate(
@@ -138,8 +146,9 @@ public class IssueLabelListActivity extends BaseActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mParentIsPullRequest = extras.getBoolean("from_pr", false);
     }
 
     @Override
@@ -153,7 +162,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     public void onRefresh() {
         setContentShown(false);
         mAdapter.clear();
-        getSupportLoaderManager().getLoader(0).onContentChanged();
+        forceLoaderReload(0);
         super.onRefresh();
     }
 
@@ -178,8 +187,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getIssueListActivityIntent(this,
-                mRepoOwner, mRepoName, Constants.Issue.STATE_OPEN);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName, mParentIsPullRequest);
     }
 
     @Override
@@ -205,7 +213,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private final class EditActionMode implements ActionMode.Callback {
-        private IssueLabelAdapter.EditableLabel mLabel;
+        private final IssueLabelAdapter.EditableLabel mLabel;
 
         public EditActionMode(IssueLabelAdapter.EditableLabel label) {
             mLabel = label;
@@ -245,9 +253,8 @@ public class IssueLabelListActivity extends BaseActivity implements
                 break;
             case Menu.FIRST + 1:
                 new AlertDialog.Builder(IssueLabelListActivity.this)
-                        .setTitle(getString(R.string.issue_dialog_delete_title, mLabel.getName()))
-                        .setMessage(R.string.issue_dialog_delete_message)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.getName()))
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 new DeleteIssueLabelTask(mLabel.getName()).schedule();
@@ -280,10 +287,10 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private class DeleteIssueLabelTask extends ProgressDialogTask<Void> {
-        private String mLabelName;
+        private final String mLabelName;
 
         public DeleteIssueLabelTask(String labelName) {
-            super(IssueLabelListActivity.this, 0, R.string.deleting_msg);
+            super(IssueLabelListActivity.this, R.string.deleting_msg);
             mLabelName = labelName;
         }
 
@@ -302,7 +309,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().getLoader(0).onContentChanged();
+            forceLoaderReload(0);
         }
 
         @Override
@@ -312,12 +319,12 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private class EditIssueLabelTask extends ProgressDialogTask<Void> {
-        private String mOldLabelName;
-        private String mNewLabelName;
-        private String mColor;
+        private final String mOldLabelName;
+        private final String mNewLabelName;
+        private final String mColor;
 
         public EditIssueLabelTask(String oldLabelName, String newLabelName, String color) {
-            super(IssueLabelListActivity.this, 0, R.string.saving_msg);
+            super(IssueLabelListActivity.this, R.string.saving_msg);
             mOldLabelName = oldLabelName;
             mNewLabelName = newLabelName;
             mColor = color;
@@ -344,7 +351,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().getLoader(0).onContentChanged();
+            forceLoaderReload(0);
         }
 
         @Override
@@ -354,11 +361,11 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private class AddIssueLabelTask extends ProgressDialogTask<Void> {
-        private String mLabelName;
-        private String mColor;
+        private final String mLabelName;
+        private final String mColor;
 
         public AddIssueLabelTask(String labelName, String color) {
-            super(IssueLabelListActivity.this, 0, R.string.saving_msg);
+            super(IssueLabelListActivity.this, R.string.saving_msg);
             mLabelName = labelName;
             mColor = color;
         }
@@ -383,7 +390,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         protected void onSuccess(Void result) {
-            getSupportLoaderManager().getLoader(0).onContentChanged();
+            forceLoaderReload(0);
             mAddedLabel = null;
         }
 

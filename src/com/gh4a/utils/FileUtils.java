@@ -3,7 +3,7 @@ package com.gh4a.utils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
-import com.gh4a.Constants;
+import com.gh4a.Gh4Application;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,7 +39,7 @@ public class FileUtils {
             }
             return true;
         } catch (IOException e) {
-            Log.e(Constants.LOG_TAG, e.getMessage(), e);
+            Log.e(Gh4Application.LOG_TAG, e.getMessage(), e);
         } finally {
             try {
                 if (inputStream != null) {
@@ -50,7 +50,7 @@ public class FileUtils {
                     out.close();
                 }
             } catch (IOException e) {
-                Log.e(Constants.LOG_TAG, e.getMessage(), e);
+                Log.e(Gh4Application.LOG_TAG, e.getMessage(), e);
             }
         }
         return false;

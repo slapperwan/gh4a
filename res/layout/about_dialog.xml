@@ -1,42 +1,48 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout_root"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="@dimen/content_padding">
+
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/copyright"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <com.gh4a.widget.StyleableTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:autoLink="email"
         android:text="@string/my_email"
-        android:autoLink="email" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <com.gh4a.widget.StyleableTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:autoLink="web"
         android:text="@string/my_web"
-        android:autoLink="web" />
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <com.gh4a.widget.StyleableTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/feedback_text"/>
+        android:text="@string/feedback_text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <Button
         android:id="@+id/btn_by_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/feedback_by_email"/>
+        android:text="@string/feedback_by_email"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
     <Button
         android:id="@+id/btn_by_gh4a"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/feedback_by_gh4a"/>
+        android:text="@string/feedback_by_gh4a"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 </LinearLayout>

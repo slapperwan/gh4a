@@ -16,21 +16,28 @@
 package com.gh4a.activities;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gh4a.BasePagerActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
@@ -42,23 +49,46 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
 import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.service.PullRequestService;
 
+import java.io.IOException;
 import java.util.Locale;
 
 public class PullRequestActivity extends BasePagerActivity implements
-        View.OnClickListener, PullRequestFragment.StateChangeListener,
-        PullRequestFilesFragment.CommentUpdateListener {
+        View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
+        return makeIntent(context, repoOwner, repoName, number, -1, -1);
+    }
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            int number, int initialPage, long initialCommentId) {
+        return new Intent(context, PullRequestActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("number", number)
+                .putExtra("initial_page", initialPage)
+                .putExtra("initial_comment", initialCommentId);
+    }
+
+    public static final int PAGE_CONVERSATION = 0;
+    public static final int PAGE_COMMITS = 1;
+    public static final int PAGE_FILES = 2;
+
     private static final int REQUEST_EDIT_ISSUE = 1001;
 
     private String mRepoOwner;
     private String mRepoName;
     private int mPullRequestNumber;
-    private boolean mIsCollaborator;
+    private int mInitialPage;
+    private long mInitialCommentId;
+    private Boolean mIsCollaborator;
 
     private Issue mIssue;
     private PullRequest mPullRequest;
@@ -68,16 +98,17 @@ public class PullRequestActivity extends BasePagerActivity implements
     private ViewGroup mHeader;
     private int[] mHeaderColorAttrs;
 
-    private static final int[] TITLES = new int[] {
-        R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
+    private static final int[] TITLES = new int[]{
+            R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
     };
 
-    private LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>(this) {
+    private final LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>(this) {
         @Override
         protected Loader<LoaderResult<PullRequest>> onCreateLoader() {
             return new PullRequestLoader(PullRequestActivity.this,
                     mRepoOwner, mRepoName, mPullRequestNumber);
         }
+
         @Override
         protected void onResultReady(PullRequest result) {
             mPullRequest = result;
@@ -87,12 +118,13 @@ public class PullRequestActivity extends BasePagerActivity implements
         }
     };
 
-    private LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
+    private final LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
         @Override
         protected Loader<LoaderResult<Issue>> onCreateLoader() {
             return new IssueLoader(PullRequestActivity.this,
                     mRepoOwner, mRepoName, mPullRequestNumber);
         }
+
         @Override
         protected void onResultReady(Issue result) {
             mIssue = result;
@@ -100,15 +132,17 @@ public class PullRequestActivity extends BasePagerActivity implements
         }
     };
 
-    private LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(PullRequestActivity.this, mRepoOwner, mRepoName);
         }
+
         @Override
         protected void onResultReady(Boolean result) {
             mIsCollaborator = result;
-            updateFabVisibility();
+            showContentIfReady();
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -116,8 +150,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LayoutInflater inflater = getLayoutInflater();
-
+        LayoutInflater inflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
@@ -136,6 +169,72 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.pullrequest_menu, menu);
+
+        Gh4Application app = Gh4Application.get();
+        boolean authorized = app.isAuthorized();
+
+        boolean isCreator = mPullRequest != null
+                && ApiHelpers.loginEquals(mPullRequest.getUser(), app.getAuthLogin());
+        boolean isClosed = mPullRequest != null
+                && ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState());
+        boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
+        boolean closerIsCreator = mIssue != null
+                && ApiHelpers.userEquals(mIssue.getUser(), mIssue.getClosedBy());
+        boolean canClose = mPullRequest != null && authorized && (isCreator || isCollaborator);
+        boolean canOpen = canClose && (isCollaborator || closerIsCreator);
+        boolean canMerge = canClose && isCollaborator;
+
+        if (!canClose) {
+            menu.removeItem(R.id.pull_close);
+        } else if (isClosed) {
+            menu.removeItem(R.id.pull_close);
+            if (mPullRequest.isMerged()) {
+                menu.findItem(R.id.pull_reopen).setEnabled(false);
+            }
+        }
+        if (!canOpen) {
+            menu.removeItem(R.id.pull_reopen);
+        }
+        if (!canMerge) {
+            menu.removeItem(R.id.pull_merge);
+        } else if (mPullRequest.isMerged() || !mPullRequest.isMergeable()) {
+            MenuItem mergeItem = menu.findItem(R.id.pull_merge);
+            mergeItem.setEnabled(false);
+        }
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.pull_merge:
+                showMergeDialog();
+                break;
+            case R.id.pull_close:
+            case R.id.pull_reopen:
+                showOpenCloseConfirmDialog(item.getItemId() == R.id.pull_reopen);
+                break;
+            case R.id.share:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_pull_subject,
+                        mPullRequest.getNumber(), mPullRequest.getTitle(),
+                        mRepoOwner + "/" + mRepoName));
+                shareIntent.putExtra(Intent.EXTRA_TEXT, mPullRequest.getHtmlUrl());
+                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
+                startActivity(shareIntent);
+                break;
+            case R.id.browser:
+                IntentUtils.launchBrowser(this, Uri.parse(mPullRequest.getHtmlUrl()));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT_ISSUE) {
             if (resultCode == Activity.RESULT_OK) {
@@ -150,22 +249,32 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mPullRequestNumber = extras.getInt(Constants.PullRequest.NUMBER);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mPullRequestNumber = extras.getInt("number");
+        mInitialCommentId = extras.getLong("initial_comment", -1);
+        mInitialPage = extras.getInt("initial_page", -1);
+        extras.remove("initial_comment");
+        extras.remove("initial_page");
     }
 
     @Override
     public void onRefresh() {
         mIssue = null;
         mPullRequest = null;
+        mIsCollaborator = null;
         setContentShown(false);
+        if (mEditFab != null) {
+            mEditFab.post(new Runnable() {
+                @Override
+                public void run() {
+                    updateFabVisibility();
+                }
+            });
+        }
         mHeader.setVisibility(View.GONE);
         mHeaderColorAttrs = null;
-        LoaderManager lm = getSupportLoaderManager();
-        for (int i = 0; i < 3; i++) {
-            lm.getLoader(i).onContentChanged();
-        }
+        forceLoaderReload(0, 1, 2);
         invalidateTabs();
         super.onRefresh();
     }
@@ -176,12 +285,12 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int[] getHeaderColors() {
+    protected int[] getHeaderColorAttrs() {
         return mHeaderColorAttrs;
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         if (position == 1) {
             return CommitCompareFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequest.getBase().getSha(), mPullRequest.getHead().getSha());
@@ -189,43 +298,46 @@ public class PullRequestActivity extends BasePagerActivity implements
             return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequestNumber, mPullRequest.getHead().getSha());
         } else {
-            mPullRequestFragment = PullRequestFragment.newInstance(mPullRequest, mIssue);
-            return mPullRequestFragment;
+            Fragment f = PullRequestFragment.newInstance(mPullRequest,
+                    mIssue, mIsCollaborator, mInitialCommentId);
+            mInitialCommentId = -1;
+            return f;
+        }
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        if (position == 0) {
+            mPullRequestFragment = (PullRequestFragment) f;
+        }
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mPullRequestFragment) {
+            mPullRequestFragment = null;
         }
     }
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getPullRequestListActivityIntent(this, mRepoOwner, mRepoName,
-                Constants.Issue.STATE_OPEN);
+        return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName, true);
     }
 
     @Override
     public void onCommentsUpdated() {
         if (mPullRequestFragment != null) {
-            mPullRequestFragment.refreshComments();
+            mPullRequestFragment.reloadEvents();
         }
-    }
-
-    @Override
-    public void onPullRequestStateChanged(PullRequest newState) {
-        mPullRequest = newState;
-        fillHeader();
-        updateFabVisibility();
-        transitionHeaderToColor(mHeaderColorAttrs[0], mHeaderColorAttrs[1]);
     }
 
     @Override
     public void onClick(View v) {
         if (v == mEditFab) {
-            Intent editIntent = new Intent(this, IssueEditActivity.class);
-            editIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-            editIntent.putExtra(Constants.Repository.NAME, mRepoName);
-            editIntent.putExtra(IssueEditActivity.EXTRA_ISSUE, mIssue);
+            Intent editIntent = IssueEditActivity.makeEditIntent(this, mRepoOwner, mRepoName, mIssue);
             startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
         } else if (v.getId() == R.id.iv_gravatar) {
-            User user = (User) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(this, user);
+            Intent intent = UserActivity.makeIntent(this, (User) v.getTag());
             if (intent != null) {
                 startActivity(intent);
             }
@@ -233,11 +345,57 @@ public class PullRequestActivity extends BasePagerActivity implements
     }
 
     private void showContentIfReady() {
-        if (mPullRequest != null && mIssue != null) {
+        if (mPullRequest != null && mIssue != null && mIsCollaborator != null) {
             setContentShown(true);
             invalidateTabs();
             updateFabVisibility();
+
+            if (mInitialPage >= 0 && mInitialPage < TITLES.length) {
+                getPager().setCurrentItem(mInitialPage);
+                mInitialPage = -1;
+            }
         }
+    }
+
+    private void showOpenCloseConfirmDialog(final boolean reopen) {
+        @StringRes int messageResId = reopen
+                ? R.string.reopen_pull_request_confirm : R.string.close_pull_request_confirm;
+        @StringRes int buttonResId = reopen
+                ? R.string.pull_request_reopen : R.string.pull_request_close;
+        new AlertDialog.Builder(this)
+                .setMessage(messageResId)
+                .setIconAttribute(android.R.attr.alertDialogIcon)
+                .setCancelable(false)
+                .setPositiveButton(buttonResId, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new PullRequestOpenCloseTask(reopen).schedule();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void showMergeDialog() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        String title = getString(R.string.pull_message_dialog_title, mPullRequest.getNumber());
+        View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
+
+        final EditText editor = (EditText) view.findViewById(R.id.et_commit_message);
+        editor.setText(mPullRequest.getTitle());
+
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setView(view)
+                .setPositiveButton(R.string.pull_request_merge, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String text = editor.getText() == null ? null : editor.getText().toString();
+                        new PullRequestMergeTask(text).schedule();
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show();
     }
 
     private void updateTabRightMargin(int dimensionResId) {
@@ -253,7 +411,8 @@ public class PullRequestActivity extends BasePagerActivity implements
     private void updateFabVisibility() {
         boolean isIssueOwner = mIssue != null
                 && ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
-        boolean shouldHaveFab = (isIssueOwner || mIsCollaborator)
+        boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
+        boolean shouldHaveFab = (isIssueOwner || isCollaborator)
                 && mPullRequest != null && mIssue != null;
         CoordinatorLayout rootLayout = getRootLayout();
 
@@ -282,7 +441,7 @@ public class PullRequestActivity extends BasePagerActivity implements
             mHeaderColorAttrs = new int[] {
                 R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark
             };
-        } else if (Constants.Issue.STATE_CLOSED.equals(mPullRequest.getState())) {
+        } else if (ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())) {
             stateTextResId = R.string.closed;
             mHeaderColorAttrs = new int[] {
                 R.attr.colorIssueClosed, R.attr.colorIssueClosedDark
@@ -301,5 +460,100 @@ public class PullRequestActivity extends BasePagerActivity implements
         tvTitle.setText(mPullRequest.getTitle());
 
         mHeader.setVisibility(View.VISIBLE);
+    }
+
+    private void handlePullRequestUpdate() {
+        if (mPullRequestFragment != null) {
+            mPullRequestFragment.updateState(mPullRequest);
+        }
+        if (mIssue != null) {
+            mIssue.setState(mPullRequest.getState());
+            if (ApiHelpers.IssueState.CLOSED.equals(mIssue.getState())) {
+                // if we came here, we either closed or merged the PR ourselves,
+                // so set the 'closed by' field accordingly
+                mIssue.setClosedBy(new User().setLogin(Gh4Application.get().getAuthLogin()));
+            }
+        }
+        fillHeader();
+        updateFabVisibility();
+        transitionHeaderToColor(mHeaderColorAttrs[0], mHeaderColorAttrs[1]);
+        supportInvalidateOptionsMenu();
+    }
+
+    private class PullRequestOpenCloseTask extends ProgressDialogTask<PullRequest> {
+        private final boolean mOpen;
+
+        public PullRequestOpenCloseTask(boolean open) {
+            super(getBaseActivity(), open ? R.string.opening_msg : R.string.closing_msg);
+            mOpen = open;
+        }
+
+        @Override
+        protected ProgressDialogTask<PullRequest> clone() {
+            return new PullRequestOpenCloseTask(mOpen);
+        }
+
+        @Override
+        protected PullRequest run() throws IOException {
+            PullRequestService pullService = (PullRequestService)
+                    Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+
+            PullRequest pullRequest = new PullRequest();
+            pullRequest.setNumber(mPullRequest.getNumber());
+            pullRequest.setState(mOpen ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED);
+
+            return pullService.editPullRequest(repoId, pullRequest);
+        }
+
+        @Override
+        protected void onSuccess(PullRequest result) {
+            mPullRequest = result;
+            handlePullRequestUpdate();
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            int errorMessageResId =
+                    mOpen ? R.string.issue_error_reopen : R.string.issue_error_close;
+            return getContext().getString(errorMessageResId, mPullRequest.getNumber());
+        }
+    }
+
+    private class PullRequestMergeTask extends ProgressDialogTask<MergeStatus> {
+        private final String mCommitMessage;
+
+        public PullRequestMergeTask(String commitMessage) {
+            super(getBaseActivity(), R.string.merging_msg);
+            mCommitMessage = commitMessage;
+        }
+
+        @Override
+        protected ProgressDialogTask<MergeStatus> clone() {
+            return new PullRequestMergeTask(mCommitMessage);
+        }
+
+        @Override
+        protected MergeStatus run() throws Exception {
+            PullRequestService pullService = (PullRequestService)
+                    Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+
+            return pullService.merge(repoId, mPullRequest.getNumber(), mCommitMessage);
+        }
+
+        @Override
+        protected void onSuccess(MergeStatus result) {
+            if (result.isMerged()) {
+                mPullRequest.setMerged(true);
+                mPullRequest.setState(ApiHelpers.IssueState.CLOSED);
+            }
+            handlePullRequestUpdate();
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.pull_error_merge, mPullRequest.getNumber());
+        }
     }
 }

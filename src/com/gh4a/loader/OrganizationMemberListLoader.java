@@ -12,7 +12,7 @@ import com.gh4a.Gh4Application;
 
 public class OrganizationMemberListLoader extends BaseLoader<List<User>> {
 
-    private String mUserLogin;
+    private final String mUserLogin;
 
     public OrganizationMemberListLoader(Context context, String userLogin) {
         super(context);
@@ -23,6 +23,6 @@ public class OrganizationMemberListLoader extends BaseLoader<List<User>> {
     public List<User> doLoadInBackground() throws IOException {
         OrganizationService orgService = (OrganizationService)
                 Gh4Application.get().getService(Gh4Application.ORG_SERVICE);
-        return orgService.getPublicMembers(mUserLogin);
+        return orgService.getMembers(mUserLogin);
     }
 }

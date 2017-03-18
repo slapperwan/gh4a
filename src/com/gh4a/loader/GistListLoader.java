@@ -11,7 +11,7 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class GistListLoader extends BaseLoader<List<Gist>> {
-    private String mUserName;
+    private final String mUserName;
 
     public GistListLoader(Context context, String userName) {
         super(context);

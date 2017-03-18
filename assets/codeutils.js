@@ -59,6 +59,32 @@ window.highlightLines = function(from, to) {
     }
 };
 
+window.highlightDiffLines = function(from, to) {
+    if (from < 0) {
+        return;
+    }
+
+    var first = document.getElementById("line" + from);
+    var last = document.getElementById("line" + to);
+    if (first != null && last != null) {
+	for (var i = from; i <= to; i++) {
+	    document.getElementById("line" + i).className += " highlighted";
+	}
+
+        var top = 0, bottom = last.offsetHeight;
+        for (elem = first; elem != null; elem = elem.offsetParent) {
+            top += elem.offsetTop;
+        }
+        for (elem = last; elem != null; elem = elem.offsetParent) {
+            bottom += elem.offsetTop;
+        }
+
+        window.highlightTop = top;
+        window.highlightBottom = bottom;
+        window.scrollToHighlight();
+    }
+};
+
 window.scrollToElement = function(elemName) {
     if (!elemName) {
         return;

@@ -1,15 +1,16 @@
 package com.gh4a.activities.home;
 
 import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
+import com.gh4a.utils.ApiHelpers;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,32 +18,32 @@ import java.util.Map;
 public class IssueListFactory extends FragmentFactory {
     private static final String QUERY = "is:%s is:%s %s:%s";
 
-    private static final String STATE_KEY_STATE = "issue:state";
+    private static final String STATE_KEY_SHOWING_CLOSED = "issue:showing_closed";
 
     private static final int[] TAB_TITLES = new int[] {
-            R.string.created, R.string.assigned, R.string.mentioned
+            R.string.created, R.string.assigned, R.string.mentioned, R.string.participating
     };
 
-    private String mState;
-    private String mLogin;
-    private boolean mIsPullRequest;
-    private IssueListFragment.SortDrawerHelper mDrawerHelper =
+    private boolean mShowingClosed;
+    private final String mLogin;
+    private final boolean mIsPullRequest;
+    private final IssueListFragment.SortDrawerHelper mDrawerHelper =
             new IssueListFragment.SortDrawerHelper();
-    private int[] mHeaderColors;
+    private int[] mHeaderColorAttrs;
 
     public IssueListFactory(HomeActivity activity, String userLogin, boolean pr) {
         super(activity);
         mLogin = userLogin;
-        mState = Constants.Issue.STATE_OPEN;
+        mShowingClosed = false;
         mIsPullRequest = pr;
     }
 
     @Override
-    protected int getTitleResId() {
-        if (Constants.Issue.STATE_OPEN.equals(mState)) {
-            return mIsPullRequest ? R.string.pull_requests_open : R.string.issues_open;
-        } else {
+    protected @StringRes int getTitleResId() {
+        if (mShowingClosed) {
             return mIsPullRequest ? R.string.pull_requests_closed : R.string.issues_closed;
+        } else {
+            return mIsPullRequest ? R.string.pull_requests_open : R.string.issues_open;
         }
     }
 
@@ -52,12 +53,12 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
-    protected int[] getHeaderColors() {
-        return mHeaderColors;
+    protected int[] getHeaderColorAttrs() {
+        return mHeaderColorAttrs;
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mDrawerHelper.getSortMode());
         filterData.put("order", mDrawerHelper.getSortOrder());
@@ -67,28 +68,31 @@ public class IssueListFactory extends FragmentFactory {
             action = "assignee";
         } else if (position == 2) {
             action = "mentions";
+        } else if (position == 3) {
+            action = "involves";
         } else {
             action = "author";
         }
 
         filterData.put("q", String.format(QUERY, mIsPullRequest ? "pr" : "issue",
-                mState, action, mLogin));
+                mShowingClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
+                action, mLogin));
 
         return IssueListFragment.newInstance(filterData,
-                Constants.Issue.STATE_CLOSED.equals(mState),
+                mShowingClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
                 true);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        int resIdState = Constants.Issue.STATE_OPEN.equals(mState) ?
-                R.string.issues_menu_show_closed : R.string.issues_menu_show_open;
+        int resIdState = mShowingClosed ?
+                R.string.issues_menu_show_open : R.string.issues_menu_show_closed;
         MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, resIdState);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
 
         item = menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.actions)
-                .setIcon(R.drawable.overflow);
+                .setIcon(R.drawable.overflow_horizontal);
         MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
 
         return super.onCreateOptionsMenu(menu);
@@ -113,6 +117,11 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
+    protected @IdRes int getInitialToolDrawerSelection() {
+        return R.id.sort_created_desc;
+    }
+
+    @Override
     protected boolean onDrawerItemSelected(MenuItem item) {
         if (mDrawerHelper.handleItemSelection(item)) {
             reloadIssueList();
@@ -124,15 +133,15 @@ public class IssueListFactory extends FragmentFactory {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(STATE_KEY_STATE, mState);
+        outState.putBoolean(STATE_KEY_SHOWING_CLOSED, mShowingClosed);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle state) {
         super.onRestoreInstanceState(state);
-        String newState = state.getString(STATE_KEY_STATE);
-        if (!TextUtils.equals(mState, newState)) {
-            mState = newState;
+        boolean showedClosed = state.getBoolean(STATE_KEY_SHOWING_CLOSED, false);
+        if (mShowingClosed != showedClosed) {
+            mShowingClosed = showedClosed;
             reloadIssueList();
             updateHeaderColor();
             mActivity.invalidateTitle();
@@ -144,8 +153,7 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     private void toggleStateFilter() {
-        mState = Constants.Issue.STATE_CLOSED.equals(mState)
-                ? Constants.Issue.STATE_OPEN : Constants.Issue.STATE_CLOSED;
+        mShowingClosed = !mShowingClosed;
         reloadIssueList();
         updateHeaderColor();
         mActivity.invalidateTitle();
@@ -153,10 +161,9 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     private void updateHeaderColor() {
-        boolean showingClosed = Constants.Issue.STATE_CLOSED.equals(mState);
-        mHeaderColors = new int[] {
-            showingClosed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
-            showingClosed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark
+        mHeaderColorAttrs = new int[] {
+            mShowingClosed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
+            mShowingClosed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark
         };
         mActivity.invalidateTabs();
     }

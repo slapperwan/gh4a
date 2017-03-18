@@ -8,18 +8,23 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.MultiAutoCompleteTextView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.DropDownUserAdapter;
 import com.gh4a.widget.SwipeRefreshLayout;
 
+import org.eclipse.egit.github.core.User;
+
 import java.io.IOException;
+import java.util.Set;
 
 public class CommentBoxFragment extends Fragment implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
@@ -31,13 +36,41 @@ public class CommentBoxFragment extends Fragment implements
     }
 
     private View mSendButton;
-    private EditText mCommentEditor;
+    private MultiAutoCompleteTextView mCommentEditor;
     private Callback mCallback;
     private boolean mLocked;
+    private DropDownUserAdapter mAdapter;
 
     public void setLocked(boolean locked) {
         mLocked = locked;
         updateLockState();
+    }
+
+    public void addQuote(CharSequence text) {
+        if (mLocked) {
+            return;
+        }
+
+        Editable editable = mCommentEditor.getText();
+        if (editable != null && editable.length() > 0) {
+            String string = editable.toString();
+            if (!string.endsWith("\n\n")) {
+                editable.append('\n');
+
+                if (!string.endsWith("\n")) {
+                    editable.append("\n");
+                }
+            }
+        }
+
+        mCommentEditor.append("> " + text.toString().replace("\n", "\n> ") + "\n\n");
+        mCommentEditor.requestFocus();
+        mCommentEditor.setSelection(mCommentEditor.length());
+        UiUtils.showImeForView(mCommentEditor);
+    }
+
+    public void setMentionUsers(Set<User> suggestions) {
+        mAdapter.replace(suggestions);
     }
 
     @Override
@@ -66,9 +99,18 @@ public class CommentBoxFragment extends Fragment implements
         mSendButton.setOnClickListener(this);
         mSendButton.setEnabled(false);
 
-        mCommentEditor = (EditText) view.findViewById(R.id.et_comment);
+        mCommentEditor = (MultiAutoCompleteTextView) view.findViewById(R.id.et_comment);
         mCommentEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mCommentEditor, mSendButton));
+
+        int inputType = (mCommentEditor.getInputType() | InputType.TYPE_TEXT_FLAG_AUTO_CORRECT)
+                & ~InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE;
+        mCommentEditor.setInputType(inputType);
+
+        mAdapter = new DropDownUserAdapter(getContext());
+        mCommentEditor.setAdapter(mAdapter);
+        mCommentEditor.setTokenizer(new UiUtils.WhitespaceTokenizer());
+        mCommentEditor.setThreshold(1);
 
         Activity activity = getActivity();
         if (activity instanceof BaseActivity) {
@@ -128,10 +170,10 @@ public class CommentBoxFragment extends Fragment implements
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
-        private String mText;
+        private final String mText;
 
         public CommentTask(String text) {
-            super((BaseActivity) getActivity(), 0, R.string.saving_comment);
+            super((BaseActivity) getActivity(), R.string.saving_comment);
             mText = text;
         }
 

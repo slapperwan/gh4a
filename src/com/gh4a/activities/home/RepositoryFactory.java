@@ -2,11 +2,11 @@ package com.gh4a.activities.home;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 
@@ -15,11 +15,11 @@ public class RepositoryFactory extends FragmentFactory {
         R.string.my_repositories
     };
 
-    private String mUserLogin;
-    private RepositoryListContainerFragment.FilterDrawerHelper mFilterDrawerHelper;
-    private RepositoryListContainerFragment.SortDrawerHelper mSortDrawerHelper;
+    private final String mUserLogin;
+    private final RepositoryListContainerFragment.FilterDrawerHelper mFilterDrawerHelper;
+    private final RepositoryListContainerFragment.SortDrawerHelper mSortDrawerHelper;
     private RepositoryListContainerFragment mFragment;
-    private SharedPreferences mPrefs;
+    private final SharedPreferences mPrefs;
 
     private static final String STATE_KEY_FRAGMENT = "repoFactoryFragment";
     private static final String PREF_KEY_FILTER = "home_repo_list_filter";
@@ -30,14 +30,13 @@ public class RepositoryFactory extends FragmentFactory {
         super(activity);
         mUserLogin = userLogin;
 
-        mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(mUserLogin,
-                Constants.User.TYPE_USER);
+        mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(mUserLogin, false);
         mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
         mPrefs = prefs;
     }
 
     @Override
-    protected int getTitleResId() {
+    protected @StringRes int getTitleResId() {
         return R.string.my_repositories;
     }
 
@@ -118,11 +117,22 @@ public class RepositoryFactory extends FragmentFactory {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
-        mFragment = RepositoryListContainerFragment.newInstance(mUserLogin,
-                Constants.User.TYPE_USER);
+    protected Fragment makeFragment(int position) {
+        return RepositoryListContainerFragment.newInstance(mUserLogin, false);
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        mFragment = (RepositoryListContainerFragment) f;
         restorePreviouslySelectedFilterAndSort();
-        return mFragment;
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mFragment) {
+            mFragment.destroyChildren();
+            mFragment = null;
+        }
     }
 
     private void restorePreviouslySelectedFilterAndSort() {

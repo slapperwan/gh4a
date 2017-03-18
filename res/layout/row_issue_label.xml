@@ -22,8 +22,8 @@
             android:id="@+id/tv_title"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
             android:layout_marginLeft="16dp"
+            android:layout_weight="1"
             android:gravity="center_vertical"
             android:textAppearance="@style/TextAppearance.ItemTitle" />
 
@@ -55,72 +55,80 @@
                 android:layout_height="40dp"
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
-                android:tag="dddddd"
+                android:background="#dddddd"
                 android:foreground="?attr/selectableItemBackground"
-                android:background="#dddddd" />
+                android:tag="dddddd" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
-                android:tag="444444"
+                android:background="#444444"
                 android:foreground="?attr/selectableItemBackground"
-                android:background="#444444" />
+                android:tag="444444" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
-                android:tag="e10c02"
+                android:background="#e10c02"
                 android:foreground="?attr/selectableItemBackground"
-                android:background="#e10c02" />
+                android:tag="e10c02" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
-                android:tag="d7e102"
+                android:background="#d7e102"
                 android:foreground="?attr/selectableItemBackground"
-                android:background="#d7e102" />
+                android:tag="d7e102" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
-                android:tag="02e10c"
+                android:background="#02e10c"
                 android:foreground="?attr/selectableItemBackground"
-                android:background="#02e10c" />
+                android:tag="02e10c" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
-                android:tag="02d7e1"
+                android:background="#02d7e1"
                 android:foreground="?attr/selectableItemBackground"
-                android:background="#02d7e1" />
+                android:tag="02d7e1" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
-                android:tag="0b02e1"
+                android:background="#0b02e1"
                 android:foreground="?attr/selectableItemBackground"
-                android:background="#0b02e1" />
+                android:tag="0b02e1" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginRight="6dp"
                 android:layout_weight="1"
-                android:tag="e102d8"
+                android:background="#e102d8"
                 android:foreground="?attr/selectableItemBackground"
-                android:background="#e102d8" />
+                android:tag="e102d8" />
+
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/custom"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_weight="1"
-                android:gravity="center"
                 android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
                 android:text="@string/ellipse" />
 
         </LinearLayout>

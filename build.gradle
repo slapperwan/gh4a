@@ -27,7 +27,7 @@ android {
     compileSdkVersion 24
     buildToolsVersion '25.0.0'
     defaultConfig {
-        minSdkVersion 10
+        minSdkVersion 16
         targetSdkVersion 23
         versionCode 48
         versionName "4.0.5"
@@ -40,6 +40,10 @@ android {
         release {
             zipAlignEnabled true
             signingConfig signingConfigs.playStore
+        }
+        buildTypes.each {
+            it.buildConfigField 'String', 'CLIENT_ID', ClientId
+            it.buildConfigField 'String', 'CLIENT_SECRET', ClientSecret
         }
     }
 
@@ -61,16 +65,15 @@ dependencies {
     compile 'com.android.support:cardview-v7:24.1.1'
     compile 'com.android.support:preference-v7:24.1.1'
     compile 'com.android.support:preference-v14:24.1.1'
+    compile 'com.android.support:customtabs:24.1.1'
     compile 'com.android.support:design:24.1.1'
     compile 'com.larswerkman:HoloColorPicker:1.5@aar'
-    compile 'com.github.johnkil.android-progressfragment:progressfragment:1.4.0@aar'
     compile 'com.caverock:androidsvg:1.2.2-beta-1@aar'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.squareup.okhttp:okhttp:1.6.0'
     compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
-    compile 'com.nineoldandroids:library:2.4.0+'
     compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;

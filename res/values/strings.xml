@@ -3,7 +3,9 @@
     <string name="app_name">OctoDroid</string>
 
     <!-- Common -->
-    <string name="record_not_found">%1$s not found</string>
+    <string name="welcome">Welcome to OctoDroid</string>
+    <string name="introduction">To be able to use the app to its full potential, please log in to GitHub using the button below.\n\nAlternatively, you can explore some parts of GitHub using the swipe-out menu on the left.</string>
+    <string name="repo_not_found_toast">Repository was not found</string>
     <string name="loading_msg">Loading\u2026</string>
     <string name="saving_msg">Saving\u2026</string>
     <string name="deleting_msg">Deleting\u2026</string>
@@ -32,8 +34,6 @@
     <string name="other_info">Other Information</string>
     <string name="view">View</string>
     <string name="readme">Readme</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="reply">Reply</string>
@@ -41,11 +41,12 @@
     <string name="members">Members</string>
     <string name="open">Open</string>
     <string name="closed">Closed</string>
+    <string name="merged">Merged</string>
     <string name="theme">Theme</string>
     <string name="pub_timeline">Public Timeline</string>
     <string name="load_failure_explanation">Loading the data from Github failed. Please verify you have a working network connection and try again.</string>
     <string name="share">Share</string>
-    <string name="download">Download</string>
+    <string name="print">Print</string>
     <string name="downloads">Downloads</string>
     <string name="releases">Releases</string>
     <string name="open_in_browser">Open in browser</string>
@@ -77,20 +78,18 @@
     <string name="view_more">View more\u2026</string>
     <string name="pulls">Pulls</string>
     <string name="issue_milestone_hint">Milestone</string>
-    <string name="issue_assignee_hint">Assignee</string>
+    <string name="issue_assignee_hint">Assignees</string>
     <string name="link_not_openable">Link could not be opened</string>
     <string name="download_created">Created %1$s</string>
     <string name="download_mobile_warning_title">Mobile connection download</string>
     <string name="download_mobile_warning_message">Do you want to download this file using your mobile connection?\nYou can also schedule it for download when you\'re using your Wi-Fi connection next time.</string>
     <string name="download_now_button">Download now</string>
     <string name="download_wifi_button">Download over Wi-Fi</string>
-    <string name="download_fail_no_storage_toast">The file could not be downloaded - the storage or SD card isn\'t available.</string>
     <string name="download_permission_rationale">Permission to write to USB storage or SD card is required in order to download files.</string>
     <string name="load_auth_failure_notice">Your authentication credentials aren\'t valid anymore, please log in again.</string>
 	<string name="auth_code">Authentication Code</string>
 	<string name="two_factor_auth">Two-factor Authentication</string>
 	<string name="verify">Verify</string>
-    <string name="confirmation">Are you sure?</string>
     <string name="unset">Unset</string>
     <string name="logout_pref_summary_logged_in">Currently logged in as %1$s</string>
     <string name="logout_pref_summary_logged_out">Currently not logged in</string>
@@ -99,6 +98,7 @@
     <string name="created">Created</string>
     <string name="assigned">Assigned</string>
     <string name="mentioned">Mentioned</string>
+    <string name="participating">Participating</string>
     <string name="my_repositories">My repositories</string>
     <string name="my_issues">My issues</string>
     <string name="my_pull_requests">My pull requests</string>
@@ -107,6 +107,16 @@
     <string name="start_page_last_selected">Last selected</string>
     <string name="login_failed">Login failed.</string>
     <string name="comment_editor_locked_hint">Comments are only available to collaborators</string>
+    <string name="org_user_template">%1$s (organization)</string>
+    <string name="clear_suggestions">Clear suggestions</string>
+    <string name="quote">Quote</string>
+    <string name="fork">Fork</string>
+    <string name="notifications">Notifications</string>
+    <string name="mark_all_as_read">Mark all as read</string>
+    <string name="mark_as_read">Mark as read</string>
+    <string name="unsubscribe">Unsubscribe</string>
+    <string name="mark_repository_as_read_question">Mark all notifications from %1$s as read?</string>
+    <string name="mark_all_as_read_question">Mark all notifications as read?</string>
 
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>
@@ -136,13 +146,15 @@
     <string name="no_files_found">No files found.</string>
     <string name="no_trends_found">No trending repositories found.</string>
     <string name="no_downloads_found">This repository doesn\'t provide any downloads.</string>
-    <string name="no_milestones_found">This repository doesn\'t have any configured milestone.</string>
+    <string name="no_open_milestones_found">This repository doesn\'t have any open milestones.</string>
+    <string name="no_closed_milestones_found">This repository doesn\'t have any closed milestones.</string>
     <string name="no_commits_found">No commits found.</string>
     <string name="no_followers_found">No followers found.</string>
     <string name="no_following_found">No users are followed so far.</string>
     <string name="no_forks_found">This repository wasn\'t forked yet.</string>
     <string name="no_issues_found">No issues were reported so far.</string>
     <string name="no_search_issues_found">No issues found matching the criteria.</string>
+    <string name="no_search_pull_requests_found">No pull requests found matching the criteria.</string>
     <string name="no_events_found">No events found.</string>
     <string name="no_pull_requests_found">No pull requests were opened so far.</string>
     <string name="no_repos_found">No repositories found.</string>
@@ -159,6 +171,9 @@
     <string name="no_starred_gists_found">No gists were starred so far.</string>
     <string name="no_bookmarks">No bookmarks were created so far.</string>
     <string name="no_wiki_updates_found">No recent Wiki updates found.</string>
+    <string name="no_notifications_found">No notifications found.</string>
+    <string name="no_org_members_found">This organization does not have any members.</string>
+    <string name="no_collaborators_found">This repository does not have any collaborators.</string>
 
     <!-- Activity event -->
     <string name="event_push_title">Pushed to [b]%1$s[/b] at [b]%2$s[/b]</string>
@@ -175,7 +190,6 @@
     <string name="event_issues_open_title">Opened issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_close_title">Closed issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_reopen_title">Reopened issue [b]%1$d[/b] on [b]%2$s[/b]</string>
-    <string name="event_delete_repo_title">Deleted repository [b]%1$s[/b]</string>
     <string name="event_delete_branch_title">Deleted branch [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_delete_tag_title">Deleted tag [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_pr_open_title">Opened pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
@@ -220,10 +234,8 @@
     <string name="user_follow_action">Follow</string>
     <string name="user_unfollow_action">Unfollow</string>
     <string name="user_no_repos">No repositories found</string>
-    <string name="user_no_data">Data for this user can\'t be loaded.</string>
 
     <!-- Repository -->
-    <string name="repository">Repository</string>
     <string name="repo_forks">Forks</string>
     <string name="repo_language">Language %1$s</string>
     <string name="repo_watchers">Watchers</string>
@@ -240,15 +252,13 @@
     <string name="repo_files">Files</string>
     <string name="repo_short">Repos</string>
     <string name="repo_no_readme">No README file found</string>
-    <string name="repo_issue_on">#%1$d on %2$s</string>
-    <string name="repo_no_data">Data for this repository can\'t be loaded.</string>
+    <string name="repo_issue_on">#%1$d on %2$s/%3$s</string>
+    <string name="repo_activity">Activity</string>
 
     <!-- Issue events -->
     <string name="issue_event_closed">Issue was closed by %1$s</string>
     <string name="issue_event_closed_with_commit">Issue was closed by %1$s with commit [commit]</string>
     <string name="issue_event_reopened">Issue was reopened by %1$s</string>
-    <string name="issue_event_merged">Pull request was merged by %1$s</string>
-    <string name="issue_event_merged_with_commit">Pull request was merged as commit [commit] by %1$s</string>
     <string name="issue_event_referenced">Issue was referenced by %1$s</string>
     <string name="issue_event_referenced_with_commit">Issue was referenced by %1$s from commit [commit]</string>
     <string name="issue_event_assigned">Issue was assigned to [b]%2$s[/b] by %1$s</string>
@@ -263,8 +273,24 @@
     <string name="issue_event_locked">Issue was [b]locked[/b] by %1$s</string>
     <string name="issue_event_unlocked">Issue was unlocked by %1$s</string>
 
+    <!-- Pull request events -->
+    <string name="pull_request_event_closed">Pull request was closed by %1$s</string>
+    <string name="pull_request_event_closed_with_commit">Pull request was closed by %1$s with commit [commit]</string>
+    <string name="pull_request_event_reopened">Pull request was reopened by %1$s</string>
+    <string name="pull_request_event_merged">Pull request was merged by %1$s</string>
+    <string name="pull_request_event_merged_with_commit">Pull request was merged as commit [commit] by %1$s</string>
+    <string name="pull_request_event_referenced">Pull request was referenced by %1$s</string>
+    <string name="pull_request_event_referenced_with_commit">Pull request was referenced by %1$s from commit [commit]</string>
+    <string name="pull_request_event_assigned">Pull request was assigned to [b]%2$s[/b] by %1$s</string>
+    <string name="pull_request_event_assigned_self">Pull request was self-assigned by %1$s</string>
+    <string name="pull_request_event_unassigned">Pull request was unassigned from [b]%2$s[/b] by %1$s</string>
+    <string name="pull_request_event_unassigned_self">Pull request was self-unassigned from %1$s</string>
+    <string name="pull_request_event_locked">Pull request was [b]locked[/b] by %1$s</string>
+    <string name="pull_request_event_unlocked">Pull request was unlocked by %1$s</string>
+
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>
+    <string name="commit_in_repo">Commit %1$s in %2$s/%3$s</string>
     <string name="commit">Commit</string>
     <string name="commits">Commits</string>
     <string name="commit_changed">Files Changed</string>
@@ -275,7 +301,7 @@
     <string name="commit_compare">Compare View</string>
     <string name="commit_comment_hint">Comment on this commit</string>
     <string name="commit_details">Committed by [b]%1$s[/b] %2$s</string>
-    <string name="commit_comment_dialog_title">Comment on line %1$d</string>
+    <string name="commit_comment_dialog_title">Comment on line -%1$d +%2$d</string>
     <string name="error_edit_commit_comment">Saving comment on line %1$d failed.</string>
     <string name="error_delete_commit_comment">Deletion of commit comment failed.</string>
     <string name="error_edit_comment">Saving comment failed.</string>
@@ -317,8 +343,7 @@
     <string name="issue_manage_milestones">Manage Milestones</string>
     <string name="issue_labels">Labels</string>
     <string name="issue_milestones">Milestones</string>
-    <string name="issue_dialog_delete_title">Delete %1$s?</string>
-    <string name="issue_dialog_delete_message">Are you sure?</string>
+    <string name="issue_dialog_delete_message">Do you really want to delete %1$s?</string>
     <string name="issue_error_comment">Comment creation failed.</string>
     <string name="issue_error_create">Issue creation failed.</string>
     <string name="issue_error_edit">Editing issue #%1$d failed.</string>
@@ -333,13 +358,21 @@
     <string name="issue_milestone_edit">Edit Milestone</string>
     <string name="issue_milestone_open_issues">%d open</string>
     <string name="issue_milestone_closed_issues">%d closed</string>
+    <string name="issue_milestone_close_message">Do you really want to close this milestone?</string>
+    <string name="issue_milestone_reopen_message">Do you really want to reopen this milestone?</string>
+    <string name="issue_milestone_close_error">Closing milestone failed.</string>
+    <string name="issue_milestone_reopen_error">Reopening milestone failed.</string>
     <string name="issue_filter">Filter</string>
     <string name="issue_filter_by_labels">Filter by labels</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>
     <string name="issue_filter_by_assignee">Filter by assignee</string>
+    <string name="issue_filter_by_participating">Filter by participating status</string>
     <string name="issue_filter_by_any_label">Any label</string>
+    <string name="issue_filter_by_no_label">Unlabeled</string>
     <string name="issue_filter_by_any_milestone">Any milestone</string>
+    <string name="issue_filter_by_no_milestone">No milestone set</string>
     <string name="issue_filter_by_any_assignee">Any assignee</string>
+    <string name="issue_filter_by_no_assignee">Unassigned</string>
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
     <string name="issue_no_labels">No labels assigned</string>
@@ -354,6 +387,9 @@
     <string name="issue_comment_header">[b]%1$s[/b]</string>
     <string name="issue_commit_comment_file">Comment on [b][file][/b]</string>
     <string name="commit_comment_header">%1$s added a note %2$s</string>
+    <string name="issue_no_description">No description provided.</string>
+    <string name="close_issue_confirm">Do you really want to close this issue?</string>
+    <string name="reopen_issue_confirm">Do you really want to reopen this issue?</string>
 
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
@@ -376,6 +412,11 @@
     <string name="pull_merge_status_dirty">Pull request has conflicts that need to be resolved manually</string>
     <string name="pull_merge_status_unknown">The status of the pull request could not be determined</string>
     <string name="pull_no_commit_status">No additional checks are attached to this pull request</string>
+    <string name="pull_request_from">From [b]%1$s[/b]</string>
+    <string name="pull_request_to">Into [b]%1$s[/b]</string>
+    <string name="close_pull_request_confirm">Do you really want to close this pull request?</string>
+    <string name="reopen_pull_request_confirm">Do you really want to reopen this pull request?</string>
+    <string name="pull_request_edit_title">Edit Pull Request #%1$d</string>
 
     <!-- Object -->
     <string name="object_view_file_at">View file @ %1$s</string>
@@ -397,6 +438,9 @@
     <string name="trend_today">Today</string>
     <string name="trend_week">Week</string>
     <string name="trend_month">Month</string>
+    <string name="trend_stars_today">%1$d today, %2$d total</string>
+    <string name="trend_stars_week">%1$d this week, %2$d total</string>
+    <string name="trend_stars_month">%1$d this month, %2$d total</string>
 
     <!-- GitHub Blog -->
     <string name="blog">GitHub Blog</string>
@@ -405,7 +449,7 @@
     <string name="recent_wiki">Recent Wiki Updates</string>
 
     <!-- Bookmarks -->
-    <string name="remove_bookmark">Remove bookmark</string>
+    <string name="remove">Remove</string>
     <string name="remove_bookmark_confirm">Do you really want to remove this bookmark?</string>
     <string name="bookmark_saved">Bookmark saved</string>
 
@@ -428,8 +472,16 @@
     <string name="share_commit_subject">Commit #%1$s at %2$s</string>
     <string name="share_user_subject">User %1$s (%2$s)</string>
     <string name="share_user_subject_loginonly">User %1$s</string>
+    <string name="share_comment_subject">Comment #%1$d in issue %2$d at %3$s</string>
+    <string name="share_commit_comment_subject">Commit comment #%1$d at %2$s</string>
 
     <!-- Webview text size -->
     <string name="menu_text_size">Code view text size</string>
     <string name="menu_gif_load_mode">Animated GIF loading</string>
+
+    <!-- Print document titles -->
+    <string name="diff_print_document_title">Diff of file %1$s in commit %2$s in %3$s/%4$s</string>
+    <string name="gist_print_document_title">%1$s in gist %2$s of %3$s</string>
+    <string name="file_print_document_title">%1$s in %2$s/%3$s</string>
+    <string name="wiki_print_document_title">Wiki page %1$s in %2$s/%3$s</string>
 </resources>

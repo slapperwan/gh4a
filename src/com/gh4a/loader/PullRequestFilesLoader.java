@@ -13,9 +13,9 @@ import java.util.List;
 
 public class PullRequestFilesLoader extends BaseLoader<List<CommitFile>> {
 
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mPullRequestNumber;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mPullRequestNumber;
 
     public PullRequestFilesLoader(Context context, String repoOwner, String repoName, int pullRequestNumber) {
         super(context);
@@ -26,8 +26,14 @@ public class PullRequestFilesLoader extends BaseLoader<List<CommitFile>> {
 
     @Override
     public List<CommitFile> doLoadInBackground() throws IOException {
+        return loadFiles(mRepoOwner, mRepoName, mPullRequestNumber);
+    }
+
+    public static List<CommitFile> loadFiles(String repoOwner, String repoName,
+            int pullRequestNumber) throws IOException {
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        return pullRequestService.getFiles(new RepositoryId(mRepoOwner, mRepoName), mPullRequestNumber);
+        return pullRequestService.getFiles(new RepositoryId(repoOwner, repoName),
+                pullRequestNumber);
     }
 }

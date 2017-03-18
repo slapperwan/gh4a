@@ -12,9 +12,8 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class ContributorListLoader extends BaseLoader<List<Contributor>> {
-
-    private String mRepoOwner;
-    private String mRepoName;
+    private final String mRepoOwner;
+    private final String mRepoName;
 
     public ContributorListLoader(Context context, String repoOwner, String repoName) {
         super(context);

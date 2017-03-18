@@ -17,10 +17,9 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
-
-    private String mRepoOwner;
-    private String mRepoName;
-    private String mPath;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final String mPath;
     private String mRef;
 
     public ContentListLoader(Context context, String repoOwner,

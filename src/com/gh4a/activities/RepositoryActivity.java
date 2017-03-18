@@ -1,22 +1,10 @@
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.RepositoryTag;
-import org.eclipse.egit.github.core.service.StarService;
-import org.eclipse.egit.github.core.service.WatcherService;
-
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
@@ -35,12 +23,12 @@ import android.widget.TextView;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.BasePagerActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListContainerFragment;
+import com.gh4a.fragment.RepositoryEventListFragment;
 import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.loader.BaseLoader;
 import com.gh4a.loader.BranchListLoader;
@@ -48,28 +36,63 @@ import com.gh4a.loader.IsStarringLoader;
 import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 
+import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.RepositoryTag;
+import org.eclipse.egit.github.core.service.StarService;
+import org.eclipse.egit.github.core.service.WatcherService;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class RepositoryActivity extends BasePagerActivity {
+    public static Intent makeIntent(Context context, Repository repo) {
+        return makeIntent(context, repo.getOwner().getLogin(), repo.getName());
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+        return makeIntent(context, repoOwner, repoName, null);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, String ref) {
+        return makeIntent(context, repoOwner, repoName, ref, null, PAGE_REPO_OVERVIEW);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, String ref,
+            String initialPath, int initialPage) {
+        if (TextUtils.isEmpty(ref)) {
+            ref = null;
+        }
+        return new Intent(context, RepositoryActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("ref", ref)
+                .putExtra("initial_path", initialPath)
+                .putExtra("initial_page", initialPage);
+    }
+
     private static final int LOADER_REPO = 0;
     private static final int LOADER_BRANCHES_AND_TAGS = 1;
     private static final int LOADER_WATCHING = 2;
     private static final int LOADER_STARRING = 3;
 
-    public static final String EXTRA_INITIAL_PATH = "initial_path";
-    public static final String EXTRA_INITIAL_PAGE = "initial_page";
     public static final int PAGE_REPO_OVERVIEW = 0;
     public static final int PAGE_FILES = 1;
     public static final int PAGE_COMMITS = 2;
+    public static final int PAGE_ACTIVITY = 3;
 
     private static final int[] TITLES = new int[] {
-        R.string.about, R.string.repo_files, R.string.commits
+        R.string.about, R.string.repo_files, R.string.commits, R.string.repo_activity
     };
 
-    private LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>(this) {
+    private final LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>(this) {
         @Override
         protected Loader<LoaderResult<Repository>> onCreateLoader() {
             return new RepositoryLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
@@ -81,7 +104,7 @@ public class RepositoryActivity extends BasePagerActivity {
             updateTitle();
             invalidateTabs();
             // Apply initial page selection first time the repo is loaded
-            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_COMMITS) {
+            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
                 getPager().setCurrentItem(mInitialPage);
                 mInitialPage = -1;
             }
@@ -90,8 +113,8 @@ public class RepositoryActivity extends BasePagerActivity {
         }
     };
 
-    private LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>> mBranchesAndTagsCallback =
-            new LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(this) {
+    private final LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>> mBranchesAndTagsCallback =
+            new ProgressDialogLoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(this, this) {
         @Override
         protected Loader<LoaderResult<Pair<List<RepositoryBranch>, List<RepositoryTag>>>> onCreateLoader() {
             return new BaseLoader<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(RepositoryActivity.this) {
@@ -104,20 +127,14 @@ public class RepositoryActivity extends BasePagerActivity {
         }
         @Override
         protected void onResultReady(Pair<List<RepositoryBranch>, List<RepositoryTag>> result) {
-            stopProgressDialog(mProgressDialog);
             mBranches = result.first;
             mTags = result.second;
             showRefSelectionDialog();
             getSupportLoaderManager().destroyLoader(LOADER_BRANCHES_AND_TAGS);
         }
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
-    private LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsWatchingLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
@@ -129,7 +146,7 @@ public class RepositoryActivity extends BasePagerActivity {
         }
     };
 
-    private LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsStarringLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
@@ -144,7 +161,6 @@ public class RepositoryActivity extends BasePagerActivity {
     private String mRepoOwner;
     private String mRepoName;
     private ActionBar mActionBar;
-    private ProgressDialog mProgressDialog;
     private int mInitialPage;
     private String mInitialPath;
 
@@ -159,6 +175,7 @@ public class RepositoryActivity extends BasePagerActivity {
     private RepositoryFragment mRepositoryFragment;
     private ContentListContainerFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
+    private RepositoryEventListFragment mActivityFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -168,7 +185,6 @@ public class RepositoryActivity extends BasePagerActivity {
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        setEmptyText(R.string.repo_no_data);
         setContentShown(false);
 
         getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
@@ -181,11 +197,11 @@ public class RepositoryActivity extends BasePagerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mSelectedRef = extras.getString(Constants.Repository.SELECTED_REF);
-        mInitialPage = extras.getInt(EXTRA_INITIAL_PAGE, -1);
-        mInitialPath = extras.getString(EXTRA_INITIAL_PATH);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mSelectedRef = extras.getString("ref");
+        mInitialPage = extras.getInt("initial_page", -1);
+        mInitialPath = extras.getString("initial_path");
     }
 
     private void updateTitle() {
@@ -206,21 +222,44 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         switch (position) {
             case 0:
-                mRepositoryFragment = RepositoryFragment.newInstance(mRepository, mSelectedRef);
-                return mRepositoryFragment;
+                return RepositoryFragment.newInstance(mRepository, mSelectedRef);
             case 1:
-                mContentListFragment = ContentListContainerFragment.newInstance(mRepository,
+                Fragment f = ContentListContainerFragment.newInstance(mRepository,
                         mSelectedRef, mInitialPath);
                 mInitialPath = null;
-                return mContentListFragment;
+                return f;
             case 2:
-                mCommitListFragment = CommitListFragment.newInstance(mRepository, mSelectedRef);
-                return mCommitListFragment;
+                return CommitListFragment.newInstance(mRepository, mSelectedRef);
+            case 3:
+                return RepositoryEventListFragment.newInstance(mRepository);
         }
         return null;
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        switch (position) {
+            case 0: mRepositoryFragment = (RepositoryFragment) f; break;
+            case 1: mContentListFragment = (ContentListContainerFragment) f; break;
+            case 2: mCommitListFragment = (CommitListFragment) f; break;
+            case 3: mActivityFragment = (RepositoryEventListFragment) f; break;
+        }
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mRepositoryFragment) {
+            mRepositoryFragment = null;
+        } else if (f == mContentListFragment) {
+            mContentListFragment = null;
+        } else if (f == mCommitListFragment) {
+            mCommitListFragment = null;
+        } else if (f == mActivityFragment) {
+            mActivityFragment = null;
+        }
     }
 
     @Override
@@ -230,7 +269,9 @@ public class RepositoryActivity extends BasePagerActivity {
         } else if (fragment instanceof ContentListContainerFragment
                 && mContentListFragment == null) {
             return true;
-        } if (fragment instanceof RepositoryFragment && mRepositoryFragment == null) {
+        } else if (fragment instanceof RepositoryFragment && mRepositoryFragment == null) {
+            return true;
+        } else if (fragment instanceof RepositoryEventListFragment && mActivityFragment == null) {
             return true;
         }
         return false;
@@ -240,6 +281,7 @@ public class RepositoryActivity extends BasePagerActivity {
     public void onRefresh() {
         mRepositoryFragment = null;
         mContentListFragment = null;
+        mActivityFragment = null;
         mRepository = null;
         mIsStarring = null;
         mIsWatching = null;
@@ -248,14 +290,7 @@ public class RepositoryActivity extends BasePagerActivity {
         clearRefDependentFragments();
         setContentShown(false);
         invalidateTabs();
-
-        LoaderManager lm = getSupportLoaderManager();
-        for (int i = 0; i < 4; i++) {
-            Loader loader = lm.getLoader(i);
-            if (loader != null) {
-                loader.onContentChanged();
-            }
-        }
+        forceLoaderReload(0, 1, 2, 3);
         super.onRefresh();
     }
 
@@ -317,11 +352,12 @@ public class RepositoryActivity extends BasePagerActivity {
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getUserActivityIntent(this, mRepoOwner);
+        return UserActivity.makeIntent(this, mRepoOwner);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName;
         switch (item.getItemId()) {
             case R.id.watch:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
@@ -335,7 +371,6 @@ public class RepositoryActivity extends BasePagerActivity {
                 return true;
             case R.id.ref:
                 if (mBranches == null) {
-                    mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
                     getSupportLoaderManager().initLoader(LOADER_BRANCHES_AND_TAGS,
                             null, mBranchesAndTagsCallback);
                 } else {
@@ -346,21 +381,24 @@ public class RepositoryActivity extends BasePagerActivity {
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, mRepoOwner + "/" + mRepoName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  "https://github.com/" + mRepoOwner + "/" + mRepoName);
+                shareIntent.putExtra(Intent.EXTRA_TEXT,  url);
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
                 return true;
+            case R.id.search:
+                String initialSearch = "repo:" + mRepoOwner + "/" + mRepoName + " ";
+                startActivity(SearchActivity.makeIntent(this,
+                        initialSearch, SearchActivity.SEARCH_TYPE_CODE));
+                return true;
             case R.id.bookmark:
-                Intent bookmarkIntent = new Intent(this, getClass());
-                bookmarkIntent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-                bookmarkIntent.putExtra(Constants.Repository.NAME, mRepoName);
-                bookmarkIntent.putExtra(Constants.Repository.SELECTED_REF, mSelectedRef);
-                saveBookmark(mActionBar.getTitle().toString(), BookmarksProvider.Columns.TYPE_REPO,
-                        bookmarkIntent, mActionBar.getSubtitle().toString());
+                String ref = getCurrentRef();
+                String bookmarkUrl = ref.equals(mRepository.getDefaultBranch())
+                        ? url : url + "/tree/" + ref;
+                BookmarksProvider.saveBookmark(this, mActionBar.getTitle().toString(),
+                        BookmarksProvider.Columns.TYPE_REPO, bookmarkUrl, ref);
                 return true;
             case R.id.zip_download:
-                String zipUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName
-                        + "/archive/" + getCurrentRef() + ".zip";
+                String zipUrl = url + "/archive/" + getCurrentRef() + ".zip";
                 UiUtils.enqueueDownloadWithPermissionCheck(this, zipUrl, "application/zip",
                         mRepoName + "-" + getCurrentRef() + ".zip", null, null);
                 return true;
@@ -416,10 +454,10 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     private class BranchAndTagAdapter extends BaseAdapter {
-        private ArrayList<Object> mItems;
-        private LayoutInflater mInflater;
-        private int mBranchDrawableResId;
-        private int mTagDrawableResId;
+        private final ArrayList<Object> mItems;
+        private final LayoutInflater mInflater;
+        private final int mBranchDrawableResId;
+        private final int mTagDrawableResId;
 
         public BranchAndTagAdapter() {
             mItems = new ArrayList<>();

@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class TwoFactorAuthException extends IOException {
     private static final long serialVersionUID = 1L;
-	private String twoFactorAuthType;
+	private final String twoFactorAuthType;
 	
 	public TwoFactorAuthException(IOException e, String twoFactorAuthType) {
         super(e);

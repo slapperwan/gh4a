@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="DarkThemeBase" parent="Theme.AppCompat">
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="windowActionBar">false</item>
@@ -7,11 +8,14 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header</item>
         <item name="alertDialogTheme">@style/DarkAlertDialogTheme</item>
-        <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title</item>
+        <item name="drawerTitleTextAppearance">
+            @style/TextAppearance.AppCompat.Widget.ActionBar.Title
+        </item>
         <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="sendIcon">@drawable/social_send_dark</item>
-        <item name="contentEditIcon">@drawable/content_edit_dark</item>
+        <item name="commentEditIcon">@drawable/comment_edit_dark</item>
         <item name="contentPictureIcon">@drawable/content_picture_dark</item>
+        <item name="loadingPictureIcon">@drawable/image_loading_dark</item>
         <item name="searchUserIcon">@drawable/search_users_dark</item>
         <item name="searchRepoIcon">@drawable/icon_repositories_dark</item>
         <item name="searchCodeIcon">@drawable/search_code_dark</item>
@@ -23,6 +27,7 @@
         <item name="commentsIcon">@drawable/comments_dark</item>
         <item name="languageSmallIcon">@drawable/language_small_dark</item>
         <item name="forkSmallIcon">@drawable/fork_small_dark</item>
+        <item name="forkSmallBoldIcon">@drawable/fork_small_bold_dark</item>
         <item name="starSmallIcon">@drawable/star_small_dark</item>
         <item name="sizeSmallIcon">@drawable/size_small_dark</item>
         <item name="dueSmallIcon">@drawable/due_small_dark</item>
@@ -39,10 +44,31 @@
         <item name="commitStatusOkIcon">@drawable/commit_status_ok_dark</item>
         <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown_dark</item>
         <item name="commitStatusFailIcon">@drawable/commit_status_fail_dark</item>
+        <item name="pullRequestIcon">@drawable/pull_request_dark</item>
         <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok_dark</item>
         <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty_dark</item>
         <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable_dark</item>
         <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown_dark</item>
+        <item name="issueEventClosedIcon">@drawable/issue_event_closed_dark</item>
+        <item name="issueEventReopenedIcon">@drawable/issue_event_reopened_dark</item>
+        <item name="issueEventMergedIcon">@drawable/issue_event_merged_dark</item>
+        <item name="issueEventReferencedIcon">@drawable/issue_event_referenced_dark</item>
+        <item name="issueEventAssignedIcon">@drawable/issue_event_person_dark</item>
+        <item name="issueEventUnassignedIcon">@drawable/issue_event_person_dark</item>
+        <item name="issueEventLabeledIcon">@drawable/issue_event_label_dark</item>
+        <item name="issueEventUnlabeledIcon">@drawable/issue_event_label_dark</item>
+        <item name="issueEventLockedIcon">@drawable/issue_event_locked_dark</item>
+        <item name="issueEventUnlockedIcon">@drawable/issue_event_unlocked_dark</item>
+        <item name="issueEventMilestonedIcon">@drawable/issue_event_milestone_dark</item>
+        <item name="issueEventDemilestonedIcon">@drawable/issue_event_milestone_dark</item>
+        <item name="issueEventRenamedIcon">@drawable/issue_event_renamed_dark</item>
+        <item name="overflowIcon">@drawable/overflow_dark</item>
+        <item name="mergedIcon">@drawable/merged_dark</item>
+        <item name="issueIcon">@drawable/issue_dark</item>
+        <item name="markAllAsReadIcon">@drawable/mark_read_all_dark</item>
+        <item name="commitIcon">@drawable/commit_dark</item>
+        <item name="descriptionIcon">@drawable/description_dark</item>
+        <item name="releaseIcon">@drawable/release_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
@@ -53,6 +79,7 @@
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/transparent</item>
         <item name="drawerBackground">@color/background_floating_material_dark</item>
+        <item name="cardBackground">@color/cardview_dark_background</item>
         <item name="colorIssueOpen">@color/issue_open_dark</item>
         <item name="colorIssueClosed">@color/issue_closed_dark</item>
         <item name="colorPullRequestMerged">@color/pr_merged_dark</item>
@@ -64,6 +91,7 @@
         <item name="colorCommitDeletion">#d25151</item>
         <item name="colorFab">@color/default_fab_dark</item>
         <item name="colorPrimaryTextEmphasized">@android:color/white</item>
+        <item name="colorWebViewBackground">#111111</item>
     </style>
 
     <style name="DarkTheme" parent="DarkThemeBase" />
@@ -91,11 +119,14 @@
         <item name="windowActionModeOverlay">true</item>
         <item name="headerTheme">@style/Theme.Header.Light</item>
         <item name="alertDialogTheme">@style/LightAlertDialogTheme</item>
-        <item name="drawerTitleTextAppearance">@style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse</item>
+        <item name="drawerTitleTextAppearance">
+            @style/TextAppearance.AppCompat.Widget.ActionBar.Title.Inverse
+        </item>
         <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="sendIcon">@drawable/social_send</item>
-        <item name="contentEditIcon">@drawable/content_edit</item>
+        <item name="commentEditIcon">@drawable/comment_edit</item>
         <item name="contentPictureIcon">@drawable/content_picture</item>
+        <item name="loadingPictureIcon">@drawable/image_loading</item>
         <item name="searchUserIcon">@drawable/search_users</item>
         <item name="searchRepoIcon">@drawable/icon_repositories</item>
         <item name="searchCodeIcon">@drawable/search_code</item>
@@ -107,6 +138,7 @@
         <item name="commentsIcon">@drawable/comments</item>
         <item name="languageSmallIcon">@drawable/language_small</item>
         <item name="forkSmallIcon">@drawable/fork_small</item>
+        <item name="forkSmallBoldIcon">@drawable/fork_small_bold</item>
         <item name="starSmallIcon">@drawable/star_small</item>
         <item name="sizeSmallIcon">@drawable/size_small</item>
         <item name="dueSmallIcon">@drawable/due_small</item>
@@ -123,10 +155,31 @@
         <item name="commitStatusOkIcon">@drawable/commit_status_ok</item>
         <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown</item>
         <item name="commitStatusFailIcon">@drawable/commit_status_fail</item>
+        <item name="pullRequestIcon">@drawable/pull_request</item>
         <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok</item>
         <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty</item>
         <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable</item>
         <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown</item>
+        <item name="issueEventClosedIcon">@drawable/issue_event_closed</item>
+        <item name="issueEventReopenedIcon">@drawable/issue_event_reopened</item>
+        <item name="issueEventMergedIcon">@drawable/issue_event_merged</item>
+        <item name="issueEventReferencedIcon">@drawable/issue_event_referenced</item>
+        <item name="issueEventAssignedIcon">@drawable/issue_event_person</item>
+        <item name="issueEventUnassignedIcon">@drawable/issue_event_person</item>
+        <item name="issueEventLabeledIcon">@drawable/issue_event_label</item>
+        <item name="issueEventUnlabeledIcon">@drawable/issue_event_label</item>
+        <item name="issueEventLockedIcon">@drawable/issue_event_locked</item>
+        <item name="issueEventUnlockedIcon">@drawable/issue_event_unlocked</item>
+        <item name="issueEventMilestonedIcon">@drawable/issue_event_milestone</item>
+        <item name="issueEventDemilestonedIcon">@drawable/issue_event_milestone</item>
+        <item name="issueEventRenamedIcon">@drawable/issue_event_renamed</item>
+        <item name="overflowIcon">@drawable/overflow</item>
+        <item name="mergedIcon">@drawable/merged</item>
+        <item name="issueIcon">@drawable/issue</item>
+        <item name="markAllAsReadIcon">@drawable/mark_read_all</item>
+        <item name="commitIcon">@drawable/commit</item>
+        <item name="descriptionIcon">@drawable/description</item>
+        <item name="releaseIcon">@drawable/release</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
@@ -138,6 +191,7 @@
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="listBackground">@android:color/white</item>
         <item name="drawerBackground">@color/background_floating_material_light</item>
+        <item name="cardBackground">@color/cardview_light_background</item>
         <item name="colorIssueOpen">@color/issue_open_light</item>
         <item name="colorIssueClosed">@color/issue_closed_light</item>
         <item name="colorPullRequestMerged">@color/pr_merged_light</item>
@@ -149,6 +203,7 @@
         <item name="colorCommitDeletion">#b34545</item>
         <item name="colorFab">@color/default_fab_light</item>
         <item name="colorPrimaryTextEmphasized">@android:color/black</item>
+        <item name="colorWebViewBackground">#f7f7f9</item>
     </style>
 
     <style name="LightTheme" parent="LightThemeBase" />

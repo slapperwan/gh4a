@@ -15,46 +15,57 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Locale;
-
-import org.eclipse.egit.github.core.Authorization;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.OAuthService;
-
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.Menu;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.design.widget.AppBarLayout;
+import android.support.v4.util.Pair;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.FrameLayout;
 
+import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
-import com.gh4a.ClientForAuthorization;
-import com.gh4a.Constants;
+import com.gh4a.BuildConfig;
+import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.TwoFactorAuthException;
-import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.CustomTabsHelper;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
+
+import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.service.UserService;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * The Github4Android activity.
  */
-public class Github4AndroidActivity extends BaseActivity {
+public class Github4AndroidActivity extends BaseActivity implements View.OnClickListener {
+    private static final String OAUTH_URL = "https://github.com/login/oauth/authorize";
+    private static final String TOKEN_URL = "https://github.com/login/oauth/access_token";
+    private static final String PARAM_CLIENT_ID = "client_id";
+    private static final String PARAM_CLIENT_SECRET = "client_secret";
+    private static final String PARAM_CODE = "code";
+    private static final String PARAM_SCOPE = "scope";
+    private static final String PARAM_CALLBACK_URI = "redirect_uri";
+
+    private static final Uri CALLBACK_URI = Uri.parse("gh4a://oauth");
+    private static final String SCOPES = "user,repo,gist";
+
     private static final int REQUEST_SETTINGS = 10000;
+
+    private View mContent;
+    private View mProgress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,7 +77,44 @@ public class Github4AndroidActivity extends BaseActivity {
             finish();
         } else {
             setContentView(R.layout.main);
+
+            AppBarLayout abl = (AppBarLayout) findViewById(R.id.header);
+            abl.setEnabled(false);
+
+            FrameLayout contentContainer = (FrameLayout) findViewById(R.id.content).getParent();
+            contentContainer.setForeground(null);
+
+            findViewById(R.id.login_button).setOnClickListener(this);
+            mContent = findViewById(R.id.welcome_container);
+            mProgress = findViewById(R.id.login_progress_container);
+
+            handleIntent(getIntent());
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        if (!handleIntent(intent)) {
+            super.onNewIntent(intent);
+        }
+    }
+
+    private boolean handleIntent(Intent intent) {
+        Uri data = intent.getData();
+        if (data != null
+                && data.getScheme().equals(CALLBACK_URI.getScheme())
+                && data.getHost().equals(CALLBACK_URI.getHost())) {
+            Uri uri = Uri.parse(TOKEN_URL)
+                    .buildUpon()
+                    .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
+                    .appendQueryParameter(PARAM_CLIENT_SECRET, BuildConfig.CLIENT_SECRET)
+                    .appendQueryParameter(PARAM_CODE, data.getQueryParameter(PARAM_CODE))
+                    .build();
+            new FetchTokenTask(uri).schedule();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -82,7 +130,7 @@ public class Github4AndroidActivity extends BaseActivity {
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
             case R.id.search:
-                startActivity(new Intent(this, SearchActivity.class));
+                startActivity(SearchActivity.makeIntent(this));
                 return true;
             case R.id.bookmarks:
                 startActivity(new Intent(this, BookmarkListActivity.class));
@@ -106,23 +154,6 @@ public class Github4AndroidActivity extends BaseActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.login);
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case Menu.FIRST:
-                doLogin();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SETTINGS) {
             if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)) {
@@ -136,199 +167,107 @@ public class Github4AndroidActivity extends BaseActivity {
         }
     }
 
-    private void doLogin() {
-        EditText loginView = (EditText) findViewById(R.id.et_username_main);
-        EditText passwordView = (EditText) findViewById(R.id.et_password_main);
-
-        UiUtils.hideImeForView(loginView);
-        UiUtils.hideImeForView(passwordView);
-
-        String username = loginView.getText().toString().trim();
-        String password = passwordView.getText().toString();
-
-        // XXX: error view
-        if (!StringUtils.checkEmail(username)) {
-            new LoginTask(username, password).schedule();
-        } else {
-            Toast.makeText(Github4AndroidActivity.this,
-                    getString(R.string.enter_username_toast), Toast.LENGTH_LONG).show();
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.login_button) {
+            triggerLogin();
         }
     }
 
-    private class LoginTask extends ProgressDialogTask<Authorization> {
-        private String mUserName;
-        private String mPassword;
-        private String mOtpCode;
+    @Override
+    public void onRefresh() {
+        super.onRefresh();
+        triggerLogin();
+    }
 
-        /**
-         * Instantiates a new load repository list task.
-         */
-        public LoginTask(String userName, String password) {
-            this(userName, password, null);
-        }
-        
-        public LoginTask(String userName, String password, String otpCode) {
-            super(Github4AndroidActivity.this, R.string.please_wait, R.string.authenticating);
-            mUserName = userName;
-            mPassword = password;
-            mOtpCode = otpCode;
+    private void triggerLogin() {
+        String pkg = CustomTabsHelper.getPackageNameToUse(Github4AndroidActivity.this);
+        Uri uri = Uri.parse(OAUTH_URL)
+                .buildUpon()
+                .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
+                .appendQueryParameter(PARAM_SCOPE, SCOPES)
+                .appendQueryParameter(PARAM_CALLBACK_URI, CALLBACK_URI.toString())
+                .build();
+        if (pkg != null) {
+            int color = UiUtils.resolveColor(Github4AndroidActivity.this, R.attr.colorPrimary);
+            CustomTabsIntent i = new CustomTabsIntent.Builder()
+                    .setToolbarColor(color)
+                    .build();
+            i.intent.setPackage(pkg);
+            i.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.launchUrl(Github4AndroidActivity.this, uri);
+        } else {
+            IntentUtils.launchBrowser(Github4AndroidActivity.this,
+                    uri, Intent.FLAG_ACTIVITY_NEW_TASK);
         }
 
-        protected LoginTask(BaseActivity activity, int resWaitId, int resWaitMsg) {
-            super(activity, resWaitId, resWaitMsg);
+        mContent.setVisibility(View.GONE);
+        mProgress.setVisibility(View.VISIBLE);
+    }
+
+    private class FetchTokenTask extends BackgroundTask<Pair<String, String>> {
+        private Uri mUri;
+        public FetchTokenTask(Uri uri) {
+            super(Github4AndroidActivity.this);
+            mUri = uri;
         }
 
         @Override
-        protected ProgressDialogTask<Authorization> clone() {
-            return new LoginTask(mUserName, mPassword, mOtpCode);
-        }
+        protected Pair<String, String> run() throws Exception {
+            HttpURLConnection connection = null;
+            CharArrayWriter writer = null;
 
-        @Override
-        protected Authorization run() throws IOException {
-            GitHubClient client = new ClientForAuthorization(mOtpCode);
-            client.setCredentials(mUserName, mPassword);
-            client.setUserAgent("Octodroid");
+            try {
+                URL url = new URL(mUri.toString());
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.addRequestProperty("Accept", "application/json");
 
-            String description = "Octodroid - " + Build.MANUFACTURER + " " + Build.MODEL;
-            String fingerprint = getHashedDeviceId();
-            int index = 1;
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    throw new IOException("HTTP failure");
+                }
 
-            OAuthService authService = new OAuthService(client);
-            for (Authorization authorization : authService.getAuthorizations()) {
-                String note = authorization.getNote();
-                if ("Gh4a".equals(note)) {
-                    authService.deleteAuthorization(authorization.getId());
-                } else if (note != null && note.startsWith("Octodroid")) {
-                    if (fingerprint.equals(authorization.getFingerprint())) {
-                        authService.deleteAuthorization(authorization.getId());
-                    } else if (note.startsWith(description)) {
-                        index++;
-                    }
+                InputStream in = new BufferedInputStream(connection.getInputStream());
+                InputStreamReader reader = new InputStreamReader(in, "UTF-8");
+                int length = connection.getContentLength();
+                writer = new CharArrayWriter(Math.max(0, length));
+                char[] tmp = new char[4096];
+
+                int l;
+                while ((l = reader.read(tmp)) != -1) {
+                    writer.write(tmp, 0, l);
+                }
+                JSONObject response = new JSONObject(writer.toString());
+                String token = response.getString("access_token");
+
+                // fetch user information to get user name
+                DefaultClient client = new DefaultClient();
+                client.setOAuth2Token(token);
+                UserService userService = new UserService(client);
+                User user = userService.getUser();
+
+                return Pair.create(user.getLogin(), token);
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                if (writer != null) {
+                    writer.close();
                 }
             }
-
-            if (index > 1) {
-                description += " #" + index;
-            }
-
-            Authorization auth = new Authorization();
-            auth.setNote(description);
-            auth.setUrl("http://github.com/slapperwan/gh4a");
-            auth.setFingerprint(fingerprint);
-            auth.setScopes(Arrays.asList("user", "repo", "gist"));
-
-            return authService.createAuthorization(auth);
         }
 
         @Override
         protected void onError(Exception e) {
-            if (e instanceof TwoFactorAuthException) {
-                if ("sms".equals(((TwoFactorAuthException) e).getTwoFactorAuthType())) {
-                    new DummyPostTask(mUserName, mPassword).schedule();
-                } else {
-                    open2FADialog(mUserName, mPassword);
-                }
-            } else {
-                super.onError(e);
-            }
+            super.onError(e);
+            setErrorViewVisibility(true);
         }
 
         @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.login_failed);
-        }
-
-        @Override
-        protected void onSuccess(Authorization result) {
-            getPrefs().edit()
-                    .putString(Constants.User.AUTH_TOKEN, result.getToken())
-                    .putString(Constants.User.LOGIN, mUserName)
-                    .apply();
-
+        protected void onSuccess(Pair<String, String> result) {
+            Gh4Application.get().setLogin(result.first, result.second);
             goToToplevelActivity();
             finish();
         }
-
-        private String getHashedDeviceId() {
-            String androidId = Settings.Secure.getString(getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
-            if (androidId == null) {
-                // shouldn't happen, do a lame fallback in that case
-                androidId = Build.FINGERPRINT;
-            }
-
-            try {
-                MessageDigest digest = MessageDigest.getInstance("SHA-1");
-                byte[] result = digest.digest(androidId.getBytes("UTF-8"));
-                StringBuilder sb = new StringBuilder();
-                for (byte b : result) {
-                    sb.append(String.format(Locale.US, "%02X", b));
-                }
-                return sb.toString();
-            } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-                // won't happen
-                return androidId;
-            }
-        }
-    }
-
-    // POST request so that GitHub trigger the SMS for OTP
-    private class DummyPostTask extends LoginTask {
-        private String mUserName;
-        private String mPassword;
-
-        public DummyPostTask(String userName, String password) {
-            super(Github4AndroidActivity.this, R.string.please_wait, R.string.authenticating);
-            mUserName = userName;
-            mPassword = password;
-        }
-
-        @Override
-        protected ProgressDialogTask<Authorization> clone() {
-            return new DummyPostTask(mUserName, mPassword);
-        }
-
-        @Override
-        protected Authorization run() throws IOException {
-            GitHubClient client = new ClientForAuthorization(null);
-            client.setCredentials(mUserName, mPassword);
-            client.setUserAgent("Octodroid");
-
-            Authorization auth = new Authorization();
-            auth.setNote("Gh4a login dummy");
-
-            OAuthService authService = new OAuthService(client);
-            return authService.createAuthorization(auth);
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            if (e instanceof TwoFactorAuthException) {
-                open2FADialog(mUserName, mPassword);
-            } else {
-                Toast.makeText(Github4AndroidActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void open2FADialog(final String username, final String password) {
-        LayoutInflater inflater = LayoutInflater.from(Github4AndroidActivity.this);
-        View authDialog = inflater.inflate(R.layout.twofactor_auth_dialog, null);
-        final EditText authCode = (EditText) authDialog.findViewById(R.id.auth_code);
-
-        new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setTitle(R.string.two_factor_auth)
-                .setView(authDialog)
-                .setPositiveButton(R.string.verify, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        LoginTask task = new LoginTask(username,
-                                password, authCode.getText().toString());
-                        task.schedule();
-                    }
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
     }
 }

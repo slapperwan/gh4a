@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/issue_reopen"
+    <item
+        android:id="@+id/issue_reopen"
         android:title="@string/pull_request_reopen"
         app:showAsAction="ifRoom|withText" />
 
-    <item android:id="@+id/issue_close"
+    <item
+        android:id="@+id/issue_close"
         android:title="@string/pull_request_close"
         app:showAsAction="ifRoom|withText" />
 
-    <item android:id="@+id/share"
-        android:title="@string/share"
+    <item
+        android:id="@+id/share"
         android:icon="@drawable/social_share"
-        app:showAsAction="ifRoom" />
+        android:title="@string/share"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/browser"
+        android:icon="@drawable/web_site"
+        android:title="@string/open_in_browser"
+        app:showAsAction="never" />
 </menu>

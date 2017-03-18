@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -9,21 +11,23 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="4dp">
 
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.ItemTitle" />
+                android:textAppearance="@style/TextAppearance.ItemTitle"
+                tools:text="Library title" />
 
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:autoLink="web" />
+                android:autoLink="web"
+                tools:text="https://example.com" />
 
         </LinearLayout>
 

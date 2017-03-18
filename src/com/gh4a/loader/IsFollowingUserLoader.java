@@ -10,7 +10,7 @@ import com.gh4a.Gh4Application;
 
 public class IsFollowingUserLoader extends BaseLoader<Boolean> {
 
-    private String mLogin;
+    private final String mLogin;
 
     public IsFollowingUserLoader(Context context, String login) {
         super(context);

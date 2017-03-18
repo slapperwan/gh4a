@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/pull_merge"
+    <item
+        android:id="@+id/pull_merge"
         android:title="@string/pull_request_merge"
         app:showAsAction="ifRoom|withText" />
 
-    <item android:id="@+id/pull_reopen"
+    <item
+        android:id="@+id/pull_reopen"
         android:title="@string/pull_request_reopen"
         app:showAsAction="ifRoom|withText" />
 
-    <item android:id="@+id/pull_close"
+    <item
+        android:id="@+id/pull_close"
         android:title="@string/pull_request_close"
         app:showAsAction="ifRoom|withText" />
 
-    <item android:id="@+id/share"
+    <item
+        android:id="@+id/share"
         android:title="@string/share"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/browser"
+        android:title="@string/open_in_browser"
         app:showAsAction="never" />
 </menu>

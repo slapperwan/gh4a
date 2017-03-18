@@ -59,7 +59,16 @@ Main features
 
 How to Build Octodroid
 ----------------------
-- Ensure Android SDK platform version 19 and build-tools version 19.1.0 are installed
+- Ensure Android SDK platform version 24 and build-tools version 24.0.0 are installed
+- Register an application for your OctoDroid usage under your [GitHub settings](https://github.com/settings/developers)
+  * naming is up to you
+  * callback URL must be gh4a://oauth
+- Create a gradle.properties file with the following content:
+```
+ClientId="<CLIENT ID DISPLAYED IN APPLICATION SETTINGS>"
+ClientSecret="<CLIENT SECRET DISPLAYED IN APPLICATION SETTINGS>"
+```
+
 - Build using Gradle
 
 ```bash
@@ -79,8 +88,6 @@ Open Source Libraries
 * [GitHub Java API](https://github.com/maniac103/egit-github/tree/master/org.eclipse.egit.github.core)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [Material Design Icons](https://github.com/google/material-design-icons)
-* [Nine Old Androids](https://github.com/JakeWharton/NineOldAndroids)
-* [ProgressFragment](https://github.com/johnkil/Android-ProgressFragment)
 * [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar)
 
 Contributions

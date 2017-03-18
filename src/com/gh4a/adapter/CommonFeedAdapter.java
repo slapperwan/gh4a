@@ -27,12 +27,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.holder.Feed;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 
 public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewHolder> {
-    private boolean mShowExtra;
+    private final boolean mShowExtra;
 
     public CommonFeedAdapter(Context context, boolean showExtra) {
         super(context);
@@ -40,7 +40,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewH
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_feed, parent, false);
         ViewHolder holder = new ViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
@@ -82,7 +82,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewH
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Feed feed = (Feed) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, feed.getAuthor());
+            Intent intent = UserActivity.makeIntent(mContext, feed.getAuthor());
             if (intent != null) {
                 mContext.startActivity(intent);
             }
@@ -101,10 +101,10 @@ public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewH
             tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvTitle;
-        private TextView tvDesc;
-        private TextView tvExtra;
-        private TextView tvTimestamp;
+        private final ImageView ivGravatar;
+        private final TextView tvTitle;
+        private final TextView tvDesc;
+        private final TextView tvExtra;
+        private final TextView tvTimestamp;
     }
 }

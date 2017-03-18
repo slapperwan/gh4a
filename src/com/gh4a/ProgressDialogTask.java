@@ -1,24 +1,23 @@
 package com.gh4a;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.view.View;
 
+import com.gh4a.utils.UiUtils;
+
 public abstract class ProgressDialogTask<T> extends BackgroundTask<T>
         implements View.OnClickListener {
     private ProgressDialogFragment mFragment;
     private BaseActivity mActivity;
-    private int mTitleResId;
-    private int mMessageResId;
+    private final int mMessageResId;
 
-    public ProgressDialogTask(BaseActivity activity, int titleResId, int messageResId) {
+    public ProgressDialogTask(BaseActivity activity, int messageResId) {
         super(activity);
         mActivity = activity;
-        mTitleResId = titleResId;
         mMessageResId = messageResId;
     }
 
@@ -28,7 +27,6 @@ public abstract class ProgressDialogTask<T> extends BackgroundTask<T>
     @Override
     protected void onPreExecute() {
         Bundle args = new Bundle();
-        args.putInt("title_res", mTitleResId);
         args.putInt("message_res", mMessageResId);
         mFragment = new ProgressDialogFragment();
         mFragment.setArguments(args);
@@ -64,17 +62,8 @@ public abstract class ProgressDialogTask<T> extends BackgroundTask<T>
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            ProgressDialog pd = new ProgressDialog(getActivity());
-            Bundle args = getArguments();
-            int titleResId = args.getInt("title_res", 0);
-            int messageResId = args.getInt("message_res", 0);
-
-            pd.setMessage(getString(messageResId));
-            if (titleResId != 0) {
-                pd.setTitle(titleResId);
-            }
-
-            return pd;
+            int messageResId = getArguments().getInt("message_res", 0);
+            return UiUtils.createProgressDialog(getActivity(), messageResId);
         }
     }
 }

@@ -15,10 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import java.util.Locale;
-
-import org.eclipse.egit.github.core.Repository;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Formatter;
@@ -31,6 +27,10 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.Repository;
+
+import java.util.Locale;
+
 public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter.ViewHolder>
         implements Filterable {
     public RepositoryAdapter(Context context) {
@@ -38,7 +38,7 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_repo, parent, false);
         return new ViewHolder(v);
     }
@@ -60,6 +60,7 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
         holder.tvStars.setText(String.valueOf(repository.getWatchers()));
         holder.tvSize.setText(Formatter.formatFileSize(mContext, 1024L * repository.getSize()));
         holder.tvPrivate.setVisibility(repository.isPrivate() ? View.VISIBLE : View.GONE);
+        holder.tvFork.setVisibility(repository.isFork() ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -79,14 +80,16 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
             tvStars = (TextView) view.findViewById(R.id.tv_stars);
             tvSize = (TextView) view.findViewById(R.id.tv_size);
             tvPrivate = (TextView) view.findViewById(R.id.tv_private);
+            tvFork = (TextView) view.findViewById(R.id.tv_fork);
         }
 
-        private TextView tvTitle;
-        private TextView tvDesc;
-        private TextView tvLanguage;
-        private TextView tvForks;
-        private TextView tvStars;
-        private TextView tvSize;
-        private TextView tvPrivate;
+        private final TextView tvTitle;
+        private final TextView tvDesc;
+        private final TextView tvLanguage;
+        private final TextView tvForks;
+        private final TextView tvStars;
+        private final TextView tvSize;
+        private final TextView tvPrivate;
+        private final TextView tvFork;
     }
 }

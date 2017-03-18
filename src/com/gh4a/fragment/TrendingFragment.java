@@ -16,25 +16,28 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.holder.Trend;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TrendLoader;
-import com.gh4a.utils.IntentUtils;
 
 import java.util.List;
 
-public class TrendingFragment extends ListDataBaseFragment<Trend> {
+public class TrendingFragment extends ListDataBaseFragment<Trend> implements
+        RootAdapter.OnItemClickListener<Trend> {
     public static final String TYPE_DAILY = "daily";
     public static final String TYPE_WEEKLY = "weekly";
     public static final String TYPE_MONTHLY = "monthly";
 
     private String mType;
+    private @StringRes int mStarsTemplate;
 
     public static TrendingFragment newInstance(String type) {
         if (type == null) {
@@ -44,6 +47,12 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
         TrendingFragment f = new TrendingFragment();
         Bundle args = new Bundle();
         args.putString("type", type);
+        switch (type) {
+            case TYPE_DAILY: args.putInt("stars_template", R.string.trend_stars_today); break;
+            case TYPE_WEEKLY: args.putInt("stars_template", R.string.trend_stars_week); break;
+            case TYPE_MONTHLY: args.putInt("stars_template", R.string.trend_stars_month); break;
+            default: throw new IllegalArgumentException();
+        }
         f.setArguments(args);
 
         return f;
@@ -53,11 +62,14 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mType = getArguments().getString("type");
+        mStarsTemplate = getArguments().getInt("stars_template", 0);
     }
 
     @Override
     protected RootAdapter<Trend, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new TrendAdapter(getActivity());
+        TrendAdapter adapter = new TrendAdapter(getActivity(), mStarsTemplate);
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override
@@ -70,7 +82,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> {
         String owner = trend.getRepoOwner();
         String name = trend.getRepoName();
         if (owner != null && name != null) {
-            startActivity(IntentUtils.getRepoActivityIntent(getActivity(), owner, name, null));
+            startActivity(RepositoryActivity.makeIntent(getActivity(), owner, name));
         }
     }
 

@@ -15,20 +15,27 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 
 public class RepositoryListActivity extends FragmentContainerActivity implements
         RepositoryListContainerFragment.Callback {
+    public static Intent makeIntent(Context context, String user, boolean userIsOrg) {
+        return new Intent(context, RepositoryListActivity.class)
+                .putExtra("user", user)
+                .putExtra("is_org", userIsOrg);
+    }
+
     private String mUserLogin;
-    private String mUserType;
+    private boolean mUserIsOrg;
     private RepositoryListContainerFragment mFragment;
     private RepositoryListContainerFragment.FilterDrawerHelper mFilterDrawerHelper;
     private RepositoryListContainerFragment.SortDrawerHelper mSortDrawerHelper;
@@ -51,17 +58,17 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
         Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString(Constants.User.LOGIN);
-        mUserType = data.getString(Constants.User.TYPE);
+        mUserLogin = data.getString("user");
+        mUserIsOrg = data.getBoolean("is_org");
 
         mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(
-                mUserLogin, mUserType);
+                mUserLogin, mUserIsOrg);
         mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
     }
 
     @Override
     protected Fragment onCreateFragment() {
-        return RepositoryListContainerFragment.newInstance(mUserLogin, mUserType);
+        return RepositoryListContainerFragment.newInstance(mUserLogin, mUserIsOrg);
     }
 
     @Override

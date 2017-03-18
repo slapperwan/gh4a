@@ -27,7 +27,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.activities.CommitHistoryActivity;
 import com.gh4a.utils.FileUtils;
@@ -42,8 +41,8 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
         implements View.OnCreateContextMenuListener {
     private static final int MENU_HISTORY = 1;
 
-    private Repository mRepository;
-    private String mRef;
+    private final Repository mRepository;
+    private final String mRef;
     private Set<String> mSubModuleNames;
 
     public FileAdapter(Context context, Repository repository, String ref) {
@@ -58,7 +57,7 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_file_manager, parent, false);
         v.setOnCreateContextMenuListener(this);
         return new ViewHolder(v);
@@ -69,12 +68,9 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
         ViewHolder holder = (ViewHolder) v.getTag();
 
         if (mSubModuleNames == null || !mSubModuleNames.contains(holder.contents.getName())) {
-            Intent historyIntent = new Intent(mContext, CommitHistoryActivity.class);
-            historyIntent.putExtra(Constants.Repository.OWNER, mRepository.getOwner().getLogin());
-            historyIntent.putExtra(Constants.Repository.NAME, mRepository.getName());
-            historyIntent.putExtra(Constants.Object.PATH, holder.contents.getPath());
-            historyIntent.putExtra(Constants.Object.REF, mRef);
-
+            Intent historyIntent = CommitHistoryActivity.makeIntent(mContext,
+                    mRepository.getOwner().getLogin(), mRepository.getName(),
+                    mRef, holder.contents.getPath());
             menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history).setIntent(historyIntent);
         }
     }
@@ -121,8 +117,8 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
 
         private RepositoryContents contents;
 
-        private ImageView icon;
-        private TextView fileName;
-        private TextView fileSize;
+        private final ImageView icon;
+        private final TextView fileName;
+        private final TextView fileSize;
     }
 }

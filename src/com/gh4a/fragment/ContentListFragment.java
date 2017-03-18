@@ -19,7 +19,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -34,7 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> {
+public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> implements
+        RootAdapter.OnItemClickListener<RepositoryContents> {
     private Repository mRepository;
     private String mPath;
     private String mRef;
@@ -53,10 +53,10 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
         ContentListFragment f = new ContentListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.Object.PATH, path);
-        args.putString(Constants.Object.REF, ref);
-        args.putSerializable("REPOSITORY", repository);
-        args.putSerializable("CONTENTS", contents);
+        args.putString("path", path);
+        args.putString("ref", ref);
+        args.putSerializable("repo", repository);
+        args.putSerializable("contents", contents);
         f.setArguments(args);
 
         return f;
@@ -65,9 +65,9 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepository = (Repository) getArguments().getSerializable("REPOSITORY");
-        mPath = getArguments().getString(Constants.Object.PATH);
-        mRef = getArguments().getString(Constants.Object.REF);
+        mRepository = (Repository) getArguments().getSerializable("repo");
+        mPath = getArguments().getString("path");
+        mRef = getArguments().getString("ref");
         if (StringUtils.isBlank(mRef)) {
             mRef = mRepository.getDefaultBranch();
         }
@@ -89,6 +89,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     protected RootAdapter<RepositoryContents, ?> onCreateAdapter() {
         mAdapter = new FileAdapter(getActivity(), mRepository, mRef);
         mAdapter.setSubModuleNames(mCallback.getSubModuleNames(this));
+        mAdapter.setOnItemClickListener(this);
         return mAdapter;
     }
 
@@ -124,7 +125,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
                 mRepository.getOwner().getLogin(), mRepository.getName(), mPath, mRef);
         @SuppressWarnings("unchecked")
         ArrayList<RepositoryContents> contents =
-                (ArrayList<RepositoryContents>) getArguments().getSerializable("CONTENTS");
+                (ArrayList<RepositoryContents>) getArguments().getSerializable("contents");
         if (contents != null) {
             loader.prefillData(contents);
         }

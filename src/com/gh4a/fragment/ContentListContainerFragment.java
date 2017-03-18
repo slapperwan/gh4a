@@ -14,10 +14,11 @@ import android.view.ViewGroup;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
+import com.gh4a.activities.FileViewerActivity;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.loader.GitModuleParserLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.PathBreadcrumbs;
 import com.gh4a.widget.SwipeRefreshLayout;
 
@@ -46,10 +47,10 @@ public class ContentListContainerFragment extends Fragment implements
     private Repository mRepository;
     private String mSelectedRef;
     private Map<String, String> mGitModuleMap;
-    private Stack<String> mDirStack = new Stack<>();
+    private final Stack<String> mDirStack = new Stack<>();
     private ArrayList<String> mInitialPathToLoad;
     private boolean mStateSaved;
-    private Map<String, ArrayList<RepositoryContents>> mContentCache =
+    private final Map<String, ArrayList<RepositoryContents>> mContentCache =
             new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
         private static final long serialVersionUID = -2379579224736389357L;
         private static final int MAX_CACHE_ENTRIES = 100;
@@ -60,12 +61,12 @@ public class ContentListContainerFragment extends Fragment implements
         }
     };
 
-    private LoaderCallbacks<Map<String, String>> mGitModuleCallback =
+    private final LoaderCallbacks<Map<String, String>> mGitModuleCallback =
             new LoaderCallbacks<Map<String, String>>(this) {
         @Override
         protected Loader<LoaderResult<Map<String, String>>> onCreateLoader() {
             return new GitModuleParserLoader(getActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), ".gitmodules", mSelectedRef);
+                    mRepository.getName(), mSelectedRef);
         }
         @Override
         protected void onResultReady(Map<String, String> result) {
@@ -253,10 +254,9 @@ public class ContentListContainerFragment extends Fragment implements
             addFragmentForTopOfStack();
         } else if (mGitModuleMap != null && mGitModuleMap.get(path) != null) {
             String[] userRepo = mGitModuleMap.get(path).split("/");
-            startActivity(IntentUtils.getRepoActivityIntent(getActivity(),
-                    userRepo[0], userRepo[1], null));
+            startActivity(RepositoryActivity.makeIntent(getActivity(), userRepo[0], userRepo[1]));
         } else {
-            startActivity(IntentUtils.getFileViewerActivityIntent(getActivity(),
+            startActivity(FileViewerActivity.makeIntent(getActivity(),
                     mRepository.getOwner().getLogin(), mRepository.getName(),
                     getCurrentRef(), content.getPath()));
         }

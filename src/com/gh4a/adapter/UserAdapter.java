@@ -26,8 +26,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class UserAdapter extends RootAdapter<User, UserAdapter.ViewHolder> {
@@ -36,7 +36,7 @@ public class UserAdapter extends RootAdapter<User, UserAdapter.ViewHolder> {
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_user, parent, false);
         ViewHolder holder = new ViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
@@ -55,7 +55,7 @@ public class UserAdapter extends RootAdapter<User, UserAdapter.ViewHolder> {
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             User user = (User) v.getTag();
-            mContext.startActivity(IntentUtils.getUserActivityIntent(mContext, user));
+            mContext.startActivity(UserActivity.makeIntent(mContext, user));
         } else {
             super.onClick(v);
         }
@@ -68,7 +68,7 @@ public class UserAdapter extends RootAdapter<User, UserAdapter.ViewHolder> {
             tvTitle = (TextView) view.findViewById(R.id.tv_title);
         }
 
-        private TextView tvTitle;
-        private ImageView ivGravatar;
+        private final TextView tvTitle;
+        private final ImageView ivGravatar;
     }
 }

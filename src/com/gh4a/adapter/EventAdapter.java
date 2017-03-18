@@ -62,9 +62,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.EllipsizeLineSpan;
@@ -76,7 +76,8 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
     }
 
     @Override
-    public EventViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public EventViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent,
+            int viewType) {
         View v = inflater.inflate(R.layout.row_event, parent, false);
         EventViewHolder holder = new EventViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
@@ -105,7 +106,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             User actor = (User) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, actor);
+            Intent intent = UserActivity.makeIntent(mContext, actor);
             if (intent != null) {
                 mContext.startActivity(intent);
             }
@@ -477,10 +478,10 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
             tvCreatedAt = (TextView) view.findViewById(R.id.tv_created_at);
         }
 
-        private ImageView ivGravatar;
-        private TextView tvActor;
-        private StyleableTextView tvTitle;
-        private StyleableTextView tvDesc;
-        private TextView tvCreatedAt;
+        private final ImageView ivGravatar;
+        private final TextView tvActor;
+        private final StyleableTextView tvTitle;
+        private final StyleableTextView tvDesc;
+        private final TextView tvCreatedAt;
     }
 }

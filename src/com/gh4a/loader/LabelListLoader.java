@@ -12,8 +12,8 @@ import com.gh4a.Gh4Application;
 
 public class LabelListLoader extends BaseLoader<List<Label>> {
 
-    private String mRepoOwner;
-    private String mRepoName;
+    private final String mRepoOwner;
+    private final String mRepoName;
 
     public LabelListLoader(Context context, String repoOwner, String repoName) {
         super(context);

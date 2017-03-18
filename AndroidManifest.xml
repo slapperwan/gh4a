@@ -12,20 +12,28 @@
         android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
         android:name="com.gh4a.Gh4Application"
         android:allowBackup="true"
         android:icon="@drawable/octodroid"
-        android:label="@string/app_name">
+        android:label="@string/app_name"
+        android:theme="@style/LightTheme">
         <activity
             android:name=".activities.Github4AndroidActivity"
+            android:launchMode="singleTop"
             android:configChanges="orientation|screenSize" >
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN" />
                 <category
                     android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <data android:scheme="gh4a" android:host="oauth" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
         </activity>
 
@@ -34,12 +42,16 @@
             android:label="@string/app_name"
             android:targetActivity=".activities.Github4AndroidActivity"/>
 
-        <activity android:name=".activities.BlogActivity" android:exported="false" />
+        <activity android:name=".activities.BlogActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize" />
         <activity android:name=".activities.BlogListActivity" android:exported="false" />
         <activity android:name=".activities.BookmarkListActivity" android:exported="false" />
         <activity android:name=".activities.CollaboratorListActivity" android:exported="false" />
         <activity android:name=".activities.CommitActivity" android:exported="false" />
-        <activity android:name=".activities.CommitDiffViewerActivity" android:exported="false" />
+        <activity android:name=".activities.CommitDiffViewerActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize" />
         <activity android:name=".activities.CommitHistoryActivity" android:exported="false" />
         <activity android:name=".activities.CompareActivity" android:exported="false" />
         <activity android:name=".activities.ContributorListActivity" android:exported="false" />
@@ -47,12 +59,16 @@
         <activity android:name=".activities.EditCommitCommentActivity" android:exported="false" />
         <activity android:name=".activities.EditIssueCommentActivity" android:exported="false" />
         <activity android:name=".activities.EditPullRequestCommentActivity" android:exported="false" />
-        <activity android:name=".activities.FileViewerActivity" android:exported="false" />
+        <activity android:name=".activities.FileViewerActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize" />
         <activity android:name=".activities.ForkListActivity" android:exported="false" />
         <activity android:name=".activities.FollowerFollowingListActivity" android:exported="false" />
         <activity android:name=".activities.GistActivity" android:exported="false" />
         <activity android:name=".activities.GistListActivity" android:exported="false" />
-        <activity android:name=".activities.GistViewerActivity" android:exported="false" />
+        <activity android:name=".activities.GistViewerActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize" />
         <activity android:name=".activities.IssueActivity" android:exported="false" />
         <activity android:name=".activities.IssueEditActivity" android:exported="false" />
         <activity android:name=".activities.IssueLabelListActivity" android:exported="false" />
@@ -61,8 +77,9 @@
         <activity android:name=".activities.IssueMilestoneListActivity" android:exported="false" />
         <activity android:name=".activities.OrganizationMemberListActivity" android:exported="false" />
         <activity android:name=".activities.PullRequestActivity" android:exported="false" />
-        <activity android:name=".activities.PullRequestListActivity" android:exported="false" />
-        <activity android:name=".activities.PullRequestDiffViewerActivity" android:exported="false" />
+        <activity android:name=".activities.PullRequestDiffViewerActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize" />
         <activity android:name=".activities.ReleaseInfoActivity" android:exported="false" />
         <activity android:name=".activities.ReleaseListActivity" android:exported="false" />
         <activity android:name=".activities.RepositoryActivity" android:exported="false" />
@@ -72,7 +89,9 @@
         <activity android:name=".activities.TrendingActivity" android:exported="false" />
         <activity android:name=".activities.UserActivity" android:exported="false" />
         <activity android:name=".activities.WatcherListActivity" android:exported="false" />
-        <activity android:name=".activities.WikiActivity" android:exported="false" />
+        <activity android:name=".activities.WikiActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize" />
         <activity android:name=".activities.WikiListActivity" android:exported="false" />
         <activity android:name=".activities.home.HomeActivity" android:exported="false" />
 
@@ -109,6 +128,11 @@
         <provider
             android:name=".db.BookmarksProvider"
             android:authorities="com.gh4a"
+            android:exported="false" />
+
+        <provider
+            android:name=".db.SuggestionsProvider"
+            android:authorities="com.gh4a.SuggestionsProvider"
             android:exported="false" />
 
         <receiver

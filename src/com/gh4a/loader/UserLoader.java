@@ -11,7 +11,7 @@ import com.gh4a.Gh4Application;
 
 public class UserLoader extends BaseLoader<User> {
 
-    private String mLogin;
+    private final String mLogin;
 
     public UserLoader(Context context, String login) {
         super(context);

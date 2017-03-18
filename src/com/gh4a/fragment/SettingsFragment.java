@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
@@ -18,7 +17,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueEditActivity;
@@ -78,10 +76,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
         mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
         mOpenSourcePref.setOnPreferenceClickListener(this);
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            getPreferenceScreen().removePreference(findPreference(KEY_GIF_LOADING));
-        }
 
         updateLogoutPrefState();
     }
@@ -179,10 +173,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                         context.getString(R.string.send_email_title));
                 context.startActivity(chooserIntent);
             } else if (id == R.id.btn_by_gh4a) {
-                Intent intent = new Intent(context, IssueEditActivity.class);
-                intent.putExtra(Constants.Repository.OWNER,
-                        context.getString(R.string.my_username));
-                intent.putExtra(Constants.Repository.NAME,
+                Intent intent = IssueEditActivity.makeCreateIntent(context,
+                        context.getString(R.string.my_username),
                         context.getString(R.string.my_repo));
                 context.startActivity(intent);
             }
@@ -208,16 +200,14 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         private static final String[][] COMPONENTS = new String[][] {
             { "android-gif-drawable", "https://github.com/koral--/android-gif-drawable" },
             { "AndroidSVG", "https://github.com/BigBadaboom/androidsvg" },
-            { "Android-ProgressFragment", "https://github.com/johnkil/Android-ProgressFragment" },
             { "Github Java bindings", "https://github.com/maniac103/egit-github" },
             { "HoloColorPicker", "https://github.com/LarsWerkman/HoloColorPicker" },
             { "Material Design Icons", "https://github.com/google/material-design-icons" },
-            { "Nine Old Androids", "https://github.com/JakeWharton/NineOldAndroids" },
             { "PrettyTime", "https://github.com/ocpsoft/prettytime" },
             { "SmoothProgressBar", "https://github.com/castorflex/SmoothProgressBar" }
         };
 
-        private LayoutInflater mInflater;
+        private final LayoutInflater mInflater;
 
         public OpenSourceComponentAdapter(Context context) {
             mInflater = LayoutInflater.from(context);

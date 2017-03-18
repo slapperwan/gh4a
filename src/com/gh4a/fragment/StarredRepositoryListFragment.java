@@ -22,39 +22,38 @@ import org.eclipse.egit.github.core.service.StarService;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
 
 import java.util.HashMap;
 
 public class StarredRepositoryListFragment extends PagedDataBaseFragment<Repository> {
-    private String mLogin;
-    private String mSortOrder;
-    private String mSortDirection;
-
     public static StarredRepositoryListFragment newInstance(String login,
             String sortOrder, String sortDirection) {
         StarredRepositoryListFragment f = new StarredRepositoryListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.LOGIN, login);
-        args.putString("sortOrder", sortOrder);
-        args.putString("sortDirection", sortDirection);
+        args.putString("user", login);
+        args.putString("sort_order", sortOrder);
+        args.putString("sort_direction", sortDirection);
         f.setArguments(args);
 
         return f;
     }
 
+    private String mLogin;
+    private String mSortOrder;
+    private String mSortDirection;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.LOGIN);
-        mSortOrder = getArguments().getString("sortOrder");
-        mSortDirection = getArguments().getString("sortDirection");
+        mLogin = getArguments().getString("user");
+        mSortOrder = getArguments().getString("sort_order");
+        mSortDirection = getArguments().getString("sort_direction");
     }
 
     @Override
@@ -69,7 +68,7 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
 
     @Override
     public void onItemClick(Repository repository) {
-        IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
+        startActivity(RepositoryActivity.makeIntent(getActivity(), repository));
     }
 
     @Override

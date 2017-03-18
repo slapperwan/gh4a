@@ -2,6 +2,7 @@ package com.gh4a.utils;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
 import android.text.TextUtils;
 
 import com.gh4a.R;
@@ -11,7 +12,26 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.User;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class ApiHelpers {
+    public interface IssueState {
+        String OPEN = "open";
+        String CLOSED = "closed";
+        String MERGED = "merged";
+        String UNMERGED = "unmerged";
+    }
+
+    public interface UserType {
+        String USER = "User";
+        String ORG = "Organization";
+    }
+
+    public interface MilestoneState {
+        String OPEN = "open";
+        String CLOSED = "closed";
+    }
 
     //RepositoryCommit
     public static String getAuthorName(Context context, RepositoryCommit commit) {
@@ -81,5 +101,51 @@ public class ApiHelpers {
 
     public static boolean loginEquals(String user, String login) {
         return user != null && user.equalsIgnoreCase(login);
+    }
+
+    public static Uri normalizeUri(Uri uri) {
+        if (uri == null || uri.getAuthority() == null) {
+            return uri;
+        }
+
+        // Only normalize API links
+        if (!uri.getPath().contains("/api/v3/") && !uri.getAuthority().contains("api.")) {
+            return uri;
+        }
+
+        String path = uri.getPath()
+                .replace("/api/v3/", "/")
+                .replace("repos/", "")
+                .replace("commits/", "commit/")
+                .replace("pulls/", "pull/");
+
+        String authority = uri.getAuthority()
+                .replace("api.", "");
+
+        return uri.buildUpon()
+                .path(path)
+                .authority(authority)
+                .build();
+    }
+
+    public static String md5(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(input.getBytes());
+            byte[] messageDigest = digest.digest();
+
+            StringBuilder builder = new StringBuilder();
+            for (byte b : messageDigest) {
+                String hexString = Integer.toHexString(0xFF & b);
+                while (hexString.length() < 2) {
+                    hexString = "0" + hexString;
+                }
+                builder.append(hexString);
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

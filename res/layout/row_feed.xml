@@ -2,19 +2,21 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?attr/listPreferredItemHeight"
     android:background="?attr/selectableItemBackground"
+    android:minHeight="?attr/listPreferredItemHeight"
     android:padding="@dimen/content_padding">
 
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/iv_gravatar"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_marginTop="8dp"
         android:layout_marginRight="16dp"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:layout_marginTop="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        tools:src="@drawable/default_avatar" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_extra"
@@ -23,35 +25,39 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="username" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/tv_extra"
         android:layout_alignBaseline="@id/tv_extra"
         android:layout_marginLeft="16dp"
-        android:textAppearance="@style/TextAppearance.VerySmall" />
+        android:layout_toRightOf="@id/tv_extra"
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="yesterday" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/iv_gravatar"
         android:layout_below="@id/tv_extra"
+        android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="@style/TextAppearance.ItemTitle"
+        android:textSize="16sp"
         app:font="boldCondensed"
-        android:textSize="16sp" />
+        tools:text="Feed item title" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/iv_gravatar"
         android:layout_below="@id/tv_title"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:ellipsize="end"
         android:maxLines="2"
-        android:ellipsize="end" />
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        tools:text="Feed item description" />
 
 </RelativeLayout>

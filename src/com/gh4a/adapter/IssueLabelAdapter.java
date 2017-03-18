@@ -54,7 +54,7 @@ public class IssueLabelAdapter extends
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_issue_label, parent, false);
         final ViewHolder holder = new ViewHolder(v);
 
@@ -156,11 +156,11 @@ public class IssueLabelAdapter extends
 
         private EditableLabel lastAssignedLabel;
 
-        private View color;
-        private StyleableTextView label;
-        private EditText editor;
-        private TextView customColorButton;
-        private View collapsedContainer;
-        private View expandedContainer;
+        private final View color;
+        private final StyleableTextView label;
+        private final EditText editor;
+        private final TextView customColorButton;
+        private final View collapsedContainer;
+        private final View expandedContainer;
     }
 }

@@ -11,8 +11,8 @@ import com.gh4a.Gh4Application;
 
 public class IsWatchingLoader extends BaseLoader<Boolean> {
 
-    private String mRepoOwner;
-    private String mRepoName;
+    private final String mRepoOwner;
+    private final String mRepoName;
 
     public IsWatchingLoader(Context context, String repoOwner, String repoName) {
         super(context);

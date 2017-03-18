@@ -27,7 +27,6 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.client.PageIterator;
 
@@ -43,15 +42,15 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     private static final String STATE_KEY_ITERATOR_STATE = "iterator_state";
 
-    private LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>> mLoaderCallback =
-            new LoaderCallbacks<PageIteratorLoader<T>.LoadedPage<T>>(this) {
+    private final LoaderCallbacks<PageIteratorLoader<T>.LoadedPage> mLoaderCallback =
+            new LoaderCallbacks<PageIteratorLoader<T>.LoadedPage>(this) {
         @Override
-        protected Loader<LoaderResult<PageIteratorLoader<T>.LoadedPage<T>>> onCreateLoader() {
+        protected Loader<LoaderResult<PageIteratorLoader<T>.LoadedPage>> onCreateLoader() {
             return new PageIteratorLoader<>(getActivity(), mIterator);
         }
 
         @Override
-        protected void onResultReady(PageIteratorLoader<T>.LoadedPage<T> result) {
+        protected void onResultReady(PageIteratorLoader<T>.LoadedPage result) {
             fillData(result.results, result.hasMoreData);
             mIsLoadCompleted = true;
             setContentShown(true);
@@ -64,7 +63,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setEmptyText(getString(getEmptyTextResId()));
         setContentShown(false);
 
         mIterator = (PageIteratorWithSaveableState<T>) onCreateIterator();
@@ -93,30 +91,25 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
+    protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
+        super.onRecyclerViewInflated(view, inflater);
         mAdapter = onCreateAdapter();
 
-        super.onViewCreated(view, savedInstanceState);
-
-        RecyclerView recyclerView = getRecyclerView();
-        LayoutInflater inflater = getLayoutInflater(savedInstanceState);
-        View loadingContainer = inflater.inflate(R.layout.list_loading_view, recyclerView, false);
-        mLoadingView = loadingContainer.findViewById(R.id.loading);
-        mLoadingView.setVisibility(View.GONE);
-
-        mAdapter.setFooterView(loadingContainer, this);
+        mLoadingView = inflater.inflate(R.layout.list_loading_view, view, false);
+        mAdapter.setFooterView(mLoadingView, this);
         mAdapter.setOnItemClickListener(this);
-        if (!mAdapter.isCardStyle()) {
-            recyclerView.setBackgroundResource(
-                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
-        }
-        recyclerView.setAdapter(mAdapter);
+        view.setAdapter(mAdapter);
         updateEmptyState();
     }
 
     @Override
     protected boolean hasDividers() {
         return !mAdapter.isCardStyle();
+    }
+
+    @Override
+    protected boolean hasCards() {
+        return mAdapter.isCardStyle();
     }
 
     private void fillData(Collection<T> data, boolean hasMoreData) {
@@ -152,7 +145,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         }
     }
 
-    protected abstract int getEmptyTextResId();
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
     protected abstract PageIterator<T> onCreateIterator();
     public abstract void onItemClick(T item);

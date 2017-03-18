@@ -9,7 +9,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -17,15 +16,16 @@ import com.gh4a.loader.DownloadsLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.UiUtils;
 
-public class DownloadsFragment extends ListDataBaseFragment<Download> {
+public class DownloadsFragment extends ListDataBaseFragment<Download> implements
+        RootAdapter.OnItemClickListener<Download> {
     private String mRepoOwner;
     private String mRepoName;
 
     public static DownloadsFragment newInstance(String repoOwner, String repoName) {
         DownloadsFragment f = new DownloadsFragment();
         Bundle args = new Bundle();
-        args.putString(Constants.Repository.OWNER, repoOwner);
-        args.putString(Constants.Repository.NAME, repoName);
+        args.putString("owner", repoOwner);
+        args.putString("repo", repoName);
         f.setArguments(args);
         return f;
     }
@@ -33,13 +33,15 @@ public class DownloadsFragment extends ListDataBaseFragment<Download> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString(Constants.Repository.OWNER);
-        mRepoName = getArguments().getString(Constants.Repository.NAME);
+        mRepoOwner = getArguments().getString("owner");
+        mRepoName = getArguments().getString("repo");
     }
 
     @Override
     protected RootAdapter<Download, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        return new DownloadAdapter(getActivity());
+        DownloadAdapter adapter = new DownloadAdapter(getActivity());
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override

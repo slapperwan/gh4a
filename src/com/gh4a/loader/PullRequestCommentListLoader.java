@@ -1,30 +1,24 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import android.content.Context;
+
+import com.gh4a.Gh4Application;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
-import android.content.Context;
-
-import com.gh4a.Gh4Application;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class PullRequestCommentListLoader extends IssueCommentListLoader {
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mIssueNumber;
 
     public PullRequestCommentListLoader(Context context, String repoOwner,
             String repoName, int issueNumber) {
-        super(context, repoOwner, repoName, issueNumber);
-        mRepoOwner = repoOwner;
-        mRepoName = repoName;
-        mIssueNumber = issueNumber;
+        super(context, repoOwner, repoName, issueNumber, true);
     }
 
     @Override

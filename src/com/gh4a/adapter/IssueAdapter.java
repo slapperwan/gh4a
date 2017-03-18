@@ -25,9 +25,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.LabelBadgeView;
 
@@ -39,7 +39,7 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_issue, parent, false);
         ViewHolder holder = new ViewHolder(v);
         holder.ivGravatar.setOnClickListener(this);
@@ -47,7 +47,7 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, Issue issue) {
+    protected void onBindViewHolder(ViewHolder holder, Issue issue) {
         AvatarHandler.assignAvatar(holder.ivGravatar, issue.getUser());
         holder.ivGravatar.setTag(issue);
 
@@ -77,7 +77,7 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Issue issue = (Issue) v.getTag();
-            Intent intent = IntentUtils.getUserActivityIntent(mContext, issue.getUser());
+            Intent intent = UserActivity.makeIntent(mContext, issue.getUser());
             if (intent != null) {
                 mContext.startActivity(intent);
             }
@@ -99,13 +99,13 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
             tvMilestone = (TextView) view.findViewById(R.id.tv_milestone);
         }
 
-        ImageView ivGravatar;
-        TextView tvNumber;
-        TextView tvDesc;
-        TextView tvCreator;
-        TextView tvTimestamp;
-        LabelBadgeView lvLabels;
-        TextView tvComments;
-        TextView tvMilestone;
+        final ImageView ivGravatar;
+        final TextView tvNumber;
+        final TextView tvDesc;
+        final TextView tvCreator;
+        final TextView tvTimestamp;
+        final LabelBadgeView lvLabels;
+        final TextView tvComments;
+        final TextView tvMilestone;
     }
 }

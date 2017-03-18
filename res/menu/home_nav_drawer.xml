@@ -9,6 +9,11 @@
             android:icon="@drawable/icon_news_feed"
             android:checked="true" />
         <item
+            android:id="@+id/notifications"
+            android:title="@string/notifications"
+            android:icon="@drawable/icon_notifications"
+            android:checked="false" />
+        <item
             android:id="@+id/my_repos"
             android:title="@string/my_repositories"
             android:icon="@drawable/icon_repositories"/>
@@ -28,10 +33,11 @@
     <item android:title="@string/navigation">
         <menu>
             <group
-                android:checkableBehavior="none">
+                android:checkableBehavior="single">
                 <item
                     android:id="@+id/search"
                     android:title="@string/search"
+                    android:checkable="false"
                     android:icon="@drawable/icon_search"/>
                 <item
                     android:id="@+id/bookmarks"

@@ -27,13 +27,12 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.IntentUtils;
 
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
@@ -42,16 +41,16 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mSortOrder;
     private String mSortDirection;
 
-    public static RepositoryListFragment newInstance(String login, String userType,
+    public static RepositoryListFragment newInstance(String login, boolean isOrg,
             String repoType, String sortOrder, String sortDirection) {
         RepositoryListFragment f = new RepositoryListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.LOGIN, login);
-        args.putString(Constants.User.TYPE, userType);
-        args.putString(Constants.Repository.TYPE, repoType);
-        args.putString("sortOrder", sortOrder);
-        args.putString("sortDirection", sortDirection);
+        args.putString("user", login);
+        args.putBoolean("is_org", isOrg);
+        args.putString("repo_type", repoType);
+        args.putString("sort_order", sortOrder);
+        args.putString("sort_direction", sortDirection);
         f.setArguments(args);
 
         return f;
@@ -60,11 +59,11 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.LOGIN);
-        mRepoType = getArguments().getString(Constants.Repository.TYPE);
-        mIsOrg = Constants.User.TYPE_ORG.equals(getArguments().getString(Constants.User.TYPE));
-        mSortOrder = getArguments().getString("sortOrder");
-        mSortDirection = getArguments().getString("sortDirection");
+        mLogin = getArguments().getString("user");
+        mRepoType = getArguments().getString("repo_type");
+        mIsOrg = getArguments().getBoolean("is_org");
+        mSortOrder = getArguments().getString("sort_order");
+        mSortDirection = getArguments().getString("sort_direction");
     }
 
     @Override
@@ -96,7 +95,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
 
     @Override
     public void onItemClick(Repository repository) {
-        IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
+        startActivity(RepositoryActivity.makeIntent(getActivity(), repository));
     }
 
     @Override

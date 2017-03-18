@@ -25,7 +25,7 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_code_search, parent, false);
         return new ViewHolder(v);
     }
@@ -75,8 +75,8 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
             tvMatches = (TextView) view.findViewById(R.id.tv_matches);
         }
 
-        private TextView tvTitle;
-        private TextView tvRepo;
-        private TextView tvMatches;
+        private final TextView tvTitle;
+        private final TextView tvRepo;
+        private final TextView tvMatches;
     }
 }

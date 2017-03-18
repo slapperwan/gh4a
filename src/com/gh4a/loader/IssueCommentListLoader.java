@@ -1,5 +1,14 @@
 package com.gh4a.loader;
 
+import android.content.Context;
+
+import com.gh4a.Gh4Application;
+
+import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.IssueEvent;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.IssueService;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,19 +16,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.IssueEvent;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.IssueService;
-
-import android.content.Context;
-
-import com.gh4a.Gh4Application;
-
 public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
-    private String mRepoOwner;
-    private String mRepoName;
-    private int mIssueNumber;
+    private final boolean mIsPullRequest;
+
+    protected final String mRepoOwner;
+    protected final String mRepoName;
+    protected final int mIssueNumber;
 
     private static final List<String> INTERESTING_EVENTS = Arrays.asList(
         IssueEvent.TYPE_CLOSED, IssueEvent.TYPE_REOPENED, IssueEvent.TYPE_MERGED,
@@ -29,18 +31,25 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
         IssueEvent.TYPE_RENAMED
     );
 
-    protected static Comparator<IssueEventHolder> SORTER = new Comparator<IssueEventHolder>() {
+    protected static final Comparator<IssueEventHolder> SORTER = new Comparator<IssueEventHolder>() {
         @Override
         public int compare(IssueEventHolder lhs, IssueEventHolder rhs) {
             return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
         }
     };
 
-    public IssueCommentListLoader(Context context, String repoOwner, String repoName, int issueNumber) {
+    public IssueCommentListLoader(Context context, String repoOwner, String repoName,
+            int issueNumber) {
+        this(context, repoOwner, repoName, issueNumber, false);
+    }
+
+    protected IssueCommentListLoader(Context context, String repoOwner, String repoName,
+            int issueNumber, boolean isPullRequest) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mIssueNumber = issueNumber;
+        mIsPullRequest = isPullRequest;
     }
 
     @Override
@@ -53,11 +62,11 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
         List<IssueEventHolder> result = new ArrayList<>();
 
         for (Comment comment : comments) {
-            result.add(new IssueEventHolder(comment));
+            result.add(new IssueEventHolder(comment, mIsPullRequest));
         }
         for (IssueEvent event : events) {
             if (INTERESTING_EVENTS.contains(event.getEvent())) {
-                result.add(new IssueEventHolder(event));
+                result.add(new IssueEventHolder(event, mIsPullRequest));
             }
         }
 

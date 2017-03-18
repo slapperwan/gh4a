@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.gh4a.R;
 
@@ -48,7 +49,9 @@ public class PathBreadcrumbs extends HorizontalScrollView implements View.OnClic
     }
 
     public void setPath(@NonNull String path) {
-        initRootCrumb();
+        mItems.clear();
+        mChildFrame.removeAllViews();
+        addCrumb("", "/");
 
         String[] paths = path.split("/");
         StringBuilder combinedPath = new StringBuilder();
@@ -57,7 +60,16 @@ public class PathBreadcrumbs extends HorizontalScrollView implements View.OnClic
             addCrumb(combinedPath.toString(), splitPath);
             combinedPath.append("/");
         }
-        setActive(path);
+
+        int active = mItems.indexOf(path);
+        if (active >= 0) {
+            mActive = active;
+            for (int i = 0; i < mChildFrame.getChildCount(); i++) {
+                ViewGroup child = (ViewGroup) mChildFrame.getChildAt(i);
+                TextView tv = (TextView) child.getChildAt(0);
+                tv.setActivated(i == mActive);
+            }
+        }
     }
 
     private void addCrumb(@NonNull String path, String title) {
@@ -65,9 +77,8 @@ public class PathBreadcrumbs extends HorizontalScrollView implements View.OnClic
         view.setTag(mItems.size());
         view.setOnClickListener(this);
 
-        ActivatableStyledTextView tv = (ActivatableStyledTextView) view.getChildAt(0);
+        TextView tv = (TextView) view.getChildAt(0);
         tv.setText(title);
-        tv.setActivatable(true);
 
         if (mChildFrame.getChildCount() > 0) {
             ViewGroup lastChild = (ViewGroup) mChildFrame.getChildAt(mChildFrame.getChildCount() - 1);
@@ -88,46 +99,19 @@ public class PathBreadcrumbs extends HorizontalScrollView implements View.OnClic
         }
     }
 
-    public void clear() {
-        mItems.clear();
-        mChildFrame.removeAllViews();
-    }
-
     public void setCallback(SelectionCallback callback) {
         mCallback = callback;
-    }
-
-    public void setActive(String path) {
-        int active = mItems.indexOf(path);
-        if (active < 0) {
-            return;
-        }
-
-        mActive = active;
-        for (int i = 0; i < mChildFrame.getChildCount(); i++) {
-            ViewGroup child = (ViewGroup) mChildFrame.getChildAt(i);
-            ActivatableStyledTextView tv = (ActivatableStyledTextView) child.getChildAt(0);
-            tv.setChecked(i == mActive);
-        }
-    }
-
-    public int size() {
-        return mItems.size();
     }
 
     @Override
     public void onClick(View v) {
         if (mCallback != null) {
             int index = (Integer) v.getTag();
-            if (index >= 0 && index < size()) {
-                mCallback.onCrumbSelection(mItems.get(index), index, size());
+            int size = mItems.size();
+            if (index >= 0 && index < size) {
+                mCallback.onCrumbSelection(mItems.get(index), index, size);
             }
         }
-    }
-
-    public void initRootCrumb() {
-        clear();
-        addCrumb("", "/");
     }
 
     public interface SelectionCallback {

@@ -1,5 +1,6 @@
 package com.gh4a.activities.home;
 
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 
 import com.gh4a.R;
@@ -15,7 +16,7 @@ public class TrendingFactory extends FragmentFactory {
     }
 
     @Override
-    protected int getTitleResId() {
+    protected @StringRes int getTitleResId() {
         return R.string.trend;
     }
 
@@ -25,7 +26,7 @@ public class TrendingFactory extends FragmentFactory {
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         switch (position) {
             case 0: return TrendingFragment.newInstance(TrendingFragment.TYPE_DAILY);
             case 1: return TrendingFragment.newInstance(TrendingFragment.TYPE_WEEKLY);

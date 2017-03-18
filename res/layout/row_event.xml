@@ -3,61 +3,66 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <android.support.v7.widget.CardView
+        style="?attr/cardViewTheme"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
-        app:cardCornerRadius="0dp"
-        style="?attr/cardViewTheme">
+        app:cardCornerRadius="0dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingBottom="16dp"
             android:paddingLeft="@dimen/content_padding"
             android:paddingRight="@dimen/content_padding"
-            android:paddingTop="8dp"
-            android:paddingBottom="16dp">
+            android:paddingTop="8dp">
 
             <com.gh4a.widget.FixedSizeImageView
                 android:id="@+id/iv_gravatar"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginRight="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless" />
+                android:background="?attr/selectableItemBackgroundBorderless"
+                tools:src="@drawable/default_avatar" />
 
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/tv_actor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:layout_alignTop="@id/iv_gravatar"
                 android:layout_alignBottom="@id/iv_gravatar"
+                android:layout_alignTop="@id/iv_gravatar"
+                android:layout_toRightOf="@id/iv_gravatar"
                 android:gravity="center_vertical"
                 android:singleLine="true"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:font="bold" />
+                app:font="bold"
+                tools:text="username" />
 
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/tv_created_at"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/tv_actor"
-                android:layout_alignParentRight="true"
                 android:layout_alignBaseline="@id/tv_actor"
+                android:layout_alignParentRight="true"
+                android:layout_toRightOf="@id/tv_actor"
                 android:gravity="right"
                 android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.VerySmall" />
+                android:textAppearance="@style/TextAppearance.VerySmall"
+                tools:text="yesterday" />
 
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/iv_gravatar"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+                android:layout_marginTop="8dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                tools:text="Event title" />
 
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/tv_desc"
@@ -66,7 +71,8 @@
                 android:layout_below="@id/tv_title"
                 android:ellipsize="end"
                 android:maxLines="@integer/event_description_max_lines"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                tools:text="Event description" />
 
         </RelativeLayout>
 

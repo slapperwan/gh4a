@@ -22,30 +22,29 @@ import org.eclipse.egit.github.core.service.WatcherService;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
 
 public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Repository> {
-    private String mLogin;
-
     public static WatchedRepositoryListFragment newInstance(String login) {
         WatchedRepositoryListFragment f = new WatchedRepositoryListFragment();
 
         Bundle args = new Bundle();
-        args.putString(Constants.User.LOGIN, login);
+        args.putString("user", login);
         f.setArguments(args);
 
         return f;
     }
 
+    private String mLogin;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString(Constants.User.LOGIN);
+        mLogin = getArguments().getString("user");
     }
 
     @Override
@@ -60,7 +59,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
 
     @Override
     public void onItemClick(Repository repository) {
-        IntentUtils.openRepositoryInfoActivity(getActivity(), repository);
+        startActivity(RepositoryActivity.makeIntent(getActivity(), repository));
     }
 
     @Override

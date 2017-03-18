@@ -26,13 +26,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.FollowerFollowingListActivity;
 import com.gh4a.activities.GistListActivity;
 import com.gh4a.activities.OrganizationMemberListActivity;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.RepositoryListActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationListLoader;
@@ -40,7 +41,6 @@ import com.gh4a.loader.RepositoryListLoader;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.Repository;
@@ -52,12 +52,21 @@ import java.util.List;
 import java.util.Map;
 
 public class UserFragment extends LoadingFragmentBase implements View.OnClickListener {
+    public static UserFragment newInstance(String login) {
+        UserFragment f = new UserFragment();
+
+        Bundle args = new Bundle();
+        args.putString("login", login);
+        f.setArguments(args);
+
+        return f;
+    }
+
     private String mUserLogin;
-    private String mUserName;
     private User mUser;
     private View mContentView;
 
-    private LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
+    private final LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
         @Override
         protected Loader<LoaderResult<User>> onCreateLoader() {
             return new UserLoader(getActivity(), mUserLogin);
@@ -71,7 +80,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         }
     };
 
-    private LoaderCallbacks<Collection<Repository>> mRepoListCallback =
+    private final LoaderCallbacks<Collection<Repository>> mRepoListCallback =
             new LoaderCallbacks<Collection<Repository>>(this) {
         @Override
         protected Loader<LoaderResult<Collection<Repository>>> onCreateLoader() {
@@ -87,7 +96,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         }
     };
 
-    private LoaderCallbacks<List<User>> mOrganizationCallback = new LoaderCallbacks<List<User>>(this) {
+    private final LoaderCallbacks<List<User>> mOrganizationCallback = new LoaderCallbacks<List<User>>(this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new OrganizationListLoader(getActivity(), mUserLogin);
@@ -98,30 +107,16 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         }
     };
 
-    public static UserFragment newInstance(String login, String name) {
-        UserFragment f = new UserFragment();
-
-        Bundle args = new Bundle();
-        args.putString(Constants.User.LOGIN, login);
-        args.putString(Constants.User.NAME, name);
-        f.setArguments(args);
-
-        return f;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserLogin = getArguments().getString(Constants.User.LOGIN);
-        mUserName = getArguments().getString(Constants.User.NAME);
+        mUserLogin = getArguments().getString("login");
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        mContentView = inflater.inflate(R.layout.user, null);
-
-        return super.onCreateView(inflater, container, savedInstanceState);
+    protected View onCreateContentView(LayoutInflater inflater, ViewGroup parent) {
+        mContentView = inflater.inflate(R.layout.user, parent, false);
+        return mContentView;
     }
 
     @Override
@@ -138,8 +133,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setEmptyText(R.string.user_no_data);
-        setContentView(mContentView);
         setContentShown(false);
 
         getLoaderManager().initLoader(0, null, mUserCallback);
@@ -155,7 +148,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         View llOrgMembers = mContentView.findViewById(R.id.cell_org_members);
         View llFollowers = mContentView.findViewById(R.id.cell_followers);
 
-        if (Constants.User.TYPE_USER.equals(mUser.getType())) {
+        if (ApiHelpers.UserType.USER.equals(mUser.getType())) {
             llFollowers.setOnClickListener(this);
             llOrgMembers.setVisibility(View.GONE);
         } else {
@@ -179,11 +172,11 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         fillCountIfUser(R.id.cell_following, R.id.tv_following_count, mUser.getFollowing());
 
         TextView tvName = (TextView) mContentView.findViewById(R.id.tv_name);
-        tvName.setText(StringUtils.isBlank(mUser.getName()) ? mUser.getLogin() : mUser.getName());
-        if (Constants.User.TYPE_ORG.equals(mUser.getType())) {
-            tvName.append(" (");
-            tvName.append(Constants.User.TYPE_ORG); // FIXME
-            tvName.append(")");
+        String name = StringUtils.isBlank(mUser.getName()) ? mUser.getLogin() : mUser.getName();
+        if (ApiHelpers.UserType.ORG.equals(mUser.getType())) {
+            tvName.setText(getString(R.string.org_user_template, name));
+        } else {
+            tvName.setText(name);
         }
 
         TextView tvCreated = (TextView) mContentView.findViewById(R.id.tv_created_at);
@@ -210,7 +203,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
     private void fillCountIfUser(int layoutId, int countId, int count) {
         View layout = mContentView.findViewById(layoutId);
-        if (Constants.User.TYPE_USER.equals(mUser.getType())) {
+        if (ApiHelpers.UserType.USER.equals(mUser.getType())) {
             TextView countView = (TextView) mContentView.findViewById(countId);
             countView.setText(String.valueOf(count));
             layout.setOnClickListener(this);
@@ -235,39 +228,31 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         Intent intent = null;
 
         if (id == R.id.cell_followers) {
-            if (Constants.User.TYPE_ORG.equals(mUser.getType())) {
-                intent = new Intent(getActivity(), OrganizationMemberListActivity.class);
-                intent.putExtra(Constants.Repository.OWNER, mUserLogin);
+            if (ApiHelpers.UserType.ORG.equals(mUser.getType())) {
+                intent = OrganizationMemberListActivity.makeIntent(getActivity(), mUserLogin);
             } else {
-                intent = new Intent(getActivity(), FollowerFollowingListActivity.class);
-                intent.putExtra(FollowerFollowingListActivity.EXTRA_SHOW_FOLLOWERS, true);
+                intent = FollowerFollowingListActivity.makeIntent(getActivity(), mUserLogin, true);
             }
         } else if (id == R.id.cell_following) {
-            intent = new Intent(getActivity(), FollowerFollowingListActivity.class);
-            intent.putExtra(FollowerFollowingListActivity.EXTRA_SHOW_FOLLOWERS, false);
+            intent = FollowerFollowingListActivity.makeIntent(getActivity(), mUserLogin, false);
         } else if (id == R.id.cell_repos || id == R.id.btn_repos) {
-            intent = new Intent(getActivity(), RepositoryListActivity.class);
+            intent = RepositoryListActivity.makeIntent(getActivity(), mUserLogin,
+                    ApiHelpers.UserType.ORG.equals(mUser.getType()));
         } else if (id == R.id.cell_gists) {
-            intent = new Intent(getActivity(), GistListActivity.class);
+            intent = GistListActivity.makeIntent(getActivity(), mUserLogin);
         } else if (id == R.id.cell_org_members) {
-            intent = new Intent(getActivity(), OrganizationMemberListActivity.class);
-            intent.putExtra(Constants.Repository.OWNER, mUserLogin);
+            intent = OrganizationMemberListActivity.makeIntent(getActivity(), mUserLogin);
         } else if (view.getTag() instanceof Repository) {
-            IntentUtils.openRepositoryInfoActivity(getActivity(), (Repository) view.getTag());
+            intent = RepositoryActivity.makeIntent(getActivity(), (Repository) view.getTag());
         } else if (view.getTag() instanceof User) {
-            User user = (User) view.getTag();
-            // can't use the clause below, as it'll overwrite the user data
-            startActivity(IntentUtils.getUserActivityIntent(getActivity(), user));
+            intent = UserActivity.makeIntent(getActivity(), (User) view.getTag());
         }
-        if (intent != null && mUser != null) {
-            intent.putExtra(Constants.User.LOGIN, mUserLogin);
-            intent.putExtra(Constants.User.NAME, mUserName);
-            intent.putExtra(Constants.User.TYPE, mUser.getType());
+        if (intent != null) {
             startActivity(intent);
         }
     }
 
-    public void fillTopRepos(Collection<Repository> topRepos) {
+    private void fillTopRepos(Collection<Repository> topRepos) {
         LinearLayout ll = (LinearLayout) mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
 
@@ -314,7 +299,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         getView().findViewById(R.id.ll_top_repos).setVisibility(View.VISIBLE);
     }
 
-    public void fillOrganizations(List<User> organizations) {
+    private void fillOrganizations(List<User> organizations) {
         ViewGroup llOrgs = (ViewGroup) mContentView.findViewById(R.id.ll_orgs);
         LinearLayout llOrg = (LinearLayout) mContentView.findViewById(R.id.ll_org);
         int count = organizations != null ? organizations.size() : 0;

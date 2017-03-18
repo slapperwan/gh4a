@@ -19,7 +19,7 @@ public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHold
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_release, parent, false);
         return new ViewHolder(v);
     }
@@ -54,8 +54,8 @@ public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHold
             tvCreatedAt  = (TextView) view.findViewById(R.id.tv_created_at);
         }
 
-        private TextView tvTitle;
-        private TextView tvType;
-        private TextView tvCreatedAt;
+        private final TextView tvTitle;
+        private final TextView tvType;
+        private final TextView tvCreatedAt;
     }
 }

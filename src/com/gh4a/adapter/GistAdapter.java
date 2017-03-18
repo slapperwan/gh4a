@@ -31,7 +31,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 
 public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
-    private String mOwnerLogin;
+    private final String mOwnerLogin;
 
     public GistAdapter(Context context, String owner) {
         super(context);
@@ -39,7 +39,7 @@ public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent) {
+    public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gist, parent, false);
         return new ViewHolder(v);
     }
@@ -76,11 +76,11 @@ public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
             tvPrivate = (TextView) view.findViewById(R.id.tv_private);
         }
 
-        private TextView tvCreator;
-        private TextView tvTimestamp;
-        private TextView tvTitle;
-        private TextView tvSha;
-        private TextView tvFiles;
-        private TextView tvPrivate;
+        private final TextView tvCreator;
+        private final TextView tvTimestamp;
+        private final TextView tvTitle;
+        private final TextView tvSha;
+        private final TextView tvFiles;
+        private final TextView tvPrivate;
     }
 }

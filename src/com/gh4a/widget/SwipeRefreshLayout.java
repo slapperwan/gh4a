@@ -14,7 +14,7 @@ public class SwipeRefreshLayout extends android.support.v4.widget.SwipeRefreshLa
         boolean canChildScrollUp();
     }
 
-    private int mTouchSlop;
+    private final int mTouchSlop;
     private float mDownX;
     private float mDownY;
     private boolean mChildScrollableOnDown;

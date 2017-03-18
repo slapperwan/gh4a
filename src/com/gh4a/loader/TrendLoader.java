@@ -68,11 +68,13 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
         for (int i = 0; i < resultArray.length(); i++) {
             JSONObject repoObject = resultArray.getJSONObject(i);
 
-            Trend trend = new Trend();
-            trend.setRepo(repoObject.getString("owner"), repoObject.getString("repo"));
-            trend.setDescription(repoObject.optString("description"));
-
-            trends.add(trend);
+            trends.add(new Trend(
+                    repoObject.getString("owner"),
+                    repoObject.getString("repo"),
+                    repoObject.optString("description"),
+                    (int) repoObject.getDouble("stars"),
+                    (int) repoObject.getDouble("new_stars"),
+                    (int) repoObject.getDouble("forks")));
         }
         return trends;
     }

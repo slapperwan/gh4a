@@ -11,8 +11,8 @@ import com.gh4a.Gh4Application;
 
 public class IsStarringLoader extends BaseLoader<Boolean> {
 
-    private String mRepoOwner;
-    private String mRepoName;
+    private final String mRepoOwner;
+    private final String mRepoName;
 
     public IsStarringLoader(Context context, String repoOwner, String repoName) {
         super(context);

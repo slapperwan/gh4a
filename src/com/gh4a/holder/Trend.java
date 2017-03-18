@@ -16,14 +16,22 @@
 package com.gh4a.holder;
 
 public class Trend {
-    private String repoOwner;
-    private String repoName;
-    private String description;
+    private final String repoOwner;
+    private final String repoName;
+    private final String description;
+    private final int stars;
+    private final int newStars;
+    private final int forks;
 
-    public void setRepo(String owner, String repo) {
+    public Trend(String owner, String repo, String desc, int stars, int newStars, int forks) {
         this.repoOwner = owner;
         this.repoName = repo;
+        this.description = desc;
+        this.forks = forks;
+        this.stars = stars;
+        this.newStars = newStars;
     }
+
     public String getRepoOwner() {
         return repoOwner;
     }
@@ -33,7 +41,13 @@ public class Trend {
     public String getDescription() {
         return description;
     }
-    public void setDescription(String description) {
-        this.description = description;
+    public int getStars() {
+        return stars;
+    }
+    public int getNewStars() {
+        return newStars;
+    }
+    public int getForks() {
+        return forks;
     }
 }

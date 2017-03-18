@@ -2,25 +2,55 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="72dp"
-    android:padding="@dimen/content_padding"
     android:background="?attr/selectableItemBackground"
-    android:orientation="vertical">
+    android:minHeight="72dp"
+    android:orientation="vertical"
+    android:padding="@dimen/content_padding">
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.ItemTitle" />
+        android:textAppearance="@style/TextAppearance.ItemTitle"
+        tools:text="username/repository" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
+        android:maxLines="2"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:maxLines="2" />
+        tools:text="Repository description" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="horizontal">
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_forks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:drawableLeft="?attr/forkSmallIcon"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="2" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_stars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="?attr/starSmallIcon"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="3468" />
+
+    </LinearLayout>
 
 </LinearLayout>

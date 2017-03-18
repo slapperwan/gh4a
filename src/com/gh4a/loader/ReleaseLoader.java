@@ -12,9 +12,9 @@ import com.gh4a.Gh4Application;
 
 public class ReleaseLoader extends BaseLoader<Release> {
 
-    private String mRepoOwner;
-    private String mRepoName;
-    private long mReleaseId;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final long mReleaseId;
 
     public ReleaseLoader(Context context, String repoOwner, String repoName, long id) {
         super(context);

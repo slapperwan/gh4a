@@ -26,11 +26,17 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
 import android.text.TextUtils;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -40,7 +46,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
-import com.gh4a.utils.ThemeUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 
@@ -50,40 +55,73 @@ import java.util.ArrayList;
 public abstract class WebViewerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate {
     protected WebView mWebView;
+    private WebView mPrintWebView;
     private boolean mStarted;
+    private boolean mHasData;
+    private boolean mRequiresJsInterface;
+    private final Handler mHandler = new Handler();
 
-    private static ArrayList<String> sLanguagePlugins = new ArrayList<>();
+    private static final String DARK_CSS_THEME = "dark";
+    private static final String LIGHT_CSS_THEME = "light";
+    private static final String PRINT_CSS_THEME = "print";
 
-    private int[] ZOOM_SIZES = new int[] {
+    private static final ArrayList<String> sLanguagePlugins = new ArrayList<>();
+
+    private final int[] ZOOM_SIZES = new int[] {
         50, 75, 100, 150, 200
     };
-    @SuppressWarnings("deprecation")
-    private WebSettings.TextSize[] ZOOM_SIZES_API10 = new WebSettings.TextSize[] {
-        WebSettings.TextSize.SMALLEST, WebSettings.TextSize.SMALLER,
-        WebSettings.TextSize.NORMAL, WebSettings.TextSize.LARGER,
-        WebSettings.TextSize.LARGEST
-    };
 
-    private WebViewClient mWebViewClient = new WebViewClient() {
+    @SuppressWarnings("unused")
+    private class RenderingDoneInterface {
+        @JavascriptInterface
+        public void onRenderingDone() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    applyLineWrapping(shouldWrapLines());
+                    setContentShown(true);
+                }
+            });
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private class PrintRenderingDoneInterface {
+        @JavascriptInterface
+        public void onRenderingDone() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mPrintWebView.loadUrl("javascript:applyLineWrapping(true)");
+                    doPrintHtml();
+                }
+            });
+        }
+    }
+
+    private final WebViewClient mWebViewClient = new WebViewClient() {
         @Override
-        public void onPageFinished(WebView webView, String url) {
-            applyLineWrapping(shouldWrapLines());
-            setContentShown(true);
+        public void onPageFinished(WebView view, String url) {
+            if (!mRequiresJsInterface) {
+                applyLineWrapping(shouldWrapLines());
+                setContentShown(true);
+            }
         }
 
         @Override
+        @TargetApi(24)
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            if (mStarted) {
+                handleUrlLoad(request.getUrl());
+            }
+            return true;
+        }
+
+        @Override
+        @SuppressWarnings("deprecation")
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (mStarted && !handleUrlLoad(url)) {
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(intent);
-                } catch (ActivityNotFoundException e) {
-                    // ignore
-                } catch (SecurityException e) {
-                    // some apps (namely the Wikipedia one) have intent filters set
-                    // for the VIEW action for internal, non-exported activities
-                    // -> ignore
-                }
+            if (mStarted) {
+                handleUrlLoad(Uri.parse(url));
             }
             return true;
         }
@@ -126,33 +164,46 @@ public abstract class WebViewerActivity extends BaseActivity implements
         return UiUtils.canViewScrollUp(mWebView);
     }
 
-    @SuppressWarnings("deprecation")
-    @SuppressLint("SetJavaScriptEnabled")
     private void setupWebView() {
         mWebView = (WebView) findViewById(R.id.web_view);
 
         WebSettings s = mWebView.getSettings();
+        initWebViewSettings(s);
+
+        SharedPreferences prefs = getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
+        int initialZoomLevel = prefs.getInt(SettingsFragment.KEY_TEXT_SIZE, -1);
+        if (initialZoomLevel >= 0 || initialZoomLevel < ZOOM_SIZES.length) {
+            s.setTextZoom(ZOOM_SIZES[initialZoomLevel]);
+        }
+
+        mWebView.setBackgroundColor(UiUtils.resolveColor(this, R.attr.colorWebViewBackground));
+        mWebView.setWebViewClient(mWebViewClient);
+    }
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("SetJavaScriptEnabled")
+    private void initWebViewSettings(WebSettings s) {
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
         s.setAllowFileAccess(true);
         s.setBuiltInZoomControls(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            s.setDisplayZoomControls(false);
-        }
+        s.setDisplayZoomControls(false);
         s.setLightTouchEnabled(true);
         s.setLoadsImagesAutomatically(true);
         s.setSupportZoom(true);
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(false);
-        applyDefaultTextSize(s);
-
-        mWebView.setBackgroundColor(ThemeUtils.getWebViewBackgroundColor(Gh4Application.THEME));
-        mWebView.setWebViewClient(mWebViewClient);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
-            menu.removeItem(R.id.search);
+        if (!mHasData) {
+            menu.removeItem(R.id.browser);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && mHasData) {
+            getMenuInflater().inflate(R.menu.print_menu, menu);
+            if (mPrintWebView != null) {
+                menu.findItem(R.id.print).setEnabled(false);
+            }
         }
         return super.onCreateOptionsMenu(menu);
     }
@@ -179,6 +230,9 @@ public abstract class WebViewerActivity extends BaseActivity implements
             setLineWrapping(newState);
             applyLineWrapping(newState);
             return true;
+        } else if (itemId == R.id.print) {
+            doPrint();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -192,33 +246,57 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    @SuppressWarnings("deprecation")
-    private void applyDefaultTextSize(WebSettings s) {
-        SharedPreferences prefs = getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
-        int initialZoomLevel = prefs.getInt(SettingsFragment.KEY_TEXT_SIZE, -1);
-        if (initialZoomLevel < 0 || initialZoomLevel >= ZOOM_SIZES.length) {
+    @TargetApi(19)
+    private void doPrint() {
+        if (handlePrintRequest()) {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            s.setTextZoom(ZOOM_SIZES[initialZoomLevel]);
+        mPrintWebView = new WebView(this);
+        initWebViewSettings(mPrintWebView.getSettings());
+
+        if (mRequiresJsInterface) {
+            mPrintWebView.addJavascriptInterface(new PrintRenderingDoneInterface(), "NativeClient");
         } else {
-            s.setTextSize(ZOOM_SIZES_API10[initialZoomLevel]);
+            mPrintWebView.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageFinished(WebView webView, String url) {
+                    doPrintHtml();
+                }
+            });
+        }
+        final String html = generateHtml(PRINT_CSS_THEME, true);
+        mPrintWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
+        supportInvalidateOptionsMenu();
+    }
+
+    @TargetApi(19)
+    private void doPrintHtml() {
+        final String title = getDocumentTitle();
+        PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+        PrintDocumentAdapter printAdapter = getPrintAdapterForWebView(mPrintWebView, title);
+        printManager.print(title, printAdapter, new PrintAttributes.Builder().build());
+        mPrintWebView = null;
+        supportInvalidateOptionsMenu();
+    }
+
+    @SuppressWarnings("deprecation")
+    @TargetApi(19)
+    private PrintDocumentAdapter getPrintAdapterForWebView(WebView webView, String title) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            return webView.createPrintDocumentAdapter(title);
+        } else {
+            return webView.createPrintDocumentAdapter();
         }
     }
 
-    protected void loadUnthemedHtml(String html) {
-        if (Gh4Application.THEME == R.style.DarkTheme) {
-            html = "<style type=\"text/css\">" +
-                    "body { color: #A3A3A5 !important }" +
-                    "a { color: #4183C4 !important }</style><body>" +
-                    html + "</body>";
+    @Override
+    protected void setContentShown(boolean shown) {
+        super.setContentShown(shown);
+        if (!shown) {
+            mHasData = false;
+            supportInvalidateOptionsMenu();
         }
-        loadThemedHtml(html);
-    }
-
-    protected void loadThemedHtml(String html) {
-        mWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
     }
 
     private boolean shouldWrapLines() {
@@ -233,8 +311,29 @@ public abstract class WebViewerActivity extends BaseActivity implements
         mWebView.loadUrl("javascript:applyLineWrapping(" + enabled + ")");
     }
 
-    protected boolean handleUrlLoad(String url) {
-        return false;
+    protected void handleUrlLoad(Uri uri) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            // ignore
+        } catch (SecurityException e) {
+            // some apps (namely the Wikipedia one) have intent filters set
+            // for the VIEW action for internal, non-exported activities
+            // -> ignore
+        }
+    }
+
+    protected void onDataReady() {
+        final String cssTheme = Gh4Application.THEME == R.style.DarkTheme
+                ? DARK_CSS_THEME : LIGHT_CSS_THEME;
+        final String html = generateHtml(cssTheme, false);
+        if (mRequiresJsInterface) {
+            mWebView.addJavascriptInterface(new RenderingDoneInterface(), "NativeClient");
+        }
+        mWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
+        mHasData = true;
+        supportInvalidateOptionsMenu();
     }
 
     private void loadLanguagePluginListIfNeeded() {
@@ -259,15 +358,25 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    protected void loadMarkdown(String base64Data,
-            String repoOwner, String repoName, String ref) {
+    protected String generateMarkdownHtml(String base64Data,
+            String repoOwner, String repoName, String ref,
+            String cssTheme, boolean addTitleHeader) {
+        String title = addTitleHeader ? getDocumentTitle() : null;
         StringBuilder content = new StringBuilder();
-        content.append("<html><head>");
+        content.append("<html><head><title>");
+        if (title != null) {
+            content.append(title);
+        }
+        content.append("</title>");
         writeScriptInclude(content, "showdown");
-        writeCssInclude(content, "markdown");
+        writeCssInclude(content, "markdown", cssTheme);
         content.append("</head>");
 
-        content.append("<body><div id='content'></div>");
+        content.append("<body>");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
+        content.append("<div id='content'></div>");
 
         content.append("<script>");
         content.append("var text = window.atob('");
@@ -288,18 +397,23 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
         content.append("</body></html>");
 
-        loadThemedHtml(content.toString());
+        return content.toString();
     }
 
-    protected void loadCode(String data, String fileName,
-            int highlightStart, int highlightEnd) {
+    protected String generateCodeHtml(String data, String fileName,
+                int highlightStart, int highlightEnd,
+                String cssTheme, boolean addTitleHeader) {
         String ext = FileUtils.getFileExtension(fileName);
-
+        String title = addTitleHeader ? getDocumentTitle() : null;
         StringBuilder content = new StringBuilder();
-        content.append("<html><head><title></title>");
+        content.append("<html><head><title>");
+        if (title != null) {
+            content.append(title);
+        }
+        content.append("</title>");
         writeScriptInclude(content, "codeutils");
 
-        writeCssInclude(content, "prettify");
+        writeCssInclude(content, "prettify", cssTheme);
         writeScriptInclude(content, "prettify");
         loadLanguagePluginListIfNeeded();
         for (String plugin : sLanguagePlugins) {
@@ -307,14 +421,30 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
         content.append("</head>");
         content.append("<body onload='prettyPrint(function() { highlightLines(");
-        content.append(highlightStart).append(",").append(highlightEnd).append("); })'");
+        content.append(highlightStart).append(",").append(highlightEnd).append("); ");
+        content.append("NativeClient.onRenderingDone(); })'");
         content.append(" onresize='scrollToHighlight();'>");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
         content.append("<pre id='content' class='prettyprint linenums lang-");
         content.append(ext).append("'>");
+
         content.append(TextUtils.htmlEncode(data));
         content.append("</pre></body></html>");
 
-        loadThemedHtml(content.toString());
+        mRequiresJsInterface = true;
+        return content.toString();
+    }
+
+    protected static String wrapUnthemedHtml(String html, String cssTheme, String title) {
+        String style = TextUtils.equals(cssTheme, DARK_CSS_THEME)
+                ? "<style type=\"text/css\">" +
+                    "body { color: #A3A3A5 !important }" +
+                    "a { color: #4183C4 !important }</style>"
+                : "";
+        String titleHeader = title != null ? "<h2>" + title + "</h2>" : "";
+        return style + "<body>" + titleHeader + html + "</body>";
     }
 
     protected static void writeScriptInclude(StringBuilder builder, String scriptName) {
@@ -323,14 +453,20 @@ public abstract class WebViewerActivity extends BaseActivity implements
         builder.append(".js' type='text/javascript'></script>");
     }
 
-    protected static void writeCssInclude(StringBuilder builder, String cssType) {
+    protected static void writeCssInclude(StringBuilder builder, String cssType, String cssTheme) {
         builder.append("<link href='file:///android_asset/");
         builder.append(cssType);
         builder.append("-");
-        builder.append(ThemeUtils.getCssTheme(Gh4Application.THEME));
+        builder.append(cssTheme);
         builder.append(".css' rel='stylesheet' type='text/css'/>");
     }
 
     @Override
     protected abstract boolean canSwipeToRefresh();
+
+    protected boolean handlePrintRequest() {
+        return false;
+    }
+    protected abstract String generateHtml(String cssTheme, boolean addTitleHeader);
+    protected abstract String getDocumentTitle();
 }

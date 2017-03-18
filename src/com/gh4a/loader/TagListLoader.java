@@ -13,8 +13,8 @@ import android.content.Context;
 import com.gh4a.Gh4Application;
 
 public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
-    private String mRepoOwner;
-    private String mRepoName;
+    private final String mRepoOwner;
+    private final String mRepoName;
 
     public TagListLoader(Context context, String repoOwner, String repoName) {
         super(context);

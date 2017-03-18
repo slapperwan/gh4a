@@ -16,15 +16,15 @@
 package com.gh4a.activities;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
@@ -38,18 +38,18 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gh4a.BasePagerActivity;
-import com.gh4a.Constants;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
-import com.gh4a.loader.CollaboratorListLoader;
+import com.gh4a.loader.AssigneeListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
-import com.gh4a.utils.IntentUtils;
+import com.gh4a.loader.ProgressDialogLoaderCallbacks;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Label;
@@ -65,41 +65,76 @@ public class IssueListActivity extends BasePagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItemCompat.OnActionExpandListener {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName) {
+        return makeIntent(context, repoOwner, repoName, false);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+            boolean isPullRequest) {
+        return new Intent(context, IssueListActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("is_pull_request", isPullRequest);
+    }
+
     private static final int REQUEST_ISSUE_CREATE = 1001;
 
     private String mRepoOwner;
     private String mRepoName;
+    private String mUserLogin;
+    private boolean mIsPullRequest;
 
     private String mSelectedLabel;
     private String mSelectedMilestone;
     private String mSelectedAssignee;
     private String mSearchQuery;
     private boolean mSearchMode;
+    private int mSelectedParticipatingStatus = 0;
 
     private FloatingActionButton mCreateFab;
     private IssueListFragment mOpenFragment;
     private IssueListFragment mClosedFragment;
     private IssueListFragment mSearchFragment;
     private Boolean mIsCollaborator;
-    private ProgressDialog mProgressDialog;
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
 
-    protected IssueListFragment.SortDrawerHelper mSortHelper =
+    private Handler mHandler = new Handler();
+    private Runnable mRefreshRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (mOpenFragment != null) {
+                mOpenFragment.onRefresh();
+            }
+        }
+    };
+
+    private final IssueListFragment.SortDrawerHelper mSortHelper =
             new IssueListFragment.SortDrawerHelper();
 
     private static final String STATE_KEY_SEARCH_QUERY = "search_query";
     private static final String STATE_KEY_SEARCH_MODE = "search_mode";
 
-    private static final String LIST_QUERY = "is:issue is:%s repo:%s/%s %s %s %s";
-    private static final String SEARCH_QUERY = "is:%s repo:%s/%s %s";
+    private static final String LIST_QUERY = "is:%s %s repo:%s/%s %s %s %s %s";
+    private static final String SEARCH_QUERY = "is:%s %s repo:%s/%s %s";
 
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
     };
 
-    private LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
+    private static final int[] PULL_REQUEST_TITLES = new int[] {
+        R.string.open, R.string.closed, R.string.merged
+    };
+
+    private static final int[][] HEADER_COLOR_ATTRS = new int[][] {
+        { R.attr.colorIssueOpen, R.attr.colorIssueOpenDark },
+        { R.attr.colorIssueClosed, R.attr.colorIssueClosedDark },
+        { R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark }
+    };
+
+    private final LoaderCallbacks<List<Label>> mLabelCallback =
+            new ProgressDialogLoaderCallbacks<List<Label>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
@@ -107,65 +142,44 @@ public class IssueListActivity extends BasePagerActivity implements
 
         @Override
         protected void onResultReady(List<Label> result) {
-            stopProgressDialog(mProgressDialog);
             mLabels = result;
             showLabelsDialog();
             getSupportLoaderManager().destroyLoader(0);
         }
-
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
-    private LoaderCallbacks<List<Milestone>> mMilestoneCallback =
-            new LoaderCallbacks<List<Milestone>>(this) {
+    private final LoaderCallbacks<List<Milestone>> mMilestoneCallback =
+            new ProgressDialogLoaderCallbacks<List<Milestone>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName,
-                    Constants.Issue.STATE_OPEN);
+                    ApiHelpers.IssueState.OPEN);
         }
 
         @Override
         protected void onResultReady(List<Milestone> result) {
-            stopProgressDialog(mProgressDialog);
             mMilestones = result;
             showMilestonesDialog();
             getSupportLoaderManager().destroyLoader(1);
         }
-
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
-    private LoaderCallbacks<List<User>> mCollaboratorListCallback =
-            new LoaderCallbacks<List<User>>(this) {
+    private final LoaderCallbacks<List<User>> mAssigneeListCallback =
+            new ProgressDialogLoaderCallbacks<List<User>>(this, this) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
-            return new CollaboratorListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
+            return new AssigneeListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
         }
 
         @Override
         protected void onResultReady(List<User> result) {
-            stopProgressDialog(mProgressDialog);
             mAssignees = result;
             showAssigneesDialog();
             getSupportLoaderManager().destroyLoader(2);
         }
-
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
-    private LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
+    private final LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
         @Override
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueListActivity.this, mRepoOwner, mRepoName);
@@ -180,29 +194,20 @@ public class IssueListActivity extends BasePagerActivity implements
                 }
             }
         }
-
-        @Override
-        protected boolean onError(Exception e) {
-            stopProgressDialog(mProgressDialog);
-            return false;
-        }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String state = getIntent().getStringExtra(Constants.Issue.STATE);
-        if (TextUtils.equals(state, Constants.Issue.STATE_CLOSED)) {
-            getPager().setCurrentItem(1);
-        }
+        mUserLogin = Gh4Application.get().getAuthLogin();
 
         if (savedInstanceState != null) {
             mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
             mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
         }
 
-        if (Gh4Application.get().isAuthorized()) {
+        if (!mIsPullRequest && Gh4Application.get().isAuthorized()) {
             CoordinatorLayout rootLayout = getRootLayout();
             mCreateFab = (FloatingActionButton) getLayoutInflater().inflate(
                     R.layout.add_fab, rootLayout, false);
@@ -213,7 +218,7 @@ public class IssueListActivity extends BasePagerActivity implements
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issues);
+        actionBar.setTitle(mIsPullRequest ? R.string.pull_requests : R.string.issues);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
@@ -221,8 +226,15 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mIsPullRequest = extras.getBoolean("is_pull_request");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacks(mRefreshRunnable);
     }
 
     @Override
@@ -231,15 +243,9 @@ public class IssueListActivity extends BasePagerActivity implements
         mMilestones = null;
         mLabels = null;
         mIsCollaborator = null;
+        mHandler.removeCallbacks(mRefreshRunnable);
         updateRightNavigationDrawer();
-
-        LoaderManager lm = getSupportLoaderManager();
-        for (int i = 0; i < 4; i++) {
-            Loader loader = lm.getLoader(i);
-            if (loader != null) {
-                loader.onContentChanged();
-            }
-        }
+        forceLoaderReload(0, 1, 2, 3);
         super.onRefresh();
     }
 
@@ -252,7 +258,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     protected int[] getTabTitleResIds() {
-        return TITLES;
+        return mIsPullRequest ? PULL_REQUEST_TITLES : TITLES;
     }
 
     @Override
@@ -274,25 +280,38 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int[][] getTabHeaderColors() {
-        return new int[][] {
-            {
-                UiUtils.resolveColor(this, R.attr.colorIssueOpen),
-                UiUtils.resolveColor(this, R.attr.colorIssueOpenDark)
-            },
-            {
-                UiUtils.resolveColor(this, R.attr.colorIssueClosed),
-                UiUtils.resolveColor(this, R.attr.colorIssueClosedDark)
-            }
-        };
+    protected int[][] getTabHeaderColorAttrs() {
+        return HEADER_COLOR_ATTRS;
     }
 
     @Override
-    protected Fragment getFragment(int position) {
+    protected Fragment makeFragment(int position) {
         if (mSearchMode) {
             return makeSearchFragment(position);
         } else {
             return makeListFragment(position);
+        }
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        if (mSearchMode) {
+            mSearchFragment = (IssueListFragment) f;
+        } else if (position == 1) {
+            mClosedFragment = (IssueListFragment) f;
+        } else {
+            mOpenFragment = (IssueListFragment) f;
+        }
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mSearchFragment) {
+            mSearchFragment = null;
+        } else if (f == mOpenFragment) {
+            mOpenFragment = null;
+        } else if (f == mClosedFragment) {
+            mClosedFragment = null;
         }
     }
 
@@ -311,8 +330,11 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ISSUE_CREATE) {
-            if (resultCode == Activity.RESULT_OK && mOpenFragment != null) {
-                mOpenFragment.onRefresh();
+            if (resultCode == Activity.RESULT_OK) {
+                // delay refresh for a bit, as
+                // - the fragment might not be created yet
+                // - Github seems to need some time to reflect new issues in their response
+                mHandler.postDelayed(mRefreshRunnable, 500);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -328,6 +350,11 @@ public class IssueListActivity extends BasePagerActivity implements
                     ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
         }
         return menuResIds;
+    }
+
+    @Override
+    protected int getInitialRightDrawerSelection() {
+        return R.id.sort_created_desc;
     }
 
     @Override
@@ -349,11 +376,16 @@ public class IssueListActivity extends BasePagerActivity implements
             case R.id.filter_by_milestone:
                 filterMilestone();
                 return true;
+            case R.id.filter_by_participating:
+                filterParticipating();
+                return true;
             case R.id.manage_labels:
-                manageLabels();
+                startActivity(IssueLabelListActivity.makeIntent(this,
+                        mRepoOwner, mRepoName, mIsPullRequest));
                 return true;
             case R.id.manage_milestones:
-                manageMilestones();
+                startActivity(IssueMilestoneListActivity.makeIntent(this,
+                        mRepoOwner, mRepoName, mIsPullRequest));
                 return true;
         }
 
@@ -414,21 +446,21 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        mSearchQuery = newText;
+        if (mSearchMode) {
+            mSearchQuery = newText;
+        }
         return false;
     }
 
     @Override
     public void onClick(View view) {
-        Intent intent = new Intent(this, IssueEditActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
+        Intent intent = IssueEditActivity.makeCreateIntent(this, mRepoOwner, mRepoName);
         startActivityForResult(intent, REQUEST_ISSUE_CREATE);
     }
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+        return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     private void setSearchMode(boolean enabled) {
@@ -448,21 +480,58 @@ public class IssueListActivity extends BasePagerActivity implements
         filterData.put("sort", mSortHelper.getSortMode());
         filterData.put("order", mSortHelper.getSortOrder());
         filterData.put("q", String.format(Locale.US, LIST_QUERY,
-                position == 1 ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
-                mRepoOwner, mRepoName,
+                mIsPullRequest ? "pr" : "issue",
+                getIssueType(position), mRepoOwner, mRepoName,
                 buildFilterItem("assignee", mSelectedAssignee),
                 buildFilterItem("label", mSelectedLabel),
-                buildFilterItem("milestone", mSelectedMilestone)));
+                buildFilterItem("milestone", mSelectedMilestone),
+                buildParticipatingFilterItem()));
 
-        final IssueListFragment f = IssueListFragment.newInstance(filterData,
-                position == 1, R.string.no_issues_found, false);
+        return IssueListFragment.newInstance(filterData,
+                getIssueState(position),
+                mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
+                false);
+    }
 
-        if (position == 1) {
-            mClosedFragment = f;
-        } else {
-            mOpenFragment = f;
+    private String getIssueState(int position) {
+        switch (position) {
+            case 1:
+                return ApiHelpers.IssueState.CLOSED;
+            case 2:
+                return ApiHelpers.IssueState.MERGED;
+            default:
+                return ApiHelpers.IssueState.OPEN;
         }
-        return f;
+    }
+
+    private String getIssueType(int position) {
+        String type = "is:" + getIssueState(position);
+        if (position == 1 && mIsPullRequest) {
+            type += " is:" + ApiHelpers.IssueState.UNMERGED;
+        }
+        return type;
+    }
+
+    private String buildParticipatingFilterItem() {
+        if (mSelectedParticipatingStatus == 1) {
+            return "involves:" + mUserLogin;
+        } else if (mSelectedParticipatingStatus == 2) {
+            return "-involves:" + mUserLogin;
+        } else {
+            return "";
+        }
+    }
+
+    private String buildFilterItem(String type, String value) {
+        if (!TextUtils.isEmpty(value)) {
+            return type + ":\"" + value + "\"";
+        } else if (value == null) {
+            // null means 'any value'
+            return "";
+        } else {
+            // empty string means 'no value set
+            return "no:" + type;
+        }
     }
 
     private String buildFilterItem(String type, String value) {
@@ -474,17 +543,18 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private Fragment makeSearchFragment(int position) {
-        boolean closed = position == 1;
         Map<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortHelper.getSortMode());
         filterData.put("order", mSortHelper.getSortOrder());
         filterData.put("q", String.format(Locale.US, SEARCH_QUERY,
-                closed ? Constants.Issue.STATE_CLOSED : Constants.Issue.STATE_OPEN,
-                mRepoOwner, mRepoName, mSearchQuery));
+                mIsPullRequest ? "pr" : "issue",
+                getIssueType(position), mRepoOwner, mRepoName, mSearchQuery));
 
-        mSearchFragment = IssueListFragment.newInstance(filterData, closed,
-                R.string.no_search_issues_found, false);
-        return mSearchFragment;
+        int emptyTextResId = mIsPullRequest
+                ? R.string.no_search_pull_requests_found
+                : R.string.no_search_issues_found;
+        return IssueListFragment.newInstance(filterData, getIssueState(position),
+                emptyTextResId, false);
     }
 
     private void reloadIssueList() {
@@ -494,22 +564,25 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private void showLabelsDialog() {
-        final String[] labels = new String[mLabels.size() + 1];
-        int selected = 0;
+        final String[] labels = new String[mLabels.size() + 2];
+        int selected = mSelectedLabel != null && mSelectedLabel.isEmpty() ? 1 : 0;
 
         labels[0] = getResources().getString(R.string.issue_filter_by_any_label);
+        labels[1] = getResources().getString(R.string.issue_filter_by_no_label);
 
         for (int i = 0; i < mLabels.size(); i++) {
-            labels[i + 1] = mLabels.get(i).getName();
-            if (TextUtils.equals(mSelectedLabel, labels[i + 1])) {
-                selected = i + 1;
+            labels[i + 2] = mLabels.get(i).getName();
+            if (TextUtils.equals(mSelectedLabel, labels[i + 2])) {
+                selected = i + 2;
             }
         }
 
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSelectedLabel = which == 0 ? null : labels[which];
+                mSelectedLabel = which == 0 ? null
+                        : which == 1 ? ""
+                        : labels[which];
                 dialog.dismiss();
                 reloadIssueList();
             }
@@ -524,22 +597,25 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private void showMilestonesDialog() {
-        final String[] milestones = new String[mMilestones.size() + 1];
-        int selected = 0;
+        final String[] milestones = new String[mMilestones.size() + 2];
+        int selected = mSelectedMilestone != null && mSelectedMilestone.isEmpty() ? 1 : 0;
 
         milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
+        milestones[1] = getResources().getString(R.string.issue_filter_by_no_milestone);
 
-        for (int i = 1; i <= mMilestones.size(); i++) {
-            milestones[i] = mMilestones.get(i - 1).getTitle();
-            if (TextUtils.equals(mSelectedMilestone, milestones[i])) {
-                selected = i;
+        for (int i = 0; i < mMilestones.size(); i++) {
+            milestones[i + 2] = mMilestones.get(i).getTitle();
+            if (TextUtils.equals(mSelectedMilestone, milestones[i + 2])) {
+                selected = i + 2;
             }
         }
 
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSelectedMilestone = which != 0 ? milestones[which] : null;
+                mSelectedMilestone = which == 0 ? null
+                        : which == 1 ? ""
+                        : milestones[which];
                 dialog.dismiss();
                 reloadIssueList();
             }
@@ -554,23 +630,26 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private void showAssigneesDialog() {
-        final String[] assignees = new String[mAssignees.size() + 1];
-        int selected = 0;
+        final String[] assignees = new String[mAssignees.size() + 2];
+        int selected = mSelectedAssignee != null && mSelectedAssignee.isEmpty() ? 1 : 0;
 
         assignees[0] = getResources().getString(R.string.issue_filter_by_any_assignee);
+        assignees[1] = getResources().getString(R.string.issue_filter_by_no_assignee);
 
-        for (int i = 1; i <= mAssignees.size(); i++) {
-            User u = mAssignees.get(i - 1);
-            assignees[i] = u.getLogin();
+        for (int i = 0; i < mAssignees.size(); i++) {
+            User u = mAssignees.get(i);
+            assignees[i + 2] = u.getLogin();
             if (u.getLogin().equalsIgnoreCase(mSelectedAssignee)) {
-                selected = i;
+                selected = i + 2;
             }
         }
 
         DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mSelectedAssignee = which != 0 ? mAssignees.get(which - 1).getLogin() : null;
+                mSelectedAssignee = which == 0 ? null
+                        : which == 1 ? ""
+                        : mAssignees.get(which - 2).getLogin();
                 dialog.dismiss();
                 reloadIssueList();
             }
@@ -586,8 +665,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private void filterAssignee() {
         if (mAssignees == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
-            getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
+            getSupportLoaderManager().initLoader(2, null, mAssigneeListCallback);
         } else {
             showAssigneesDialog();
         }
@@ -595,7 +673,6 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private void filterMilestone() {
         if (mMilestones == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
         } else {
             showMilestonesDialog();
@@ -604,24 +681,28 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private void filterLabel() {
         if (mLabels == null) {
-            mProgressDialog = showProgressDialog(getString(R.string.loading_msg), true);
             getSupportLoaderManager().initLoader(0, null, mLabelCallback);
         } else {
             showLabelsDialog();
         }
     }
 
-    private void manageLabels() {
-        Intent intent = new Intent(this, IssueLabelListActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        startActivity(intent);
-    }
+    private void filterParticipating() {
+        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mSelectedParticipatingStatus = which;
+                dialog.dismiss();
+                reloadIssueList();
+            }
+        };
 
-    private void manageMilestones() {
-        Intent intent = new Intent(this, IssueMilestoneListActivity.class);
-        intent.putExtra(Constants.Repository.OWNER, mRepoOwner);
-        intent.putExtra(Constants.Repository.NAME, mRepoName);
-        startActivity(intent);
+        new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setTitle(R.string.issue_filter_by_participating)
+                .setSingleChoiceItems(R.array.filter_participating, mSelectedParticipatingStatus,
+                        selectCb)
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 }

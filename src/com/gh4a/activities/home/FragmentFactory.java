@@ -1,27 +1,32 @@
 package com.gh4a.activities.home;
 
 import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.eclipse.egit.github.core.User;
+
 public abstract class FragmentFactory {
-    protected HomeActivity mActivity;
+    protected final HomeActivity mActivity;
 
     protected FragmentFactory(HomeActivity activity) {
         mActivity = activity;
     }
 
-    protected abstract int getTitleResId();
+    protected abstract @StringRes int getTitleResId();
     protected abstract int[] getTabTitleResIds();
-    protected abstract Fragment getFragment(int position);
+    protected abstract Fragment makeFragment(int position);
 
-    /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
-    protected int[][] getTabHeaderColors() {
-        return null;
+    protected void onFragmentInstantiated(Fragment f, int position) {
     }
 
-    protected int[] getHeaderColors() {
+    protected void onFragmentDestroyed(Fragment f) {
+    }
+
+    protected int[] getHeaderColorAttrs() {
         return null;
     }
 
@@ -49,7 +54,13 @@ public abstract class FragmentFactory {
 
     protected void onRestoreInstanceState(Bundle state) {}
 
+    protected void onRefresh() {}
+
     protected void onDestroy() {}
 
-    protected void onStart() {}
+    protected @IdRes int getInitialToolDrawerSelection() {
+        return 0;
+    }
+
+    protected void setUserInfo(User user) { }
 }

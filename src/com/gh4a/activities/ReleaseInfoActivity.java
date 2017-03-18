@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -27,7 +28,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Constants;
 import com.gh4a.R;
 import com.gh4a.adapter.DownloadAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -37,13 +37,11 @@ import com.gh4a.loader.MarkdownLoader;
 import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.SwipeRefreshLayout;
-import com.github.mobile.util.HtmlUtils;
-import com.github.mobile.util.HttpImageGetter;
 
 import org.eclipse.egit.github.core.Download;
 import org.eclipse.egit.github.core.Release;
@@ -51,6 +49,21 @@ import org.eclipse.egit.github.core.Release;
 public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
         RootAdapter.OnItemClickListener<Download> {
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, long id) {
+        return new Intent(context, ReleaseInfoActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("id", id);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+                                    Release release) {
+        return new Intent(context, ReleaseInfoActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra("release", release);
+    }
+
     private String mRepoOwner;
     private String mRepoName;
     private Release mRelease;
@@ -59,7 +72,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     private View mRootView;
     private HttpImageGetter mImageGetter;
 
-    private LoaderCallbacks<Release> mReleaseCallback = new LoaderCallbacks<Release>(this) {
+    private final LoaderCallbacks<Release> mReleaseCallback = new LoaderCallbacks<Release>(this) {
         @Override
         protected Loader<LoaderResult<Release>> onCreateLoader() {
             return new ReleaseLoader(ReleaseInfoActivity.this, mRepoOwner, mRepoName, mReleaseId);
@@ -72,7 +85,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
             setContentShown(true);
         }
     };
-    private LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>(this) {
+    private final LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>(this) {
         @Override
         protected Loader<LoaderResult<String>> onCreateLoader() {
             return new MarkdownLoader(ReleaseInfoActivity.this,
@@ -111,10 +124,10 @@ public class ReleaseInfoActivity extends BaseActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString(Constants.Repository.OWNER);
-        mRepoName = extras.getString(Constants.Repository.NAME);
-        mRelease = (Release) extras.getSerializable(Constants.Release.RELEASE);
-        mReleaseId = extras.getLong(Constants.Release.ID);
+        mRepoOwner = extras.getString("owner");
+        mRepoName = extras.getString("repo");
+        mRelease = (Release) extras.getSerializable("release");
+        mReleaseId = extras.getLong("id");
     }
 
     @Override
@@ -124,11 +137,10 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     public void onRefresh() {
-        Loader loader = getSupportLoaderManager().getLoader(0);
-        if (loader != null) {
+        if (forceLoaderReload(0)) {
             mRelease = null;
             setContentShown(false);
-            loader.onContentChanged();
+            mImageGetter.clearHtmlCache();
             getSupportLoaderManager().destroyLoader(1);
         }
         super.onRefresh();
@@ -154,7 +166,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     protected Intent navigateUp() {
-        return IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName, null);
+        return ReleaseListActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
     private void handleReleaseReady() {
@@ -215,7 +227,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
         TextView body = (TextView) findViewById(R.id.tv_release_notes);
 
         if (!StringUtils.isBlank(bodyHtml)) {
-            bodyHtml = HtmlUtils.format(bodyHtml).toString();
             mImageGetter.bind(body, bodyHtml, mRelease.getId());
             body.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         } else {
@@ -232,11 +243,11 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
         switch (v.getId()) {
             case R.id.tv_releasetag:
-                intent = IntentUtils.getRepoActivityIntent(this, mRepoOwner, mRepoName,
-                        mRelease.getTagName());
+                intent = RepositoryActivity.makeIntent(this,
+                        mRepoOwner, mRepoName, mRelease.getTagName());
                 break;
             case R.id.iv_gravatar:
-                intent = IntentUtils.getUserActivityIntent(this, mRelease.getAuthor());
+                intent = UserActivity.makeIntent(this, mRelease.getAuthor());
                 break;
         }
 

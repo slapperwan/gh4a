@@ -15,18 +15,20 @@
  */
 package com.gh4a.adapter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import android.content.Context;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * The Root adapter.
@@ -39,6 +41,9 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     public interface OnItemClickListener<T> {
         void onItemClick(T item);
     }
+    public interface OnContextMenuListener<T> {
+        void onCreateContextMenu(ContextMenu menu, T item);
+    }
     public interface OnScrolledToFooterListener {
         void onScrolledToFooter();
     }
@@ -47,7 +52,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
      * The objects.
      */
     private List<T> mObjects;
-    private List<T> mUnfilteredObjects;
+    private final List<T> mUnfilteredObjects;
 
     /**
      * The context.
@@ -55,16 +60,21 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     protected final Context mContext;
     private final LayoutInflater mInflater;
     private OnItemClickListener<T> mItemClickListener;
+    private boolean mContextMenuSupported;
 
     private View mHeaderView;
     private View mFooterView;
     private OnScrolledToFooterListener mFooterListener;
+    private int mHighlightPosition = -1;
+    private boolean mHolderCreated = false;
 
-    private static final int VIEW_TYPE_ITEM = 0;
-    private static final int VIEW_TYPE_HEADER = 1;
-    private static final int VIEW_TYPE_FOOTER = 2;
+    private static final int VIEW_TYPE_HEADER = 0;
+    private static final int VIEW_TYPE_FOOTER = 1;
+    private static final int VIEW_TYPE_ITEM = 2;
 
-    private Filter mFilter = new Filter() {
+    public static final int CUSTOM_VIEW_TYPE_START = VIEW_TYPE_ITEM;
+
+    private final Filter mFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
@@ -116,7 +126,17 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     }
 
     public void setOnItemClickListener(OnItemClickListener<T> listener) {
+        if (mHolderCreated) {
+            throw new IllegalStateException("Must not set item click listener after views are bound");
+        }
         mItemClickListener = listener;
+    }
+
+    public void setContextMenuSupported(boolean supported) {
+        if (mHolderCreated) {
+            throw new IllegalStateException("Must not set context menu state after views are bound");
+        }
+        mContextMenuSupported = supported;
     }
 
     @Override
@@ -134,7 +154,9 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         } else if (mFooterView != null && position == itemStart + mObjects.size()) {
             return VIEW_TYPE_FOOTER;
         } else {
-            return VIEW_TYPE_ITEM;
+            int viewType = getItemViewType(getItem(position - itemStart));
+            assert viewType >= CUSTOM_VIEW_TYPE_START;
+            return viewType;
         }
     }
 
@@ -180,17 +202,28 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         notifyDataSetChanged();
     }
 
+    public void highlight(int position) {
+        mHighlightPosition = position;
+        notifyDataSetChanged();
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        mHolderCreated = true;
         switch (viewType) {
             case VIEW_TYPE_HEADER:
                 return new HeaderViewHolder(mHeaderView);
             case VIEW_TYPE_FOOTER:
                 return new FooterViewHolder(mFooterView);
             default:
-                RecyclerView.ViewHolder holder = onCreateViewHolder(mInflater, parent);
-                holder.itemView.setOnClickListener(this);
-                holder.itemView.setTag(holder);
+                RecyclerView.ViewHolder holder = onCreateViewHolder(mInflater, parent, viewType);
+                if (mItemClickListener != null) {
+                    holder.itemView.setOnClickListener(this);
+                    holder.itemView.setTag(holder);
+                }
+                if (mContextMenuSupported) {
+                    holder.itemView.setLongClickable(true);
+                }
                 return holder;
         }
     }
@@ -203,24 +236,42 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
             }
         } else if (!(holder instanceof HeaderViewHolder)) {
             onBindViewHolder((VH) holder, getItemFromAdapterPosition(position));
+            if (position == mHighlightPosition) {
+                final View v = holder.itemView;
+                v.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (v.getBackground() != null) {
+                            final int centerX = v.getWidth() / 2;
+                            final int centerY = v.getHeight() / 2;
+                            DrawableCompat.setHotspot(v.getBackground(), centerX, centerY);
+                        }
+                        v.setPressed(true);
+                        v.setPressed(false);
+                        mHighlightPosition = -1;
+                    }
+                });
+            }
         }
     }
 
     @Override
     public void onClick(View view) {
-        if (mItemClickListener != null) {
-            VH holder = (VH) view.getTag();
-            int position = holder.getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                mItemClickListener.onItemClick(getItemFromAdapterPosition(position));
-            }
+        VH holder = (VH) view.getTag();
+        int position = holder.getAdapterPosition();
+        if (position != RecyclerView.NO_POSITION) {
+            mItemClickListener.onItemClick(getItemFromAdapterPosition(position));
         }
     }
 
-    protected abstract VH onCreateViewHolder(LayoutInflater inflater, ViewGroup parent);
+    protected abstract VH onCreateViewHolder(LayoutInflater inflater, ViewGroup parent,
+            int viewType);
     protected abstract void onBindViewHolder(VH holder, T item);
     protected boolean isFiltered(CharSequence filter, T object) {
         return true;
+    }
+    protected int getItemViewType(T item) {
+        return VIEW_TYPE_ITEM;
     }
 
     @Override

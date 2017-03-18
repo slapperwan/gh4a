@@ -15,33 +15,48 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.Constants;
 import com.gh4a.R;
+import com.gh4a.holder.Feed;
 
 public class BlogActivity extends WebViewerActivity {
+    public static Intent makeIntent(Context context, Feed blog) {
+        return new Intent(context, BlogActivity.class)
+                .putExtra("title", blog.getTitle())
+                .putExtra("content", blog.getContent());
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String title = getIntent().getStringExtra(Constants.Blog.TITLE);
-        String content = getIntent().getStringExtra(Constants.Blog.CONTENT);
-
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(title);
+        actionBar.setTitle(getDocumentTitle());
         actionBar.setSubtitle(R.string.blog);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        loadUnthemedHtml(content);
+        onDataReady();
     }
 
     @Override
     protected boolean canSwipeToRefresh() {
         // content is contained in the intent extras
         return false;
+    }
+
+    @Override
+    protected String generateHtml(String cssTheme, boolean addTitleHeader) {
+        String title = addTitleHeader ? getDocumentTitle() : null;
+        return wrapUnthemedHtml(getIntent().getStringExtra("content"), cssTheme, title);
+    }
+
+    @Override
+    protected String getDocumentTitle() {
+        return getIntent().getStringExtra("title");
     }
 
     @Override

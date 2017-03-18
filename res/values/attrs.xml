@@ -4,6 +4,7 @@
     <attr name="headerTheme" format="reference" />
     <attr name="cardViewTheme" format="reference" />
     <attr name="listBackground" format="reference" />
+    <attr name="cardBackground" format="reference" />
     <attr name="drawerBackground" format="reference" />
     <attr name="colorIssueOpen" format="color" />
     <attr name="colorIssueClosed" format="color" />
@@ -17,11 +18,13 @@
     <attr name="colorFab" format="color" />
     <attr name="colorPrimaryTextEmphasized" format="color" />
     <attr name="colorBreadcrumbBackground" format="color" />
+    <attr name="colorWebViewBackground" format="color" />
 
     <attr name="sendIcon" format="reference" />
-    <attr name="contentEditIcon" format="reference" />
+    <attr name="commentEditIcon" format="reference" />
     <attr name="sortIcon" format="reference" />
     <attr name="contentPictureIcon" format="reference" />
+    <attr name="loadingPictureIcon" format="reference" />
     <attr name="searchUserIcon" format="reference" />
     <attr name="searchRepoIcon" format="reference" />
     <attr name="searchCodeIcon" format="reference" />
@@ -33,6 +36,7 @@
     <attr name="commentsIcon" format="reference" />
     <attr name="languageSmallIcon" format="reference" />
     <attr name="forkSmallIcon" format="reference" />
+    <attr name="forkSmallBoldIcon" format="reference" />
     <attr name="starSmallIcon" format="reference" />
     <attr name="sizeSmallIcon" format="reference" />
     <attr name="dueSmallIcon" format="reference" />
@@ -46,6 +50,7 @@
     <attr name="labelsIcon" format="reference" />
     <attr name="branchIcon" format="reference" />
     <attr name="tagIcon" format="reference" />
+    <attr name="pullRequestIcon" format="reference" />
     <attr name="pullRequestMergeOkIcon" format="reference" />
     <attr name="pullRequestMergeUnstableIcon" format="reference" />
     <attr name="pullRequestMergeDirtyIcon" format="reference" />
@@ -53,10 +58,30 @@
     <attr name="commitStatusOkIcon" format="reference" />
     <attr name="commitStatusUnknownIcon" format="reference" />
     <attr name="commitStatusFailIcon" format="reference" />
+    <attr name="issueEventClosedIcon" format="reference" />
+    <attr name="issueEventReopenedIcon" format="reference" />
+    <attr name="issueEventMergedIcon" format="reference" />
+    <attr name="issueEventReferencedIcon" format="reference" />
+    <attr name="issueEventAssignedIcon" format="reference" />
+    <attr name="issueEventUnassignedIcon" format="reference" />
+    <attr name="issueEventLabeledIcon" format="reference" />
+    <attr name="issueEventUnlabeledIcon" format="reference" />
+    <attr name="issueEventLockedIcon" format="reference" />
+    <attr name="issueEventUnlockedIcon" format="reference" />
+    <attr name="issueEventMilestonedIcon" format="reference" />
+    <attr name="issueEventDemilestonedIcon" format="reference" />
+    <attr name="issueEventRenamedIcon" format="reference" />
+    <attr name="overflowIcon" format="reference" />
+    <attr name="mergedIcon" format="reference" />
+    <attr name="issueIcon" format="reference" />
+    <attr name="markAllAsReadIcon" format="reference" />
+    <attr name="commitIcon" format="reference" />
+    <attr name="descriptionIcon" format="reference" />
+    <attr name="releaseIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
-        <attr name="badgeSize" format="dimension"/>
-        <attr name="badgeSpacing" format="dimension"/>
+        <attr name="badgeSize" format="dimension" />
+        <attr name="badgeSpacing" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="StyleableTextView">
@@ -68,7 +93,7 @@
             <enum name="condensed" value="4" />
             <enum name="boldCondensed" value="5" />
         </attr>
-        <attr name="allCaps" format="boolean"/>
+        <attr name="allCaps" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="IssueStateTrackingFloatingActionButton">
