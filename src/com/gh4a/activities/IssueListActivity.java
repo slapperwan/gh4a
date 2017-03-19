@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PersistableBundle;
+import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -94,7 +95,6 @@ public class IssueListActivity extends BasePagerActivity implements
     private FloatingActionButton mCreateFab;
     private IssueListFragment mOpenFragment;
     private IssueListFragment mClosedFragment;
-    private IssueListFragment mSearchFragment;
     private Boolean mIsCollaborator;
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
@@ -286,18 +286,36 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     protected Fragment makeFragment(int position) {
+        final @StringRes int emptyTextResId;
+        final Map<String, String> filterData = new HashMap<>();
+
+        filterData.put("sort", mSortHelper.getSortMode());
+        filterData.put("order", mSortHelper.getSortOrder());
         if (mSearchMode) {
-            return makeSearchFragment(position);
+            filterData.put("q", String.format(Locale.US, SEARCH_QUERY,
+                    mIsPullRequest ? "pr" : "issue",
+                    getIssueType(position), mRepoOwner, mRepoName, mSearchQuery));
+            emptyTextResId = mIsPullRequest
+                    ? R.string.no_search_pull_requests_found : R.string.no_search_issues_found;
         } else {
-            return makeListFragment(position);
+            filterData.put("q", String.format(Locale.US, LIST_QUERY,
+                    mIsPullRequest ? "pr" : "issue",
+                    getIssueType(position), mRepoOwner, mRepoName,
+                    buildFilterItem("assignee", mSelectedAssignee),
+                    buildFilterItem("label", mSelectedLabel),
+                    buildFilterItem("milestone", mSelectedMilestone),
+                    buildParticipatingFilterItem()));
+            emptyTextResId = mIsPullRequest
+                    ? R.string.no_pull_requests_found : R.string.no_issues_found;
         }
+
+        return IssueListFragment.newInstance(filterData,
+                getIssueState(position), emptyTextResId, false);
     }
 
     @Override
     protected void onFragmentInstantiated(Fragment f, int position) {
-        if (mSearchMode) {
-            mSearchFragment = (IssueListFragment) f;
-        } else if (position == 1) {
+        if (position == 1) {
             mClosedFragment = (IssueListFragment) f;
         } else {
             mOpenFragment = (IssueListFragment) f;
@@ -306,9 +324,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     protected void onFragmentDestroyed(Fragment f) {
-        if (f == mSearchFragment) {
-            mSearchFragment = null;
-        } else if (f == mOpenFragment) {
+        if (f == mOpenFragment) {
             mOpenFragment = null;
         } else if (f == mClosedFragment) {
             mClosedFragment = null;
@@ -317,14 +333,8 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     protected boolean fragmentNeedsRefresh(Fragment object) {
-        if (object instanceof IssueListFragment) {
-            if (mSearchMode && object != mSearchFragment) {
-                return true;
-            } else if (!mSearchMode && object != mOpenFragment && object != mClosedFragment) {
-                return true;
-            }
-        }
-        return false;
+        return object instanceof IssueListFragment
+                && object != mOpenFragment && object != mClosedFragment;
     }
 
     @Override
@@ -475,24 +485,6 @@ public class IssueListActivity extends BasePagerActivity implements
         }
     }
 
-    private Fragment makeListFragment(int position) {
-        Map<String, String> filterData = new HashMap<>();
-        filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("order", mSortHelper.getSortOrder());
-        filterData.put("q", String.format(Locale.US, LIST_QUERY,
-                mIsPullRequest ? "pr" : "issue",
-                getIssueType(position), mRepoOwner, mRepoName,
-                buildFilterItem("assignee", mSelectedAssignee),
-                buildFilterItem("label", mSelectedLabel),
-                buildFilterItem("milestone", mSelectedMilestone),
-                buildParticipatingFilterItem()));
-
-        return IssueListFragment.newInstance(filterData,
-                getIssueState(position),
-                mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
-                false);
-    }
-
     private String getIssueState(int position) {
         switch (position) {
             case 1:
@@ -532,21 +524,6 @@ public class IssueListActivity extends BasePagerActivity implements
             // empty string means 'no value set
             return "no:" + type;
         }
-    }
-
-    private Fragment makeSearchFragment(int position) {
-        Map<String, String> filterData = new HashMap<>();
-        filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("order", mSortHelper.getSortOrder());
-        filterData.put("q", String.format(Locale.US, SEARCH_QUERY,
-                mIsPullRequest ? "pr" : "issue",
-                getIssueType(position), mRepoOwner, mRepoName, mSearchQuery));
-
-        int emptyTextResId = mIsPullRequest
-                ? R.string.no_search_pull_requests_found
-                : R.string.no_search_issues_found;
-        return IssueListFragment.newInstance(filterData, getIssueState(position),
-                emptyTextResId, false);
     }
 
     private void reloadIssueList() {
