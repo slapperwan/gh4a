@@ -381,6 +381,13 @@ public class UiUtils {
         return view.getText().subSequence(min, max);
     }
 
+    public static void replaceSelectionText(EditText view, CharSequence text) {
+        int selectionStart = view.getSelectionStart();
+        int selectionEnd = view.getSelectionEnd();
+
+        view.getText().replace(selectionStart, selectionEnd, text);
+    }
+
     public static abstract class QuoteActionModeCallback implements ActionMode.Callback {
         private final TextView mView;
 
