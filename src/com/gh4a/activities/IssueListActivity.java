@@ -304,7 +304,7 @@ public class IssueListActivity extends BasePagerActivity implements
                     buildFilterItem("assignee", mSelectedAssignee),
                     buildFilterItem("label", mSelectedLabel),
                     buildFilterItem("milestone", mSelectedMilestone),
-                    buildParticipatingFilterItem()));
+                    buildParticipatingFilterItem()).trim());
             emptyTextResId = mIsPullRequest
                     ? R.string.no_pull_requests_found : R.string.no_issues_found;
         }
@@ -450,15 +450,14 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        mSearchQuery = query;
         setSearchMode(true);
         return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if (mSearchMode) {
-            mSearchQuery = newText;
-        }
+        mSearchQuery = newText;
         return false;
     }
 
