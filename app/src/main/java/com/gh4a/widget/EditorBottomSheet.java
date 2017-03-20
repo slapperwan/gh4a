@@ -53,6 +53,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private int mBasicPeekHeight;
     private int mAdvancedPeekHeight;
     private int mLatestOffset;
+    private View mResizingView;
 
     public EditorBottomSheet(Context context) {
         super(context);
@@ -141,7 +142,18 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             // Update peek height to keep the bottom sheet at unchanged position
             int defaultPeekHeight = isInAdvancedMode() ? mAdvancedPeekHeight : mBasicPeekHeight;
             getBehavior().setPeekHeight(defaultPeekHeight + mLatestOffset);
+
+            if (mResizingView != null) {
+                MarginLayoutParams lp = (MarginLayoutParams) mResizingView.getLayoutParams();
+                lp.setMargins(lp.leftMargin, lp.topMargin, lp.rightMargin,
+                        defaultPeekHeight + mLatestOffset);
+                mResizingView.setLayoutParams(lp);
+            }
         }
+    }
+
+    public void setResizingView(View view) {
+        mResizingView = view;
     }
 
     public boolean isExpanded() {
