@@ -281,12 +281,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         updateCommentSectionVisibility(getView());
     }
 
-    @Override
-    protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
-        super.setHighlightColors(colorAttrId, statusBarColorAttrId);
-        mBottomSheet.setPagerColors(colorAttrId);
-    }
-
     private void updateCommentSectionVisibility(View v) {
         if (v == null) {
             return;

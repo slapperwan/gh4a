@@ -52,6 +52,10 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
         mMentionAdapter.replace(users);
     }
 
+    public Set<User> getMentionUsers() {
+        return mMentionAdapter.getUnfilteredUsers();
+    }
+
     public void setCommentEditorHintResId(@StringRes int resId) {
         mCommentEditorHintResId = resId;
         updateLockState();
@@ -60,6 +64,10 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
     public void setLocked(boolean locked) {
         mLocked = locked;
         updateLockState();
+    }
+
+    public boolean isLocked() {
+        return mLocked;
     }
 
     public void addQuote(CharSequence text) {

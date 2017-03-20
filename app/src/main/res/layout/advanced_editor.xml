@@ -1,59 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/advanced_editor"
-    android:background="?android:colorBackground"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_height="@dimen/comment_bottom_sheet_height"
+    android:background="?android:colorBackground"
     android:visibility="gone"
     tools:visibility="visible">
 
-    <android.support.v4.widget.NestedScrollView
+    <com.gh4a.widget.WrapContentHeightViewPager
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/comment_bottom_sheet_height">
+        android:layout_height="wrap_content">
 
-        <com.gh4a.widget.WrapContentHeightViewPager
-            android:id="@+id/view_pager"
+        <LinearLayout
+            android:id="@+id/advanced_editor_box"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/comment_bottom_sheet_height"
+            android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/advanced_editor_box"
+            <com.gh4a.widget.CommentEditor
+                android:id="@+id/et_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="@dimen/comment_bottom_sheet_height">
+                android:layout_margin="8dp"
+                android:inputType="textMultiLine|textCapSentences"
+                tools:text="Enter comment"/>
 
-                <com.gh4a.widget.CommentEditor
-                    android:id="@+id/et_comment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:padding="8dp"
-                    tools:text="Enter comment"/>
-
-            </LinearLayout>
-
-            <com.gh4a.widget.MarkdownPreviewWebView
-                android:id="@+id/wv_preview"
+            <HorizontalScrollView
+                android:id="@+id/markdown_buttons"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="48dp"
+                android:layout_gravity="bottom"
+                android:visibility="gone">
 
-        </com.gh4a.widget.WrapContentHeightViewPager>
+            </HorizontalScrollView>
 
-    </android.support.v4.widget.NestedScrollView>
+        </LinearLayout>
 
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabs"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?colorPrimary"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="@color/tab_indicator_color"
-        app:tabMaxWidth="-1dp"
-        app:tabMode="scrollable"
-        app:tabSelectedTextColor="@color/tab_indicator_color"
-        app:tabTextColor="@color/tab_text_color"/>
-</LinearLayout>
+        <com.gh4a.widget.MarkdownPreviewWebView
+            android:id="@+id/wv_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </com.gh4a.widget.WrapContentHeightViewPager>
+
+</android.support.v4.widget.NestedScrollView>

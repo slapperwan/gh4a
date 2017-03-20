@@ -23,6 +23,7 @@
     <attr name="colorDiffRemoveBackground" format="color" />
     <attr name="colorDiffAddLineNumberBackground" format="color" />
     <attr name="colorDiffRemoveLineNumberBackground" format="color" />
+    <attr name="colorIconForeground" format="color" />
 
     <attr name="sendIcon" format="reference" />
     <attr name="commentEditIcon" format="reference" />
