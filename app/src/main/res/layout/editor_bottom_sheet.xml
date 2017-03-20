@@ -12,7 +12,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="4dp"
+        android:layout_height="@dimen/bottom_sheet_top_shadow_height"
         android:background="@drawable/top_shadow" />
 
     <LinearLayout
