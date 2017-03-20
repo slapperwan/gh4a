@@ -18,9 +18,11 @@ package com.gh4a.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.util.Pair;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -119,7 +121,15 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
 
     @Override
     protected int getLeftNavigationDrawerMenuResource() {
-        return R.menu.anon_nav_drawer;
+        return R.menu.home_nav_drawer;
+    }
+
+    @IdRes
+    protected int getInitialLeftDrawerSelection(Menu menu) {
+        menu.setGroupCheckable(R.id.navigation, false, false);
+        menu.setGroupCheckable(R.id.explore, false, false);
+        menu.setGroupVisible(R.id.my_items, false);
+        return super.getInitialLeftDrawerSelection(menu);
     }
 
     @Override

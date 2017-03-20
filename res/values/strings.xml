@@ -429,10 +429,6 @@
     <string name="gist_no_description">&lt;No description&gt;</string>
     <string name="gist_files">Files</string>
 
-    <!-- Explore -->
-    <string name="navigation">Navigation</string>
-    <string name="explore">Explore</string>
-
     <!-- Trending repos -->
     <string name="trend">Trending Repos</string>
     <string name="trend_today">Today</string>

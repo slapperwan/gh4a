@@ -121,7 +121,7 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected int getInitialLeftDrawerSelection() {
+    protected int getInitialLeftDrawerSelection(Menu menu) {
         return mSelectedFactoryId;
     }
 

@@ -152,7 +152,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     @IdRes
-    protected int getInitialLeftDrawerSelection() {
+    protected int getInitialLeftDrawerSelection(Menu menu) {
         return 0;
     }
 
@@ -585,7 +585,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
             leftDrawer.inflateMenu(drawerMenuResId);
             leftDrawer.setNavigationItemSelectedListener(this);
 
-            int initialLeftDrawerSelection = getInitialLeftDrawerSelection();
+            int initialLeftDrawerSelection = getInitialLeftDrawerSelection(leftDrawer.getMenu());
             if (initialLeftDrawerSelection != 0) {
                 leftDrawer.setCheckedItem(initialLeftDrawerSelection);
             }
