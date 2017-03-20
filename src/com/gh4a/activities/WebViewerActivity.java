@@ -264,13 +264,14 @@ public abstract class WebViewerActivity extends BaseActivity implements
         StringBuilder content = new StringBuilder();
         content.append("<html><head>");
         writeScriptInclude(content, "showdown");
+        writeScriptInclude(content, "base64");
         writeCssInclude(content, "markdown");
         content.append("</head>");
 
         content.append("<body><div id='content'></div>");
 
         content.append("<script>");
-        content.append("var text = window.atob('");
+        content.append("var text = Base64.decode('");
         content.append(base64Data.replaceAll("\\n", ""));
         content.append("');\n");
         content.append("var converter = new showdown.Converter();\n");
