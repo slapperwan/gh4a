@@ -23,9 +23,7 @@
 
         <ImageView
             android:id="@+id/iv_advanced_editor_toggle"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="12dp"
+            style="@style/ImageButton"
             android:src="?expandIcon" />
 
         <com.gh4a.widget.CommentEditor
@@ -54,9 +52,7 @@
 
         <ImageView
             android:id="@+id/send_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:padding="12dp"
+            style="@style/ImageButton"
             android:src="?sendIcon" />
 
     </LinearLayout>
