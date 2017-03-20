@@ -6,7 +6,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.view.SupportMenuInflater;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -23,7 +22,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 import org.eclipse.egit.github.core.Repository;
@@ -49,7 +47,6 @@ public class RepositoryListContainerFragment extends Fragment implements
     private String mSortDirection = "asc";
     private boolean mSearchVisible;
 
-    private MenuInflater mMenuInflater;
     private PagedDataBaseFragment<Repository> mMainFragment;
     private RepositorySearchFragment mSearchFragment;
     private MenuItem mFilterItem;
@@ -110,7 +107,6 @@ public class RepositoryListContainerFragment extends Fragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mMenuInflater = new SupportMenuInflater(UiUtils.makeHeaderThemedContext(getActivity()));
 
         FragmentManager fm = getChildFragmentManager();
         mMainFragment = (PagedDataBaseFragment<Repository>) fm.findFragmentByTag("main");
@@ -232,7 +228,7 @@ public class RepositoryListContainerFragment extends Fragment implements
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        mMenuInflater.inflate(R.menu.repo_list_menu, menu);
+        getActivity().getMenuInflater().inflate(R.menu.repo_list_menu, menu);
 
         // We can only properly search the 'all repos' list
         if ("all".equals(mFilterType)) {

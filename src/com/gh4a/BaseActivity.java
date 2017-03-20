@@ -45,11 +45,13 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
+import android.support.v7.view.SupportMenuInflater;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,6 +95,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private NavigationView mRightDrawer;
     private View mLeftDrawerTitle;
     private View mRightDrawerTitle;
+    private SupportMenuInflater mMenuInflater;
 
     private ActivityCompat.OnRequestPermissionsResultCallback mPendingPermissionCb;
 
@@ -378,6 +381,14 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (mContentContainer.getChildCount() == 0) {
             throw new IllegalStateException("Content view must be initialized before");
         }
+    }
+
+    @Override
+    public MenuInflater getMenuInflater() {
+        if (mMenuInflater == null) {
+            mMenuInflater = new SupportMenuInflater(UiUtils.makeHeaderThemedContext(this));
+        }
+        return mMenuInflater;
     }
 
     @Override

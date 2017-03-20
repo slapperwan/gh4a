@@ -5,11 +5,9 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.view.SupportMenuInflater;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,7 +22,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationListLoader;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.User;
 
@@ -89,9 +86,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
             return super.onCreateOptionsMenu(menu);
         }
 
-        Context themedContext = UiUtils.makeHeaderThemedContext(mActivity);
-        MenuInflater inflater = new SupportMenuInflater(themedContext);
-        inflater.inflate(R.menu.user_selector, menu);
+        mActivity.getMenuInflater().inflate(R.menu.user_selector, menu);
 
         Spinner spinner = (Spinner) MenuItemCompat.getActionView(menu.findItem(R.id.selector));
         UserAdapter adapter = new UserAdapter(mActivity, mSelf, mUserScopes);
