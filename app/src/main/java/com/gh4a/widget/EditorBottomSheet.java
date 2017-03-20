@@ -140,15 +140,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), mLatestOffset);
 
             // Update peek height to keep the bottom sheet at unchanged position
-            int defaultPeekHeight = isInAdvancedMode() ? mAdvancedPeekHeight : mBasicPeekHeight;
-            getBehavior().setPeekHeight(defaultPeekHeight + mLatestOffset);
-
-            if (mResizingView != null) {
-                MarginLayoutParams lp = (MarginLayoutParams) mResizingView.getLayoutParams();
-                lp.setMargins(lp.leftMargin, lp.topMargin, lp.rightMargin,
-                        defaultPeekHeight + mLatestOffset);
-                mResizingView.setLayoutParams(lp);
-            }
+            updatePeekHeight(isInAdvancedMode());
         }
     }
 
@@ -161,8 +153,19 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                 && getBehavior().getPeekHeight() != getHeight();
     }
 
+    private void updatePeekHeight(boolean isInAdvancedMode) {
+        final int peekHeight = isInAdvancedMode ? mAdvancedPeekHeight : mBasicPeekHeight;
+
+        if (mResizingView != null) {
+            mResizingView.setPadding(mResizingView.getPaddingLeft(), mResizingView.getPaddingTop(),
+                    mResizingView.getPaddingRight(), peekHeight + mLatestOffset);
+        }
+
+        getBehavior().setPeekHeight(peekHeight + mLatestOffset);
+    }
+
     private void toggleAdvancedEditor() {
-        boolean visible = !isInAdvancedMode();
+        final boolean visible = !isInAdvancedMode();
 
         if (visible) {
             setAdvancedEditorVisible(true);
@@ -177,18 +180,16 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             }, 250);
         }
 
-        if (visible) {
-            // When entering advanced mode expand bottom sheet through message queue so the
-            // animation can play.
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    setExpanded(true);
-                }
-            });
-        } else {
-            setExpanded(false);
-        }
+        // Expand bottom sheet through message queue so the animation can play.
+        post(new Runnable() {
+            @Override
+            public void run() {
+                updatePeekHeight(visible);
+
+                getBehavior().setState(visible
+                        ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
     }
 
     private Editable getCommentText() {
@@ -215,14 +216,6 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private boolean isInAdvancedMode() {
         return mAdvancedEditorContainer != null
                 && mAdvancedEditorContainer.getVisibility() == View.VISIBLE;
-    }
-
-    private void setExpanded(boolean visible) {
-        int peekHeight = visible ? mAdvancedPeekHeight : mBasicPeekHeight;
-        getBehavior().setPeekHeight(mLatestOffset + peekHeight);
-
-        getBehavior().setState(visible
-                ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_COLLAPSED);
     }
 
     private void setAdvancedEditorVisible(boolean visible) {

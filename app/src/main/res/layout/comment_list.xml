@@ -10,7 +10,7 @@
         android:id="@+id/list_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="@dimen/comment_advanced_editor_peek_height" />
+        android:paddingBottom="@dimen/comment_advanced_editor_peek_height" />
 
     <com.gh4a.widget.EditorBottomSheet
         android:id="@+id/bottom_sheet"
