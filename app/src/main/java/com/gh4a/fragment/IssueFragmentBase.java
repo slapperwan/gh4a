@@ -120,6 +120,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
         mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
         mBottomSheet.setCallback(this);
+        mBottomSheet.setResizingView(listContainer);
 
         mImageGetter = new HttpImageGetter(inflater.getContext());
         updateCommentSectionVisibility(v);

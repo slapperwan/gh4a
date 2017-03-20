@@ -100,6 +100,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
         mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
         mBottomSheet.setCallback(this);
+        mBottomSheet.setResizingView(listContainer);
 
         if (!Gh4Application.get().isAuthorized()) {
             mBottomSheet.setVisibility(View.GONE);
