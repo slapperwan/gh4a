@@ -34,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:inputType="textMultiLine|textCapSentences"
+            android:maxLines="3"
             android:minHeight="48dp"
             android:padding="8dp"
             tools:text="Enter comment" />
