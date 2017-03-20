@@ -454,6 +454,7 @@
     <string name="bookmark_saved">Bookmark saved</string>
 
     <!-- Search -->
+    <string name="search_type">Search type</string>
     <string name="search_type_repo">Repository</string>
     <string name="search_type_user">User</string>
     <string name="search_type_code">Code</string>

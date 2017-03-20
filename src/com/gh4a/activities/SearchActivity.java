@@ -33,12 +33,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -89,6 +89,8 @@ public class SearchActivity extends BaseActivity implements
     private RootAdapter<?, ?> mAdapter;
     private RecyclerView mResultsView;
 
+    private int mInitialSearchType;
+
     private Spinner mSearchType;
     private SearchView mSearch;
     private String mQuery;
@@ -103,10 +105,10 @@ public class SearchActivity extends BaseActivity implements
 
     private static final String STATE_KEY_QUERY = "query";
     private static final String STATE_KEY_SEARCH_MODE = "search_mode";
-    private static final int SEARCH_MODE_NONE = 0;
-    private static final int SEARCH_MODE_REPO = 1;
-    private static final int SEARCH_MODE_USER = 2;
-    private static final int SEARCH_MODE_CODE = 3;
+    private static final int SEARCH_MODE_NONE = -1;
+    private static final int SEARCH_MODE_REPO = 0;
+    private static final int SEARCH_MODE_USER = 1;
+    private static final int SEARCH_MODE_CODE = 2;
 
     private final LoaderCallbacks<List<Repository>> mRepoCallback = new LoaderCallbacks<List<Repository>>(this) {
         @Override
@@ -189,31 +191,7 @@ public class SearchActivity extends BaseActivity implements
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.search);
-
-        LayoutInflater inflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
-        LinearLayout searchLayout = (LinearLayout) inflater.inflate(R.layout.search_action_bar, null);
-        actionBar.setCustomView(searchLayout);
-        actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        mSearchType = (Spinner) searchLayout.findViewById(R.id.search_type);
-        mSearchType.setAdapter(new SearchTypeAdapter(actionBar.getThemedContext(), this));
-        mSearchType.setOnItemSelectedListener(this);
-
-        mSearch = (SearchView) searchLayout.findViewById(R.id.search_view);
-        mSearch.setIconifiedByDefault(true);
-        mSearch.requestFocus();
-        mSearch.setIconified(false);
-        mSearch.setOnQueryTextListener(this);
-        mSearch.setOnCloseListener(this);
-        mSearch.onActionViewExpanded();
-
-        mSearch.setOnSuggestionListener(this);
-        mSearch.setSuggestionsAdapter(new SuggestionAdapter(this));
-
-        getSupportLoaderManager().initLoader(1, null, mSuggestionCallback);
-
-        updateSelectedSearchType();
 
         mResultsView = (RecyclerView) findViewById(R.id.list);
         mResultsView.setLayoutManager(new LinearLayoutManager(this));
@@ -221,7 +199,7 @@ public class SearchActivity extends BaseActivity implements
 
         if (savedInstanceState != null) {
             mQuery = savedInstanceState.getString(STATE_KEY_QUERY);
-            mSearch.setQuery(mQuery, false);
+            mInitialSearchType = savedInstanceState.getInt(STATE_KEY_SEARCH_MODE, SEARCH_MODE_NONE);
 
             LoaderManager lm = getSupportLoaderManager();
             int previousMode = savedInstanceState.getInt(STATE_KEY_SEARCH_MODE, SEARCH_MODE_NONE);
@@ -233,14 +211,43 @@ public class SearchActivity extends BaseActivity implements
         } else {
             Intent intent = getIntent();
             if (intent.hasExtra("search_type")) {
-                int searchType = intent.getIntExtra("search_type", SEARCH_TYPE_REPO);
-                mSearchType.setSelection(searchType);
+                mInitialSearchType = intent.getIntExtra("search_type", SEARCH_TYPE_REPO);
             }
             if (intent.hasExtra("initial_search")) {
-                String initialSearch = intent.getStringExtra("initial_search");
-                mSearch.setQuery(initialSearch, false);
+                mQuery = intent.getStringExtra("initial_search");
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search, menu);
+
+        mSearchType = (Spinner) menu.findItem(R.id.type).getActionView();
+        mSearchType.setAdapter(new SearchTypeAdapter(mSearchType.getContext(), this));
+        mSearchType.setOnItemSelectedListener(this);
+        if (mInitialSearchType != SEARCH_MODE_NONE) {
+            mSearchType.setSelection(mInitialSearchType);
+            mInitialSearchType = SEARCH_MODE_NONE;
+        }
+
+        mSearch = (SearchView) menu.findItem(R.id.search).getActionView();
+        mSearch.setIconifiedByDefault(true);
+        mSearch.requestFocus();
+        mSearch.onActionViewExpanded();
+        mSearch.setIconified(false);
+        mSearch.setOnQueryTextListener(this);
+        mSearch.setOnCloseListener(this);
+        mSearch.setOnSuggestionListener(this);
+        mSearch.setSuggestionsAdapter(new SuggestionAdapter(this));
+        if (mQuery != null) {
+            mSearch.setQuery(mQuery, false);
+        }
+
+        getSupportLoaderManager().initLoader(1, null, mSuggestionCallback);
+        updateSelectedSearchType();
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
