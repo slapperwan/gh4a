@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:inputType="textMultiLine|textCapSentences"
-                tools:text="Enter comment"/>
+                tools:text="Enter comment" />
 
             <HorizontalScrollView
                 android:id="@+id/markdown_buttons"
@@ -43,7 +43,7 @@
         <com.gh4a.widget.MarkdownPreviewWebView
             android:id="@+id/wv_preview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
     </com.gh4a.widget.WrapContentHeightViewPager>
 

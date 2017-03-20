@@ -12,6 +12,6 @@
         android:layout_height="wrap_content"
         android:inputType="textMultiLine|textCapSentences"
         android:padding="8dp"
-        tools:text="Enter comment"/>
+        tools:text="Enter comment" />
 
 </LinearLayout>

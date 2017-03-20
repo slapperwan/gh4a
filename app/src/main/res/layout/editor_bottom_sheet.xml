@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/comment_editor"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <View
@@ -34,7 +36,7 @@
             android:inputType="textMultiLine|textCapSentences"
             android:minHeight="48dp"
             android:padding="8dp"
-            tools:text="Enter comment"/>
+            tools:text="Enter comment" />
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
@@ -54,7 +56,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:padding="12dp"
-            android:src="?sendIcon"/>
+            android:src="?sendIcon" />
 
     </LinearLayout>
 
