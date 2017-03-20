@@ -75,7 +75,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mAdvancedPeekHeight =
                 getResources().getDimensionPixelSize(R.dimen.comment_advanced_editor_peek_height);
 
-        View view = View.inflate(getContext(), R.layout.view_pager_bottom_sheet, this);
+        View view = View.inflate(getContext(), R.layout.editor_bottom_sheet, this);
 
         mAdvancedEditorToggle = (ImageView) view.findViewById(R.id.iv_advanced_editor_toggle);
         mAdvancedEditorToggle.setOnClickListener(this);
