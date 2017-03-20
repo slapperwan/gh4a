@@ -17,6 +17,7 @@
     <dimen name="comment_editor_peek_height">52dp</dimen>
     <dimen name="comment_advanced_editor_peek_height">104dp</dimen>
     <dimen name="comment_bottom_sheet_height">400dp</dimen>
+    <dimen name="bottom_sheet_top_shadow_height">4dp</dimen>
 
     <dimen name="breadcrumb_height">42dp</dimen>
     <dimen name="breadcrumb_padding_side">8dp</dimen>

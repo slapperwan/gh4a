@@ -53,6 +53,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private int mAdvancedPeekHeight;
     private int mLatestOffset;
     private View mResizingView;
+    private int mTopShadowHeight;
 
     public EditorBottomSheet(Context context) {
         super(context);
@@ -73,6 +74,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mBasicPeekHeight = getResources().getDimensionPixelSize(R.dimen.comment_editor_peek_height);
         mAdvancedPeekHeight =
                 getResources().getDimensionPixelSize(R.dimen.comment_advanced_editor_peek_height);
+        mTopShadowHeight =
+                getResources().getDimensionPixelSize(R.dimen.bottom_sheet_top_shadow_height);
 
         View view = View.inflate(getContext(), R.layout.editor_bottom_sheet, this);
 
@@ -157,7 +160,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
         if (mResizingView != null) {
             mResizingView.setPadding(mResizingView.getPaddingLeft(), mResizingView.getPaddingTop(),
-                    mResizingView.getPaddingRight(), peekHeight + mLatestOffset);
+                    mResizingView.getPaddingRight(), peekHeight + mLatestOffset - mTopShadowHeight);
         }
 
         getBehavior().setPeekHeight(peekHeight + mLatestOffset);
