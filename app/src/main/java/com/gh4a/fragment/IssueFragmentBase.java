@@ -20,10 +20,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -52,7 +48,6 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.CommentBoxFragmentAdapter;
 import com.gh4a.widget.EditorBottomSheet;
 import com.gh4a.widget.ReactionBar;
 
@@ -70,7 +65,7 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
-        View.OnClickListener, CommentBoxFragment.Callback, TimelineItemAdapter.OnCommentAction,
+        View.OnClickListener, EditorBottomSheet.Callback, TimelineItemAdapter.OnCommentAction,
         ReactionBar.Callback, ReactionBar.Item, ReactionBar.ReactionDetailsCache.Listener {
     protected static final int REQUEST_EDIT = 1000;
 
@@ -87,8 +82,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     private TimelineItemAdapter mAdapter;
     private HttpImageGetter mImageGetter;
     private EditorBottomSheet mBottomSheet;
-    private UiUtils.BottomSheetOnOffsetChangedListener mBottomSheetOnOffsetChangedListener;
-    private CommentBoxFragmentAdapter mCommentBoxAdapter;
 
     protected static Bundle buildArgs(String repoOwner, String repoName,
             Issue issue, boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
@@ -114,7 +107,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         args.remove("initial_comment");
 
         setHasOptionsMenu(true);
-        updateCommentLockState();
     }
 
     @Override
@@ -127,14 +119,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         listContainer.addView(listContent);
 
         mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
-        mCommentBoxAdapter = new CommentBoxFragmentAdapter(getActivity(),
-                getChildFragmentManager());
-        mBottomSheet.setPagerAdapter(mCommentBoxAdapter);
-        mBottomSheetOnOffsetChangedListener =
-                new UiUtils.BottomSheetOnOffsetChangedListener(mBottomSheet);
+        mBottomSheet.setCallback(this);
 
         mImageGetter = new HttpImageGetter(inflater.getContext());
         updateCommentSectionVisibility(v);
+        updateCommentLockState();
 
         return v;
     }
@@ -142,7 +131,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getBaseActivity().addAppBarOffsetListener(mBottomSheetOnOffsetChangedListener);
+        getBaseActivity().addAppBarOffsetListener(mBottomSheet);
     }
 
     @Override
@@ -155,7 +144,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             mAdapter = null;
         }
 
-        getBaseActivity().removeAppBarOffsetListener(mBottomSheetOnOffsetChangedListener);
+        getBaseActivity().removeAppBarOffsetListener(mBottomSheet);
     }
 
     @Override
@@ -204,11 +193,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public boolean canChildScrollUp() {
-        if (mBottomSheet.getBehavior().getState() == BottomSheetBehavior.STATE_EXPANDED) {
-            return true;
-        }
+        return mBottomSheet.isExpanded() || super.canChildScrollUp();
 
-        return super.canChildScrollUp();
     }
 
     @Override
@@ -320,13 +306,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         if (mIssue.getUser() != null) {
             users.add(mIssue.getUser());
         }
-        mCommentBoxAdapter.getCommentFragment().setMentionUsers(users);
+        mBottomSheet.setMentionUsers(users);
     }
 
     private void updateCommentLockState() {
-        if (mCommentBoxAdapter != null) {
-            mCommentBoxAdapter.getCommentFragment().setLocked(isLocked());
-        }
+        mBottomSheet.setLocked(isLocked());
     }
 
     private void fillData() {
@@ -487,6 +471,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
+    public void quoteText(CharSequence text) {
+        mBottomSheet.addQuote(text);
+    }
+
+    @Override
     public void onSendCommentInBackground(String comment) throws IOException {
         IssueService issueService = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
@@ -516,18 +505,9 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public void quoteText(CharSequence text) {
-        mCommentBoxAdapter.getCommentFragment().addQuote(text);
-    }
-
-    @Override
     public String getShareSubject(Comment comment) {
         return getString(R.string.share_comment_subject, comment.getId(), mIssue.getNumber(),
                 mRepoOwner + "/" + mRepoName);
-    }
-
-    public void updatePreview(String content) {
-        mCommentBoxAdapter.getPreviewFragment().setContent(content);
     }
 
     protected abstract void bindSpecialViews(View headerView);

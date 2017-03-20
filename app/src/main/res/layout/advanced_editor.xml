@@ -18,7 +18,30 @@
         <com.gh4a.widget.WrapContentHeightViewPager
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/advanced_editor_box"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/comment_bottom_sheet_height">
+
+                <com.gh4a.widget.CommentEditor
+                    android:id="@+id/et_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:padding="8dp"
+                    tools:text="Enter comment"/>
+
+            </LinearLayout>
+
+            <com.gh4a.widget.MarkdownPreviewWebView
+                android:id="@+id/wv_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+        </com.gh4a.widget.WrapContentHeightViewPager>
 
     </android.support.v4.widget.NestedScrollView>
 

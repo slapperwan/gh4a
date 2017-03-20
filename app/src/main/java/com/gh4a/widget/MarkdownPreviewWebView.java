@@ -1,12 +1,8 @@
-package com.gh4a.fragment;
+package com.gh4a.widget;
 
 import android.annotation.SuppressLint;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.content.Context;
+import android.util.AttributeSet;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -16,36 +12,33 @@ import com.gh4a.activities.WebViewerActivity;
 
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
-public class CommentPreviewFragment extends Fragment {
+public class MarkdownPreviewWebView extends WebView {
 
-    private WebView mPreviewWebView;
-    private String mInitialData;
     private String mCssTheme;
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mCssTheme = Gh4Application.THEME == R.style.DarkTheme
-                ? WebViewerActivity.DARK_CSS_THEME : WebViewerActivity.LIGHT_CSS_THEME;
+    public MarkdownPreviewWebView(Context context) {
+        super(context);
+        initialize();
     }
 
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.comment_preview, container, false);
-        mPreviewWebView = (WebView) v.findViewById(R.id.wv_preview);
-        initWebViewSettings(mPreviewWebView.getSettings());
+    public MarkdownPreviewWebView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initialize();
+    }
 
-        if (mInitialData != null) {
-            setContent(mInitialData);
-            mInitialData = null;
-        } else {
+    public MarkdownPreviewWebView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        initialize();
+    }
+
+    private void initialize() {
+        mCssTheme = Gh4Application.THEME == R.style.DarkTheme
+                ? WebViewerActivity.DARK_CSS_THEME : WebViewerActivity.LIGHT_CSS_THEME;
+
+        if (!isInEditMode()) {
+            initWebViewSettings(getSettings());
             setContent("");
         }
-
-        return v;
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -57,13 +50,8 @@ public class CommentPreviewFragment extends Fragment {
     }
 
     public void setContent(String content) {
-        if (mPreviewWebView == null) {
-            mInitialData = content;
-            return;
-        }
-
         String html = generateMarkdownHtml(EncodingUtils.toBase64(content), mCssTheme);
-        mPreviewWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
+        loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
     }
 
     protected String generateMarkdownHtml(String base64Data, String cssTheme) {
