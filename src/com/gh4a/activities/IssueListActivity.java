@@ -31,10 +31,12 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.view.SupportMenuInflater;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -92,6 +94,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private boolean mSearchMode;
     private int mSelectedParticipatingStatus = 0;
 
+    private MenuInflater mMenuInflater;
     private FloatingActionButton mCreateFab;
     private IssueListFragment mOpenFragment;
     private IssueListFragment mClosedFragment;
@@ -201,6 +204,9 @@ public class IssueListActivity extends BasePagerActivity implements
         super.onCreate(savedInstanceState);
 
         mUserLogin = Gh4Application.get().getAuthLogin();
+
+        Context headerContext = UiUtils.makeHeaderThemedContext(this);
+        mMenuInflater = new SupportMenuInflater(headerContext);
 
         if (savedInstanceState != null) {
             mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
@@ -404,7 +410,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.issue_list_menu, menu);
+        mMenuInflater.inflate(R.menu.issue_list_menu, menu);
 
         MenuItem searchItem = menu.findItem(R.id.search);
         MenuItemCompat.setOnActionExpandListener(searchItem, this);
