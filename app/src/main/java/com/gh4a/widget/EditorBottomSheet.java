@@ -46,7 +46,6 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private View mAdvancedEditorContainer;
     private CommentEditor mBasicEditor;
     private CommentEditor mAdvancedEditor;
-    private View mMarkdownButtons;
     private Callback mCallback;
     private MarkdownPreviewWebView mPreviewWebView;
     private ImageView mAdvancedEditorToggle;
@@ -224,7 +223,6 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         }
 
         mAdvancedEditorContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
-        mMarkdownButtons.setVisibility(visible ? View.VISIBLE : View.GONE);
         mBasicEditor.setVisibility(visible ? View.GONE : View.VISIBLE);
         mTabs.setVisibility(visible ? View.VISIBLE : View.GONE);
 
@@ -275,8 +273,11 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mAdvancedEditor.setLocked(mBasicEditor.isLocked());
         mAdvancedEditor.setMentionUsers(mBasicEditor.getMentionUsers());
 
+        MarkdownButtonsBar mMarkdownButtons =
+                (MarkdownButtonsBar) findViewById(R.id.markdown_buttons);
+        mMarkdownButtons.setEditText(mAdvancedEditor);
+
         mAdvancedEditorContainer = findViewById(R.id.advanced_editor);
-        mMarkdownButtons = findViewById(R.id.markdown_buttons);
         mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.wv_preview);
     }
 

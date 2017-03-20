@@ -3,11 +3,11 @@ package com.gh4a.widget;
 import android.content.Context;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.AppCompatMultiAutoCompleteTextView;
-import android.text.Editable;
 import android.text.InputType;
 import android.util.AttributeSet;
 
 import com.gh4a.R;
+import com.gh4a.utils.MarkdownUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.User;
@@ -75,19 +75,8 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
             return;
         }
 
-        Editable editable = getText();
-        if (editable != null && editable.length() > 0) {
-            String string = editable.toString();
-            if (!string.endsWith("\n\n")) {
-                editable.append('\n');
+        MarkdownUtils.addQuote(this, text);
 
-                if (!string.endsWith("\n")) {
-                    editable.append("\n");
-                }
-            }
-        }
-
-        append("> " + text.toString().replace("\n", "\n> ") + "\n\n");
         requestFocus();
         setSelection(length());
         UiUtils.showImeForView(this);
