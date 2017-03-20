@@ -369,6 +369,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
         content.append("</title>");
         writeScriptInclude(content, "showdown");
+        writeScriptInclude(content, "base64");
         writeCssInclude(content, "markdown", cssTheme);
         content.append("</head>");
 
@@ -379,7 +380,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         content.append("<div id='content'></div>");
 
         content.append("<script>");
-        content.append("var text = window.atob('");
+        content.append("var text = Base64.decode('");
         content.append(base64Data.replaceAll("\\n", ""));
         content.append("');\n");
         content.append("var converter = new showdown.Converter();\n");
