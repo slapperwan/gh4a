@@ -54,6 +54,7 @@ public class HomeActivity extends BasePagerActivity implements
         START_PAGE_MAPPING.put(R.id.trend, "trends");
         START_PAGE_MAPPING.put(R.id.blog, "blog");
         START_PAGE_MAPPING.put(R.id.bookmarks, "bookmarks");
+        START_PAGE_MAPPING.put(R.id.search, "search");
     }
 
     private final LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
@@ -170,9 +171,6 @@ public class HomeActivity extends BasePagerActivity implements
         }
 
         switch (id) {
-            case R.id.search:
-                startActivity(SearchActivity.makeIntent(this));
-                return true;
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
@@ -195,6 +193,8 @@ public class HomeActivity extends BasePagerActivity implements
                 return new IssueListFactory(this, mUserLogin, true);
             case R.id.my_gists:
                 return new GistFactory(this, mUserLogin);
+            case R.id.search:
+                return new SearchFactory(this);
             case R.id.bookmarks:
                 return new BookmarkFactory(this);
             case R.id.pub_timeline:

@@ -37,7 +37,6 @@
                 <item
                     android:id="@+id/search"
                     android:title="@string/search"
-                    android:checkable="false"
                     android:icon="@drawable/icon_search"/>
                 <item
                     android:id="@+id/bookmarks"
