@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -81,58 +82,32 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         View sendButton = view.findViewById(R.id.send_button);
         sendButton.setOnClickListener(this);
 
-        ViewPager viewPager = (ViewPager) view.findViewById(R.id.view_pager);
-        viewPager.setAdapter(new AdvancedEditorPagerAdapter());
-
-        mTabs = (TabLayout) view.findViewById(R.id.tabs);
-        mTabs.setupWithViewPager(viewPager);
-
-        LinearLayout tabStrip = (LinearLayout) mTabs.getChildAt(0);
-        for (int i = 0; i < tabStrip.getChildCount(); i++) {
-            View tab = tabStrip.getChildAt(i);
-            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) tab.getLayoutParams();
-            lp.width = LinearLayout.LayoutParams.WRAP_CONTENT;
-            lp.weight = 1;
-            tab.setLayoutParams(lp);
-        }
-
         mBasicEditor = (CommentEditor) view.findViewById(R.id.et_basic_editor);
         mBasicEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mBasicEditor, sendButton));
-
-        mAdvancedEditor = (CommentEditor) view.findViewById(R.id.et_comment);
-        mAdvancedEditor.addTextChangedListener(
-                new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor, sendButton) {
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        mPreviewWebView.setContent(s.toString());
-                    }
-                });
-
-        mAdvancedEditorContainer = view.findViewById(R.id.advanced_editor);
-        mMarkdownButtons = view.findViewById(R.id.markdown_buttons);
-        mPreviewWebView = (MarkdownPreviewWebView) view.findViewById(R.id.wv_preview);
     }
 
     public void setCallback(Callback callback) {
         mCallback = callback;
 
         mBasicEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
-        mAdvancedEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
-    }
-
-    public void setPagerColors(int colorAttrId) {
-        mTabs.setBackgroundColor(UiUtils.resolveColor(getContext(), colorAttrId));
+        if (mAdvancedEditor != null) {
+            mAdvancedEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
+        }
     }
 
     public void setLocked(boolean locked) {
         mBasicEditor.setLocked(locked);
-        mAdvancedEditor.setLocked(locked);
+        if (mAdvancedEditor != null) {
+            mAdvancedEditor.setLocked(locked);
+        }
     }
 
     public void setMentionUsers(Set<User> users) {
         mBasicEditor.setMentionUsers(users);
-        mAdvancedEditor.setMentionUsers(users);
+        if (mAdvancedEditor != null) {
+            mAdvancedEditor.setMentionUsers(users);
+        }
     }
 
     public void addQuote(CharSequence text) {
@@ -226,7 +201,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     }
 
     private boolean isInAdvancedMode() {
-        return mAdvancedEditorContainer.getVisibility() == View.VISIBLE;
+        return mAdvancedEditorContainer != null
+                && mAdvancedEditorContainer.getVisibility() == View.VISIBLE;
     }
 
     private void setExpanded(boolean visible) {
@@ -238,9 +214,14 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     }
 
     private void setAdvancedEditorVisible(boolean visible) {
+        if (mAdvancedEditor == null) {
+            initAdvancedMode();
+        }
+
         mAdvancedEditorContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
         mMarkdownButtons.setVisibility(visible ? View.VISIBLE : View.GONE);
         mBasicEditor.setVisibility(visible ? View.GONE : View.VISIBLE);
+        mTabs.setVisibility(visible ? View.VISIBLE : View.GONE);
 
         if (visible) {
             mAdvancedEditor.setText(mBasicEditor.getText());
@@ -254,6 +235,44 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
         mAdvancedEditorToggle.setImageResource(UiUtils.resolveDrawable(getContext(),
                 visible ? R.attr.collapseIcon : R.attr.expandIcon));
+    }
+
+    private void initAdvancedMode() {
+        ViewStub stub = (ViewStub) findViewById(R.id.advanced_editor_stub);
+        stub.inflate();
+
+        ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
+        viewPager.setAdapter(new AdvancedEditorPagerAdapter());
+
+        mTabs = (TabLayout) findViewById(R.id.tabs);
+        mTabs.setupWithViewPager(viewPager);
+
+        LinearLayout tabStrip = (LinearLayout) mTabs.getChildAt(0);
+        for (int i = 0; i < tabStrip.getChildCount(); i++) {
+            View tab = tabStrip.getChildAt(i);
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) tab.getLayoutParams();
+            lp.width = LinearLayout.LayoutParams.WRAP_CONTENT;
+            lp.weight = 1;
+            tab.setLayoutParams(lp);
+        }
+
+        mAdvancedEditor = (CommentEditor) findViewById(R.id.et_comment);
+        mAdvancedEditor.addTextChangedListener(
+                new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor, findViewById(R.id.send_button)) {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                mPreviewWebView.setContent(s.toString());
+            }
+        });
+        if (mCallback != null) {
+            mAdvancedEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
+        }
+        mAdvancedEditor.setLocked(mBasicEditor.isLocked());
+        mAdvancedEditor.setMentionUsers(mBasicEditor.getMentionUsers());
+
+        mAdvancedEditorContainer = findViewById(R.id.advanced_editor);
+        mMarkdownButtons = findViewById(R.id.markdown_buttons);
+        mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.wv_preview);
     }
 
     private BottomSheetBehavior getBehavior() {

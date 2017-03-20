@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.User;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,6 +65,10 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
         }
 
         notifyDataSetChanged();
+    }
+
+    public Set<User> getUnfilteredUsers() {
+        return new HashSet<>(mOriginalUsers);
     }
 
     @Override

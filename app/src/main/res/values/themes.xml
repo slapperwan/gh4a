@@ -106,6 +106,7 @@
         <item name="colorDiffRemoveBackground">@color/diff_remove_dark</item>
         <item name="colorDiffAddLineNumberBackground">@color/diff_add_line_number_dark</item>
         <item name="colorDiffRemoveLineNumberBackground">@color/diff_remove_line_number_dark</item>
+        <item name="colorIconForeground">#ccffffff</item>
     </style>
 
     <style name="DarkTheme" parent="DarkThemeBase" />
@@ -233,6 +234,7 @@
         <item name="colorDiffRemoveBackground">@color/diff_remove_light</item>
         <item name="colorDiffAddLineNumberBackground">@color/diff_add_line_number_light</item>
         <item name="colorDiffRemoveLineNumberBackground">@color/diff_remove_line_number_light</item>
+        <item name="colorIconForeground">#99343434</item>
     </style>
 
     <style name="LightTheme" parent="LightThemeBase" />
