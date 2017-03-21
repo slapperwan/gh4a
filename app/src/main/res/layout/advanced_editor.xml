@@ -1,26 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/advanced_editor"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/comment_bottom_sheet_height"
-    android:background="?android:colorBackground"
-    android:visibility="gone"
-    tools:visibility="visible">
+    android:layout_height="wrap_content">
 
-    <com.gh4a.widget.WrapContentHeightViewPager
-        android:id="@+id/view_pager"
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/markdown_buttons"
+        android:background="?android:colorBackground"
+        android:scrollbars="vertical">
 
-        <include layout="@layout/advanced_editor_edit_page" />
-
-        <com.gh4a.widget.MarkdownPreviewWebView
-            android:id="@+id/wv_preview"
+        <com.gh4a.widget.WrapContentHeightViewPager
+            android:id="@+id/view_pager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
 
-    </com.gh4a.widget.WrapContentHeightViewPager>
+            <com.gh4a.widget.CommentEditor
+                android:id="@+id/et_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:gravity="top"
+                android:inputType="textMultiLine|textCapSentences"
+                tools:text="Enter comment" />
 
-</android.support.v4.widget.NestedScrollView>
+            <com.gh4a.widget.MarkdownPreviewWebView
+                android:id="@+id/wv_preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.gh4a.widget.WrapContentHeightViewPager>
+
+    </android.support.v4.widget.NestedScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_above="@+id/markdown_buttons"
+        android:background="@drawable/top_shadow" />
+
+    <com.gh4a.widget.MarkdownButtonsBar
+        android:id="@+id/markdown_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:background="?colorPrimary" />
+
+</RelativeLayout>

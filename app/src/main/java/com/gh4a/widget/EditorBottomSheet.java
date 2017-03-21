@@ -335,7 +335,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             int resId = 0;
             switch (position) {
                 case 0:
-                    resId = R.id.advanced_editor_box;
+                    resId = R.id.et_comment;
                     break;
                 case 1:
                     resId = R.id.wv_preview;
