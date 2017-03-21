@@ -264,12 +264,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
         mAdvancedEditor = (CommentEditor) findViewById(R.id.et_comment);
         mAdvancedEditor.addTextChangedListener(
-                new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor, findViewById(R.id.send_button)) {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                mPreviewWebView.setContent(s.toString());
-            }
-        });
+                new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor, findViewById(R.id.send_button)));
+
         if (mCallback != null) {
             mAdvancedEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
         }
@@ -282,6 +278,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
         mAdvancedEditorContainer = findViewById(R.id.advanced_editor);
         mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.wv_preview);
+        mPreviewWebView.setEditText(mAdvancedEditor);
     }
 
     private BottomSheetBehavior getBehavior() {

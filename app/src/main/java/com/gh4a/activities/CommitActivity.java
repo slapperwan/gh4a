@@ -26,7 +26,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.gh4a.BasePagerActivity;
+import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
@@ -41,7 +41,7 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 
 import java.util.List;
 
-public class CommitActivity extends BasePagerActivity implements
+public class CommitActivity extends BaseFragmentPagerActivity implements
         CommitFragment.CommentUpdateListener, CommitNoteFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
         return makeIntent(context, repoOwner, repoName, -1, sha, null);

@@ -36,7 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gh4a.BasePagerActivity;
+import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
@@ -60,7 +60,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class IssueListActivity extends BasePagerActivity implements
+public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItemCompat.OnActionExpandListener {

@@ -20,27 +20,8 @@
             style="@style/TextAppearance.Header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/overview_item_spacing"
             android:inputType="textCapSentences"
             android:maxLines="2" />
-
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/desc_wrapper"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/issue_body">
-
-        <android.support.design.widget.TextInputEditText
-            android:id="@+id/et_desc"
-            style="@style/TextAppearance.Header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top"
-            android:inputType="textMultiLine|textCapSentences"
-            android:maxLines="@integer/issue_edit_body_max_lines"
-            android:minLines="@integer/issue_edit_body_min_lines" />
 
     </android.support.design.widget.TextInputLayout>
 

@@ -1,133 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
+        android:id="@+id/editor_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="@dimen/content_padding"
-        android:paddingLeft="@dimen/content_padding"
-        android:paddingRight="@dimen/content_padding"
-        android:paddingTop="@dimen/floating_action_button_margin_mini">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <RelativeLayout
-            android:id="@+id/milestone_container"
+        <com.gh4a.widget.CommentEditor
+            android:id="@+id/editor"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:layout_height="0dp"
+            android:gravity="top"
+            android:layout_margin="8dp"
+            android:inputType="textMultiLine|textCapSentences"
+            tools:text="Issue body" />
 
-            <ImageView
-                android:id="@+id/iv_milestone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
-                android:src="?attr/milestoneIcon" />
-
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_milestone_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/iv_milestone"
-                android:text="@string/issue_milestone_hint"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="?android:attr/textColorPrimary" />
-
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_milestone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_milestone_label"
-                android:layout_toRightOf="@id/iv_milestone"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                tools:text="v10.1.2" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/assignee_container"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:gravity="center_vertical">
+            android:layout_height="4dp"
+            android:background="@drawable/top_shadow" />
 
-            <ImageView
-                android:id="@+id/iv_assignee"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
-                android:src="?attr/assigneeIcon" />
-
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_assignee_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/iv_assignee"
-                android:text="@string/issue_assignee_hint"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="?android:attr/textColorPrimary" />
-
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_assignee"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_assignee_label"
-                android:layout_toRightOf="@id/iv_assignee"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                tools:text="list of people" />
-
-            <LinearLayout
-                android:id="@+id/assignee_list"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_assignee_label"
-                android:layout_toRightOf="@id/iv_assignee"
-                android:orientation="vertical"
-                android:visibility="gone" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/label_container"
+        <com.gh4a.widget.MarkdownButtonsBar
+            android:id="@+id/markdown_buttons"
             android:layout_width="match_parent"
-            android:layout_height="72dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:id="@+id/iv_labels"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="16dp"
-                android:src="?attr/labelsIcon" />
-
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_labels_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/iv_labels"
-                android:text="@string/issue_labels"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="?android:attr/textColorPrimary" />
-
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_labels"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/tv_labels_label"
-                android:layout_toRightOf="@id/iv_labels"
-                android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                tools:text="colored labels here" />
-
-        </RelativeLayout>
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="?colorPrimary"
+            android:visibility="gone" />
 
     </LinearLayout>
 
-</android.support.v4.widget.NestedScrollView>
+    <com.gh4a.widget.MarkdownPreviewWebView
+        android:id="@+id/preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/options"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/content_padding"
+            android:paddingLeft="@dimen/content_padding"
+            android:paddingRight="@dimen/content_padding"
+            android:paddingTop="@dimen/floating_action_button_margin_mini">
+
+            <RelativeLayout
+                android:id="@+id/milestone_container"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/iv_milestone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp"
+                    android:src="?attr/milestoneIcon" />
+
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_milestone_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/iv_milestone"
+                    android:text="@string/issue_milestone_hint"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_milestone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_milestone_label"
+                    android:layout_toRightOf="@id/iv_milestone"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    tools:text="v10.1.2" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/assignee_container"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/iv_assignee"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp"
+                    android:src="?attr/assigneeIcon" />
+
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_assignee_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/iv_assignee"
+                    android:text="@string/issue_assignee_hint"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <LinearLayout
+                    android:id="@+id/assignee_list"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_assignee_label"
+                    android:layout_toRightOf="@id/iv_assignee"
+                    android:orientation="vertical" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/label_container"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:id="@+id/iv_labels"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp"
+                    android:src="?attr/labelsIcon" />
+
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_labels_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/iv_labels"
+                    android:text="@string/issue_labels"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_labels"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_labels_label"
+                    android:layout_toRightOf="@id/iv_labels"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    tools:text="colored labels here" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</merge>

@@ -38,7 +38,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.gh4a.BasePagerActivity;
+import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -66,7 +66,7 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 import java.io.IOException;
 import java.util.Locale;
 
-public class PullRequestActivity extends BasePagerActivity implements
+public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
         return makeIntent(context, repoOwner, repoName, number, -1, null);
@@ -441,16 +441,6 @@ public class PullRequestActivity extends BasePagerActivity implements
                 .show();
     }
 
-    private void updateTabRightMargin(int dimensionResId) {
-        int margin = dimensionResId != 0
-                ? getResources().getDimensionPixelSize(dimensionResId) : 0;
-
-        View tabs = findViewById(R.id.tabs);
-        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) tabs.getLayoutParams();
-        lp.rightMargin = margin;
-        tabs.setLayoutParams(lp);
-    }
-
     private void updateFabVisibility() {
         boolean isIssueOwner = mIssue != null
                 && ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
@@ -464,10 +454,10 @@ public class PullRequestActivity extends BasePagerActivity implements
                     getLayoutInflater().inflate(R.layout.issue_edit_fab, rootLayout, false);
             mEditFab.setOnClickListener(this);
             rootLayout.addView(mEditFab);
-            updateTabRightMargin(R.dimen.mini_fab_size_with_margin);
+            adjustTabsForHeaderAlignedFab(true);
         } else if (!shouldHaveFab && mEditFab != null) {
             rootLayout.removeView(mEditFab);
-            updateTabRightMargin(0);
+            adjustTabsForHeaderAlignedFab(false);
             mEditFab = null;
         }
         if (mEditFab != null) {

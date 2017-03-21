@@ -20,11 +20,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -34,7 +37,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.BaseActivity;
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -49,6 +52,8 @@ import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.MarkdownButtonsBar;
+import com.gh4a.widget.MarkdownPreviewWebView;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -60,7 +65,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IssueEditActivity extends BaseActivity implements View.OnClickListener {
+public class IssueEditActivity extends BasePagerActivity implements
+        AppBarLayout.OnOffsetChangedListener, View.OnClickListener,
+        View.OnFocusChangeListener {
     public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
         // can't reuse makeEditIntent here, because even a null extra counts for hasExtra()
         return new Intent(context, IssueEditActivity.class)
@@ -79,6 +86,10 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     private static final int REQUEST_MANAGE_LABELS = 1000;
     private static final int REQUEST_MANAGE_MILESTONES = 1001;
 
+    private static final int[] TITLES = {
+        R.string.issue_body, R.string.preview, R.string.settings
+    };
+
     private String mRepoOwner;
     private String mRepoName;
 
@@ -90,16 +101,13 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
     private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
-    private TextInputLayout mDescWrapper;
     private EditText mDescView;
-    private TextView mTvSelectedMilestone;
-    private TextView mTvSelectedAssignee;
-    private ViewGroup mSelectedAssigneeContainer;
-    private TextView mTvLabels;
 
-    private View mMilestoneContainer;
-    private View mAssigneeContainer;
-    private View mLabelContainer;
+    private View mRootView;
+    private MarkdownButtonsBar mMarkdownButtons;
+    private TextView mSelectedMilestoneView;
+    private ViewGroup mSelectedAssigneeContainer;
+    private TextView mLabelsView;
 
     private static final String STATE_KEY_ISSUE = "issue";
 
@@ -154,8 +162,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         @Override
         protected void onResultReady(Boolean result) {
             mIsCollaborator = result;
-            updateLabels();
-            updateLabelStates();
+            invalidatePages();
         }
     };
 
@@ -168,7 +175,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         @Override
         protected void onResultReady(String result) {
             getSupportLoaderManager().destroyLoader(4);
-            mDescWrapper.setHint(getString(R.string.issue_body));
+            mDescView.setHint(null);
             mDescView.setEnabled(true);
             mDescView.setText(result);
         }
@@ -184,8 +191,6 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             finish();
             return;
         }
-        setContentView(R.layout.issue_create);
-        setToolbarScrollable(false);
 
         LayoutInflater headerInflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         View header = headerInflater.inflate(R.layout.issue_create_header, null);
@@ -193,27 +198,28 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         mTitleWrapper = (TextInputLayout) header.findViewById(R.id.title_wrapper);
         mTitleView = (EditText) header.findViewById(R.id.et_title);
-        mDescWrapper = (TextInputLayout) header.findViewById(R.id.desc_wrapper);
-        mDescView = (EditText) header.findViewById(R.id.et_desc);
+        mTitleView.setOnFocusChangeListener(this);
+
+        mDescView = (EditText) findViewById(R.id.editor);
+        mSelectedMilestoneView = (TextView) findViewById(R.id.tv_milestone);
+        mSelectedAssigneeContainer = (ViewGroup) findViewById(R.id.assignee_list);
+        mLabelsView = (TextView) findViewById(R.id.tv_labels);
+
+        mMarkdownButtons = (MarkdownButtonsBar) findViewById(R.id.markdown_buttons);
+        mMarkdownButtons.setEditText(mDescView);
+
+        MarkdownPreviewWebView preview = (MarkdownPreviewWebView) findViewById(R.id.preview);
+        preview.setEditText(mDescView);
+
+        findViewById(R.id.milestone_container).setOnClickListener(this);
+        findViewById(R.id.assignee_container).setOnClickListener(this);
+        findViewById(R.id.label_container).setOnClickListener(this);
 
         CoordinatorLayout rootLayout = getRootLayout();
         FloatingActionButton fab = (FloatingActionButton)
                 getLayoutInflater().inflate(R.layout.accept_fab, rootLayout, false);
         fab.setOnClickListener(this);
         rootLayout.addView(fab);
-
-        findViewById(R.id.milestone_container).setOnClickListener(this);
-        findViewById(R.id.assignee_container).setOnClickListener(this);
-        findViewById(R.id.label_container).setOnClickListener(this);
-
-        mTvSelectedMilestone = (TextView) findViewById(R.id.tv_milestone);
-        mTvSelectedAssignee = (TextView) findViewById(R.id.tv_assignee);
-        mSelectedAssigneeContainer = (ViewGroup) findViewById(R.id.assignee_list);
-        mTvLabels = (TextView) findViewById(R.id.tv_labels);
-
-        mMilestoneContainer = findViewById(R.id.milestone_container);
-        mAssigneeContainer = findViewById(R.id.assignee_container);
-        mLabelContainer = findViewById(R.id.label_container);
 
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
@@ -222,7 +228,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         } else if (!isInEditMode()) {
             getSupportLoaderManager().initLoader(4, null, mIssueTemplateCallback);
             mDescView.setEnabled(false);
-            mDescWrapper.setHint(getString(R.string.issue_loading_template_hint));
+            mDescView.setHint(getString(R.string.issue_loading_template_hint));
         }
 
         if (mEditIssue == null) {
@@ -255,9 +261,18 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        updateLabels();
-        updateLabelStates();
+        adjustTabsForHeaderAlignedFab(true);
         setToolbarScrollable(false);
+        updateOptionViews();
+
+        addAppBarOffsetListener(this);
+    }
+
+    @Override
+    protected PagerAdapter createAdapter(ViewGroup root) {
+        mRootView = root;
+        getLayoutInflater().inflate(R.layout.issue_create, root);
+        return new EditPagerAdapter();
     }
 
     @Override
@@ -281,10 +296,16 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         mAllMilestone = null;
         mAllLabels = null;
         mIsCollaborator = false;
-        updateLabels();
-        updateLabelStates();
         forceLoaderReload(0, 1, 2, 3);
         super.onRefresh();
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        // Set the bottom padding to make the bottom appear as not moving while the
+        // AppBarLayout pushes it down or up.
+        mRootView.setPadding(mRootView.getPaddingLeft(), mRootView.getPaddingTop(),
+                mRootView.getPaddingRight(), appBarLayout.getTotalScrollRange() + verticalOffset);
     }
 
     private boolean isInEditMode() {
@@ -304,6 +325,13 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             mEditIssue.setTitle(mTitleView.getText().toString());
             mEditIssue.setBody(mDescView.getText().toString());
             new SaveIssueTask(mEditIssue).schedule();
+        }
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean hasFocus) {
+        if (view == mTitleView) {
+            mMarkdownButtons.setVisibility(hasFocus ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -369,7 +397,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                     } else {
                         mEditIssue.setMilestone(mAllMilestone.get(which - 1));
                     }
-                    updateLabels();
+                    updateOptionViews();
                     dialog.dismiss();
                 }
             };
@@ -428,7 +456,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                         }
                     }
                     mEditIssue.setAssignees(newAssigneeList);
-                    updateLabels();
+                    updateOptionViews();
                     dialog.dismiss();
                 }
             };
@@ -490,7 +518,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             mEditIssue.setLabels(selectedLabels);
-                            updateLabels();
+                            updateOptionViews();
                         }
                     })
                     .setNeutralButton(R.string.issue_manage_labels,
@@ -519,6 +547,44 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
             view.setBackgroundColor(0);
             view.setTextColor(ContextCompat.getColor(this, Gh4Application.THEME != R.style.LightTheme
                     ? R.color.label_fg_light : R.color.label_fg_dark));
+        }
+    }
+
+    private void updateOptionViews() {
+        if (mEditIssue.getMilestone() != null) {
+            mSelectedMilestoneView.setText(mEditIssue.getMilestone().getTitle());
+        } else {
+            mSelectedMilestoneView.setText(R.string.issue_clear_milestone);
+        }
+
+        List<User> assignees = mEditIssue.getAssignees();
+        LayoutInflater inflater = getLayoutInflater();
+
+        mSelectedAssigneeContainer.removeAllViews();
+        if (assignees != null && !assignees.isEmpty()) {
+            for (User assignee : assignees) {
+                View row = inflater.inflate(R.layout.row_assignee, mSelectedAssigneeContainer, false);
+                TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
+                tvAssignee.setText(ApiHelpers.getUserLogin(this, assignee));
+
+                ImageView ivAssignee = (ImageView) row.findViewById(R.id.iv_assignee);
+                AvatarHandler.assignAvatar(ivAssignee, assignee);
+
+                mSelectedAssigneeContainer.addView(row);
+            }
+        } else {
+            View row = inflater.inflate(R.layout.row_assignee, mSelectedAssigneeContainer, false);
+            TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
+            tvAssignee.setText(R.string.issue_clear_assignee);
+            row.findViewById(R.id.iv_assignee).setVisibility(View.GONE);
+            mSelectedAssigneeContainer.addView(row);
+        }
+
+        List<Label> labels = mEditIssue.getLabels();
+        if (labels == null || labels.isEmpty()) {
+            mLabelsView.setText(R.string.issue_no_labels);
+        } else {
+            mLabelsView.setText(UiUtils.formatLabelList(this, labels));
         }
     }
 
@@ -574,61 +640,31 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    private void updateLabels() {
-        if (mEditIssue.getMilestone() != null) {
-            mTvSelectedMilestone.setText(mEditIssue.getMilestone().getTitle());
-        } else if (!mIsCollaborator && !isInEditMode()) {
-            mTvSelectedMilestone.setText(R.string.issue_milestone_collab_only);
-        } else {
-            mTvSelectedMilestone.setText(R.string.issue_clear_milestone);
-        }
-
-        List<User> assignees = mEditIssue.getAssignees();
-        if (assignees != null && !assignees.isEmpty()) {
-            LayoutInflater inflater = getLayoutInflater();
-            mSelectedAssigneeContainer.removeAllViews();
-            for (User assignee : assignees) {
-                View row = inflater.inflate(R.layout.row_assignee, mSelectedAssigneeContainer, false);
-                TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
-                tvAssignee.setText(ApiHelpers.getUserLogin(this, assignee));
-
-                ImageView ivAssignee = (ImageView) row.findViewById(R.id.iv_assignee);
-                AvatarHandler.assignAvatar(ivAssignee, assignee);
-
-                mSelectedAssigneeContainer.addView(row);
+    private class EditPagerAdapter extends PagerAdapter {
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            @IdRes int resId = 0;
+            switch (position) {
+                case 0: resId = R.id.editor_container; break;
+                case 1: resId = R.id.preview; break;
+                case 2: resId = R.id.options; break;
             }
-
-            mTvSelectedAssignee.setVisibility(View.GONE);
-            mSelectedAssigneeContainer.setVisibility(View.VISIBLE);
-        } else if (!mIsCollaborator && !isInEditMode()) {
-            mTvSelectedAssignee.setText(R.string.issue_assignee_collab_only);
-            mTvSelectedAssignee.setVisibility(View.VISIBLE);
-            mSelectedAssigneeContainer.setVisibility(View.GONE);
-        } else {
-            mTvSelectedAssignee.setText(R.string.issue_clear_assignee);
-            mTvSelectedAssignee.setVisibility(View.VISIBLE);
-            mSelectedAssigneeContainer.setVisibility(View.GONE);
+            return container.findViewById(resId);
         }
 
-        List<Label> labels = mEditIssue.getLabels();
-        if (!mIsCollaborator && !isInEditMode()) {
-            mTvLabels.setText(R.string.issue_labels_collab_only);
-        } else if (labels == null || labels.isEmpty()) {
-            mTvLabels.setText(R.string.issue_no_labels);
-        } else {
-            mTvLabels.setText(UiUtils.formatLabelList(this, labels));
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
         }
-    }
 
-    private void updateLabelStates() {
-        mMilestoneContainer.setEnabled(mIsCollaborator);
-        findViewById(R.id.tv_milestone_label).setEnabled(mIsCollaborator);
-        mTvSelectedMilestone.setEnabled(mIsCollaborator);
-        mAssigneeContainer.setEnabled(mIsCollaborator);
-        findViewById(R.id.tv_assignee_label).setEnabled(mIsCollaborator);
-        mTvSelectedAssignee.setEnabled(mIsCollaborator);
-        mLabelContainer.setEnabled(mIsCollaborator);
-        findViewById(R.id.tv_labels_label).setEnabled(mIsCollaborator);
-        mTvLabels.setEnabled(mIsCollaborator);
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return getBaseActivity().getString(TITLES[position]);
+        }
+
+        @Override
+        public int getCount() {
+            return mIsCollaborator ? TITLES.length : TITLES.length - 1;
+        }
     }
 }

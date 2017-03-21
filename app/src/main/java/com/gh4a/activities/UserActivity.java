@@ -13,7 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.gh4a.BackgroundTask;
-import com.gh4a.BasePagerActivity;
+import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
@@ -29,7 +29,7 @@ import com.gh4a.utils.StringUtils;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.UserService;
 
-public class UserActivity extends BasePagerActivity {
+public class UserActivity extends BaseFragmentPagerActivity {
     public static Intent makeIntent(Context context, String login) {
         return makeIntent(context, login, null);
     }
