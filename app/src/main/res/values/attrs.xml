@@ -119,6 +119,10 @@
         <attr name="state_merged" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="HeightLimitedLinearLayout">
+        <attr name="maxHeight" format="dimension" />
+    </declare-styleable>
+
     <item name="EdgeColorHelper" type="id" />
     <item name="FloatingActionButtonScrollEnabled" type="id" />
 </resources>
