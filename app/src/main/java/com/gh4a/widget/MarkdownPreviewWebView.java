@@ -2,9 +2,12 @@ package com.gh4a.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.EditText;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -41,6 +44,23 @@ public class MarkdownPreviewWebView extends WebView {
         }
     }
 
+    public void setEditText(EditText editor) {
+        editor.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                setContent(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebViewSettings(WebSettings s) {
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
@@ -49,7 +69,7 @@ public class MarkdownPreviewWebView extends WebView {
         s.setUseWideViewPort(false);
     }
 
-    public void setContent(String content) {
+    private void setContent(String content) {
         String html = generateMarkdownHtml(EncodingUtils.toBase64(content), mCssTheme);
         loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
     }

@@ -396,9 +396,6 @@
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
     <string name="issue_no_labels">No labels assigned</string>
-    <string name="issue_milestone_collab_only">Milestone can only be set by repo collaborators</string>
-    <string name="issue_assignee_collab_only">Assignee can only be set by repo collaborators</string>
-    <string name="issue_labels_collab_only">Labels can only be set by repo collaborators</string>
     <string name="issue_milestone_due_date">Due Date</string>
     <string name="issue_milestone_due_unset">No date set</string>
     <string name="issue_comment_title">Comment</string>

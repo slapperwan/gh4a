@@ -26,13 +26,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.gh4a.BasePagerActivity;
+import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
 
-public class IssueMilestoneListActivity extends BasePagerActivity implements
+public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             boolean fromPullRequest) {

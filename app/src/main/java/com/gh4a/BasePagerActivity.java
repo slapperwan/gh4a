@@ -6,25 +6,21 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EdgeEffect;
 import android.widget.LinearLayout;
 
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.SwipeRefreshLayout;
 
 import java.lang.reflect.Field;
 
 public abstract class BasePagerActivity extends BaseActivity implements
-        SwipeRefreshLayout.ChildScrollDelegate, ViewPager.OnPageChangeListener {
-    private FragmentAdapter mAdapter;
+        ViewPager.OnPageChangeListener {
+    private PagerAdapter mAdapter;
     private TabLayout mTabs;
     private ViewPager mPager;
     private int[][] mTabHeaderColors;
@@ -37,15 +33,12 @@ public abstract class BasePagerActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAdapter = new FragmentAdapter();
         setContentView(R.layout.view_pager);
+        mPager = setupPager();
 
         mCurrentHeaderColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
         updateTabHeaderColors();
-        mPager = setupPager();
         updateTabVisibility();
-
-        setChildScrollDelegate(this);
     }
 
     @Override
@@ -54,13 +47,22 @@ public abstract class BasePagerActivity extends BaseActivity implements
         onPageMoved(0, 0);
     }
 
-    protected void invalidateFragments() {
+    protected void adjustTabsForHeaderAlignedFab(boolean fabPresent) {
+        int margin = fabPresent
+                ? getResources().getDimensionPixelSize(R.dimen.mini_fab_size_with_margin) : 0;
+
+        ViewGroup.MarginLayoutParams lp = (ViewGroup.MarginLayoutParams) mTabs.getLayoutParams();
+        lp.rightMargin = margin;
+        mTabs.setLayoutParams(lp);
+    }
+
+    protected void invalidatePages() {
         mAdapter.notifyDataSetChanged();
         updateTabVisibility();
     }
 
     protected void invalidateTabs() {
-        invalidateFragments();
+        invalidatePages();
         updateTabHeaderColors();
         if (mTabHeaderColors != null) {
             onPageMoved(0, 0);
@@ -86,26 +88,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
         super.setErrorViewVisibility(visible);
     }
 
-    @Override
-    public void onRefresh() {
-        for (int i = 0; i < mAdapter.getCount(); i++) {
-            Fragment f = mAdapter.getExistingFragment(i);
-            if (f instanceof LoaderCallbacks.ParentCallback) {
-                ((LoaderCallbacks.ParentCallback) f).onRefresh();
-            }
-        }
-        super.onRefresh();
-    }
-
-    @Override
-    public boolean canChildScrollUp() {
-        Fragment item = mAdapter.getCurrentFragment();
-        if (item != null && item instanceof SwipeRefreshLayout.ChildScrollDelegate) {
-            return ((SwipeRefreshLayout.ChildScrollDelegate) item).canChildScrollUp();
-        }
-        return false;
-    }
-
     private void updateTabHeaderColors() {
         int[][] colorAttrs = getTabHeaderColorAttrs();
         if (colorAttrs == null) {
@@ -122,6 +104,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     private ViewPager setupPager() {
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        mAdapter = createAdapter(pager);
         pager.setAdapter(mAdapter);
         pager.addOnPageChangeListener(this);
 
@@ -177,17 +160,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mCurrentHeaderColor = UiUtils.resolveColor(this, colorAttrId);
     }
 
-    protected abstract int[] getTabTitleResIds();
-    protected abstract Fragment makeFragment(int position);
-    protected boolean fragmentNeedsRefresh(Fragment object) {
-        return false;
-    }
-
-    protected void onFragmentInstantiated(Fragment f, int position) {
-    }
-
-    protected void onFragmentDestroyed(Fragment f) {
-    }
+    protected abstract PagerAdapter createAdapter(ViewGroup root);
 
     /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
     protected int[][] getTabHeaderColorAttrs() {
@@ -227,71 +200,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
             int statusBarColor = UiUtils.mixColors(mTabHeaderColors[position][1],
                     mTabHeaderColors[nextIndex][1], fraction);
             setHeaderColor(headerColor, statusBarColor);
-        }
-    }
-
-    private class FragmentAdapter extends FragmentStatePagerAdapter {
-        private final SparseArray<Fragment> mFragments = new SparseArray<>();
-        private Fragment mCurrentFragment;
-
-        public FragmentAdapter() {
-            super(getSupportFragmentManager());
-        }
-
-        @Override
-        public int getCount() {
-            int[] titleResIds = getTabTitleResIds();
-            return titleResIds != null ? titleResIds.length : 0;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            return makeFragment(position);
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            Fragment f = (Fragment) super.instantiateItem(container, position);
-            mFragments.put(position, f);
-            onFragmentInstantiated(f, position);
-            return f;
-        }
-
-        private Fragment getExistingFragment(int position) {
-            return mFragments.get(position);
-        }
-
-        private Fragment getCurrentFragment() {
-            return mCurrentFragment;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return getString(getTabTitleResIds()[position]);
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            super.destroyItem(container, position, object);
-            mFragments.remove(position);
-            onFragmentDestroyed((Fragment) object);
-            if (object == mCurrentFragment) {
-                mCurrentFragment = null;
-            }
-        }
-
-        @Override
-        public void setPrimaryItem(ViewGroup container, int position, Object object) {
-            mCurrentFragment = (Fragment) object;
-            super.setPrimaryItem(container, position, object);
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            if (object instanceof Fragment && fragmentNeedsRefresh((Fragment) object)) {
-                return POSITION_NONE;
-            }
-            return POSITION_UNCHANGED;
         }
     }
 

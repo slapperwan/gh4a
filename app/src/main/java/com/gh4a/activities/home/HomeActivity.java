@@ -26,7 +26,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.BasePagerActivity;
+import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.Github4AndroidActivity;
@@ -46,7 +46,7 @@ import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.User;
 
-public class HomeActivity extends BasePagerActivity implements
+public class HomeActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, RepositoryListContainerFragment.Callback,
         NotificationListFragment.ParentCallback {
     private static final int REQUEST_SETTINGS = 10000;

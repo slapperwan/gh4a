@@ -21,12 +21,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 
-import com.gh4a.BasePagerActivity;
+import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.StargazerListFragment;
 import com.gh4a.fragment.WatcherListFragment;
 
-public class WatcherListActivity extends BasePagerActivity {
+public class WatcherListActivity extends BaseFragmentPagerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return new Intent(context, WatcherListActivity.class)
                 .putExtra("owner", repoOwner)

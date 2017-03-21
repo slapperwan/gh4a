@@ -21,12 +21,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.format.DateFormat;
@@ -35,16 +38,20 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.MarkdownButtonsBar;
+import com.gh4a.widget.MarkdownPreviewWebView;
 
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -54,7 +61,8 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
-public class IssueMilestoneEditActivity extends BaseActivity implements View.OnClickListener {
+public class IssueMilestoneEditActivity extends BasePagerActivity implements
+        View.OnClickListener, View.OnFocusChangeListener, AppBarLayout.OnOffsetChangedListener {
     public static Intent makeEditIntent(Context context, String repoOwner, String repoName,
             Milestone milestone, boolean fromPullRequest) {
         return makeCreateIntent(context, repoOwner, repoName, fromPullRequest)
@@ -69,14 +77,20 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
                 .putExtra("from_pr", fromPullRequest);
     }
 
+    private static final int[] TITLES = {
+        R.string.issue_body, R.string.preview, R.string.settings
+    };
+
     private String mRepoOwner;
     private String mRepoName;
     private boolean mFromPullRequest;
 
     private Milestone mMilestone;
 
+    private View mRootView;
     private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
+    private MarkdownButtonsBar mMarkdownButtons;
     private EditText mDescriptionView;
     private TextView mDueView;
 
@@ -91,16 +105,22 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
             return;
         }
 
-        setContentView(R.layout.issue_create_milestone);
-
         LayoutInflater headerInflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         View header = headerInflater.inflate(R.layout.issue_create_header, null);
         addHeaderView(header, false);
 
         mTitleWrapper = (TextInputLayout) header.findViewById(R.id.title_wrapper);
         mTitleView = (EditText) header.findViewById(R.id.et_title);
-        mDescriptionView = (EditText) header.findViewById(R.id.et_desc);
+        mTitleView.setOnFocusChangeListener(this);
+
+        mDescriptionView = (EditText) findViewById(R.id.editor);
         mDueView = (TextView) findViewById(R.id.tv_due);
+
+        mMarkdownButtons = (MarkdownButtonsBar) findViewById(R.id.markdown_buttons);
+        mMarkdownButtons.setEditText(mDescriptionView);
+
+        MarkdownPreviewWebView preview = (MarkdownPreviewWebView) findViewById(R.id.preview);
+        preview.setEditText(mDescriptionView);
 
         CoordinatorLayout rootLayout = getRootLayout();
         FloatingActionButton fab = (FloatingActionButton)
@@ -138,6 +158,14 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         mDescriptionView.setText(mMilestone.getDescription());
         updateLabels();
         setToolbarScrollable(false);
+        adjustTabsForHeaderAlignedFab(true);
+    }
+
+    @Override
+    protected PagerAdapter createAdapter(ViewGroup root) {
+        mRootView = root;
+        getLayoutInflater().inflate(R.layout.issue_create_milestone, root);
+        return new MilestonePagerAdapter();
     }
 
     @Override
@@ -194,6 +222,21 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
             mMilestone.setDescription(desc);
             new SaveIssueMilestoneTask(mMilestone).schedule();
         }
+    }
+
+    @Override
+    public void onFocusChange(View view, boolean hasFocus) {
+        if (view == mTitleView) {
+            mMarkdownButtons.setVisibility(hasFocus ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        // Set the bottom padding to make the bottom appear as not moving while the
+        // AppBarLayout pushes it down or up.
+        mRootView.setPadding(mRootView.getPaddingLeft(), mRootView.getPaddingTop(),
+                mRootView.getPaddingRight(), appBarLayout.getTotalScrollRange() + verticalOffset);
     }
 
     @Override
@@ -432,6 +475,34 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
         private IssueMilestoneEditActivity getEditActivity() {
             return (IssueMilestoneEditActivity) getActivity();
+        }
+    }
+
+    private class MilestonePagerAdapter extends PagerAdapter {
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            @IdRes int resId = 0;
+            switch (position) {
+                case 0: resId = R.id.editor_container; break;
+                case 1: resId = R.id.preview; break;
+                case 2: resId = R.id.options; break;
+            }
+            return container.findViewById(resId);
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return getBaseActivity().getString(TITLES[position]);
+        }
+
+        @Override
+        public int getCount() {
+            return TITLES.length;
         }
     }
 }
