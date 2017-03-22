@@ -78,6 +78,7 @@
         <item name="timelineEventReviewed">@drawable/timeline_event_reviewed_dark</item>
         <item name="expandIcon">@drawable/expand_dark</item>
         <item name="collapseIcon">@drawable/collapse_dark</item>
+        <item name="saveIcon">@drawable/save_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
@@ -208,6 +209,7 @@
         <item name="timelineEventReviewed">@drawable/timeline_event_reviewed</item>
         <item name="expandIcon">@drawable/expand</item>
         <item name="collapseIcon">@drawable/collapse</item>
+        <item name="saveIcon">@drawable/save</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
