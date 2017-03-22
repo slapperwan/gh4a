@@ -208,10 +208,10 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                 SpannableStringBuilder ssb = new SpannableStringBuilder();
                 float density = mContext.getResources().getDisplayMetrics().density;
                 int bottomMargin = Math.round(2 /* dp */ * density);
-                int count = commits.size();
+                int count = payload.getSize();
                 int maxLines =
                         mContext.getResources().getInteger(R.integer.event_description_max_lines);
-                int max = count > maxLines ? maxLines - 1 : count;
+                int max = Math.min(count > maxLines ? maxLines - 1 : count, commits.size());
 
                 for (int i = 0; i < max; i++) {
                     Commit commit = commits.get(i);
