@@ -1,6 +1,7 @@
 package com.gh4a.widget;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
@@ -31,28 +32,27 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         AppBarLayout.OnOffsetChangedListener {
 
     public interface Callback {
-        @StringRes
-        int getCommentEditorHintResId();
-
+        @StringRes int getCommentEditorHintResId();
         void onSendCommentInBackground(String comment) throws IOException;
-
         void onCommentSent();
-
         BaseActivity getBaseActivity();
     }
+
 
     private TabLayout mTabs;
     private BottomSheetBehavior mBehavior;
     private View mAdvancedEditorContainer;
     private CommentEditor mBasicEditor;
     private CommentEditor mAdvancedEditor;
-    private Callback mCallback;
     private MarkdownPreviewWebView mPreviewWebView;
     private ImageView mAdvancedEditorToggle;
+
+    private Callback mCallback;
+    private View mResizingView;
+
     private int mBasicPeekHeight;
     private int mAdvancedPeekHeight;
     private int mLatestOffset;
-    private View mResizingView;
     private int mTopShadowHeight;
 
     public EditorBottomSheet(Context context) {
@@ -71,11 +71,10 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     }
 
     private void initialize() {
-        mBasicPeekHeight = getResources().getDimensionPixelSize(R.dimen.comment_editor_peek_height);
-        mAdvancedPeekHeight =
-                getResources().getDimensionPixelSize(R.dimen.comment_advanced_editor_peek_height);
-        mTopShadowHeight =
-                getResources().getDimensionPixelSize(R.dimen.bottom_sheet_top_shadow_height);
+        final Resources res = getResources();
+        mBasicPeekHeight = res.getDimensionPixelSize(R.dimen.comment_editor_peek_height);
+        mAdvancedPeekHeight = res.getDimensionPixelSize(R.dimen.comment_advanced_editor_peek_height);
+        mTopShadowHeight = res.getDimensionPixelSize(R.dimen.bottom_sheet_top_shadow_height);
 
         View view = View.inflate(getContext(), R.layout.editor_bottom_sheet, this);
 
@@ -248,7 +247,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mAdvancedEditorContainer = stub.inflate();
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
-        viewPager.setAdapter(new AdvancedEditorPagerAdapter());
+        viewPager.setAdapter(new AdvancedEditorPagerAdapter(getContext()));
 
         mTabs = (TabLayout) findViewById(R.id.tabs);
         mTabs.setupWithViewPager(viewPager);
@@ -319,11 +318,16 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         }
     }
 
-    private class AdvancedEditorPagerAdapter extends PagerAdapter {
-
-        private final int[] TITLES = new int[] {
-                R.string.edit, R.string.preview
+    private static class AdvancedEditorPagerAdapter extends PagerAdapter {
+        private static final int[] TITLES = new int[] {
+            R.string.edit, R.string.preview
         };
+
+        private Context mContext;
+
+        public AdvancedEditorPagerAdapter(Context context) {
+            mContext = context;
+        }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
@@ -347,7 +351,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return getContext().getString(TITLES[position]);
+            return mContext.getString(TITLES[position]);
         }
 
         @Override

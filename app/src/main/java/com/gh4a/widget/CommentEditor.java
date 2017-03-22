@@ -17,8 +17,7 @@ import java.util.Set;
 public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
     private DropDownUserAdapter mMentionAdapter;
     private boolean mLocked;
-    @StringRes
-    private int mCommentEditorHintResId = R.string.issue_comment_hint;
+    private @StringRes int mCommentEditorHintResId;
 
     public CommentEditor(Context context) {
         super(context);
@@ -88,6 +87,12 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
 
     private void updateLockState() {
         setEnabled(!mLocked);
-        setHint(mLocked ? R.string.comment_editor_locked_hint : mCommentEditorHintResId);
+        if (mLocked) {
+            setHint(R.string.comment_editor_locked_hint);
+        } else if (mCommentEditorHintResId != 0) {
+            setHint(mCommentEditorHintResId);
+        } else {
+            setHint(null);
+        }
     }
 }
