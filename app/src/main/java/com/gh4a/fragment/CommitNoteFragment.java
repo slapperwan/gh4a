@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -147,6 +148,15 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     @Override
     public CoordinatorLayout getRootLayout() {
         return getBaseActivity().getRootLayout();
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (mBottomSheet != null && mBottomSheet.isInAdvancedMode()) {
+            mBottomSheet.setAdvancedMode(false);
+            return true;
+        }
+        return false;
     }
 
     @Override

@@ -55,7 +55,7 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
         ImageView saveButton = (ImageView) mEditorSheet.findViewById(R.id.send_button);
         saveButton.setImageResource(UiUtils.resolveDrawable(this, R.attr.saveIcon));
 
-        mEditorSheet.toggleAdvancedEditor();
+        mEditorSheet.setAdvancedMode(true);
         mEditorSheet.setCallback(this);
         mEditorSheet.setCommentText(getIntent().getStringExtra("body"), false);
 

@@ -136,7 +136,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_advanced_editor_toggle:
-                toggleAdvancedEditor();
+                setAdvancedMode(!isInAdvancedMode());
                 break;
             case R.id.send_button:
                 new CommentTask(getCommentText().toString()).schedule();
@@ -178,9 +178,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         getBehavior().setPeekHeight(peekHeight + mLatestOffset);
     }
 
-    public void toggleAdvancedEditor() {
-        final boolean visible = !isInAdvancedMode();
-
+    public void setAdvancedMode(final boolean visible) {
         if (visible) {
             setAdvancedEditorVisible(true);
         } else {
@@ -206,6 +204,11 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         });
     }
 
+    public boolean isInAdvancedMode() {
+        return mAdvancedEditorContainer != null
+                && mAdvancedEditorContainer.getVisibility() == View.VISIBLE;
+    }
+
     public void setCommentText(CharSequence text, boolean clearFocus) {
         if (isInAdvancedMode()) {
             mAdvancedEditor.setText(text);
@@ -225,11 +228,6 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             return mAdvancedEditor.getText();
         }
         return mBasicEditor.getText();
-    }
-
-    private boolean isInAdvancedMode() {
-        return mAdvancedEditorContainer != null
-                && mAdvancedEditorContainer.getVisibility() == View.VISIBLE;
     }
 
     private void setAdvancedEditorVisible(boolean visible) {
