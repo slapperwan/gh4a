@@ -278,5 +278,4 @@ public abstract class BasePagerActivity extends BaseActivity implements
             return false;
         }
     }
-
 }

@@ -144,6 +144,12 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
+    protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
+        super.setHighlightColors(colorAttrId, statusBarColorAttrId);
+        mBottomSheet.setHighlightColor(colorAttrId);
+    }
+
+    @Override
     protected RootAdapter<CommitComment, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new CommitNoteAdapter(getActivity(), mRepoOwner, mRepoName, this);
         return mAdapter;

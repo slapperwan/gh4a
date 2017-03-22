@@ -2,6 +2,10 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
+import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
@@ -38,17 +42,18 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         BaseActivity getBaseActivity();
     }
 
-
     private TabLayout mTabs;
     private BottomSheetBehavior mBehavior;
     private View mAdvancedEditorContainer;
     private CommentEditor mBasicEditor;
     private CommentEditor mAdvancedEditor;
+    private MarkdownButtonsBar mMarkdownButtons;
     private MarkdownPreviewWebView mPreviewWebView;
     private ImageView mAdvancedEditorToggle;
 
     private Callback mCallback;
     private View mResizingView;
+    private @ColorInt int mHighlightColor = Color.TRANSPARENT;
 
     private int mBasicPeekHeight;
     private int mAdvancedPeekHeight;
@@ -111,6 +116,13 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             mAdvancedEditor.setMentionUsers(users);
         }
     }
+
+    public void setHighlightColor(@AttrRes int colorAttrId) {
+        mHighlightColor = UiUtils.resolveColor(getContext(), colorAttrId);
+        if (mMarkdownButtons != null) {
+            mMarkdownButtons.setBackgroundColor(mHighlightColor);
+        }
+     }
 
     public void addQuote(CharSequence text) {
         if (isInAdvancedMode()) {
@@ -271,9 +283,12 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mAdvancedEditor.setLocked(mBasicEditor.isLocked());
         mAdvancedEditor.setMentionUsers(mBasicEditor.getMentionUsers());
 
-        MarkdownButtonsBar markdownButtons =
+        mMarkdownButtons =
                 (MarkdownButtonsBar) mAdvancedEditorContainer.findViewById(R.id.markdown_buttons);
-        markdownButtons.setEditText(mAdvancedEditor);
+        mMarkdownButtons.setEditText(mAdvancedEditor);
+        if (mHighlightColor != Color.TRANSPARENT) {
+            mMarkdownButtons.setBackgroundColor(mHighlightColor);
+        }
 
         mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.wv_preview);
         mPreviewWebView.setEditText(mAdvancedEditor);
