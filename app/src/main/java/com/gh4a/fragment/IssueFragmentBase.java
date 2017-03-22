@@ -195,7 +195,12 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public boolean canChildScrollUp() {
         return mBottomSheet.isExpanded() || super.canChildScrollUp();
+    }
 
+    @Override
+    protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
+        super.setHighlightColors(colorAttrId, statusBarColorAttrId);
+        mBottomSheet.setHighlightColor(colorAttrId);
     }
 
     @Override
