@@ -382,10 +382,18 @@ public class UiUtils {
     }
 
     public static void replaceSelectionText(EditText view, CharSequence text) {
-        int selectionStart = view.getSelectionStart();
-        int selectionEnd = view.getSelectionEnd();
+        int min = 0;
+        int max = view.length();
 
-        view.getText().replace(selectionStart, selectionEnd, text);
+        if (view.isFocused()) {
+            int selectionStart = view.getSelectionStart();
+            int selectionEnd = view.getSelectionEnd();
+
+            min = Math.max(0, Math.min(selectionStart, selectionEnd));
+            max = Math.max(0, Math.max(selectionStart, selectionEnd));
+        }
+
+        view.getText().replace(min, max, text);
     }
 
     public static abstract class QuoteActionModeCallback implements ActionMode.Callback {
