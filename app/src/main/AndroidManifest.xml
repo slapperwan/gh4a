@@ -57,9 +57,15 @@
         <activity android:name=".activities.CompareActivity" android:exported="false" />
         <activity android:name=".activities.ContributorListActivity" android:exported="false" />
         <activity android:name=".activities.DownloadsActivity" android:exported="false" />
-        <activity android:name=".activities.EditCommitCommentActivity" android:exported="false" />
-        <activity android:name=".activities.EditIssueCommentActivity" android:exported="false" />
-        <activity android:name=".activities.EditPullRequestCommentActivity" android:exported="false" />
+        <activity android:name=".activities.EditCommitCommentActivity"
+            android:theme="@style/BottomSheetLightTheme"
+            android:exported="false" />
+        <activity android:name=".activities.EditIssueCommentActivity"
+            android:theme="@style/BottomSheetLightTheme"
+            android:exported="false" />
+        <activity android:name=".activities.EditPullRequestCommentActivity"
+            android:theme="@style/BottomSheetLightTheme"
+            android:exported="false" />
         <activity android:name=".activities.FileViewerActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize" />

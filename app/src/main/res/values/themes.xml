@@ -116,16 +116,19 @@
         <item name="colorAccent">@color/dark_accent</item>
     </style>
 
-    <style name="TransparentDarkThemeBase" parent="Theme.AppCompat.NoActionBar">
+    <style name="TransparentDarkThemeBase" parent="DarkThemeBase">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="alertDialogTheme">@style/DarkAlertDialogTheme</item>
     </style>
 
     <style name="TransparentDarkTheme" parent="TransparentDarkThemeBase" />
+
+    <style name="BottomSheetDarkTheme" parent="TransparentDarkTheme">
+        <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
+    </style>
 
     <style name="LightThemeBase" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowSoftInputMode">adjustResize</item>
@@ -244,16 +247,19 @@
         <item name="colorAccent">@color/light_primary</item>
     </style>
 
-    <style name="TransparentLightThemeBase" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="TransparentLightThemeBase" parent="LightThemeBase">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="alertDialogTheme">@style/LightAlertDialogTheme</item>
     </style>
 
     <style name="TransparentLightTheme" parent="TransparentLightThemeBase" />
+
+    <style name="BottomSheetLightTheme" parent="TransparentLightTheme">
+        <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
+    </style>
 
     <style name="Theme.Header" parent="Theme.AppCompat">
         <item name="colorAccent">#ffffff</item>
