@@ -3,42 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <include
         android:id="@+id/editor_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <com.gh4a.widget.CommentEditor
-            android:id="@+id/editor"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:layout_height="0dp"
-            android:gravity="top"
-            android:layout_margin="8dp"
-            android:inputType="textMultiLine|textCapSentences"
-            tools:text="Issue body" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:background="@drawable/top_shadow" />
-
-        <com.gh4a.widget.MarkdownButtonsBar
-            android:id="@+id/markdown_buttons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:background="?colorPrimary"
-            android:visibility="gone" />
-
-    </LinearLayout>
+        layout="@layout/editor_with_markdown_buttons" />
 
     <com.gh4a.widget.MarkdownPreviewWebView
         android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/options"
