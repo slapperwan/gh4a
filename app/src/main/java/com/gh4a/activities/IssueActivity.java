@@ -268,6 +268,14 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         super.onRefresh();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mFragment != null && mFragment.onBackPressed()) {
+            return;
+        }
+        super.onBackPressed();
+    }
+
     private void showOpenCloseConfirmDialog(final boolean reopen) {
         @StringRes int messageResId = reopen
                 ? R.string.reopen_issue_confirm : R.string.close_issue_confirm;

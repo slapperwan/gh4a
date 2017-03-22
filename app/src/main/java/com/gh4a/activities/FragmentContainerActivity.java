@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
+import com.gh4a.fragment.LoadingFragmentBase;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.widget.SwipeRefreshLayout;
 
@@ -41,5 +42,14 @@ public abstract class FragmentContainerActivity extends BaseActivity {
         if (mFragment instanceof LoaderCallbacks.ParentCallback) {
             ((LoaderCallbacks.ParentCallback) mFragment).onRefresh();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mFragment instanceof LoadingFragmentBase
+                && ((LoadingFragmentBase) mFragment).onBackPressed()) {
+            return;
+        }
+        super.onBackPressed();
     }
 }

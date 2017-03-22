@@ -120,4 +120,8 @@ public abstract class LoadingFragmentBase extends Fragment implements
     }
 
     protected abstract View onCreateContentView(LayoutInflater inflater, ViewGroup parent);
+
+    public boolean onBackPressed() {
+        return false;
+    }
 }

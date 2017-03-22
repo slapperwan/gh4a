@@ -167,6 +167,15 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
+    public boolean onBackPressed() {
+        if (mBottomSheet != null && mBottomSheet.isInAdvancedMode()) {
+            mBottomSheet.setAdvancedMode(false);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
     public void onRefresh() {
         if (mListHeaderView != null) {
             getActivity().supportInvalidateOptionsMenu();

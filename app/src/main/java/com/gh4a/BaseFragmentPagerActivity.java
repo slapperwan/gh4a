@@ -7,6 +7,7 @@ import android.support.v4.view.PagerAdapter;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
+import com.gh4a.fragment.LoadingFragmentBase;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.widget.SwipeRefreshLayout;
 
@@ -28,6 +29,15 @@ public abstract class BaseFragmentPagerActivity extends BasePagerActivity implem
 
     protected void invalidateFragments() {
         invalidatePages();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment item = mAdapter.getCurrentFragment();
+        if (item instanceof LoadingFragmentBase && ((LoadingFragmentBase) item).onBackPressed()) {
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override
