@@ -393,7 +393,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
                 .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new DeleteCommentTask(getBaseActivity(), comment.comment.getId()).schedule();
+                        new DeleteCommentTask(getBaseActivity(), comment.comment).schedule();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -402,26 +402,26 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
 
     protected abstract void bindSpecialViews(View headerView);
     protected abstract void assignHighlightColor();
-    protected abstract void deleteCommentInBackground(RepositoryId repoId, long commentId)
+    protected abstract void deleteCommentInBackground(RepositoryId repoId, Comment comment)
             throws Exception;
 
     private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private final long mId;
+        private final Comment mComment;
 
-        public DeleteCommentTask(BaseActivity activity, long id) {
+        public DeleteCommentTask(BaseActivity activity, Comment comment) {
             super(activity, R.string.deleting_msg);
-            mId = id;
+            mComment = comment;
         }
 
         @Override
         protected ProgressDialogTask<Void> clone() {
-            return new DeleteCommentTask(getBaseActivity(), mId);
+            return new DeleteCommentTask(getBaseActivity(), mComment);
         }
 
         @Override
         protected Void run() throws Exception {
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            deleteCommentInBackground(repoId, mId);
+            deleteCommentInBackground(repoId, mComment);
             return null;
         }
 

@@ -38,12 +38,14 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitStatus;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.io.IOException;
@@ -227,12 +229,17 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     @Override
-    protected void deleteCommentInBackground(RepositoryId repoId, long commentId) throws Exception {
+    protected void deleteCommentInBackground(RepositoryId repoId, Comment comment) throws Exception {
         Gh4Application app = Gh4Application.get();
-        PullRequestService pullService =
-                (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
 
-        pullService.deleteComment(repoId, commentId);
+        if (comment instanceof CommitComment) {
+            PullRequestService pullService =
+                    (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
+            pullService.deleteComment(repoId, comment.getId());
+        } else {
+            IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
+            issueService.deleteComment(repoId, comment.getId());
+        }
     }
 
     @Override

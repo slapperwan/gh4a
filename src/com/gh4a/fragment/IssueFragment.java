@@ -14,6 +14,7 @@ import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -77,11 +78,11 @@ public class IssueFragment extends IssueFragmentBase {
     }
 
     @Override
-    protected void deleteCommentInBackground(RepositoryId repoId, long commentId) throws Exception {
+    protected void deleteCommentInBackground(RepositoryId repoId, Comment comment) throws Exception {
         Gh4Application app = Gh4Application.get();
         IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
 
-        issueService.deleteComment(repoId, commentId);
+        issueService.deleteComment(repoId, comment.getId());
     }
 
     @Override
