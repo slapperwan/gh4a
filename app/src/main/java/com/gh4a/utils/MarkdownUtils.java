@@ -346,16 +346,21 @@ public class MarkdownUtils {
 
     private static void setSurroundText(@NonNull EditText editText, @NonNull CharSequence text,
             String surroundText) {
+        CharSequence source = editText.getText();
         int selectionStart = editText.getSelectionStart();
 
-        CharSequence resultText = surroundText + text + surroundText + " ";
+        StringBuilder result = new StringBuilder();
+        if (selectionStart > 0 && !Character.isWhitespace(source.charAt(selectionStart - 1))) {
+            result.append(" ");
+        }
+        result.append(surroundText).append(text).append(surroundText).append(" ");
 
-        UiUtils.replaceSelectionText(editText, resultText);
+        UiUtils.replaceSelectionText(editText, result);
 
         int selectionBack = 0;
         if (text.length() == 0) {
             selectionBack = surroundText.length() + 1;
         }
-        editText.setSelection(selectionStart + resultText.length() - selectionBack);
+        editText.setSelection(selectionStart + result.length() - selectionBack);
     }
 }
