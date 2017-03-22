@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.gh4a.widget.HeightLimitedLinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/advanced_editor"
     android:layout_width="match_parent"
@@ -14,44 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <include
             android:id="@+id/comment_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <android.support.v4.widget.NestedScrollView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:fillViewport="true">
-
-                <com.gh4a.widget.CommentEditor
-                    android:id="@+id/et_comment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:inputType="textMultiLine|textCapSentences"
-                    tools:text="Enter comment" />
-
-            </android.support.v4.widget.NestedScrollView>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="4dp"
-                android:layout_above="@+id/markdown_buttons"
-                android:background="@drawable/top_shadow" />
-
-            <com.gh4a.widget.MarkdownButtonsBar
-                android:id="@+id/markdown_buttons"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_gravity="bottom"
-                android:background="?colorPrimary" />
-
-        </LinearLayout>
+            layout="@layout/editor_with_markdown_buttons" />
 
         <com.gh4a.widget.MarkdownPreviewWebView
             android:id="@+id/wv_preview"

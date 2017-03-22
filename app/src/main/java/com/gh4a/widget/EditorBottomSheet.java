@@ -245,7 +245,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
     private void initAdvancedMode() {
         ViewStub stub = (ViewStub) findViewById(R.id.advanced_editor_stub);
-        stub.inflate();
+        mAdvancedEditorContainer = stub.inflate();
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
         viewPager.setAdapter(new AdvancedEditorPagerAdapter());
@@ -262,7 +262,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             tab.setLayoutParams(lp);
         }
 
-        mAdvancedEditor = (CommentEditor) findViewById(R.id.et_comment);
+        mAdvancedEditor = (CommentEditor) mAdvancedEditorContainer.findViewById(R.id.editor);
         mAdvancedEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor, findViewById(R.id.send_button)));
 
@@ -272,11 +272,10 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mAdvancedEditor.setLocked(mBasicEditor.isLocked());
         mAdvancedEditor.setMentionUsers(mBasicEditor.getMentionUsers());
 
-        MarkdownButtonsBar mMarkdownButtons =
-                (MarkdownButtonsBar) findViewById(R.id.markdown_buttons);
-        mMarkdownButtons.setEditText(mAdvancedEditor);
+        MarkdownButtonsBar markdownButtons =
+                (MarkdownButtonsBar) mAdvancedEditorContainer.findViewById(R.id.markdown_buttons);
+        markdownButtons.setEditText(mAdvancedEditor);
 
-        mAdvancedEditorContainer = findViewById(R.id.advanced_editor);
         mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.wv_preview);
         mPreviewWebView.setEditText(mAdvancedEditor);
     }
