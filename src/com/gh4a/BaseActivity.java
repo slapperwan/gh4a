@@ -481,6 +481,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!closeDrawers()) {
+            super.onBackPressed();
+        }
+    }
+
     protected boolean forceLoaderReload(int... ids) {
         LoaderManager lm = getSupportLoaderManager();
         boolean reloadedAny = false;

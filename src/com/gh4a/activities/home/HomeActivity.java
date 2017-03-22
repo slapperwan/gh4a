@@ -285,9 +285,9 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     public void onBackPressed() {
         FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
+        if (!closeDrawers() && fm.getBackStackEntryCount() > 0) {
             fm.popBackStack();
-        } else if (!closeDrawers()) {
+        } else {
             super.onBackPressed();
         }
     }
