@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
@@ -50,6 +51,9 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
 
         View advancedToggle = mEditorSheet.findViewById(R.id.iv_advanced_editor_toggle);
         advancedToggle.setVisibility(View.GONE);
+
+        ImageView saveButton = (ImageView) mEditorSheet.findViewById(R.id.send_button);
+        saveButton.setImageResource(UiUtils.resolveDrawable(this, R.attr.saveIcon));
 
         mEditorSheet.toggleAdvancedEditor();
         mEditorSheet.setCallback(this);
