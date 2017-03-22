@@ -2,6 +2,7 @@ package com.gh4a.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.AttrRes;
 
 import com.gh4a.Gh4Application;
 
@@ -13,11 +14,11 @@ import java.io.IOException;
 
 public class EditPullRequestCommentActivity extends EditCommentActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            int prNumber, CommitComment comment) {
+            int prNumber, CommitComment comment, @AttrRes int highlightColorAttr) {
         Intent intent = new Intent(context, EditPullRequestCommentActivity.class)
                 .putExtra("pr", prNumber);
         return EditCommentActivity.fillInIntent(intent,
-                repoOwner, repoName, comment.getId(), comment.getBody());
+                repoOwner, repoName, comment.getId(), comment.getBody(), highlightColorAttr);
     }
 
     @Override

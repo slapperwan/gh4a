@@ -135,10 +135,10 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         Intent intent;
         if (comment instanceof CommitComment) {
             intent = EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mIssueNumber, (CommitComment) comment);
+                    mIssueNumber, (CommitComment) comment, 0);
         } else {
             intent = EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mIssueNumber, comment);
+                    mIssueNumber, comment, 0);
         }
 
         startActivityForResult(intent, REQUEST_EDIT);

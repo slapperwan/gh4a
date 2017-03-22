@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.annotation.AttrRes;
 import android.support.v4.content.Loader;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -247,11 +248,15 @@ public class PullRequestFragment extends IssueFragmentBase {
 
     @Override
     public void editComment(Comment comment) {
+        final @AttrRes int highlightColorAttr = mPullRequest.isMerged()
+                ? R.attr.colorPullRequestMerged
+                : ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())
+                        ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
         Intent intent = comment instanceof CommitComment
                 ? EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mPullRequest.getNumber(), (CommitComment) comment)
+                        mPullRequest.getNumber(), (CommitComment) comment, highlightColorAttr)
                 : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mIssue.getNumber(), comment);
+                        mIssue.getNumber(), comment, highlightColorAttr);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
