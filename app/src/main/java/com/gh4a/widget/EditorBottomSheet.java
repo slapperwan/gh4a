@@ -5,12 +5,13 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
-import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
@@ -22,7 +23,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
@@ -39,7 +39,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         @StringRes int getCommentEditorHintResId();
         void onSendCommentInBackground(String comment) throws IOException;
         void onCommentSent();
-        BaseActivity getBaseActivity();
+        FragmentActivity getActivity();
+        CoordinatorLayout getRootLayout();
     }
 
     private TabLayout mTabs;
@@ -139,7 +140,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                 break;
             case R.id.send_button:
                 new CommentTask(getCommentText().toString()).schedule();
-                UiUtils.hideImeForView(mCallback.getBaseActivity().getCurrentFocus());
+                UiUtils.hideImeForView(mCallback.getActivity().getCurrentFocus());
                 break;
         }
     }
@@ -305,7 +306,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         private final String mText;
 
         public CommentTask(String text) {
-            super(mCallback.getBaseActivity(), R.string.saving_comment);
+            super(mCallback.getActivity(), mCallback.getRootLayout(), R.string.saving_comment);
             mText = text;
         }
 

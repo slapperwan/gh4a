@@ -3,8 +3,11 @@ package com.gh4a;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 
 import com.gh4a.utils.UiUtils;
@@ -12,12 +15,22 @@ import com.gh4a.utils.UiUtils;
 public abstract class ProgressDialogTask<T> extends BackgroundTask<T>
         implements View.OnClickListener {
     private ProgressDialogFragment mFragment;
-    private BaseActivity mActivity;
+    private CoordinatorLayout mRootLayout;
+    private FragmentManager mFragmentManager;
     private final int mMessageResId;
 
     public ProgressDialogTask(BaseActivity activity, int messageResId) {
         super(activity);
-        mActivity = activity;
+        mFragmentManager = activity.getSupportFragmentManager();
+        mRootLayout = activity.getRootLayout();
+        mMessageResId = messageResId;
+    }
+
+    public ProgressDialogTask(FragmentActivity activity,
+            CoordinatorLayout rootLayout, int messageResId) {
+        super(activity);
+        mFragmentManager = activity.getSupportFragmentManager();
+        mRootLayout = rootLayout;
         mMessageResId = messageResId;
     }
 
@@ -30,7 +43,7 @@ public abstract class ProgressDialogTask<T> extends BackgroundTask<T>
         args.putInt("message_res", mMessageResId);
         mFragment = new ProgressDialogFragment();
         mFragment.setArguments(args);
-        mFragment.show(mActivity.getSupportFragmentManager(), "progressdialog");
+        mFragment.show(mFragmentManager, "progressdialog");
 
         super.onPreExecute();
     }
@@ -42,13 +55,14 @@ public abstract class ProgressDialogTask<T> extends BackgroundTask<T>
         }
         super.onPostExecute(result);
         mFragment = null;
-        mActivity = null;
+        mFragmentManager = null;
+        mRootLayout = null;
     }
 
     @Override
     protected void onError(Exception e) {
         super.onError(e);
-        Snackbar.make(mActivity.getRootLayout(), getErrorMessage(), Snackbar.LENGTH_LONG)
+        Snackbar.make(mRootLayout, getErrorMessage(), Snackbar.LENGTH_LONG)
                 .setAction(R.string.retry, this)
                 .show();
     }
