@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.gh4a.Gh4Application;
-import com.gh4a.R;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -19,12 +18,6 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
                 .putExtra("pr", prNumber);
         return EditCommentActivity.fillInIntent(intent,
                 repoOwner, repoName, comment.getId(), comment.getBody());
-    }
-
-    @Override
-    protected CharSequence getSubtitle() {
-        int prNumber = getIntent().getIntExtra("pr", 0);
-        return getString(R.string.repo_issue_on, prNumber, mRepoOwner, mRepoName);
     }
 
     @Override

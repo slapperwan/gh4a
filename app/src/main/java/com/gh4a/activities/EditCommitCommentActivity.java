@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.gh4a.Gh4Application;
-import com.gh4a.R;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -19,12 +18,6 @@ public class EditCommitCommentActivity extends EditCommentActivity {
                 .putExtra("commit", commitSha);
         return EditCommentActivity.fillInIntent(intent,
                 repoOwner, repoName, comment.getId(), comment.getBody());
-    }
-
-    @Override
-    protected CharSequence getSubtitle() {
-        String commitSha = getIntent().getStringExtra("commit").substring(0, 7);
-        return getString(R.string.commit_in_repo, commitSha, mRepoOwner, mRepoName);
     }
 
     @Override

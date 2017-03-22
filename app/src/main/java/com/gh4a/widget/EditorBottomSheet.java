@@ -177,7 +177,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         getBehavior().setPeekHeight(peekHeight + mLatestOffset);
     }
 
-    private void toggleAdvancedEditor() {
+    public void toggleAdvancedEditor() {
         final boolean visible = !isInAdvancedMode();
 
         if (visible) {
@@ -205,14 +205,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         });
     }
 
-    private Editable getCommentText() {
-        if (isInAdvancedMode()) {
-            return mAdvancedEditor.getText();
-        }
-        return mBasicEditor.getText();
-    }
-
-    private void setCommentText(Editable text, boolean clearFocus) {
+    public void setCommentText(CharSequence text, boolean clearFocus) {
         if (isInAdvancedMode()) {
             mAdvancedEditor.setText(text);
             if (clearFocus) {
@@ -224,6 +217,13 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                 mBasicEditor.clearFocus();
             }
         }
+    }
+
+    private Editable getCommentText() {
+        if (isInAdvancedMode()) {
+            return mAdvancedEditor.getText();
+        }
+        return mBasicEditor.getText();
     }
 
     private boolean isInAdvancedMode() {

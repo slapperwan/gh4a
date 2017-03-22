@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.gh4a.Gh4Application;
-import com.gh4a.R;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -19,12 +18,6 @@ public class EditIssueCommentActivity extends EditCommentActivity {
                 .putExtra("issue", issueNumber);
         return EditCommentActivity.fillInIntent(intent,
                 repoOwner, repoName, comment.getId(), comment.getBody());
-    }
-
-    @Override
-    protected CharSequence getSubtitle() {
-        int issueNumber = getIntent().getIntExtra("issue", 0);
-        return getString(R.string.repo_issue_on, issueNumber, mRepoOwner, mRepoName);
     }
 
     @Override
