@@ -2,6 +2,7 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.AttrRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
@@ -25,11 +26,12 @@ import java.io.IOException;
 public abstract class EditCommentActivity extends AppCompatActivity implements
         EditorBottomSheet.Callback {
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
-            long id, String body) {
+            long id, String body, @AttrRes int highlightColorAttr) {
         return baseIntent.putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("id", id)
-                .putExtra("body", body);
+                .putExtra("body", body)
+                .putExtra("highlight_color_attr", highlightColorAttr);
     }
 
     private EditorBottomSheet mEditorSheet;
@@ -52,6 +54,11 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
         mEditorSheet.toggleAdvancedEditor();
         mEditorSheet.setCallback(this);
         mEditorSheet.setCommentText(getIntent().getStringExtra("body"), false);
+
+        @AttrRes int highlightColorAttr = getIntent().getIntExtra("highlight_color_attr", 0);
+        if (highlightColorAttr != 0) {
+            mEditorSheet.setHighlightColor(highlightColorAttr);
+        }
 
         setResult(RESULT_CANCELED);
     }

@@ -1,6 +1,7 @@
 package com.gh4a.fragment;
 
 import android.content.Intent;
+import android.support.annotation.AttrRes;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.TextView;
@@ -73,8 +74,10 @@ public class IssueFragment extends IssueFragmentBase {
 
     @Override
     public void editComment(Comment comment) {
+        @AttrRes int highlightColorAttr = ApiHelpers.IssueState.CLOSED.equals(mIssue.getState())
+                ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
         Intent intent = EditIssueCommentActivity.makeIntent(getActivity(),
-                mRepoOwner, mRepoName, mIssue.getNumber(), comment);
+                mRepoOwner, mRepoName, mIssue.getNumber(), comment, highlightColorAttr);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 

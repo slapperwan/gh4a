@@ -17,7 +17,7 @@ public class EditCommitCommentActivity extends EditCommentActivity {
         Intent intent = new Intent(context, EditCommitCommentActivity.class)
                 .putExtra("commit", commitSha);
         return EditCommentActivity.fillInIntent(intent,
-                repoOwner, repoName, comment.getId(), comment.getBody());
+                repoOwner, repoName, comment.getId(), comment.getBody(), 0);
     }
 
     @Override
