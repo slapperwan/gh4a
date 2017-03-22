@@ -16,6 +16,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -33,7 +34,7 @@ import java.io.IOException;
 import java.util.Set;
 
 public class EditorBottomSheet extends FrameLayout implements View.OnClickListener,
-        AppBarLayout.OnOffsetChangedListener {
+        View.OnTouchListener, AppBarLayout.OnOffsetChangedListener {
 
     public interface Callback {
         @StringRes int getCommentEditorHintResId();
@@ -44,7 +45,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     }
 
     private TabLayout mTabs;
-    private BottomSheetBehavior mBehavior;
+    private ToggleableBottomSheetBehavior mBehavior;
     private View mAdvancedEditorContainer;
     private CommentEditor mBasicEditor;
     private CommentEditor mAdvancedEditor;
@@ -130,6 +131,19 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             mAdvancedEditor.addQuote(text);
         }
         mBasicEditor.addQuote(text);
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                getBehavior().setEnabled(false);
+                break;
+            case MotionEvent.ACTION_UP:
+                getBehavior().setEnabled(true);
+                break;
+        }
+        return false;
     }
 
     @Override
@@ -289,13 +303,17 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             mMarkdownButtons.setBackgroundColor(mHighlightColor);
         }
 
-        mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.wv_preview);
+        mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.preview);
         mPreviewWebView.setEditText(mAdvancedEditor);
+
+        mAdvancedEditorContainer.findViewById(R.id.editor_scroller).setOnTouchListener(this);
+        mPreviewWebView.setOnTouchListener(this);
+        mAdvancedEditor.setOnTouchListener(this);
     }
 
-    private BottomSheetBehavior getBehavior() {
+    private ToggleableBottomSheetBehavior getBehavior() {
         if (mBehavior == null) {
-            mBehavior = BottomSheetBehavior.from(this);
+            mBehavior = (ToggleableBottomSheetBehavior) BottomSheetBehavior.from(this);
         }
         return mBehavior;
     }
@@ -352,7 +370,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                     resId = R.id.comment_container;
                     break;
                 case 1:
-                    resId = R.id.wv_preview;
+                    resId = R.id.preview;
                     break;
             }
             return container.findViewById(resId);
