@@ -47,19 +47,11 @@ public class MarkdownUtils {
             tag = "- ";
         }
 
-        String source = editText.getText().toString();
-        int selectionStart = editText.getSelectionStart();
-
         if (text.length() == 0) {
-            String substring = source.substring(0, selectionStart);
-
-            int firstLine = substring.lastIndexOf('\n');
-            if (firstLine != -1) {
-                selectionStart = firstLine + 1;
-            } else {
-                selectionStart = 0;
-            }
+            moveSelectionStartToStartOfLine(editText);
+            text = UiUtils.getSelectedText(editText);
         }
+        int selectionStart = editText.getSelectionStart();
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -91,10 +83,6 @@ public class MarkdownUtils {
             stringBuilder.append(tag);
         }
 
-        if (text.length() == 0) {
-            stringBuilder.append(source.substring(selectionStart, editText.getSelectionStart()));
-        }
-
         int selectionEnd = editText.getSelectionEnd();
         requireEmptyLineAbove(editText, stringBuilder, selectionStart);
         requireEmptyLineBelow(editText, stringBuilder, selectionEnd);
@@ -122,20 +110,22 @@ public class MarkdownUtils {
      */
     public static void addHeader(@NonNull EditText editText, @NonNull CharSequence text,
             int level) {
-        CharSequence source = editText.getText();
+        if (text.length() == 0) {
+            moveSelectionStartToStartOfLine(editText);
+            moveSelectionEndToEndOfLine(editText);
+            text = UiUtils.getSelectedText(editText);
+        }
         int selectionStart = editText.getSelectionStart();
 
         StringBuilder result = new StringBuilder();
-        if (!hasNewLineBeforeSelection(source, selectionStart)) {
-            result.append("\n");
-        }
+        requireEmptyLineAbove(editText, result, selectionStart);
+
         for (int i = 0; i < level; i++) {
             result.append("#");
         }
-        result.append(" ");
-        if (text.length() > 0) {
-            result.append(text).append("\n\n");
-        }
+        result.append(" ").append(text);
+
+        requireEmptyLineBelow(editText, result, editText.getSelectionEnd());
 
         UiUtils.replaceSelectionText(editText, result);
         editText.setSelection(selectionStart + result.length());
@@ -364,7 +354,7 @@ public class MarkdownUtils {
         editText.setSelection(selectionStart + result.length() - charactersToGoBack);
     }
 
-    private static void requireEmptyLineAbove(@NonNull  EditText editText,
+    private static void requireEmptyLineAbove(@NonNull EditText editText,
             StringBuilder stringBuilder, int position) {
         CharSequence source = editText.getText();
 
@@ -379,7 +369,7 @@ public class MarkdownUtils {
         }
     }
 
-    private static void requireEmptyLineBelow(@NonNull  EditText editText,
+    private static void requireEmptyLineBelow(@NonNull EditText editText,
             StringBuilder stringBuilder, int position) {
         CharSequence source = editText.getText();
 
@@ -392,5 +382,27 @@ public class MarkdownUtils {
         } else if (position < source.length() - 2 && source.charAt(position + 1) != '\n') {
             stringBuilder.append("\n");
         }
+    }
+
+    private static void moveSelectionStartToStartOfLine(@NonNull EditText editText) {
+        int position = editText.getSelectionStart();
+        String substring = editText.getText().toString().substring(0, position);
+
+        int selectionStart = substring.lastIndexOf('\n') + 1;
+        editText.setSelection(selectionStart, editText.getSelectionEnd());
+    }
+
+    private static void moveSelectionEndToEndOfLine(@NonNull EditText editText) {
+        int position = editText.getSelectionEnd();
+        String source = editText.getText().toString();
+        String substring = source.substring(position);
+
+        int selectionEnd = substring.indexOf('\n');
+        if (selectionEnd == -1) {
+            selectionEnd = source.length();
+        } else {
+            selectionEnd += position;
+        }
+        editText.setSelection(editText.getSelectionStart(), selectionEnd);
     }
 }
