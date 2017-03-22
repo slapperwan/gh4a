@@ -349,6 +349,8 @@ public class MarkdownUtils {
         CharSequence source = editText.getText();
         int selectionStart = editText.getSelectionStart();
 
+        text = text.toString().trim();
+
         StringBuilder result = new StringBuilder();
         if (selectionStart > 0 && !Character.isWhitespace(source.charAt(selectionStart - 1))) {
             result.append(" ");
@@ -357,10 +359,10 @@ public class MarkdownUtils {
 
         UiUtils.replaceSelectionText(editText, result);
 
-        int selectionBack = 0;
+        int charactersToGoBack = 0;
         if (text.length() == 0) {
-            selectionBack = surroundText.length() + 1;
+            charactersToGoBack = surroundText.length() + 1;
         }
-        editText.setSelection(selectionStart + result.length() - selectionBack);
+        editText.setSelection(selectionStart + result.length() - charactersToGoBack);
     }
 }
