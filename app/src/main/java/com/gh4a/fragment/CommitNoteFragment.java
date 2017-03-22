@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -141,6 +142,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     @Override
     public boolean canChildScrollUp() {
         return mBottomSheet.isExpanded() || super.canChildScrollUp();
+    }
+
+    @Override
+    public CoordinatorLayout getRootLayout() {
+        return getBaseActivity().getRootLayout();
     }
 
     @Override

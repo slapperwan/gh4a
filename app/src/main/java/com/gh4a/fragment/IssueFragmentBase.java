@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -195,6 +196,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public boolean canChildScrollUp() {
         return mBottomSheet.isExpanded() || super.canChildScrollUp();
+    }
+
+    @Override
+    public CoordinatorLayout getRootLayout() {
+        return getBaseActivity().getRootLayout();
     }
 
     @Override

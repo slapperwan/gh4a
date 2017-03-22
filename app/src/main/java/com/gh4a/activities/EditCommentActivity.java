@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.Space;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +33,7 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
     }
 
     private EditorBottomSheet mEditorSheet;
+    private CoordinatorLayout mRootLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +43,7 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
 
         setContentView(R.layout.comment_editor);
 
+        mRootLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
         mEditorSheet = (EditorBottomSheet) findViewById(R.id.bottom_sheet);
 
         View advancedToggle = mEditorSheet.findViewById(R.id.iv_advanced_editor_toggle);
@@ -72,8 +75,13 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
     }
 
     @Override
-    public BaseActivity getBaseActivity() {
-        return null;
+    public FragmentActivity getActivity() {
+        return this;
+    }
+
+    @Override
+    public CoordinatorLayout getRootLayout() {
+        return mRootLayout;
     }
 
     protected abstract void editComment(RepositoryId repoId, long id, String body) throws IOException;
