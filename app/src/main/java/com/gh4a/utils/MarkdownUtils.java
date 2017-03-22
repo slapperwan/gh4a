@@ -1,10 +1,19 @@
 package com.gh4a.utils;
 
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.widget.EditText;
 
 public class MarkdownUtils {
+
+    public static final int LIST_TYPE_BULLETS = 0;
+    public static final int LIST_TYPE_NUMBERS = 1;
+    public static final int LIST_TYPE_TASKS = 2;
+
+    @IntDef({ LIST_TYPE_BULLETS, LIST_TYPE_NUMBERS, LIST_TYPE_TASKS })
+    public @interface ListType {
+    }
 
     private MarkdownUtils() {
     }
@@ -12,26 +21,29 @@ public class MarkdownUtils {
     /**
      * Turns the current selection inside of the specified EditText into a markdown list.
      *
-     * @param editText      The EditText to which to add markdown list.
-     * @param isOrderedList Whether the list should be an ordered list.
+     * @param editText The EditText to which to add markdown list.
+     * @param listType The type of the list.
      */
-    public static void addList(@NonNull EditText editText, boolean isOrderedList) {
-        addList(editText, UiUtils.getSelectedText(editText), isOrderedList);
+    public static void addList(@NonNull EditText editText, @ListType int listType) {
+        addList(editText, UiUtils.getSelectedText(editText), listType);
     }
 
     /**
      * Inserts a markdown list to the specified EditText at the currently selected position.
      *
-     * @param editText      The EditText to which to add markdown list.
-     * @param text          The text of the list.
-     * @param isOrderedList Whether the list should be an ordered list.
+     * @param editText The EditText to which to add markdown list.
+     * @param text     The text to turn into the list. Each new line will become a separate list
+     *                 entry.
+     * @param listType The type of the list.
      */
     public static void addList(@NonNull EditText editText, @NonNull CharSequence text,
-            boolean isOrderedList) {
+            @ListType int listType) {
         int tagCount = 1;
         String tag;
-        if (isOrderedList) {
+        if (listType == LIST_TYPE_NUMBERS) {
             tag = "1. ";
+        } else if (listType == LIST_TYPE_TASKS) {
+            tag = "- [ ] ";
         } else {
             tag = "- ";
         }
@@ -73,7 +85,7 @@ public class MarkdownUtils {
                     stringBuilder.append(line);
                 }
 
-                if (isOrderedList) {
+                if (listType == LIST_TYPE_NUMBERS) {
                     tagCount += 1;
                     tag = tagCount + ". ";
                 }

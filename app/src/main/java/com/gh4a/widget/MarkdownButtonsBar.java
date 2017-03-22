@@ -37,6 +37,7 @@ public class MarkdownButtonsBar extends HorizontalScrollView implements View.OnC
         view.findViewById(R.id.md_strikethrough).setOnClickListener(this);
         view.findViewById(R.id.md_bullet_list).setOnClickListener(this);
         view.findViewById(R.id.md_number_list).setOnClickListener(this);
+        view.findViewById(R.id.md_task_list).setOnClickListener(this);
         view.findViewById(R.id.md_divider).setOnClickListener(this);
         view.findViewById(R.id.md_code).setOnClickListener(this);
         view.findViewById(R.id.md_quote).setOnClickListener(this);
@@ -74,10 +75,13 @@ public class MarkdownButtonsBar extends HorizontalScrollView implements View.OnC
                 MarkdownUtils.addStrikeThrough(mEditText);
                 break;
             case R.id.md_bullet_list:
-                MarkdownUtils.addList(mEditText, false);
+                MarkdownUtils.addList(mEditText, MarkdownUtils.LIST_TYPE_BULLETS);
                 break;
             case R.id.md_number_list:
-                MarkdownUtils.addList(mEditText, true);
+                MarkdownUtils.addList(mEditText, MarkdownUtils.LIST_TYPE_NUMBERS);
+                break;
+            case R.id.md_task_list:
+                MarkdownUtils.addList(mEditText, MarkdownUtils.LIST_TYPE_TASKS);
                 break;
             case R.id.md_divider:
                 MarkdownUtils.addDivider(mEditText);

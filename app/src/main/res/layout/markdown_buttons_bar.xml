@@ -5,7 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    tools:showIn="@layout/advanced_editor_edit_page">
+    tools:background="?colorPrimary">
 
     <ImageView
         android:id="@+id/md_h1"
@@ -46,6 +46,11 @@
         android:id="@+id/md_number_list"
         style="@style/ImageButton"
         android:src="@drawable/md_number_list" />
+
+    <ImageView
+        android:id="@+id/md_task_list"
+        style="@style/ImageButton"
+        android:src="@drawable/md_task_list" />
 
     <ImageView
         android:id="@+id/md_divider"
