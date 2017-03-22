@@ -16,15 +16,24 @@
 package com.gh4a.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.gh4a.R;
+import com.gh4a.activities.CommitHistoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.ContentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.widget.ContextMenuAwareRecyclerView;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryContents;
@@ -35,6 +44,8 @@ import java.util.Set;
 
 public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> implements
         RootAdapter.OnItemClickListener<RepositoryContents> {
+    private static final int MENU_HISTORY = Menu.FIRST + 1;
+
     private Repository mRepository;
     private String mPath;
     private String mRef;
@@ -87,15 +98,57 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
     @Override
     protected RootAdapter<RepositoryContents, ?> onCreateAdapter() {
-        mAdapter = new FileAdapter(getActivity(), mRepository, mRef);
+        mAdapter = new FileAdapter(getActivity());
         mAdapter.setSubModuleNames(mCallback.getSubModuleNames(this));
+        mAdapter.setContextMenuSupported(true);
         mAdapter.setOnItemClickListener(this);
         return mAdapter;
     }
 
     @Override
+    protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
+        super.onRecyclerViewInflated(view, inflater);
+        registerForContextMenu(view);
+    }
+
+    @Override
     protected int getEmptyTextResId() {
         return R.string.no_files_found;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        ContextMenuAwareRecyclerView.RecyclerContextMenuInfo info =
+                (ContextMenuAwareRecyclerView.RecyclerContextMenuInfo) menuInfo;
+        RepositoryContents contents = mAdapter.getItemFromAdapterPosition(info.position);
+        Set<String> subModules = mCallback.getSubModuleNames(this);
+
+        if (subModules == null || !subModules.contains(contents.getName())) {
+            menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        ContextMenuAwareRecyclerView.RecyclerContextMenuInfo info =
+                (ContextMenuAwareRecyclerView.RecyclerContextMenuInfo) item.getMenuInfo();
+        if (info.position >= mAdapter.getItemCount()) {
+            return false;
+        }
+
+        int id = item.getItemId();
+        if (id == MENU_HISTORY) {
+            RepositoryContents contents = mAdapter.getItemFromAdapterPosition(info.position);
+            Intent intent = CommitHistoryActivity.makeIntent(getActivity(),
+                    mRepository.getOwner().getLogin(), mRepository.getName(),
+                    mRef, contents.getPath());
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onContextItemSelected(item);
     }
 
     public String getPath() {
