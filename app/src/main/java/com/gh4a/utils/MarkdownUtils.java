@@ -177,7 +177,7 @@ public class MarkdownUtils {
      * @param text     The text of the italic tag.
      */
     public static void addItalic(@NonNull EditText editText, @NonNull CharSequence text) {
-        setSurroundText(editText, text, "*");
+        setSurroundText(editText, text, "_");
     }
 
     /**
