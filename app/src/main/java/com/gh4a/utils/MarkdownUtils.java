@@ -343,8 +343,8 @@ public class MarkdownUtils {
             result.append(" ");
         }
         result.append(surroundText).append(text).append(surroundText);
-        if (selectionEnd < source.length() - 1 &&
-                !Character.isWhitespace(source.charAt(selectionEnd + 1))) {
+        if (selectionEnd < source.length() &&
+                !Character.isWhitespace(source.charAt(selectionEnd))) {
             result.append(" ");
             charactersToGoBack += 1;
         }
