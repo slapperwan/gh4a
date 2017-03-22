@@ -18,7 +18,7 @@
             layout="@layout/editor_with_markdown_buttons" />
 
         <com.gh4a.widget.MarkdownPreviewWebView
-            android:id="@+id/wv_preview"
+            android:id="@+id/preview"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
