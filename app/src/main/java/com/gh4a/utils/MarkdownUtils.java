@@ -2,7 +2,6 @@ package com.gh4a.utils;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.text.Editable;
 import android.widget.EditText;
 
 public class MarkdownUtils {
@@ -64,10 +63,6 @@ public class MarkdownUtils {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        if (!hasNewLineBeforeSelection(source, selectionStart)) {
-            stringBuilder.append("\n");
-        }
-
         String[] lines = text.toString().split("\n");
         if (lines.length > 0) {
             for (String line : lines) {
@@ -100,7 +95,11 @@ public class MarkdownUtils {
             stringBuilder.append(source.substring(selectionStart, editText.getSelectionStart()));
         }
 
-        editText.getText().replace(selectionStart, editText.getSelectionEnd(), stringBuilder);
+        int selectionEnd = editText.getSelectionEnd();
+        requireEmptyLineAbove(editText, stringBuilder, selectionStart);
+        requireEmptyLineBelow(editText, stringBuilder, selectionEnd);
+
+        editText.getText().replace(selectionStart, selectionEnd, stringBuilder);
         editText.setSelection(selectionStart + stringBuilder.length());
     }
 
@@ -247,28 +246,20 @@ public class MarkdownUtils {
      * @param text     The text of the quote block.
      */
     public static void addQuote(@NonNull EditText editText, @NonNull CharSequence text) {
-        Editable source = editText.getText();
         int selectionStart = editText.getSelectionStart();
 
-        StringBuilder result = new StringBuilder();
-        if (selectionStart > 0 && (selectionStart < 2 ||
-                source.charAt(selectionStart - 2) != '\n' ||
-                source.charAt(selectionStart - 1) != '\n')) {
-            result.append("\n");
+        StringBuilder stringBuilder = new StringBuilder();
+        requireEmptyLineAbove(editText, stringBuilder, selectionStart);
 
-            if (!hasNewLineBeforeSelection(source, selectionStart)) {
-                result.append("\n");
-            }
-        }
-
-        result.append("> ");
+        stringBuilder.append("> ");
         if (text.length() > 0) {
-            result.append(text.toString().replace("\n", "\n> "));
-            result.append("\n\n");
+            stringBuilder.append(text.toString().replace("\n", "\n> "));
         }
 
-        UiUtils.replaceSelectionText(editText, result);
-        editText.setSelection(selectionStart + result.length());
+        requireEmptyLineBelow(editText, stringBuilder, editText.getSelectionEnd());
+
+        UiUtils.replaceSelectionText(editText, stringBuilder);
+        editText.setSelection(selectionStart + stringBuilder.length());
     }
 
     /**
@@ -371,5 +362,35 @@ public class MarkdownUtils {
         UiUtils.replaceSelectionText(editText, result);
 
         editText.setSelection(selectionStart + result.length() - charactersToGoBack);
+    }
+
+    private static void requireEmptyLineAbove(@NonNull  EditText editText,
+            StringBuilder stringBuilder, int position) {
+        CharSequence source = editText.getText();
+
+        if (position <= 0) {
+            return;
+        }
+
+        if (source.charAt(position - 1) != '\n') {
+            stringBuilder.insert(0, "\n\n");
+        } else if (position > 1 && source.charAt(position - 2) != '\n') {
+            stringBuilder.insert(0, "\n");
+        }
+    }
+
+    private static void requireEmptyLineBelow(@NonNull  EditText editText,
+            StringBuilder stringBuilder, int position) {
+        CharSequence source = editText.getText();
+
+        if (position > source.length() - 1) {
+            return;
+        }
+
+        if (source.charAt(position) != '\n') {
+            stringBuilder.append("\n\n");
+        } else if (position < source.length() - 2 && source.charAt(position + 1) != '\n') {
+            stringBuilder.append("\n");
+        }
     }
 }
