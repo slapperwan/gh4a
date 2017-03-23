@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -38,7 +37,8 @@ import java.util.List;
 import java.util.Set;
 
 public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
-        CommitNoteAdapter.OnCommentAction<CommitComment>, EditorBottomSheet.Callback {
+        CommitNoteAdapter.OnCommentAction<CommitComment>, EditorBottomSheet.Callback,
+        EditorBottomSheet.OnToggleAdvancedModeListener {
 
     public static CommitNoteFragment newInstance(String repoOwner, String repoName,
             String commitSha, RepositoryCommit commit,
@@ -103,6 +103,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
         mBottomSheet.setCallback(this);
         mBottomSheet.setResizingView(listContainer);
+        mBottomSheet.setOnToggleAdvancedModeListener(this);
 
         if (!Gh4Application.get().isAuthorized()) {
             mBottomSheet.setVisibility(View.GONE);
@@ -157,6 +158,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onToggleAdvancedMode(boolean advancedMode) {
+        getBaseActivity().setToolbarLocked(advancedMode);
     }
 
     @Override
