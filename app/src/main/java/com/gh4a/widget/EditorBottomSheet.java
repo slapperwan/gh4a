@@ -172,11 +172,6 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
         mLatestOffset = appBarLayout.getTotalScrollRange() + verticalOffset;
         if (mLatestOffset >= 0) {
-            // Set the bottom padding to make the bottom appear as not moving while the
-            // AppBarLayout pushes it down or up.
-            setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), mLatestOffset);
-
-            // Update peek height to keep the bottom sheet at unchanged position
             updatePeekHeight(isInAdvancedMode());
         }
     }
@@ -190,7 +185,16 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                 && getBehavior().getPeekHeight() != getHeight();
     }
 
+    public void resetPeekHeight() {
+        mLatestOffset = 0;
+        updatePeekHeight(isInAdvancedMode());
+    }
+
     private void updatePeekHeight(boolean isInAdvancedMode) {
+        // Set the bottom padding to make the bottom appear as not moving while the
+        // AppBarLayout pushes it down or up.
+        setPadding(getPaddingLeft(), getPaddingTop(), getPaddingRight(), mLatestOffset);
+
         final int peekHeight = isInAdvancedMode ? mAdvancedPeekHeight : mBasicPeekHeight;
 
         if (mResizingView != null) {
@@ -198,6 +202,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                     mResizingView.getPaddingRight(), peekHeight + mLatestOffset - mTopShadowHeight);
         }
 
+        // Update peek height to keep the bottom sheet at unchanged position
         getBehavior().setPeekHeight(peekHeight + mLatestOffset);
     }
 
