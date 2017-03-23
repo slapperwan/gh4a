@@ -66,7 +66,8 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
-        View.OnClickListener, EditorBottomSheet.Callback, TimelineItemAdapter.OnCommentAction,
+        View.OnClickListener, TimelineItemAdapter.OnCommentAction,
+        EditorBottomSheet.Callback, EditorBottomSheet.OnToggleAdvancedModeListener,
         ReactionBar.Callback, ReactionBar.Item, ReactionBar.ReactionDetailsCache.Listener {
     protected static final int REQUEST_EDIT = 1000;
 
@@ -122,6 +123,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
         mBottomSheet.setCallback(this);
         mBottomSheet.setResizingView(listContainer);
+        mBottomSheet.setOnToggleAdvancedModeListener(this);
 
         mImageGetter = new HttpImageGetter(inflater.getContext());
         updateCommentSectionVisibility(v);
@@ -523,6 +525,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     public String getShareSubject(Comment comment) {
         return getString(R.string.share_comment_subject, comment.getId(), mIssue.getNumber(),
                 mRepoOwner + "/" + mRepoName);
+    }
+
+    @Override
+    public void onToggleAdvancedMode(boolean advancedMode) {
+        getBaseActivity().setToolbarLocked(advancedMode);
     }
 
     protected abstract void bindSpecialViews(View headerView);

@@ -44,6 +44,10 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         CoordinatorLayout getRootLayout();
     }
 
+    public interface OnToggleAdvancedModeListener {
+        void onToggleAdvancedMode(boolean advancedMode);
+    }
+
     private TabLayout mTabs;
     private ToggleableBottomSheetBehavior mBehavior;
     private View mAdvancedEditorContainer;
@@ -52,6 +56,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private MarkdownButtonsBar mMarkdownButtons;
     private MarkdownPreviewWebView mPreviewWebView;
     private ImageView mAdvancedEditorToggle;
+    private OnToggleAdvancedModeListener mOnToggleAdvancedMode;
 
     private Callback mCallback;
     private View mResizingView;
@@ -94,6 +99,10 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mBasicEditor = (CommentEditor) view.findViewById(R.id.et_basic_editor);
         mBasicEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mBasicEditor, sendButton));
+    }
+
+    public void setOnToggleAdvancedModeListener(OnToggleAdvancedModeListener listener) {
+        this.mOnToggleAdvancedMode = listener;
     }
 
     public void setCallback(Callback callback) {
@@ -265,6 +274,10 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
         mAdvancedEditorToggle.setImageResource(UiUtils.resolveDrawable(getContext(),
                 visible ? R.attr.collapseIcon : R.attr.expandIcon));
+
+        if (mOnToggleAdvancedMode != null) {
+            mOnToggleAdvancedMode.onToggleAdvancedMode(visible);
+        }
     }
 
     private void initAdvancedMode() {

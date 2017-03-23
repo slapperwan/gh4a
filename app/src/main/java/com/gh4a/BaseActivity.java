@@ -356,6 +356,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mHeader.removeOnOffsetChangedListener(l);
     }
 
+    public void setToolbarLocked(boolean locked) {
+        if (locked) {
+            mHeader.setExpanded(false);
+        }
+        mHeaderBehavior.setEnabled(!locked);
+    }
+
     protected void addHeaderView(View view, boolean scrollable) {
         mHeader.addView(view, 1, new AppBarLayout.LayoutParams(
                 AppBarLayout.LayoutParams.MATCH_PARENT,

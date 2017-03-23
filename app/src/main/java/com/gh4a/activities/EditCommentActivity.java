@@ -4,18 +4,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.AttrRes;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.widget.Space;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.EditorBottomSheet;
