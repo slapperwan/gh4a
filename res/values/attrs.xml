@@ -19,6 +19,7 @@
     <attr name="colorPrimaryTextEmphasized" format="color" />
     <attr name="colorBreadcrumbBackground" format="color" />
     <attr name="colorWebViewBackground" format="color" />
+    <attr name="colorScrollbarThumb" format="color" />
 
     <attr name="sendIcon" format="reference" />
     <attr name="commentEditIcon" format="reference" />
