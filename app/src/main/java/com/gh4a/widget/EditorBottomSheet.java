@@ -356,6 +356,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             mCallback.onCommentSent();
 
             setCommentText(null, true);
+            setAdvancedMode(false);
         }
 
         @Override
