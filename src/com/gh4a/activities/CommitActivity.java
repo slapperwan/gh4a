@@ -158,7 +158,6 @@ public class CommitActivity extends BasePagerActivity implements
         mCommit = null;
         mComments = null;
         setContentShown(false);
-        invalidateTabs();
         forceLoaderReload(0, 1);
         super.onRefresh();
     }
@@ -174,6 +173,11 @@ public class CommitActivity extends BasePagerActivity implements
             return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
                     mCommit, mComments);
         }
+    }
+
+    @Override
+    protected boolean fragmentNeedsRefresh(Fragment object) {
+        return true;
     }
 
     @Override
@@ -217,7 +221,6 @@ public class CommitActivity extends BasePagerActivity implements
         mComments = null;
         setResult(RESULT_OK);
         setContentShown(false);
-        invalidateTabs();
         forceLoaderReload(1);
     }
 
