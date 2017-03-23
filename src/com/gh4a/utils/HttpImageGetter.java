@@ -357,10 +357,14 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     public void bind(final TextView view, final String html, final Object id) {
+        unbind(view);
+        findOrCreateInfo(id).bind(view, html, this);
+    }
+
+    public void unbind(final TextView view) {
         for (ObjectInfo info : mObjectInfos.values()) {
             info.unbind(view);
         }
-        findOrCreateInfo(id).bind(view, html, this);
     }
 
     private ObjectInfo findOrCreateInfo(Object id) {

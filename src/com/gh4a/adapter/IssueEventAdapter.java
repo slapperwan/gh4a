@@ -116,6 +116,7 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
         if (item.comment != null) {
             imageGetter.bind(view, item.comment.getBodyHtml(), item.comment.getId());
         } else {
+            imageGetter.unbind(view);
             view.setText(formatEvent(item.event, item.getUser(),
                     view.getTypefaceValue(), item.isPullRequestEvent));
         }
