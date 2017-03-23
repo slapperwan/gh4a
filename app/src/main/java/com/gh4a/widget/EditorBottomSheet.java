@@ -309,6 +309,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mAdvancedEditorContainer.findViewById(R.id.editor_scroller).setOnTouchListener(this);
         mPreviewWebView.setOnTouchListener(this);
         mAdvancedEditor.setOnTouchListener(this);
+        viewPager.setOnTouchListener(this);
     }
 
     private ToggleableBottomSheetBehavior getBehavior() {
