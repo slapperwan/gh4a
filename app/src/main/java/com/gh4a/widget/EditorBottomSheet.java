@@ -3,6 +3,8 @@ package com.gh4a.widget;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
@@ -12,6 +14,9 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.os.ParcelableCompat;
+import android.support.v4.os.ParcelableCompatCreatorCallbacks;
+import android.support.v4.view.AbsSavedState;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
@@ -208,16 +213,9 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
     public void setAdvancedMode(final boolean visible) {
         if (visible) {
+            // Showing editor has to be done before updating peek height so when it expands the
+            // user can immediately see the content
             setAdvancedEditorVisible(true);
-        } else {
-            // When leaving advanced mode delay hiding it so the bottom sheet can finish collapse
-            // animation
-            postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    setAdvancedEditorVisible(false);
-                }
-            }, 250);
         }
 
         // Expand bottom sheet through message queue so the animation can play.
@@ -230,6 +228,12 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                         ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
+
+        if (!visible) {
+            // Hiding on the other hand should be done after updating peek height so the bottom
+            // sheet can start collapsing with animation
+            setAdvancedEditorVisible(false);
+        }
     }
 
     public boolean isInAdvancedMode() {
@@ -410,5 +414,64 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         public int getCount() {
             return TITLES.length;
         }
+    }
+
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        final Parcelable superState = super.onSaveInstanceState();
+        final SavedState ss = new SavedState(superState);
+
+        ss.isInAdvancedMode = isInAdvancedMode();
+        ss.commentText = getCommentText().toString();
+
+        return ss;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (state instanceof SavedState) {
+            final SavedState ss = (SavedState) state;
+            super.onRestoreInstanceState(ss.getSuperState());
+            setAdvancedMode(ss.isInAdvancedMode);
+            mBasicEditor.setText(ss.commentText);
+            mAdvancedEditor.setText(ss.commentText);
+        } else {
+            super.onRestoreInstanceState(state);
+        }
+    }
+
+    private static class SavedState extends AbsSavedState {
+        boolean isInAdvancedMode;
+        String commentText;
+
+        public SavedState(Parcel source, ClassLoader loader) {
+            super(source, loader);
+            isInAdvancedMode = source.readByte() == 1;
+            commentText = source.readString();
+        }
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            super.writeToParcel(out, flags);
+            out.writeByte((byte) (isInAdvancedMode ? 1 : 0));
+            out.writeString(commentText);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR =
+                ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in, ClassLoader loader) {
+                return new SavedState(in, loader);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        });
     }
 }
