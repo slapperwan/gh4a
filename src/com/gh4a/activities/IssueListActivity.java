@@ -93,7 +93,6 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private FloatingActionButton mCreateFab;
     private IssueListFragment mOpenFragment;
-    private IssueListFragment mClosedFragment;
     private Boolean mIsCollaborator;
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
@@ -314,9 +313,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     protected void onFragmentInstantiated(Fragment f, int position) {
-        if (position == 1) {
-            mClosedFragment = (IssueListFragment) f;
-        } else {
+        if (position == 0) {
             mOpenFragment = (IssueListFragment) f;
         }
     }
@@ -325,15 +322,12 @@ public class IssueListActivity extends BasePagerActivity implements
     protected void onFragmentDestroyed(Fragment f) {
         if (f == mOpenFragment) {
             mOpenFragment = null;
-        } else if (f == mClosedFragment) {
-            mClosedFragment = null;
         }
     }
 
     @Override
     protected boolean fragmentNeedsRefresh(Fragment object) {
-        return object instanceof IssueListFragment
-                && object != mOpenFragment && object != mClosedFragment;
+        return true;
     }
 
     @Override
@@ -371,7 +365,7 @@ public class IssueListActivity extends BasePagerActivity implements
         super.onNavigationItemSelected(item);
 
         if (mSortHelper.handleItemSelection(item)) {
-            reloadIssueList();
+            invalidateFragments();
             return true;
         }
 
@@ -477,7 +471,7 @@ public class IssueListActivity extends BasePagerActivity implements
         if (mCreateFab != null) {
             mCreateFab.setVisibility(enabled ? View.GONE : View.VISIBLE);
         }
-        reloadIssueList();
+        invalidateFragments();
         if (changed) {
             updateRightNavigationDrawer();
         }
@@ -524,12 +518,6 @@ public class IssueListActivity extends BasePagerActivity implements
         }
     }
 
-    private void reloadIssueList() {
-        mOpenFragment = null;
-        mClosedFragment = null;
-        invalidateFragments();
-    }
-
     private void showLabelsDialog() {
         final String[] labels = new String[mLabels.size() + 2];
         int selected = mSelectedLabel != null && mSelectedLabel.isEmpty() ? 1 : 0;
@@ -551,7 +539,7 @@ public class IssueListActivity extends BasePagerActivity implements
                         : which == 1 ? ""
                         : labels[which];
                 dialog.dismiss();
-                reloadIssueList();
+                invalidateFragments();
             }
         };
 
@@ -584,7 +572,7 @@ public class IssueListActivity extends BasePagerActivity implements
                         : which == 1 ? ""
                         : milestones[which];
                 dialog.dismiss();
-                reloadIssueList();
+                invalidateFragments();
             }
         };
 
@@ -618,7 +606,7 @@ public class IssueListActivity extends BasePagerActivity implements
                         : which == 1 ? ""
                         : mAssignees.get(which - 2).getLogin();
                 dialog.dismiss();
-                reloadIssueList();
+                invalidateFragments();
             }
         };
 
@@ -660,7 +648,7 @@ public class IssueListActivity extends BasePagerActivity implements
             public void onClick(DialogInterface dialog, int which) {
                 mSelectedParticipatingStatus = which;
                 dialog.dismiss();
-                reloadIssueList();
+                invalidateFragments();
             }
         };
 
