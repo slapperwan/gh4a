@@ -163,6 +163,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     @Override
     public void onToggleAdvancedMode(boolean advancedMode) {
         getBaseActivity().setToolbarLocked(advancedMode);
+        mBottomSheet.resetPeekHeight();
     }
 
     @Override
