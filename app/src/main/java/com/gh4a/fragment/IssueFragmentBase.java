@@ -206,7 +206,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public boolean canChildScrollUp() {
-        return mBottomSheet.isExpanded() || super.canChildScrollUp();
+        return (mBottomSheet != null && mBottomSheet.isExpanded()) || super.canChildScrollUp();
     }
 
     @Override

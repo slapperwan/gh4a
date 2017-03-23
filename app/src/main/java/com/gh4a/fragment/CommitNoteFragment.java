@@ -143,7 +143,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public boolean canChildScrollUp() {
-        return mBottomSheet.isExpanded() || super.canChildScrollUp();
+        return (mBottomSheet != null && mBottomSheet.isExpanded()) || super.canChildScrollUp();
     }
 
     @Override
