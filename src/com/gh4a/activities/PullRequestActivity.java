@@ -292,8 +292,8 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     protected Fragment makeFragment(int position) {
         if (position == 1) {
-            return CommitCompareFragment.newInstance(mRepoOwner, mRepoName,
-                    mPullRequest.getBase().getSha(), mPullRequest.getHead().getSha());
+            return CommitCompareFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber,
+                    mPullRequest.getBase().getLabel(), mPullRequest.getHead().getLabel());
         } else if (position == 2) {
             return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequestNumber, mPullRequest.getHead().getSha());
