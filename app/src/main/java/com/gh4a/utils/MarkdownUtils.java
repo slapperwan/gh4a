@@ -291,15 +291,20 @@ public class MarkdownUtils {
      * Inserts a markdown image tag to the specified EditText at the currently selected position.
      *
      * @param editText The EditText to which to add image tag.
-     * @param link     The link to the image.
+     * @param text     The title of the image.
      */
-    public static void addImage(@NonNull EditText editText, @NonNull CharSequence link) {
+    public static void addImage(@NonNull EditText editText, @NonNull CharSequence text) {
         int selectionStart = editText.getSelectionStart();
 
-        UiUtils.replaceSelectionText(editText, "![](" + link + ") ");
+        String result = "![" + text + "](url)";
+        UiUtils.replaceSelectionText(editText, result);
 
-        int selectionAdd = link.length() > 0 ? 2 : 4;
-        editText.setSelection(selectionStart + selectionAdd);
+        if (text.length() == 0) {
+            editText.setSelection(selectionStart + 2);
+        } else {
+            selectionStart = selectionStart + result.length() - 4;
+            editText.setSelection(selectionStart, selectionStart + 3);
+        }
     }
 
     /**
@@ -315,15 +320,20 @@ public class MarkdownUtils {
      * Inserts a markdown link tag to the specified EditText at the currently selected position.
      *
      * @param editText The EditText to which to add link tag.
-     * @param link     The link.
+     * @param text     The title of the link.
      */
-    public static void addLink(@NonNull EditText editText, @NonNull CharSequence link) {
+    public static void addLink(@NonNull EditText editText, @NonNull CharSequence text) {
         int selectionStart = editText.getSelectionStart();
 
-        UiUtils.replaceSelectionText(editText, "[](" + link + ") ");
+        String result = "[" + text + "](url)";
+        UiUtils.replaceSelectionText(editText, result);
 
-        int selectionAdd = link.length() > 0 ? 1 : 3;
-        editText.setSelection(selectionStart + selectionAdd);
+        if (text.length() == 0) {
+            editText.setSelection(selectionStart + 1);
+        } else {
+            selectionStart = selectionStart + result.length() - 4;
+            editText.setSelection(selectionStart, selectionStart + 3);
+        }
     }
 
     private static boolean hasNewLineBeforeSelection(@NonNull CharSequence text,
