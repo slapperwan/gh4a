@@ -294,6 +294,11 @@ public class MarkdownUtils {
      * @param text     The title of the image.
      */
     public static void addImage(@NonNull EditText editText, @NonNull CharSequence text) {
+        if (text.length() == 0) {
+            selectWordAroundCursor(editText);
+            text = UiUtils.getSelectedText(editText);
+        }
+
         int selectionStart = editText.getSelectionStart();
 
         String result = "![" + text + "](url)";
@@ -323,6 +328,11 @@ public class MarkdownUtils {
      * @param text     The title of the link.
      */
     public static void addLink(@NonNull EditText editText, @NonNull CharSequence text) {
+        if (text.length() == 0) {
+            selectWordAroundCursor(editText);
+            text = UiUtils.getSelectedText(editText);
+        }
+
         int selectionStart = editText.getSelectionStart();
 
         String result = "[" + text + "](url)";
@@ -343,6 +353,11 @@ public class MarkdownUtils {
 
     private static void setSurroundText(@NonNull EditText editText, @NonNull CharSequence text,
             String surroundText) {
+        if (text.length() == 0) {
+            selectWordAroundCursor(editText);
+            text = UiUtils.getSelectedText(editText);
+        }
+
         CharSequence source = editText.getText();
         int selectionStart = editText.getSelectionStart();
         int selectionEnd = editText.getSelectionEnd();
@@ -368,6 +383,25 @@ public class MarkdownUtils {
         UiUtils.replaceSelectionText(editText, result);
 
         editText.setSelection(selectionStart + result.length() - charactersToGoBack);
+    }
+
+    private static void selectWordAroundCursor(@NonNull EditText editText) {
+        String source = editText.getText().toString();
+        int selectionStart = editText.getSelectionStart();
+        int selectionEnd = editText.getSelectionEnd();
+        if (selectionStart != selectionEnd) {
+            return;
+        }
+
+        while (selectionStart > 0 && !Character.isWhitespace(source.charAt(selectionStart - 1))) {
+            selectionStart -= 1;
+        }
+        while (selectionEnd < source.length() &&
+                !Character.isWhitespace(source.charAt(selectionEnd))) {
+            selectionEnd += 1;
+        }
+
+        editText.setSelection(selectionStart, selectionEnd);
     }
 
     private static void requireEmptyLineAbove(@NonNull EditText editText,
