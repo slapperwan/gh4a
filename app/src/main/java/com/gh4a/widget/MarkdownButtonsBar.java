@@ -2,16 +2,18 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 
 import com.gh4a.R;
 import com.gh4a.utils.MarkdownUtils;
 
-public class MarkdownButtonsBar extends FrameLayout implements View.OnClickListener {
+public class MarkdownButtonsBar extends FrameLayout implements View.OnClickListener,
+        View.OnTouchListener {
     private EditText mEditText;
+    private ToggleableBottomSheetBehavior mBottomSheetBehavior;
 
     public MarkdownButtonsBar(Context context) {
         super(context);
@@ -30,24 +32,41 @@ public class MarkdownButtonsBar extends FrameLayout implements View.OnClickListe
 
     private void initialize() {
         View view = View.inflate(getContext(), R.layout.markdown_buttons_bar, this);
-        view.findViewById(R.id.md_h1).setOnClickListener(this);
-        view.findViewById(R.id.md_h2).setOnClickListener(this);
-        view.findViewById(R.id.md_h3).setOnClickListener(this);
-        view.findViewById(R.id.md_bold).setOnClickListener(this);
-        view.findViewById(R.id.md_italic).setOnClickListener(this);
-        view.findViewById(R.id.md_strikethrough).setOnClickListener(this);
-        view.findViewById(R.id.md_bullet_list).setOnClickListener(this);
-        view.findViewById(R.id.md_number_list).setOnClickListener(this);
-        view.findViewById(R.id.md_task_list).setOnClickListener(this);
-        view.findViewById(R.id.md_divider).setOnClickListener(this);
-        view.findViewById(R.id.md_code).setOnClickListener(this);
-        view.findViewById(R.id.md_quote).setOnClickListener(this);
-        view.findViewById(R.id.md_link).setOnClickListener(this);
-        view.findViewById(R.id.md_image).setOnClickListener(this);
+        initializeButtons(view, R.id.md_h1, R.id.md_h2, R.id.md_h3, R.id.md_bold, R.id.md_italic,
+                R.id.md_strikethrough, R.id.md_bullet_list, R.id.md_number_list, R.id.md_task_list,
+                R.id.md_divider, R.id.md_code, R.id.md_quote, R.id.md_link, R.id.md_image);
+    }
+
+    private void initializeButtons(View view, int... ids) {
+        for (int id : ids) {
+            View button = view.findViewById(id);
+            button.setOnClickListener(this);
+            button.setOnTouchListener(this);
+        }
     }
 
     public void setEditText(EditText editText) {
         mEditText = editText;
+    }
+
+    public void setBottomSheetBehavior(ToggleableBottomSheetBehavior behavior) {
+        mBottomSheetBehavior = behavior;
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent event) {
+        if (mBottomSheetBehavior == null) return false;
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mBottomSheetBehavior.setEnabled(false);
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                mBottomSheetBehavior.setEnabled(true);
+                break;
+        }
+        return false;
     }
 
     @Override

@@ -328,6 +328,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.preview);
         mPreviewWebView.setEditText(mAdvancedEditor);
 
+        mMarkdownButtons.setBottomSheetBehavior(getBehavior());
         mAdvancedEditorContainer.findViewById(R.id.editor_scroller).setOnTouchListener(this);
         mPreviewWebView.setOnTouchListener(this);
         mAdvancedEditor.setOnTouchListener(this);
