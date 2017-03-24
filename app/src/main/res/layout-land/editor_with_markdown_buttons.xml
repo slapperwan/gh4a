@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="horizontal">
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/editor_scroller"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_margin="8dp"
         android:layout_weight="1"
         android:fillViewport="true">
@@ -24,16 +24,11 @@
 
     </android.support.v4.widget.NestedScrollView>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:background="@drawable/top_shadow" />
-
     <com.gh4a.widget.MarkdownButtonsBar
         android:id="@+id/markdown_buttons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="?colorPrimary" />
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="?colorPrimary"
+        android:elevation="40dp" />
 
 </LinearLayout>

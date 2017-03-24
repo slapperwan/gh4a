@@ -4,12 +4,13 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 
 import com.gh4a.R;
 import com.gh4a.utils.MarkdownUtils;
 
-public class MarkdownButtonsBar extends HorizontalScrollView implements View.OnClickListener {
+public class MarkdownButtonsBar extends FrameLayout implements View.OnClickListener {
     private EditText mEditText;
 
     public MarkdownButtonsBar(Context context) {
