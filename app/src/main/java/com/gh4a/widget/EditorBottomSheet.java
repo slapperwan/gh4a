@@ -219,6 +219,10 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     }
 
     public void setAdvancedMode(final boolean visible) {
+        if (mAdvancedEditor == null) {
+            initAdvancedMode();
+        }
+
         if (visible) {
             // Showing editor has to be done before updating peek height so when it expands the
             // user can immediately see the content
@@ -236,11 +240,16 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             }
         });
 
-        if (!visible) {
-            // Hiding on the other hand should be done after updating peek height so the bottom
-            // sheet can start collapsing with animation
-            setAdvancedEditorVisible(false);
-        }
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!visible) {
+                    // Hiding on the other hand should be done after updating peek height so the
+                    // bottom sheet can start collapsing with animation
+                    setAdvancedEditorVisible(false);
+                }
+            }
+        }, 250);
     }
 
     public boolean isInAdvancedMode() {
@@ -270,10 +279,6 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     }
 
     private void setAdvancedEditorVisible(boolean visible) {
-        if (mAdvancedEditor == null) {
-            initAdvancedMode();
-        }
-
         mAdvancedEditorContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
         mBasicEditor.setVisibility(visible ? View.GONE : View.VISIBLE);
         mTabs.setVisibility(visible ? View.VISIBLE : View.GONE);
