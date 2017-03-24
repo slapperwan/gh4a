@@ -206,18 +206,24 @@ public class MarkdownUtils {
      * @param text     The text of the code block.
      */
     public static void addCode(@NonNull EditText editText, @NonNull CharSequence text) {
-        String source = editText.getText().toString();
         int selectionStart = editText.getSelectionStart();
+        String string = text.toString();
+        int charactersToGoBack = 1;
 
-        String result;
-        if (hasNewLineBeforeSelection(source, selectionStart)) {
-            result = "```\n" + text + "\n```\n";
+        StringBuilder stringBuilder = new StringBuilder();
+        if (string.contains("\n")) {
+            requireEmptyLineAbove(editText, stringBuilder, selectionStart);
+            stringBuilder.append("```\n").append(text).append("\n```");
+            requireEmptyLineBelow(editText, stringBuilder, editText.getSelectionEnd());
+
+            charactersToGoBack += 4;
         } else {
-            result = "\n```\n" + text + "\n```\n";
+            stringBuilder.append("`").append(string.trim()).append("`");
         }
 
-        UiUtils.replaceSelectionText(editText, result);
-        editText.setSelection(selectionStart + result.length() - 5);
+
+        UiUtils.replaceSelectionText(editText, stringBuilder);
+        editText.setSelection(selectionStart + stringBuilder.length() - charactersToGoBack);
     }
 
     /**
