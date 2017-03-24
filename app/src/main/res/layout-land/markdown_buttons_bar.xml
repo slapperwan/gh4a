@@ -1,86 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    tools:background="?colorPrimary">
+    android:orientation="vertical">
 
-    <GridLayout
+    <View
+        android:id="@+id/markdown_buttons_top_shadow"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="@drawable/top_shadow" />
+
+    <ScrollView
+        android:id="@+id/buttons_container_landscape"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:columnCount="3">
+        android:layout_height="match_parent"
+        android:background="?colorPrimary">
 
-        <ImageView
-            android:id="@+id/md_h1"
-            style="@style/ImageButton"
-            android:src="@drawable/md_h1" />
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="3">
 
-        <ImageView
-            android:id="@+id/md_h2"
-            style="@style/ImageButton"
-            android:src="@drawable/md_h2" />
+            <ImageView
+                android:id="@+id/md_h1"
+                style="@style/ImageButton"
+                android:src="@drawable/md_h1" />
 
-        <ImageView
-            android:id="@+id/md_h3"
-            style="@style/ImageButton"
-            android:src="@drawable/md_h3" />
+            <ImageView
+                android:id="@+id/md_h2"
+                style="@style/ImageButton"
+                android:src="@drawable/md_h2" />
 
-        <ImageView
-            android:id="@+id/md_bold"
-            style="@style/ImageButton"
-            android:src="@drawable/md_bold" />
+            <ImageView
+                android:id="@+id/md_h3"
+                style="@style/ImageButton"
+                android:src="@drawable/md_h3" />
 
-        <ImageView
-            android:id="@+id/md_italic"
-            style="@style/ImageButton"
-            android:src="@drawable/md_italic" />
+            <ImageView
+                android:id="@+id/md_bold"
+                style="@style/ImageButton"
+                android:src="@drawable/md_bold" />
 
-        <ImageView
-            android:id="@+id/md_strikethrough"
-            style="@style/ImageButton"
-            android:src="@drawable/md_strikethrough" />
+            <ImageView
+                android:id="@+id/md_italic"
+                style="@style/ImageButton"
+                android:src="@drawable/md_italic" />
 
-        <ImageView
-            android:id="@+id/md_bullet_list"
-            style="@style/ImageButton"
-            android:src="@drawable/md_bullet_list" />
+            <ImageView
+                android:id="@+id/md_strikethrough"
+                style="@style/ImageButton"
+                android:src="@drawable/md_strikethrough" />
 
-        <ImageView
-            android:id="@+id/md_number_list"
-            style="@style/ImageButton"
-            android:src="@drawable/md_number_list" />
+            <ImageView
+                android:id="@+id/md_bullet_list"
+                style="@style/ImageButton"
+                android:src="@drawable/md_bullet_list" />
 
-        <ImageView
-            android:id="@+id/md_task_list"
-            style="@style/ImageButton"
-            android:src="@drawable/md_task_list" />
+            <ImageView
+                android:id="@+id/md_number_list"
+                style="@style/ImageButton"
+                android:src="@drawable/md_number_list" />
 
-        <ImageView
-            android:id="@+id/md_divider"
-            style="@style/ImageButton"
-            android:src="@drawable/md_divider" />
+            <ImageView
+                android:id="@+id/md_task_list"
+                style="@style/ImageButton"
+                android:src="@drawable/md_task_list" />
 
-        <ImageView
-            android:id="@+id/md_code"
-            style="@style/ImageButton"
-            android:src="@drawable/md_code" />
+            <ImageView
+                android:id="@+id/md_divider"
+                style="@style/ImageButton"
+                android:src="@drawable/md_divider" />
 
-        <ImageView
-            android:id="@+id/md_quote"
-            style="@style/ImageButton"
-            android:src="@drawable/md_quote" />
+            <ImageView
+                android:id="@+id/md_code"
+                style="@style/ImageButton"
+                android:src="@drawable/md_code" />
 
-        <ImageView
-            android:id="@+id/md_link"
-            style="@style/ImageButton"
-            android:src="@drawable/md_link" />
+            <ImageView
+                android:id="@+id/md_quote"
+                style="@style/ImageButton"
+                android:src="@drawable/md_quote" />
 
-        <ImageView
-            android:id="@+id/md_image"
-            style="@style/ImageButton"
-            android:src="@drawable/md_image" />
+            <ImageView
+                android:id="@+id/md_link"
+                style="@style/ImageButton"
+                android:src="@drawable/md_link" />
 
-    </GridLayout>
+            <ImageView
+                android:id="@+id/md_image"
+                style="@style/ImageButton"
+                android:src="@drawable/md_image" />
 
-</ScrollView>
+        </GridLayout>
+
+    </ScrollView>
+
+</LinearLayout>

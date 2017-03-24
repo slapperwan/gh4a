@@ -24,11 +24,29 @@
 
     </android.support.v4.widget.NestedScrollView>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/markdown_buttons_top_left_shadow"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:background="@drawable/top_left_shadow" />
+
+        <View
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/left_shadow" />
+
+    </LinearLayout>
+
     <com.gh4a.widget.MarkdownButtonsBar
         android:id="@+id/markdown_buttons"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:background="?colorPrimary"
-        android:elevation="40dp" />
+        android:layout_height="match_parent" />
 
 </LinearLayout>
