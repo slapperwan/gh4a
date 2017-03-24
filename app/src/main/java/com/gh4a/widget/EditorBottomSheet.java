@@ -104,6 +104,13 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mBasicEditor = (CommentEditor) view.findViewById(R.id.et_basic_editor);
         mBasicEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mBasicEditor, sendButton));
+
+        post(new Runnable() {
+            @Override
+            public void run() {
+                resetPeekHeight();
+            }
+        });
     }
 
     public void setOnToggleAdvancedModeListener(OnToggleAdvancedModeListener listener) {
