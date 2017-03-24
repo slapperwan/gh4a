@@ -903,7 +903,9 @@ public class HtmlUtils {
                     position = parseIntAttribute(attrs, "value", position);
                 }
                 mPosition = position;
-                list.mPosition = position + 1;
+                if (list != null) {
+                    list.mPosition = position + 1;
+                }
             }
         }
 
