@@ -208,6 +208,15 @@ public class IssueEditActivity extends BasePagerActivity implements
         mMarkdownButtons = (MarkdownButtonsBar) findViewById(R.id.markdown_buttons);
         mMarkdownButtons.setEditText(mDescView);
 
+        View topLeftShadow = findViewById(R.id.markdown_buttons_top_left_shadow);
+        if (topLeftShadow != null) {
+            topLeftShadow.setVisibility(View.GONE);
+        }
+        View topShadow = findViewById(R.id.markdown_buttons_top_shadow);
+        if (topShadow != null) {
+            topShadow.setVisibility(View.GONE);
+        }
+
         MarkdownPreviewWebView preview = (MarkdownPreviewWebView) findViewById(R.id.preview);
         preview.setEditText(mDescView);
 

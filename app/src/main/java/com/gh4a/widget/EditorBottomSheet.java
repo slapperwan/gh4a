@@ -136,7 +136,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     public void setHighlightColor(@AttrRes int colorAttrId) {
         mHighlightColor = UiUtils.resolveColor(getContext(), colorAttrId);
         if (mMarkdownButtons != null) {
-            mMarkdownButtons.setBackgroundColor(mHighlightColor);
+            mMarkdownButtons.setButtonsBackgroundColor(mHighlightColor);
         }
      }
 
@@ -322,7 +322,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                 (MarkdownButtonsBar) mAdvancedEditorContainer.findViewById(R.id.markdown_buttons);
         mMarkdownButtons.setEditText(mAdvancedEditor);
         if (mHighlightColor != Color.TRANSPARENT) {
-            mMarkdownButtons.setBackgroundColor(mHighlightColor);
+            mMarkdownButtons.setButtonsBackgroundColor(mHighlightColor);
         }
 
         mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.preview);
