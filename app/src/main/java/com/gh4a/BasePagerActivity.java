@@ -28,6 +28,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
     private boolean mErrorViewVisible;
     private int mCurrentHeaderColor;
     private int mLastTabCount;
+    private boolean mAppBarLocked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +82,10 @@ public abstract class BasePagerActivity extends BaseActivity implements
         return mPager;
     }
 
+    protected boolean hasTabsInToolbar() {
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
     @Override
     protected void setErrorViewVisibility(boolean visible) {
         mErrorViewVisible = visible;
@@ -111,7 +116,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mTabs = (TabLayout) getLayoutInflater().inflate(R.layout.tab_bar, null);
         mTabs.setupWithViewPager(pager);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (hasTabsInToolbar()) {
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             toolbar.addView(mTabs, new Toolbar.LayoutParams(
                     Toolbar.LayoutParams.WRAP_CONTENT,
@@ -121,6 +126,10 @@ public abstract class BasePagerActivity extends BaseActivity implements
         }
 
         return pager;
+    }
+
+    private void updateToolbarScrollableState() {
+        setToolbarScrollable(mAdapter.getCount() > 1 && (!hasTabsInToolbar() || mAppBarLocked));
     }
 
     private void updateTabVisibility() {
@@ -135,8 +144,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mPager.setOffscreenPageLimit(Math.max(1, count - 1));
 
         mTabs.setVisibility(count > 1 && !mErrorViewVisible ? View.VISIBLE : View.GONE);
-        setToolbarScrollable(count > 1
-                && getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE);
+        updateToolbarScrollableState();
 
         LinearLayout tabStrip = (LinearLayout) mTabs.getChildAt(0);
         for (int i = 0; i < tabStrip.getChildCount(); i++) {
@@ -146,6 +154,13 @@ public abstract class BasePagerActivity extends BaseActivity implements
             lp.weight = 1;
             tab.setLayoutParams(lp);
         }
+    }
+
+    @Override
+    public void setAppBarLockedInCollapsedState(boolean locked) {
+        mAppBarLocked = locked;
+        updateToolbarScrollableState();
+        super.setAppBarLockedInCollapsedState(locked);
     }
 
     @Override
