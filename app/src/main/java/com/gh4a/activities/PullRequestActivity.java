@@ -173,7 +173,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);
-        addHeaderView(mHeader, true);
+        addHeaderView(mHeader, !hasTabsInToolbar());
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getResources().getString(R.string.pull_request_title) + " #" + mPullRequestNumber);
