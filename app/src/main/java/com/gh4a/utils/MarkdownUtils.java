@@ -115,6 +115,7 @@ public class MarkdownUtils {
             moveSelectionEndToEndOfLine(editText);
             text = UiUtils.getSelectedText(editText);
         }
+        
         int selectionStart = editText.getSelectionStart();
 
         StringBuilder result = new StringBuilder();
@@ -242,6 +243,12 @@ public class MarkdownUtils {
      * @param text     The text of the quote block.
      */
     public static void addQuote(@NonNull EditText editText, @NonNull CharSequence text) {
+        if (text.length() == 0) {
+            moveSelectionStartToStartOfLine(editText);
+            moveSelectionEndToEndOfLine(editText);
+            text = UiUtils.getSelectedText(editText);
+        }
+
         int selectionStart = editText.getSelectionStart();
 
         StringBuilder stringBuilder = new StringBuilder();
