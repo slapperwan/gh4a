@@ -264,18 +264,19 @@ public class MarkdownUtils {
      * @param editText The EditText to which to add divider.
      */
     public static void addDivider(@NonNull EditText editText) {
-        String source = editText.getText().toString();
         int selectionStart = editText.getSelectionStart();
 
-        String result;
-        if (hasNewLineBeforeSelection(source, selectionStart)) {
-            result = "-------\n";
+        StringBuilder stringBuilder = new StringBuilder();
+        requireEmptyLineAbove(editText, stringBuilder, selectionStart);
+        stringBuilder.append("-------");
+        if (editText.getSelectionEnd() == editText.getText().length()) {
+            stringBuilder.append("\n\n");
         } else {
-            result = "\n-------\n";
+            requireEmptyLineBelow(editText, stringBuilder, editText.getSelectionEnd());
         }
 
-        UiUtils.replaceSelectionText(editText, result);
-        editText.setSelection(selectionStart + result.length());
+        UiUtils.replaceSelectionText(editText, stringBuilder);
+        editText.setSelection(selectionStart + stringBuilder.length());
     }
 
     /**
@@ -344,11 +345,6 @@ public class MarkdownUtils {
             selectionStart = selectionStart + result.length() - 4;
             editText.setSelection(selectionStart, selectionStart + 3);
         }
-    }
-
-    private static boolean hasNewLineBeforeSelection(@NonNull CharSequence text,
-            int selectionStart) {
-        return selectionStart <= 0 || text.charAt(selectionStart - 1) == '\n';
     }
 
     private static void setSurroundText(@NonNull EditText editText, @NonNull CharSequence text,
