@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.gh4a.widget.ContextMenuAwareRecyclerView
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/list"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scrollbars="vertical" />
+    android:layout_height="match_parent">
+
+    <com.gh4a.widget.ContextMenuAwareRecyclerView
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.pluscubed.recyclerfastscroll.RecyclerFastScroller
+        android:id="@+id/fast_scroller"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        app:rfs_barColor="@android:color/transparent"
+        app:rfs_handleNormalColor="?colorScrollbarThumb"
+        app:rfs_handlePressedColor="?colorPrimary" />
+
+</FrameLayout>

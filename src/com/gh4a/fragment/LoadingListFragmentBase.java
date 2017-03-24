@@ -16,12 +16,14 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.pluscubed.recyclerfastscroll.RecyclerFastScroller;
 
 public abstract class LoadingListFragmentBase extends LoadingFragmentBase implements
         LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private NestedScrollView mEmptyViewContainer;
+    private RecyclerFastScroller mFastScroller;
 
     public interface OnRecyclerViewCreatedListener {
         void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView);
@@ -53,6 +55,9 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
             mRecyclerView.setBackgroundResource(
                     UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
         }
+
+        mFastScroller = (RecyclerFastScroller) view.findViewById(R.id.fast_scroller);
+        mFastScroller.attachRecyclerView(mRecyclerView);
 
         return view;
     }
@@ -113,6 +118,7 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
     protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
         super.setHighlightColors(colorAttrId, statusBarColorAttrId);
         UiUtils.trySetListOverscrollColor(mRecyclerView, getHighlightColor());
+        mFastScroller.setHandlePressedColor(getHighlightColor());
     }
 
     protected abstract int getEmptyTextResId();
