@@ -23,6 +23,9 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.AttrRes;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.text.Editable;
 import android.text.Html.ImageGetter;
 import android.text.Layout;
@@ -66,7 +69,6 @@ import java.util.regex.Pattern;
 import static android.graphics.Paint.Style.FILL;
 
 public class HtmlUtils {
-
     private static class ReplySpan implements LeadingMarginSpan {
         private final int mColor;
         private final int mMargin;
@@ -208,7 +210,7 @@ public class HtmlUtils {
             }
 
             HtmlToSpannedConverter converter =
-                    new HtmlToSpannedConverter(context.getResources(), source, imageGetter, parser);
+                    new HtmlToSpannedConverter(context, source, imageGetter, parser);
             return converter.convert();
         }
     }
@@ -223,6 +225,7 @@ public class HtmlUtils {
         private int mReplyMargin;
         private int mReplyMarkerSize;
 
+        private Context mContext;
         private String mSource;
         private XMLReader mReader;
         private SpannableStringBuilder mSpannableStringBuilder;
@@ -264,13 +267,15 @@ public class HtmlUtils {
             return sTextDecorationPattern;
         }
 
-        public HtmlToSpannedConverter(Resources res, String source,
+        public HtmlToSpannedConverter(Context context, String source,
                 android.text.Html.ImageGetter imageGetter, Parser parser) {
+            final Resources res = context.getResources();
             mDividerHeight = res.getDimension(R.dimen.divider_span_height);
             mBulletMargin = res.getDimensionPixelSize(R.dimen.bullet_span_margin);
             mReplyMargin = res.getDimensionPixelSize(R.dimen.reply_span_margin);
             mReplyMarkerSize = res.getDimensionPixelSize(R.dimen.reply_span_size);
 
+            mContext = context;
             mSource = source;
             mSpannableStringBuilder = new SpannableStringBuilder();
             mImageGetter = imageGetter;
@@ -355,6 +360,20 @@ public class HtmlUtils {
                 start(mSpannableStringBuilder, new List(parseIntAttribute(attributes, "start", 1)));
             } else if (tag.equalsIgnoreCase("li")) {
                 startLi(mSpannableStringBuilder, attributes);
+            } else if (tag.equalsIgnoreCase("input")) {
+                if ("checkbox".equalsIgnoreCase(attributes.getValue("", "type"))) {
+                    @AttrRes int drawableAttrResId = attributes.getIndex("", "checked") >= 0
+                            ? R.attr.checkboxCheckedSmallIcon
+                            : R.attr.checkboxUncheckedSmallIcon;
+                    Drawable d = ContextCompat.getDrawable(mContext,
+                            UiUtils.resolveDrawable(mContext, drawableAttrResId));
+                    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                    ImageSpan span = new ImageSpan(d, ImageSpan.ALIGN_BOTTOM);
+
+                    mSpannableStringBuilder.append("  ");
+                    mSpannableStringBuilder.setSpan(span, mSpannableStringBuilder.length() - 2,
+                            mSpannableStringBuilder.length() - 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
             } else if (tag.equalsIgnoreCase("div")) {
                 startBlockElement(mSpannableStringBuilder, attributes);
                 String cssClass = attributes.getValue("", "class");

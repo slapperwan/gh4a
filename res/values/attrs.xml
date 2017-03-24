@@ -78,6 +78,8 @@
     <attr name="commitIcon" format="reference" />
     <attr name="descriptionIcon" format="reference" />
     <attr name="releaseIcon" format="reference" />
+    <attr name="checkboxCheckedSmallIcon" format="reference" />
+    <attr name="checkboxUncheckedSmallIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension" />
