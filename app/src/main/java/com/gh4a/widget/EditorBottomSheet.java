@@ -8,6 +8,7 @@ import android.os.Parcelable;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.BottomSheetBehavior;
@@ -72,6 +73,20 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private int mLatestOffset;
     private int mTopShadowHeight;
 
+    private BottomSheetBehavior.BottomSheetCallback mBehaviorCallback =
+            new BottomSheetBehavior.BottomSheetCallback() {
+        @Override
+        public void onStateChanged(@NonNull View bottomSheet, int newState) {
+            if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                setAdvancedEditorVisible(false);
+            }
+        }
+
+        @Override
+        public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+        }
+    };
+
     public EditorBottomSheet(Context context) {
         super(context);
         initialize();
@@ -108,6 +123,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         post(new Runnable() {
             @Override
             public void run() {
+                getBehavior().setBottomSheetCallback(mBehaviorCallback);
                 resetPeekHeight();
             }
         });
@@ -220,6 +236,9 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
     public void setAdvancedMode(final boolean visible) {
         if (mAdvancedEditor == null) {
+            if (!visible) {
+                return;
+            }
             initAdvancedMode();
         }
 
@@ -239,17 +258,6 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                         ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_COLLAPSED);
             }
         });
-
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (!visible) {
-                    // Hiding on the other hand should be done after updating peek height so the
-                    // bottom sheet can start collapsing with animation
-                    setAdvancedEditorVisible(false);
-                }
-            }
-        }, 250);
     }
 
     public boolean isInAdvancedMode() {
@@ -447,7 +455,9 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             super.onRestoreInstanceState(ss.getSuperState());
             setAdvancedMode(ss.isInAdvancedMode);
             mBasicEditor.setText(ss.commentText);
-            mAdvancedEditor.setText(ss.commentText);
+            if (mAdvancedEditor != null) {
+                mAdvancedEditor.setText(ss.commentText);
+            }
         } else {
             super.onRestoreInstanceState(state);
         }
