@@ -89,6 +89,7 @@ public class MarkdownUtils {
 
         editText.getText().replace(selectionStart, selectionEnd, stringBuilder);
         editText.setSelection(selectionStart + stringBuilder.length());
+        updateCursorPosition(editText, text.length() > 0);
     }
 
     /**
@@ -115,7 +116,7 @@ public class MarkdownUtils {
             moveSelectionEndToEndOfLine(editText);
             text = UiUtils.getSelectedText(editText);
         }
-        
+
         int selectionStart = editText.getSelectionStart();
 
         StringBuilder result = new StringBuilder();
@@ -129,7 +130,7 @@ public class MarkdownUtils {
         requireEmptyLineBelow(editText, result, editText.getSelectionEnd());
 
         UiUtils.replaceSelectionText(editText, result);
-        editText.setSelection(selectionStart + result.length());
+        updateCursorPosition(editText, text.length() > 0);
     }
 
     /**
@@ -207,24 +208,29 @@ public class MarkdownUtils {
      * @param text     The text of the code block.
      */
     public static void addCode(@NonNull EditText editText, @NonNull CharSequence text) {
+        if (text.length() == 0) {
+            selectWordAroundCursor(editText);
+            text = UiUtils.getSelectedText(editText);
+        }
         int selectionStart = editText.getSelectionStart();
         String string = text.toString();
-        int charactersToGoBack = 1;
+        boolean isCodeBlock = string.contains("\n");
 
         StringBuilder stringBuilder = new StringBuilder();
-        if (string.contains("\n")) {
+        if (isCodeBlock) {
             requireEmptyLineAbove(editText, stringBuilder, selectionStart);
             stringBuilder.append("```\n").append(text).append("\n```");
             requireEmptyLineBelow(editText, stringBuilder, editText.getSelectionEnd());
-
-            charactersToGoBack += 4;
         } else {
             stringBuilder.append("`").append(string.trim()).append("`");
         }
 
-
         UiUtils.replaceSelectionText(editText, stringBuilder);
-        editText.setSelection(selectionStart + stringBuilder.length() - charactersToGoBack);
+        if (isCodeBlock) {
+            updateCursorPosition(editText, true);
+        } else {
+            editText.setSelection(editText.getSelectionEnd() - 1);
+        }
     }
 
     /**
@@ -262,7 +268,7 @@ public class MarkdownUtils {
         requireEmptyLineBelow(editText, stringBuilder, editText.getSelectionEnd());
 
         UiUtils.replaceSelectionText(editText, stringBuilder);
-        editText.setSelection(selectionStart + stringBuilder.length());
+        updateCursorPosition(editText, text.length() > 0);
     }
 
     /**
@@ -283,7 +289,7 @@ public class MarkdownUtils {
         }
 
         UiUtils.replaceSelectionText(editText, stringBuilder);
-        editText.setSelection(selectionStart + stringBuilder.length());
+        updateCursorPosition(editText, true);
     }
 
     /**
@@ -384,7 +390,6 @@ public class MarkdownUtils {
         }
 
         UiUtils.replaceSelectionText(editText, result);
-
         editText.setSelection(selectionStart + result.length() - charactersToGoBack);
     }
 
@@ -457,5 +462,21 @@ public class MarkdownUtils {
             selectionEnd += position;
         }
         editText.setSelection(editText.getSelectionStart(), selectionEnd);
+    }
+
+    private static void updateCursorPosition(@NonNull EditText editText, boolean goToNewLine) {
+        int selectionEnd = editText.getSelectionEnd();
+        String source = editText.getText().toString();
+        if (selectionEnd > source.length()) {
+            return;
+        }
+
+        while (selectionEnd > 0 && source.charAt(selectionEnd - 1) == '\n') {
+            selectionEnd -= 1;
+        }
+        if (goToNewLine && selectionEnd < source.length()) {
+            selectionEnd += 1;
+        }
+        editText.setSelection(selectionEnd);
     }
 }
