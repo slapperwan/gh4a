@@ -478,34 +478,41 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         }
     }
 
-    private class SaveIssueTask extends ProgressDialogTask<Void> {
+    private class SaveIssueTask extends ProgressDialogTask<Issue> {
         private final Issue mIssue;
 
         public SaveIssueTask(Issue issue) {
             super(IssueEditActivity.this, R.string.saving_msg);
-            mIssue = issue;
+            Milestone milestone = issue.getMilestone();
+            mIssue = new Issue()
+                    .setNumber(issue.getNumber())
+                    .setTitle(issue.getTitle())
+                    .setBody(issue.getBody())
+                    .setMilestone(milestone != null ? milestone : new Milestone())
+                    .setAssignees(issue.getAssignees())
+                    .setLabels(issue.getLabels());
         }
 
         @Override
-        protected ProgressDialogTask<Void> clone() {
+        protected ProgressDialogTask<Issue> clone() {
             return new SaveIssueTask(mIssue);
         }
 
         @Override
-        protected Void run() throws IOException {
+        protected Issue run() throws IOException {
             IssueService issueService = (IssueService)
                     Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
 
             if (isInEditMode()) {
-                mEditIssue = issueService.editIssue(mRepoOwner, mRepoName, mIssue);
+                return issueService.editIssue(mRepoOwner, mRepoName, mIssue);
             } else {
-                mEditIssue = issueService.createIssue(mRepoOwner, mRepoName, mIssue);
+                return issueService.createIssue(mRepoOwner, mRepoName, mIssue);
             }
-            return null;
         }
 
         @Override
-        protected void onSuccess(Void result) {
+        protected void onSuccess(Issue result) {
+            mEditIssue = result;
             setResult(RESULT_OK);
             finish();
         }
