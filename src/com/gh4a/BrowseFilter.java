@@ -19,6 +19,7 @@ import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
+import com.gh4a.activities.IssueEditActivity;
 import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
@@ -118,11 +119,16 @@ public class BrowseFilter extends AppCompatActivity {
                 return; // avoid finish() for now
             } else if ("issues".equals(action)) {
                 if (!StringUtils.isBlank(id)) {
-                    try {
-                        intent = IssueActivity.makeIntent(this, user, repo,
-                                Integer.parseInt(id), extractCommentId(uri.getFragment(), "issue"));
-                    } catch (NumberFormatException e) {
-                        // ignored
+                    if ("new".equals(id)) {
+                        intent = IssueEditActivity.makeCreateIntent(this, user, repo);
+                    } else {
+                        try {
+                            intent = IssueActivity.makeIntent(this, user, repo,
+                                    Integer.parseInt(id),
+                                    extractCommentId(uri.getFragment(), "issue"));
+                        } catch (NumberFormatException e) {
+                            // ignored
+                        }
                     }
                 } else {
                     intent = IssueListActivity.makeIntent(this, user, repo);
