@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/floating_action_button_margin_mini"
+    android:paddingBottom="@dimen/issue_edit_header_bottom_padding"
     android:paddingLeft="@dimen/content_padding"
     android:paddingRight="@dimen/content_padding"
     android:paddingTop="@dimen/content_padding">

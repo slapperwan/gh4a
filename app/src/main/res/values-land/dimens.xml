@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="issue_edit_body_min_lines">2</integer>
-    <integer name="issue_edit_body_max_lines">3</integer>
+    <dimen name="issue_edit_header_bottom_padding">@dimen/floating_action_button_margin_mini</dimen>
 </resources>
