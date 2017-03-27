@@ -26,16 +26,23 @@
             style="@style/ImageButton"
             android:src="?expandIcon" />
 
-        <com.gh4a.widget.CommentEditor
-            android:id="@+id/et_basic_editor"
+        <com.gh4a.widget.HeightLimitedNestedScrollView
+            android:id="@+id/basic_editor_scroll"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:inputType="textMultiLine|textCapSentences"
-            android:maxLines="3"
-            android:minHeight="48dp"
-            android:padding="8dp"
-            tools:text="Enter comment" />
+            app:maxHeight="96dp">
+
+            <com.gh4a.widget.CommentEditor
+                android:id="@+id/et_basic_editor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine|textCapSentences"
+                android:minHeight="48dp"
+                android:padding="8dp"
+                tools:text="Enter comment" />
+
+        </com.gh4a.widget.HeightLimitedNestedScrollView>
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"

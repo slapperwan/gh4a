@@ -20,6 +20,7 @@ import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.support.v4.view.AbsSavedState;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.NestedScrollView;
 import android.text.Editable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -60,9 +61,9 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private CommentEditor mBasicEditor;
     private CommentEditor mAdvancedEditor;
     private MarkdownButtonsBar mMarkdownButtons;
-    private MarkdownPreviewWebView mPreviewWebView;
     private ImageView mAdvancedEditorToggle;
     private OnToggleAdvancedModeListener mOnToggleAdvancedMode;
+    private NestedScrollView mBasicEditorScrollView;
 
     private Callback mCallback;
     private View mResizingView;
@@ -120,6 +121,9 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mBasicEditor = (CommentEditor) view.findViewById(R.id.et_basic_editor);
         mBasicEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mBasicEditor, sendButton));
+
+        mBasicEditorScrollView = (NestedScrollView) view.findViewById(R.id.basic_editor_scroll);
+        mBasicEditorScrollView.setOnTouchListener(this);
 
         post(new Runnable() {
             @Override
@@ -289,7 +293,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
     private void setAdvancedEditorVisible(boolean visible) {
         mAdvancedEditorContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
-        mBasicEditor.setVisibility(visible ? View.GONE : View.VISIBLE);
+        mBasicEditorScrollView.setVisibility(visible ? View.GONE : View.VISIBLE);
         mTabs.setVisibility(visible ? View.VISIBLE : View.GONE);
 
         if (visible) {
@@ -330,8 +334,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         }
 
         mAdvancedEditor = (CommentEditor) mAdvancedEditorContainer.findViewById(R.id.editor);
-        mAdvancedEditor.addTextChangedListener(
-                new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor, findViewById(R.id.send_button)));
+        mAdvancedEditor.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor,
+                findViewById(R.id.send_button)));
 
         if (mCallback != null) {
             mAdvancedEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
@@ -346,12 +350,12 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             mMarkdownButtons.setButtonsBackgroundColor(mHighlightColor);
         }
 
-        mPreviewWebView = (MarkdownPreviewWebView) findViewById(R.id.preview);
-        mPreviewWebView.setEditText(mAdvancedEditor);
+        MarkdownPreviewWebView previewWebView = (MarkdownPreviewWebView) findViewById(R.id.preview);
+        previewWebView.setEditText(mAdvancedEditor);
 
         mMarkdownButtons.setBottomSheetBehavior(getBehavior());
         mAdvancedEditorContainer.findViewById(R.id.editor_scroller).setOnTouchListener(this);
-        mPreviewWebView.setOnTouchListener(this);
+        previewWebView.setOnTouchListener(this);
         mAdvancedEditor.setOnTouchListener(this);
         viewPager.setOnTouchListener(this);
     }

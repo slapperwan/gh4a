@@ -474,4 +474,23 @@ public class UiUtils {
         }
         return builder;
     }
+
+    public static int limitViewHeight(int heightMeasureSpec, int maxHeight) {
+        int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
+        int heightMode = View.MeasureSpec.getMode(heightMeasureSpec);
+
+        switch (heightMode) {
+            case View.MeasureSpec.AT_MOST:
+            case View.MeasureSpec.EXACTLY:
+                heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(
+                        Math.min(heightSize, maxHeight), heightMode);
+                break;
+            case View.MeasureSpec.UNSPECIFIED:
+                heightMeasureSpec =
+                        View.MeasureSpec.makeMeasureSpec(maxHeight, View.MeasureSpec.AT_MOST);
+                break;
+        }
+
+        return heightMeasureSpec;
+    }
 }

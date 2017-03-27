@@ -98,6 +98,8 @@
     <attr name="collapseIcon" format="reference" />
     <attr name="saveIcon" format="reference" />
 
+    <attr name="maxHeight" format="dimension" />
+
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension" />
         <attr name="badgeSpacing" format="dimension" />
@@ -121,7 +123,11 @@
     </declare-styleable>
 
     <declare-styleable name="HeightLimitedLinearLayout">
-        <attr name="maxHeight" format="dimension" />
+        <attr name="maxHeight" />
+    </declare-styleable>
+
+    <declare-styleable name="HeightLimitedNestedScrollView">
+        <attr name="maxHeight" />
     </declare-styleable>
 
     <item name="EdgeColorHelper" type="id" />
