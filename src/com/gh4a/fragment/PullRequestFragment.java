@@ -28,14 +28,15 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.loader.CommitStatusLoader;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.StyleableTextView;
 
 import org.eclipse.egit.github.core.Comment;
@@ -48,7 +49,6 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,12 +121,32 @@ public class PullRequestFragment extends IssueFragmentBase {
         branchGroup.setVisibility(View.VISIBLE);
 
         StyleableTextView fromBranch = (StyleableTextView) branchGroup.findViewById(R.id.tv_pr_from);
-        StringUtils.applyBoldTagsAndSetText(fromBranch, getString(R.string.pull_request_from,
-                mPullRequest.getHead().getLabel()));
+        String fromText = getString(R.string.pull_request_from);
+        UiUtils.setIntentSpan(fromBranch, fromText + " " + mPullRequest.getHead().getLabel(),
+                new IntentSpan(fromBranch.getContext()) {
+            @Override
+            protected Intent getIntent() {
+                Repository pullRequestRepo = mPullRequest.getHead().getRepo();
+                return RepositoryActivity
+                        .makeIntent(getActivity(), pullRequestRepo.getOwner().getLogin(),
+                                pullRequestRepo.getName(),
+                                mPullRequest.getHead().getRef());
+            }
+        }, fromText.length() + 1);
 
         StyleableTextView toBranch = (StyleableTextView) branchGroup.findViewById(R.id.tv_pr_to);
-        StringUtils.applyBoldTagsAndSetText(toBranch, getString(R.string.pull_request_to,
-                mPullRequest.getBase().getLabel()));
+        String toText = getString(R.string.pull_request_to);
+        UiUtils.setIntentSpan(toBranch, toText + " " + mPullRequest.getBase().getLabel(),
+                new IntentSpan(toBranch.getContext()) {
+            @Override
+            protected Intent getIntent() {
+                Repository pullRequestRepo = mPullRequest.getBase().getRepo();
+                return RepositoryActivity
+                        .makeIntent(getActivity(), pullRequestRepo.getOwner().getLogin(),
+                                pullRequestRepo.getName(),
+                                mPullRequest.getBase().getRef());
+            }
+        }, toText.length() + 1);
     }
 
     @Override
