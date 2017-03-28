@@ -69,9 +69,8 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
     protected void openCommentDialog(long id, long replyToId, String line, int position,
             int leftLine, int rightLine, CommitComment commitComment) {
         String body = commitComment == null ? "" : commitComment.getBody();
-        Intent intent = EditDiffCommentActivity
-                .makeIntent(this, mRepoOwner, mRepoName, mSha, mPath, line, leftLine, rightLine,
-                        position, id, body);
+        Intent intent = EditDiffCommentActivity.makeIntent(this, mRepoOwner, mRepoName,
+                mSha, mPath, line, leftLine, rightLine, position, id, body);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
