@@ -33,11 +33,12 @@ import java.util.List;
 
 public class CommitDiffViewerActivity extends DiffViewerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-                String commitSha, String path, String diff, List<CommitComment> comments,
-                int highlightStartLine, int highlightEndLine, boolean highlightIsRight) {
+            String commitSha, String path, String diff, List<CommitComment> comments,
+            int highlightStartLine, int highlightEndLine, boolean highlightIsRight,
+            long initialCommentId) {
         return DiffViewerActivity.fillInIntent(new Intent(context, CommitDiffViewerActivity.class),
                 repoOwner, repoName, commitSha, path, diff, comments, -1,
-                highlightStartLine, highlightEndLine, highlightIsRight);
+                highlightStartLine, highlightEndLine, highlightIsRight, initialCommentId);
     }
 
     @Override

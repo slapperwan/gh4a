@@ -169,6 +169,11 @@ public class BrowseFilter extends AppCompatActivity {
                     new CommitDiffLoadTask(user, repo, diffId, id).execute();
                     return; // avoid finish() for now
                 } else {
+                    long commentId = extractCommentId(uri.getFragment(), "commit");
+                    if (commentId != -1) {
+                        new CommitCommentLoadTask(user, repo, id, commentId).execute();
+                        return; // avoid finish() for now
+                    }
                     intent = CommitActivity.makeIntent(this, user, repo, id,
                             extractCommentId(uri.getFragment(), "commit"));
                 }
@@ -331,6 +336,60 @@ public class BrowseFilter extends AppCompatActivity {
         }
     }
 
+    private class CommitCommentLoadTask extends UrlLoadTask {
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final String mCommitSha;
+        private final long mCommentId;
+
+        public CommitCommentLoadTask(String repoOwner, String repoName, String commitSha,
+                long commentId) {
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mCommitSha = commitSha;
+            mCommentId = commentId;
+        }
+
+        @Override
+        protected Intent run() throws Exception {
+            List<CommitComment> comments =
+                    CommitCommentListLoader.loadComments(mRepoOwner, mRepoName, mCommitSha);
+            RepositoryCommit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mCommitSha);
+
+            boolean foundComment = false;
+            CommitFile resultFile = null;
+            for (CommitComment comment : comments) {
+                if (comment.getId() == mCommentId) {
+                    foundComment = true;
+                    for (CommitFile commitFile : commit.getFiles()) {
+                        if (commitFile.getFilename().equals(comment.getPath())) {
+                            resultFile = commitFile;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (!foundComment || isFinishing()) {
+                return null;
+            }
+
+            Intent intent = null;
+            if (resultFile != null) {
+                if (!FileUtils.isImage(resultFile.getFilename())) {
+                    intent = CommitDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner,
+                            mRepoName, mCommitSha, resultFile.getFilename(), resultFile.getPatch(),
+                            comments, -1, -1, false, mCommentId);
+                }
+            } else {
+                intent = CommitActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                        mCommitSha, mCommentId);
+            }
+            return intent;
+        }
+    }
+
     private abstract class DiffLoadTask extends UrlLoadTask {
         protected final String mRepoOwner;
         protected final String mRepoName;
@@ -428,7 +487,7 @@ public class BrowseFilter extends AppCompatActivity {
                 List<CommitComment> comments, DiffHighlightId diffId) {
             return CommitDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
                     sha, file.getFilename(), file.getPatch(), comments, diffId.startLine,
-                    diffId.endLine, diffId.right);
+                    diffId.endLine, diffId.right, -1);
         }
 
         @Override
