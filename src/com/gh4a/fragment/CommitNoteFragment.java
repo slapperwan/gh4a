@@ -21,7 +21,6 @@ import com.gh4a.activities.EditCommitCommentActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderResult;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -56,7 +55,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         args.putString("sha", commitSha);
         args.putSerializable("commit", commit);
         args.putSerializable("comments", comments);
-        args.putSerializable("initial_comment", initialCommentId);
+        args.putLong("initial_comment", initialCommentId);
 
         f.setArguments(args);
         return f;

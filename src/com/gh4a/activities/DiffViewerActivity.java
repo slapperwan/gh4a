@@ -68,7 +68,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
             String commitSha, String path, String diff, List<CommitComment> comments,
             int initialLine, int highlightStartLine, int highlightEndLine,
-            boolean highlightisRight) {
+            boolean highlightisRight, long initialCommentId) {
         return baseIntent.putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("sha", commitSha)
@@ -78,7 +78,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 .putExtra("initial_line", initialLine)
                 .putExtra("highlight_start", highlightStartLine)
                 .putExtra("highlight_end", highlightEndLine)
-                .putExtra("highlight_right", highlightisRight);
+                .putExtra("highlight_right", highlightisRight)
+                .putExtra("initial_comment", initialCommentId);
     }
 
     private static final Pattern HUNK_START_PATTERN =
@@ -95,6 +96,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     private int mHighlightStartLine;
     private int mHighlightEndLine;
     private boolean mHighlightIsRight;
+    private long mInitialCommentId;
 
     private String mDiff;
     private String[] mDiffLines;
@@ -154,6 +156,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         mHighlightStartLine = extras.getInt("highlight_start", -1);
         mHighlightEndLine = extras.getInt("highlight_end", -1);
         mHighlightIsRight = extras.getBoolean("highlight_right", false);
+        mInitialCommentId = extras.getLong("initial_comment", -1);
+        extras.remove("initial_comment");
     }
 
     @Override
@@ -255,11 +259,13 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             List<CommitComment> comments = mCommitCommentsByPos.get(i);
             if (comments != null) {
                 for (CommitComment comment : comments) {
-                    mCommitComments.put(comment.getId(), comment);
-                    content.append("<div class=\"comment\"");
+                    long id = comment.getId();
+                    mCommitComments.put(id, comment);
+                    content.append("<div ").append("id=\"comment").append(id).append("\"");
+                    content.append(" class=\"comment\"");
                     if (authorized) {
                         String uri = String.format(Locale.US, COMMENT_EDIT_URI_FORMAT,
-                                i, leftDiffPosition, rightDiffPosition, comment.getId());
+                                i, leftDiffPosition, rightDiffPosition, id);
                         content.append(" onclick=\"javascript:location.href='");
                         content.append(uri).append("'\"");
                     }
@@ -275,6 +281,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         if (mInitialLine > 0) {
             content.insert(highlightInsertPos, " onload='scrollToElement(\"line"
                     + mInitialLine + "\")' onresize='scrollToHighlight();'");
+        } else if (mInitialCommentId != -1) {
+            content.insert(highlightInsertPos, " onload='scrollToElement(\"comment"
+                    + mInitialCommentId + "\")' onresize='scrollToHighlight();'");
         } else if (highlightStartLine != -1 && highlightEndLine != -1) {
             content.insert(highlightInsertPos, " onload='highlightDiffLines("
                     + highlightStartLine + "," + highlightEndLine
