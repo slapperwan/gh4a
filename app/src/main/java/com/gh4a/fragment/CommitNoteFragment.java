@@ -194,7 +194,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         if (mCommit.getCommitter() != null) {
             users.add(mCommit.getCommitter());
         }
-//        mCommentBoxAdapter.getCommentFragment().setMentionUsers(users);
+        mBottomSheet.setMentionUsers(users);
+
         if (mInitialComment != null) {
             for (int i = 0; i < data.size(); i++) {
                 if (mInitialComment.matches(data.get(i).getId(), data.get(i).getCreatedAt())) {
