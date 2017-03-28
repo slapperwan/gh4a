@@ -6,7 +6,6 @@ import android.support.annotation.AttrRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.gh4a.Gh4Application;
@@ -29,7 +28,6 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
                 .putExtra("highlight_color_attr", highlightColorAttr);
     }
 
-    private EditorBottomSheet mEditorSheet;
     private CoordinatorLayout mRootLayout;
 
     @Override
@@ -41,21 +39,18 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
         setContentView(R.layout.comment_editor);
 
         mRootLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-        mEditorSheet = (EditorBottomSheet) findViewById(R.id.bottom_sheet);
+        EditorBottomSheet editorBottomSheet = (EditorBottomSheet) findViewById(R.id.bottom_sheet);
 
-        View advancedToggle = mEditorSheet.findViewById(R.id.iv_advanced_editor_toggle);
-        advancedToggle.setVisibility(View.GONE);
-
-        ImageView saveButton = (ImageView) mEditorSheet.findViewById(R.id.send_button);
+        ImageView saveButton = (ImageView) editorBottomSheet.findViewById(R.id.send_button);
         saveButton.setImageResource(UiUtils.resolveDrawable(this, R.attr.saveIcon));
 
-        mEditorSheet.setAdvancedMode(true);
-        mEditorSheet.setCallback(this);
-        mEditorSheet.setCommentText(getIntent().getStringExtra("body"), false);
+        editorBottomSheet.setAdvancedMode(true);
+        editorBottomSheet.setCallback(this);
+        editorBottomSheet.setCommentText(getIntent().getStringExtra("body"), false);
 
         @AttrRes int highlightColorAttr = getIntent().getIntExtra("highlight_color_attr", 0);
         if (highlightColorAttr != 0) {
-            mEditorSheet.setHighlightColor(highlightColorAttr);
+            editorBottomSheet.setHighlightColor(highlightColorAttr);
         }
 
         setResult(RESULT_CANCELED);

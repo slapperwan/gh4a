@@ -130,6 +130,10 @@
         <attr name="maxHeight" />
     </declare-styleable>
 
+    <declare-styleable name="EditorBottomSheet">
+        <attr name="collapsible" format="boolean" />
+    </declare-styleable>
+
     <item name="EdgeColorHelper" type="id" />
     <item name="FloatingActionButtonScrollEnabled" type="id" />
 </resources>

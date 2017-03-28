@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:behavior_peekHeight="@dimen/comment_advanced_editor_peek_height"
+            app:collapsible="false"
             app:layout_behavior="com.gh4a.widget.ToggleableBottomSheetBehavior" />
 
     </android.support.design.widget.CoordinatorLayout>
