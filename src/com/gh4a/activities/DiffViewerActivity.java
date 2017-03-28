@@ -83,7 +83,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
     private static final Pattern HUNK_START_PATTERN =
             Pattern.compile("@@ -(\\d+),\\d+ \\+(\\d+),\\d+.*");
-    private static final String COMMENT_URI_FORMAT = "comment://%s?position=%d&l=%d&r=%d";
+    private static final String COMMENT_ADD_URI_FORMAT = "comment://add?position=%d&l=%d&r=%d";
+    private static final String COMMENT_EDIT_URI_FORMAT =
+            "comment://edit?position=%d&l=%d&r=%d&id=%d";
 
     protected String mRepoOwner;
     protected String mRepoName;
@@ -243,8 +245,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 content.append("class=\"").append(cssClass).append("\"");
             }
             if (authorized) {
-                String uri = String.format(Locale.US, COMMENT_URI_FORMAT,
-                        "add", i, leftDiffPosition, rightDiffPosition);
+                String uri = String.format(Locale.US, COMMENT_ADD_URI_FORMAT,
+                        i, leftDiffPosition, rightDiffPosition);
                 content.append(" onclick=\"javascript:location.href='");
                 content.append(uri).append("'\"");
             }
@@ -256,8 +258,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     mCommitComments.put(comment.getId(), comment);
                     content.append("<div class=\"comment\"");
                     if (authorized) {
-                        String uri = String.format(Locale.US, COMMENT_URI_FORMAT,
-                                "edit", i, leftDiffPosition, rightDiffPosition);
+                        String uri = String.format(Locale.US, COMMENT_EDIT_URI_FORMAT,
+                                i, leftDiffPosition, rightDiffPosition, comment.getId());
                         content.append(" onclick=\"javascript:location.href='");
                         content.append(uri).append("'\"");
                     }
