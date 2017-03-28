@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
+import org.eclipse.egit.github.core.client.RequestException;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -107,5 +108,19 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     @Override
     public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader() {
         return new CommitCompareLoader(getActivity(), mRepoOwner, mRepoName, mBase, mHead);
+    }
+
+    @Override
+    protected boolean onLoaderError(Exception e) {
+        if (e instanceof RequestException) {
+            RequestException re = (RequestException) e;
+            if (re.getStatus() == 404) {
+                // this happens when the source branch is deleted
+                setContentShown(true);
+                updateEmptyState();
+                return true;
+            }
+        }
+        return super.onLoaderError(e);
     }
 }
