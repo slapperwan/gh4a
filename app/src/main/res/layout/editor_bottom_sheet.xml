@@ -16,6 +16,14 @@
         android:background="@drawable/top_shadow" />
 
     <LinearLayout
+        android:id="@+id/bottom_sheet_header_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:colorBackground"
+        android:orientation="vertical"
+        android:visibility="gone" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:colorBackground"

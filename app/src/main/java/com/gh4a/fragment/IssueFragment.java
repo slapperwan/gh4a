@@ -95,7 +95,7 @@ public class IssueFragment extends IssueFragmentBase {
     }
 
     @Override
-    public void replyToComment(long replyToId, String text) {
+    public void replyToComment(long replyToId) {
         // Not used in this screen
     }
 }

@@ -135,7 +135,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         Intent intent;
         if (comment instanceof CommitComment) {
             intent = EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mIssueNumber, (CommitComment) comment, 0);
+                    mIssueNumber, 0L, (CommitComment) comment, 0);
         } else {
             intent = EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
                     mIssueNumber, comment, 0);
@@ -164,8 +164,10 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    public void replyToComment(long replyToId, String text) {
-        new ReplyTask(getBaseActivity(), replyToId, text).schedule();
+    public void replyToComment(long replyToId) {
+        Intent intent = EditPullRequestCommentActivity.makeIntent(getActivity(),
+                mRepoOwner, mRepoName, mIssueNumber, replyToId, new CommitComment(), 0);
+        startActivity(intent);
     }
 
     @Override
@@ -200,44 +202,6 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
             IssueService issueService =
                     (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
             return issueService.addCommentReaction(repoId, comment.getId(), content);
-        }
-    }
-
-    private class ReplyTask extends ProgressDialogTask<CommitComment> {
-        private final BaseActivity mBaseActivity;
-        private final String mBody;
-        private final long mReplyToId;
-
-        public ReplyTask(BaseActivity baseActivity, long replyToId, String body) {
-            super(baseActivity, R.string.saving_msg);
-            mBaseActivity = baseActivity;
-            mReplyToId = replyToId;
-            mBody = body;
-        }
-
-        @Override
-        protected ProgressDialogTask<CommitComment> clone() {
-            return new ReplyTask(mBaseActivity, mReplyToId, mBody);
-        }
-
-        @Override
-        protected CommitComment run() throws IOException {
-            PullRequestService pullRequestService =
-                    (PullRequestService) Gh4Application.get()
-                            .getService(Gh4Application.PULL_SERVICE);
-
-            return pullRequestService.replyToComment(new RepositoryId(mRepoOwner, mRepoName),
-                    mIssueNumber, mReplyToId, mBody);
-        }
-
-        @Override
-        protected void onSuccess(CommitComment result) {
-            reloadComments(true);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_comment);
         }
     }
 

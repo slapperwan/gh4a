@@ -50,6 +50,16 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     private int mPullRequestNumber;
 
     @Override
+    protected void openCommentDialog(long id, long replyToId, String line, int position,
+            int leftLine, int rightLine, CommitComment commitComment) {
+        String body = commitComment == null ? "" : commitComment.getBody();
+        Intent intent = EditPullRequestDiffCommentActivity.makeIntent(this,
+                mRepoOwner, mRepoName, mSha, mPath, line, leftLine, rightLine,
+                position, id, body, mPullRequestNumber, replyToId);
+        startActivityForResult(intent, REQUEST_EDIT);
+    }
+
+    @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
         mPullRequestNumber = extras.getInt("number", -1);
@@ -80,30 +90,6 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     @Override
     protected boolean canReply() {
         return true;
-    }
-
-    @Override
-    protected void createComment(CommitComment comment, long replyToCommentId) throws IOException {
-        Gh4Application app = Gh4Application.get();
-        PullRequestService pullRequestService = (PullRequestService)
-                app.getService(Gh4Application.PULL_SERVICE);
-        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-        if (replyToCommentId != 0L) {
-            pullRequestService.replyToComment(repoId, mPullRequestNumber, replyToCommentId,
-                    comment.getBody());
-        } else {
-            comment.setCommitId(mSha);
-            comment.setPath(mPath);
-            pullRequestService.createComment(repoId, mPullRequestNumber, comment);
-        }
-    }
-
-    @Override
-    protected void editComment(CommitComment comment) throws IOException {
-        Gh4Application app = Gh4Application.get();
-        PullRequestService pullRequestService = (PullRequestService)
-                app.getService(Gh4Application.PULL_SERVICE);
-        pullRequestService.editComment(new RepositoryId(mRepoOwner, mRepoName), comment);
     }
 
     @Override

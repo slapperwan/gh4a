@@ -65,6 +65,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private ImageView mAdvancedEditorToggle;
     private OnToggleAdvancedModeListener mOnToggleAdvancedMode;
     private NestedScrollView mBasicEditorScrollView;
+    private ViewGroup mContainer;
 
     private Callback mCallback;
     private View mResizingView;
@@ -139,6 +140,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mBasicEditorScrollView = (NestedScrollView) view.findViewById(R.id.basic_editor_scroll);
         mBasicEditorScrollView.setOnTouchListener(this);
 
+        mContainer = (ViewGroup) view.findViewById(R.id.bottom_sheet_header_container);
+
         post(new Runnable() {
             @Override
             public void run() {
@@ -150,6 +153,12 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                 }
             }
         });
+    }
+
+    public void addHeaderView(View view) {
+        mContainer.addView(view, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        mContainer.setVisibility(View.VISIBLE);
     }
 
     public void setOnToggleAdvancedModeListener(OnToggleAdvancedModeListener listener) {

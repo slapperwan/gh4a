@@ -254,7 +254,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                         ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
         Intent intent = comment instanceof CommitComment
                 ? EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mPullRequest.getNumber(), (CommitComment) comment, highlightColorAttr)
+                        mPullRequest.getNumber(), 0L, (CommitComment) comment, highlightColorAttr)
                 : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
                         mIssue.getNumber(), comment, highlightColorAttr);
         startActivityForResult(intent, REQUEST_EDIT);
@@ -280,7 +280,7 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     @Override
-    public void replyToComment(long replyToId, String text) {
+    public void replyToComment(long replyToId) {
         // Not used in this screen
     }
 }

@@ -1,0 +1,33 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/title"
+        style="@style/TextAppearance.ItemTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
+        android:paddingTop="@dimen/content_padding"
+        tools:text="Comment on line -23 +34" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/content_padding"
+        android:scrollbarStyle="outsideInset"
+        android:scrollbars="horizontal">
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="3"
+            tools:text="+ void codeLine() {" />
+
+    </HorizontalScrollView>
+</LinearLayout>
