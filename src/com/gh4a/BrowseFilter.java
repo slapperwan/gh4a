@@ -84,7 +84,9 @@ public class BrowseFilter extends AppCompatActivity {
         } else if ("explore".equals(first)) {
             intent = new Intent(this, TrendingActivity.class);
         } else if ("blog".equals(first)) {
-            intent = new Intent(this, BlogListActivity.class);
+            if (parts.size() == 1) {
+                intent = new Intent(this, BlogListActivity.class);
+            }
         } else if (first != null) {
             String user = first;
             String repo = parts.size() >= 2 ? parts.get(1) : null;
