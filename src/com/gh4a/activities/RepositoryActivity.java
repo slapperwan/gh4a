@@ -54,7 +54,11 @@ import java.util.List;
 
 public class RepositoryActivity extends BasePagerActivity {
     public static Intent makeIntent(Context context, Repository repo) {
-        return makeIntent(context, repo.getOwner().getLogin(), repo.getName());
+        return makeIntent(context, repo, null);
+    }
+
+    public static Intent makeIntent(Context context, Repository repo, String ref) {
+        return makeIntent(context, repo.getOwner().getLogin(), repo.getName(), ref);
     }
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {

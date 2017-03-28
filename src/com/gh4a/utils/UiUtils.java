@@ -23,7 +23,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.ActionMode;
@@ -44,7 +43,6 @@ import android.widget.Toast;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.widget.IntentSpan;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -443,19 +441,5 @@ public class UiUtils {
         public CharSequence terminateToken(CharSequence text) {
             return text;
         }
-    }
-
-    public static void setIntentSpan(TextView view, String text, IntentSpan span, int start) {
-        setIntentSpan(view, text, span, start, text.length());
-    }
-
-    public static void setIntentSpan(TextView view, String text, IntentSpan span, int start,
-            int end) {
-        SpannableStringBuilder builder = new SpannableStringBuilder();
-        builder.append(text);
-        builder.setSpan(span, start, end, 0);
-
-        view.setText(builder);
-        view.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
     }
 }

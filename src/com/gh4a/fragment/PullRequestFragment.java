@@ -17,7 +17,9 @@ package com.gh4a.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v4.content.Loader;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +37,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.StyleableTextView;
@@ -44,6 +47,7 @@ import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitStatus;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.PullRequestMarker;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -121,32 +125,10 @@ public class PullRequestFragment extends IssueFragmentBase {
         branchGroup.setVisibility(View.VISIBLE);
 
         StyleableTextView fromBranch = (StyleableTextView) branchGroup.findViewById(R.id.tv_pr_from);
-        String fromText = getString(R.string.pull_request_from);
-        UiUtils.setIntentSpan(fromBranch, fromText + " " + mPullRequest.getHead().getLabel(),
-                new IntentSpan(fromBranch.getContext()) {
-            @Override
-            protected Intent getIntent() {
-                Repository pullRequestRepo = mPullRequest.getHead().getRepo();
-                return RepositoryActivity
-                        .makeIntent(getActivity(), pullRequestRepo.getOwner().getLogin(),
-                                pullRequestRepo.getName(),
-                                mPullRequest.getHead().getRef());
-            }
-        }, fromText.length() + 1);
+        formatMarkerText(fromBranch, R.string.pull_request_from, mPullRequest.getHead());
 
         StyleableTextView toBranch = (StyleableTextView) branchGroup.findViewById(R.id.tv_pr_to);
-        String toText = getString(R.string.pull_request_to);
-        UiUtils.setIntentSpan(toBranch, toText + " " + mPullRequest.getBase().getLabel(),
-                new IntentSpan(toBranch.getContext()) {
-            @Override
-            protected Intent getIntent() {
-                Repository pullRequestRepo = mPullRequest.getBase().getRepo();
-                return RepositoryActivity
-                        .makeIntent(getActivity(), pullRequestRepo.getOwner().getLogin(),
-                                pullRequestRepo.getName(),
-                                mPullRequest.getBase().getRef());
-            }
-        }, toText.length() + 1);
+        formatMarkerText(toBranch, R.string.pull_request_to, mPullRequest.getBase());
     }
 
     @Override
@@ -158,6 +140,26 @@ public class PullRequestFragment extends IssueFragmentBase {
         } else {
             setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
         }
+    }
+
+    private void formatMarkerText(StyleableTextView view,
+            @StringRes int formatResId, final PullRequestMarker marker) {
+        SpannableStringBuilder builder = StringUtils.applyBoldTags(getActivity(),
+                getString(formatResId), view.getTypefaceValue());
+        int pos = builder.toString().indexOf("[ref]");
+        if (pos >= 0) {
+            builder.replace(pos, pos + 5, marker.getLabel());
+            builder.setSpan(new IntentSpan(getActivity()) {
+                @Override
+                protected Intent getIntent() {
+                    return RepositoryActivity.makeIntent(getActivity(),
+                            marker.getRepo(), marker.getRef());
+                }
+            }, pos, pos + marker.getLabel().length(), 0);
+        }
+
+        view.setText(builder);
+        view.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
     }
 
     private void loadStatusIfOpen() {
