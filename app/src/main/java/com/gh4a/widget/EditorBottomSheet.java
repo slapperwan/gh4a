@@ -2,6 +2,7 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -68,6 +69,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private Callback mCallback;
     private View mResizingView;
     private @ColorInt int mHighlightColor = Color.TRANSPARENT;
+    private boolean mIsCollapsible;
 
     private int mBasicPeekHeight;
     private int mAdvancedPeekHeight;
@@ -79,6 +81,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
             if (mAdvancedEditorContainer != null
+                    && mIsCollapsible
                     && newState == BottomSheetBehavior.STATE_COLLAPSED) {
                 setAdvancedEditorVisible(false);
             }
@@ -91,29 +94,40 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
     public EditorBottomSheet(Context context) {
         super(context);
-        initialize();
+        initialize(null);
     }
 
     public EditorBottomSheet(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initialize();
+        initialize(attrs);
     }
 
     public EditorBottomSheet(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initialize();
+        initialize(attrs);
     }
 
-    private void initialize() {
+    private void initialize(AttributeSet attrs) {
         final Resources res = getResources();
         mBasicPeekHeight = res.getDimensionPixelSize(R.dimen.comment_editor_peek_height);
         mAdvancedPeekHeight = res.getDimensionPixelSize(R.dimen.comment_advanced_editor_peek_height);
         mTopShadowHeight = res.getDimensionPixelSize(R.dimen.bottom_sheet_top_shadow_height);
 
+        if (attrs != null) {
+            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EditorBottomSheet);
+            mIsCollapsible = a.getBoolean(R.styleable.EditorBottomSheet_collapsible, true);
+            a.recycle();
+        } else {
+            mIsCollapsible = true;
+        }
+
         View view = View.inflate(getContext(), R.layout.editor_bottom_sheet, this);
 
         mAdvancedEditorToggle = (ImageView) view.findViewById(R.id.iv_advanced_editor_toggle);
         mAdvancedEditorToggle.setOnClickListener(this);
+        if (!mIsCollapsible) {
+            mAdvancedEditorToggle.setVisibility(View.GONE);
+        }
 
         View sendButton = view.findViewById(R.id.send_button);
         sendButton.setOnClickListener(this);
@@ -130,6 +144,10 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             public void run() {
                 getBehavior().setBottomSheetCallback(mBehaviorCallback);
                 resetPeekHeight();
+
+                if (!mIsCollapsible) {
+                    setAdvancedMode(true);
+                }
             }
         });
     }
