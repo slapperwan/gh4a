@@ -157,10 +157,10 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     @Override
-    public void setAppBarLockedInCollapsedState(boolean locked) {
+    public void setAppBarLocked(boolean locked) {
         mAppBarLocked = locked;
         updateToolbarScrollableState();
-        super.setAppBarLockedInCollapsedState(locked);
+        super.setAppBarLocked(locked);
     }
 
     @Override
