@@ -26,8 +26,8 @@ public class EditDiffCommentActivity extends EditCommentActivity {
                 .putExtra("left_line", leftLine)
                 .putExtra("right_line", rightLine)
                 .putExtra("position", position);
-        return EditCommentActivity
-                .fillInIntent(intent, repoOwner, repoName, id, 0L, body, R.attr.colorIssueOpen);
+        return EditCommentActivity.fillInIntent(intent,
+                repoOwner, repoName, id, 0L, body, R.attr.colorIssueOpen);
     }
 
     @Override
