@@ -1,22 +1,16 @@
 package com.gh4a.adapter.timeline;
 
-import android.content.DialogInterface;
-import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.loader.TimelineItem;
-import com.gh4a.utils.UiUtils;
 
 class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Reply>
         implements View.OnClickListener {
 
     public interface Callback {
-        void reply(long replyToId, String text);
+        void reply(long replyToId);
     }
 
     private final Callback mCallback;
@@ -42,35 +36,7 @@ class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timelin
         if (v.getId() == R.id.btn_reply) {
             TimelineItem.TimelineComment timelineComment =
                     (TimelineItem.TimelineComment) v.getTag();
-
-            final long replyToId = timelineComment.comment.getId();
-
-            LayoutInflater inflater = LayoutInflater.from(v.getContext());
-            View commentDialog = inflater.inflate(R.layout.commit_comment_dialog, null);
-
-            final TextView code = (TextView) commentDialog.findViewById(R.id.line);
-            code.setVisibility(View.GONE);
-
-            final EditText body = (EditText) commentDialog.findViewById(R.id.body);
-
-            final DialogInterface.OnClickListener saveCb = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    String text = body.getText().toString();
-                    mCallback.reply(replyToId, text);
-                }
-            };
-
-            AlertDialog d = new AlertDialog.Builder(v.getContext())
-                    .setCancelable(true)
-                    .setTitle(R.string.reply_to_review_comments)
-                    .setView(commentDialog)
-                    .setPositiveButton(R.string.reply, saveCb)
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
-
-            body.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(
-                    body, d.getButton(DialogInterface.BUTTON_POSITIVE)));
+            mCallback.reply(timelineComment.comment.getId());
         }
     }
 }

@@ -66,6 +66,12 @@
         <activity android:name=".activities.EditPullRequestCommentActivity"
             android:theme="@style/BottomSheetLightTheme"
             android:exported="false" />
+        <activity android:name=".activities.EditDiffCommentActivity"
+            android:theme="@style/BottomSheetLightTheme"
+            android:exported="false" />
+        <activity android:name=".activities.EditPullRequestDiffCommentActivity"
+            android:theme="@style/BottomSheetLightTheme"
+            android:exported="false" />
         <activity android:name=".activities.FileViewerActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize" />

@@ -13,22 +13,26 @@ import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.EditorBottomSheet;
 
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
 
 import java.io.IOException;
 
 public abstract class EditCommentActivity extends AppCompatActivity implements
         EditorBottomSheet.Callback {
+
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
-            long id, String body, @AttrRes int highlightColorAttr) {
+            long id, long replyToId, String body, @AttrRes int highlightColorAttr) {
         return baseIntent.putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("id", id)
+                .putExtra("reply_to", replyToId)
                 .putExtra("body", body)
                 .putExtra("highlight_color_attr", highlightColorAttr);
     }
 
     private CoordinatorLayout mRootLayout;
+    protected EditorBottomSheet mEditorSheet;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -39,18 +43,17 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
         setContentView(R.layout.comment_editor);
 
         mRootLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-        EditorBottomSheet editorBottomSheet = (EditorBottomSheet) findViewById(R.id.bottom_sheet);
+        mEditorSheet = (EditorBottomSheet) findViewById(R.id.bottom_sheet);
 
-        ImageView saveButton = (ImageView) editorBottomSheet.findViewById(R.id.send_button);
+        ImageView saveButton = (ImageView) mEditorSheet.findViewById(R.id.send_button);
         saveButton.setImageResource(UiUtils.resolveDrawable(this, R.attr.saveIcon));
 
-        editorBottomSheet.setAdvancedMode(true);
-        editorBottomSheet.setCallback(this);
-        editorBottomSheet.setCommentText(getIntent().getStringExtra("body"), false);
+        mEditorSheet.setCallback(this);
+        mEditorSheet.setCommentText(getIntent().getStringExtra("body"), false);
 
         @AttrRes int highlightColorAttr = getIntent().getIntExtra("highlight_color_attr", 0);
         if (highlightColorAttr != 0) {
-            editorBottomSheet.setHighlightColor(highlightColorAttr);
+            mEditorSheet.setHighlightColor(highlightColorAttr);
         }
 
         setResult(RESULT_CANCELED);
@@ -62,10 +65,19 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSendCommentInBackground(String comment) throws IOException {
+    public void onSendCommentInBackground(String body) throws IOException {
         Bundle extras = getIntent().getExtras();
         RepositoryId repoId = new RepositoryId(extras.getString("owner"), extras.getString("repo"));
-        editComment(repoId, extras.getLong("id"), comment);
+        long id = extras.getLong("id", 0L);
+
+        CommitComment comment = new CommitComment();
+        comment.setId(id);
+        comment.setBody(body);
+        if (id == 0L) {
+            createComment(repoId, comment, extras.getLong("reply_to"));
+        } else {
+            editComment(repoId, comment);
+        }
     }
 
     @Override
@@ -84,5 +96,7 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
         return mRootLayout;
     }
 
-    protected abstract void editComment(RepositoryId repoId, long id, String body) throws IOException;
+    protected abstract void createComment(RepositoryId repoId,
+            CommitComment comment, long replyToCommentId) throws IOException;
+    protected abstract void editComment(RepositoryId repoId, CommitComment comment) throws IOException;
 }
