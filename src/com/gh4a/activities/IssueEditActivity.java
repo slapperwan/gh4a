@@ -512,8 +512,11 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         @Override
         protected void onSuccess(Issue result) {
-            mEditIssue = result;
-            setResult(RESULT_OK);
+            Intent data = new Intent();
+            Bundle extras = new Bundle();
+            extras.putSerializable("issue", result);
+            data.putExtras(extras);
+            setResult(RESULT_OK, data);
             finish();
         }
 

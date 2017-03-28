@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
@@ -52,6 +51,7 @@ import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.User;
@@ -78,6 +78,7 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     private static final int REQUEST_ISSUE_CREATE = 1001;
+    private static final int REQUEST_ISSUE_AFTER_CREATE = 1002;
 
     private String mRepoOwner;
     private String mRepoName;
@@ -97,16 +98,6 @@ public class IssueListActivity extends BasePagerActivity implements
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
-
-    private Handler mHandler = new Handler();
-    private Runnable mRefreshRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (mOpenFragment != null) {
-                mOpenFragment.onRefresh();
-            }
-        }
-    };
 
     private final IssueListFragment.SortDrawerHelper mSortHelper =
             new IssueListFragment.SortDrawerHelper();
@@ -232,7 +223,6 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mHandler.removeCallbacks(mRefreshRunnable);
     }
 
     @Override
@@ -241,7 +231,6 @@ public class IssueListActivity extends BasePagerActivity implements
         mMilestones = null;
         mLabels = null;
         mIsCollaborator = null;
-        mHandler.removeCallbacks(mRefreshRunnable);
         updateRightNavigationDrawer();
         forceLoaderReload(0, 1, 2, 3);
         super.onRefresh();
@@ -333,12 +322,16 @@ public class IssueListActivity extends BasePagerActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ISSUE_CREATE) {
-            if (resultCode == Activity.RESULT_OK) {
-                // delay refresh for a bit, as
-                // - the fragment might not be created yet
-                // - Github seems to need some time to reflect new issues in their response
-                mHandler.postDelayed(mRefreshRunnable, 500);
+            if (resultCode == Activity.RESULT_OK && data.hasExtra("issue")) {
+                Issue issue = (Issue) data.getSerializableExtra("issue");
+                Intent intent = IssueActivity.makeIntent(this, mRepoOwner, mRepoName,
+                        issue.getNumber());
+                startActivityForResult(intent, REQUEST_ISSUE_AFTER_CREATE);
             }
+        } else if (requestCode == REQUEST_ISSUE_AFTER_CREATE) {
+            // Refresh all fragments (instead of just open issues fragment) when coming back from
+            // newly created issue as there is a chance that it could be immediately closed
+            super.onRefresh();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
