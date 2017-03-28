@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Set;
 
 public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
-        CommitNoteAdapter.OnCommentAction<CommitComment>, EditorBottomSheet.Callback,
-        EditorBottomSheet.OnToggleAdvancedModeListener {
+        CommitNoteAdapter.OnCommentAction<CommitComment>,
+        EditorBottomSheet.Callback, EditorBottomSheet.Listener {
 
     public static CommitNoteFragment newInstance(String repoOwner, String repoName,
             String commitSha, RepositoryCommit commit,
@@ -103,7 +103,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
         mBottomSheet.setCallback(this);
         mBottomSheet.setResizingView(listContainer);
-        mBottomSheet.setOnToggleAdvancedModeListener(this);
+        mBottomSheet.setListener(this);
 
         if (!Gh4Application.get().isAuthorized()) {
             mBottomSheet.setVisibility(View.GONE);
@@ -162,8 +162,14 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void onToggleAdvancedMode(boolean advancedMode) {
-        getBaseActivity().setAppBarLockedInCollapsedState(advancedMode);
+        getBaseActivity().collapseAppBar();
+        getBaseActivity().setAppBarLocked(advancedMode);
         mBottomSheet.resetPeekHeight();
+    }
+
+    @Override
+    public void onScrollingInBasicEditor(boolean scrolling) {
+        getBaseActivity().setAppBarLocked(scrolling);
     }
 
     @Override

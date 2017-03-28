@@ -67,7 +67,7 @@ import java.util.Set;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
         View.OnClickListener, TimelineItemAdapter.OnCommentAction,
-        EditorBottomSheet.Callback, EditorBottomSheet.OnToggleAdvancedModeListener,
+        EditorBottomSheet.Callback, EditorBottomSheet.Listener,
         ReactionBar.Callback, ReactionBar.Item, ReactionBar.ReactionDetailsCache.Listener {
     protected static final int REQUEST_EDIT = 1000;
 
@@ -123,7 +123,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
         mBottomSheet.setCallback(this);
         mBottomSheet.setResizingView(listContainer);
-        mBottomSheet.setOnToggleAdvancedModeListener(this);
+        mBottomSheet.setListener(this);
 
         mImageGetter = new HttpImageGetter(inflater.getContext());
         updateCommentSectionVisibility(v);
@@ -529,8 +529,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public void onToggleAdvancedMode(boolean advancedMode) {
-        getBaseActivity().setAppBarLockedInCollapsedState(advancedMode);
+        getBaseActivity().collapseAppBar();
+        getBaseActivity().setAppBarLocked(advancedMode);
         mBottomSheet.resetPeekHeight();
+    }
+
+    @Override
+    public void onScrollingInBasicEditor(boolean scrolling) {
+        getBaseActivity().setAppBarLocked(scrolling);
     }
 
     protected abstract void bindSpecialViews(View headerView);

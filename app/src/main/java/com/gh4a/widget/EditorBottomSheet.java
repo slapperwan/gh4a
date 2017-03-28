@@ -52,8 +52,9 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         CoordinatorLayout getRootLayout();
     }
 
-    public interface OnToggleAdvancedModeListener {
+    public interface Listener {
         void onToggleAdvancedMode(boolean advancedMode);
+        void onScrollingInBasicEditor(boolean scrolling);
     }
 
     private TabLayout mTabs;
@@ -63,7 +64,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private CommentEditor mAdvancedEditor;
     private MarkdownButtonsBar mMarkdownButtons;
     private ImageView mAdvancedEditorToggle;
-    private OnToggleAdvancedModeListener mOnToggleAdvancedMode;
+    private Listener mListener;
     private NestedScrollView mBasicEditorScrollView;
     private ViewGroup mContainer;
 
@@ -136,6 +137,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mBasicEditor = (CommentEditor) view.findViewById(R.id.et_basic_editor);
         mBasicEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mBasicEditor, sendButton));
+        mBasicEditor.setOnTouchListener(this);
 
         mBasicEditorScrollView = (NestedScrollView) view.findViewById(R.id.basic_editor_scroll);
         mBasicEditorScrollView.setOnTouchListener(this);
@@ -161,8 +163,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mContainer.setVisibility(View.VISIBLE);
     }
 
-    public void setOnToggleAdvancedModeListener(OnToggleAdvancedModeListener listener) {
-        this.mOnToggleAdvancedMode = listener;
+    public void setListener(Listener listener) {
+        mListener = listener;
     }
 
     public void setCallback(Callback callback) {
@@ -204,14 +206,19 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
     @Override
     public boolean onTouch(View view, MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                getBehavior().setEnabled(false);
-                break;
-            case MotionEvent.ACTION_UP:
-                getBehavior().setEnabled(true);
-                break;
+        int action = event.getActionMasked();
+        if (action != MotionEvent.ACTION_DOWN && action != MotionEvent.ACTION_UP) {
+            return false;
         }
+
+        boolean down = action == MotionEvent.ACTION_DOWN;
+        if (view != mBasicEditor) {
+            getBehavior().setEnabled(!down);
+        }
+        if ((view == mBasicEditor || view == mBasicEditorScrollView) && mListener != null) {
+            mListener.onScrollingInBasicEditor(down);
+        }
+
         return false;
     }
 
@@ -336,8 +343,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mAdvancedEditorToggle.setImageResource(UiUtils.resolveDrawable(getContext(),
                 visible ? R.attr.collapseIcon : R.attr.expandIcon));
 
-        if (mOnToggleAdvancedMode != null) {
-            mOnToggleAdvancedMode.onToggleAdvancedMode(visible);
+        if (mListener != null) {
+            mListener.onToggleAdvancedMode(visible);
         }
     }
 

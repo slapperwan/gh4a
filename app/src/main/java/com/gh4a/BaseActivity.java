@@ -98,6 +98,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private View mRightDrawerHeader;
     private SupportMenuInflater mMenuInflater;
 
+    private boolean mAppBarLocked = false;
+    private boolean mAppBarScrollable = true;
+
     private ActivityCompat.OnRequestPermissionsResultCallback mPendingPermissionCb;
 
     private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
@@ -356,11 +359,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mHeader.removeOnOffsetChangedListener(l);
     }
 
-    public void setAppBarLockedInCollapsedState(boolean locked) {
-        if (locked) {
-            mHeader.setExpanded(false);
-        }
-        mHeaderBehavior.setEnabled(!locked);
+    public void collapseAppBar() {
+        mHeader.setExpanded(false);
+    }
+
+    public void setAppBarLocked(boolean locked) {
+        mAppBarLocked = locked;
+        updateAppBarEnabledState();
     }
 
     protected void addHeaderView(View view, boolean scrollable) {
@@ -372,7 +377,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected void setToolbarScrollable(boolean scrollable) {
         setAppBarChildScrollable(mToolbar, scrollable);
-        mHeaderBehavior.setEnabled(scrollable);
+        mAppBarScrollable = scrollable;
+        updateAppBarEnabledState();
+    }
+
+    private void updateAppBarEnabledState() {
+        mHeaderBehavior.setEnabled(mAppBarScrollable && !mAppBarLocked);
     }
 
     private void setAppBarChildScrollable(View view, boolean scrollable) {
