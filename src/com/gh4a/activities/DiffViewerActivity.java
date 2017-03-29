@@ -262,7 +262,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     long id = comment.getId();
                     mCommitComments.put(id, comment);
                     content.append("<div ").append("id=\"comment").append(id).append("\"");
-                    content.append(" class=\"comment\"");
+                    content.append(" class=\"comment");
+                    if (id == mInitialCommentId) {
+                        content.append(" highlighted");
+                    }
+                    content.append("\"");
                     if (authorized) {
                         String uri = String.format(Locale.US, COMMENT_EDIT_URI_FORMAT,
                                 i, leftDiffPosition, rightDiffPosition, id);
