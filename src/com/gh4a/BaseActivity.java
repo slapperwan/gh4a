@@ -444,6 +444,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return false;
     }
 
+    public void setRightDrawerLockedClosed(boolean locked) {
+        mDrawerLayout.setDrawerLockMode(
+                locked ? DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED,
+                Gravity.RIGHT);
+    }
+
     public void requestPermission(final String permission,
             ActivityCompat.OnRequestPermissionsResultCallback cb,
             int rationaleTextResId) {

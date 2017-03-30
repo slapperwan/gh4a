@@ -6,6 +6,7 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -58,6 +59,23 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
 
         mFastScroller = (RecyclerFastScroller) view.findViewById(R.id.fast_scroller);
         mFastScroller.attachRecyclerView(mRecyclerView);
+        mFastScroller.setOnHandleTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        getBaseActivity().setRightDrawerLockedClosed(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        getBaseActivity().setRightDrawerLockedClosed(false);
+                        break;
+                }
+
+                return false;
+            }
+        });
 
         return view;
     }
