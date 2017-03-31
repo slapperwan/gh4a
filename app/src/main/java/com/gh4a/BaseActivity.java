@@ -355,6 +355,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mHeader.addOnOffsetChangedListener(l);
     }
 
+    public int getAppBarTotalScrollRange() {
+        return mHeader.getTotalScrollRange();
+    }
+
     public void removeAppBarOffsetListener(AppBarLayout.OnOffsetChangedListener l) {
         mHeader.removeOnOffsetChangedListener(l);
     }
