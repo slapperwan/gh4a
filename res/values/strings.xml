@@ -14,6 +14,7 @@
     <string name="merging_msg">Merging\u2026</string>
     <string name="authenticating">Authenticating\u2026</string>
     <string name="search">Search</string>
+    <string name="search_code">Search code</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="try_again">Try again</string>

@@ -14,7 +14,7 @@
         android:icon="@drawable/social_share"
         app:showAsAction="never" />
     <item android:id="@+id/search"
-        android:title="@string/search"
+        android:title="@string/search_code"
         android:icon="@drawable/action_search"
         app:showAsAction="never"/>
     <item android:id="@+id/watch"
