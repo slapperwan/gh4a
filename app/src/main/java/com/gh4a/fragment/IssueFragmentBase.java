@@ -531,7 +531,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     public void onToggleAdvancedMode(boolean advancedMode) {
         getBaseActivity().collapseAppBar();
         getBaseActivity().setAppBarLocked(advancedMode);
-        mBottomSheet.resetPeekHeight();
+        mBottomSheet.resetPeekHeight(0);
     }
 
     @Override

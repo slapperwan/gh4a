@@ -148,7 +148,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             @Override
             public void run() {
                 getBehavior().setBottomSheetCallback(mBehaviorCallback);
-                resetPeekHeight();
+                resetPeekHeight(0);
 
                 if (!mIsCollapsible) {
                     setAdvancedMode(true);
@@ -252,8 +252,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                 && getBehavior().getPeekHeight() != getHeight();
     }
 
-    public void resetPeekHeight() {
-        mLatestOffset = 0;
+    public void resetPeekHeight(int totalScrollRange) {
+        mLatestOffset = totalScrollRange;
         updatePeekHeight(isInAdvancedMode());
     }
 
