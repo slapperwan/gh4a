@@ -59,6 +59,30 @@ public class BookmarksProvider extends ContentProvider {
         }
     }
 
+    public static void removeBookmark(Context context, String url) {
+        int removedRows = context.getContentResolver().delete(Columns.CONTENT_URI,
+                Columns.URI + " = ?",
+                new String[] { url });
+        if (removedRows > 0) {
+            Toast.makeText(context, R.string.bookmark_removed, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static boolean hasBookmarked(Context context, String url) {
+        Cursor cursor = context.getContentResolver().query(Columns.CONTENT_URI,
+                new String[] { Columns._ID },
+                Columns.URI + " = ?",
+                new String[] { url },
+                null);
+
+        boolean hasBookmarked = false;
+        if (cursor != null) {
+            hasBookmarked = cursor.getCount() > 0;
+            cursor.close();
+        }
+        return hasBookmarked;
+    }
+
     @Override
     public boolean onCreate() {
         mDbHelper = new DbHelper(getContext());

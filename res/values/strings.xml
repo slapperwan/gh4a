@@ -447,7 +447,9 @@
     <!-- Bookmarks -->
     <string name="remove">Remove</string>
     <string name="remove_bookmark_confirm">Do you really want to remove this bookmark?</string>
+    <string name="remove_bookmark">Remove bookmark</string>
     <string name="bookmark_saved">Bookmark saved</string>
+    <string name="bookmark_removed">Bookmark removed</string>
 
     <!-- Search -->
     <string name="search_type">Search type</string>

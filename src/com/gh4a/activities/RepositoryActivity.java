@@ -220,6 +220,12 @@ public class RepositoryActivity extends BasePagerActivity {
         return mRepository.getDefaultBranch();
     }
 
+    private String getBookmarkUrl() {
+        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName;
+        String ref = getCurrentRef();
+        return ref.equals(mRepository.getDefaultBranch()) ? url : url + "/tree/" + ref;
+    }
+
     @Override
     protected int[] getTabTitleResIds() {
         return mRepository != null ? TITLES : null;
@@ -349,6 +355,13 @@ public class RepositoryActivity extends BasePagerActivity {
             menu.removeItem(R.id.ref);
             menu.removeItem(R.id.bookmark);
             menu.removeItem(R.id.zip_download);
+        } else {
+            MenuItem bookmarkAction = menu.findItem(R.id.bookmark);
+            if (bookmarkAction != null) {
+                bookmarkAction.setTitle(BookmarksProvider.hasBookmarked(this, getBookmarkUrl())
+                        ? R.string.remove_bookmark
+                        : R.string.bookmark_repo);
+            }
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -395,11 +408,13 @@ public class RepositoryActivity extends BasePagerActivity {
                         initialSearch, SearchActivity.SEARCH_TYPE_CODE));
                 return true;
             case R.id.bookmark:
-                String ref = getCurrentRef();
-                String bookmarkUrl = ref.equals(mRepository.getDefaultBranch())
-                        ? url : url + "/tree/" + ref;
-                BookmarksProvider.saveBookmark(this, mActionBar.getTitle().toString(),
-                        BookmarksProvider.Columns.TYPE_REPO, bookmarkUrl, ref);
+                String bookmarkUrl = getBookmarkUrl();
+                if (BookmarksProvider.hasBookmarked(this, bookmarkUrl)) {
+                    BookmarksProvider.removeBookmark(this, bookmarkUrl);
+                } else {
+                    BookmarksProvider.saveBookmark(this, mActionBar.getTitle().toString(),
+                            BookmarksProvider.Columns.TYPE_REPO, bookmarkUrl, getCurrentRef());
+                }
                 return true;
             case R.id.zip_download:
                 String zipUrl = url + "/archive/" + getCurrentRef() + ".zip";
