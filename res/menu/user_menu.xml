@@ -7,6 +7,9 @@
     <item android:id="@+id/share"
         android:title="@string/share"
         app:showAsAction="never" />
+    <item android:id="@+id/browser"
+        android:title="@string/open_in_browser"
+        app:showAsAction="never" />
     <item android:id="@+id/bookmark"
         android:title="@string/bookmark_user"
         app:showAsAction="never" />

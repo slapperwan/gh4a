@@ -3,6 +3,7 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
@@ -39,6 +40,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Repository;
@@ -388,6 +390,9 @@ public class RepositoryActivity extends BasePagerActivity {
                 shareIntent.putExtra(Intent.EXTRA_TEXT,  url);
                 shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
                 startActivity(shareIntent);
+                return true;
+            case R.id.browser:
+                IntentUtils.launchBrowser(this, Uri.parse(url));
                 return true;
             case R.id.search:
                 String initialSearch = "repo:" + mRepoOwner + "/" + mRepoName + " ";
