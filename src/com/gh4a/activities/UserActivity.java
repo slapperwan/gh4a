@@ -146,6 +146,14 @@ public class UserActivity extends BasePagerActivity {
             }
         }
 
+        MenuItem bookmarkAction = menu.findItem(R.id.bookmark);
+        if (bookmarkAction != null) {
+            String url = "https://github.com/" + mUserLogin;
+            bookmarkAction.setTitle(BookmarksProvider.hasBookmarked(this, url)
+                    ? R.string.remove_bookmark
+                    : R.string.bookmark_user);
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -177,8 +185,12 @@ public class UserActivity extends BasePagerActivity {
                 IntentUtils.launchBrowser(this, Uri.parse(url));
                 return true;
             case R.id.bookmark:
-                BookmarksProvider.saveBookmark(this, mUserLogin,
-                        BookmarksProvider.Columns.TYPE_USER, url, mUserName);
+                if (BookmarksProvider.hasBookmarked(this, url)) {
+                    BookmarksProvider.removeBookmark(this, url);
+                } else {
+                    BookmarksProvider.saveBookmark(this, mUserLogin,
+                            BookmarksProvider.Columns.TYPE_USER, url, mUserName);
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
