@@ -82,6 +82,15 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 tools:text="list of people" />
 
+            <LinearLayout
+                android:id="@+id/assignee_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/tv_assignee_label"
+                android:layout_toRightOf="@id/iv_assignee"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
         </RelativeLayout>
 
         <RelativeLayout
