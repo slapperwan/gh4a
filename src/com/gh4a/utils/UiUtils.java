@@ -23,6 +23,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.view.ActionMode;
@@ -43,10 +44,14 @@ import android.widget.Toast;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.widget.IssueLabelSpan;
+
+import org.eclipse.egit.github.core.Label;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class UiUtils {
     public static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
@@ -441,5 +446,17 @@ public class UiUtils {
         public CharSequence terminateToken(CharSequence text) {
             return text;
         }
+    }
+
+    @NonNull
+    public static SpannableStringBuilder createLabelsString(Context context, List<Label> labels) {
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        for (Label label : labels) {
+            int pos = builder.length();
+            IssueLabelSpan span = new IssueLabelSpan(context, label, true);
+            builder.append(label.getName());
+            builder.setSpan(span, pos, pos + label.getName().length(), 0);
+        }
+        return builder;
     }
 }
