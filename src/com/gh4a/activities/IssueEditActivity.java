@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
@@ -46,6 +47,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Issue;
@@ -89,6 +91,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
     private EditText mDescView;
     private TextView mTvSelectedMilestone;
     private TextView mTvSelectedAssignee;
+    private ViewGroup mSelectedAssigneeContainer;
     private TextView mTvLabels;
 
     private View mMilestoneContainer;
@@ -202,6 +205,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         mTvSelectedMilestone = (TextView) findViewById(R.id.tv_milestone);
         mTvSelectedAssignee = (TextView) findViewById(R.id.tv_assignee);
+        mSelectedAssigneeContainer = (ViewGroup) findViewById(R.id.assignee_list);
         mTvLabels = (TextView) findViewById(R.id.tv_labels);
 
         mMilestoneContainer = findViewById(R.id.milestone_container);
@@ -538,18 +542,29 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
 
         List<User> assignees = mEditIssue.getAssignees();
         if (assignees != null && !assignees.isEmpty()) {
-            StringBuilder assigneeText = new StringBuilder();
-            for (int i = 0; i < assignees.size(); i++) {
-                if (i != 0) {
-                    assigneeText.append(", ");
-                }
-                assigneeText.append(ApiHelpers.getUserLogin(this, assignees.get(i)));
+            LayoutInflater inflater = getLayoutInflater();
+            mSelectedAssigneeContainer.removeAllViews();
+            for (User assignee : assignees) {
+                View row = inflater.inflate(R.layout.row_assignee, mSelectedAssigneeContainer, false);
+                TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
+                tvAssignee.setText(ApiHelpers.getUserLogin(this, assignee));
+
+                ImageView ivAssignee = (ImageView) row.findViewById(R.id.iv_assignee);
+                AvatarHandler.assignAvatar(ivAssignee, assignee);
+
+                mSelectedAssigneeContainer.addView(row);
             }
-            mTvSelectedAssignee.setText(assigneeText);
+
+            mTvSelectedAssignee.setVisibility(View.GONE);
+            mSelectedAssigneeContainer.setVisibility(View.VISIBLE);
         } else if (!mIsCollaborator && !isInEditMode()) {
             mTvSelectedAssignee.setText(R.string.issue_assignee_collab_only);
+            mTvSelectedAssignee.setVisibility(View.VISIBLE);
+            mSelectedAssigneeContainer.setVisibility(View.GONE);
         } else {
             mTvSelectedAssignee.setText(R.string.issue_clear_assignee);
+            mTvSelectedAssignee.setVisibility(View.VISIBLE);
+            mSelectedAssigneeContainer.setVisibility(View.GONE);
         }
 
         List<Label> labels = mEditIssue.getLabels();
