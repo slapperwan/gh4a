@@ -153,13 +153,6 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         return getIntent().hasExtra("milestone");
     }
 
-    private void openIssueMilestones() {
-        Intent intent = IssueMilestoneListActivity.makeIntent(this,
-                mRepoOwner, mRepoName, mFromPullRequest);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-    }
-
     @Override
     protected boolean canSwipeToRefresh() {
         // swipe-to-refresh doesn't make much sense in the
@@ -306,7 +299,8 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
         @Override
         protected void onSuccess(Void result) {
-            openIssueMilestones();
+            setResult(RESULT_OK);
+            finish();
         }
 
         @Override
@@ -339,7 +333,8 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
 
         @Override
         protected void onSuccess(Void result) {
-            openIssueMilestones();
+            setResult(RESULT_OK);
+            finish();
         }
 
         @Override
@@ -377,6 +372,7 @@ public class IssueMilestoneEditActivity extends BaseActivity implements View.OnC
         @Override
         protected void onSuccess(Void result) {
             supportInvalidateOptionsMenu();
+            setResult(RESULT_OK);
         }
 
         @Override
