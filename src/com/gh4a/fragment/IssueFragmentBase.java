@@ -24,7 +24,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,7 +36,6 @@ import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
-import com.gh4a.activities.EditCommentActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -47,7 +45,6 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.IssueLabelSpan;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
@@ -331,15 +328,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         View labelGroup = mListHeaderView.findViewById(R.id.label_container);
         if (labels != null && !labels.isEmpty()) {
             TextView labelView = (TextView) mListHeaderView.findViewById(R.id.labels);
-            SpannableStringBuilder builder = new SpannableStringBuilder();
-
-            for (Label label : labels) {
-                int pos = builder.length();
-                IssueLabelSpan span = new IssueLabelSpan(getActivity(), label, true);
-                builder.append(label.getName());
-                builder.setSpan(span, pos, pos + label.getName().length(), 0);
-            }
-            labelView.setText(builder);
+            labelView.setText(UiUtils.createLabelsString(getActivity(), labels));
             labelGroup.setVisibility(View.VISIBLE);
         } else {
             labelGroup.setVisibility(View.GONE);
