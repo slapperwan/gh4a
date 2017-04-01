@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.SettingsActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.fragment.RepositoryListContainerFragment;
@@ -39,6 +38,7 @@ public class HomeActivity extends BasePagerActivity implements
     private String mUserLogin;
     private User mUserInfo;
     private int mSelectedFactoryId;
+    private View mLeftDrawerTitleView;
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
 
@@ -144,8 +144,11 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     protected View getLeftDrawerTitle(ViewGroup container) {
         View view = getLayoutInflater().inflate(R.layout.drawer_title_home, container, false);
+
+        mLeftDrawerTitleView = view.findViewById(R.id.left_drawer_title);
+        mLeftDrawerTitleView.setOnClickListener(this);
+
         mAvatarView = (ImageView) view.findViewById(R.id.avatar);
-        mAvatarView.setOnClickListener(this);
         updateUserInfo();
 
         TextView nameView = (TextView) view.findViewById(R.id.user_name);
@@ -343,7 +346,7 @@ public class HomeActivity extends BasePagerActivity implements
             return;
         }
         if (mAvatarView != null) {
-            mAvatarView.setTag(mUserInfo);
+            mLeftDrawerTitleView.setTag(mUserInfo);
             AvatarHandler.assignAvatar(mAvatarView, mUserInfo);
         }
         mFactory.setUserInfo(mUserInfo);
