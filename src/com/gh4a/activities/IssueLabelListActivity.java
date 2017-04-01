@@ -310,6 +310,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         @Override
         protected void onSuccess(Void result) {
             forceLoaderReload(0);
+            setResult(RESULT_OK);
         }
 
         @Override
@@ -352,6 +353,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         @Override
         protected void onSuccess(Void result) {
             forceLoaderReload(0);
+            setResult(RESULT_OK);
         }
 
         @Override
@@ -392,6 +394,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         protected void onSuccess(Void result) {
             forceLoaderReload(0);
             mAddedLabel = null;
+            setResult(RESULT_OK);
         }
 
         @Override

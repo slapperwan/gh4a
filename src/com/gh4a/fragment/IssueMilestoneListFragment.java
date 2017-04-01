@@ -15,6 +15,8 @@
  */
 package com.gh4a.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
@@ -52,6 +54,8 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         return f;
     }
 
+    private static final int REQUEST_EDIT_MILESTONE = 2000;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,13 +82,26 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
     @Override
     public void onItemClick(Milestone milestone) {
-        startActivity(IssueMilestoneEditActivity.makeEditIntent(
-                getActivity(), mRepoOwner, mRepoName, milestone, mFromPullRequest));
+        startActivityForResult(IssueMilestoneEditActivity.makeEditIntent(
+                getActivity(), mRepoOwner, mRepoName, milestone, mFromPullRequest),
+                REQUEST_EDIT_MILESTONE);
     }
 
     @Override
     public Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
         return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName,
                 mShowClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_EDIT_MILESTONE) {
+            if (resultCode == Activity.RESULT_OK) {
+                onRefresh();
+                getActivity().setResult(Activity.RESULT_OK);
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 }

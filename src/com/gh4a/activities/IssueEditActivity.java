@@ -76,6 +76,9 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                 .putExtra("issue", issue);
     }
 
+    private static final int REQUEST_MANAGE_LABELS = 1000;
+    private static final int REQUEST_MANAGE_MILESTONES = 1001;
+
     private String mRepoOwner;
     private String mRepoName;
 
@@ -324,6 +327,23 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         return IssueActivity.makeIntent(this, mRepoOwner, mRepoName, mEditIssue.getNumber());
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_MANAGE_LABELS) {
+            if (resultCode == RESULT_OK) {
+                // Require reload of labels
+                mAllLabels = null;
+            }
+        } else if (requestCode == REQUEST_MANAGE_MILESTONES) {
+            if (resultCode == RESULT_OK) {
+                // Require reload of milestones
+                mAllMilestone = null;
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
     private void showMilestonesDialog() {
         if (mAllMilestone == null) {
             getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
@@ -359,6 +379,16 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                     .setTitle(R.string.issue_milestone_hint)
                     .setSingleChoiceItems(milestones, selected, selectCb)
                     .setNegativeButton(R.string.cancel, null)
+                    .setNeutralButton(R.string.issue_manage_milestones,
+                            new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = IssueMilestoneListActivity.makeIntent(
+                                    IssueEditActivity.this, mRepoOwner, mRepoName,
+                                    mEditIssue.getPullRequest() != null);
+                            startActivityForResult(intent, REQUEST_MANAGE_MILESTONES);
+                        }
+                    })
                     .show();
         }
     }
@@ -461,6 +491,16 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
                         public void onClick(DialogInterface dialog, int which) {
                             mEditIssue.setLabels(selectedLabels);
                             updateLabels();
+                        }
+                    })
+                    .setNeutralButton(R.string.issue_manage_labels,
+                            new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = IssueLabelListActivity.makeIntent(
+                                    IssueEditActivity.this, mRepoOwner, mRepoName,
+                                    mEditIssue.getPullRequest() != null);
+                            startActivityForResult(intent, REQUEST_MANAGE_LABELS);
                         }
                     })
                     .show();
