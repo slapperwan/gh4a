@@ -449,7 +449,7 @@ public class UiUtils {
     }
 
     @NonNull
-    public static SpannableStringBuilder createLabelsString(Context context, List<Label> labels) {
+    public static SpannableStringBuilder formatLabelList(Context context, List<Label> labels) {
         SpannableStringBuilder builder = new SpannableStringBuilder();
         for (Label label : labels) {
             int pos = builder.length();

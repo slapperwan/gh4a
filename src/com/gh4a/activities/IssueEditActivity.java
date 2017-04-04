@@ -573,7 +573,7 @@ public class IssueEditActivity extends BaseActivity implements View.OnClickListe
         } else if (labels == null || labels.isEmpty()) {
             mTvLabels.setText(R.string.issue_no_labels);
         } else {
-            mTvLabels.setText(UiUtils.createLabelsString(this, labels));
+            mTvLabels.setText(UiUtils.formatLabelList(this, labels));
         }
     }
 
