@@ -328,7 +328,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         View labelGroup = mListHeaderView.findViewById(R.id.label_container);
         if (labels != null && !labels.isEmpty()) {
             TextView labelView = (TextView) mListHeaderView.findViewById(R.id.labels);
-            labelView.setText(UiUtils.createLabelsString(getActivity(), labels));
+            labelView.setText(UiUtils.formatLabelList(getActivity(), labels));
             labelGroup.setVisibility(View.VISIBLE);
         } else {
             labelGroup.setVisibility(View.GONE);
