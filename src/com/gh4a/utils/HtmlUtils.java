@@ -589,8 +589,12 @@ public class HtmlUtils {
         }
 
         private void startLi(Editable text, Attributes attributes) {
+            ListItem item = new ListItem(getLast(text, List.class), attributes);
             startBlockElement(text, attributes, 1);
-            start(text, new ListItem(getLast(text, List.class), attributes));
+            start(text, item);
+            if (item.mOrdered) {
+                text.insert(text.length(), "" + item.mPosition + ". ");
+            }
             startCssStyle(text, attributes);
         }
 
@@ -600,9 +604,7 @@ public class HtmlUtils {
             ListItem item = getLast(text, ListItem.class);
             if (item != null) {
                 if (item.mOrdered) {
-                    int where = text.getSpanStart(item);
                     text.removeSpan(item);
-                    text.insert(where, "" + item.mPosition + ". ");
                 } else {
                     setSpanFromMark(text, item, new BulletSpan(mBulletMargin));
                 }
