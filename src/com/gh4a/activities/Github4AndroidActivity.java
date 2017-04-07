@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -75,7 +76,9 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
 
         Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
-            goToToplevelActivity();
+            if (!handleIntent(getIntent())) {
+                goToToplevelActivity();
+            }
             finish();
         } else {
             setContentView(R.layout.main);
@@ -190,8 +193,8 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         triggerLogin();
     }
 
-    private void triggerLogin() {
-        String pkg = CustomTabsHelper.getPackageNameToUse(Github4AndroidActivity.this);
+    public static void launchLogin(Context context) {
+        String pkg = CustomTabsHelper.getPackageNameToUse(context);
         Uri uri = Uri.parse(OAUTH_URL)
                 .buildUpon()
                 .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
@@ -199,18 +202,20 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                 .appendQueryParameter(PARAM_CALLBACK_URI, CALLBACK_URI.toString())
                 .build();
         if (pkg != null) {
-            int color = UiUtils.resolveColor(Github4AndroidActivity.this, R.attr.colorPrimary);
+            int color = UiUtils.resolveColor(context, R.attr.colorPrimary);
             CustomTabsIntent i = new CustomTabsIntent.Builder()
                     .setToolbarColor(color)
                     .build();
             i.intent.setPackage(pkg);
             i.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.launchUrl(Github4AndroidActivity.this, uri);
+            i.launchUrl(context, uri);
         } else {
-            IntentUtils.launchBrowser(Github4AndroidActivity.this,
-                    uri, Intent.FLAG_ACTIVITY_NEW_TASK);
+            IntentUtils.launchBrowser(context, uri, Intent.FLAG_ACTIVITY_NEW_TASK);
         }
+    }
 
+    private void triggerLogin() {
+        launchLogin(this);
         mContent.setVisibility(View.GONE);
         mProgress.setVisibility(View.VISIBLE);
     }

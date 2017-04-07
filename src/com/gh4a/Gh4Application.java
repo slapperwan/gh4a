@@ -206,8 +206,20 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return mPt;
     }
 
+    public void setActiveLogin(String login) {
+        if (getAuthLogins().contains(login)) {
+            getPrefs().edit()
+                    .putString(KEY_ACTIVE_LOGIN, login)
+                    .apply();
+        }
+    }
+
     public String getAuthLogin() {
         return getPrefs().getString(KEY_ACTIVE_LOGIN, null);
+    }
+
+    public Set<String> getAuthLogins() {
+        return getPrefs().getStringSet(KEY_ALL_LOGINS, null);
     }
 
     public String getAuthToken() {

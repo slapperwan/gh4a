@@ -76,4 +76,13 @@
             android:title="@string/logout"
             android:icon="@drawable/logout" />
     </group>
+    <group android:id="@+id/other_accounts"
+           android:checkableBehavior="none"
+           android:visible="false">
+        <item
+            android:id="@+id/add_account"
+            android:title="@string/add_account"
+            android:icon="@drawable/icon_add"
+            android:orderInCategory="9999" />
+    </group>
 </menu>

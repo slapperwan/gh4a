@@ -11,14 +11,13 @@ import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.SearchActivity;
+import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SettingsActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.fragment.RepositoryListContainerFragment;
@@ -26,6 +25,7 @@ import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.UserLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 
 import org.eclipse.egit.github.core.User;
@@ -45,6 +45,8 @@ public class HomeActivity extends BasePagerActivity implements
     private Menu mLeftDrawerMenu;
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
+
+    private static final int OTHER_ACCOUNTS_GROUP_BASE_ID = 1000;
 
     private static final SparseArray<String> START_PAGE_MAPPING = new SparseArray<>();
     static {
@@ -148,10 +150,10 @@ public class HomeActivity extends BasePagerActivity implements
         mAvatarView = (ImageView) header.findViewById(R.id.avatar);
         mUserExtraView = (TextView) header.findViewById(R.id.user_extra);
 
-        updateUserInfo();
+        TextView userNameView = (TextView) header.findViewById(R.id.user_name);
+        userNameView.setText(mUserLogin);
 
-        TextView nameView = (TextView) header.findViewById(R.id.user_name);
-        nameView.setText(mUserLogin);
+        updateUserInfo();
 
         mDrawerSwitcher = (ImageView) header.findViewById(R.id.switcher);
         mDrawerSwitcher.setVisibility(View.VISIBLE);
@@ -186,12 +188,30 @@ public class HomeActivity extends BasePagerActivity implements
                 goToToplevelActivity();
                 finish();
                 return true;
+            case R.id.add_account:
+                Github4AndroidActivity.launchLogin(this);
+                return true;
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
         }
 
+        int accountCount = Gh4Application.get().getAuthLogins().size();
+        if (id >= OTHER_ACCOUNTS_GROUP_BASE_ID && id < OTHER_ACCOUNTS_GROUP_BASE_ID + accountCount) {
+            switchActiveUser(item.getTitle().toString());
+            return true;
+        }
+
         return false;
+    }
+
+    private void switchActiveUser(String login) {
+        Gh4Application.get().setActiveLogin(login);
+        mUserLogin = login;
+        onRefresh();
+        closeDrawers();
+        switchTo(mSelectedFactoryId, getFactoryForItem(mSelectedFactoryId));
+        recreate();
     }
 
     private FragmentFactory getFactoryForItem(int id) {
@@ -376,6 +396,28 @@ public class HomeActivity extends BasePagerActivity implements
         mLeftDrawerMenu.setGroupVisible(R.id.explore, !accountMode);
         mLeftDrawerMenu.setGroupVisible(R.id.settings, !accountMode);
         mLeftDrawerMenu.setGroupVisible(R.id.account, accountMode);
+        mLeftDrawerMenu.setGroupVisible(R.id.other_accounts, accountMode);
+
+        if (accountMode) {
+            // repopulate other account list
+            for (int i = 0; ; i++) {
+                MenuItem item = mLeftDrawerMenu.findItem(OTHER_ACCOUNTS_GROUP_BASE_ID + i);
+                if (item == null) {
+                    break;
+                }
+                mLeftDrawerMenu.removeItem(item.getItemId());
+            }
+
+            int id = OTHER_ACCOUNTS_GROUP_BASE_ID;
+            for (String login: Gh4Application.get().getAuthLogins()) {
+                if (ApiHelpers.loginEquals(mUserLogin, login)) {
+                    continue;
+                }
+
+                mLeftDrawerMenu.add(R.id.other_accounts, id++, Menu.NONE, login);
+                // XXX set icon
+            }
+        }
 
         mDrawerSwitcher.setImageResource(accountMode
                 ? R.drawable.drop_up_arrow : R.drawable.drop_down_arrow);
