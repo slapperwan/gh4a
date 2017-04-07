@@ -36,9 +36,13 @@ public class HomeActivity extends BasePagerActivity implements
 
     private FragmentFactory mFactory;
     private ImageView mAvatarView;
+    private TextView mUserExtraView;
+    private ImageView mDrawerSwitcher;
     private String mUserLogin;
     private User mUserInfo;
     private int mSelectedFactoryId;
+    private boolean mDrawerInAccountMode;
+    private Menu mLeftDrawerMenu;
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
 
@@ -107,12 +111,7 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     public void onClick(View view) {
-        User user = (User) view.getTag();
-        Intent intent = UserActivity.makeIntent(this, user);
-        if (intent != null) {
-            closeDrawers();
-            startActivity(intent);
-        }
+        updateDrawerMode(!mDrawerInAccountMode);
     }
 
     @Override
@@ -122,6 +121,7 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     protected int getInitialLeftDrawerSelection(Menu menu) {
+        mLeftDrawerMenu = menu;
         return mSelectedFactoryId;
     }
 
@@ -142,16 +142,22 @@ public class HomeActivity extends BasePagerActivity implements
     }
 
     @Override
-    protected View getLeftDrawerTitle(ViewGroup container) {
-        View view = getLayoutInflater().inflate(R.layout.drawer_title_home, container, false);
-        mAvatarView = (ImageView) view.findViewById(R.id.avatar);
-        mAvatarView.setOnClickListener(this);
+    protected void configureLeftDrawerHeader(View header) {
+        super.configureLeftDrawerHeader(header);
+
+        mAvatarView = (ImageView) header.findViewById(R.id.avatar);
+        mUserExtraView = (TextView) header.findViewById(R.id.user_extra);
+
         updateUserInfo();
 
-        TextView nameView = (TextView) view.findViewById(R.id.user_name);
+        TextView nameView = (TextView) header.findViewById(R.id.user_name);
         nameView.setText(mUserLogin);
 
-        return view;
+        mDrawerSwitcher = (ImageView) header.findViewById(R.id.switcher);
+        mDrawerSwitcher.setVisibility(View.VISIBLE);
+
+        mDrawerSwitcher.setOnClickListener(this);
+        header.setOnClickListener(this);
     }
 
     @Override
@@ -171,6 +177,15 @@ public class HomeActivity extends BasePagerActivity implements
         }
 
         switch (id) {
+            case R.id.profile:
+                startActivity(UserActivity.makeIntent(this, mUserLogin));
+                updateDrawerMode(false);
+                return true;
+            case R.id.logout:
+                Gh4Application.get().logout();
+                goToToplevelActivity();
+                finish();
+                return true;
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
                 return true;
@@ -251,8 +266,7 @@ public class HomeActivity extends BasePagerActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SETTINGS) {
-            if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)
-                    || data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_AUTH_CHANGED, false)) {
+            if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)) {
                 goToToplevelActivity();
                 finish();
             }
@@ -343,10 +357,29 @@ public class HomeActivity extends BasePagerActivity implements
             return;
         }
         if (mAvatarView != null) {
-            mAvatarView.setTag(mUserInfo);
             AvatarHandler.assignAvatar(mAvatarView, mUserInfo);
         }
+        if (mUserExtraView != null) {
+            if (TextUtils.isEmpty(mUserInfo.getName())) {
+                mUserExtraView.setVisibility(View.GONE);
+            } else {
+                mUserExtraView.setText(mUserInfo.getName());
+                mUserExtraView.setVisibility(View.VISIBLE);
+            }
+        }
         mFactory.setUserInfo(mUserInfo);
+    }
+
+    private void updateDrawerMode(boolean accountMode) {
+        mLeftDrawerMenu.setGroupVisible(R.id.my_items, !accountMode);
+        mLeftDrawerMenu.setGroupVisible(R.id.navigation, !accountMode);
+        mLeftDrawerMenu.setGroupVisible(R.id.explore, !accountMode);
+        mLeftDrawerMenu.setGroupVisible(R.id.settings, !accountMode);
+        mLeftDrawerMenu.setGroupVisible(R.id.account, accountMode);
+
+        mDrawerSwitcher.setImageResource(accountMode
+                ? R.drawable.drop_up_arrow : R.drawable.drop_down_arrow);
+        mDrawerInAccountMode = accountMode;
     }
 
     private void switchTo(int itemId, FragmentFactory factory) {

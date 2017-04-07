@@ -11,8 +11,6 @@ import com.gh4a.fragment.SettingsFragment;
 public class SettingsActivity extends BaseActivity implements
         SettingsFragment.OnStateChangeListener {
     public static final String RESULT_EXTRA_THEME_CHANGED = "theme_changed";
-    public static final String RESULT_EXTRA_AUTH_CHANGED = "auth_changed";
-
     private static final String STATE_KEY_RESULT = "result";
 
     private Intent mResultIntent;
@@ -55,10 +53,5 @@ public class SettingsActivity extends BaseActivity implements
     public void onThemeChanged() {
         mResultIntent.putExtra(RESULT_EXTRA_THEME_CHANGED, true);
         recreate();
-    }
-
-    @Override
-    public void onAuthStateChanged() {
-        mResultIntent.putExtra(RESULT_EXTRA_AUTH_CHANGED, true);
     }
 }

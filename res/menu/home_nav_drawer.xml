@@ -64,4 +64,16 @@
             android:title="@string/settings"
             android:icon="@drawable/icon_settings"/>
     </group>
+    <group android:id="@+id/account"
+           android:checkableBehavior="none"
+           android:visible="false">
+        <item
+            android:id="@+id/profile"
+            android:title="@string/my_profile"
+            android:icon="@drawable/profile" />
+        <item
+            android:id="@+id/logout"
+            android:title="@string/logout"
+            android:icon="@drawable/logout" />
+    </group>
 </menu>

@@ -34,10 +34,6 @@
         android:defaultValue="1" />
 
     <Preference
-        android:key="logout"
-        android:title="@string/logout" />
-
-    <Preference
         android:key="about"
         android:title="@string/about" />
 

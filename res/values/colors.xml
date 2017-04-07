@@ -43,4 +43,7 @@
 
     <color name="scrollbar_thumb_dark">#5dffffff</color>
     <color name="scrollbar_thumb_light">#5d000000</color>
+
+    <color name="nav_header_primary_text">#ffffffff</color>
+    <color name="nav_header_secondary_text">#b3ffffff</color>
 </resources>

@@ -26,7 +26,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
     public interface OnStateChangeListener {
         void onThemeChanged();
-        void onAuthStateChanged();
     }
 
     public static final String PREF_NAME = "Gh4a-pref";
@@ -35,13 +34,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     public static final String KEY_START_PAGE = "start_page";
     public static final String KEY_TEXT_SIZE = "webview_initial_zoom";
     public static final String KEY_GIF_LOADING = "http_gif_load_mode";
-    private static final String KEY_LOGOUT = "logout";
     private static final String KEY_ABOUT = "about";
     private static final String KEY_OPEN_SOURCE_COMPONENTS = "open_source_components";
 
     private OnStateChangeListener mListener;
     private IntegerListPreference mThemePref;
-    private Preference mLogoutPref;
     private Preference mAboutPref;
     private Preference mOpenSourcePref;
 
@@ -67,17 +64,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         mThemePref = (IntegerListPreference) findPreference(KEY_THEME);
         mThemePref.setOnPreferenceChangeListener(this);
 
-        mLogoutPref = findPreference(KEY_LOGOUT);
-        mLogoutPref.setOnPreferenceClickListener(this);
-
         mAboutPref = findPreference(KEY_ABOUT);
         mAboutPref.setOnPreferenceClickListener(this);
         mAboutPref.setSummary(getAppName());
 
         mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
         mOpenSourcePref.setOnPreferenceClickListener(this);
-
-        updateLogoutPrefState();
     }
 
     @Override
@@ -91,14 +83,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
     @Override
     public boolean onPreferenceClick(Preference pref) {
-        Gh4Application app = Gh4Application.get();
-        if (pref == mLogoutPref) {
-            app.logout();
-            updateLogoutPrefState();
-            mListener.onAuthStateChanged();
-            return true;
-        } else if (pref == mAboutPref) {
-            AboutDialog d = new AboutDialog(getActivity(), app.isAuthorized());
+        if (pref == mAboutPref) {
+            AboutDialog d = new AboutDialog(getActivity(), Gh4Application.get().isAuthorized());
             d.setTitle(getAppName());
             d.show();
             return true;
@@ -108,18 +94,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             return true;
         }
         return false;
-    }
-
-    private void updateLogoutPrefState() {
-        Gh4Application app = Gh4Application.get();
-        if (app.isAuthorized()) {
-            mLogoutPref.setEnabled(true);
-            mLogoutPref.setSummary(getString(R.string.logout_pref_summary_logged_in,
-                    app.getAuthLogin()));
-        } else {
-            mLogoutPref.setEnabled(false);
-            mLogoutPref.setSummary(R.string.logout_pref_summary_logged_out);
-        }
     }
 
     private String getAppName() {
