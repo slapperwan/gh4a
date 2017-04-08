@@ -70,6 +70,7 @@ public class HomeActivity extends BasePagerActivity implements
         }
         @Override
         protected void onResultReady(User result) {
+            Gh4Application.get().setCurrentAccountInfo(result);
             mUserInfo = result;
             updateUserInfo();
         }
@@ -196,7 +197,7 @@ public class HomeActivity extends BasePagerActivity implements
                 return true;
         }
 
-        int accountCount = Gh4Application.get().getAuthLogins().size();
+        int accountCount = Gh4Application.get().getAccounts().size();
         if (id >= OTHER_ACCOUNTS_GROUP_BASE_ID && id < OTHER_ACCOUNTS_GROUP_BASE_ID + accountCount) {
             switchActiveUser(item.getTitle().toString());
             return true;
@@ -410,13 +411,15 @@ public class HomeActivity extends BasePagerActivity implements
             }
 
             int id = OTHER_ACCOUNTS_GROUP_BASE_ID;
-            for (String login: Gh4Application.get().getAuthLogins()) {
+            SparseArray<String> accounts = Gh4Application.get().getAccounts();
+            for (int i = 0; i < accounts.size(); i++) {
+                String login = accounts.valueAt(i);
                 if (ApiHelpers.loginEquals(mUserLogin, login)) {
                     continue;
                 }
 
-                mLeftDrawerMenu.add(R.id.other_accounts, id++, Menu.NONE, login);
-                // XXX set icon
+                MenuItem item = mLeftDrawerMenu.add(R.id.other_accounts, id++, Menu.NONE, login);
+                AvatarHandler.assignAvatar(this, item, login, accounts.keyAt(i), null);
             }
         }
 

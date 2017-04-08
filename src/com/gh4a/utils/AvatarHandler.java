@@ -31,6 +31,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.LruCache;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 
 public class AvatarHandler {
@@ -44,7 +45,7 @@ public class AvatarHandler {
     private static class Request {
         int id;
         String url;
-        ArrayList<ImageView> views;
+        ArrayList<ViewDelegate> views;
     }
     private static final SparseArrayCompat<Request> sRequests = new SparseArrayCompat<>();
     private static int sMaxImageSizePx = -1;
@@ -77,7 +78,7 @@ public class AvatarHandler {
             if (request != null && bitmap != null) {
                 sCache.put(request.id, bitmap);
 
-                for (ImageView view : request.views) {
+                for (ViewDelegate view : request.views) {
                     applyAvatarToView(view, bitmap);
                 }
             }
@@ -95,6 +96,16 @@ public class AvatarHandler {
     }
 
     public static void assignAvatar(ImageView view, String userName, int userId, String url) {
+        assignAvatarInternal(new ImageViewDelegate(view), userName, userId, url);
+    }
+
+    public static void assignAvatar(Context context, MenuItem item,
+            String userName, int userId, String url) {
+        assignAvatarInternal(new MenuItemDelegate(context, item), userName, userId, url);
+    }
+
+    public static void assignAvatarInternal(ViewDelegate view,
+            String userName, int userId, String url) {
         removeOldRequest(view);
 
         if (sCache == null) {
@@ -106,7 +117,7 @@ public class AvatarHandler {
             return;
         }
 
-        view.setImageDrawable(new DefaultAvatarDrawable(view.getContext(), userName));
+        view.setDrawable(new DefaultAvatarDrawable(view.getContext(), userName));
         if (userId <= 0) {
             return;
         }
@@ -131,8 +142,7 @@ public class AvatarHandler {
             sWorkerThread.start();
             sWorkerHandler = new WorkerHandler(sWorkerThread.getLooper());
         }
-        Message msg = sWorkerHandler.obtainMessage(MSG_LOAD,
-                requestId, view.getWidth(), request.url);
+        Message msg = sWorkerHandler.obtainMessage(MSG_LOAD, requestId, 0, request.url);
         msg.sendToTarget();
     }
 
@@ -173,8 +183,9 @@ public class AvatarHandler {
                 .toString();
     }
 
-    private static void applyAvatarToView(ImageView view, Bitmap avatar) {
-        RoundedBitmapDrawable d = RoundedBitmapDrawableFactory.create(view.getResources(), avatar);
+    private static void applyAvatarToView(ViewDelegate view, Bitmap avatar) {
+        Resources res = view.getContext().getResources();
+        RoundedBitmapDrawable d = RoundedBitmapDrawableFactory.create(res, avatar);
         d.setCornerRadius(Math.max(avatar.getWidth() / 2, avatar.getHeight() / 2));
         d.setAntiAlias(true);
 
@@ -182,11 +193,10 @@ public class AvatarHandler {
         if (old instanceof DefaultAvatarDrawable) {
             TransitionDrawable transition = new TransitionDrawable(new Drawable[] { old, d });
             transition.setCrossFadeEnabled(true);
-            transition.startTransition(
-                    view.getResources().getInteger(android.R.integer.config_shortAnimTime));
-            view.setImageDrawable(transition);
+            transition.startTransition(res.getInteger(android.R.integer.config_shortAnimTime));
+            view.setDrawable(transition);
         } else {
-            view.setImageDrawable(d);
+            view.setDrawable(d);
         }
     }
 
@@ -201,7 +211,7 @@ public class AvatarHandler {
         return null;
     }
 
-    private static void removeOldRequest(ImageView view) {
+    private static void removeOldRequest(ViewDelegate view) {
         int count = sRequests.size();
         for (int i = 0; i < count; i++) {
             Request request = sRequests.valueAt(i);
@@ -352,6 +362,52 @@ public class AvatarHandler {
         @Override
         public int getOpacity() {
             return android.graphics.PixelFormat.OPAQUE;
+        }
+    }
+
+    private interface ViewDelegate {
+        Context getContext();
+        Drawable getDrawable();
+        void setDrawable(Drawable d);
+    }
+
+    private static class ImageViewDelegate implements ViewDelegate {
+        private ImageView mView;
+        public ImageViewDelegate(ImageView view) {
+            mView = view;
+        }
+        @Override
+        public Context getContext() {
+            return mView.getContext();
+        }
+        @Override
+        public Drawable getDrawable() {
+            return mView.getDrawable();
+        }
+        @Override
+        public void setDrawable(Drawable d) {
+            mView.setImageDrawable(d);
+        }
+    }
+
+    private static class MenuItemDelegate implements ViewDelegate {
+        private Context mContext;
+        private MenuItem mItem;
+        public MenuItemDelegate(Context context, MenuItem item) {
+            mContext = context;
+            mItem = item;
+        }
+        @Override
+        public Context getContext() {
+            return mContext;
+        }
+        @Override
+        public Drawable getDrawable() {
+            return mItem.getIcon();
+        }
+        @Override
+        public void setDrawable(Drawable d) {
+            mItem.setIcon(d);
         }
     }
 }

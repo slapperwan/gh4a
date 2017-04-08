@@ -23,10 +23,12 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.SparseArray;
 
 import com.crashlytics.android.Crashlytics;
 import com.gh4a.fragment.SettingsFragment;
 
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.CommitService;
@@ -91,6 +93,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     private static final String KEY_ACTIVE_LOGIN = "active_login";
     private static final String KEY_ALL_LOGINS = "logins";
     private static final String KEY_PREFIX_TOKEN = "token_";
+    private static final String KEY_PREFIX_USER_ID = "user_id_";
 
     private static final int MAX_TRACKED_URLS = 5;
     private static int sNextUrlTrackingPosition = 0;
@@ -207,7 +210,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     }
 
     public void setActiveLogin(String login) {
-        if (getAuthLogins().contains(login)) {
+        if (getPrefs().getStringSet(KEY_ALL_LOGINS, null).contains(login)) {
             getPrefs().edit()
                     .putString(KEY_ACTIVE_LOGIN, login)
                     .apply();
@@ -218,8 +221,15 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return getPrefs().getString(KEY_ACTIVE_LOGIN, null);
     }
 
-    public Set<String> getAuthLogins() {
-        return getPrefs().getStringSet(KEY_ALL_LOGINS, null);
+    public SparseArray<String> getAccounts() {
+        SparseArray<String> accounts = new SparseArray<>();
+        for (String login : getPrefs().getStringSet(KEY_ALL_LOGINS, null)) {
+            int id = getPrefs().getInt(KEY_PREFIX_USER_ID + login, -1);
+            if (id > 0) {
+                accounts.put(id, login);
+            }
+        }
+        return accounts;
     }
 
     public String getAuthToken() {
@@ -227,7 +237,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return login != null ? getPrefs().getString(KEY_PREFIX_TOKEN + login, null) : null;
     }
 
-    public void setLogin(String login, String token) {
+    public void addAccount(User user, String token) {
+        String login = user.getLogin();
         Set<String> logins = getPrefs().getStringSet(KEY_ALL_LOGINS, null);
         logins.add(login);
 
@@ -235,6 +246,13 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 .putString(KEY_ACTIVE_LOGIN, login)
                 .putStringSet(KEY_ALL_LOGINS, logins)
                 .putString(KEY_PREFIX_TOKEN + login, token)
+                .putInt(KEY_PREFIX_USER_ID + login, user.getId())
+                .apply();
+    }
+
+    public void setCurrentAccountInfo(User user) {
+        getPrefs().edit()
+                .putInt(KEY_PREFIX_USER_ID + user.getLogin(), user.getId())
                 .apply();
     }
 
@@ -251,6 +269,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 .putString(KEY_ACTIVE_LOGIN, logins.size() > 0 ? logins.iterator().next() : null)
                 .putStringSet(KEY_ALL_LOGINS, logins)
                 .remove(KEY_PREFIX_TOKEN + login)
+                .remove(KEY_PREFIX_USER_ID + login)
                 .apply();
     }
 

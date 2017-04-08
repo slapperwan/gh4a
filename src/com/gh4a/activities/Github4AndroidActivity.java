@@ -220,7 +220,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         mProgress.setVisibility(View.VISIBLE);
     }
 
-    private class FetchTokenTask extends BackgroundTask<Pair<String, String>> {
+    private class FetchTokenTask extends BackgroundTask<Pair<User, String>> {
         private Uri mUri;
         public FetchTokenTask(Uri uri) {
             super(Github4AndroidActivity.this);
@@ -228,7 +228,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         }
 
         @Override
-        protected Pair<String, String> run() throws Exception {
+        protected Pair<User, String> run() throws Exception {
             HttpURLConnection connection = null;
             CharArrayWriter writer = null;
 
@@ -261,7 +261,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                 UserService userService = new UserService(client);
                 User user = userService.getUser();
 
-                return Pair.create(user.getLogin(), token);
+                return Pair.create(user, token);
             } finally {
                 if (connection != null) {
                     connection.disconnect();
@@ -279,8 +279,8 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         }
 
         @Override
-        protected void onSuccess(Pair<String, String> result) {
-            Gh4Application.get().setLogin(result.first, result.second);
+        protected void onSuccess(Pair<User, String> result) {
+            Gh4Application.get().addAccount(result.first, result.second);
             goToToplevelActivity();
             finish();
         }
