@@ -31,7 +31,7 @@ public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdap
 
     @Override
     public void onBindViewHolder(ViewHolder holder, Contributor contributor) {
-        AvatarHandler.assignAvatar(holder.ivGravatar,
+        AvatarHandler.assignAvatar(holder.ivGravatar, contributor.getLogin(),
                 contributor.getId(), contributor.getAvatarUrl());
         holder.ivGravatar.setTag(contributor);
 

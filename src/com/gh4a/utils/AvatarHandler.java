@@ -12,12 +12,20 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.ColorInt;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.LruCache;
@@ -25,14 +33,11 @@ import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.gh4a.R;
-
 public class AvatarHandler {
     private static final String TAG = "GravatarHandler";
 
     private static final int MAX_CACHED_IMAGE_SIZE = 60; /* dp - maximum gravatar view size used */
 
-    private static Bitmap sDefaultAvatarBitmap;
     private static LruCache<Integer, Bitmap> sCache;
     private static int sNextRequestId = 1;
 
@@ -82,14 +87,14 @@ public class AvatarHandler {
 
     public static void assignAvatar(ImageView view, User user) {
         if (user == null) {
-            assignAvatar(view, 0, null);
+            assignAvatar(view, null, 0, null);
             return;
         }
 
-        assignAvatar(view, user.getId(), user.getAvatarUrl());
+        assignAvatar(view, user.getLogin(), user.getId(), user.getAvatarUrl());
     }
 
-    public static void assignAvatar(ImageView view, int userId, String url) {
+    public static void assignAvatar(ImageView view, String userName, int userId, String url) {
         removeOldRequest(view);
 
         if (sCache == null) {
@@ -101,7 +106,7 @@ public class AvatarHandler {
             return;
         }
 
-        applyAvatarToView(view, sDefaultAvatarBitmap);
+        view.setImageDrawable(new DefaultAvatarDrawable(view.getContext(), userName));
         if (userId <= 0) {
             return;
         }
@@ -156,7 +161,6 @@ public class AvatarHandler {
         };
 
         Resources res = context.getResources();
-        sDefaultAvatarBitmap = BitmapFactory.decodeResource(res, R.drawable.default_avatar);
         sMaxImageSizePx = Math.round(res.getDisplayMetrics().density * MAX_CACHED_IMAGE_SIZE);
     }
 
@@ -173,7 +177,17 @@ public class AvatarHandler {
         RoundedBitmapDrawable d = RoundedBitmapDrawableFactory.create(view.getResources(), avatar);
         d.setCornerRadius(Math.max(avatar.getWidth() / 2, avatar.getHeight() / 2));
         d.setAntiAlias(true);
-        view.setImageDrawable(d);
+
+        Drawable old = view.getDrawable();
+        if (old instanceof DefaultAvatarDrawable) {
+            TransitionDrawable transition = new TransitionDrawable(new Drawable[] { old, d });
+            transition.setCrossFadeEnabled(true);
+            transition.startTransition(
+                    view.getResources().getInteger(android.R.integer.config_shortAnimTime));
+            view.setImageDrawable(transition);
+        } else {
+            view.setImageDrawable(d);
+        }
     }
 
     private static Request getRequestForId(int id) {
@@ -275,6 +289,69 @@ public class AvatarHandler {
                     sHandler.obtainMessage(MSG_LOADED, msg.arg1, 0, bitmap).sendToTarget();
                     break;
             }
+        }
+    }
+
+    public static class DefaultAvatarDrawable extends Drawable {
+        private static final @ColorInt int[] COLOR_PALETTE = {
+            0xffdb4437, 0xffe91e63, 0xff9c27b0, 0xff673ab7,
+            0xff3f51b5, 0xff4285f4, 0xff039be5, 0xff0097a7,
+            0xff009688, 0xff0f9d58, 0xff689f38, 0xffef6c00,
+            0xffff5722, 0xff757575
+        };
+        private static final float LETTER_TO_TILE_RATIO = 0.67f;
+
+        private final Paint mPaint;
+        private final @ColorInt int mColor;
+        private final char[] mLetter = new char[1];
+        private static final Rect sRect = new Rect();
+
+        public DefaultAvatarDrawable(Context context, String userName) {
+            mPaint = new Paint();
+            mPaint.setTypeface(TypefaceCache.getTypeface(context, TypefaceCache.TF_MEDIUM));
+            mPaint.setTextAlign(Paint.Align.CENTER);
+            mPaint.setAntiAlias(true);
+
+            mLetter[0] = userName.length() > 0 ? Character.toUpperCase(userName.charAt(0)) : '?';
+
+            final int colorIndex = Math.abs(userName.hashCode()) % COLOR_PALETTE.length;
+            mColor = COLOR_PALETTE[colorIndex];
+        }
+
+        @Override
+        public void draw(final Canvas canvas) {
+            final Rect bounds = getBounds();
+            if (!isVisible() || bounds.isEmpty()) {
+                return;
+            }
+
+            mPaint.setColor(mColor);
+
+            final int minDimension = Math.min(bounds.width(), bounds.height());
+            canvas.drawCircle(bounds.centerX(), bounds.centerY(), minDimension / 2, mPaint);
+
+            mPaint.setTextSize(LETTER_TO_TILE_RATIO * minDimension);
+            mPaint.getTextBounds(mLetter, 0, 1, sRect);
+            mPaint.setColor(Color.WHITE);
+
+            canvas.drawText(mLetter, 0, 1, bounds.centerX(),
+                    bounds.centerY() - sRect.exactCenterY(),
+                    mPaint);
+        }
+
+        @Override
+        public void setAlpha(final int alpha) {
+            mPaint.setAlpha(alpha);
+        }
+
+        @Override
+        public void setColorFilter(final ColorFilter cf) {
+            mPaint.setColorFilter(cf);
+        }
+
+        @Override
+        public int getOpacity() {
+            return android.graphics.PixelFormat.OPAQUE;
         }
     }
 }

@@ -58,7 +58,7 @@ public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewH
 
         if (mShowExtra && feed.getUserId() > 0) {
             AvatarHandler.assignAvatar(holder.ivGravatar,
-                    feed.getUserId(), feed.getAvatarUrl());
+                    feed.getAuthor(), feed.getUserId(), feed.getAvatarUrl());
             holder.ivGravatar.setTag(feed);
             holder.ivGravatar.setVisibility(View.VISIBLE);
         } else {

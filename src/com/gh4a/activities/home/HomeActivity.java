@@ -374,6 +374,7 @@ public class HomeActivity extends BasePagerActivity implements
 
     private void updateUserInfo() {
         if (mUserInfo == null) {
+            mAvatarView.setImageDrawable(new AvatarHandler.DefaultAvatarDrawable(this, mUserLogin));
             return;
         }
         if (mAvatarView != null) {

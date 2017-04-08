@@ -45,7 +45,8 @@ public class SearchUserAdapter extends RootAdapter<SearchUser, SearchUserAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, SearchUser user) {
-        AvatarHandler.assignAvatar(holder.ivGravatar, determineUserId(user.getId()), null);
+        AvatarHandler.assignAvatar(holder.ivGravatar, user.getLogin(),
+                determineUserId(user.getId()), null);
         holder.ivGravatar.setTag(user);
 
         holder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
