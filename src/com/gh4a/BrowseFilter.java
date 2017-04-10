@@ -53,11 +53,16 @@ import org.eclipse.egit.github.core.client.IGitHubConstants;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class BrowseFilter extends AppCompatActivity {
     private static final Pattern SHA1_PATTERN = Pattern.compile("[a-z0-9]{40}");
+
+    private static final List<String> RESERVED_NAMES = Arrays.asList(
+        "login", "logout", "sessions", "settings"
+    );
 
     public void onCreate(Bundle savedInstanceState) {
         setTheme(Gh4Application.THEME == R.style.DarkTheme
@@ -79,8 +84,8 @@ public class BrowseFilter extends AppCompatActivity {
             if (!parts.isEmpty()) {
                 intent = GistActivity.makeIntent(this, parts.get(parts.size() - 1));
             }
-        } else if ("login".equals(first) || "sessions".equals(first)) {
-            // may happen during login -> forward to browser
+        } else if (RESERVED_NAMES.contains(first)) {
+            // forward to browser
         } else if ("explore".equals(first)) {
             intent = new Intent(this, TrendingActivity.class);
         } else if ("blog".equals(first)) {

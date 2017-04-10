@@ -15,12 +15,11 @@
  */
 package com.gh4a.activities;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.util.Pair;
 import android.view.Menu;
@@ -34,9 +33,7 @@ import com.gh4a.BuildConfig;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.CustomTabsHelper;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.UserService;
@@ -193,25 +190,14 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         triggerLogin();
     }
 
-    public static void launchLogin(Context context) {
-        String pkg = CustomTabsHelper.getPackageNameToUse(context);
+    public static void launchLogin(Activity activity) {
         Uri uri = Uri.parse(OAUTH_URL)
                 .buildUpon()
                 .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
                 .appendQueryParameter(PARAM_SCOPE, SCOPES)
                 .appendQueryParameter(PARAM_CALLBACK_URI, CALLBACK_URI.toString())
                 .build();
-        if (pkg != null) {
-            int color = UiUtils.resolveColor(context, R.attr.colorPrimary);
-            CustomTabsIntent i = new CustomTabsIntent.Builder()
-                    .setToolbarColor(color)
-                    .build();
-            i.intent.setPackage(pkg);
-            i.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.launchUrl(context, uri);
-        } else {
-            IntentUtils.launchBrowser(context, uri, Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
+        IntentUtils.openInCustomTabOrBrowser(activity, uri);
     }
 
     private void triggerLogin() {

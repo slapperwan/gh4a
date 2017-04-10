@@ -2,12 +2,14 @@ package com.gh4a.utils;
 
 import org.eclipse.egit.github.core.Repository;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.support.customtabs.CustomTabsIntent;
 import android.widget.Toast;
 
 import com.gh4a.R;
@@ -58,6 +60,21 @@ public class IntentUtils {
             return resolvedViewIntent;
         }
         return createBrowserIntent(context, uri);
+    }
+
+    public static void openInCustomTabOrBrowser(Activity activity, Uri uri) {
+        String pkg = CustomTabsHelper.getPackageNameToUse(activity);
+        if (pkg != null) {
+            int color = UiUtils.resolveColor(activity, R.attr.colorPrimary);
+            CustomTabsIntent i = new CustomTabsIntent.Builder()
+                    .setToolbarColor(color)
+                    .build();
+            i.intent.setPackage(pkg);
+            i.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.launchUrl(activity, uri);
+        } else {
+            launchBrowser(activity, uri, Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
     }
 
     private static Intent createActivityChooserIntent(Context context, Intent intent, Uri uri) {

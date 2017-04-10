@@ -1,11 +1,17 @@
 package com.gh4a.activities.home;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.Menu;
@@ -27,6 +33,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.User;
 
@@ -190,7 +197,7 @@ public class HomeActivity extends BasePagerActivity implements
                 finish();
                 return true;
             case R.id.add_account:
-                Github4AndroidActivity.launchLogin(this);
+                new BrowserLogoutDialogFragment().show(getSupportFragmentManager(), "browserlogout");
                 return true;
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
@@ -446,5 +453,48 @@ public class HomeActivity extends BasePagerActivity implements
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
         invalidateTitle();
         invalidateTabs();
+    }
+
+    public static class BrowserLogoutDialogFragment extends DialogFragment implements
+            DialogInterface.OnClickListener {
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.browser_logout_dialog_title)
+                    .setMessage(R.string.browser_logout_dialog_text)
+                    .setPositiveButton(R.string.go_to_logout_page, this)
+                    .setNeutralButton(R.string.continue_login, this)
+                    .create();
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == DialogInterface.BUTTON_NEUTRAL) {
+                Github4AndroidActivity.launchLogin(getActivity());
+            } else if (which == DialogInterface.BUTTON_POSITIVE) {
+                Uri uri = Uri.parse("https://github.com/logout");
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                IntentUtils.openInCustomTabOrBrowser(getActivity(), uri);
+                new BrowserLogoutCompletedDialogFragment().show(fm, "browserlogoutcomplete");
+            }
+        }
+    }
+
+    public static class BrowserLogoutCompletedDialogFragment extends DialogFragment implements
+            DialogInterface.OnClickListener {
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return new AlertDialog.Builder(getActivity())
+                    .setMessage(R.string.browser_logout_completed_dialog_text)
+                    .setPositiveButton(R.string.continue_login, this)
+                    .create();
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Github4AndroidActivity.launchLogin(getActivity());
+        }
     }
 }
