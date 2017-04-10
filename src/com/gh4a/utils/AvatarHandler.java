@@ -30,6 +30,7 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.LruCache;
 import android.support.v4.util.SparseArrayCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -322,9 +323,15 @@ public class AvatarHandler {
             mPaint.setTextAlign(Paint.Align.CENTER);
             mPaint.setAntiAlias(true);
 
-            mLetter[0] = userName.length() > 0 ? Character.toUpperCase(userName.charAt(0)) : '?';
+            final int colorIndex;
+            if (TextUtils.isEmpty(userName)) {
+                mLetter[0] = '?';
+                colorIndex = (int) (Math.random() * COLOR_PALETTE.length);
+            } else {
+                mLetter[0] = Character.toUpperCase(userName.charAt(0));
+                colorIndex = Math.abs(userName.hashCode()) % COLOR_PALETTE.length;
+            }
 
-            final int colorIndex = Math.abs(userName.hashCode()) % COLOR_PALETTE.length;
             mColor = COLOR_PALETTE[colorIndex];
         }
 
