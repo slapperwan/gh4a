@@ -412,6 +412,10 @@
     <string name="pull_merge_status_unstable">Pull request didn\'t pass all checks</string>
     <string name="pull_merge_status_dirty">Pull request has conflicts that need to be resolved manually</string>
     <string name="pull_merge_status_unknown">The status of the pull request could not be determined</string>
+    <string name="pull_merge_method">Merge method</string>
+    <string name="pull_merge_method_merge">Create merge commit</string>
+    <string name="pull_merge_method_squash">Squash into one commit</string>
+    <string name="pull_merge_method_rebase">Rebase and merge</string>
     <string name="pull_no_commit_status">No additional checks are attached to this pull request</string>
     <string name="pull_request_from">From [b][ref][/b]</string>
     <string name="pull_request_to">Into [b][ref][/b]</string>

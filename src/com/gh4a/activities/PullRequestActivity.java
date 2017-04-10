@@ -32,7 +32,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.gh4a.BasePagerActivity;
@@ -101,6 +104,21 @@ public class PullRequestActivity extends BasePagerActivity implements
     private static final int[] TITLES = new int[]{
             R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
     };
+
+    private class MergeMethodDesc {
+        final @StringRes int textResId;
+        final String action;
+
+        public MergeMethodDesc(@StringRes int textResId, String action) {
+            this.textResId = textResId;
+            this.action = action;
+        }
+
+        @Override
+        public String toString() {
+            return getString(textResId);
+        }
+    }
 
     private final LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>(this) {
         @Override
@@ -381,8 +399,33 @@ public class PullRequestActivity extends BasePagerActivity implements
         String title = getString(R.string.pull_message_dialog_title, mPullRequest.getNumber());
         View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
 
+        final View editorNotice = view.findViewById(R.id.notice);
         final EditText editor = (EditText) view.findViewById(R.id.et_commit_message);
         editor.setText(mPullRequest.getTitle());
+
+        final ArrayAdapter<MergeMethodDesc> adapter = new ArrayAdapter<>(this,
+                R.layout.pull_merge_method_item);
+        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_merge,
+                PullRequestService.MERGE_METHOD_MERGE));
+        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_squash,
+                PullRequestService.MERGE_METHOD_SQUASH));
+        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_rebase,
+                PullRequestService.MERGE_METHOD_REBASE));
+
+        final Spinner mergeMethod = (Spinner) view.findViewById(R.id.merge_method);
+        mergeMethod.setAdapter(adapter);
+        mergeMethod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int editorVisibility = position == 2 ? View.GONE : View.VISIBLE;
+                editorNotice.setVisibility(editorVisibility);
+                editor.setVisibility(editorVisibility);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
 
         new AlertDialog.Builder(this)
                 .setTitle(title)
@@ -391,7 +434,9 @@ public class PullRequestActivity extends BasePagerActivity implements
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String text = editor.getText() == null ? null : editor.getText().toString();
-                        new PullRequestMergeTask(text).schedule();
+                        int methodIndex = mergeMethod.getSelectedItemPosition();
+                        String method = adapter.getItem(methodIndex).action;
+                        new PullRequestMergeTask(text, method).schedule();
                     }
                 })
                 .setNegativeButton(getString(R.string.cancel), null)
@@ -522,15 +567,17 @@ public class PullRequestActivity extends BasePagerActivity implements
 
     private class PullRequestMergeTask extends ProgressDialogTask<MergeStatus> {
         private final String mCommitMessage;
+        private final String mMergeMethod;
 
-        public PullRequestMergeTask(String commitMessage) {
+        public PullRequestMergeTask(String commitMessage, String mergeMethod) {
             super(getBaseActivity(), R.string.merging_msg);
             mCommitMessage = commitMessage;
+            mMergeMethod = mergeMethod;
         }
 
         @Override
         protected ProgressDialogTask<MergeStatus> clone() {
-            return new PullRequestMergeTask(mCommitMessage);
+            return new PullRequestMergeTask(mCommitMessage, mMergeMethod);
         }
 
         @Override
@@ -539,7 +586,7 @@ public class PullRequestActivity extends BasePagerActivity implements
                     Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
             RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
 
-            return pullService.merge(repoId, mPullRequest.getNumber(), mCommitMessage);
+            return pullService.merge(repoId, mPullRequest.getNumber(), mCommitMessage, mMergeMethod);
         }
 
         @Override

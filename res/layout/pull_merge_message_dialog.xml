@@ -4,11 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="16dp">
 
     <com.gh4a.widget.StyleableTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:text="@string/pull_merge_method" />
+
+    <Spinner
+        android:id="@+id/merge_method"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/notice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="@string/pull_merge_message_description"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
