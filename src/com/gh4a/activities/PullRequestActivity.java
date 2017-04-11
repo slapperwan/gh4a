@@ -63,21 +63,23 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Locale;
 
 public class PullRequestActivity extends BasePagerActivity implements
         View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
-        return makeIntent(context, repoOwner, repoName, number, -1, -1);
+        return makeIntent(context, repoOwner, repoName, number, -1, -1, null);
     }
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            int number, int initialPage, long initialCommentId) {
+            int number, int initialPage, long initialCommentId, Date lastReadAt) {
         return new Intent(context, PullRequestActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("number", number)
                 .putExtra("initial_page", initialPage)
-                .putExtra("initial_comment", initialCommentId);
+                .putExtra("initial_comment", initialCommentId)
+                .putExtra("last_read_at", lastReadAt);
     }
 
     public static final int PAGE_CONVERSATION = 0;
@@ -91,6 +93,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     private int mPullRequestNumber;
     private int mInitialPage;
     private long mInitialCommentId;
+    private Date mLastReadAt;
     private Boolean mIsCollaborator;
 
     private Issue mIssue;
@@ -272,8 +275,10 @@ public class PullRequestActivity extends BasePagerActivity implements
         mPullRequestNumber = extras.getInt("number");
         mInitialCommentId = extras.getLong("initial_comment", -1);
         mInitialPage = extras.getInt("initial_page", -1);
+        mLastReadAt = (Date) extras.getSerializable("last_read_at");
         extras.remove("initial_comment");
         extras.remove("initial_page");
+        extras.remove("last_read_at");
     }
 
     @Override
@@ -317,8 +322,9 @@ public class PullRequestActivity extends BasePagerActivity implements
                     mPullRequestNumber, mPullRequest.getHead().getSha());
         } else {
             Fragment f = PullRequestFragment.newInstance(mPullRequest,
-                    mIssue, mIsCollaborator, mInitialCommentId);
+                    mIssue, mIsCollaborator, mInitialCommentId, mLastReadAt);
             mInitialCommentId = -1;
+            mLastReadAt = null;
             return f;
         }
     }

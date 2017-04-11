@@ -54,6 +54,7 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -67,6 +68,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     protected String mRepoOwner;
     protected String mRepoName;
     private long mInitialCommentId;
+    private Date mLastReadAt;
     private boolean mIsCollaborator;
     private boolean mListShown;
     private CommentBoxFragment mCommentFragment;
@@ -74,13 +76,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     private HttpImageGetter mImageGetter;
 
     protected static Bundle buildArgs(String repoOwner, String repoName,
-            Issue issue, boolean isCollaborator, long initialCommentId) {
+            Issue issue, boolean isCollaborator, long initialCommentId, Date lastReadAt) {
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putSerializable("issue", issue);
         args.putSerializable("collaborator", isCollaborator);
         args.putLong("initial_comment", initialCommentId);
+        args.putSerializable("last_read_at", lastReadAt);
         return args;
     }
 
@@ -94,7 +97,9 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         mIssue = (Issue) args.getSerializable("issue");
         mIsCollaborator = args.getBoolean("collaborator");
         mInitialCommentId = args.getLong("initial_comment", -1);
+        mLastReadAt = (Date) args.getSerializable("last_read_at");
         args.remove("initial_comment");
+        args.remove("last_read_at");
 
         updateCommentLockState();
     }
@@ -203,7 +208,18 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
                 }
             }
             mInitialCommentId = -1;
+        } else if (mLastReadAt != null) {
+            for (int i = 0; i < data.size(); i++) {
+                IssueEventHolder event = data.get(i);
+                if (event.comment != null && event.getCreatedAt().after(mLastReadAt)) {
+                    scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
+                    break;
+                }
+            }
         }
+
+        mLastReadAt = null;
+
         updateMentionUsers();
     }
 

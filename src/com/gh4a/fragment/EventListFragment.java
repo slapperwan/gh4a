@@ -42,7 +42,6 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.EventAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
 
@@ -212,10 +211,11 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             if (request != null && request.getHtmlUrl() != null) {
                 intent = PullRequestActivity.makeIntent(getActivity(),
                         repoOwner, repoName, issue.getNumber(),
-                        commentId != -1 ? PullRequestActivity.PAGE_CONVERSATION : -1, commentId);
+                        commentId != -1 ? PullRequestActivity.PAGE_CONVERSATION : -1, commentId,
+                        null);
             } else if (issue != null) {
                 intent = IssueActivity.makeIntent(getActivity(),
-                        repoOwner, repoName, issue.getNumber(), commentId);
+                        repoOwner, repoName, issue.getNumber(), commentId, null);
             }
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
@@ -244,7 +244,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             if (pr != null) {
                 intent = PullRequestActivity.makeIntent(getActivity(),
                         repoOwner, repoName, pr.getNumber(),
-                        commentId != -1 ? PullRequestActivity.PAGE_CONVERSATION : -1, commentId);
+                        commentId != -1 ? PullRequestActivity.PAGE_CONVERSATION : -1, commentId,
+                        null);
             } else if (comment != null) {
                 intent = CommitActivity.makeIntent(getActivity(), repoOwner, repoName,
                         comment.getCommitId(), commentId);

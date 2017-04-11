@@ -26,7 +26,6 @@ import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoadResult;
 import com.gh4a.loader.NotificationListLoader;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Notification;
 import org.eclipse.egit.github.core.NotificationSubject;
@@ -124,6 +123,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             Uri uri = ApiHelpers.normalizeUri(Uri.parse(subject.getUrl()));
             intent = new Intent(getActivity(), BrowseFilter.class);
             intent.setData(uri);
+            intent.putExtra("last_read_at", item.notification.getLastReadAt());
         }
 
         startActivity(intent);

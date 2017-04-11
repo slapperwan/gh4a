@@ -19,13 +19,14 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 
+import java.util.Date;
 import java.util.List;
 
 public class IssueFragment extends IssueFragmentBase {
     public static IssueFragment newInstance(String repoOwner, String repoName, Issue issue,
-            boolean isCollaborator, long initialCommentId) {
+            boolean isCollaborator, long initialCommentId, Date lastReadAt) {
         IssueFragment f = new IssueFragment();
-        f.setArguments(buildArgs(repoOwner, repoName, issue, isCollaborator, initialCommentId));
+        f.setArguments(buildArgs(repoOwner, repoName, issue, isCollaborator, initialCommentId, lastReadAt));
         return f;
     }
 
