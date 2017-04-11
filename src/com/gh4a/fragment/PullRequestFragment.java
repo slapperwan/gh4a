@@ -54,6 +54,7 @@ import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,12 +77,12 @@ public class PullRequestFragment extends IssueFragmentBase {
     };
 
     public static PullRequestFragment newInstance(PullRequest pr, Issue issue,
-            boolean isCollaborator, long initialCommentId) {
+            boolean isCollaborator, long initialCommentId, Date lastReadAt) {
         PullRequestFragment f = new PullRequestFragment();
 
         Repository repo = pr.getBase().getRepo();
         Bundle args = buildArgs(repo.getOwner().getLogin(), repo.getName(),
-                issue, isCollaborator, initialCommentId);
+                issue, isCollaborator, initialCommentId, lastReadAt);
         args.putSerializable("pr", pr);
         f.setArguments(args);
 

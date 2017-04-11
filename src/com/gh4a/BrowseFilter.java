@@ -53,6 +53,7 @@ import org.eclipse.egit.github.core.client.IGitHubConstants;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -125,9 +126,11 @@ public class BrowseFilter extends AppCompatActivity {
                         intent = IssueEditActivity.makeCreateIntent(this, user, repo);
                     } else {
                         try {
+                            Date lastReadAt =
+                                    (Date) getIntent().getSerializableExtra("last_read_at");
                             intent = IssueActivity.makeIntent(this, user, repo,
                                     Integer.parseInt(id),
-                                    extractCommentId(uri.getFragment(), "issue"));
+                                    extractCommentId(uri.getFragment(), "issue"), lastReadAt);
                         } catch (NumberFormatException e) {
                             // ignored
                         }
@@ -159,8 +162,9 @@ public class BrowseFilter extends AppCompatActivity {
                         int page = "commits".equals(action) ? PullRequestActivity.PAGE_COMMITS
                                 : "files".equals(target) ? PullRequestActivity.PAGE_FILES
                                 : -1;
+                        Date lastReadAt = (Date) getIntent().getSerializableExtra("last_read_at");
                         intent = PullRequestActivity.makeIntent(this, user, repo, pullRequestNumber,
-                                page, extractCommentId(uri.getFragment(), "issue"));
+                                page, extractCommentId(uri.getFragment(), "issue"), lastReadAt);
                     }
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {

@@ -54,19 +54,21 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Locale;
 
 public class IssueActivity extends BaseActivity implements View.OnClickListener {
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
-        return makeIntent(context, login, repoName, number, -1);
+        return makeIntent(context, login, repoName, number, -1, null);
     }
     public static Intent makeIntent(Context context, String login, String repoName,
-            int number, long initialCommentId) {
+            int number, long initialCommentId, Date lastReadAt) {
         return new Intent(context, IssueActivity.class)
                 .putExtra("owner", login)
                 .putExtra("repo", repoName)
                 .putExtra("number", number)
-                .putExtra("initial_comment", initialCommentId);
+                .putExtra("initial_comment", initialCommentId)
+                .putExtra("last_read_at", lastReadAt);
     }
 
     private static final int REQUEST_EDIT_ISSUE = 1000;
@@ -76,6 +78,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     private String mRepoName;
     private int mIssueNumber;
     private long mInitialCommentId;
+    private Date mLastReadAt;
     private ViewGroup mHeader;
     private Boolean mIsCollaborator;
     private IssueStateTrackingFloatingActionButton mEditFab;
@@ -141,7 +144,9 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         mRepoName = extras.getString("repo");
         mIssueNumber = extras.getInt("number");
         mInitialCommentId = extras.getLong("initial_comment", -1);
+        mLastReadAt = (Date) extras.getSerializable("last_read_at");
         extras.remove("initial_comment");
+        extras.remove("last_read_at");
     }
 
     private void showUiIfDone() {
@@ -149,11 +154,12 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             return;
         }
         setFragment(IssueFragment.newInstance(mRepoOwner, mRepoName,
-                mIssue, mIsCollaborator, mInitialCommentId));
+                mIssue, mIsCollaborator, mInitialCommentId, mLastReadAt));
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.details, mFragment)
                 .commitAllowingStateLoss();
         mInitialCommentId = -1;
+        mLastReadAt = null;
 
         updateHeader();
         updateFabVisibility();
