@@ -42,6 +42,7 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.EventAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
 
@@ -156,7 +157,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             CommitComment comment = payload.getComment();
             if (comment != null) {
                 intent = CommitActivity.makeIntent(getActivity(),
-                        repoOwner, repoName, comment.getCommitId(), comment.getId());
+                        repoOwner, repoName, comment.getCommitId(),
+                        new IntentUtils.InitialCommentMarker(comment.getId()));
             }
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
@@ -206,16 +208,17 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
             Issue issue = payload.getIssue();
             PullRequest request = issue != null ? issue.getPullRequest() : null;
-            long commentId = payload.getComment() != null ? payload.getComment().getId() : -1;
+            IntentUtils.InitialCommentMarker initialComment = payload.getComment() != null
+                    ? new IntentUtils.InitialCommentMarker(payload.getComment().getId()) : null;
 
             if (request != null && request.getHtmlUrl() != null) {
                 intent = PullRequestActivity.makeIntent(getActivity(),
                         repoOwner, repoName, issue.getNumber(),
-                        commentId != -1 ? PullRequestActivity.PAGE_CONVERSATION : -1, commentId,
-                        null);
+                        initialComment != null ? PullRequestActivity.PAGE_CONVERSATION : -1,
+                        initialComment);
             } else if (issue != null) {
                 intent = IssueActivity.makeIntent(getActivity(),
-                        repoOwner, repoName, issue.getNumber(), commentId, null);
+                        repoOwner, repoName, issue.getNumber(), initialComment);
             }
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
@@ -239,16 +242,17 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                     (PullRequestReviewCommentPayload) event.getPayload();
             PullRequest pr = payload.getPullRequest();
             CommitComment comment = payload.getComment();
-            long commentId = comment != null ? comment.getId() : -1;
+            IntentUtils.InitialCommentMarker initialComment = comment != null
+                    ? new IntentUtils.InitialCommentMarker(comment.getId()) : null;
 
             if (pr != null) {
                 intent = PullRequestActivity.makeIntent(getActivity(),
                         repoOwner, repoName, pr.getNumber(),
-                        commentId != -1 ? PullRequestActivity.PAGE_CONVERSATION : -1, commentId,
-                        null);
+                        initialComment != null ? PullRequestActivity.PAGE_CONVERSATION : -1,
+                        initialComment);
             } else if (comment != null) {
                 intent = CommitActivity.makeIntent(getActivity(), repoOwner, repoName,
-                        comment.getCommitId(), commentId);
+                        comment.getCommitId(), initialComment);
             }
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {

@@ -275,7 +275,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
                     mObjectSha, file.getFilename());
         } else {
             intent = CommitDiffViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mObjectSha, file.getFilename(), file.getPatch(), mComments, -1, -1, false, -1);
+                    mObjectSha, file.getFilename(), file.getPatch(), mComments, -1, -1, false, null);
         }
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);
     }

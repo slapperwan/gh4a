@@ -2,6 +2,7 @@ package com.gh4a;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -58,6 +59,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class BrowseFilter extends AppCompatActivity {
+    public static Intent makeRedirectionIntent(Context context, Uri uri,
+            IntentUtils.InitialCommentMarker initialComment) {
+        Intent intent = new Intent(context, BrowseFilter.class);
+        intent.setData(uri);
+        intent.putExtra("initial_comment", initialComment);
+        return intent;
+    }
+
     private static final Pattern SHA1_PATTERN = Pattern.compile("[a-z0-9]{40}");
 
     public void onCreate(Bundle savedInstanceState) {
@@ -126,11 +135,9 @@ public class BrowseFilter extends AppCompatActivity {
                         intent = IssueEditActivity.makeCreateIntent(this, user, repo);
                     } else {
                         try {
-                            Date lastReadAt =
-                                    (Date) getIntent().getSerializableExtra("last_read_at");
                             intent = IssueActivity.makeIntent(this, user, repo,
                                     Integer.parseInt(id),
-                                    extractCommentId(uri.getFragment(), "issue"), lastReadAt);
+                                    generateInitialCommentMarker(uri.getFragment(), "issue"));
                         } catch (NumberFormatException e) {
                             // ignored
                         }
@@ -164,7 +171,7 @@ public class BrowseFilter extends AppCompatActivity {
                                 : -1;
                         Date lastReadAt = (Date) getIntent().getSerializableExtra("last_read_at");
                         intent = PullRequestActivity.makeIntent(this, user, repo, pullRequestNumber,
-                                page, extractCommentId(uri.getFragment(), "issue"), lastReadAt);
+                                page, generateInitialCommentMarker(uri.getFragment(), "issue"));
                     }
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
@@ -173,13 +180,14 @@ public class BrowseFilter extends AppCompatActivity {
                     new CommitDiffLoadTask(user, repo, diffId, id).execute();
                     return; // avoid finish() for now
                 } else {
-                    long commentId = extractCommentId(uri.getFragment(), "commit");
-                    if (commentId != -1) {
-                        new CommitCommentLoadTask(user, repo, id, commentId).execute();
+                    IntentUtils.InitialCommentMarker initialComment =
+                            generateInitialCommentMarker(uri.getFragment(), "commit");
+                    if (initialComment != null) {
+                        new CommitCommentLoadTask(user, repo, id, initialComment).execute();
                         return; // avoid finish() for now
                     }
                     intent = CommitActivity.makeIntent(this, user, repo, id,
-                            extractCommentId(uri.getFragment(), "commit"));
+                            generateInitialCommentMarker(uri.getFragment(), "commit"));
                 }
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 4) {
                 String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
@@ -195,16 +203,17 @@ public class BrowseFilter extends AppCompatActivity {
         finish();
     }
 
-    private long extractCommentId(String fragment, String type) {
+    private IntentUtils.InitialCommentMarker generateInitialCommentMarker(String fragment, String type) {
         String prefix = type + "comment-";
         if (fragment != null && fragment.startsWith(prefix)) {
             try {
-                return Long.parseLong(fragment.substring(prefix.length()));
+                long commentId = Long.parseLong(fragment.substring(prefix.length()));
+                return new IntentUtils.InitialCommentMarker(commentId);
             } catch (NumberFormatException e) {
                 // fall through
             }
         }
-        return -1;
+        return getIntent().getParcelableExtra("initial_comment");
     }
 
     private DiffHighlightId extractCommitDiffId(String fragment) {
@@ -344,14 +353,14 @@ public class BrowseFilter extends AppCompatActivity {
         private final String mRepoOwner;
         private final String mRepoName;
         private final String mCommitSha;
-        private final long mCommentId;
+        private final IntentUtils.InitialCommentMarker mMarker;
 
         public CommitCommentLoadTask(String repoOwner, String repoName, String commitSha,
-                long commentId) {
+                IntentUtils.InitialCommentMarker marker) {
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mCommitSha = commitSha;
-            mCommentId = commentId;
+            mMarker = marker;
         }
 
         @Override
@@ -363,7 +372,7 @@ public class BrowseFilter extends AppCompatActivity {
             boolean foundComment = false;
             CommitFile resultFile = null;
             for (CommitComment comment : comments) {
-                if (comment.getId() == mCommentId) {
+                if (mMarker.matches(comment.getId(), comment.getCreatedAt())) {
                     foundComment = true;
                     for (CommitFile commitFile : commit.getFiles()) {
                         if (commitFile.getFilename().equals(comment.getPath())) {
@@ -384,11 +393,11 @@ public class BrowseFilter extends AppCompatActivity {
                 if (!FileUtils.isImage(resultFile.getFilename())) {
                     intent = CommitDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner,
                             mRepoName, mCommitSha, resultFile.getFilename(), resultFile.getPatch(),
-                            comments, -1, -1, false, mCommentId);
+                            comments, -1, -1, false, mMarker);
                 }
             } else {
                 intent = CommitActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
-                        mCommitSha, mCommentId);
+                        mCommitSha, mMarker);
             }
             return intent;
         }
@@ -491,7 +500,7 @@ public class BrowseFilter extends AppCompatActivity {
                 List<CommitComment> comments, DiffHighlightId diffId) {
             return CommitDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
                     sha, file.getFilename(), file.getPatch(), comments, diffId.startLine,
-                    diffId.endLine, diffId.right, -1);
+                    diffId.endLine, diffId.right, null);
         }
 
         @Override

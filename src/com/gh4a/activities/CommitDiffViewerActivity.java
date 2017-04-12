@@ -23,6 +23,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -35,10 +36,10 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             String commitSha, String path, String diff, List<CommitComment> comments,
             int highlightStartLine, int highlightEndLine, boolean highlightIsRight,
-            long initialCommentId) {
+            IntentUtils.InitialCommentMarker initialComment) {
         return DiffViewerActivity.fillInIntent(new Intent(context, CommitDiffViewerActivity.class),
                 repoOwner, repoName, commitSha, path, diff, comments, -1,
-                highlightStartLine, highlightEndLine, highlightIsRight, initialCommentId);
+                highlightStartLine, highlightEndLine, highlightIsRight, initialComment);
     }
 
     @Override

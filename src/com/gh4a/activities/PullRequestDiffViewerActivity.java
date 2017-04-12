@@ -41,7 +41,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
                 .putExtra("number", number);
         return DiffViewerActivity.fillInIntent(intent, repoOwner, repoName, commitSha, path,
                 diff, comments, initialLine, highlightStartLine, highlightEndLine,
-                highlightIsRight, -1);
+                highlightIsRight, null);
     }
 
     private int mPullRequestNumber;

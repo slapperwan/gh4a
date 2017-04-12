@@ -54,21 +54,19 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Locale;
 
 public class IssueActivity extends BaseActivity implements View.OnClickListener {
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
-        return makeIntent(context, login, repoName, number, -1, null);
+        return makeIntent(context, login, repoName, number, null);
     }
     public static Intent makeIntent(Context context, String login, String repoName,
-            int number, long initialCommentId, Date lastReadAt) {
+            int number, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, IssueActivity.class)
                 .putExtra("owner", login)
                 .putExtra("repo", repoName)
                 .putExtra("number", number)
-                .putExtra("initial_comment", initialCommentId)
-                .putExtra("last_read_at", lastReadAt);
+                .putExtra("initial_comment", initialComment);
     }
 
     private static final int REQUEST_EDIT_ISSUE = 1000;
@@ -77,8 +75,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
-    private long mInitialCommentId;
-    private Date mLastReadAt;
+    private IntentUtils.InitialCommentMarker mInitialComment;
     private ViewGroup mHeader;
     private Boolean mIsCollaborator;
     private IssueStateTrackingFloatingActionButton mEditFab;
@@ -143,8 +140,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
         mIssueNumber = extras.getInt("number");
-        mInitialCommentId = extras.getLong("initial_comment", -1);
-        mLastReadAt = (Date) extras.getSerializable("last_read_at");
+        mInitialComment = extras.getParcelable("initial_comment");
         extras.remove("initial_comment");
         extras.remove("last_read_at");
     }
@@ -154,12 +150,11 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             return;
         }
         setFragment(IssueFragment.newInstance(mRepoOwner, mRepoName,
-                mIssue, mIsCollaborator, mInitialCommentId, mLastReadAt));
+                mIssue, mIsCollaborator, mInitialComment));
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.details, mFragment)
                 .commitAllowingStateLoss();
-        mInitialCommentId = -1;
-        mLastReadAt = null;
+        mInitialComment = null;
 
         updateHeader();
         updateFabVisibility();

@@ -13,20 +13,20 @@ import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 
-import java.util.Date;
 import java.util.List;
 
 public class IssueFragment extends IssueFragmentBase {
     public static IssueFragment newInstance(String repoOwner, String repoName, Issue issue,
-            boolean isCollaborator, long initialCommentId, Date lastReadAt) {
+            boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
         IssueFragment f = new IssueFragment();
-        f.setArguments(buildArgs(repoOwner, repoName, issue, isCollaborator, initialCommentId, lastReadAt));
+        f.setArguments(buildArgs(repoOwner, repoName, issue, isCollaborator, initialComment));
         return f;
     }
 
