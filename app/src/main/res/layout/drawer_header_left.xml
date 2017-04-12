@@ -10,6 +10,7 @@
     android:orientation="vertical"
     android:paddingTop="24dp"
     android:paddingLeft="16dp"
+    android:paddingBottom="8dp"
     tools:background="?colorPrimary">
 
     <ImageView
