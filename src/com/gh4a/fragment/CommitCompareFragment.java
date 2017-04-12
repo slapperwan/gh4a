@@ -37,16 +37,19 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
         RootAdapter.OnItemClickListener<RepositoryCommit> {
     public static CommitCompareFragment newInstance(String repoOwner, String repoName,
             String baseRef, String headRef) {
-        return newInstance(repoOwner, repoName, -1, baseRef, headRef);
+        return newInstance(repoOwner, repoName, -1, null, baseRef, null, headRef);
     }
 
     public static CommitCompareFragment newInstance(String repoOwner, String repoName,
-            int pullRequestNumber, String baseRef, String headRef) {
+            int pullRequestNumber, String baseRefLabel, String baseRef,
+            String headRefLabel, String headRef) {
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putString("base", baseRef);
+        args.putString("base_label", baseRefLabel);
         args.putString("head", headRef);
+        args.putString("head_label", headRefLabel);
         args.putInt("pr", pullRequestNumber);
 
         CommitCompareFragment f = new CommitCompareFragment();
@@ -59,7 +62,9 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     private String mRepoOwner;
     private String mRepoName;
     private String mBase;
+    private String mBaseLabel;
     private String mHead;
+    private String mHeadLabel;
     private int mPullRequestNumber;
 
     @Override
@@ -70,7 +75,9 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
         mRepoOwner = args.getString("owner");
         mRepoName = args.getString("repo");
         mBase = args.getString("base");
+        mBaseLabel = args.getString("base_label");
         mHead = args.getString("head");
+        mHeadLabel = args.getString("head_label");
         mPullRequestNumber = args.getInt("pr", -1);
     }
 
@@ -107,20 +114,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
 
     @Override
     public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader() {
-        return new CommitCompareLoader(getActivity(), mRepoOwner, mRepoName, mBase, mHead);
-    }
-
-    @Override
-    protected boolean onLoaderError(Exception e) {
-        if (e instanceof RequestException) {
-            RequestException re = (RequestException) e;
-            if (re.getStatus() == 404) {
-                // this happens when the source branch is deleted
-                setContentShown(true);
-                updateEmptyState();
-                return true;
-            }
-        }
-        return super.onLoaderError(e);
+        return new CommitCompareLoader(getActivity(), mRepoOwner, mRepoName,
+                mBaseLabel, mBase, mHeadLabel, mHead);
     }
 }

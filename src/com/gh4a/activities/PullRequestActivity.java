@@ -58,6 +58,7 @@ import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.PullRequestMarker;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.PullRequestService;
@@ -310,8 +311,10 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     protected Fragment makeFragment(int position) {
         if (position == 1) {
+            PullRequestMarker base = mPullRequest.getBase();
+            PullRequestMarker head = mPullRequest.getHead();
             return CommitCompareFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber,
-                    mPullRequest.getBase().getLabel(), mPullRequest.getHead().getLabel());
+                    base.getLabel(), base.getSha(), head.getLabel(), head.getSha());
         } else if (position == 2) {
             return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequestNumber, mPullRequest.getHead().getSha());
