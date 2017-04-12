@@ -21,6 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/overview_item_spacing"
+            android:inputType="textCapSentences"
             android:maxLines="2" />
 
     </android.support.design.widget.TextInputLayout>
