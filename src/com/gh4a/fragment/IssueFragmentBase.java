@@ -43,6 +43,7 @@ import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -67,8 +68,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     protected Issue mIssue;
     protected String mRepoOwner;
     protected String mRepoName;
-    private long mInitialCommentId;
-    private Date mLastReadAt;
+    private IntentUtils.InitialCommentMarker mInitialComment;
     private boolean mIsCollaborator;
     private boolean mListShown;
     private CommentBoxFragment mCommentFragment;
@@ -76,14 +76,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     private HttpImageGetter mImageGetter;
 
     protected static Bundle buildArgs(String repoOwner, String repoName,
-            Issue issue, boolean isCollaborator, long initialCommentId, Date lastReadAt) {
+            Issue issue, boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putSerializable("issue", issue);
         args.putSerializable("collaborator", isCollaborator);
-        args.putLong("initial_comment", initialCommentId);
-        args.putSerializable("last_read_at", lastReadAt);
+        args.putParcelable("initial_comment", initialComment);
         return args;
     }
 
@@ -96,8 +95,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         mRepoName = args.getString("repo");
         mIssue = (Issue) args.getSerializable("issue");
         mIsCollaborator = args.getBoolean("collaborator");
-        mInitialCommentId = args.getLong("initial_comment", -1);
-        mLastReadAt = (Date) args.getSerializable("last_read_at");
+        mInitialComment = args.getParcelable("initial_comment");
         args.remove("initial_comment");
         args.remove("last_read_at");
 
@@ -199,26 +197,19 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     @Override
     protected void onAddData(RootAdapter<IssueEventHolder, ?> adapter, List<IssueEventHolder> data) {
         super.onAddData(adapter, data);
-        if (mInitialCommentId >= 0) {
+        if (mInitialComment != null) {
             for (int i = 0; i < data.size(); i++) {
                 IssueEventHolder event = data.get(i);
-                if (event.comment != null && event.comment.getId() == mInitialCommentId) {
+                if (event.comment == null) {
+                    continue;
+                }
+                if (mInitialComment.matches(event.comment.getId(), event.getCreatedAt())) {
                     scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
                     break;
                 }
             }
-            mInitialCommentId = -1;
-        } else if (mLastReadAt != null) {
-            for (int i = 0; i < data.size(); i++) {
-                IssueEventHolder event = data.get(i);
-                if (event.comment != null && event.getCreatedAt().after(mLastReadAt)) {
-                    scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
-                    break;
-                }
-            }
+            mInitialComment = null;
         }
-
-        mLastReadAt = null;
 
         updateMentionUsers();
     }

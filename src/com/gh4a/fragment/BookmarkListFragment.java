@@ -73,9 +73,7 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
 
     @Override
     public void onItemClick(long id, String url) {
-        Intent intent = new Intent(getActivity(), BrowseFilter.class);
-        intent.setData(Uri.parse(url));
-        startActivity(intent);
+        startActivity(BrowseFilter.makeRedirectionIntent(getActivity(), Uri.parse(url), null));
     }
 
     @Override

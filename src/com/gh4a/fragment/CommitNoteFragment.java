@@ -22,6 +22,7 @@ import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -38,7 +39,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         CommitNoteAdapter.OnCommentAction<CommitComment>, CommentBoxFragment.Callback {
     public static CommitNoteFragment newInstance(String repoOwner, String repoName,
             String commitSha, RepositoryCommit commit,
-            List<CommitComment> allComments, long initialCommentId) {
+            List<CommitComment> allComments, IntentUtils.InitialCommentMarker initialComment) {
         CommitNoteFragment f = new CommitNoteFragment();
 
         ArrayList<CommitComment> comments = new ArrayList<>();
@@ -55,7 +56,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         args.putString("sha", commitSha);
         args.putSerializable("commit", commit);
         args.putSerializable("comments", comments);
-        args.putLong("initial_comment", initialCommentId);
+        args.putParcelable("initial_comment", initialComment);
 
         f.setArguments(args);
         return f;
@@ -71,7 +72,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private String mRepoName;
     private String mObjectSha;
     private RepositoryCommit mCommit;
-    private long mInitialCommentId;
+    private IntentUtils.InitialCommentMarker mInitialComment;
 
     private CommitNoteAdapter mAdapter;
     private CommentBoxFragment mCommentFragment;
@@ -84,7 +85,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mRepoName = args.getString("repo");
         mObjectSha = args.getString("sha");
         mCommit = (RepositoryCommit) args.getSerializable("commit");
-        mInitialCommentId = args.getLong("initial_comment", -1);
+        mInitialComment = args.getParcelable("initial_comment");
         args.remove("initial_comment");
     }
 
@@ -157,14 +158,15 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
             users.add(mCommit.getCommitter());
         }
         mCommentFragment.setMentionUsers(users);
-        if (mInitialCommentId >= 0) {
+
+        if (mInitialComment != null) {
             for (int i = 0; i < data.size(); i++) {
-                if (data.get(i).getId() == mInitialCommentId) {
+                if (mInitialComment.matches(data.get(i).getId(), data.get(i).getCreatedAt())) {
                     scrollToAndHighlightPosition(i);
                     break;
                 }
             }
-            mInitialCommentId = -1;
+            mInitialComment = null;
         }
     }
 

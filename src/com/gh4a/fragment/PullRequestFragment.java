@@ -37,6 +37,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
@@ -54,7 +55,6 @@ import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,12 +77,12 @@ public class PullRequestFragment extends IssueFragmentBase {
     };
 
     public static PullRequestFragment newInstance(PullRequest pr, Issue issue,
-            boolean isCollaborator, long initialCommentId, Date lastReadAt) {
+            boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
         PullRequestFragment f = new PullRequestFragment();
 
         Repository repo = pr.getBase().getRepo();
         Bundle args = buildArgs(repo.getOwner().getLogin(), repo.getName(),
-                issue, isCollaborator, initialCommentId, lastReadAt);
+                issue, isCollaborator, initialComment);
         args.putSerializable("pr", pr);
         f.setArguments(args);
 

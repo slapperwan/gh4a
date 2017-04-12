@@ -68,7 +68,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
             String commitSha, String path, String diff, List<CommitComment> comments,
             int initialLine, int highlightStartLine, int highlightEndLine,
-            boolean highlightisRight, long initialCommentId) {
+            boolean highlightisRight, IntentUtils.InitialCommentMarker initialComment) {
         return baseIntent.putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("sha", commitSha)
@@ -79,7 +79,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 .putExtra("highlight_start", highlightStartLine)
                 .putExtra("highlight_end", highlightEndLine)
                 .putExtra("highlight_right", highlightisRight)
-                .putExtra("initial_comment", initialCommentId);
+                .putExtra("initial_comment", initialComment);
     }
 
     private static final Pattern HUNK_START_PATTERN =
@@ -96,7 +96,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     private int mHighlightStartLine;
     private int mHighlightEndLine;
     private boolean mHighlightIsRight;
-    private long mInitialCommentId;
+    private IntentUtils.InitialCommentMarker mInitialComment;
 
     private String mDiff;
     private String[] mDiffLines;
@@ -156,7 +156,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         mHighlightStartLine = extras.getInt("highlight_start", -1);
         mHighlightEndLine = extras.getInt("highlight_end", -1);
         mHighlightIsRight = extras.getBoolean("highlight_right", false);
-        mInitialCommentId = extras.getLong("initial_comment", -1);
+        mInitialComment = extras.getParcelable("initial_comment");
         extras.remove("initial_comment");
     }
 
@@ -263,7 +263,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     mCommitComments.put(id, comment);
                     content.append("<div ").append("id=\"comment").append(id).append("\"");
                     content.append(" class=\"comment");
-                    if (id == mInitialCommentId) {
+                    if (mInitialComment != null && mInitialComment.matches(id, null)) {
                         content.append(" highlighted");
                     }
                     content.append("\"");
@@ -285,9 +285,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         if (mInitialLine > 0) {
             content.insert(highlightInsertPos, " onload='scrollToElement(\"line"
                     + mInitialLine + "\")' onresize='scrollToHighlight();'");
-        } else if (mInitialCommentId != -1) {
+        } else if (mInitialComment != null) {
             content.insert(highlightInsertPos, " onload='scrollToElement(\"comment"
-                    + mInitialCommentId + "\")' onresize='scrollToHighlight();'");
+                    + mInitialComment.commentId + "\")' onresize='scrollToHighlight();'");
         } else if (highlightStartLine != -1 && highlightEndLine != -1) {
             content.insert(highlightInsertPos, " onload='highlightDiffLines("
                     + highlightStartLine + "," + highlightEndLine

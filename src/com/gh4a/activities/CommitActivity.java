@@ -44,27 +44,27 @@ import java.util.List;
 public class CommitActivity extends BasePagerActivity implements
         CommitFragment.CommentUpdateListener, CommitNoteFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
-        return makeIntent(context, repoOwner, repoName, -1, sha, -1);
+        return makeIntent(context, repoOwner, repoName, -1, sha, null);
     }
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             int pullRequestNumber, String sha) {
-        return makeIntent(context, repoOwner, repoName, pullRequestNumber, sha, -1);
+        return makeIntent(context, repoOwner, repoName, pullRequestNumber, sha, null);
     }
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            String sha, long initialCommentId) {
-        return makeIntent(context, repoOwner, repoName, -1, sha, initialCommentId);
+            String sha, IntentUtils.InitialCommentMarker initialComment) {
+        return makeIntent(context, repoOwner, repoName, -1, sha, initialComment);
     }
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            int pullRequestNumber, String sha, long initialCommentId) {
+            int pullRequestNumber, String sha, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, CommitActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("pr", pullRequestNumber)
                 .putExtra("sha", sha)
-                .putExtra("initial_comment", initialCommentId);
+                .putExtra("initial_comment", initialComment);
     }
 
     private String mRepoOwner;
@@ -74,7 +74,7 @@ public class CommitActivity extends BasePagerActivity implements
 
     private RepositoryCommit mCommit;
     private List<CommitComment> mComments;
-    private long mInitialCommentId;
+    private IntentUtils.InitialCommentMarker mInitialComment;
 
     private static final int[] TITLES = new int[] {
         R.string.commit, R.string.issue_comments
@@ -106,15 +106,15 @@ public class CommitActivity extends BasePagerActivity implements
         protected void onResultReady(List<CommitComment> result) {
             mComments = result;
             boolean foundComment = false;
-            if (mInitialCommentId >= 0) {
+            if (mInitialComment != null) {
                 for (CommitComment comment : result) {
-                    if (comment.getId() == mInitialCommentId) {
+                    if (comment.getId() == mInitialComment.commentId) {
                         foundComment = comment.getPosition() < 0;
                         break;
                     }
                 }
                 if (!foundComment) {
-                    mInitialCommentId = -1;
+                    mInitialComment = null;
                 }
             }
             showContentIfReady();
@@ -144,7 +144,7 @@ public class CommitActivity extends BasePagerActivity implements
         mRepoName = extras.getString("repo");
         mObjectSha = extras.getString("sha");
         mPullRequestNumber = extras.getInt("pr", -1);
-        mInitialCommentId = extras.getLong("initial_comment", -1);
+        mInitialComment = extras.getParcelable("initial_comment");
         extras.remove("initial_comment");
     }
 
@@ -166,8 +166,8 @@ public class CommitActivity extends BasePagerActivity implements
     protected Fragment makeFragment(int position) {
         if (position == 1) {
             Fragment f = CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
-                    mCommit, mComments, mInitialCommentId);
-            mInitialCommentId = -1;
+                    mCommit, mComments, mInitialComment);
+            mInitialComment = null;
             return f;
         } else {
             return CommitFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
@@ -228,7 +228,7 @@ public class CommitActivity extends BasePagerActivity implements
         if (mCommit != null && mComments != null) {
             setContentShown(true);
             invalidateTabs();
-            if (mInitialCommentId != -1) {
+            if (mInitialComment != null) {
                 getPager().setCurrentItem(1);
             }
         }

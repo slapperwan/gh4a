@@ -1,20 +1,22 @@
 package com.gh4a.utils;
 
-import org.eclipse.egit.github.core.Repository;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.v4.os.ParcelableCompat;
+import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.widget.Toast;
 
 import com.gh4a.R;
-import com.gh4a.activities.RepositoryActivity;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class IntentUtils {
@@ -98,5 +100,59 @@ public class IntentUtils {
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
                 chooserIntents.toArray(new Intent[chooserIntents.size()]));
         return chooserIntent;
+    }
+
+    public static class InitialCommentMarker implements Parcelable {
+        public final long commentId;
+        public final Date date;
+
+        public InitialCommentMarker(long commentId) {
+            this(commentId, null);
+        }
+
+        public InitialCommentMarker(Date date) {
+            this(-1, date);
+        }
+
+        private InitialCommentMarker(long commentId, Date date) {
+            this.commentId = commentId;
+            this.date = date;
+        }
+
+        public boolean matches(long id, Date date) {
+            if (commentId >= 0 && id >= 0) {
+                return commentId == id;
+            }
+            if (date != null && this.date != null) {
+                return date.after(this.date);
+            }
+            return false;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel out, int flags) {
+            out.writeLong(commentId);
+            out.writeLong(date != null ? date.getTime() : -1);
+        }
+
+        public static final Parcelable.Creator<InitialCommentMarker> CREATOR =
+                ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<InitialCommentMarker>() {
+            @Override
+            public InitialCommentMarker createFromParcel(Parcel in, ClassLoader loader) {
+                long commentId = in.readLong();
+                long timeMillis = in.readLong();
+                return new InitialCommentMarker(commentId,
+                        timeMillis != -1 ? new Date(timeMillis) : null);
+            }
+            @Override
+            public InitialCommentMarker[] newArray(int size) {
+                return new InitialCommentMarker[size];
+            }
+        });
     }
 }
