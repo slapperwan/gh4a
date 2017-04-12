@@ -142,7 +142,6 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         mIssueNumber = extras.getInt("number");
         mInitialComment = extras.getParcelable("initial_comment");
         extras.remove("initial_comment");
-        extras.remove("last_read_at");
     }
 
     private void showUiIfDone() {

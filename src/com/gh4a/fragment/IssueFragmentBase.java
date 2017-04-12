@@ -97,7 +97,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         mIsCollaborator = args.getBoolean("collaborator");
         mInitialComment = args.getParcelable("initial_comment");
         args.remove("initial_comment");
-        args.remove("last_read_at");
 
         updateCommentLockState();
     }

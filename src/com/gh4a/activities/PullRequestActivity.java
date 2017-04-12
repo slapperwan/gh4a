@@ -274,7 +274,6 @@ public class PullRequestActivity extends BasePagerActivity implements
         mInitialPage = extras.getInt("initial_page", -1);
         extras.remove("initial_comment");
         extras.remove("initial_page");
-        extras.remove("last_read_at");
     }
 
     @Override
