@@ -1,5 +1,7 @@
 package com.gh4a.utils;
 
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -8,6 +10,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.os.ParcelableCompat;
 import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.widget.Toast;
@@ -60,6 +63,21 @@ public class IntentUtils {
             return resolvedViewIntent;
         }
         return createBrowserIntent(context, uri);
+    }
+
+    public static void openInCustomTabOrBrowser(Activity activity, Uri uri) {
+        String pkg = CustomTabsHelper.getPackageNameToUse(activity);
+        if (pkg != null) {
+            int color = UiUtils.resolveColor(activity, R.attr.colorPrimary);
+            CustomTabsIntent i = new CustomTabsIntent.Builder()
+                    .setToolbarColor(color)
+                    .build();
+            i.intent.setPackage(pkg);
+            i.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.launchUrl(activity, uri);
+        } else {
+            launchBrowser(activity, uri, Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
     }
 
     private static Intent createActivityChooserIntent(Context context, Intent intent, Uri uri) {

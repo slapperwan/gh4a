@@ -93,8 +93,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
     private NavigationView mRightDrawer;
-    private View mLeftDrawerTitle;
-    private View mRightDrawerTitle;
+    private View mLeftDrawerHeader;
+    private View mRightDrawerHeader;
     private SupportMenuInflater mMenuInflater;
 
     private ActivityCompat.OnRequestPermissionsResultCallback mPendingPermissionCb;
@@ -186,8 +186,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    protected View getLeftDrawerTitle(ViewGroup container) {
-        return getLayoutInflater().inflate(R.layout.drawer_title_main, container, false);
+    protected void configureLeftDrawerHeader(View header) {
     }
 
     protected boolean canSwipeToRefresh() {
@@ -535,6 +534,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
         error.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    protected void onDrawerOpened(boolean right) {
+    }
+
+    protected void onDrawerClosed(boolean right) {
+    }
+
     private void updateSwipeToRefreshState() {
         ensureContent();
         mSwipeLayout.setEnabled(mContentShown && !mErrorShown && canSwipeToRefresh());
@@ -544,8 +549,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         ensureContent();
 
         int primaryColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        assignBackground(mLeftDrawerTitle, primaryColor);
-        assignBackground(mRightDrawerTitle, primaryColor);
+        assignBackground(mLeftDrawerHeader, primaryColor);
+        assignBackground(mRightDrawerHeader, primaryColor);
         assignBackground(mHeader, primaryColor);
 
         int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
@@ -584,11 +589,29 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private void setupNavigationDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
         NavigationView leftDrawer = (NavigationView) findViewById(R.id.left_drawer);
         applyHighlightColor(leftDrawer);
         mRightDrawer = (NavigationView) findViewById(R.id.right_drawer);
         applyHighlightColor(mRightDrawer);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+            }
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                BaseActivity.this.onDrawerOpened(drawerView == mRightDrawer);
+            }
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                BaseActivity.this.onDrawerClosed(drawerView == mRightDrawer);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+            }
+        });
 
         Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
@@ -619,10 +642,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 }
             });
 
-            mLeftDrawerTitle = getLeftDrawerTitle(leftDrawer);
-            if (mLeftDrawerTitle!= null) {
-                leftDrawer.addHeaderView(mLeftDrawerTitle);
-            }
+            mLeftDrawerHeader = leftDrawer.inflateHeaderView(R.layout.drawer_header_left);
+            configureLeftDrawerHeader(mLeftDrawerHeader);
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);
         }
@@ -631,7 +652,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_right, Gravity.RIGHT);
         mDrawerLayout.setScrimColor(ContextCompat.getColor(this, R.color.drawer_scrim));
 
-        mRightDrawerTitle = mRightDrawer.inflateHeaderView(R.layout.drawer_title_right);
+        mRightDrawerHeader = mRightDrawer.inflateHeaderView(R.layout.drawer_header_right);
 
         updateRightNavigationDrawer();
     }

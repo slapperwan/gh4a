@@ -15,11 +15,11 @@
  */
 package com.gh4a.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.util.Pair;
 import android.view.Menu;
@@ -33,9 +33,7 @@ import com.gh4a.BuildConfig;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.CustomTabsHelper;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.UserService;
@@ -75,7 +73,9 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
 
         Gh4Application app = Gh4Application.get();
         if (app.isAuthorized()) {
-            goToToplevelActivity();
+            if (!handleIntent(getIntent())) {
+                goToToplevelActivity();
+            }
             finish();
         } else {
             setContentView(R.layout.main);
@@ -190,32 +190,23 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         triggerLogin();
     }
 
-    private void triggerLogin() {
-        String pkg = CustomTabsHelper.getPackageNameToUse(Github4AndroidActivity.this);
+    public static void launchLogin(Activity activity) {
         Uri uri = Uri.parse(OAUTH_URL)
                 .buildUpon()
                 .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
                 .appendQueryParameter(PARAM_SCOPE, SCOPES)
                 .appendQueryParameter(PARAM_CALLBACK_URI, CALLBACK_URI.toString())
                 .build();
-        if (pkg != null) {
-            int color = UiUtils.resolveColor(Github4AndroidActivity.this, R.attr.colorPrimary);
-            CustomTabsIntent i = new CustomTabsIntent.Builder()
-                    .setToolbarColor(color)
-                    .build();
-            i.intent.setPackage(pkg);
-            i.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.launchUrl(Github4AndroidActivity.this, uri);
-        } else {
-            IntentUtils.launchBrowser(Github4AndroidActivity.this,
-                    uri, Intent.FLAG_ACTIVITY_NEW_TASK);
-        }
+        IntentUtils.openInCustomTabOrBrowser(activity, uri);
+    }
 
+    private void triggerLogin() {
+        launchLogin(this);
         mContent.setVisibility(View.GONE);
         mProgress.setVisibility(View.VISIBLE);
     }
 
-    private class FetchTokenTask extends BackgroundTask<Pair<String, String>> {
+    private class FetchTokenTask extends BackgroundTask<Pair<User, String>> {
         private Uri mUri;
         public FetchTokenTask(Uri uri) {
             super(Github4AndroidActivity.this);
@@ -223,7 +214,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         }
 
         @Override
-        protected Pair<String, String> run() throws Exception {
+        protected Pair<User, String> run() throws Exception {
             HttpURLConnection connection = null;
             CharArrayWriter writer = null;
 
@@ -256,7 +247,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                 UserService userService = new UserService(client);
                 User user = userService.getUser();
 
-                return Pair.create(user.getLogin(), token);
+                return Pair.create(user, token);
             } finally {
                 if (connection != null) {
                     connection.disconnect();
@@ -274,8 +265,8 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         }
 
         @Override
-        protected void onSuccess(Pair<String, String> result) {
-            Gh4Application.get().setLogin(result.first, result.second);
+        protected void onSuccess(Pair<User, String> result) {
+            Gh4Application.get().addAccount(result.first, result.second);
             goToToplevelActivity();
             finish();
         }

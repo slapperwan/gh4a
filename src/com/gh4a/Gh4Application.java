@@ -23,10 +23,12 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.SparseArray;
 
 import com.crashlytics.android.Crashlytics;
 import com.gh4a.fragment.SettingsFragment;
 
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.CommitService;
@@ -49,6 +51,8 @@ import org.eclipse.egit.github.core.service.WatcherService;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -85,8 +89,11 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     private static final int THEME_DARK = 0;
     private static final int THEME_LIGHT = 1;
 
-    private static final String KEY_LOGIN = "USER_LOGIN";
-    private static final String KEY_TOKEN = "Token";
+    private static final String KEY_VERSION = "version";
+    private static final String KEY_ACTIVE_LOGIN = "active_login";
+    private static final String KEY_ALL_LOGINS = "logins";
+    private static final String KEY_PREFIX_TOKEN = "token_";
+    private static final String KEY_PREFIX_USER_ID = "user_id_";
 
     private static final int MAX_TRACKED_URLS = 5;
     private static int sNextUrlTrackingPosition = 0;
@@ -104,6 +111,28 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
         SharedPreferences prefs = getPrefs();
         selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, THEME_LIGHT));
+
+        if (prefs.getInt(KEY_VERSION, 0) < 2) {
+            // convert old-style login/token pref to new-style login list
+            String login = prefs.getString("USER_LOGIN", null);
+            String token = prefs.getString("Token", null);
+            HashSet<String> loginSet = new HashSet<>();
+            if (login != null && token != null) {
+                loginSet.add(login);
+            }
+
+            SharedPreferences.Editor editor = prefs.edit()
+                    .putString(KEY_ACTIVE_LOGIN, login)
+                    .putStringSet(KEY_ALL_LOGINS, loginSet)
+                    .putInt(KEY_VERSION, 2)
+                    .remove("USER_LOGIN")
+                    .remove("Token");
+            if (login != null && token != null) {
+                editor.putString(KEY_PREFIX_TOKEN + login, token);
+            }
+            editor.apply();
+        }
+
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         boolean isDebuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
@@ -180,23 +209,68 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return mPt;
     }
 
+    public void setActiveLogin(String login) {
+        if (getPrefs().getStringSet(KEY_ALL_LOGINS, null).contains(login)) {
+            getPrefs().edit()
+                    .putString(KEY_ACTIVE_LOGIN, login)
+                    .apply();
+        }
+    }
+
     public String getAuthLogin() {
-        return getPrefs().getString(KEY_LOGIN, null);
+        return getPrefs().getString(KEY_ACTIVE_LOGIN, null);
+    }
+
+    public SparseArray<String> getAccounts() {
+        SparseArray<String> accounts = new SparseArray<>();
+        for (String login : getPrefs().getStringSet(KEY_ALL_LOGINS, null)) {
+            int id = getPrefs().getInt(KEY_PREFIX_USER_ID + login, -1);
+            if (id > 0) {
+                accounts.put(id, login);
+            }
+        }
+        return accounts;
     }
 
     public String getAuthToken() {
-        return getPrefs().getString(KEY_TOKEN, null);
+        String login = getAuthLogin();
+        return login != null ? getPrefs().getString(KEY_PREFIX_TOKEN + login, null) : null;
     }
 
-    public void setLogin(String login, String token) {
+    public void addAccount(User user, String token) {
+        String login = user.getLogin();
+        Set<String> logins = getPrefs().getStringSet(KEY_ALL_LOGINS, null);
+        logins.add(login);
+
         getPrefs().edit()
-                .putString(KEY_TOKEN, token)
-                .putString(KEY_LOGIN, login)
+                .putString(KEY_ACTIVE_LOGIN, login)
+                .putStringSet(KEY_ALL_LOGINS, logins)
+                .putString(KEY_PREFIX_TOKEN + login, token)
+                .putInt(KEY_PREFIX_USER_ID + login, user.getId())
+                .apply();
+    }
+
+    public void setCurrentAccountInfo(User user) {
+        getPrefs().edit()
+                .putInt(KEY_PREFIX_USER_ID + user.getLogin(), user.getId())
                 .apply();
     }
 
     public void logout() {
-        setLogin(null, null);
+        String login = getAuthLogin();
+        if (login == null) {
+            return;
+        }
+
+        Set<String> logins = getPrefs().getStringSet(KEY_ALL_LOGINS, null);
+        logins.remove(login);
+
+        getPrefs().edit()
+                .putString(KEY_ACTIVE_LOGIN, logins.size() > 0 ? logins.iterator().next() : null)
+                .putStringSet(KEY_ALL_LOGINS, logins)
+                .remove(KEY_PREFIX_TOKEN + login)
+                .remove(KEY_PREFIX_USER_ID + login)
+                .apply();
     }
 
     private SharedPreferences getPrefs() {
@@ -213,7 +287,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(KEY_TOKEN)) {
+        if (key.equals(KEY_ACTIVE_LOGIN)) {
             mClient.setOAuth2Token(getAuthToken());
         } else if (key.equals(SettingsFragment.KEY_THEME)) {
             selectTheme(sharedPreferences.getInt(key, THEME_LIGHT));

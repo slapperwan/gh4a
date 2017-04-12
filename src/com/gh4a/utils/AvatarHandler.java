@@ -12,34 +12,41 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.ColorInt;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.LruCache;
 import android.support.v4.util.SparseArrayCompat;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
-
-import com.gh4a.R;
 
 public class AvatarHandler {
     private static final String TAG = "GravatarHandler";
 
     private static final int MAX_CACHED_IMAGE_SIZE = 60; /* dp - maximum gravatar view size used */
 
-    private static Bitmap sDefaultAvatarBitmap;
     private static LruCache<Integer, Bitmap> sCache;
     private static int sNextRequestId = 1;
 
     private static class Request {
         int id;
         String url;
-        ArrayList<ImageView> views;
+        ArrayList<ViewDelegate> views;
     }
     private static final SparseArrayCompat<Request> sRequests = new SparseArrayCompat<>();
     private static int sMaxImageSizePx = -1;
@@ -72,7 +79,7 @@ public class AvatarHandler {
             if (request != null && bitmap != null) {
                 sCache.put(request.id, bitmap);
 
-                for (ImageView view : request.views) {
+                for (ViewDelegate view : request.views) {
                     applyAvatarToView(view, bitmap);
                 }
             }
@@ -82,14 +89,24 @@ public class AvatarHandler {
 
     public static void assignAvatar(ImageView view, User user) {
         if (user == null) {
-            assignAvatar(view, 0, null);
+            assignAvatar(view, null, 0, null);
             return;
         }
 
-        assignAvatar(view, user.getId(), user.getAvatarUrl());
+        assignAvatar(view, user.getLogin(), user.getId(), user.getAvatarUrl());
     }
 
-    public static void assignAvatar(ImageView view, int userId, String url) {
+    public static void assignAvatar(ImageView view, String userName, int userId, String url) {
+        assignAvatarInternal(new ImageViewDelegate(view), userName, userId, url);
+    }
+
+    public static void assignAvatar(Context context, MenuItem item,
+            String userName, int userId, String url) {
+        assignAvatarInternal(new MenuItemDelegate(context, item), userName, userId, url);
+    }
+
+    public static void assignAvatarInternal(ViewDelegate view,
+            String userName, int userId, String url) {
         removeOldRequest(view);
 
         if (sCache == null) {
@@ -101,7 +118,7 @@ public class AvatarHandler {
             return;
         }
 
-        applyAvatarToView(view, sDefaultAvatarBitmap);
+        view.setDrawable(new DefaultAvatarDrawable(view.getContext(), userName));
         if (userId <= 0) {
             return;
         }
@@ -126,8 +143,7 @@ public class AvatarHandler {
             sWorkerThread.start();
             sWorkerHandler = new WorkerHandler(sWorkerThread.getLooper());
         }
-        Message msg = sWorkerHandler.obtainMessage(MSG_LOAD,
-                requestId, view.getWidth(), request.url);
+        Message msg = sWorkerHandler.obtainMessage(MSG_LOAD, requestId, 0, request.url);
         msg.sendToTarget();
     }
 
@@ -156,7 +172,6 @@ public class AvatarHandler {
         };
 
         Resources res = context.getResources();
-        sDefaultAvatarBitmap = BitmapFactory.decodeResource(res, R.drawable.default_avatar);
         sMaxImageSizePx = Math.round(res.getDisplayMetrics().density * MAX_CACHED_IMAGE_SIZE);
     }
 
@@ -169,11 +184,21 @@ public class AvatarHandler {
                 .toString();
     }
 
-    private static void applyAvatarToView(ImageView view, Bitmap avatar) {
-        RoundedBitmapDrawable d = RoundedBitmapDrawableFactory.create(view.getResources(), avatar);
+    private static void applyAvatarToView(ViewDelegate view, Bitmap avatar) {
+        Resources res = view.getContext().getResources();
+        RoundedBitmapDrawable d = RoundedBitmapDrawableFactory.create(res, avatar);
         d.setCornerRadius(Math.max(avatar.getWidth() / 2, avatar.getHeight() / 2));
         d.setAntiAlias(true);
-        view.setImageDrawable(d);
+
+        Drawable old = view.getDrawable();
+        if (old instanceof DefaultAvatarDrawable) {
+            TransitionDrawable transition = new TransitionDrawable(new Drawable[] { old, d });
+            transition.setCrossFadeEnabled(true);
+            transition.startTransition(res.getInteger(android.R.integer.config_shortAnimTime));
+            view.setDrawable(transition);
+        } else {
+            view.setDrawable(d);
+        }
     }
 
     private static Request getRequestForId(int id) {
@@ -187,12 +212,11 @@ public class AvatarHandler {
         return null;
     }
 
-    private static void removeOldRequest(ImageView view) {
+    private static void removeOldRequest(ViewDelegate view) {
         int count = sRequests.size();
         for (int i = 0; i < count; i++) {
             Request request = sRequests.valueAt(i);
-            if (request.views.contains(view)) {
-                request.views.remove(view);
+            if (request.views.remove(view)) {
                 if (request.views.isEmpty()) {
                     if (sWorkerHandler != null) {
                         sWorkerHandler.removeMessages(MSG_LOAD, request.url);
@@ -275,6 +299,129 @@ public class AvatarHandler {
                     sHandler.obtainMessage(MSG_LOADED, msg.arg1, 0, bitmap).sendToTarget();
                     break;
             }
+        }
+    }
+
+    public static class DefaultAvatarDrawable extends Drawable {
+        private static final @ColorInt int[] COLOR_PALETTE = {
+            0xffdb4437, 0xffe91e63, 0xff9c27b0, 0xff673ab7,
+            0xff3f51b5, 0xff4285f4, 0xff039be5, 0xff0097a7,
+            0xff009688, 0xff0f9d58, 0xff689f38, 0xffef6c00,
+            0xffff5722, 0xff757575
+        };
+        private static final float LETTER_TO_TILE_RATIO = 0.67f;
+
+        private final Paint mPaint;
+        private final @ColorInt int mColor;
+        private final char[] mLetter = new char[1];
+        private static final Rect sRect = new Rect();
+
+        public DefaultAvatarDrawable(Context context, String userName) {
+            mPaint = new Paint();
+            mPaint.setTypeface(TypefaceCache.getTypeface(context, TypefaceCache.TF_MEDIUM));
+            mPaint.setTextAlign(Paint.Align.CENTER);
+            mPaint.setAntiAlias(true);
+
+            final int colorIndex;
+            if (TextUtils.isEmpty(userName)) {
+                mLetter[0] = '?';
+                colorIndex = (int) (Math.random() * COLOR_PALETTE.length);
+            } else {
+                mLetter[0] = Character.toUpperCase(userName.charAt(0));
+                colorIndex = Math.abs(userName.hashCode()) % COLOR_PALETTE.length;
+            }
+
+            mColor = COLOR_PALETTE[colorIndex];
+        }
+
+        @Override
+        public void draw(final Canvas canvas) {
+            final Rect bounds = getBounds();
+            if (!isVisible() || bounds.isEmpty()) {
+                return;
+            }
+
+            mPaint.setColor(mColor);
+
+            final int minDimension = Math.min(bounds.width(), bounds.height());
+            canvas.drawCircle(bounds.centerX(), bounds.centerY(), minDimension / 2, mPaint);
+
+            mPaint.setTextSize(LETTER_TO_TILE_RATIO * minDimension);
+            mPaint.getTextBounds(mLetter, 0, 1, sRect);
+            mPaint.setColor(Color.WHITE);
+
+            canvas.drawText(mLetter, 0, 1, bounds.centerX(),
+                    bounds.centerY() - sRect.exactCenterY(),
+                    mPaint);
+        }
+
+        @Override
+        public void setAlpha(final int alpha) {
+            mPaint.setAlpha(alpha);
+        }
+
+        @Override
+        public void setColorFilter(final ColorFilter cf) {
+            mPaint.setColorFilter(cf);
+        }
+
+        @Override
+        public int getOpacity() {
+            return android.graphics.PixelFormat.OPAQUE;
+        }
+    }
+
+    private interface ViewDelegate {
+        Context getContext();
+        Drawable getDrawable();
+        void setDrawable(Drawable d);
+    }
+
+    private static class ImageViewDelegate implements ViewDelegate {
+        private ImageView mView;
+        public ImageViewDelegate(ImageView view) {
+            mView = view;
+        }
+        @Override
+        public Context getContext() {
+            return mView.getContext();
+        }
+        @Override
+        public Drawable getDrawable() {
+            return mView.getDrawable();
+        }
+        @Override
+        public void setDrawable(Drawable d) {
+            mView.setImageDrawable(d);
+        }
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof ImageViewDelegate && ((ImageViewDelegate) obj).mView == mView;
+        }
+    }
+
+    private static class MenuItemDelegate implements ViewDelegate {
+        private Context mContext;
+        private MenuItem mItem;
+        public MenuItemDelegate(Context context, MenuItem item) {
+            mContext = context;
+            mItem = item;
+        }
+        @Override
+        public Context getContext() {
+            return mContext;
+        }
+        @Override
+        public Drawable getDrawable() {
+            return mItem.getIcon();
+        }
+        @Override
+        public void setDrawable(Drawable d) {
+            mItem.setIcon(d);
+        }
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof MenuItemDelegate && ((MenuItemDelegate) obj).mItem == mItem;
         }
     }
 }
