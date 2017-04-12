@@ -9,10 +9,14 @@ import android.view.MenuItem;
 
 import com.gh4a.R;
 import com.gh4a.fragment.RepositoryListContainerFragment;
+import com.gh4a.fragment.StarredRepositoryListContainerFragment;
 
 public class RepositoryFactory extends FragmentFactory {
     private static final int[] TAB_TITLES = new int[] {
-        R.string.my_repositories
+            R.string.my_repositories
+    };
+    private static final int[] STARRED_TAB_TITLES = new int[] {
+            R.string.starred_repositories
     };
 
     private final String mUserLogin;
@@ -20,40 +24,50 @@ public class RepositoryFactory extends FragmentFactory {
     private final RepositoryListContainerFragment.SortDrawerHelper mSortDrawerHelper;
     private RepositoryListContainerFragment mFragment;
     private final SharedPreferences mPrefs;
+    private final boolean mOnlyStarred;
 
     private static final String STATE_KEY_FRAGMENT = "repoFactoryFragment";
     private static final String PREF_KEY_FILTER = "home_repo_list_filter";
     private static final String PREF_KEY_SORT_ORDER = "home_repo_list_sort_order";
     private static final String PREF_KEY_SORT_DIR = "home_repo_list_sort_dir";
 
-    public RepositoryFactory(HomeActivity activity, String userLogin, SharedPreferences prefs) {
+    public RepositoryFactory(HomeActivity activity, String userLogin, SharedPreferences prefs,
+            boolean onlyStarred) {
         super(activity);
         mUserLogin = userLogin;
+        mOnlyStarred = onlyStarred;
 
         mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(mUserLogin, false);
-        mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
+        mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper(mOnlyStarred);
         mPrefs = prefs;
     }
 
     @Override
     protected @StringRes int getTitleResId() {
-        return R.string.my_repositories;
+        return getTabTitleResIds()[0];
     }
 
     @Override
     protected int[] getTabTitleResIds() {
-        return TAB_TITLES;
+        return mOnlyStarred ? STARRED_TAB_TITLES : TAB_TITLES;
     }
 
     @Override
     protected int[] getToolDrawerMenuResIds() {
         int sortMenuResId = mSortDrawerHelper.getMenuResId();
+
+        if (mOnlyStarred) {
+            if (sortMenuResId == 0) {
+                return new int[] {};
+            }
+            return new int[] { sortMenuResId };
+        }
+
         int filterMenuResId = mFilterDrawerHelper.getMenuResId();
         if (sortMenuResId == 0) {
             return new int[] { filterMenuResId };
-        } else {
-            return new int[] { sortMenuResId, filterMenuResId };
         }
+        return new int[] { sortMenuResId, filterMenuResId };
     }
 
     @Override
@@ -118,6 +132,9 @@ public class RepositoryFactory extends FragmentFactory {
 
     @Override
     protected Fragment makeFragment(int position) {
+        if (mOnlyStarred) {
+            return StarredRepositoryListContainerFragment.newInstance(mUserLogin, false);
+        }
         return RepositoryListContainerFragment.newInstance(mUserLogin, false);
     }
 

@@ -63,7 +63,7 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
 
         mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(
                 mUserLogin, mUserIsOrg);
-        mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
+        mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper(false);
     }
 
     @Override
