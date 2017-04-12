@@ -167,7 +167,9 @@ public class HomeActivity extends BasePagerActivity implements
         mDrawerSwitcher.setVisibility(View.VISIBLE);
 
         mDrawerSwitcher.setOnClickListener(this);
-        header.setOnClickListener(this);
+
+        View clickableBackground = header.findViewById(R.id.drawer_header);
+        clickableBackground.setOnClickListener(this);
     }
 
     @Override
