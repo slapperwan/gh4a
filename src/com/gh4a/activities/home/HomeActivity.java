@@ -213,6 +213,14 @@ public class HomeActivity extends BasePagerActivity implements
         return false;
     }
 
+    @Override
+    protected void onDrawerClosed(boolean right) {
+        super.onDrawerClosed(right);
+        if (!right) {
+            updateDrawerMode(false);
+        }
+    }
+
     private void switchActiveUser(String login) {
         Gh4Application.get().setActiveLogin(login);
         mUserLogin = login;

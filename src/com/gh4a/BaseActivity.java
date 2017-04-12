@@ -534,6 +534,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
         error.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    protected void onDrawerOpened(boolean right) {
+    }
+
+    protected void onDrawerClosed(boolean right) {
+    }
+
     private void updateSwipeToRefreshState() {
         ensureContent();
         mSwipeLayout.setEnabled(mContentShown && !mErrorShown && canSwipeToRefresh());
@@ -583,11 +589,29 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private void setupNavigationDrawer() {
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
         NavigationView leftDrawer = (NavigationView) findViewById(R.id.left_drawer);
         applyHighlightColor(leftDrawer);
         mRightDrawer = (NavigationView) findViewById(R.id.right_drawer);
         applyHighlightColor(mRightDrawer);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
+        mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+            }
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                BaseActivity.this.onDrawerOpened(drawerView == mRightDrawer);
+            }
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                BaseActivity.this.onDrawerClosed(drawerView == mRightDrawer);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+            }
+        });
 
         Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
