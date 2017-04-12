@@ -216,8 +216,7 @@ public class AvatarHandler {
         int count = sRequests.size();
         for (int i = 0; i < count; i++) {
             Request request = sRequests.valueAt(i);
-            if (request.views.contains(view)) {
-                request.views.remove(view);
+            if (request.views.remove(view)) {
                 if (request.views.isEmpty()) {
                     if (sWorkerHandler != null) {
                         sWorkerHandler.removeMessages(MSG_LOAD, request.url);
@@ -395,6 +394,10 @@ public class AvatarHandler {
         public void setDrawable(Drawable d) {
             mView.setImageDrawable(d);
         }
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof ImageViewDelegate && ((ImageViewDelegate) obj).mView == mView;
+        }
     }
 
     private static class MenuItemDelegate implements ViewDelegate {
@@ -415,6 +418,10 @@ public class AvatarHandler {
         @Override
         public void setDrawable(Drawable d) {
             mItem.setIcon(d);
+        }
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof MenuItemDelegate && ((MenuItemDelegate) obj).mItem == mItem;
         }
     }
 }
