@@ -54,7 +54,6 @@ import org.eclipse.egit.github.core.client.IGitHubConstants;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -169,7 +168,6 @@ public class BrowseFilter extends AppCompatActivity {
                         int page = "commits".equals(action) ? PullRequestActivity.PAGE_COMMITS
                                 : "files".equals(target) ? PullRequestActivity.PAGE_FILES
                                 : -1;
-                        Date lastReadAt = (Date) getIntent().getSerializableExtra("last_read_at");
                         intent = PullRequestActivity.makeIntent(this, user, repo, pullRequestNumber,
                                 page, generateInitialCommentMarker(uri.getFragment(), "issue"));
                     }
