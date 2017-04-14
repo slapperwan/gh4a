@@ -343,8 +343,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
     }
 
-    private void openCommentDialog(final long id, String line, final int position,
-            final int leftLine, final int rightLine) {
+    private void openCommentDialog(final long id, final long replyToId, String line,
+            final int position, final int leftLine, final int rightLine) {
         final boolean isEdit = id != 0L;
         LayoutInflater inflater = LayoutInflater.from(this);
         View commentDialog = inflater.inflate(R.layout.commit_comment_dialog, null);
@@ -363,7 +363,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String text = body.getText().toString();
-                new CommentTask(id, text, position).schedule();
+                new CommentTask(id, replyToId, text, position).schedule();
             }
         };
 
@@ -394,7 +394,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         long id = idParam != null ? Long.parseLong(idParam) : 0L;
 
         if (idParam == null) {
-            openCommentDialog(id, lineText, line, leftLine, rightLine);
+            openCommentDialog(id, 0L, lineText, line, leftLine, rightLine);
         } else {
             CommentActionPopup p = new CommentActionPopup(id, line, lineText, leftLine, rightLine,
                     mLastTouchDown.x, mLastTouchDown.y);
@@ -418,8 +418,10 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     protected abstract Loader<LoaderResult<List<CommitComment>>> createCommentLoader();
-    protected abstract void updateComment(long id, String body, int position) throws IOException;
+    protected abstract void createComment(CommitComment comment, long replyToCommentId) throws IOException;
+    protected abstract void editComment(CommitComment comment) throws IOException;
     protected abstract void deleteComment(long id) throws IOException;
+    protected abstract boolean canReply();
     protected abstract String createUrl();
 
     private class CommentActionPopup extends ListPopupWindow implements
@@ -455,7 +457,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (position == 2) {
+            int choiceCount = parent.getAdapter().getCount();
+            if (choiceCount > 2 && position == choiceCount - 1) {
                 new AlertDialog.Builder(DiffViewerActivity.this)
                         .setMessage(R.string.delete_comment_message)
                         .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
@@ -467,7 +470,9 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                         .setNegativeButton(R.string.cancel, null)
                         .show();
             } else {
-                openCommentDialog(position == 0 ? 0 : mId, mLineText,
+                long replyToId = canReply() && position == 0 ? mId : 0L;
+                long commentId = choiceCount > 2 && position == choiceCount - 2 ? mId : 0L;
+                openCommentDialog(commentId, replyToId, mLineText,
                         mPosition, mLeftLine, mRightLine);
             }
             dismiss();
@@ -480,11 +485,16 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
 
         private String[] populateChoices(boolean ownComment) {
-            String[] choices = new String[ownComment ? 3 : 1];
-            choices[0] = getString(R.string.reply);
+            int choiceCount = (ownComment ? 3 : 1) + (canReply() ? 1 : 0);
+            String[] choices = new String[choiceCount];
+            int index = 0;
+            if (canReply()) {
+                choices[index++] = getString(R.string.reply);
+            }
+            choices[index++] = getString(R.string.add_comment);
             if (ownComment) {
-                choices[1] = getString(R.string.edit);
-                choices[2] = getString(R.string.delete);
+                choices[index++] = getString(R.string.edit);
+                choices[index++] = getString(R.string.delete);
             }
             return choices;
         }
@@ -506,25 +516,31 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     private class CommentTask extends ProgressDialogTask<Void> {
-        private final String mBody;
-        private final int mPosition;
-        private final long mId;
+        private final CommitComment mComment;
+        private final long mReplyToId;
 
-        public CommentTask(long id, String body, int position) {
+        public CommentTask(long id, long replyToId, String body, int position) {
             super(DiffViewerActivity.this, R.string.saving_msg);
-            mBody = body;
-            mPosition = position;
-            mId = id;
+            mComment = new CommitComment();
+            mComment.setBody(body);
+            mComment.setId(id);
+            mComment.setPosition(position);
+            mReplyToId = replyToId;
         }
 
         @Override
         protected ProgressDialogTask<Void> clone() {
-            return new CommentTask(mId, mBody, mPosition);
+            return new CommentTask(mComment.getId(), mReplyToId,
+                    mComment.getBody(), mComment.getPosition());
         }
 
         @Override
         protected Void run() throws IOException {
-            updateComment(mId, mBody, mPosition);
+            if (mComment.getId() == 0L) {
+                createComment(mComment, mReplyToId);
+            } else {
+                editComment(mComment);
+            }
             return null;
         }
 
@@ -536,7 +552,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         @Override
         protected String getErrorMessage() {
-            return getContext().getString(R.string.error_edit_commit_comment, mPosition);
+            return getContext().getString(R.string.error_edit_commit_comment, mComment.getPosition());
         }
     }
 

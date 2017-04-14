@@ -69,27 +69,32 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    protected void updateComment(long id, String body, int position) throws IOException {
-        boolean isEdit = id != 0L;
-        CommitComment commitComment = new CommitComment();
+    protected boolean canReply() {
+        return true;
+    }
 
-        if (isEdit) {
-            commitComment.setId(id);
-        }
-        commitComment.setPosition(position);
-        commitComment.setCommitId(mSha);
-        commitComment.setPath(mPath);
-        commitComment.setBody(body);
-
+    @Override
+    protected void createComment(CommitComment comment, long replyToCommentId) throws IOException {
         Gh4Application app = Gh4Application.get();
         PullRequestService pullRequestService = (PullRequestService)
                 app.getService(Gh4Application.PULL_SERVICE);
         RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-        if (isEdit) {
-            pullRequestService.editComment(repoId, commitComment);
+        if (replyToCommentId != 0L) {
+            pullRequestService.replyToComment(repoId, mPullRequestNumber, (int) replyToCommentId,
+                    comment.getBody());
         } else {
-            pullRequestService.createComment(repoId, mPullRequestNumber, commitComment);
+            comment.setCommitId(mSha);
+            comment.setPath(mPath);
+            pullRequestService.createComment(repoId, mPullRequestNumber, comment);
         }
+    }
+
+    @Override
+    protected void editComment(CommitComment comment) throws IOException {
+        Gh4Application app = Gh4Application.get();
+        PullRequestService pullRequestService = (PullRequestService)
+                app.getService(Gh4Application.PULL_SERVICE);
+        pullRequestService.editComment(new RepositoryId(mRepoOwner, mRepoName), comment);
     }
 
     @Override

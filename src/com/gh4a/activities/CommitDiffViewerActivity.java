@@ -54,27 +54,24 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    public void updateComment(long id, String body, int position) throws IOException {
-        boolean isEdit = id != 0L;
-        CommitComment commitComment = new CommitComment();
+    protected boolean canReply() {
+        return false;
+    }
 
-        if (isEdit) {
-            commitComment.setId(id);
-        }
-        commitComment.setPosition(position);
-        commitComment.setCommitId(mSha);
-        commitComment.setPath(mPath);
-        commitComment.setBody(body);
+    @Override
+    protected void createComment(CommitComment comment, long replyToCommentId) throws IOException {
+        comment.setPath(mPath);
 
         Gh4Application app = Gh4Application.get();
         CommitService commitService = (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
-        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mSha, comment);
+    }
 
-        if (isEdit) {
-            commitService.editComment(repoId, commitComment);
-        } else {
-            commitService.addComment(repoId, mSha, commitComment);
-        }
+    @Override
+    protected void editComment(CommitComment comment) throws IOException {
+        Gh4Application app = Gh4Application.get();
+        CommitService commitService = (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
+        commitService.editComment(new RepositoryId(mRepoOwner, mRepoName), comment);
     }
 
     @Override
