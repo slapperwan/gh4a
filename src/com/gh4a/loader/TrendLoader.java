@@ -71,7 +71,7 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
             trends.add(new Trend(
                     repoObject.getString("owner"),
                     repoObject.getString("repo"),
-                    repoObject.optString("description"),
+                    repoObject.isNull("description") ? null : repoObject.optString("description"),
                     (int) repoObject.getDouble("stars"),
                     (int) repoObject.getDouble("new_stars"),
                     (int) repoObject.getDouble("forks")));
