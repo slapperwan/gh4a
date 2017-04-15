@@ -48,7 +48,7 @@ public class NotificationAdapter extends
 
     public void markAsRead(@Nullable Repository repository, @Nullable Notification notification) {
         NotificationHolder previousRepoItem = null;
-        int notificationsInSameRepoCount = 0;
+        int unreadNotificationsInSameRepoCount = 0;
 
         boolean isMarkingSingleNotification = repository == null && notification != null;
 
@@ -63,24 +63,24 @@ public class NotificationAdapter extends
             }
 
             // When marking single notification as read also mark the repository if it contained
-            // only 1 notification
+            // only 1 unread notification
             if (isMarkingSingleNotification) {
                 if (item.notification == null) {
-                    if (previousRepoItem != null && notificationsInSameRepoCount == 1
+                    if (previousRepoItem != null && unreadNotificationsInSameRepoCount == 0
                             && previousRepoItem.repository.equals(notification.getRepository())) {
                         previousRepoItem.setIsRead(true);
                     }
                     previousRepoItem = item;
-                    notificationsInSameRepoCount = 0;
-                } else {
-                    notificationsInSameRepoCount += 1;
+                    unreadNotificationsInSameRepoCount = 0;
+                } else if (!item.isRead()) {
+                    unreadNotificationsInSameRepoCount += 1;
                 }
             }
         }
 
         // Additional check for the very last notification
         if (isMarkingSingleNotification && previousRepoItem != null
-                && notificationsInSameRepoCount == 1
+                && unreadNotificationsInSameRepoCount == 0
                 && previousRepoItem.repository.equals(notification.getRepository())) {
             previousRepoItem.setIsRead(true);
         }
