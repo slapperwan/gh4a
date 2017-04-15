@@ -171,8 +171,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
         initWebViewSettings(s);
 
         SharedPreferences prefs = getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
-        int initialZoomLevel = prefs.getInt(SettingsFragment.KEY_TEXT_SIZE, -1);
-        if (initialZoomLevel >= 0 || initialZoomLevel < ZOOM_SIZES.length) {
+        int initialZoomLevel = prefs.getInt(SettingsFragment.KEY_TEXT_SIZE, 2);
+        if (initialZoomLevel >= 0 && initialZoomLevel < ZOOM_SIZES.length) {
             s.setTextZoom(ZOOM_SIZES[initialZoomLevel]);
         }
 
