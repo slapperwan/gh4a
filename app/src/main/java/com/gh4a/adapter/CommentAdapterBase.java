@@ -35,6 +35,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
 import org.eclipse.egit.github.core.User;
@@ -126,6 +127,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         bindExtraView(item, holder.tvExtra);
         bindFileView(item, holder.tvFile);
         bindEventIcon(item, holder.ivEventIcon);
+        bindReactions(item, holder.reactions);
 
         if (canQuote(item)) {
             holder.tvDesc.setCustomSelectionActionModeCallback(
@@ -215,6 +217,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     protected abstract void bindExtraView(T item, StyleableTextView view);
     protected abstract void bindFileView(T item, StyleableTextView view);
     protected abstract void bindEventIcon(T item, ImageView view);
+    protected abstract void bindReactions(T item, ReactionBar view);
     protected abstract boolean hasActionMenu(T item);
     protected abstract boolean canQuote(T item);
 
@@ -238,6 +241,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
             tvFile = (StyleableTextView) view.findViewById(R.id.tv_file);
             ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
             ivMenu.setOnClickListener(this);
+            reactions = (ReactionBar) view.findViewById(R.id.reactions);
 
             mPopupMenu = new PopupMenu(view.getContext(), ivMenu);
             mPopupMenu.getMenuInflater().inflate(R.menu.comment_menu, mPopupMenu.getMenu());
@@ -252,6 +256,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         private final TextView tvEditTimestamp;
         private final StyleableTextView tvFile;
         private final ImageView ivMenu;
+        private final ReactionBar reactions;
         private final PopupMenu mPopupMenu;
         private final OnCommentMenuItemClick mCommentMenuItemClickCallback;
 

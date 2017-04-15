@@ -66,6 +66,12 @@
         <item name="releaseIcon">@drawable/release_dark</item>
         <item name="checkboxCheckedSmallIcon">@drawable/checkbox_checked_small_dark</item>
         <item name="checkboxUncheckedSmallIcon">@drawable/checkbox_unchecked_small_dark</item>
+        <item name="reactionConfusedIcon">@drawable/reaction_confused_dark</item>
+        <item name="reactionHeartIcon">@drawable/reaction_heart_dark</item>
+        <item name="reactionHoorayIcon">@drawable/reaction_hooray_dark</item>
+        <item name="reactionLaughIcon">@drawable/reaction_laugh_dark</item>
+        <item name="reactionMinusOneIcon">@drawable/reaction_minus_one_dark</item>
+        <item name="reactionPlusOneIcon">@drawable/reaction_plus_one_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
@@ -176,6 +182,12 @@
         <item name="releaseIcon">@drawable/release</item>
         <item name="checkboxCheckedSmallIcon">@drawable/checkbox_checked_small</item>
         <item name="checkboxUncheckedSmallIcon">@drawable/checkbox_unchecked_small</item>
+        <item name="reactionConfusedIcon">@drawable/reaction_confused</item>
+        <item name="reactionHeartIcon">@drawable/reaction_heart</item>
+        <item name="reactionHoorayIcon">@drawable/reaction_hooray</item>
+        <item name="reactionLaughIcon">@drawable/reaction_laugh</item>
+        <item name="reactionMinusOneIcon">@drawable/reaction_minus_one</item>
+        <item name="reactionPlusOneIcon">@drawable/reaction_plus_one</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>

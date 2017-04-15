@@ -79,6 +79,12 @@
     <attr name="releaseIcon" format="reference" />
     <attr name="checkboxCheckedSmallIcon" format="reference" />
     <attr name="checkboxUncheckedSmallIcon" format="reference" />
+    <attr name="reactionConfusedIcon" format="reference" />
+    <attr name="reactionHeartIcon" format="reference" />
+    <attr name="reactionHoorayIcon" format="reference" />
+    <attr name="reactionLaughIcon" format="reference" />
+    <attr name="reactionMinusOneIcon" format="reference" />
+    <attr name="reactionPlusOneIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension" />

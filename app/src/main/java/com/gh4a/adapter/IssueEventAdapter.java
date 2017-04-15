@@ -35,6 +35,7 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.IssueLabelSpan;
+import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -177,6 +178,11 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
         } else {
             view.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    protected void bindReactions(IssueEventHolder item, ReactionBar view) {
+        view.setReactions(item.comment != null ? item.comment.getReactions() : null);
     }
 
     @Override

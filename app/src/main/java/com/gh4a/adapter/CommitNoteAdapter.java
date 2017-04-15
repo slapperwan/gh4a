@@ -25,6 +25,7 @@ import android.widget.ImageView;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
 import org.eclipse.egit.github.core.CommitComment;
@@ -86,6 +87,11 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     @Override
     protected void bindEventIcon(CommitComment item, ImageView view) {
         view.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void bindReactions(CommitComment item, ReactionBar view) {
+        view.setReactions(item.getReactions());
     }
 
     @Override

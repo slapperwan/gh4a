@@ -246,4 +246,10 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
+    <com.gh4a.widget.ReactionBar
+        android:id="@+id/reactions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/overview_item_spacing" />
+
 </LinearLayout>

@@ -46,6 +46,7 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.ReactionBar;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
@@ -328,6 +329,9 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         } else {
             assigneeGroup.setVisibility(View.GONE);
         }
+
+        ReactionBar reactions = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
+        reactions.setReactions(mIssue.getReactions());
 
         assignHighlightColor();
         bindSpecialViews(mListHeaderView);
