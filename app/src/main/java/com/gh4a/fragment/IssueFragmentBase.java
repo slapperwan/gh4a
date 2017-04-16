@@ -33,6 +33,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -51,6 +52,7 @@ import com.gh4a.widget.ReactionBar;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -60,7 +62,8 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventHolder> implements
-        View.OnClickListener, IssueEventAdapter.OnCommentAction<IssueEventHolder>,
+        View.OnClickListener, ReactionBar.ReactionDetailsProvider,
+        IssueEventAdapter.OnCommentAction<IssueEventHolder>,
         CommentBoxFragment.Callback {
     protected static final int REQUEST_EDIT = 1000;
 
@@ -331,6 +334,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         }
 
         ReactionBar reactions = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
+        reactions.setReactionDetailsProvider(this);
         reactions.setReactions(mIssue.getReactions());
 
         assignHighlightColor();
@@ -346,6 +350,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         } else {
             labelGroup.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public List<Reaction> loadReactionDetailsInBackground(ReactionBar view) throws IOException {
+        IssueService service = new IssueService(
+                new DefaultClient("application/vnd.github.squirrel-girl-preview"));
+        return service.getIssueReactions(new RepositoryId(mRepoOwner, mRepoName),
+                mIssue.getNumber());
     }
 
     @Override

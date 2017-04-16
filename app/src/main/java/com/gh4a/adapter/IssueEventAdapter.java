@@ -23,6 +23,8 @@ import android.text.style.TypefaceSpan;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.gh4a.DefaultClient;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
@@ -38,15 +40,21 @@ import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.Rename;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.service.IssueService;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -182,6 +190,7 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
 
     @Override
     protected void bindReactions(IssueEventHolder item, ReactionBar view) {
+        view.setTag(item.comment);
         view.setReactions(item.comment != null ? item.comment.getReactions() : null);
     }
 
@@ -193,6 +202,14 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
     @Override
     protected boolean canQuote(IssueEventHolder item) {
         return item.comment != null && !mLocked;
+    }
+
+    @Override
+    public List<Reaction> loadReactionDetailsInBackground(ReactionBar view) throws IOException {
+        Comment comment = (Comment) view.getTag();
+        IssueService service = new IssueService(
+                new DefaultClient("application/vnd.github.squirrel-girl-preview"));
+        return service.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName), comment.getId());
     }
 
     private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue,

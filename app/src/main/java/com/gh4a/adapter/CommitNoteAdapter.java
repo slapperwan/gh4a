@@ -22,6 +22,8 @@ import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.gh4a.DefaultClient;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HttpImageGetter;
@@ -29,9 +31,14 @@ import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.Reaction;
+import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.service.CommitService;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     public CommitNoteAdapter(Context context, String repoOwner, String repoName,
@@ -91,6 +98,7 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
 
     @Override
     protected void bindReactions(CommitComment item, ReactionBar view) {
+        view.setTag(item);
         view.setReactions(item.getReactions());
     }
 
@@ -102,5 +110,13 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     @Override
     protected boolean canQuote(CommitComment item) {
         return true;
+    }
+
+    @Override
+    public List<Reaction> loadReactionDetailsInBackground(ReactionBar view) throws IOException {
+        CommitComment comment = (CommitComment) view.getTag();
+        CommitService service = new CommitService(
+                new DefaultClient("application/vnd.github.squirrel-girl-preview"));
+        return service.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName), comment.getId());
     }
 }

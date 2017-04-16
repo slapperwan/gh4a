@@ -45,7 +45,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.ViewHolder> {
+abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.ViewHolder>
+        implements ReactionBar.ReactionDetailsProvider {
     public interface OnCommentAction<T> {
         void editComment(T comment);
         void deleteComment(T comment);
@@ -103,6 +104,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
         ViewHolder holder = new ViewHolder(v, mCommentMenuItemClickCallback);
         holder.ivGravatar.setOnClickListener(this);
+        holder.reactions.setReactionDetailsProvider(this);
         return holder;
     }
 

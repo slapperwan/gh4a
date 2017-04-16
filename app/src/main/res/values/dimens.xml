@@ -12,6 +12,7 @@
     <dimen name="issue_label_text_size">12sp</dimen>
     <dimen name="issue_label_margin">2dp</dimen>
     <dimen name="mini_fab_size_with_margin">56dp</dimen> <!-- 40dp FAB + 16dp margin -->
+    <dimen name="reaction_details_popup_width">200dp</dimen>
 
     <dimen name="breadcrumb_height">42dp</dimen>
     <dimen name="breadcrumb_padding_side">8dp</dimen>
