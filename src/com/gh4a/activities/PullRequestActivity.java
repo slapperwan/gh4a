@@ -222,6 +222,9 @@ public class PullRequestActivity extends BasePagerActivity implements
             MenuItem mergeItem = menu.findItem(R.id.pull_merge);
             mergeItem.setEnabled(false);
         }
+        if (mPullRequest == null) {
+            menu.removeItem(R.id.browser);
+        }
 
         return super.onCreateOptionsMenu(menu);
     }

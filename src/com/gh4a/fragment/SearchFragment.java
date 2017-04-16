@@ -141,7 +141,9 @@ public class SearchFragment extends LoadingListFragmentBase implements
                 RequestError error = ((RequestException) e).getError();
                 if (error != null && error.getErrors() != null && !error.getErrors().isEmpty()) {
                     updateEmptyText(R.string.code_search_too_broad);
-                    mAdapter.clear();
+                    if (mAdapter != null) {
+                        mAdapter.clear();
+                    }
                     updateEmptyState();
                     setContentShown(true);
                     return true;

@@ -204,6 +204,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         }
 
         if (mIssue == null) {
+            menu.removeItem(R.id.browser);
             menu.removeItem(R.id.share);
         }
 
