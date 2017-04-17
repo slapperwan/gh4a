@@ -2,6 +2,7 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.ListPopupWindow;
 import android.text.TextUtils;
@@ -12,15 +13,18 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.Reactions;
+import org.eclipse.egit.github.core.User;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -28,7 +32,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-public class ReactionBar extends LinearLayout {
+public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissListener {
     public interface ReactionDetailsProvider {
         List<Reaction> loadReactionDetailsInBackground(ReactionBar view) throws IOException;
     }
@@ -41,6 +45,8 @@ public class ReactionBar extends LinearLayout {
     private TextView mHeartView;
 
     private ReactionDetailsProvider mProvider;
+    private ListPopupWindow mPopup;
+    private long mLastPopupDismissTime;
 
     public ReactionBar(Context context) {
         this(context, null);
@@ -86,19 +92,35 @@ public class ReactionBar extends LinearLayout {
     }
 
     @Override
+    protected Parcelable onSaveInstanceState() {
+        if (mPopup != null) {
+            mPopup.dismiss();
+        }
+        return super.onSaveInstanceState();
+    }
+
+    @Override
     public boolean performClick() {
-        if (mProvider == null) {
+        // Touching the reaction bar will both dismiss the popup and cause performClick() to be
+        // called (from a handler). In that case we don't want to show the popup again, which is
+        // why we have this timeout in place.
+        long timeSinceLastDismiss = System.currentTimeMillis() - mLastPopupDismissTime;
+        if (mPopup != null) {
+            mPopup.dismiss();
+            return true;
+        } else if (mProvider == null || timeSinceLastDismiss < 100) {
             return super.performClick();
         }
 
-        final ListPopupWindow popup = new ListPopupWindow(getContext());
-        final ReactionDetailsAdapter adapter = new ReactionDetailsAdapter(getContext());
-
-        popup.setContentWidth(
+        mPopup = new ListPopupWindow(getContext());
+        mPopup.setOnDismissListener(this);
+        mPopup.setContentWidth(
                 getResources().getDimensionPixelSize(R.dimen.reaction_details_popup_width));
-        popup.setAnchorView(this);
-        popup.setAdapter(adapter);
-        popup.show();
+        mPopup.setAnchorView(this);
+
+        final ReactionDetailsAdapter adapter = new ReactionDetailsAdapter(getContext(), mPopup);
+        mPopup.setAdapter(adapter);
+        mPopup.show();
 
         new AsyncTask<Void, Void, List<Reaction>>() {
             @Override
@@ -127,11 +149,17 @@ public class ReactionBar extends LinearLayout {
                 if (reactions != null) {
                     adapter.setReactions(reactions);
                 } else {
-                    popup.dismiss();
+                    mPopup.dismiss();
                 }
             }
         }.execute();
         return true;
+    }
+
+    @Override
+    public void onDismiss() {
+        mPopup = null;
+        mLastPopupDismissTime = System.currentTimeMillis();
     }
 
     private void updateView(TextView view, int count) {
@@ -143,14 +171,16 @@ public class ReactionBar extends LinearLayout {
         }
     }
 
-    private static class ReactionDetailsAdapter extends BaseAdapter {
+    private static class ReactionDetailsAdapter extends BaseAdapter implements View.OnClickListener {
         private Context mContext;
+        private ListPopupWindow mParent;
         private LayoutInflater mInflater;
         private List<Reaction> mReactions;
         private HashMap<String, Integer> mIconLookup = new HashMap<>();
 
-        public ReactionDetailsAdapter(Context context) {
+        public ReactionDetailsAdapter(Context context, ListPopupWindow popup) {
             mContext = context;
+            mParent = popup;
             mInflater = LayoutInflater.from(context);
 
             mIconLookup.put(Reaction.CONTENT_PLUS_ONE,
@@ -224,8 +254,17 @@ public class ReactionBar extends LinearLayout {
             }
             AvatarHandler.assignAvatar(avatar, reaction.getUser());
             name.setText(ApiHelpers.getUserLogin(mContext, reaction.getUser()));
+            convertView.setTag(reaction.getUser());
+            convertView.setOnClickListener(this);
 
             return convertView;
+        }
+
+        @Override
+        public void onClick(View view) {
+            User user = (User) view.getTag();
+            mParent.dismiss();
+            mContext.startActivity(UserActivity.makeIntent(mContext, user));
         }
     }
 }
