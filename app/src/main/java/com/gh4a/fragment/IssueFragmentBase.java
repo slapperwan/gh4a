@@ -55,6 +55,7 @@ import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
@@ -334,7 +335,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         }
 
         ReactionBar reactions = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
-        reactions.setReactionDetailsProvider(this);
+        reactions.setReactionDetailsProvider(this, null);
         reactions.setReactions(mIssue.getReactions());
 
         assignHighlightColor();
@@ -353,11 +354,19 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(ReactionBar view) throws IOException {
+    public List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException {
         IssueService service = new IssueService(
                 new DefaultClient("application/vnd.github.squirrel-girl-preview"));
         return service.getIssueReactions(new RepositoryId(mRepoOwner, mRepoName),
                 mIssue.getNumber());
+    }
+
+    @Override
+    public void addReactionInBackground(GitHubClient client,
+            Object item, String content) throws IOException {
+        IssueService service = new IssueService(client);
+        service.addIssueReaction(new RepositoryId(mRepoOwner, mRepoName),
+                mIssue.getNumber(), content);
     }
 
     @Override

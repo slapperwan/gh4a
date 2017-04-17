@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?attr/indeterminateProgressStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:id="@+id/action_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:visibility="gone">
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:columnCount="3">
+
+            <com.gh4a.widget.CheckableImageButton
+                android:id="@+id/plus_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:padding="16dp" />
+
+            <com.gh4a.widget.CheckableImageButton
+                android:id="@+id/minus_one"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:padding="16dp" />
+
+            <com.gh4a.widget.CheckableImageButton
+                android:id="@+id/laugh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:padding="16dp" />
+
+            <com.gh4a.widget.CheckableImageButton
+                android:id="@+id/hooray"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:padding="16dp" />
+
+            <com.gh4a.widget.CheckableImageButton
+                android:id="@+id/confused"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:padding="16dp" />
+
+            <com.gh4a.widget.CheckableImageButton
+                android:id="@+id/heart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:padding="16dp" />
+
+        </GridLayout>
+
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/save_button"
+        style="?attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:text="@string/save"
+        android:visibility="gone" />
+
+</LinearLayout>

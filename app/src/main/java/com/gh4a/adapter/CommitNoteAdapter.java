@@ -34,6 +34,7 @@ import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import java.io.IOException;
@@ -98,7 +99,6 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
 
     @Override
     protected void bindReactions(CommitComment item, ReactionBar view) {
-        view.setTag(item);
         view.setReactions(item.getReactions());
     }
 
@@ -113,10 +113,23 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(ReactionBar view) throws IOException {
-        CommitComment comment = (CommitComment) view.getTag();
+    protected boolean canReact(CommitComment item) {
+        return true;
+    }
+
+    @Override
+    public List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException {
+        CommitComment comment = (CommitComment) item;
         CommitService service = new CommitService(
                 new DefaultClient("application/vnd.github.squirrel-girl-preview"));
         return service.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName), comment.getId());
+    }
+
+    @Override
+    public void addReactionInBackground(GitHubClient client,
+            Object item, String content) throws IOException {
+        CommitComment comment = (CommitComment) item;
+        CommitService service = new CommitService(client);
+        service.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName), comment.getId(), content);
     }
 }

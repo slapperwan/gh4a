@@ -6,6 +6,11 @@
         android:title="@string/share"
         app:showAsAction="never" />
     <item
+        android:id="@+id/react"
+        android:title="@string/add_reaction"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/edit"
         android:title="@string/edit"
         app:showAsAction="never" />

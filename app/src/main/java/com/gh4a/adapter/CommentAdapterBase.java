@@ -75,6 +75,10 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
                             mContext.getString(R.string.share_title));
                     mContext.startActivity(shareIntent);
                     return true;
+
+                case R.id.react:
+                    new ReactionBar.AddReactionDialog(mContext, CommentAdapterBase.this, item)
+                            .show();
             }
             return false;
         }
@@ -104,7 +108,6 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
         ViewHolder holder = new ViewHolder(v, mCommentMenuItemClickCallback);
         holder.ivGravatar.setOnClickListener(this);
-        holder.reactions.setReactionDetailsProvider(this);
         return holder;
     }
 
@@ -130,6 +133,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         bindFileView(item, holder.tvFile);
         bindEventIcon(item, holder.ivEventIcon);
         bindReactions(item, holder.reactions);
+        holder.reactions.setReactionDetailsProvider(this, item);
 
         if (canQuote(item)) {
             holder.tvDesc.setCustomSelectionActionModeCallback(
@@ -155,9 +159,11 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
                 || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
         MenuItem editMenuItem = holder.mPopupMenu.getMenu().findItem(R.id.edit);
         MenuItem deleteMenuItem = holder.mPopupMenu.getMenu().findItem(R.id.delete);
+        MenuItem reactMenuItem = holder.mPopupMenu.getMenu().findItem(R.id.react);
 
         editMenuItem.setVisible(mActionCallback != null && canEdit);
         deleteMenuItem.setVisible(mActionCallback != null && canEdit);
+        reactMenuItem.setVisible(mActionCallback != null && ourLogin != null && canReact(item));
     }
 
     public void resume() {
@@ -222,6 +228,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     protected abstract void bindReactions(T item, ReactionBar view);
     protected abstract boolean hasActionMenu(T item);
     protected abstract boolean canQuote(T item);
+    protected abstract boolean canReact(T item);
 
     public static class ViewHolder<T> extends RecyclerView.ViewHolder
             implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {

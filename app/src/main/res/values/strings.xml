@@ -41,6 +41,7 @@
     <string name="delete">Delete</string>
     <string name="reply">Reply</string>
     <string name="add_comment">Add comment</string>
+    <string name="add_reaction">Add reaction</string>
     <string name="edit">Edit</string>
     <string name="members">Members</string>
     <string name="open">Open</string>
