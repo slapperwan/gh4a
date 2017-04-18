@@ -26,6 +26,9 @@ import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -102,6 +105,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         mInitialComment = args.getParcelable("initial_comment");
         args.remove("initial_comment");
 
+        setHasOptionsMenu(true);
         updateCommentLockState();
     }
 
@@ -183,6 +187,21 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
             return true;
         }
         return super.canChildScrollUp();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.issue_fragment_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.react) {
+            new ReactionBar.AddReactionDialog(getActivity(), this, null).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void reloadEvents(boolean alsoClearCaches) {
