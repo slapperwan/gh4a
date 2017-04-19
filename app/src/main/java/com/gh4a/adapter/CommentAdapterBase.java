@@ -38,6 +38,7 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
+import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.User;
 
 import java.util.Collection;
@@ -45,8 +46,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.ViewHolder>
-        implements ReactionBar.ReactionDetailsProvider {
+abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.ViewHolder> implements
+        ReactionBar.ReactionDetailsProvider,
+        ReactionBar.AddReactionDialog.RefreshListener {
     public interface OnCommentAction<T> {
         void editComment(T comment);
         void deleteComment(T comment);
@@ -77,8 +79,8 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
                     return true;
 
                 case R.id.react:
-                    new ReactionBar.AddReactionDialog(mContext, CommentAdapterBase.this, item)
-                            .show();
+                    new ReactionBar.AddReactionDialog(mContext,
+                            CommentAdapterBase.this, CommentAdapterBase.this, item).show();
             }
             return false;
         }

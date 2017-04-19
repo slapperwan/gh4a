@@ -103,6 +103,9 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
     }
 
     public void setReactions(Reactions reactions) {
+        if (mPopup != null) {
+            mPopup.clearCache();
+        }
         if (reactions != null && reactions.getTotalCount() > 0) {
             updateView(mPlusOneView, reactions.getPlusOne());
             updateView(mMinusOneView, reactions.getMinusOne());
@@ -123,6 +126,14 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         for (int i = 0; i < VIEW_IDS.length; i++) {
             findViewById(VIEW_IDS[i]).setOnClickListener(provider != null ? this : null);
         }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        if (mPopup != null) {
+            mPopup.dismiss();
+        }
+        super.onDetachedFromWindow();
     }
 
     @Override
@@ -178,6 +189,11 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                     context.getResources()
                             .getDimensionPixelSize(R.dimen.reaction_details_popup_width));
             setAdapter(mAdapter);
+        }
+
+        public void clearCache() {
+            mCachedReactions = null;
+            dismiss();
         }
 
         public void show(String content) {
@@ -321,15 +337,21 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
     }
 
     public static class AddReactionDialog extends BottomSheetDialog implements View.OnClickListener {
+        public interface RefreshListener {
+            void updateReactions(Object item, Reactions reactions);
+        }
         private View mContentView;
         private ReactionDetailsProvider mProvider;
+        private RefreshListener mListener;
         private SparseIntArray mOldReactionIds = new SparseIntArray();
         private Object mItem;
+        private Reactions mReactions = new Reactions();
 
-        public AddReactionDialog(@NonNull Context context,
+        public AddReactionDialog(@NonNull Context context, RefreshListener listener,
                 ReactionDetailsProvider provider, Object item) {
             super(context);
 
+            mListener = listener;
             mProvider = provider;
             mItem = item;
 
@@ -376,6 +398,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                     }
                     String ownLogin = Gh4Application.get().getAuthLogin();
                     for (Reaction reaction : reactions) {
+                        updateReactionsCache(reaction.getContent(), 1);
                         if (!ApiHelpers.loginEquals(reaction.getUser(), ownLogin)) {
                             continue;
                         }
@@ -407,14 +430,16 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 Checkable checkable = (Checkable) mContentView.findViewById(resId);
                 if (checkable.isChecked() && oldReactionId == 0) {
                     reactionsToAdd.add(CONTENTS[i]);
+                    updateReactionsCache(CONTENTS[i], 1);
                 } else if (!checkable.isChecked() && oldReactionId != 0) {
                     reactionsToDelete.add(oldReactionId);
+                    updateReactionsCache(CONTENTS[i], -1);
                 }
             }
 
-            new AsyncTask<Void, Void, Void>() {
+            new AsyncTask<Void, Void, Boolean>() {
                 @Override
-                protected Void doInBackground(Void... voids) {
+                protected Boolean doInBackground(Void... voids) {
                     try {
                         for (String content : reactionsToAdd) {
                             mProvider.addReactionInBackground(mItem, content);
@@ -424,17 +449,32 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                         for (int reactionId : reactionsToDelete) {
                             service.deleteReaction(reactionId);
                         }
+                        return true;
                     } catch (IOException e) {
                         android.util.Log.d("foo", "save fail", e);
                     }
-                    return null;
+                    return false;
                 }
 
                 @Override
-                protected void onPostExecute(Void aVoid) {
+                protected void onPostExecute(Boolean result) {
+                    if (result && mListener != null) {
+                        mListener.updateReactions(mItem, mReactions);
+                    }
                     dismiss();
                 }
             }.execute();
+        }
+
+        private void updateReactionsCache(String content, int delta) {
+            switch (content) {
+                case Reaction.CONTENT_PLUS_ONE: mReactions.setPlusOne(mReactions.getPlusOne() + delta); break;
+                case Reaction.CONTENT_MINUS_ONE: mReactions.setMinusOne(mReactions.getMinusOne() + delta); break;
+                case Reaction.CONTENT_CONFUSED: mReactions.setConfused(mReactions.getConfused() + delta); break;
+                case Reaction.CONTENT_HEART: mReactions.setHeart(mReactions.getHeart() + delta); break;
+                case Reaction.CONTENT_HOORAY: mReactions.setHooray(mReactions.getHooray() + delta); break;
+                case Reaction.CONTENT_LAUGH: mReactions.setLaugh(mReactions.getLaugh() + delta); break;
+            }
         }
 
         private Drawable wrapDrawableForCheckState(Drawable d, @ColorInt int checkedColor,

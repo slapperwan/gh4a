@@ -31,6 +31,7 @@ import com.gh4a.widget.StyleableTextView;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Reaction;
+import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.CommitService;
@@ -129,5 +130,12 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
         CommitService service = (CommitService)
                 Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
         service.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName), comment.getId(), content);
+    }
+
+    @Override
+    public void updateReactions(Object item, Reactions reactions) {
+        CommitComment comment = (CommitComment) item;
+        comment.setReactions(reactions);
+        notifyDataSetChanged();
     }
 }

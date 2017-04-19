@@ -55,6 +55,7 @@ import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Reaction;
+import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -65,6 +66,7 @@ import java.util.Set;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventHolder> implements
         View.OnClickListener, ReactionBar.ReactionDetailsProvider,
+        ReactionBar.AddReactionDialog.RefreshListener,
         IssueEventAdapter.OnCommentAction<IssueEventHolder>,
         CommentBoxFragment.Callback {
     protected static final int REQUEST_EDIT = 1000;
@@ -196,7 +198,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.react) {
-            new ReactionBar.AddReactionDialog(getActivity(), this, null).show();
+            new ReactionBar.AddReactionDialog(getActivity(), this, this, null).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -384,6 +386,15 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         service.addIssueReaction(new RepositoryId(mRepoOwner, mRepoName),
                 mIssue.getNumber(), content);
+    }
+
+    @Override
+    public void updateReactions(Object item, Reactions reactions) {
+        mIssue.setReactions(reactions);
+        if (mListHeaderView != null) {
+            ReactionBar bar = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
+            bar.setReactions(reactions);
+        }
     }
 
     @Override

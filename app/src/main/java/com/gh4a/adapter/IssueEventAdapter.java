@@ -45,6 +45,7 @@ import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.Reaction;
+import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.Rename;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
@@ -223,6 +224,13 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         service.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName),
                 holder.comment.getId(), content);
+    }
+
+    @Override
+    public void updateReactions(Object item, Reactions reactions) {
+        IssueEventHolder holder = (IssueEventHolder) item;
+        holder.comment.setReactions(reactions);
+        notifyDataSetChanged();
     }
 
     private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue,
