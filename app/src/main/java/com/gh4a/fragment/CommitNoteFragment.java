@@ -262,7 +262,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void quoteText(CharSequence text) {
-//        mCommentBoxAdapter.getCommentFragment().addQuote(text);
+        mBottomSheet.addQuote(text);
     }
 
     @Override
