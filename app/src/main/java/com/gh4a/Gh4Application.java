@@ -44,6 +44,7 @@ import org.eclipse.egit.github.core.service.MilestoneService;
 import org.eclipse.egit.github.core.service.NotificationService;
 import org.eclipse.egit.github.core.service.OrganizationService;
 import org.eclipse.egit.github.core.service.PullRequestService;
+import org.eclipse.egit.github.core.service.ReactionService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 import org.eclipse.egit.github.core.service.StarService;
 import org.eclipse.egit.github.core.service.UserService;
@@ -74,6 +75,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public static final String NOTIFICATION_SERVICE = "github.notification";
     public static final String ORG_SERVICE = "github.organization";
     public static final String PULL_SERVICE = "github.pullrequest";
+    public static final String REACTION_SERVICE = "github.reaction";
     public static final String REPO_SERVICE = "github.repository";
     public static final String STAR_SERVICE = "github.star";
     public static final String USER_SERVICE = "github.user";
@@ -150,6 +152,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mServices.put(NOTIFICATION_SERVICE, new NotificationService(mClient));
         mServices.put(ORG_SERVICE, new OrganizationService(mClient));
         mServices.put(PULL_SERVICE, new PullRequestService(mClient));
+        mServices.put(REACTION_SERVICE, new ReactionService(mClient));
         mServices.put(REPO_SERVICE, new RepositoryService(mClient));
         mServices.put(STAR_SERVICE, new StarService(mClient));
         mServices.put(USER_SERVICE, new UserService(mClient));

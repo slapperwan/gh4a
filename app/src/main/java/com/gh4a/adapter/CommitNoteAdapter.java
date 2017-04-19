@@ -22,7 +22,6 @@ import android.text.style.StyleSpan;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
@@ -34,7 +33,6 @@ import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import java.io.IOException;
@@ -120,16 +118,16 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     @Override
     public List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException {
         CommitComment comment = (CommitComment) item;
-        CommitService service = new CommitService(
-                new DefaultClient("application/vnd.github.squirrel-girl-preview"));
+        CommitService service = (CommitService)
+                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
         return service.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName), comment.getId());
     }
 
     @Override
-    public void addReactionInBackground(GitHubClient client,
-            Object item, String content) throws IOException {
+    public void addReactionInBackground(Object item, String content) throws IOException {
         CommitComment comment = (CommitComment) item;
-        CommitService service = new CommitService(client);
+        CommitService service = (CommitService)
+                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
         service.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName), comment.getId(), content);
     }
 }

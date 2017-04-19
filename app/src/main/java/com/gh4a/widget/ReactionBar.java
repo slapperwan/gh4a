@@ -30,7 +30,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
@@ -41,7 +40,6 @@ import com.gh4a.utils.UiUtils;
 import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.ReactionService;
 
 import java.io.IOException;
@@ -54,8 +52,7 @@ import java.util.List;
 public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissListener {
     public interface ReactionDetailsProvider {
         List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException;
-        void addReactionInBackground(GitHubClient client,
-                Object item, String content) throws IOException;
+        void addReactionInBackground(Object item, String content) throws IOException;
     }
 
     private TextView mPlusOneView;
@@ -412,14 +409,11 @@ public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissLi
                 @Override
                 protected Void doInBackground(Void... voids) {
                     try {
-                        GitHubClient client =
-                                new DefaultClient("application/vnd.github.squirrel-girl-preview");
-                        client.setOAuth2Token(Gh4Application.get().getAuthToken());
-
                         for (String content : reactionsToAdd) {
-                            mProvider.addReactionInBackground(client, mItem, content);
+                            mProvider.addReactionInBackground(mItem, content);
                         }
-                        ReactionService service = new ReactionService(client);
+                        ReactionService service = (ReactionService)
+                                Gh4Application.get().getService(Gh4Application.REACTION_SERVICE);
                         for (int reactionId : reactionsToDelete) {
                             service.deleteReaction(reactionId);
                         }
