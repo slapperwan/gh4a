@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,7 +26,6 @@ import android.widget.BaseAdapter;
 import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
@@ -46,14 +44,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
-public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissListener {
+public class ReactionBar extends LinearLayout implements View.OnClickListener {
     public interface ReactionDetailsProvider {
         List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException;
         void addReactionInBackground(Object item, String content) throws IOException;
     }
+
+    private static final @IdRes int[] VIEW_IDS = {
+        R.id.plus_one, R.id.minus_one, R.id.laugh,
+        R.id.hooray, R.id.heart, R.id.confused
+    };
+    private static final @AttrRes  int[] ICON_IDS = {
+        R.attr.reactionPlusOneIcon, R.attr.reactionMinusOneIcon,
+        R.attr.reactionLaughIcon, R.attr.reactionHoorayIcon,
+        R.attr.reactionHeartIcon, R.attr.reactionConfusedIcon
+    };
+    private static final String[] CONTENTS = {
+        Reaction.CONTENT_PLUS_ONE, Reaction.CONTENT_MINUS_ONE,
+        Reaction.CONTENT_LAUGH, Reaction.CONTENT_HOORAY,
+        Reaction.CONTENT_HEART, Reaction.CONTENT_CONFUSED
+    };
 
     private TextView mPlusOneView;
     private TextView mMinusOneView;
@@ -64,8 +76,7 @@ public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissLi
 
     private ReactionDetailsProvider mProvider;
     private Object mReferenceItem;
-    private ListPopupWindow mPopup;
-    private long mLastPopupDismissTime;
+    private ReactionUserPopup mPopup;
 
     public ReactionBar(Context context) {
         this(context, null);
@@ -108,7 +119,10 @@ public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissLi
     public void setReactionDetailsProvider(ReactionDetailsProvider provider, Object item) {
         mProvider = provider;
         mReferenceItem = item;
-        setClickable(provider != null);
+
+        for (int i = 0; i < VIEW_IDS.length; i++) {
+            findViewById(VIEW_IDS[i]).setOnClickListener(provider != null ? this : null);
+        }
     }
 
     @Override
@@ -120,45 +134,21 @@ public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissLi
     }
 
     @Override
-    public boolean performClick() {
-        // Touching the reaction bar will both dismiss the popup and cause performClick() to be
-        // called (from a handler). In that case we don't want to show the popup again, which is
-        // why we have this timeout in place.
-        long timeSinceLastDismiss = System.currentTimeMillis() - mLastPopupDismissTime;
-        if (mPopup != null) {
+    public void onClick(View view) {
+        if (mPopup != null && mPopup.isShowing()) {
             mPopup.dismiss();
-            return true;
-        } else if (mProvider == null || timeSinceLastDismiss < 100) {
-            return super.performClick();
+            return;
         }
-
-        mPopup = new ListPopupWindow(getContext());
-        mPopup.setOnDismissListener(this);
-        mPopup.setContentWidth(
-                getResources().getDimensionPixelSize(R.dimen.reaction_details_popup_width));
-        mPopup.setAnchorView(this);
-
-        final ReactionDetailsAdapter adapter = new ReactionDetailsAdapter(getContext(), mPopup);
-        mPopup.setAdapter(adapter);
-        mPopup.show();
-
-        new FetchReactionTask(mProvider, mReferenceItem) {
-            @Override
-            protected void onPostExecute(List<Reaction> reactions) {
-                if (reactions != null) {
-                    adapter.setReactions(reactions);
-                } else {
-                    mPopup.dismiss();
+        for (int i = 0; i < VIEW_IDS.length; i++) {
+            if (view.getId() == VIEW_IDS[i]) {
+                if (mPopup == null) {
+                    mPopup = new ReactionUserPopup(getContext(), mProvider, mReferenceItem);
                 }
-            }
-        }.execute();
-        return true;
-    }
+                mPopup.setAnchorView(view);
+                mPopup.show(CONTENTS[i]);
 
-    @Override
-    public void onDismiss() {
-        mPopup = null;
-        mLastPopupDismissTime = System.currentTimeMillis();
+            }
+        }
     }
 
     private void updateView(TextView view, int count) {
@@ -170,45 +160,86 @@ public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissLi
         }
     }
 
-    private static class ReactionDetailsAdapter extends BaseAdapter implements View.OnClickListener {
+    private static class ReactionUserPopup extends ListPopupWindow {
+        private ReactionDetailsProvider mProvider;
+        private Object mItem;
+        private List<Reaction> mCachedReactions;
+        private ReactionUserAdapter mAdapter;
+        private String mContent;
+
+        public ReactionUserPopup(@NonNull Context context, ReactionDetailsProvider provider,
+                Object item) {
+            super(context);
+
+            mProvider = provider;
+            mItem = item;
+            mAdapter = new ReactionUserAdapter(context, this);
+            setContentWidth(
+                    context.getResources()
+                            .getDimensionPixelSize(R.dimen.reaction_details_popup_width));
+            setAdapter(mAdapter);
+        }
+
+        public void show(String content) {
+            if (!TextUtils.equals(content, mContent)) {
+                mAdapter.setUsers(null);
+                mContent = content;
+            }
+            show();
+
+            if (mCachedReactions != null) {
+                populateAdapter();
+            } else {
+                new FetchReactionTask(mProvider, mItem) {
+                    @Override
+                    protected void onPostExecute(List<Reaction> reactions) {
+                        mCachedReactions = reactions;
+                        populateAdapter();
+                    }
+                }.execute();
+            }
+        }
+
+        private void populateAdapter() {
+            if (mCachedReactions != null) {
+                List<User> users = new ArrayList<>();
+                for (Reaction reaction : mCachedReactions) {
+                    if (TextUtils.equals(mContent, reaction.getContent())) {
+                        users.add(reaction.getUser());
+                    }
+                }
+                mAdapter.setUsers(users);
+            } else {
+                dismiss();
+            }
+        }
+    }
+
+    private static class ReactionUserAdapter extends BaseAdapter implements View.OnClickListener {
         private Context mContext;
         private ListPopupWindow mParent;
         private LayoutInflater mInflater;
-        private List<Reaction> mReactions;
-        private HashMap<String, Integer> mIconLookup = new HashMap<>();
+        private List<User> mUsers;
 
-        public ReactionDetailsAdapter(Context context, ListPopupWindow popup) {
+        public ReactionUserAdapter(Context context, ListPopupWindow popup) {
             mContext = context;
             mParent = popup;
             mInflater = LayoutInflater.from(context);
-
-            mIconLookup.put(Reaction.CONTENT_PLUS_ONE,
-                    UiUtils.resolveDrawable(context, R.attr.reactionPlusOneIcon));
-            mIconLookup.put(Reaction.CONTENT_MINUS_ONE,
-                    UiUtils.resolveDrawable(context, R.attr.reactionMinusOneIcon));
-            mIconLookup.put(Reaction.CONTENT_CONFUSED,
-                    UiUtils.resolveDrawable(context, R.attr.reactionConfusedIcon));
-            mIconLookup.put(Reaction.CONTENT_HEART,
-                    UiUtils.resolveDrawable(context, R.attr.reactionHeartIcon));
-            mIconLookup.put(Reaction.CONTENT_HOORAY,
-                    UiUtils.resolveDrawable(context, R.attr.reactionHoorayIcon));
-            mIconLookup.put(Reaction.CONTENT_LAUGH,
-                    UiUtils.resolveDrawable(context, R.attr.reactionLaughIcon));
         }
 
-        public void setReactions(List<Reaction> reactions) {
-            mReactions = reactions;
+        public void setUsers(List<User> users) {
+            mUsers = users;
             notifyDataSetChanged();
         }
 
         @Override
         public int getCount() {
-            return mReactions != null ? mReactions.size() : 1;
+            return mUsers != null ? mUsers.size() : 1;
         }
 
         @Override
         public int getItemViewType(int position) {
-            return mReactions != null ? 0 : 1;
+            return mUsers != null ? 0 : 1;
         }
 
         @Override
@@ -218,7 +249,7 @@ public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissLi
 
         @Override
         public Object getItem(int position) {
-            return mReactions != null ? mReactions.get(position) : null;
+            return mUsers != null ? mUsers.get(position) : null;
         }
 
         @Override
@@ -228,7 +259,7 @@ public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissLi
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            if (mReactions == null) {
+            if (mUsers == null) {
                 return convertView != null
                         ? convertView
                         : mInflater.inflate(R.layout.reaction_details_progress, parent, false);
@@ -238,22 +269,13 @@ public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissLi
                 convertView = mInflater.inflate(R.layout.row_reaction_details, parent, false);
             }
 
-            Reaction reaction = mReactions.get(position);
-            Reaction prevReaction = position == 0 ? null : mReactions.get(position - 1);
-
-            ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
+            User user = mUsers.get(position);
             ImageView avatar = (ImageView) convertView.findViewById(R.id.avatar);
             TextView name = (TextView) convertView.findViewById(R.id.name);
 
-            if (prevReaction == null
-                    || !TextUtils.equals(reaction.getContent(), prevReaction.getContent())) {
-                icon.setImageResource(mIconLookup.get(reaction.getContent()));
-            } else {
-                icon.setImageDrawable(null);
-            }
-            AvatarHandler.assignAvatar(avatar, reaction.getUser());
-            name.setText(ApiHelpers.getUserLogin(mContext, reaction.getUser()));
-            convertView.setTag(reaction.getUser());
+            AvatarHandler.assignAvatar(avatar, user);
+            name.setText(ApiHelpers.getUserLogin(mContext, user));
+            convertView.setTag(user);
             convertView.setOnClickListener(this);
 
             return convertView;
@@ -303,21 +325,6 @@ public class ReactionBar extends LinearLayout implements PopupWindow.OnDismissLi
         private ReactionDetailsProvider mProvider;
         private SparseIntArray mOldReactionIds = new SparseIntArray();
         private Object mItem;
-
-        private static final @IdRes int[] VIEW_IDS = {
-            R.id.plus_one, R.id.minus_one, R.id.laugh,
-            R.id.hooray, R.id.heart, R.id.confused
-        };
-        private static final @AttrRes  int[] ICON_IDS = {
-            R.attr.reactionPlusOneIcon, R.attr.reactionMinusOneIcon,
-            R.attr.reactionLaughIcon, R.attr.reactionHoorayIcon,
-            R.attr.reactionHeartIcon, R.attr.reactionConfusedIcon
-        };
-        private static final String[] CONTENTS = {
-            Reaction.CONTENT_PLUS_ONE, Reaction.CONTENT_MINUS_ONE,
-            Reaction.CONTENT_LAUGH, Reaction.CONTENT_HOORAY,
-            Reaction.CONTENT_HEART, Reaction.CONTENT_CONFUSED
-        };
 
         public AddReactionDialog(@NonNull Context context,
                 ReactionDetailsProvider provider, Object item) {

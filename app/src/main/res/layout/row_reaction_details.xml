@@ -5,16 +5,10 @@
     android:orientation="horizontal"
     android:padding="8dp">
 
-    <ImageView
-        android:id="@+id/icon"
-        android:layout_width="18dp"
-        android:layout_height="18dp" />
-
     <com.gh4a.widget.FixedSizeImageView
         android:id="@+id/avatar"
         android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_marginLeft="8dp" />
+        android:layout_height="18dp" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/name"
