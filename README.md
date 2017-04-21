@@ -11,7 +11,7 @@ Download
 Main features
 -------------
 
-###Repository###
+### Repository
 * List repositories
 * Watch/unwatch repository
 * View branches/tags
@@ -20,7 +20,7 @@ Main features
 * View watchers/networks
 * View issues
 
-###User###
+### User
 * View basic information
 * Activity feeds
 * Follow/unfollow user
@@ -29,7 +29,7 @@ Main features
 * View organizations (if type is user)
 * View members (if type is organization)
 
-###Issue###
+### Issue
 * List issues
 * Filter by label, assignee or milestone
 * Create/edit/close/reopen issue
@@ -37,20 +37,20 @@ Main features
 * Manage labels
 * Manage milestones
 
-###Commit###
+### Commit
 * View commit (shows files changed/added/deleted)
 * Diff viewer with colorized HTML
 * View commit history on each file
 
-###Tree/File browser###
+### Tree/File browser
 * Browse source code
 * View code with syntax hightlighting
 
-###Gist###
+### Gist
 * List public gists
 * View gist content
 
-###Explore Github###
+### Explore Github
 * Public timeline
 * Trending repos (today, week, month, forever)
 * GitHub blog
