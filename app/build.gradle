@@ -1,3 +1,6 @@
+def taskRequests = getGradle().getStartParameter().getTaskRequests().toString()
+def isPlaystore = taskRequests.contains("Playstore") || taskRequests.contains("playstore")
+
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
@@ -15,7 +18,10 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
+
+if (isPlaystore) {
+    apply plugin: 'io.fabric'
+}
 
 android {
     signingConfigs {
@@ -43,6 +49,18 @@ android {
             it.buildConfigField 'String', 'CLIENT_SECRET', ClientSecret
         }
     }
+
+    productFlavors {
+        // includes proprietary libs
+        playstore {
+
+        }
+
+        // only foss
+        foss {
+
+        }
+    }
 }
 
 dependencies {
@@ -61,7 +79,7 @@ dependencies {
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
     compile 'com.github.pluscubed:recycler-fast-scroll:0.3.2@aar'
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+    playstoreCompile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
 }
