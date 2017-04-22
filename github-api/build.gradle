@@ -1,0 +1,16 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion '25.0.0'
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 23
+    }
+}
+
+dependencies {
+    compile 'com.google.code.gson:gson:2.4'
+    compile 'com.squareup.okhttp:okhttp:1.6.0'
+}
