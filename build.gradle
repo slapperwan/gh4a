@@ -11,8 +11,6 @@ buildscript {
 }
 
 repositories {
-    maven { url 'http://dl.bintray.com/populov/maven' }
-    maven { url 'https://github.com/kageiit/maven-repo/raw/master' }
     mavenCentral()
     maven { url 'https://maven.fabric.io/public' }
     maven { url "https://jitpack.io" }
