@@ -104,6 +104,7 @@
     <string name="mentioned">Mentioned</string>
     <string name="participating">Participating</string>
     <string name="my_repositories">My repositories</string>
+    <string name="starred_repositories">Starred repositories</string>
     <string name="my_issues">My issues</string>
     <string name="my_pull_requests">My pull requests</string>
     <string name="my_gists">My gists</string>

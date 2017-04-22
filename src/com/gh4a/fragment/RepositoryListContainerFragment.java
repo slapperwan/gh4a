@@ -31,18 +31,20 @@ public class RepositoryListContainerFragment extends Fragment implements
         MenuItemCompat.OnActionExpandListener, SwipeRefreshLayout.ChildScrollDelegate {
     public static RepositoryListContainerFragment newInstance(String userLogin, boolean isOrg) {
         RepositoryListContainerFragment f = new RepositoryListContainerFragment();
-        Bundle args = new Bundle();
+        f.setArguments(createArgs(userLogin, isOrg));
+        return f;
+    }
 
+    protected static Bundle createArgs(String userLogin, boolean isOrg) {
+        Bundle args = new Bundle();
         args.putString("user", userLogin);
         args.putBoolean("is_org", isOrg);
-        f.setArguments(args);
-
-        return f;
+        return args;
     }
 
     private String mUserLogin;
     private boolean mIsOrg;
-    private String mFilterType = "all";
+    private String mFilterType = displayOnlyStarredRepos() ? "starred" : "all";
     private String mSortOrder = "full_name";
     private String mSortDirection = "asc";
     private boolean mSearchVisible;
@@ -69,7 +71,8 @@ public class RepositoryListContainerFragment extends Fragment implements
         mIsOrg = data.getBoolean("is_org");
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_FILTER_TYPE)) {
-            mFilterType = savedInstanceState.getString(STATE_KEY_FILTER_TYPE);
+            mFilterType = displayOnlyStarredRepos()
+                    ? "starred" : savedInstanceState.getString(STATE_KEY_FILTER_TYPE);
             mSortOrder = savedInstanceState.getString(STATE_KEY_SORT_ORDER);
             mSortDirection = savedInstanceState.getString(STATE_KEY_SORT_DIRECTION);
             mSearchVisible = savedInstanceState.getBoolean(STATE_KEY_SEARCH_VISIBLE);
@@ -140,6 +143,10 @@ public class RepositoryListContainerFragment extends Fragment implements
     }
 
     public void setFilterType(String type) {
+        if (displayOnlyStarredRepos()) {
+            return;
+        }
+
         if (!TextUtils.equals(type, mFilterType)) {
             mFilterType = type;
             applyFilterTypeAndSortOrder();
@@ -153,6 +160,10 @@ public class RepositoryListContainerFragment extends Fragment implements
             validateSortOrder();
             applyFilterTypeAndSortOrder();
         }
+    }
+
+    protected boolean displayOnlyStarredRepos() {
+        return false;
     }
 
     private void validateSortOrder() {
@@ -393,7 +404,8 @@ public class RepositoryListContainerFragment extends Fragment implements
     }
 
     public static class SortDrawerHelper {
-        private String mFilterType = "all";
+        private final boolean mOnlyStarredRepos;
+        private String mFilterType;
 
         private static final SparseArray<String[]> SORT_LOOKUP = new SparseArray<>();
         static {
@@ -407,11 +419,15 @@ public class RepositoryListContainerFragment extends Fragment implements
             SORT_LOOKUP.put(R.id.sort_updated_desc, new String[] { "updated", "desc" });
         }
 
-        public SortDrawerHelper() {
+        public SortDrawerHelper(boolean onlyStarredRepos) {
+            mOnlyStarredRepos = onlyStarredRepos;
+            mFilterType = mOnlyStarredRepos ? "starred" : "all";
         }
 
         public void setFilterType(String type) {
-            mFilterType = type;
+            if (!mOnlyStarredRepos) {
+                mFilterType = type;
+            }
         }
 
         public int getMenuResId() {

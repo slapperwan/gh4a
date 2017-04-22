@@ -68,6 +68,7 @@ public class HomeActivity extends BasePagerActivity implements
         START_PAGE_MAPPING.put(R.id.blog, "blog");
         START_PAGE_MAPPING.put(R.id.bookmarks, "bookmarks");
         START_PAGE_MAPPING.put(R.id.search, "search");
+        START_PAGE_MAPPING.put(R.id.starred_repos, "stars");
     }
 
     private final LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
@@ -237,7 +238,7 @@ public class HomeActivity extends BasePagerActivity implements
             case R.id.notifications:
                 return new NotificationListFactory(this);
             case R.id.my_repos:
-                return new RepositoryFactory(this, mUserLogin, getPrefs());
+                return new RepositoryFactory(this, mUserLogin, getPrefs(), false);
             case R.id.my_issues:
                 return new IssueListFactory(this, mUserLogin, false);
             case R.id.my_prs:
@@ -248,6 +249,8 @@ public class HomeActivity extends BasePagerActivity implements
                 return new SearchFactory(this);
             case R.id.bookmarks:
                 return new BookmarkFactory(this);
+            case R.id.starred_repos:
+                return new RepositoryFactory(this, mUserLogin, getPrefs(), true);
             case R.id.pub_timeline:
                 return new TimelineFactory(this);
             case R.id.blog:

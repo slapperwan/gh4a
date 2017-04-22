@@ -18,6 +18,7 @@
         <item>@string/my_gists</item>
         <item>@string/search</item>
         <item>@string/bookmarks</item>
+        <item>@string/starred_repositories</item>
         <item>@string/pub_timeline</item>
         <item>@string/trend</item>
         <item>@string/blog</item>
@@ -32,6 +33,7 @@
         <item>gists</item>
         <item>search</item>
         <item>bookmarks</item>
+        <item>stars</item>
         <item>timeline</item>
         <item>trends</item>
         <item>blog</item>

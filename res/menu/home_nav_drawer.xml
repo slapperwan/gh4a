@@ -41,6 +41,10 @@
             android:id="@+id/bookmarks"
             android:title="@string/bookmarks"
             android:icon="@drawable/icon_bookmark" />
+        <item
+            android:id="@+id/starred_repos"
+            android:title="@string/starred_repositories"
+            android:icon="@drawable/unstar" />
     </group>
     <group
         android:id="@+id/explore"
