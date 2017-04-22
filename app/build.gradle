@@ -1,3 +1,6 @@
+def taskRequests = getGradle().getStartParameter().getTaskRequests().toString()
+def isFabric = taskRequests.contains("Fabric") || taskRequests.contains("fabric")
+
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
@@ -15,14 +18,17 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
+
+if (isFabric) {
+    apply plugin: 'io.fabric'
+}
 
 android {
     signingConfigs {
         playStore
     }
     compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '25.0.2'
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 23
@@ -39,8 +45,20 @@ android {
             signingConfig signingConfigs.playStore
         }
         buildTypes.each {
-            it.buildConfigField 'String', 'CLIENT_ID', ClientId
-            it.buildConfigField 'String', 'CLIENT_SECRET', ClientSecret
+            it.buildConfigField 'String', 'CLIENT_ID', '"ClientId"'
+            it.buildConfigField 'String', 'CLIENT_SECRET', '"ClientSecret"'
+        }
+    }
+
+    productFlavors {
+        // includes proprietary libs
+        fabric {
+            buildConfigField "boolean", "FDROID", "false"
+        }
+
+        // only foss
+        fdroid {
+            buildConfigField "boolean", "FDROID", "true"
         }
     }
 }
@@ -61,7 +79,7 @@ dependencies {
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
     compile 'com.github.pluscubed:recycler-fast-scroll:0.3.2@aar'
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+    fabricCompile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
 }

@@ -25,7 +25,6 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.SparseArray;
 
-import com.crashlytics.android.Crashlytics;
 import com.gh4a.fragment.SettingsFragment;
 
 import org.eclipse.egit.github.core.User;
@@ -53,8 +52,6 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
-import io.fabric.sdk.android.Fabric;
 
 /**
  * The Class Gh4Application.
@@ -136,9 +133,9 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         boolean isDebuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-        sHasCrashlytics = !isDebuggable && !TextUtils.equals(Build.DEVICE, "sdk");
+        sHasCrashlytics = !isDebuggable && !TextUtils.equals(Build.DEVICE, "sdk") && !BuildConfig.FDROID;
         if (sHasCrashlytics) {
-            Fabric.with(this, new Crashlytics());
+            FabricApplication.onCreate(this);
         }
 
         mPt = new PrettyTime();
@@ -196,8 +193,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     /* package */ static void trackVisitedUrl(String url) {
         synchronized (Gh4Application.class) {
             if (sHasCrashlytics) {
-                Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
-                Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
+                FabricApplication.trackVisitedUrl(url, sNextUrlTrackingPosition);
                 if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
                     sNextUrlTrackingPosition = 0;
                 }
