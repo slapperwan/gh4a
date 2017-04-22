@@ -85,7 +85,6 @@ Open Source Libraries
 ---------------------
 * [android-gif-drawable](https://github.com/koral--/android-gif-drawable)
 * [AndroidSVG](https://github.com/BigBadaboom/androidsvg)
-* [GitHub Java API](https://github.com/maniac103/egit-github/tree/master/org.eclipse.egit.github.core)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [Material Design Icons](https://github.com/google/material-design-icons)
 * [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar)
