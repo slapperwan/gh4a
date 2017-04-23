@@ -133,7 +133,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         boolean isDebuggable = (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-        sHasCrashlytics = !isDebuggable && !TextUtils.equals(Build.DEVICE, "sdk") && !BuildConfig.FDROID;
+        sHasCrashlytics = !isDebuggable && !TextUtils.equals(Build.DEVICE, "sdk") && !BuildConfig.FOSS;
         if (sHasCrashlytics) {
             FabricApplication.onCreate(this);
         }

@@ -10,8 +10,8 @@ public class FabricApplication {
     public static void onCreate(Application app) {
         Fabric.with(app, new Crashlytics());
     }
-    public static void trackVisitedUrl(String url, int sNextUrlTrackingPosition) {
-        Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
-        Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
+    public static void trackVisitedUrl(String url, int position) {
+        Crashlytics.setString("github-url-" + position, url);
+        Crashlytics.setInt("last-url-position", position);
     }
 }

@@ -7,7 +7,7 @@ public class ApiKeyHelper {
     private static final String GITHUB_FDROID_SECRET = "SOMETEXT";
 
     public static String getClientId() {
-        if (BuildConfig.FDROID) {
+        if (BuildConfig.FOSS) {
             return GITHUB_FDROID_CLIENT_ID;
         } else {
             return BuildConfig.CLIENT_ID;
@@ -15,7 +15,7 @@ public class ApiKeyHelper {
     }
 
     public static String getSecret() {
-        if (BuildConfig.FDROID) {
+        if (BuildConfig.FOSS) {
             return GITHUB_FDROID_SECRET;
         } else {
             return BuildConfig.CLIENT_SECRET;

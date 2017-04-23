@@ -1,5 +1,5 @@
 def taskRequests = getGradle().getStartParameter().getTaskRequests().toString()
-def isFabric = taskRequests.contains("Fabric") || taskRequests.contains("fabric")
+def isPlaystore = taskRequests.contains("Playstore") || taskRequests.contains("playstore")
 
 buildscript {
     repositories {
@@ -19,7 +19,7 @@ repositories {
 
 apply plugin: 'com.android.application'
 
-if (isFabric) {
+if (isPlaystore) {
     apply plugin: 'io.fabric'
 }
 
@@ -52,13 +52,13 @@ android {
 
     productFlavors {
         // includes proprietary libs
-        fabric {
-            buildConfigField "boolean", "FDROID", "false"
+        playstore {
+            buildConfigField "boolean", "FOSS", "false"
         }
 
         // only foss
-        fdroid {
-            buildConfigField "boolean", "FDROID", "true"
+        foss {
+            buildConfigField "boolean", "FOSS", "true"
         }
     }
 }
@@ -79,7 +79,7 @@ dependencies {
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
     compile 'com.github.pluscubed:recycler-fast-scroll:0.3.2@aar'
-    fabricCompile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+    playstoreCompile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
 }
