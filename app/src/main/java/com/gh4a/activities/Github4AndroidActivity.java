@@ -29,10 +29,10 @@ import android.widget.FrameLayout;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
+import com.gh4a.BuildConfig;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.ApiKeyHelper;
 import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.User;
@@ -108,8 +108,8 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                 && data.getHost().equals(CALLBACK_URI.getHost())) {
             Uri uri = Uri.parse(TOKEN_URL)
                     .buildUpon()
-                    .appendQueryParameter(PARAM_CLIENT_ID, ApiKeyHelper.getClientId())
-                    .appendQueryParameter(PARAM_CLIENT_SECRET, ApiKeyHelper.getSecret())
+                    .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
+                    .appendQueryParameter(PARAM_CLIENT_SECRET, BuildConfig.CLIENT_SECRET)
                     .appendQueryParameter(PARAM_CODE, data.getQueryParameter(PARAM_CODE))
                     .build();
             new FetchTokenTask(uri).schedule();
@@ -193,7 +193,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
     public static void launchLogin(Activity activity) {
         Uri uri = Uri.parse(OAUTH_URL)
                 .buildUpon()
-                .appendQueryParameter(PARAM_CLIENT_ID, ApiKeyHelper.getClientId())
+                .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
                 .appendQueryParameter(PARAM_SCOPE, SCOPES)
                 .appendQueryParameter(PARAM_CALLBACK_URI, CALLBACK_URI.toString())
                 .build();

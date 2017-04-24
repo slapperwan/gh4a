@@ -45,8 +45,8 @@ android {
             signingConfig signingConfigs.playStore
         }
         buildTypes.each {
-            it.buildConfigField 'String', 'CLIENT_ID', '"ClientId"'
-            it.buildConfigField 'String', 'CLIENT_SECRET', '"ClientSecret"'
+            it.buildConfigField 'String', 'CLIENT_ID', ClientId
+            it.buildConfigField 'String', 'CLIENT_SECRET', ClientSecret
         }
     }
 
