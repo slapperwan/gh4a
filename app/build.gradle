@@ -53,12 +53,12 @@ android {
     productFlavors {
         // includes proprietary libs
         playstore {
-            buildConfigField "boolean", "FOSS", "false"
+
         }
 
         // only foss
         foss {
-            buildConfigField "boolean", "FOSS", "true"
+
         }
     }
 }
