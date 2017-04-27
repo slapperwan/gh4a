@@ -351,7 +351,7 @@ public class PullRequestActivity extends BasePagerActivity implements
     @Override
     public void onCommentsUpdated() {
         if (mPullRequestFragment != null) {
-            mPullRequestFragment.reloadEvents();
+            mPullRequestFragment.reloadEvents(true);
         }
     }
 

@@ -39,6 +39,7 @@ import com.gh4a.widget.StyleableTextView;
 
 import org.eclipse.egit.github.core.User;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -81,6 +82,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     private final OnCommentAction mActionCallback;
     protected final String mRepoOwner;
     protected final String mRepoName;
+    private boolean mDontClearCacheOnClear;
 
     protected CommentAdapterBase(Context context, String repoOwner, String repoName,
             OnCommentAction actionCallback) {
@@ -173,10 +175,22 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         return users;
     }
 
+    public void suppressCacheClearOnNextClear() {
+        mDontClearCacheOnClear = true;
+    }
+
     @Override
     public void clear() {
         super.clear();
-        mImageGetter.clearHtmlCache();
+        if (!mDontClearCacheOnClear) {
+            mImageGetter.clearHtmlCache();
+        }
+    }
+
+    @Override
+    public void addAll(Collection<T> objects) {
+        mDontClearCacheOnClear = false;
+        super.addAll(objects);
     }
 
     @Override

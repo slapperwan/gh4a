@@ -181,7 +181,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         return super.canChildScrollUp();
     }
 
-    public void reloadEvents() {
+    public void reloadEvents(boolean alsoClearCaches) {
+        if (mAdapter != null && !alsoClearCaches) {
+            // Don't clear adapter's cache, we're only interested in the new event
+            mAdapter.suppressCacheClearOnNextClear();
+        }
         super.onRefresh();
     }
 
@@ -353,7 +357,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == Activity.RESULT_OK) {
-                reloadEvents();
+                reloadEvents(true);
                 getActivity().setResult(Activity.RESULT_OK);
             }
         } else {
@@ -377,7 +381,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     public void onCommentSent() {
         // reload comments
         if (isAdded()) {
-            reloadEvents();
+            reloadEvents(false);
         }
     }
 
@@ -422,7 +426,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
 
         @Override
         protected void onSuccess(Void result) {
-            reloadEvents();
+            reloadEvents(false);
             getActivity().setResult(Activity.RESULT_OK);
         }
 

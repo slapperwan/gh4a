@@ -96,7 +96,7 @@ public class PullRequestFragment extends IssueFragmentBase {
 
         assignHighlightColor();
         loadStatusIfOpen();
-        reloadEvents();
+        reloadEvents(false);
     }
 
     @Override

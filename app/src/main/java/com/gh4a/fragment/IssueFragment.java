@@ -33,7 +33,7 @@ public class IssueFragment extends IssueFragmentBase {
     public void updateState(Issue issue) {
         mIssue.setState(issue.getState());
         assignHighlightColor();
-        reloadEvents();
+        reloadEvents(false);
     }
 
     @Override
