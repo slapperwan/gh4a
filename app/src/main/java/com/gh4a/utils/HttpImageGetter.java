@@ -246,6 +246,7 @@ public class HttpImageGetter implements ImageGetter {
         void clearHtmlCache() {
             if (mTask != null) {
                 mTask.cancel(true);
+                mTask = null;
             }
             mRawHtml = null;
             mEncodedHtml = null;
