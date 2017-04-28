@@ -119,6 +119,14 @@
     <string name="browser_logout_completed_dialog_text">You can now proceed in the login process for the new account.</string>
     <string name="go_to_logout_page">Go to logout page</string>
     <string name="continue_login">Continue new login</string>
+
+    <string name="reaction_plus_one" translatable="false">+1</string>
+    <string name="reaction_minus_one" translatable="false">-1</string>
+    <string name="reaction_laugh">Laugh</string>
+    <string name="reaction_confused">Confused</string>
+    <string name="reaction_heart">Heart</string>
+    <string name="reaction_hooray">Hooray</string>
+
     <plurals name="contributor_extra_data">
         <item quantity="one">%1$d contribution</item>
         <item quantity="other">%1$d contributions</item>

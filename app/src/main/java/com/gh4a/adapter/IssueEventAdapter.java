@@ -95,6 +95,11 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
     }
 
     @Override
+    protected long getId(IssueEventHolder item) {
+        return item.comment != null ? item.comment.getId() : item.event.getId();
+    }
+
+    @Override
     protected User getUser(IssueEventHolder item) {
         return item.getUser();
     }
@@ -210,27 +215,25 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
 
     @Override
     public List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException {
-        IssueEventHolder holder = (IssueEventHolder) item;
+        ViewHolder<IssueEventHolder> holder = (ViewHolder) item;
         IssueService service = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         return service.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName),
-                holder.comment.getId());
+                holder.mBoundItem.comment.getId());
     }
 
     @Override
-    public void addReactionInBackground(Object item, String content) throws IOException {
-        IssueEventHolder holder = (IssueEventHolder) item;
+    public Reaction addReactionInBackground(Object item, String content) throws IOException {
+        ViewHolder<IssueEventHolder> holder = (ViewHolder) item;
         IssueService service = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        service.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName),
-                holder.comment.getId(), content);
+        return service.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName),
+                holder.mBoundItem.comment.getId(), content);
     }
 
     @Override
-    public void updateReactions(Object item, Reactions reactions) {
-        IssueEventHolder holder = (IssueEventHolder) item;
-        holder.comment.setReactions(reactions);
-        notifyDataSetChanged();
+    protected void updateReactions(IssueEventHolder item, Reactions reactions) {
+        item.comment.setReactions(reactions);
     }
 
     private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue,

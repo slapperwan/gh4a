@@ -7,8 +7,10 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/react"
-        android:title="@string/add_reaction"
-        app:showAsAction="never" />
+        android:title="@string/add_reaction">
+        <menu></menu>
+    </item>
+
     <item
         android:id="@+id/edit"
         android:title="@string/edit"

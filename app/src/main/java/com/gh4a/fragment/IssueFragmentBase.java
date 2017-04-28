@@ -65,8 +65,7 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventHolder> implements
-        View.OnClickListener, ReactionBar.ReactionDetailsProvider,
-        ReactionBar.AddReactionDialog.RefreshListener,
+        View.OnClickListener, ReactionBar.Callback,
         IssueEventAdapter.OnCommentAction<IssueEventHolder>,
         CommentBoxFragment.Callback {
     protected static final int REQUEST_EDIT = 1000;
@@ -79,6 +78,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     private boolean mIsCollaborator;
     private boolean mListShown;
     private CommentBoxFragment mCommentFragment;
+    private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
     private IssueEventAdapter mAdapter;
     private HttpImageGetter mImageGetter;
 
@@ -193,12 +193,21 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.issue_fragment_menu, menu);
+
+        MenuItem reactItem = menu.findItem(R.id.react);
+        inflater.inflate(R.menu.reaction_menu, reactItem.getSubMenu());
+        if (mReactionMenuHelper == null) {
+            mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(getActivity(),
+                    reactItem.getSubMenu(), this, null);
+        } else {
+            mReactionMenuHelper.updateFromMenu(reactItem.getSubMenu());
+        }
+        mReactionMenuHelper.startLoadingIfNeeded();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.react) {
-            new ReactionBar.AddReactionDialog(getActivity(), this, this, null).show();
+        if (mReactionMenuHelper != null && mReactionMenuHelper.onItemClick(item)) {
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -354,7 +363,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         }
 
         ReactionBar reactions = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
-        reactions.setReactionDetailsProvider(this, null);
+        reactions.setCallback(this, null);
         reactions.setReactions(mIssue.getReactions());
 
         assignHighlightColor();
@@ -381,19 +390,24 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     }
 
     @Override
-    public void addReactionInBackground(Object item, String content) throws IOException {
+    public Reaction addReactionInBackground(Object item, String content) throws IOException {
         IssueService service = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        service.addIssueReaction(new RepositoryId(mRepoOwner, mRepoName),
+        return service.addIssueReaction(new RepositoryId(mRepoOwner, mRepoName),
                 mIssue.getNumber(), content);
     }
 
     @Override
-    public void updateReactions(Object item, Reactions reactions) {
+    public void onReactionsUpdated(Object item, Reactions reactions, List<Reaction> details) {
         mIssue.setReactions(reactions);
         if (mListHeaderView != null) {
             ReactionBar bar = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
             bar.setReactions(reactions);
+            bar.updateReactionDetails(details);
+        }
+        if (mReactionMenuHelper != null) {
+            mReactionMenuHelper.updateDetails(details);
+            getActivity().supportInvalidateOptionsMenu();
         }
     }
 

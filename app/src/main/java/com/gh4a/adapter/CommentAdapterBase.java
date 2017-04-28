@@ -20,7 +20,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,17 +40,18 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
+import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.User;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.ViewHolder> implements
-        ReactionBar.ReactionDetailsProvider,
-        ReactionBar.AddReactionDialog.RefreshListener {
+abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.ViewHolder>
+        implements ReactionBar.Callback {
     public interface OnCommentAction<T> {
         void editComment(T comment);
         void deleteComment(T comment);
@@ -77,10 +80,6 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
                             mContext.getString(R.string.share_title));
                     mContext.startActivity(shareIntent);
                     return true;
-
-                case R.id.react:
-                    new ReactionBar.AddReactionDialog(mContext,
-                            CommentAdapterBase.this, CommentAdapterBase.this, item).show();
             }
             return false;
         }
@@ -91,6 +90,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     protected final String mRepoOwner;
     protected final String mRepoName;
     private boolean mDontClearCacheOnClear;
+    private SparseArray<ReactionBar.AddReactionMenuHelper> mReactionHelpers = new SparseArray<>();
 
     protected CommentAdapterBase(Context context, String repoOwner, String repoName,
             OnCommentAction actionCallback) {
@@ -119,6 +119,19 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         Date createdAt = getCreatedAt(item);
         Date updatedAt = getUpdatedAt(item);
 
+        holder.mBoundItem = item;
+
+        int itemId = (int) getId(item);
+        ReactionBar.AddReactionMenuHelper reactionHelper = mReactionHelpers.get(itemId);
+        if (reactionHelper == null) {
+            reactionHelper = new ReactionBar.AddReactionMenuHelper(mContext,
+                    holder.getReactItemSubMenu(), this, holder);
+            mReactionHelpers.put(itemId, reactionHelper);
+        } else {
+            reactionHelper.updateFromMenu(holder.getReactItemSubMenu());
+        }
+        holder.mReactionMenuHelper = reactionHelper;
+
         AvatarHandler.assignAvatar(holder.ivGravatar, user);
         holder.ivGravatar.setTag(user);
 
@@ -135,7 +148,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         bindFileView(item, holder.tvFile);
         bindEventIcon(item, holder.ivEventIcon);
         bindReactions(item, holder.reactions);
-        holder.reactions.setReactionDetailsProvider(this, item);
+        holder.reactions.setCallback(this, holder);
 
         if (canQuote(item)) {
             holder.tvDesc.setCustomSelectionActionModeCallback(
@@ -218,6 +231,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         }
     }
 
+    protected abstract long getId(T item);
     protected abstract User getUser(T item);
     protected abstract Date getCreatedAt(T item);
     protected abstract Date getUpdatedAt(T item);
@@ -231,6 +245,20 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     protected abstract boolean hasActionMenu(T item);
     protected abstract boolean canQuote(T item);
     protected abstract boolean canReact(T item);
+    protected abstract void updateReactions(T item, Reactions reactions);
+
+    @Override
+    public void onReactionsUpdated(Object item, Reactions reactions, List<Reaction> details) {
+        ViewHolder<T> holder = (ViewHolder<T>) item;
+        updateReactions(holder.mBoundItem, reactions);
+
+        holder.reactions.setReactions(reactions);
+        holder.reactions.updateReactionDetails(details);
+        if (holder.mReactionMenuHelper != null) {
+            holder.mReactionMenuHelper.updateDetails(details);
+        }
+        notifyItemChanged(holder.getAdapterPosition());
+    }
 
     public static class ViewHolder<T> extends RecyclerView.ViewHolder
             implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
@@ -257,6 +285,9 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
             mPopupMenu = new PopupMenu(view.getContext(), ivMenu);
             mPopupMenu.getMenuInflater().inflate(R.menu.comment_menu, mPopupMenu.getMenu());
             mPopupMenu.setOnMenuItemClickListener(this);
+
+            MenuItem reactItem = mPopupMenu.getMenu().findItem(R.id.react);
+            mPopupMenu.getMenuInflater().inflate(R.menu.reaction_menu, reactItem.getSubMenu());
         }
 
         private final ImageView ivGravatar;
@@ -271,9 +302,20 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         private final PopupMenu mPopupMenu;
         private final OnCommentMenuItemClick mCommentMenuItemClickCallback;
 
+        private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
+        protected T mBoundItem;
+
+        private Menu getReactItemSubMenu() {
+            MenuItem reactItem = mPopupMenu.getMenu().findItem(R.id.react);
+            return reactItem.getSubMenu();
+        }
+
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.iv_menu) {
+                if (mReactionMenuHelper != null) {
+                    mReactionMenuHelper.startLoadingIfNeeded();
+                }
                 mPopupMenu.show();
             }
         }
@@ -281,6 +323,9 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {
             T item = (T) ivMenu.getTag();
+            if (mReactionMenuHelper != null && mReactionMenuHelper.onItemClick(menuItem)) {
+                return true;
+            }
             return mCommentMenuItemClickCallback.onCommentMenuItemClick(item, menuItem);
         }
     }

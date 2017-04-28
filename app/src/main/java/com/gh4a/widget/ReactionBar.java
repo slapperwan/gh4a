@@ -1,29 +1,28 @@
 package com.gh4a.widget;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Parcelable;
-import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.ListPopupWindow;
+import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.SparseIntArray;
+import android.util.Pair;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Checkable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -47,19 +46,15 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ReactionBar extends LinearLayout implements View.OnClickListener {
-    public interface ReactionDetailsProvider {
+    public interface Callback {
         List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException;
-        void addReactionInBackground(Object item, String content) throws IOException;
+        Reaction addReactionInBackground(Object item, String content) throws IOException;
+        void onReactionsUpdated(Object item, Reactions reactions, List<Reaction> details);
     }
 
     private static final @IdRes int[] VIEW_IDS = {
         R.id.plus_one, R.id.minus_one, R.id.laugh,
         R.id.hooray, R.id.heart, R.id.confused
-    };
-    private static final @AttrRes  int[] ICON_IDS = {
-        R.attr.reactionPlusOneIcon, R.attr.reactionMinusOneIcon,
-        R.attr.reactionLaughIcon, R.attr.reactionHoorayIcon,
-        R.attr.reactionHeartIcon, R.attr.reactionConfusedIcon
     };
     private static final String[] CONTENTS = {
         Reaction.CONTENT_PLUS_ONE, Reaction.CONTENT_MINUS_ONE,
@@ -73,10 +68,21 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
     private TextView mHoorayView;
     private TextView mConfusedView;
     private TextView mHeartView;
+    private View mReactButton;
 
-    private ReactionDetailsProvider mProvider;
+    private Callback mCallback;
     private Object mReferenceItem;
     private ReactionUserPopup mPopup;
+
+    private MenuPopupHelper mAddReactionPopup;
+    private AddReactionMenuHelper mAddHelper;
+    private PopupMenu.OnMenuItemClickListener mAddReactionClickListener =
+            new PopupMenu.OnMenuItemClickListener() {
+        @Override
+        public boolean onMenuItemClick(MenuItem item) {
+            return mAddHelper.onItemClick(item);
+        }
+    };
 
     public ReactionBar(Context context) {
         this(context, null);
@@ -98,6 +104,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         mHoorayView = (TextView) findViewById(R.id.hooray);
         mConfusedView = (TextView) findViewById(R.id.confused);
         mHeartView = (TextView) findViewById(R.id.heart);
+        mReactButton = findViewById(R.id.react);
 
         setReactions(null);
     }
@@ -119,13 +126,24 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
     }
 
-    public void setReactionDetailsProvider(ReactionDetailsProvider provider, Object item) {
-        mProvider = provider;
+    public void updateReactionDetails(List<Reaction> details) {
+        if (mPopup != null) {
+            mPopup.updateCache(details);
+        }
+        if (mAddHelper != null) {
+            mAddHelper.updateDetails(details);
+        }
+    }
+
+    public void setCallback(Callback callback, Object item) {
+        mCallback = callback;
         mReferenceItem = item;
 
         for (int i = 0; i < VIEW_IDS.length; i++) {
-            findViewById(VIEW_IDS[i]).setOnClickListener(provider != null ? this : null);
+            findViewById(VIEW_IDS[i]).setOnClickListener(callback != null ? this : null);
         }
+        mReactButton.setVisibility(callback != null ? View.VISIBLE : View.GONE);
+        mReactButton.setOnClickListener(callback != null ? this : null);
     }
 
     @Override
@@ -150,14 +168,29 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             mPopup.dismiss();
             return;
         }
+        if (view == mReactButton) {
+            if (mAddReactionPopup == null) {
+                PopupMenu popup = new PopupMenu(getContext(), mReactButton);
+                popup.inflate(R.menu.reaction_menu);
+                popup.setOnMenuItemClickListener(mAddReactionClickListener);
+                mAddHelper = new AddReactionMenuHelper(getContext(), popup.getMenu(),
+                        mCallback, mReferenceItem);
+
+                mAddReactionPopup = new MenuPopupHelper(getContext(), (MenuBuilder) popup.getMenu(),
+                        mReactButton);
+                mAddReactionPopup.setForceShowIcon(true);
+            }
+            mAddHelper.startLoadingIfNeeded();
+            mAddReactionPopup.show();
+            return;
+        }
         for (int i = 0; i < VIEW_IDS.length; i++) {
             if (view.getId() == VIEW_IDS[i]) {
                 if (mPopup == null) {
-                    mPopup = new ReactionUserPopup(getContext(), mProvider, mReferenceItem);
+                    mPopup = new ReactionUserPopup(getContext(), mCallback, mReferenceItem);
                 }
                 mPopup.setAnchorView(view);
                 mPopup.show(CONTENTS[i]);
-
             }
         }
     }
@@ -172,23 +205,27 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
     }
 
     private static class ReactionUserPopup extends ListPopupWindow {
-        private ReactionDetailsProvider mProvider;
+        private Callback mCallback;
         private Object mItem;
         private List<Reaction> mCachedReactions;
         private ReactionUserAdapter mAdapter;
         private String mContent;
 
-        public ReactionUserPopup(@NonNull Context context, ReactionDetailsProvider provider,
-                Object item) {
+        public ReactionUserPopup(@NonNull Context context, Callback callback, Object item) {
             super(context);
 
-            mProvider = provider;
+            mCallback = callback;
             mItem = item;
             mAdapter = new ReactionUserAdapter(context, this);
             setContentWidth(
                     context.getResources()
                             .getDimensionPixelSize(R.dimen.reaction_details_popup_width));
             setAdapter(mAdapter);
+        }
+
+        public void updateCache(List<Reaction> reactions) {
+            mCachedReactions = reactions;
+            populateAdapter();
         }
 
         public void clearCache() {
@@ -206,7 +243,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             if (mCachedReactions != null) {
                 populateAdapter();
             } else {
-                new FetchReactionTask(mProvider, mItem) {
+                new FetchReactionTask(mCallback, mItem) {
                     @Override
                     protected void onPostExecute(List<Reaction> reactions) {
                         mCachedReactions = reactions;
@@ -306,11 +343,11 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
     }
 
     private static class FetchReactionTask extends AsyncTask<Void, Void, List<Reaction>> {
-        private ReactionDetailsProvider mProvider;
+        private Callback mCallback;
         private Object mItem;
 
-        public FetchReactionTask(ReactionDetailsProvider provider, Object item) {
-            mProvider = provider;
+        public FetchReactionTask(Callback callback, Object item) {
+            mCallback = callback;
             mItem = item;
         }
 
@@ -318,7 +355,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         protected List<Reaction> doInBackground(Void... voids) {
             try {
                 List<Reaction> reactions =
-                        mProvider.loadReactionDetailsInBackground(mItem);
+                        mCallback.loadReactionDetailsInBackground(mItem);
                 Collections.sort(reactions, new Comparator<Reaction>() {
                     @Override
                     public int compare(Reaction lhs, Reaction rhs) {
@@ -336,132 +373,160 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
     }
 
-    public static class AddReactionDialog extends BottomSheetDialog implements View.OnClickListener {
-        public interface RefreshListener {
-            void updateReactions(Object item, Reactions reactions);
-        }
-        private View mContentView;
-        private ReactionDetailsProvider mProvider;
-        private RefreshListener mListener;
-        private SparseIntArray mOldReactionIds = new SparseIntArray();
+    public static class AddReactionMenuHelper {
+        private Context mContext;
+        private MenuItem mLoadingItem;
+        private MenuItem[] mItems = new MenuItem[CONTENTS.length];
+        private List<Reaction> mCachedReactions;
+        private int[] mOldReactionIds;
+        private Callback mCallback;
         private Object mItem;
         private Reactions mReactions = new Reactions();
 
-        public AddReactionDialog(@NonNull Context context, RefreshListener listener,
-                ReactionDetailsProvider provider, Object item) {
-            super(context);
-
-            mListener = listener;
-            mProvider = provider;
+        public AddReactionMenuHelper(@NonNull Context context, Menu menu,
+                Callback callback, Object item) {
+            mContext = context;
+            mCallback = callback;
             mItem = item;
 
-            mContentView = View.inflate(context, R.layout.add_reaction_dialog, null);
-            setContentView(mContentView);
+            updateFromMenu(menu);
+        }
 
-            @ColorInt int bgColor = UiUtils.resolveColor(getContext(),
-                    android.R.attr.textColorSecondary);
-            @ColorInt int iconColor = UiUtils.resolveColor(getContext(),
-                    android.R.attr.textColorPrimaryInverse);
+        public void updateFromMenu(Menu menu) {
+            mLoadingItem = menu.findItem(R.id.loading);
 
             for (int i = 0; i < VIEW_IDS.length; i++) {
-                ImageView view = (ImageView) mContentView.findViewById(VIEW_IDS[i]);
-                Drawable icon = ContextCompat.getDrawable(getContext(),
-                        UiUtils.resolveDrawable(getContext(), ICON_IDS[i]));
-                Drawable bg = ContextCompat.getDrawable(getContext(),
-                        R.drawable.add_reaction_selector);
-                view.setBackground(
-                        wrapDrawableForCheckState(bg, bgColor, PorterDuff.Mode.SRC_IN));
-                view.setImageDrawable(
-                        wrapDrawableForCheckState(icon, iconColor, PorterDuff.Mode.SRC_ATOP));
+                mItems[i] = menu.findItem(VIEW_IDS[i]);
+                Drawable icon = DrawableCompat.wrap(mItems[i].getIcon().mutate());
+                DrawableCompat.setTintMode(icon, PorterDuff.Mode.SRC_ATOP);
+                mItems[i].setIcon(icon);
+            }
+            if (mOldReactionIds != null) {
+                showDataItems();
             }
         }
 
-        @Override
-        protected void onStart() {
-            super.onStart();
+        public boolean onItemClick(MenuItem item) {
+            for (int i = 0; i < mItems.length; i++) {
+                if (item == mItems[i]) {
+                    item.setChecked(mOldReactionIds[i] == 0);
+                    addOrRemoveReaction(CONTENTS[i], mOldReactionIds[i]);
+                    updateDrawableState();
+                    return true;
+                }
+            }
+            return false;
+        }
 
-            final View progress = mContentView.findViewById(R.id.progress);
-            final View container = mContentView.findViewById(R.id.action_container);
-            final View saveButton = mContentView.findViewById(R.id.save_button);
+        public void updateDetails(List<Reaction> reactions) {
+            mCachedReactions = reactions != null ? reactions : new ArrayList<Reaction>();
+            mOldReactionIds = new int[mItems.length];
+            mReactions = new Reactions();
+            if (reactions != null) {
+                String ownLogin = Gh4Application.get().getAuthLogin();
+                for (Reaction reaction : reactions) {
+                    updateReactionsCache(reaction.getContent(), 1);
+                    if (!ApiHelpers.loginEquals(reaction.getUser(), ownLogin)) {
+                        continue;
+                    }
+                    for (int i = 0; i < CONTENTS.length; i++) {
+                        if (TextUtils.equals(CONTENTS[i], reaction.getContent())) {
+                            mOldReactionIds[i] = reaction.getId();
+                            break;
+                        }
+                    }
+                }
+            }
+        }
 
-            progress.setVisibility(View.VISIBLE);
-            container.setVisibility(View.GONE);
-            saveButton.setVisibility(View.GONE);
-            saveButton.setOnClickListener(this);
-
-            new FetchReactionTask(mProvider, mItem) {
+        public void startLoadingIfNeeded() {
+            if (mOldReactionIds != null) {
+                syncCheckStates();
+                return;
+            }
+            new FetchReactionTask(mCallback, mItem) {
                 @Override
                 protected void onPostExecute(List<Reaction> reactions) {
-                    if (reactions == null) {
-                        dismiss();
-                        return;
-                    }
-                    String ownLogin = Gh4Application.get().getAuthLogin();
-                    for (Reaction reaction : reactions) {
-                        updateReactionsCache(reaction.getContent(), 1);
-                        if (!ApiHelpers.loginEquals(reaction.getUser(), ownLogin)) {
-                            continue;
+                    updateDetails(reactions);
+                    showDataItems();
+                }
+            }.execute();
+
+        }
+
+        private void showDataItems() {
+            mLoadingItem.setVisible(false);
+            for (int i = 0; i < mItems.length; i++) {
+                mItems[i].setVisible(true);
+            }
+            syncCheckStates();
+        }
+
+        private void syncCheckStates() {
+            for (int i = 0; i < mItems.length; i++) {
+                mItems[i].setChecked(mOldReactionIds[i] != 0);
+            }
+            updateDrawableState();
+        }
+
+        private void updateDrawableState() {
+            @ColorInt int accentColor = UiUtils.resolveColor(mContext, R.attr.colorAccent);
+            @ColorInt int secondaryColor = UiUtils.resolveColor(mContext,
+                    android.R.attr.textColorSecondary);
+            for (int i = 0; i < mItems.length; i++) {
+                DrawableCompat.setTint(mItems[i].getIcon(), mItems[i].isChecked()
+                        ? accentColor : secondaryColor);
+            }
+        }
+
+        private void addOrRemoveReaction(final String content, final int id) {
+            updateReactionsCache(content, id != 0 ? -1 : 1);
+
+            new AsyncTask<Void, Void, Pair<Boolean, Reaction>>() {
+                @Override
+                protected Pair<Boolean, Reaction> doInBackground(Void... voids) {
+                    try {
+                        if (id == 0) {
+                            Reaction result = mCallback.addReactionInBackground(mItem, content);
+                            return Pair.create(true, result);
+                        } else {
+                            ReactionService service = (ReactionService)
+                                    Gh4Application.get().getService(Gh4Application.REACTION_SERVICE);
+                            service.deleteReaction(id);
+                            return Pair.create(true, null);
                         }
+                    } catch (IOException e) {
+                        android.util.Log.d("foo", "save fail", e);
+                        return Pair.create(false, null);
+                    }
+                }
+
+                @Override
+                protected void onPostExecute(Pair<Boolean, Reaction> result) {
+                    if (!result.first) {
+                        // revert the change we did before
+                        updateReactionsCache(content, id != 0 ? 1 : -1);
+                    } else {
                         for (int i = 0; i < CONTENTS.length; i++) {
-                            if (TextUtils.equals(CONTENTS[i], reaction.getContent())) {
-                                final @IdRes int resId = VIEW_IDS[i];
-                                ((Checkable) mContentView.findViewById(resId)).setChecked(true);
-                                mOldReactionIds.put(resId, reaction.getId());
+                            if (TextUtils.equals(CONTENTS[i], content)) {
+                                mOldReactionIds[i] = result.second != null ? result.second.getId() : 0;
                                 break;
                             }
                         }
-                    }
-
-                    progress.setVisibility(View.GONE);
-                    container.setVisibility(View.VISIBLE);
-                    saveButton.setVisibility(View.VISIBLE);
-                }
-            }.execute();
-        }
-
-        @Override
-        public void onClick(View view) {
-            final List<String> reactionsToAdd = new ArrayList<>();
-            final List<Integer> reactionsToDelete = new ArrayList<>();
-
-            for (int i = 0; i < VIEW_IDS.length; i++) {
-                final @IdRes int resId = VIEW_IDS[i];
-                final int oldReactionId = mOldReactionIds.get(resId);
-                Checkable checkable = (Checkable) mContentView.findViewById(resId);
-                if (checkable.isChecked() && oldReactionId == 0) {
-                    reactionsToAdd.add(CONTENTS[i]);
-                    updateReactionsCache(CONTENTS[i], 1);
-                } else if (!checkable.isChecked() && oldReactionId != 0) {
-                    reactionsToDelete.add(oldReactionId);
-                    updateReactionsCache(CONTENTS[i], -1);
-                }
-            }
-
-            new AsyncTask<Void, Void, Boolean>() {
-                @Override
-                protected Boolean doInBackground(Void... voids) {
-                    try {
-                        for (String content : reactionsToAdd) {
-                            mProvider.addReactionInBackground(mItem, content);
+                        if (result.second != null) {
+                            mCachedReactions.add(result.second);
+                        } else {
+                            for (int i = 0; i < mCachedReactions.size(); i++) {
+                                Reaction reaction = mCachedReactions.get(i);
+                                if (reaction.getId() == id) {
+                                    mCachedReactions.remove(i);
+                                    break;
+                                }
+                            }
                         }
-                        ReactionService service = (ReactionService)
-                                Gh4Application.get().getService(Gh4Application.REACTION_SERVICE);
-                        for (int reactionId : reactionsToDelete) {
-                            service.deleteReaction(reactionId);
-                        }
-                        return true;
-                    } catch (IOException e) {
-                        android.util.Log.d("foo", "save fail", e);
                     }
-                    return false;
-                }
-
-                @Override
-                protected void onPostExecute(Boolean result) {
-                    if (result && mListener != null) {
-                        mListener.updateReactions(mItem, mReactions);
-                    }
-                    dismiss();
+                    syncCheckStates();
+                    mCallback.onReactionsUpdated(mItem, mReactions, mCachedReactions);
                 }
             }.execute();
         }
@@ -475,22 +540,6 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 case Reaction.CONTENT_HOORAY: mReactions.setHooray(mReactions.getHooray() + delta); break;
                 case Reaction.CONTENT_LAUGH: mReactions.setLaugh(mReactions.getLaugh() + delta); break;
             }
-        }
-
-        private Drawable wrapDrawableForCheckState(Drawable d, @ColorInt int checkedColor,
-                PorterDuff.Mode mode) {
-            ColorStateList tintList = new ColorStateList(new int[][] {
-                new int[] { android.R.attr.state_checked },
-                new int[] { }
-            }, new int[] {
-                checkedColor,
-                Color.TRANSPARENT
-            });
-
-            Drawable wrapped = DrawableCompat.wrap(d);
-            DrawableCompat.setTintList(wrapped, tintList);
-            DrawableCompat.setTintMode(wrapped, mode);
-            return wrapped;
         }
     }
 }
