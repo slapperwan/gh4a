@@ -15,7 +15,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.eclipse.egit.github.core.util.DateUtils;
+import org.eclipse.egit.github.core.util.ObjectUtils;
 
 /**
  * Repository model class
@@ -168,7 +168,7 @@ public class Repository implements IRepositoryIdProvider, Serializable {
 	 * @return createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class Repository implements IRepositoryIdProvider, Serializable {
 	 * @return this rdateepository
 	 */
 	public Repository setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 
@@ -184,7 +184,7 @@ public class Repository implements IRepositoryIdProvider, Serializable {
 	 * @return pushedAt
 	 */
 	public Date getPushedAt() {
-		return DateUtils.clone(pushedAt);
+		return ObjectUtils.cloneDate(pushedAt);
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class Repository implements IRepositoryIdProvider, Serializable {
 	 * @return this repository
 	 */
 	public Repository setPushedAt(Date pushedAt) {
-		this.pushedAt = DateUtils.clone(pushedAt);
+		this.pushedAt = ObjectUtils.cloneDate(pushedAt);
 		return this;
 	}
 
@@ -529,7 +529,7 @@ public class Repository implements IRepositoryIdProvider, Serializable {
 	 * @return updatedAt
 	 */
 	public Date getUpdatedAt() {
-		return DateUtils.clone(updatedAt);
+		return ObjectUtils.cloneDate(updatedAt);
 	}
 
 	/**
@@ -537,7 +537,7 @@ public class Repository implements IRepositoryIdProvider, Serializable {
 	 * @return this repository
 	 */
 	public Repository setUpdatedAt(Date updatedAt) {
-		this.updatedAt = DateUtils.clone(updatedAt);
+		this.updatedAt = ObjectUtils.cloneDate(updatedAt);
 		return this;
 	}
 
@@ -583,6 +583,6 @@ public class Repository implements IRepositoryIdProvider, Serializable {
 
 	@Override
 	public int hashCode() {
-		return Long.hashCode(this.id);
+		return ObjectUtils.hashCodeForLong(this.id);
 	}
 }

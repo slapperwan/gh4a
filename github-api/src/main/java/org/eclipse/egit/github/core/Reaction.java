@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.egit.github.core;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 public class Reaction implements Serializable {
 
@@ -60,11 +60,11 @@ public class Reaction implements Serializable {
 	}
 
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	public Reaction setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 }

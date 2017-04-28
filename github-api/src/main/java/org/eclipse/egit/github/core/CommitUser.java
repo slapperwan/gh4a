@@ -10,10 +10,10 @@
  *****************************************************************************/
 package org.eclipse.egit.github.core;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 /**
  * Commit user model class
@@ -33,7 +33,7 @@ public class CommitUser implements Serializable {
 	 * @return date
 	 */
 	public Date getDate() {
-		return DateUtils.clone(date);
+		return ObjectUtils.cloneDate(date);
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class CommitUser implements Serializable {
 	 * @return this commit user
 	 */
 	public CommitUser setDate(Date date) {
-		this.date = DateUtils.clone(date);
+		this.date = ObjectUtils.cloneDate(date);
 		return this;
 	}
 

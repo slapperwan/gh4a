@@ -10,10 +10,10 @@
  *****************************************************************************/
 package org.eclipse.egit.github.core;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 /**
  * Download model class
@@ -173,7 +173,7 @@ public class Download implements Serializable {
 	 * @return creation date
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -181,7 +181,7 @@ public class Download implements Serializable {
 	 * @return this download
 	 */
 	public Download setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 

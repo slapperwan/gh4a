@@ -13,7 +13,7 @@ package org.eclipse.egit.github.core;
 import java.io.Serializable;
 import java.util.Date;
 
-import org.eclipse.egit.github.core.util.DateUtils;
+import org.eclipse.egit.github.core.util.ObjectUtils;
 
 /**
  * Issue event model class
@@ -234,7 +234,7 @@ public class IssueEvent implements Serializable {
     * @return createdAt
     */
     public Date getCreatedAt() {
-        return DateUtils.clone(createdAt);
+        return ObjectUtils.cloneDate(createdAt);
     }
 
     /**
@@ -242,7 +242,7 @@ public class IssueEvent implements Serializable {
     * @return this issue event
     */
     public IssueEvent setCreatedAt(Date createdAt) {
-        this.createdAt = DateUtils.clone(createdAt);
+        this.createdAt = ObjectUtils.cloneDate(createdAt);
         return this;
     }
 
@@ -352,6 +352,6 @@ public class IssueEvent implements Serializable {
 
     @Override
     public int hashCode() {
-        return Long.hashCode(this.id);
+        return ObjectUtils.hashCodeForLong(this.id);
     }
 }

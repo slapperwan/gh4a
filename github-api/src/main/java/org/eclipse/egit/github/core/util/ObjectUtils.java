@@ -12,10 +12,7 @@ package org.eclipse.egit.github.core.util;
 
 import java.util.Date;
 
-/**
- * Date utilities
- */
-public abstract class DateUtils {
+public abstract class ObjectUtils {
 
 	/**
 	 * Clone date if non-null
@@ -23,9 +20,13 @@ public abstract class DateUtils {
 	 * @param date
 	 * @return copied date
 	 */
-	public static Date clone(final Date date) {
+	public static Date cloneDate(final Date date) {
 		if (date == null)
 			return null;
 		return new Date(date.getTime());
+	}
+
+	public static int hashCodeForLong(long value) {
+		return (int) (value >> 32) ^ (int) value;
 	}
 }

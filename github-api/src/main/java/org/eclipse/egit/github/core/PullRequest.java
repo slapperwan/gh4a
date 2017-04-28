@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
-import org.eclipse.egit.github.core.util.DateUtils;
+import org.eclipse.egit.github.core.util.ObjectUtils;
 
 /**
  * Pull request model class.
@@ -147,7 +147,7 @@ public class PullRequest implements Serializable {
 	 * @return closedAt
 	 */
 	public Date getClosedAt() {
-		return DateUtils.clone(closedAt);
+		return ObjectUtils.cloneDate(closedAt);
 	}
 
 	/**
@@ -155,7 +155,7 @@ public class PullRequest implements Serializable {
 	 * @return this pull request
 	 */
 	public PullRequest setClosedAt(Date closedAt) {
-		this.closedAt = DateUtils.clone(closedAt);
+		this.closedAt = ObjectUtils.cloneDate(closedAt);
 		return this;
 	}
 
@@ -163,7 +163,7 @@ public class PullRequest implements Serializable {
 	 * @return mergedAt
 	 */
 	public Date getMergedAt() {
-		return DateUtils.clone(mergedAt);
+		return ObjectUtils.cloneDate(mergedAt);
 	}
 
 	/**
@@ -171,7 +171,7 @@ public class PullRequest implements Serializable {
 	 * @return this pull request
 	 */
 	public PullRequest setMergedAt(Date mergedAt) {
-		this.mergedAt = DateUtils.clone(mergedAt);
+		this.mergedAt = ObjectUtils.cloneDate(mergedAt);
 		return this;
 	}
 
@@ -179,7 +179,7 @@ public class PullRequest implements Serializable {
 	 * @return updatedAt
 	 */
 	public Date getUpdatedAt() {
-		return DateUtils.clone(updatedAt);
+		return ObjectUtils.cloneDate(updatedAt);
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class PullRequest implements Serializable {
 	 * @return this pull request
 	 */
 	public PullRequest setUpdatedAt(Date updatedAt) {
-		this.updatedAt = DateUtils.clone(updatedAt);
+		this.updatedAt = ObjectUtils.cloneDate(updatedAt);
 		return this;
 	}
 
@@ -195,7 +195,7 @@ public class PullRequest implements Serializable {
 	 * @return createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -203,7 +203,7 @@ public class PullRequest implements Serializable {
 	 * @return this pull request
 	 */
 	public PullRequest setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 
@@ -602,7 +602,7 @@ public class PullRequest implements Serializable {
 	}
 
 	/**
-	 * @param id
+	 * @param locked
 	 * @return this issue
 	 */
 	public PullRequest setLocked(boolean locked) {
@@ -620,7 +620,7 @@ public class PullRequest implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Long.hashCode(this.id);
+		return ObjectUtils.hashCodeForLong(this.id);
 	}
 
 	@Override

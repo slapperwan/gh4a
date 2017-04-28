@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.util.DateUtils;
+import org.eclipse.egit.github.core.util.ObjectUtils;
 
 /**
  * Event model class.
@@ -225,7 +225,7 @@ public class Event implements Serializable {
 	 * @return the createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -233,7 +233,7 @@ public class Event implements Serializable {
 	 * @return this Event
 	 */
 	public Event setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 

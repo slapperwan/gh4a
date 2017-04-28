@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.egit.github.core.util.DateUtils;
+import org.eclipse.egit.github.core.util.ObjectUtils;
 
 /**
  * GitHub issue model class.
@@ -71,7 +71,7 @@ public class Issue implements Serializable {
 	 * @return closedAt
 	 */
 	public Date getClosedAt() {
-		return DateUtils.clone(closedAt);
+		return ObjectUtils.cloneDate(closedAt);
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class Issue implements Serializable {
 	 * @return this issue
 	 */
 	public Issue setClosedAt(Date closedAt) {
-		this.closedAt = DateUtils.clone(closedAt);
+		this.closedAt = ObjectUtils.cloneDate(closedAt);
 		return this;
 	}
 
@@ -87,7 +87,7 @@ public class Issue implements Serializable {
 	 * @return createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -95,7 +95,7 @@ public class Issue implements Serializable {
 	 * @return this issue
 	 */
 	public Issue setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 
@@ -103,7 +103,7 @@ public class Issue implements Serializable {
 	 * @return updatedAt
 	 */
 	public Date getUpdatedAt() {
-		return DateUtils.clone(updatedAt);
+		return ObjectUtils.cloneDate(updatedAt);
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class Issue implements Serializable {
 	 * @return this issue
 	 */
 	public Issue setUpdatedAt(Date updatedAt) {
-		this.updatedAt = DateUtils.clone(updatedAt);
+		this.updatedAt = ObjectUtils.cloneDate(updatedAt);
 		return this;
 	}
 
@@ -363,7 +363,7 @@ public class Issue implements Serializable {
 	}
 
 	/**
-	 * @param id
+	 * @param locked
 	 * @return this issue
 	 */
 	public Issue setLocked(boolean locked) {
@@ -406,7 +406,7 @@ public class Issue implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Long.hashCode(this.id);
+		return ObjectUtils.hashCodeForLong(this.id);
 	}
 
 	@Override

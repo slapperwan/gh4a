@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.egit.github.core;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 /**
  * GitHub issue milestone class.
@@ -47,7 +47,7 @@ public class Milestone implements Serializable {
 	 * @return createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class Milestone implements Serializable {
 	 * @return this milestone
 	 */
 	public Milestone setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 
@@ -63,7 +63,7 @@ public class Milestone implements Serializable {
 	 * @return dueOn
 	 */
 	public Date getDueOn() {
-		return DateUtils.clone(dueOn);
+		return ObjectUtils.cloneDate(dueOn);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class Milestone implements Serializable {
 	 * @return this milestone
 	 */
 	public Milestone setDueOn(Date dueOn) {
-		this.dueOn = DateUtils.clone(dueOn);
+		this.dueOn = ObjectUtils.cloneDate(dueOn);
 		return this;
 	}
 

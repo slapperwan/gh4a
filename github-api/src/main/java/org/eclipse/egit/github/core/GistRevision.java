@@ -10,10 +10,10 @@
  *******************************************************************************/
 package org.eclipse.egit.github.core;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 /**
  * Gist revision class.
@@ -37,7 +37,7 @@ public class GistRevision implements Serializable {
 	 * @return committedAt
 	 */
 	public Date getCommittedAt() {
-		return DateUtils.clone(committedAt);
+		return ObjectUtils.cloneDate(committedAt);
 	}
 
 	/**
@@ -45,7 +45,7 @@ public class GistRevision implements Serializable {
 	 * @return this gist revision
 	 */
 	public GistRevision setCommittedAt(Date committedAt) {
-		this.committedAt = DateUtils.clone(committedAt);
+		this.committedAt = ObjectUtils.cloneDate(committedAt);
 		return this;
 	}
 

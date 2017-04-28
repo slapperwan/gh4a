@@ -10,9 +10,9 @@
  *****************************************************************************/
 package org.eclipse.egit.github.core;
 
-import java.util.Date;
+import org.eclipse.egit.github.core.util.ObjectUtils;
 
-import org.eclipse.egit.github.core.util.DateUtils;
+import java.util.Date;
 
 /**
  * Extension of {@link Download} to represent the initiation of a download with
@@ -63,7 +63,7 @@ public class DownloadResource extends Download {
 	 * @return expirationdate
 	 */
 	public Date getExpirationdate() {
-		return DateUtils.clone(expirationdate);
+		return ObjectUtils.cloneDate(expirationdate);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class DownloadResource extends Download {
 	 * @return this download resource
 	 */
 	public DownloadResource setExpirationdate(Date expirationdate) {
-		this.expirationdate = DateUtils.clone(expirationdate);
+		this.expirationdate = ObjectUtils.cloneDate(expirationdate);
 		return this;
 	}
 

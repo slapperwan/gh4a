@@ -10,13 +10,8 @@
  *******************************************************************************/
 package org.eclipse.egit.github.core;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 /**
  * GitHub code search result class.

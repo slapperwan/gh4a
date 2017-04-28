@@ -12,10 +12,10 @@ package org.eclipse.egit.github.core;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 /**
  * GitHub user model class.
@@ -60,7 +60,7 @@ public class SearchUser implements Serializable {
 	 * @return createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**

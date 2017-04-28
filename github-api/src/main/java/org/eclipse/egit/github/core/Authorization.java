@@ -10,11 +10,11 @@
  *****************************************************************************/
 package org.eclipse.egit.github.core;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 /**
  * Authorization model class
@@ -68,7 +68,7 @@ public class Authorization implements Serializable {
 	 * @return createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class Authorization implements Serializable {
 	 * @return this authorization
 	 */
 	public Authorization setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 
@@ -84,7 +84,7 @@ public class Authorization implements Serializable {
 	 * @return updatedAt
 	 */
 	public Date getUpdatedAt() {
-		return DateUtils.clone(updatedAt);
+		return ObjectUtils.cloneDate(updatedAt);
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class Authorization implements Serializable {
 	 * @return this authorization
 	 */
 	public Authorization setUpdatedAt(Date updatedAt) {
-		this.updatedAt = DateUtils.clone(updatedAt);
+		this.updatedAt = ObjectUtils.cloneDate(updatedAt);
 		return this;
 	}
 

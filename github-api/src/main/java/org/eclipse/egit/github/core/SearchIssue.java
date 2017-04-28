@@ -10,11 +10,11 @@
  *****************************************************************************/
 package org.eclipse.egit.github.core;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 /**
  * GitHub v2 issue model class.
@@ -53,7 +53,7 @@ public class SearchIssue implements Serializable {
 	 * @return createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -61,7 +61,7 @@ public class SearchIssue implements Serializable {
 	 * @return this issue
 	 */
 	public SearchIssue setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 
@@ -69,7 +69,7 @@ public class SearchIssue implements Serializable {
 	 * @return updatedAt
 	 */
 	public Date getUpdatedAt() {
-		return DateUtils.clone(updatedAt);
+		return ObjectUtils.cloneDate(updatedAt);
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class SearchIssue implements Serializable {
 	 * @return this issue
 	 */
 	public SearchIssue setUpdatedAt(Date updatedAt) {
-		this.updatedAt = DateUtils.clone(updatedAt);
+		this.updatedAt = ObjectUtils.cloneDate(updatedAt);
 		return this;
 	}
 

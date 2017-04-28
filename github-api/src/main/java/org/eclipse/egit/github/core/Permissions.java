@@ -10,12 +10,7 @@
  *****************************************************************************/
 package org.eclipse.egit.github.core;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
-import java.util.Date;
-
-import org.eclipse.egit.github.core.util.DateUtils;
 
 /**
  * Permission model class

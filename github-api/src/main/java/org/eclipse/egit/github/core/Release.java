@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
-import org.eclipse.egit.github.core.util.DateUtils;
+import org.eclipse.egit.github.core.util.ObjectUtils;
 
 /**
  * Release model class
@@ -281,7 +281,7 @@ public class Release implements Serializable {
 	 * @return this release
 	 */
 	public Release setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 
@@ -297,7 +297,7 @@ public class Release implements Serializable {
 	 * @return this release
 	 */
 	public Release setPublishedAt(Date publishedAt) {
-		this.publishedAt = DateUtils.clone(publishedAt);
+		this.publishedAt = ObjectUtils.cloneDate(publishedAt);
 		return this;
 	}
 
@@ -343,6 +343,6 @@ public class Release implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Long.hashCode(this.id);
+		return ObjectUtils.hashCodeForLong(this.id);
 	}
 }

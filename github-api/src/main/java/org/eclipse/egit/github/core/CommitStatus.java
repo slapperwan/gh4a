@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.Date;
 
-import org.eclipse.egit.github.core.util.DateUtils;
+import org.eclipse.egit.github.core.util.ObjectUtils;
 
 /**
  * Status of a commit in a repository
@@ -65,7 +65,7 @@ public class CommitStatus implements Serializable {
 	 * @return createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class CommitStatus implements Serializable {
 	 * @return this status
 	 */
 	public CommitStatus setCreatedAt(final Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 
@@ -81,7 +81,7 @@ public class CommitStatus implements Serializable {
 	 * @return updatedAt
 	 */
 	public Date getUpdatedAt() {
-		return DateUtils.clone(updatedAt);
+		return ObjectUtils.cloneDate(updatedAt);
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class CommitStatus implements Serializable {
 	 * @return this status
 	 */
 	public CommitStatus setUpdatedAt(final Date updatedAt) {
-		this.updatedAt = DateUtils.clone(updatedAt);
+		this.updatedAt = ObjectUtils.cloneDate(updatedAt);
 		return this;
 	}
 
@@ -220,6 +220,6 @@ public class CommitStatus implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Long.hashCode(this.id);
+		return ObjectUtils.hashCodeForLong(this.id);
 	}
 }

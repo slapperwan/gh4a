@@ -10,6 +10,8 @@
  *****************************************************************************/
 package org.eclipse.egit.github.core.event;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
 
 /**
@@ -84,6 +86,6 @@ public class EventRepository implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Long.hashCode(this.id);
+		return ObjectUtils.hashCodeForLong(this.id);
 	}
 }

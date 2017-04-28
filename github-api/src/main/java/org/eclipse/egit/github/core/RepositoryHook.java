@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-import org.eclipse.egit.github.core.util.DateUtils;
+import org.eclipse.egit.github.core.util.ObjectUtils;
 
 /**
  * Repository hook model class
@@ -60,7 +60,7 @@ public class RepositoryHook implements Serializable {
 	 * @return createdAt
 	 */
 	public Date getCreatedAt() {
-		return DateUtils.clone(createdAt);
+		return ObjectUtils.cloneDate(createdAt);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class RepositoryHook implements Serializable {
 	 * @return this hook
 	 */
 	public RepositoryHook setCreatedAt(Date createdAt) {
-		this.createdAt = DateUtils.clone(createdAt);
+		this.createdAt = ObjectUtils.cloneDate(createdAt);
 		return this;
 	}
 
@@ -76,7 +76,7 @@ public class RepositoryHook implements Serializable {
 	 * @return updatedAt
 	 */
 	public Date getUpdatedAt() {
-		return DateUtils.clone(updatedAt);
+		return ObjectUtils.cloneDate(updatedAt);
 	}
 
 	/**
@@ -84,7 +84,7 @@ public class RepositoryHook implements Serializable {
 	 * @return this hook
 	 */
 	public RepositoryHook setUpdatedAt(Date updatedAt) {
-		this.updatedAt = DateUtils.clone(updatedAt);
+		this.updatedAt = ObjectUtils.cloneDate(updatedAt);
 		return this;
 	}
 
@@ -178,6 +178,6 @@ public class RepositoryHook implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Long.hashCode(this.id);
+		return ObjectUtils.hashCodeForLong(this.id);
 	}
 }
