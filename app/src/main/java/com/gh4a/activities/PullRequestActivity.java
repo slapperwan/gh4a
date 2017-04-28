@@ -205,16 +205,13 @@ public class PullRequestActivity extends BasePagerActivity implements
         boolean canOpen = canClose && (isCollaborator || closerIsCreator);
         boolean canMerge = canClose && isCollaborator;
 
-        if (!canClose) {
+        if (!canClose || isClosed) {
             menu.removeItem(R.id.pull_close);
-        } else if (isClosed) {
-            menu.removeItem(R.id.pull_close);
-            if (mPullRequest.isMerged()) {
-                menu.findItem(R.id.pull_reopen).setEnabled(false);
-            }
         }
-        if (!canOpen) {
+        if (!canOpen || !isClosed) {
             menu.removeItem(R.id.pull_reopen);
+        } else if (isClosed && mPullRequest.isMerged()) {
+            menu.findItem(R.id.pull_reopen).setEnabled(false);
         }
         if (!canMerge) {
             menu.removeItem(R.id.pull_merge);
