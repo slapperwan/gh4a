@@ -77,6 +77,14 @@
         <item name="allCaps">true</item>
     </style>
 
+    <style name="ReactionBarButton" parent="SelectableBorderlessItem">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
     <style name="Widget.ActionBar.TabView" parent="Widget.AppCompat.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator</item>
     </style>

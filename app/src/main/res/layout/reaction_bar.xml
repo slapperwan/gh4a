@@ -3,57 +3,33 @@
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/plus_one"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="?attr/reactionPlusOneIcon"
-        android:drawablePadding="4dp"
-        android:padding="8dp"
-        android:textColor="?android:attr/textColorSecondary" />
+        style="@style/ReactionBarButton"
+        android:drawableLeft="?attr/reactionPlusOneIcon" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/minus_one"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="?attr/reactionMinusOneIcon"
-        android:drawablePadding="4dp"
-        android:padding="8dp"
-        android:textColor="?android:attr/textColorSecondary" />
+        style="@style/ReactionBarButton"
+        android:drawableLeft="?attr/reactionMinusOneIcon" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/laugh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="?attr/reactionLaughIcon"
-        android:drawablePadding="4dp"
-        android:padding="8dp"
-        android:textColor="?android:attr/textColorSecondary" />
+        style="@style/ReactionBarButton"
+        android:drawableLeft="?attr/reactionLaughIcon" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/hooray"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="?attr/reactionHoorayIcon"
-        android:drawablePadding="4dp"
-        android:padding="8dp"
-        android:textColor="?android:attr/textColorSecondary" />
+        style="@style/ReactionBarButton"
+        android:drawableLeft="?attr/reactionHoorayIcon" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/confused"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="?attr/reactionConfusedIcon"
-        android:drawablePadding="4dp"
-        android:padding="8dp"
-        android:textColor="?android:attr/textColorSecondary" />
+        style="@style/ReactionBarButton"
+        android:drawableLeft="?attr/reactionConfusedIcon" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/heart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableLeft="?attr/reactionHeartIcon"
-        android:drawablePadding="4dp"
-        android:padding="8dp"
-        android:textColor="?android:attr/textColorSecondary" />
+        style="@style/ReactionBarButton"
+        android:drawableLeft="?attr/reactionHeartIcon" />
 
     <ImageView
         android:id="@+id/react"
