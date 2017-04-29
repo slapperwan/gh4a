@@ -113,6 +113,9 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         if (mPopup != null) {
             mPopup.clearCache();
         }
+        if (mAddHelper != null) {
+            mAddHelper.clearCache();
+        }
         if (reactions != null && reactions.getTotalCount() > 0) {
             updateView(mPlusOneView, reactions.getPlusOne());
             updateView(mMinusOneView, reactions.getMinusOne());
@@ -381,7 +384,6 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         private int[] mOldReactionIds;
         private Callback mCallback;
         private Object mItem;
-        private Reactions mReactions = new Reactions();
 
         public AddReactionMenuHelper(@NonNull Context context, Menu menu,
                 Callback callback, Object item) {
@@ -402,7 +404,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 mItems[i].setIcon(icon);
             }
             if (mOldReactionIds != null) {
-                showDataItems();
+                setDataItemsVisible(true);
             }
         }
 
@@ -421,11 +423,9 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         public void updateDetails(List<Reaction> reactions) {
             mCachedReactions = reactions != null ? reactions : new ArrayList<Reaction>();
             mOldReactionIds = new int[mItems.length];
-            mReactions = new Reactions();
             if (reactions != null) {
                 String ownLogin = Gh4Application.get().getAuthLogin();
                 for (Reaction reaction : reactions) {
-                    updateReactionsCache(reaction.getContent(), 1);
                     if (!ApiHelpers.loginEquals(reaction.getUser(), ownLogin)) {
                         continue;
                     }
@@ -439,6 +439,12 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             }
         }
 
+        public void clearCache() {
+            mOldReactionIds = null;
+            mCachedReactions = null;
+            setDataItemsVisible(false);
+        }
+
         public void startLoadingIfNeeded() {
             if (mOldReactionIds != null) {
                 syncCheckStates();
@@ -448,23 +454,23 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 @Override
                 protected void onPostExecute(List<Reaction> reactions) {
                     updateDetails(reactions);
-                    showDataItems();
+                    setDataItemsVisible(true);
                 }
             }.execute();
 
         }
 
-        private void showDataItems() {
-            mLoadingItem.setVisible(false);
+        private void setDataItemsVisible(boolean visible) {
+            mLoadingItem.setVisible(!visible);
             for (int i = 0; i < mItems.length; i++) {
-                mItems[i].setVisible(true);
+                mItems[i].setVisible(visible);
             }
             syncCheckStates();
         }
 
         private void syncCheckStates() {
             for (int i = 0; i < mItems.length; i++) {
-                mItems[i].setChecked(mOldReactionIds[i] != 0);
+                mItems[i].setChecked(mOldReactionIds != null && mOldReactionIds[i] != 0);
             }
             updateDrawableState();
         }
@@ -480,8 +486,6 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
 
         private void addOrRemoveReaction(final String content, final int id) {
-            updateReactionsCache(content, id != 0 ? -1 : 1);
-
             new AsyncTask<Void, Void, Pair<Boolean, Reaction>>() {
                 @Override
                 protected Pair<Boolean, Reaction> doInBackground(Void... voids) {
@@ -504,42 +508,45 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 @Override
                 protected void onPostExecute(Pair<Boolean, Reaction> result) {
                     if (!result.first) {
-                        // revert the change we did before
-                        updateReactionsCache(content, id != 0 ? 1 : -1);
-                    } else {
-                        for (int i = 0; i < CONTENTS.length; i++) {
-                            if (TextUtils.equals(CONTENTS[i], content)) {
-                                mOldReactionIds[i] = result.second != null ? result.second.getId() : 0;
-                                break;
-                            }
+                        return;
+                    }
+
+                    for (int i = 0; i < CONTENTS.length; i++) {
+                        if (TextUtils.equals(CONTENTS[i], content)) {
+                            mOldReactionIds[i] = result.second != null ? result.second.getId() : 0;
+                            break;
                         }
-                        if (result.second != null) {
-                            mCachedReactions.add(result.second);
-                        } else {
-                            for (int i = 0; i < mCachedReactions.size(); i++) {
-                                Reaction reaction = mCachedReactions.get(i);
-                                if (reaction.getId() == id) {
-                                    mCachedReactions.remove(i);
-                                    break;
-                                }
+                    }
+                    if (result.second != null) {
+                        mCachedReactions.add(result.second);
+                    } else {
+                        for (int i = 0; i < mCachedReactions.size(); i++) {
+                            Reaction reaction = mCachedReactions.get(i);
+                            if (reaction.getId() == id) {
+                                mCachedReactions.remove(i);
+                                break;
                             }
                         }
                     }
                     syncCheckStates();
-                    mCallback.onReactionsUpdated(mItem, mReactions, mCachedReactions);
+                    mCallback.onReactionsUpdated(mItem, buildReactions(), mCachedReactions);
                 }
             }.execute();
         }
 
-        private void updateReactionsCache(String content, int delta) {
-            switch (content) {
-                case Reaction.CONTENT_PLUS_ONE: mReactions.setPlusOne(mReactions.getPlusOne() + delta); break;
-                case Reaction.CONTENT_MINUS_ONE: mReactions.setMinusOne(mReactions.getMinusOne() + delta); break;
-                case Reaction.CONTENT_CONFUSED: mReactions.setConfused(mReactions.getConfused() + delta); break;
-                case Reaction.CONTENT_HEART: mReactions.setHeart(mReactions.getHeart() + delta); break;
-                case Reaction.CONTENT_HOORAY: mReactions.setHooray(mReactions.getHooray() + delta); break;
-                case Reaction.CONTENT_LAUGH: mReactions.setLaugh(mReactions.getLaugh() + delta); break;
+        private Reactions buildReactions() {
+            Reactions result = new Reactions();
+            for (Reaction reaction : mCachedReactions) {
+                switch (reaction.getContent()) {
+                    case Reaction.CONTENT_PLUS_ONE: result.setPlusOne(result.getPlusOne() + 1); break;
+                    case Reaction.CONTENT_MINUS_ONE: result.setMinusOne(result.getMinusOne() + 1); break;
+                    case Reaction.CONTENT_CONFUSED: result.setConfused(result.getConfused() + 1); break;
+                    case Reaction.CONTENT_HEART: result.setHeart(result.getHeart() + 1); break;
+                    case Reaction.CONTENT_HOORAY: result.setHooray(result.getHooray() + 1); break;
+                    case Reaction.CONTENT_LAUGH: result.setLaugh(result.getLaugh() + 1); break;
+                }
             }
+            return result;
         }
     }
 }
