@@ -20,9 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,18 +38,16 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
-import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.User;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.ViewHolder>
-        implements ReactionBar.Callback {
+        implements ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
     public interface OnCommentAction<T> {
         void editComment(T comment);
         void deleteComment(T comment);
@@ -90,7 +86,8 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     protected final String mRepoOwner;
     protected final String mRepoName;
     private boolean mDontClearCacheOnClear;
-    private SparseArray<ReactionBar.AddReactionMenuHelper> mReactionHelpers = new SparseArray<>();
+    private ReactionBar.ReactionDetailsCache mReactionDetailsCache =
+            new ReactionBar.ReactionDetailsCache(this);
 
     protected CommentAdapterBase(Context context, String repoOwner, String repoName,
             OnCommentAction actionCallback) {
@@ -108,7 +105,8 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_gravatar_comment, parent, false);
-        ViewHolder holder = new ViewHolder(v, mCommentMenuItemClickCallback);
+        ViewHolder holder = new ViewHolder(v, mCommentMenuItemClickCallback,
+                this, mReactionDetailsCache);
         holder.ivGravatar.setOnClickListener(this);
         return holder;
     }
@@ -120,17 +118,6 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         Date updatedAt = getUpdatedAt(item);
 
         holder.mBoundItem = item;
-
-        int itemId = (int) getId(item);
-        ReactionBar.AddReactionMenuHelper reactionHelper = mReactionHelpers.get(itemId);
-        if (reactionHelper == null) {
-            reactionHelper = new ReactionBar.AddReactionMenuHelper(mContext,
-                    holder.getReactItemSubMenu(), this, holder);
-            mReactionHelpers.put(itemId, reactionHelper);
-        } else {
-            reactionHelper.updateFromMenu(holder.getReactItemSubMenu());
-        }
-        holder.mReactionMenuHelper = reactionHelper;
 
         AvatarHandler.assignAvatar(holder.ivGravatar, user);
         holder.ivGravatar.setTag(user);
@@ -148,7 +135,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         bindFileView(item, holder.tvFile);
         bindEventIcon(item, holder.ivEventIcon);
         bindReactions(item, holder.reactions);
-        holder.reactions.setCallback(this, holder);
+        holder.mReactionMenuHelper.update();
 
         if (canQuote(item)) {
             holder.tvDesc.setCustomSelectionActionModeCallback(
@@ -209,6 +196,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         super.clear();
         if (!mDontClearCacheOnClear) {
             mImageGetter.clearHtmlCache();
+            mReactionDetailsCache.clear();
         }
     }
 
@@ -231,7 +219,6 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         }
     }
 
-    protected abstract long getId(T item);
     protected abstract User getUser(T item);
     protected abstract Date getCreatedAt(T item);
     protected abstract Date getUpdatedAt(T item);
@@ -248,25 +235,26 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
     protected abstract void updateReactions(T item, Reactions reactions);
 
     @Override
-    public void onReactionsUpdated(Object item, Reactions reactions, List<Reaction> details) {
+    public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         ViewHolder<T> holder = (ViewHolder<T>) item;
         updateReactions(holder.mBoundItem, reactions);
 
         holder.reactions.setReactions(reactions);
-        holder.reactions.updateReactionDetails(details);
         if (holder.mReactionMenuHelper != null) {
-            holder.mReactionMenuHelper.updateDetails(details);
+            holder.mReactionMenuHelper.update();
         }
         notifyItemChanged(holder.getAdapterPosition());
     }
 
-    public static class ViewHolder<T> extends RecyclerView.ViewHolder
-            implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+    public static class ViewHolder<T> extends RecyclerView.ViewHolder implements
+            View.OnClickListener, PopupMenu.OnMenuItemClickListener, ReactionBar.Item {
         private interface OnCommentMenuItemClick<T> {
             boolean onCommentMenuItemClick(T comment, MenuItem item);
         }
 
-        private ViewHolder(View view, OnCommentMenuItemClick commentMenuItemClickCallback) {
+        private ViewHolder(View view, OnCommentMenuItemClick commentMenuItemClickCallback,
+                ReactionBar.Callback reactionCallback,
+                ReactionBar.ReactionDetailsCache reactionDetailsCache) {
             super(view);
             mCommentMenuItemClickCallback = commentMenuItemClickCallback;
 
@@ -281,6 +269,8 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
             ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
             ivMenu.setOnClickListener(this);
             reactions = (ReactionBar) view.findViewById(R.id.reactions);
+            reactions.setCallback(reactionCallback, this);
+            reactions.setDetailsCache(reactionDetailsCache);
 
             mPopupMenu = new PopupMenu(view.getContext(), ivMenu);
             mPopupMenu.getMenuInflater().inflate(R.menu.comment_menu, mPopupMenu.getMenu());
@@ -288,6 +278,9 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
 
             MenuItem reactItem = mPopupMenu.getMenu().findItem(R.id.react);
             mPopupMenu.getMenuInflater().inflate(R.menu.reaction_menu, reactItem.getSubMenu());
+
+            mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(view.getContext(),
+                    reactItem.getSubMenu(), reactionCallback, this, reactionDetailsCache);
         }
 
         private final ImageView ivGravatar;
@@ -305,9 +298,9 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
         protected T mBoundItem;
 
-        private Menu getReactItemSubMenu() {
-            MenuItem reactItem = mPopupMenu.getMenu().findItem(R.id.react);
-            return reactItem.getSubMenu();
+        @Override
+        public Object getCacheKey() {
+            return mBoundItem;
         }
 
         @Override
@@ -330,3 +323,4 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
         }
     }
 }
+

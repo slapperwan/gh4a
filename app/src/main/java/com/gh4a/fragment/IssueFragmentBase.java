@@ -65,7 +65,8 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventHolder> implements
-        View.OnClickListener, ReactionBar.Callback,
+        View.OnClickListener, ReactionBar.Callback, ReactionBar.Item,
+        ReactionBar.ReactionDetailsCache.Listener,
         IssueEventAdapter.OnCommentAction<IssueEventHolder>,
         CommentBoxFragment.Callback {
     protected static final int REQUEST_EDIT = 1000;
@@ -79,6 +80,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     private boolean mListShown;
     private CommentBoxFragment mCommentFragment;
     private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
+    private ReactionBar.ReactionDetailsCache mReactionDetailsCache =
+            new ReactionBar.ReactionDetailsCache(this);
     private IssueEventAdapter mAdapter;
     private HttpImageGetter mImageGetter;
 
@@ -164,6 +167,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         if (mImageGetter != null) {
             mImageGetter.clearHtmlCache();
         }
+        mReactionDetailsCache.clear();
         super.onRefresh();
     }
 
@@ -198,7 +202,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         inflater.inflate(R.menu.reaction_menu, reactItem.getSubMenu());
         if (mReactionMenuHelper == null) {
             mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(getActivity(),
-                    reactItem.getSubMenu(), this, null);
+                    reactItem.getSubMenu(), this, this, mReactionDetailsCache);
         } else {
             mReactionMenuHelper.updateFromMenu(reactItem.getSubMenu());
         }
@@ -363,7 +367,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         }
 
         ReactionBar reactions = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
-        reactions.setCallback(this, null);
+        reactions.setCallback(this, this);
+        reactions.setDetailsCache(mReactionDetailsCache);
         reactions.setReactions(mIssue.getReactions());
 
         assignHighlightColor();
@@ -382,7 +387,12 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException {
+    public Object getCacheKey() {
+        return mIssue;
+    }
+
+    @Override
+    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws IOException {
         IssueService service = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         return service.getIssueReactions(new RepositoryId(mRepoOwner, mRepoName),
@@ -390,7 +400,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     }
 
     @Override
-    public Reaction addReactionInBackground(Object item, String content) throws IOException {
+    public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws IOException {
         IssueService service = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         return service.addIssueReaction(new RepositoryId(mRepoOwner, mRepoName),
@@ -398,15 +408,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     }
 
     @Override
-    public void onReactionsUpdated(Object item, Reactions reactions, List<Reaction> details) {
+    public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         mIssue.setReactions(reactions);
         if (mListHeaderView != null) {
             ReactionBar bar = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
             bar.setReactions(reactions);
-            bar.updateReactionDetails(details);
         }
         if (mReactionMenuHelper != null) {
-            mReactionMenuHelper.updateDetails(details);
+            mReactionMenuHelper.update();
             getActivity().supportInvalidateOptionsMenu();
         }
     }

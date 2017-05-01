@@ -43,13 +43,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ReactionBar extends LinearLayout implements View.OnClickListener {
+    public interface Item {
+        Object getCacheKey();
+    }
     public interface Callback {
-        List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException;
-        Reaction addReactionInBackground(Object item, String content) throws IOException;
-        void onReactionsUpdated(Object item, Reactions reactions, List<Reaction> details);
+        List<Reaction> loadReactionDetailsInBackground(Item item) throws IOException;
+        Reaction addReactionInBackground(Item item, String content) throws IOException;
     }
 
     private static final @IdRes int[] VIEW_IDS = {
@@ -71,9 +75,10 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
     private View mReactButton;
 
     private Callback mCallback;
-    private Object mReferenceItem;
+    private Item mReferenceItem;
     private ReactionUserPopup mPopup;
 
+    private ReactionDetailsCache mDetailsCache;
     private MenuPopupHelper mAddReactionPopup;
     private AddReactionMenuHelper mAddHelper;
     private PopupMenu.OnMenuItemClickListener mAddReactionClickListener =
@@ -111,10 +116,10 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
     public void setReactions(Reactions reactions) {
         if (mPopup != null) {
-            mPopup.clearCache();
+            mPopup.update();
         }
         if (mAddHelper != null) {
-            mAddHelper.clearCache();
+            mAddHelper.update();
         }
         if (reactions != null && reactions.getTotalCount() > 0) {
             updateView(mPlusOneView, reactions.getPlusOne());
@@ -129,16 +134,11 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
     }
 
-    public void updateReactionDetails(List<Reaction> details) {
-        if (mPopup != null) {
-            mPopup.updateCache(details);
-        }
-        if (mAddHelper != null) {
-            mAddHelper.updateDetails(details);
-        }
+    public void setDetailsCache(ReactionDetailsCache cache) {
+        mDetailsCache = cache;
     }
 
-    public void setCallback(Callback callback, Object item) {
+    public void setCallback(Callback callback, Item item) {
         mCallback = callback;
         mReferenceItem = item;
 
@@ -177,7 +177,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 popup.inflate(R.menu.reaction_menu);
                 popup.setOnMenuItemClickListener(mAddReactionClickListener);
                 mAddHelper = new AddReactionMenuHelper(getContext(), popup.getMenu(),
-                        mCallback, mReferenceItem);
+                        mCallback, mReferenceItem, mDetailsCache);
 
                 mAddReactionPopup = new MenuPopupHelper(getContext(), (MenuBuilder) popup.getMenu(),
                         mReactButton);
@@ -190,7 +190,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         for (int i = 0; i < VIEW_IDS.length; i++) {
             if (view.getId() == VIEW_IDS[i]) {
                 if (mPopup == null) {
-                    mPopup = new ReactionUserPopup(getContext(), mCallback, mReferenceItem);
+                    mPopup = new ReactionUserPopup(getContext(),
+                            mCallback, mReferenceItem, mDetailsCache);
                 }
                 mPopup.setAnchorView(view);
                 mPopup.show(CONTENTS[i]);
@@ -209,16 +210,18 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
     private static class ReactionUserPopup extends ListPopupWindow {
         private Callback mCallback;
-        private Object mItem;
-        private List<Reaction> mCachedReactions;
+        private Item mItem;
+        private ReactionDetailsCache mDetailsCache;
         private ReactionUserAdapter mAdapter;
         private String mContent;
 
-        public ReactionUserPopup(@NonNull Context context, Callback callback, Object item) {
+        public ReactionUserPopup(@NonNull Context context, Callback callback,
+                Item item, ReactionDetailsCache detailsCache) {
             super(context);
 
             mCallback = callback;
             mItem = item;
+            mDetailsCache = detailsCache;
             mAdapter = new ReactionUserAdapter(context, this);
             setContentWidth(
                     context.getResources()
@@ -226,14 +229,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             setAdapter(mAdapter);
         }
 
-        public void updateCache(List<Reaction> reactions) {
-            mCachedReactions = reactions;
-            populateAdapter();
-        }
-
-        public void clearCache() {
-            mCachedReactions = null;
-            dismiss();
+        public void update() {
+            populateAdapter(mDetailsCache.getEntry(mItem));
         }
 
         public void show(String content) {
@@ -243,23 +240,24 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             }
             show();
 
-            if (mCachedReactions != null) {
-                populateAdapter();
+            List<Reaction> details = mDetailsCache.getEntry(mItem);
+            if (details != null) {
+                populateAdapter(details);
             } else {
-                new FetchReactionTask(mCallback, mItem) {
+                new FetchReactionTask(mCallback, mItem, mDetailsCache) {
                     @Override
                     protected void onPostExecute(List<Reaction> reactions) {
-                        mCachedReactions = reactions;
-                        populateAdapter();
+                        super.onPostExecute(reactions);
+                        populateAdapter(reactions);
                     }
                 }.execute();
             }
         }
 
-        private void populateAdapter() {
-            if (mCachedReactions != null) {
+        private void populateAdapter(List<Reaction> details) {
+            if (details != null) {
                 List<User> users = new ArrayList<>();
-                for (Reaction reaction : mCachedReactions) {
+                for (Reaction reaction : details) {
                     if (TextUtils.equals(mContent, reaction.getContent())) {
                         users.add(reaction.getUser());
                     }
@@ -347,11 +345,14 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
     private static class FetchReactionTask extends AsyncTask<Void, Void, List<Reaction>> {
         private Callback mCallback;
-        private Object mItem;
+        private Item mItem;
+        private ReactionDetailsCache mDetailsCache;
 
-        public FetchReactionTask(Callback callback, Object item) {
+        public FetchReactionTask(Callback callback, Item item,
+                ReactionDetailsCache detailsCache) {
             mCallback = callback;
             mItem = item;
+            mDetailsCache = detailsCache;
         }
 
         @Override
@@ -374,22 +375,30 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 return null;
             }
         }
+
+        @Override
+        protected void onPostExecute(List<Reaction> reactions) {
+            mDetailsCache.putEntry(mItem, reactions);
+            super.onPostExecute(reactions);
+        }
     }
 
     public static class AddReactionMenuHelper {
         private Context mContext;
         private MenuItem mLoadingItem;
         private MenuItem[] mItems = new MenuItem[CONTENTS.length];
-        private List<Reaction> mCachedReactions;
+        private ReactionDetailsCache mDetailsCache;
+        private List<Reaction> mLastKnownDetails;
         private int[] mOldReactionIds;
         private Callback mCallback;
-        private Object mItem;
+        private Item mItem;
 
         public AddReactionMenuHelper(@NonNull Context context, Menu menu,
-                Callback callback, Object item) {
+                Callback callback, Item item, ReactionDetailsCache detailsCache) {
             mContext = context;
             mCallback = callback;
             mItem = item;
+            mDetailsCache = detailsCache;
 
             updateFromMenu(menu);
         }
@@ -420,10 +429,12 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             return false;
         }
 
-        public void updateDetails(List<Reaction> reactions) {
-            mCachedReactions = reactions != null ? reactions : new ArrayList<Reaction>();
-            mOldReactionIds = new int[mItems.length];
+        public void update() {
+            List<Reaction> reactions = mDetailsCache.getEntry(mItem);
             if (reactions != null) {
+                mOldReactionIds = new int[mItems.length];
+                mLastKnownDetails = new ArrayList<>(reactions);
+
                 String ownLogin = Gh4Application.get().getAuthLogin();
                 for (Reaction reaction : reactions) {
                     if (!ApiHelpers.loginEquals(reaction.getUser(), ownLogin)) {
@@ -436,28 +447,27 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                         }
                     }
                 }
+            } else {
+                mOldReactionIds = null;
+                mLastKnownDetails = null;
             }
-        }
-
-        public void clearCache() {
-            mOldReactionIds = null;
-            mCachedReactions = null;
-            setDataItemsVisible(false);
+            setDataItemsVisible(mOldReactionIds != null);
         }
 
         public void startLoadingIfNeeded() {
             if (mOldReactionIds != null) {
                 syncCheckStates();
-                return;
+            } else if (mDetailsCache.hasEntryFor(mItem)) {
+                update();
+            } else {
+                new FetchReactionTask(mCallback, mItem, mDetailsCache) {
+                    @Override
+                    protected void onPostExecute(List<Reaction> reactions) {
+                        super.onPostExecute(reactions);
+                        update();
+                    }
+                }.execute();
             }
-            new FetchReactionTask(mCallback, mItem) {
-                @Override
-                protected void onPostExecute(List<Reaction> reactions) {
-                    updateDetails(reactions);
-                    setDataItemsVisible(true);
-                }
-            }.execute();
-
         }
 
         private void setDataItemsVisible(boolean visible) {
@@ -518,25 +528,60 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                         }
                     }
                     if (result.second != null) {
-                        mCachedReactions.add(result.second);
+                        mLastKnownDetails.add(result.second);
                     } else {
-                        for (int i = 0; i < mCachedReactions.size(); i++) {
-                            Reaction reaction = mCachedReactions.get(i);
+                        for (int i = 0; i < mLastKnownDetails.size(); i++) {
+                            Reaction reaction = mLastKnownDetails.get(i);
                             if (reaction.getId() == id) {
-                                mCachedReactions.remove(i);
+                                mLastKnownDetails.remove(i);
                                 break;
                             }
                         }
                     }
+                    mDetailsCache.putEntry(mItem, mLastKnownDetails);
                     syncCheckStates();
-                    mCallback.onReactionsUpdated(mItem, buildReactions(), mCachedReactions);
                 }
             }.execute();
         }
+    }
 
-        private Reactions buildReactions() {
+    public static class ReactionDetailsCache {
+        public interface Listener {
+            void onReactionsUpdated(Item item, Reactions reactions);
+        }
+
+        private Listener mListener;
+        private HashMap<Object, List<Reaction>> mMap = new HashMap<>();
+
+        public ReactionDetailsCache(Listener listener) {
+            super();
+            mListener = listener;
+        }
+
+        public void clear() {
+            mMap.clear();
+        }
+
+        public boolean hasEntryFor(Item item) {
+            return mMap.containsKey(item.getCacheKey());
+        }
+
+        public List<Reaction> getEntry(Item item) {
+            return mMap.get(item.getCacheKey());
+        }
+
+        public List<Reaction> putEntry(Item item, List<Reaction> value) {
+            Object key = item.getCacheKey();
+            List<Reaction> result = mMap.put(key, new ArrayList<>(value));
+            if (result != null) {
+                mListener.onReactionsUpdated(item, buildReactions(value));
+            }
+            return result;
+        }
+
+        private Reactions buildReactions(List<Reaction> reactions) {
             Reactions result = new Reactions();
-            for (Reaction reaction : mCachedReactions) {
+            for (Reaction reaction : reactions) {
                 switch (reaction.getContent()) {
                     case Reaction.CONTENT_PLUS_ONE: result.setPlusOne(result.getPlusOne() + 1); break;
                     case Reaction.CONTENT_MINUS_ONE: result.setMinusOne(result.getMinusOne() + 1); break;

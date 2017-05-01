@@ -47,11 +47,6 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     }
 
     @Override
-    protected long getId(CommitComment item) {
-        return item.getId();
-    }
-
-    @Override
     protected User getUser(CommitComment item) {
         return item.getUser();
     }
@@ -122,7 +117,7 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(Object item) throws IOException {
+    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws IOException {
         CommitComment comment = (CommitComment) item;
         CommitService service = (CommitService)
                 Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
@@ -130,7 +125,7 @@ public class CommitNoteAdapter extends CommentAdapterBase<CommitComment> {
     }
 
     @Override
-    public Reaction addReactionInBackground(Object item, String content) throws IOException {
+    public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws IOException {
         CommitComment comment = (CommitComment) item;
         CommitService service = (CommitService)
                 Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
