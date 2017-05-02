@@ -92,6 +92,7 @@
                     android:paddingBottom="@dimen/content_padding"
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
+                    android:textIsSelectable="true"
                     android:visibility="gone"
                     tools:text="Release notes text"
                     tools:visibility="visible" />
