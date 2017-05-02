@@ -327,6 +327,7 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     public void supportInvalidateOptionsMenu() {
+        //noinspection StatementWithEmptyBody
         if (mFactory instanceof RepositoryFactory) {
             // happens when load is done; we ignore it as we don't want to close the IME in that case
         } else {

@@ -44,7 +44,6 @@
     <attr name="downloadSmallIcon" format="reference" />
     <attr name="filesSmallIcon" format="reference" />
     <attr name="privateSmallIcon" format="reference" />
-    <attr name="dueIcon" format="reference" />
     <attr name="milestoneIcon" format="reference" />
     <attr name="assigneeIcon" format="reference" />
     <attr name="labelsIcon" format="reference" />

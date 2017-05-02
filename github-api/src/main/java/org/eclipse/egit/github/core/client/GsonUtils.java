@@ -35,7 +35,7 @@ public abstract class GsonUtils {
 	 *
 	 * @return created gson, never null
 	 */
-	public static final Gson createGson() {
+	public static Gson createGson() {
 		return createGson(true);
 	}
 
@@ -47,7 +47,7 @@ public abstract class GsonUtils {
 	 *
 	 * @return created gson, never null
 	 */
-	public static final Gson createGson(final boolean serializeNulls) {
+	public static Gson createGson(final boolean serializeNulls) {
 		final GsonBuilder builder = new GsonBuilder();
 		builder.registerTypeAdapter(Date.class, new DateFormatter());
 		builder.registerTypeAdapter(Event.class, new EventFormatter());
@@ -62,7 +62,7 @@ public abstract class GsonUtils {
 	 *
 	 * @return Gson instance
 	 */
-	public static final Gson getGson() {
+	public static Gson getGson() {
 		return GSON;
 	}
 
@@ -72,7 +72,7 @@ public abstract class GsonUtils {
 	 * @param serializeNulls
 	 * @return Gson instance
 	 */
-	public static final Gson getGson(final boolean serializeNulls) {
+	public static Gson getGson(final boolean serializeNulls) {
 		return serializeNulls ? GSON : GSON_NO_NULLS;
 	}
 
@@ -82,7 +82,7 @@ public abstract class GsonUtils {
 	 * @param object
 	 * @return json string
 	 */
-	public static final String toJson(final Object object) {
+	public static String toJson(final Object object) {
 		return toJson(object, true);
 	}
 
@@ -93,7 +93,7 @@ public abstract class GsonUtils {
 	 * @param includeNulls
 	 * @return json string
 	 */
-	public static final String toJson(final Object object,
+	public static String toJson(final Object object,
 			final boolean includeNulls) {
 		return includeNulls ? GSON.toJson(object) : GSON_NO_NULLS
 				.toJson(object);
@@ -106,7 +106,7 @@ public abstract class GsonUtils {
 	 * @param type
 	 * @return instance of type
 	 */
-	public static final <V> V fromJson(String json, Class<V> type) {
+	public static <V> V fromJson(String json, Class<V> type) {
 		return GSON.fromJson(json, type);
 	}
 
@@ -117,7 +117,7 @@ public abstract class GsonUtils {
 	 * @param type
 	 * @return instance of type
 	 */
-	public static final <V> V fromJson(String json, Type type) {
+	public static <V> V fromJson(String json, Type type) {
 		return GSON.fromJson(json, type);
 	}
 
@@ -128,7 +128,7 @@ public abstract class GsonUtils {
 	 * @param type
 	 * @return instance of type
 	 */
-	public static final <V> V fromJson(Reader reader, Class<V> type) {
+	public static <V> V fromJson(Reader reader, Class<V> type) {
 		return GSON.fromJson(reader, type);
 	}
 
@@ -139,7 +139,7 @@ public abstract class GsonUtils {
 	 * @param type
 	 * @return instance of type
 	 */
-	public static final <V> V fromJson(Reader reader, Type type) {
+	public static <V> V fromJson(Reader reader, Type type) {
 		return GSON.fromJson(reader, type);
 	}
 }

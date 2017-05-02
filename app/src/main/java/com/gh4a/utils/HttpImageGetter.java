@@ -488,7 +488,6 @@ public class HttpImageGetter implements ImageGetter {
 
     private static Bitmap getBitmap(final File image, int width, int height) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
-        String imagePath = image.getAbsolutePath();
         RandomAccessFile file = null;
 
         try {
@@ -517,6 +516,7 @@ public class HttpImageGetter implements ImageGetter {
                 try {
                     file.close();
                 } catch (IOException e) {
+                    // ignored
                 }
             }
         }
@@ -524,6 +524,7 @@ public class HttpImageGetter implements ImageGetter {
 
     private static Bitmap renderSvgToBitmap(Resources res, InputStream is,
             int maxWidth, int maxHeight) {
+        //noinspection TryWithIdenticalCatches
         try {
             SVG svg = SVG.getFromInputStream(is);
             if (svg != null) {

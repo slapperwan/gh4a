@@ -19,15 +19,15 @@ package com.gh4a.widget;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 /**
  * A subclass of ImageView that assumes to be fixed size
  * (not wrap_content / match_parent). Doing so it can
  * optimize the drawable change code paths.
  */
-public class FixedSizeImageView extends ImageView {
+public class FixedSizeImageView extends AppCompatImageView {
     private boolean mSuppressLayoutRequest;
 
     public FixedSizeImageView(Context context) {

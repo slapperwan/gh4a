@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="sharedpref" path="Gh4a-pref.xml" />
+    <include domain="database" path="gh4adb.db" />
+    <include domain="database" path="suggestions.db" />
+</full-backup-content>

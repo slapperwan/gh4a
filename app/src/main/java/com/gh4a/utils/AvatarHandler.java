@@ -26,6 +26,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.LruCache;
@@ -335,7 +336,7 @@ public class AvatarHandler {
         }
 
         @Override
-        public void draw(final Canvas canvas) {
+        public void draw(@NonNull final Canvas canvas) {
             final Rect bounds = getBounds();
             if (!isVisible() || bounds.isEmpty()) {
                 return;

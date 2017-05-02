@@ -430,9 +430,8 @@ public class GitHubClient {
 			return gson.toJson(object);
 		} catch (JsonParseException jpe) {
 			IOException ioe = new IOException(
-					"Parse exception converting object to JSON"); //$NON-NLS-1$
-			ioe.initCause(jpe);
-			throw ioe;
+					"Parse exception converting object to JSON", jpe); //$NON-NLS-1$
+            throw ioe;
 		}
 	}
 
@@ -468,9 +467,8 @@ public class GitHubClient {
 				return gson.fromJson(reader, type);
 			} catch (JsonParseException jpe) {
 				IOException ioe = new IOException(
-						"Parse exception converting JSON to object"); //$NON-NLS-1$
-				ioe.initCause(jpe);
-				throw ioe;
+						"Parse exception converting JSON to object", jpe); //$NON-NLS-1$
+                throw ioe;
 			} finally {
 				try {
 					reader.close();
@@ -487,9 +485,8 @@ public class GitHubClient {
 					return gson.fromJson(jsonReader, type);
 			} catch (JsonParseException jpe) {
 				IOException ioe = new IOException(
-						"Parse exception converting JSON to object"); //$NON-NLS-1$
-				ioe.initCause(jpe);
-				throw ioe;
+						"Parse exception converting JSON to object", jpe); //$NON-NLS-1$
+                throw ioe;
 			} finally {
 				try {
 					jsonReader.close();

@@ -18,7 +18,8 @@
         android:allowBackup="true"
         android:icon="@drawable/octodroid"
         android:label="@string/app_name"
-        android:theme="@style/LightTheme">
+        android:theme="@style/LightTheme"
+        android:fullBackupContent="@xml/backup_descriptor">
         <activity
             android:name=".activities.Github4AndroidActivity"
             android:launchMode="singleTop"

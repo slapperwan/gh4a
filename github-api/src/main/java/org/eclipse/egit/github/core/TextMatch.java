@@ -16,6 +16,7 @@ import java.util.List;
 public class TextMatch implements Serializable {
 	public static class MatchItem implements Serializable {
 		private String text;
+		@SuppressWarnings("MismatchedQueryAndUpdateOfCollection") // updated by Gson
 		private List<Integer> indices;
 
 		/**

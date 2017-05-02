@@ -5,16 +5,16 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.support.v7.text.AllCapsTransformationMethod;
+import android.support.v7.widget.AppCompatTextView;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.TypefaceCache;
 import com.gh4a.utils.UiUtils;
 
-public class StyleableTextView extends TextView {
+public class StyleableTextView extends AppCompatTextView {
     private static final int[] TEXT_APPEARANCE_ATTRS = new int[] {
         android.R.attr.textAppearance
     };

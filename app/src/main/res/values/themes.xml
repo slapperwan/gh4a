@@ -31,7 +31,6 @@
         <item name="downloadSmallIcon">@drawable/download_small_dark</item>
         <item name="filesSmallIcon">@drawable/files_small_dark</item>
         <item name="privateSmallIcon">@drawable/private_small_dark</item>
-        <item name="dueIcon">@drawable/due_dark</item>
         <item name="milestoneIcon">@drawable/milestone_dark</item>
         <item name="assigneeIcon">@drawable/assignee_dark</item>
         <item name="labelsIcon">@drawable/labels_dark</item>
@@ -142,7 +141,6 @@
         <item name="downloadSmallIcon">@drawable/download_small</item>
         <item name="filesSmallIcon">@drawable/files_small</item>
         <item name="privateSmallIcon">@drawable/private_small</item>
-        <item name="dueIcon">@drawable/due</item>
         <item name="milestoneIcon">@drawable/milestone</item>
         <item name="assigneeIcon">@drawable/assignee</item>
         <item name="labelsIcon">@drawable/labels</item>

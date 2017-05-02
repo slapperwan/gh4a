@@ -43,7 +43,7 @@ public class OrganizationService extends GitHubService {
 	 * Filter for roles a member can have
 	 * @since 4.2
 	 */
-	public static enum RoleFilter {
+	public enum RoleFilter {
 		all, admin, member
 	}
 

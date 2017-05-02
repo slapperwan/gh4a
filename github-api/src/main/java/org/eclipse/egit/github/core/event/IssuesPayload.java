@@ -13,8 +13,6 @@ package org.eclipse.egit.github.core.event;
 import java.io.Serializable;
 
 import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.User;
 
 /**
  * IssuesEvent payload model class.

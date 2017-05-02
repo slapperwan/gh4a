@@ -381,7 +381,7 @@ public class PullRequestService extends GitHubService {
 	 */
 	public MergeStatus merge(IRepositoryIdProvider repository, int id,
 			String commitMessage) throws IOException {
-		return merge(repository, id, null);
+		return merge(repository, id, commitMessage, null);
 	}
 
 	/**
@@ -551,7 +551,7 @@ public class PullRequestService extends GitHubService {
 		uri.append('/').append(pullRequestId);
 		uri.append(SEGMENT_COMMENTS);
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("in_reply_to", Integer.valueOf(commentId)); //$NON-NLS-1$
+		params.put("in_reply_to", commentId); //$NON-NLS-1$
 		params.put("body", body); //$NON-NLS-1$
 		return client.post(uri.toString(), params, CommitComment.class);
 	}

@@ -15,33 +15,16 @@
  */
 package com.gh4a.activities;
 
-import java.io.FileNotFoundException;
-import java.util.List;
-
 import org.eclipse.egit.github.core.GollumPage;
-import org.xml.sax.SAXException;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.R;
-import com.gh4a.adapter.CommonFeedAdapter;
-import com.gh4a.adapter.RootAdapter;
 import com.gh4a.fragment.WikiListFragment;
-import com.gh4a.holder.Feed;
-import com.gh4a.loader.FeedLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.DividerItemDecoration;
-import com.gh4a.widget.SwipeRefreshLayout;
 
 public class WikiListActivity extends FragmentContainerActivity {
     public static Intent makeIntent(Context context, String repoOwner,

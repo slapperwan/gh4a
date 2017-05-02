@@ -246,6 +246,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
+    @SuppressLint("AddJavascriptInterface")
     @TargetApi(19)
     private void doPrint() {
         if (handlePrintRequest()) {
@@ -312,6 +313,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     protected void handleUrlLoad(Uri uri) {
+        //noinspection TryWithIdenticalCatches
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
@@ -324,6 +326,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
+    @SuppressLint("AddJavascriptInterface")
     protected void onDataReady() {
         final String cssTheme = Gh4Application.THEME == R.style.DarkTheme
                 ? DARK_CSS_THEME : LIGHT_CSS_THEME;

@@ -37,7 +37,7 @@
                 android:layout_alignTop="@id/iv_gravatar"
                 android:layout_toRightOf="@id/iv_gravatar"
                 android:gravity="center_vertical"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 app:font="bold"
                 tools:text="username" />
@@ -50,7 +50,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_toRightOf="@id/tv_actor"
                 android:gravity="right"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textAppearance="@style/TextAppearance.VerySmall"
                 tools:text="yesterday" />
 

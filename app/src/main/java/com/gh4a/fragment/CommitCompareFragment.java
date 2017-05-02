@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import java.util.List;
 
 import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.client.RequestException;
 
 import android.app.Activity;
 import android.content.Intent;

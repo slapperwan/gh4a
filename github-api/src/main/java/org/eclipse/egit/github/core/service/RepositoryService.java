@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.eclipse.egit.github.core.service;
 
-import static org.eclipse.egit.github.core.client.IGitHubConstants.CHARSET_UTF8;
-import static org.eclipse.egit.github.core.client.IGitHubConstants.PARAM_LANGUAGE;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.PARAM_QUERY;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.PARAM_START_PAGE;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_ASSIGNEES;

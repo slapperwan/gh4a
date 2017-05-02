@@ -93,7 +93,7 @@ public class BrowseFilter extends AppCompatActivity {
             if (!parts.isEmpty()) {
                 intent = GistActivity.makeIntent(this, parts.get(parts.size() - 1));
             }
-        } else if (RESERVED_NAMES.contains(first)) {
+        } else if (RESERVED_NAMES.contains(first)) { //noinspection StatementWithEmptyBody
             // forward to browser
         } else if ("explore".equals(first)) {
             intent = new Intent(this, TrendingActivity.class);

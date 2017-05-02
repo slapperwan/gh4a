@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/selector"
-        android:title="bla"
+        android:title="@string/user_context"
         app:actionViewClass="android.widget.Spinner"
         app:showAsAction="always" />
 

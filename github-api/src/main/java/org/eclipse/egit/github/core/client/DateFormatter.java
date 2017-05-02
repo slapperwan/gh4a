@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.egit.github.core.client;
 
+import android.annotation.SuppressLint;
+
 import static org.eclipse.egit.github.core.client.IGitHubConstants.DATE_FORMAT;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.DATE_FORMAT_V2_1;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.DATE_FORMAT_V2_2;
@@ -40,6 +42,7 @@ public class DateFormatter implements JsonDeserializer<Date>,
 	/**
 	 * Create date formatter
 	 */
+	@SuppressLint("SimpleDateFormat")
 	public DateFormatter() {
 		formats = new DateFormat[3];
 		formats[0] = new SimpleDateFormat(DATE_FORMAT);

@@ -4,7 +4,6 @@ import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 
 import com.gh4a.R;
-import com.gh4a.fragment.BlogListFragment;
 import com.gh4a.fragment.BookmarkListFragment;
 
 public class BookmarkFactory extends FragmentFactory {

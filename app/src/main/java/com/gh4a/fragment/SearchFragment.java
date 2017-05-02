@@ -307,6 +307,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
         if (adapter != null) {
             Cursor cursor = adapter.getCursor();
             int count = cursor != null ? cursor.getCount() - 1 : -1;
+            //noinspection StatementWithEmptyBody
             if (mQuery != null && newText.startsWith(mQuery) && count == 0) {
                 // nothing found on previous query
             } else {

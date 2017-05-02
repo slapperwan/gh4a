@@ -17,7 +17,6 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 import com.google.gson.reflect.TypeToken;
 
-import java.io.InputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.Collections;

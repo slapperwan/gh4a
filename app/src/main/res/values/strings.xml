@@ -3,7 +3,6 @@
     <string name="app_name">OctoDroid</string>
 
     <!-- Common -->
-    <string name="welcome">Welcome to OctoDroid</string>
     <string name="introduction">To be able to use the app to its full potential, please log in to GitHub using the button below.\n\nAlternatively, you can explore some parts of GitHub using the swipe-out menu on the left.</string>
     <string name="repo_not_found_toast">Repository was not found</string>
     <string name="loading_msg">Loading\u2026</string>
@@ -25,6 +24,7 @@
     <string name="retry">Retry</string>
     <string name="open_source_components">Open source components</string>
     <string name="my_profile">My profile</string>
+    <string name="user_context">Account</string>
     <string name="add_account">Add account</string>
     <string name="my_email">slapperwan@gmail.com</string>
     <string name="my_web">http://slapperwan.github.com/gh4a</string>
@@ -61,7 +61,6 @@
     <string name="deleted">(deleted)</string>
     <string name="go_to">Go to</string>
     <string name="forked_from">forked from %1$s</string>
-    <string name="enter_username_toast">Please enter your user name instead of your email address</string>
     <string name="menu_user">User %1$s</string>
     <string name="menu_repo">Repo %1$s</string>
     <string name="menu_compare">Compare %1$s</string>
@@ -75,7 +74,6 @@
     <string name="menu_issues">Open issues</string>
     <string name="delete_comment_message">Delete this comment?</string>
     <string name="saving_comment">Saving comment\u2026</string>
-    <string name="please_wait">Please wait</string>
     <string name="bookmark_user">Bookmark user</string>
     <string name="bookmark_repo">Bookmark repo</string>
     <string name="ellipse" translatable="false">\u2026</string>
@@ -91,12 +89,7 @@
     <string name="download_wifi_button">Download over Wi-Fi</string>
     <string name="download_permission_rationale">Permission to write to USB storage or SD card is required in order to download files.</string>
     <string name="load_auth_failure_notice">Your authentication credentials aren\'t valid anymore, please log in again.</string>
-	<string name="auth_code">Authentication Code</string>
-	<string name="two_factor_auth">Two-factor Authentication</string>
-	<string name="verify">Verify</string>
     <string name="unset">Unset</string>
-    <string name="logout_pref_summary_logged_in">Currently logged in as %1$s</string>
-    <string name="logout_pref_summary_logged_out">Currently not logged in</string>
     <string name="copyright_notice">\u00a9 2014 Azwan Adli, Danny Baumann</string>
     <string name="actions">Actions</string>
     <string name="created">Created</string>
@@ -109,7 +102,6 @@
     <string name="my_gists">My gists</string>
     <string name="start_page">Start page</string>
     <string name="start_page_last_selected">Last selected</string>
-    <string name="login_failed">Login failed.</string>
     <string name="comment_editor_locked_hint">Comments are only available to collaborators</string>
     <string name="org_user_template">%1$s (organization)</string>
     <string name="clear_suggestions">Clear suggestions</string>
@@ -228,8 +220,6 @@
     <string name="event_push_desc">%1$d more commits\u2026</string>
     <string name="event_team_add_desc">%1$s now has %2$d members and %3$d repositories</string>
 
-    <string name="user_username">Username</string>
-    <string name="user_password">Password</string>
     <string name="user_following">Following</string>
     <string name="user_followers">Followers</string><!-- For type organization -->
     <string name="user_members">Members</string><!-- For type organization -->

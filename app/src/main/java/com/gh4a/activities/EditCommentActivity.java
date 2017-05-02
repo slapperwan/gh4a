@@ -6,7 +6,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.Space;
 import android.support.v7.app.ActionBar;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
@@ -32,7 +31,6 @@ public abstract class EditCommentActivity extends BaseActivity implements View.O
     protected String mRepoName;
     private long mCommentId;
     private EditText mEditText;
-    private TextWatcher mTextWatcher;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,9 +55,7 @@ public abstract class EditCommentActivity extends BaseActivity implements View.O
 
         mEditText = (EditText) findViewById(R.id.et_text);
         mEditText.setText(getIntent().getStringExtra("body"));
-
-        mTextWatcher = new UiUtils.ButtonEnableTextWatcher(mEditText, fab);
-        mEditText.addTextChangedListener(mTextWatcher);
+        mEditText.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mEditText, fab));
 
         setResult(RESULT_CANCELED);
     }

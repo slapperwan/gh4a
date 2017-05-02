@@ -25,7 +25,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.AttrRes;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.text.Editable;
 import android.text.Html.ImageGetter;
 import android.text.Layout;
@@ -201,10 +200,7 @@ public class HtmlUtils {
             Parser parser = new Parser();
             try {
                 parser.setProperty(Parser.schemaProperty, HtmlParser.schema);
-            } catch (org.xml.sax.SAXNotRecognizedException e) {
-                // Should not happen.
-                throw new RuntimeException(e);
-            } catch (org.xml.sax.SAXNotSupportedException e) {
+            } catch (org.xml.sax.SAXNotRecognizedException | org.xml.sax.SAXNotSupportedException e) {
                 // Should not happen.
                 throw new RuntimeException(e);
             }
@@ -284,6 +280,7 @@ public class HtmlUtils {
 
         public Spanned convert() {
             mReader.setContentHandler(this);
+            //noinspection TryWithIdenticalCatches
             try {
                 mReader.parse(new InputSource(new StringReader(mSource)));
             } catch (IOException e) {
@@ -346,6 +343,7 @@ public class HtmlUtils {
         }
 
         private void handleStartTag(String tag, Attributes attributes) {
+            //noinspection StatementWithEmptyBody
             if (tag.equalsIgnoreCase("br")) {
                 // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
                 // so we can safely emit the linebreaks when we handle the close tag.

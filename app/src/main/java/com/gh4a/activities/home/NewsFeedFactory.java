@@ -37,6 +37,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
         R.string.user_news_feed
     };
 
+    @SuppressWarnings("FieldCanBeLocal")
     private LoaderCallbacks<List<User>> mOrganizationCallback =
             new LoaderCallbacks<List<User>>(mActivity) {
         @Override

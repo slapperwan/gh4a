@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="16dp"
-            android:src="?attr/dueIcon" />
+            android:src="?attr/dueSmallIcon" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_due_label"

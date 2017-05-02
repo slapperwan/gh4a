@@ -25,7 +25,7 @@ public abstract class EncodingUtils {
 	 * @param content
 	 * @return byte array
 	 */
-	public static final byte[] fromBase64(final String content) {
+	public static byte[] fromBase64(final String content) {
 		return Base64.decode(content);
 	}
 
@@ -35,7 +35,7 @@ public abstract class EncodingUtils {
 	 * @param content
 	 * @return byte array
 	 */
-	public static final String toBase64(final byte[] content) {
+	public static String toBase64(final byte[] content) {
 		return Base64.encodeBytes(content);
 	}
 
@@ -45,7 +45,7 @@ public abstract class EncodingUtils {
 	 * @param content
 	 * @return byte array
 	 */
-	public static final String toBase64(final String content) {
+	public static String toBase64(final String content) {
 		byte[] bytes;
 		try {
 			bytes = content.getBytes(CHARSET_UTF8);

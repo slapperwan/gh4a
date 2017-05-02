@@ -382,6 +382,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
+    @NonNull
     @Override
     public MenuInflater getMenuInflater() {
         if (mMenuInflater == null) {
