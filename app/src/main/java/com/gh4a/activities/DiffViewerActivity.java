@@ -47,8 +47,10 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.ReactionBar;
 
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.Reactions;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,7 +60,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class DiffViewerActivity extends WebViewerActivity implements
-        View.OnTouchListener {
+        ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener, View.OnTouchListener {
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
             String commitSha, String path, String diff, List<CommitComment> comments,
             int initialLine, int highlightStartLine, int highlightEndLine,
@@ -91,11 +93,24 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     private int mHighlightEndLine;
     private boolean mHighlightIsRight;
     private IntentUtils.InitialCommentMarker mInitialComment;
+    private ReactionBar.ReactionDetailsCache mReactionDetailsCache =
+            new ReactionBar.ReactionDetailsCache(this);
+
+    protected static class CommitCommentWrapper implements ReactionBar.Item {
+        public final CommitComment comment;
+        public CommitCommentWrapper(CommitComment comment) {
+            this.comment = comment;
+        }
+        @Override
+        public Object getCacheKey() {
+            return comment;
+        }
+    }
 
     private String mDiff;
     private String[] mDiffLines;
     private final SparseArray<List<CommitComment>> mCommitCommentsByPos = new SparseArray<>();
-    private final LongSparseArray<CommitComment> mCommitComments = new LongSparseArray<>();
+    private final LongSparseArray<CommitCommentWrapper> mCommitComments = new LongSparseArray<>();
 
     private final Point mLastTouchDown = new Point();
 
@@ -181,6 +196,12 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
+        CommitCommentWrapper comment = (CommitCommentWrapper) item;
+        comment.comment.setReactions(reactions);
+        onDataReady();
+    }
 
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
@@ -254,7 +275,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             if (comments != null) {
                 for (CommitComment comment : comments) {
                     long id = comment.getId();
-                    mCommitComments.put(id, comment);
+                    mCommitComments.put(id, new CommitCommentWrapper(comment));
                     content.append("<div ").append("id=\"comment").append(id).append("\"");
                     content.append(" class=\"comment");
                     if (mInitialComment != null && mInitialComment.matches(id, null)) {
@@ -271,7 +292,20 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     content.append(getString(R.string.commit_comment_header,
                             "<b>" + ApiHelpers.getUserLogin(this, comment.getUser()) + "</b>",
                             StringUtils.formatRelativeTime(DiffViewerActivity.this, comment.getCreatedAt(), true)));
-                    content.append("</div>").append(comment.getBodyHtml()).append("</div>");
+                    content.append("</div>").append(comment.getBodyHtml());
+
+                    Reactions reactions = comment.getReactions();
+                    if (reactions.getTotalCount() > 0) {
+                        content.append("<div>");
+                        appendReactionSpan(content, reactions.getPlusOne(), 0x1f44d);
+                        appendReactionSpan(content, reactions.getMinusOne(), 0x1f44e);
+                        appendReactionSpan(content, reactions.getConfused(), 0x1f615);
+                        appendReactionSpan(content, reactions.getHeart(), 0x2764);
+                        appendReactionSpan(content, reactions.getLaugh(), 0x1f601);
+                        appendReactionSpan(content, reactions.getHooray(), 0x1f389);
+                        content.append("</div>");
+                    }
+                    content.append("</div>");
                 }
             }
         }
@@ -290,6 +324,15 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         content.append("</pre></body></html>");
         return content.toString();
+    }
+
+    private void appendReactionSpan(StringBuilder content, int count, int emojiCodePoint) {
+        if (count == 0) {
+            return;
+        }
+        content.append("<span class='reaction'>");
+        content.append(new String(Character.toChars(emojiCodePoint)));
+        content.append(" ").append(count).append("</span>");
     }
 
     @Override
@@ -348,7 +391,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         final EditText body = (EditText) commentDialog.findViewById(R.id.body);
         if (isEdit) {
-            body.setText(mCommitComments.get(id).getBody());
+            body.setText(mCommitComments.get(id).comment.getBody());
         }
 
         final int saveButtonResId = isEdit
@@ -425,6 +468,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         private final int mLeftLine;
         private final int mRightLine;
         private final String mLineText;
+        private final ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
 
         public CommentActionPopup(long id, int position, String lineText,
                 int leftLine, int rightLine, int x, int y) {
@@ -436,7 +480,25 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             mRightLine = rightLine;
             mLineText = lineText;
 
-            populateChoices(isOwnComment(id));
+            Menu menu = getMenu();
+            CommitCommentWrapper comment = mCommitComments.get(mId);
+            String ownLogin = Gh4Application.get().getAuthLogin();
+
+            getMenuInflater().inflate(R.menu.commit_comment_actions, menu);
+            if (!canReply()) {
+                menu.removeItem(R.id.reply);
+            }
+            if (!ApiHelpers.loginEquals(comment.comment.getUser(), ownLogin)) {
+                menu.removeItem(R.id.edit);
+                menu.removeItem(R.id.delete);
+            }
+
+            Menu reactionMenu = menu.findItem(R.id.react).getSubMenu();
+            getMenuInflater().inflate(R.menu.reaction_menu, reactionMenu);
+
+            mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(DiffViewerActivity.this,
+                    reactionMenu, DiffViewerActivity.this, comment, mReactionDetailsCache);
+            mReactionMenuHelper.startLoadingIfNeeded();
 
             View anchor = findViewById(R.id.popup_helper);
             anchor.layout(x, y, x + 1, y + 1);
@@ -446,6 +508,10 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         @Override
         public boolean onMenuItemClick(MenuItem item) {
+            if (mReactionMenuHelper.onItemClick(item)) {
+                return true;
+            }
+
             switch (item.getItemId()) {
                 case R.id.delete:
                     new AlertDialog.Builder(DiffViewerActivity.this)
@@ -470,25 +536,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     break;
             }
             return true;
-        }
-
-        private boolean isOwnComment(long id) {
-            String login = Gh4Application.get().getAuthLogin();
-            CommitComment comment = mCommitComments.get(id);
-            return ApiHelpers.loginEquals(comment.getUser(), login);
-        }
-
-        private void populateChoices(boolean ownComment) {
-            Menu menu = getMenu();
-            getMenuInflater().inflate(R.menu.commit_comment_actions, menu);
-            if (!canReply()) {
-                menu.removeItem(R.id.reply);
-            }
-            if (!ownComment) {
-                menu.removeItem(R.id.edit);
-                menu.removeItem(R.id.delete);
-            }
-
         }
     }
 

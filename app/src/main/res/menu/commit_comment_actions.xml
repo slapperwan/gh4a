@@ -7,6 +7,11 @@
         android:id="@+id/add_comment"
         android:title="@string/add_comment" />
     <item
+        android:id="@+id/react"
+        android:title="@string/add_reaction">
+        <menu></menu>
+    </item>
+    <item
         android:id="@+id/edit"
         android:title="@string/edit" />
     <item

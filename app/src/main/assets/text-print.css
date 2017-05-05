@@ -42,3 +42,9 @@ pre > div {
     margin-top: 3px;
     margin-bottom: 3px;
 }
+
+.reaction {
+    display: inline-block;
+    padding-left: 4px;
+    padding-right: 4px;
+}

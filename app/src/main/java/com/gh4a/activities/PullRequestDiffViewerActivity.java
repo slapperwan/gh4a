@@ -25,8 +25,10 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.widget.ReactionBar;
 
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
@@ -105,5 +107,27 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
                 app.getService(Gh4Application.PULL_SERVICE);
 
         pullRequestService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), id);
+    }
+
+    @Override
+    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws IOException {
+        CommitCommentWrapper comment = (CommitCommentWrapper) item;
+        Gh4Application app = Gh4Application.get();
+        PullRequestService pullRequestService = (PullRequestService)
+                app.getService(Gh4Application.PULL_SERVICE);
+
+        return pullRequestService.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName),
+                comment.comment.getId());
+    }
+
+    @Override
+    public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws IOException {
+        CommitCommentWrapper comment = (CommitCommentWrapper) item;
+        Gh4Application app = Gh4Application.get();
+        PullRequestService pullRequestService = (PullRequestService)
+                app.getService(Gh4Application.PULL_SERVICE);
+
+        return pullRequestService.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName),
+                comment.comment.getId(), content);
     }
 }

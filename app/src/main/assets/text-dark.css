@@ -46,3 +46,9 @@ pre > div {
 .highlighted {
     background: #555512;
 }
+
+.reaction {
+    display: inline-block;
+    padding-left: 4px;
+    padding-right: 4px;
+}

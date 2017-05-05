@@ -24,8 +24,10 @@ import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.widget.ReactionBar;
 
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.CommitService;
 
@@ -85,5 +87,25 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
     @Override
     protected Loader<LoaderResult<List<CommitComment>>> createCommentLoader() {
         return new CommitCommentListLoader(this, mRepoOwner, mRepoName, mSha, false, true);
+    }
+
+    @Override
+    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws IOException {
+        CommitCommentWrapper comment = (CommitCommentWrapper) item;
+        Gh4Application app = Gh4Application.get();
+        CommitService commitService = (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
+
+        return commitService.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName),
+                comment.comment.getId());
+    }
+
+    @Override
+    public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws IOException {
+        CommitCommentWrapper comment = (CommitCommentWrapper) item;
+        Gh4Application app = Gh4Application.get();
+        CommitService commitService = (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
+
+        return commitService.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName),
+                comment.comment.getId(), content);
     }
 }
