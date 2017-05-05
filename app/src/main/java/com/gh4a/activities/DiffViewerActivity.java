@@ -84,6 +84,40 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     private static final String COMMENT_EDIT_URI_FORMAT =
             "comment://edit?position=%d&l=%d&r=%d&id=%d";
 
+    private static final String REACTION_PLUS_ONE_PATH = "M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2"
+            + "h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9"
+            + "v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73"
+            + "v-1.91l-.01-.01L23 10z";
+    private static final String REACTION_MINUS_ONE_PATH = "M19,15H23V3H19M15,3H6"
+            + "C5.17,3 4.46,3.5 4.16,4.22L1.14,11.27C1.05,11.5 1,11.74 1,12V13.91L1,14"
+            + "A2,2 0 0,0 3,16H9.31L8.36,20.57C8.34,20.67 8.33,20.77 8.33,20.88"
+            + "C8.33,21.3 8.5,21.67 8.77,21.94L9.83,23L16.41,16.41"
+            + "C16.78,16.05 17,15.55 17,15V5C17,3.89 16.1,3 15,3Z";
+    private static final String REACTION_CONFUSED_PATH = "M8.5,11A1.5,1.5 0 0,1 7,9.5"
+            + "A1.5,1.5 0 0,1 8.5,8A1.5,1.5 0 0,1 10,9.5A1.5,1.5 0 0,1 8.5,11M15.5,11"
+            + "A1.5,1.5 0 0,1 14,9.5A1.5,1.5 0 0,1 15.5,8A1.5,1.5 0 0,1 17,9.5"
+            + "A1.5,1.5 0 0,1 15.5,11M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12"
+            + "A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12"
+            + "A10,10 0 0,1 12,2M9,14H15A1,1 0 0,1 16,15A1,1 0 0,1 15,16H9"
+            + "A1,1 0 0,1 8,15A1,1 0 0,1 9,14Z";
+    private static final String REACTION_HEART_PATH = "M12,21.35L10.55,20.03"
+            + "C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08"
+            + "C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03"
+            + "L12,21.35Z";
+    private static final String REACTION_HOORAY_PATH = "M11.5,0.5C12,0.75 13,2.4 13,3.5"
+            + "C13,4.6 12.33,5 11.5,5C10.67,5 10,4.85 10,3.75C10,2.65 11,2 11.5,0.5M18.5,9"
+            + "C21,9 23,11 23,13.5C23,15.06 22.21,16.43 21,17.24V23H12L3,23V17.24"
+            + "C1.79,16.43 1,15.06 1,13.5C1,11 3,9 5.5,9H10V6H13V9H18.5M12,16"
+            + "A2.5,2.5 0 0,0 14.5,13.5H16A2.5,2.5 0 0,0 18.5,16A2.5,2.5 0 0,0 21,13.5"
+            + "A2.5,2.5 0 0,0 18.5,11H5.5A2.5,2.5 0 0,0 3,13.5A2.5,2.5 0 0,0 5.5,16"
+            + "A2.5,2.5 0 0,0 8,13.5H9.5A2.5,2.5 0 0,0 12,16Z";
+    private static final String REACTION_LAUGH_PATH = "M12,17.5C14.33,17.5 16.3,16.04 17.11,14"
+            + "H6.89C7.69,16.04 9.67,17.5 12,17.5M8.5,11A1.5,1.5 0 0,0 10,9.5A1.5,1.5 0 0,0 8.5,8"
+            + "A1.5,1.5 0 0,0 7,9.5A1.5,1.5 0 0,0 8.5,11M15.5,11A1.5,1.5 0 0,0 17,9.5"
+            + "A1.5,1.5 0 0,0 15.5,8A1.5,1.5 0 0,0 14,9.5A1.5,1.5 0 0,0 15.5,11M12,20"
+            + "A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2"
+            + "C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
+
     protected String mRepoOwner;
     protected String mRepoName;
     protected String mPath;
@@ -297,12 +331,12 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     Reactions reactions = comment.getReactions();
                     if (reactions.getTotalCount() > 0) {
                         content.append("<div>");
-                        appendReactionSpan(content, reactions.getPlusOne(), 0x1f44d);
-                        appendReactionSpan(content, reactions.getMinusOne(), 0x1f44e);
-                        appendReactionSpan(content, reactions.getConfused(), 0x1f615);
-                        appendReactionSpan(content, reactions.getHeart(), 0x2764);
-                        appendReactionSpan(content, reactions.getLaugh(), 0x1f601);
-                        appendReactionSpan(content, reactions.getHooray(), 0x1f389);
+                        appendReactionSpan(content, reactions.getPlusOne(), REACTION_PLUS_ONE_PATH);
+                        appendReactionSpan(content, reactions.getMinusOne(), REACTION_MINUS_ONE_PATH);
+                        appendReactionSpan(content, reactions.getConfused(), REACTION_CONFUSED_PATH);
+                        appendReactionSpan(content, reactions.getHeart(), REACTION_HEART_PATH);
+                        appendReactionSpan(content, reactions.getLaugh(), REACTION_LAUGH_PATH);
+                        appendReactionSpan(content, reactions.getHooray(), REACTION_HOORAY_PATH);
                         content.append("</div>");
                     }
                     content.append("</div>");
@@ -326,13 +360,14 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         return content.toString();
     }
 
-    private void appendReactionSpan(StringBuilder content, int count, int emojiCodePoint) {
+    private void appendReactionSpan(StringBuilder content, int count, String iconPathContents) {
         if (count == 0) {
             return;
         }
         content.append("<span class='reaction'>");
-        content.append(new String(Character.toChars(emojiCodePoint)));
-        content.append(" ").append(count).append("</span>");
+        content.append("<svg width='14px' height='14px' viewBox='0 0 24 24'><path d='");
+        content.append(iconPathContents).append("' /></svg>");
+        content.append(count).append("</span>");
     }
 
     @Override
