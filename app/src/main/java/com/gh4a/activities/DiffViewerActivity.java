@@ -15,7 +15,6 @@
  */
 package com.gh4a.activities;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
@@ -26,7 +25,7 @@ import android.support.v4.util.LongSparseArray;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.ListPopupWindow;
+import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -35,12 +34,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
@@ -424,8 +418,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     protected abstract boolean canReply();
     protected abstract String createUrl();
 
-    private class CommentActionPopup extends ListPopupWindow implements
-            AdapterView.OnItemClickListener {
+    private class CommentActionPopup extends PopupMenu implements
+            PopupMenu.OnMenuItemClickListener {
         private final long mId;
         private final int mPosition;
         private final int mLeftLine;
@@ -434,7 +428,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
 
         public CommentActionPopup(long id, int position, String lineText,
                 int leftLine, int rightLine, int x, int y) {
-            super(DiffViewerActivity.this, null, R.attr.listPopupWindowStyle);
+            super(DiffViewerActivity.this, findViewById(R.id.popup_helper));
 
             mId = id;
             mPosition = position;
@@ -442,40 +436,40 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             mRightLine = rightLine;
             mLineText = lineText;
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(DiffViewerActivity.this,
-                    R.layout.popup_menu_item, populateChoices(isOwnComment(id)));
-            setAdapter(adapter);
-            setContentWidth(measureContentWidth(adapter));
+            populateChoices(isOwnComment(id));
 
             View anchor = findViewById(R.id.popup_helper);
             anchor.layout(x, y, x + 1, y + 1);
-            setAnchorView(anchor);
 
-            setOnItemClickListener(this);
-            setModal(true);
+            setOnMenuItemClickListener(this);
         }
 
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            int choiceCount = parent.getAdapter().getCount();
-            if (choiceCount > 2 && position == choiceCount - 1) {
-                new AlertDialog.Builder(DiffViewerActivity.this)
-                        .setMessage(R.string.delete_comment_message)
-                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+        public boolean onMenuItemClick(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.delete:
+                    new AlertDialog.Builder(DiffViewerActivity.this)
+                            .setMessage(R.string.delete_comment_message)
+                            .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteCommentTask(mId).schedule();
-                            }
-                        })
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
-            } else {
-                long replyToId = canReply() && position == 0 ? mId : 0L;
-                long commentId = choiceCount > 2 && position == choiceCount - 2 ? mId : 0L;
-                openCommentDialog(commentId, replyToId, mLineText,
-                        mPosition, mLeftLine, mRightLine);
+                                    new DeleteCommentTask(mId).schedule();
+                                }
+                            })
+                            .setNegativeButton(R.string.cancel, null)
+                            .show();
+                    break;
+                case R.id.reply:
+                    openCommentDialog(0L, mId, mLineText, mPosition, mLeftLine, mRightLine);
+                    break;
+                case R.id.edit:
+                    openCommentDialog(mId, 0L, mLineText, mPosition, mLeftLine, mRightLine);
+                    break;
+                case R.id.add_comment:
+                    openCommentDialog(0L, 0L, mLineText, mPosition, mLeftLine, mRightLine);
+                    break;
             }
-            dismiss();
+            return true;
         }
 
         private boolean isOwnComment(long id) {
@@ -484,34 +478,17 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             return ApiHelpers.loginEquals(comment.getUser(), login);
         }
 
-        private String[] populateChoices(boolean ownComment) {
-            int choiceCount = (ownComment ? 3 : 1) + (canReply() ? 1 : 0);
-            String[] choices = new String[choiceCount];
-            int index = 0;
-            if (canReply()) {
-                choices[index++] = getString(R.string.reply);
+        private void populateChoices(boolean ownComment) {
+            Menu menu = getMenu();
+            getMenuInflater().inflate(R.menu.commit_comment_actions, menu);
+            if (!canReply()) {
+                menu.removeItem(R.id.reply);
             }
-            choices[index++] = getString(R.string.add_comment);
-            if (ownComment) {
-                choices[index++] = getString(R.string.edit);
-                choices[index++] = getString(R.string.delete);
+            if (!ownComment) {
+                menu.removeItem(R.id.edit);
+                menu.removeItem(R.id.delete);
             }
-            return choices;
-        }
 
-        private int measureContentWidth(ListAdapter adapter) {
-            Context context = DiffViewerActivity.this;
-            ViewGroup measureParent = new FrameLayout(context);
-            int measureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-            int maxWidth = 0, count = adapter.getCount();
-            View itemView = null;
-
-            for (int i = 0; i < count; i++) {
-                itemView = adapter.getView(i, itemView, measureParent);
-                itemView.measure(measureSpec, measureSpec);
-                maxWidth = Math.max(maxWidth, itemView.getMeasuredWidth());
-            }
-            return maxWidth;
         }
     }
 
