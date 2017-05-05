@@ -361,7 +361,6 @@ public class CommitService extends GitHubService {
 
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
 		uri.append('/').append(id);
-		uri.append(SEGMENT_COMMITS);
 		uri.append(SEGMENT_COMMENTS);
 		uri.append('/').append(commentId);
 		uri.append(SEGMENT_REACTIONS);
