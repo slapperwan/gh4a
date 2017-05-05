@@ -72,7 +72,7 @@ ClientSecret="<CLIENT SECRET DISPLAYED IN APPLICATION SETTINGS>"
 - Build using Gradle
 
 ```bash
-./gradlew assembleDebug
+./gradlew assembleFossDebug
 ```
 
 - To get a full list of available tasks
