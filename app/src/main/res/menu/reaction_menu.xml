@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/loading"
-        android:title="Loading..." />
+        android:title="@string/loading_msg" />
 
     <item
         android:id="@+id/plus_one"
