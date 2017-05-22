@@ -55,6 +55,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.util.UrlUtils;
 
 /**
  * Repository service class.
@@ -373,7 +374,7 @@ public class RepositoryService extends GitHubService {
 			throw new IllegalArgumentException("User cannot be empty"); //$NON-NLS-1$
 
 		StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		uri.append(SEGMENT_REPOS);
 		PagedRequest<Repository> request = createPagedRequest(start, size);
 		request.setUri(uri);

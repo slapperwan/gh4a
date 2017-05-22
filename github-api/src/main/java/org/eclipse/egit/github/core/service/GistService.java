@@ -33,6 +33,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.util.UrlUtils;
 
 /**
  * Service class for interacting with Gists and Gist comments.
@@ -154,7 +155,7 @@ public class GistService extends GitHubService {
 			throw new IllegalArgumentException("User cannot be empty"); //$NON-NLS-1$
 
 		StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		uri.append(SEGMENT_GISTS);
 		PagedRequest<Gist> request = createPagedRequest(start, size);
 		request.setUri(uri).setType(new TypeToken<List<Gist>>() {

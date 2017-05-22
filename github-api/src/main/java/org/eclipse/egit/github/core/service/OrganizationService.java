@@ -28,6 +28,7 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.util.UrlUtils;
 
 /**
  * Organization service class
@@ -78,7 +79,7 @@ public class OrganizationService extends GitHubService {
 			request.setUri(SEGMENT_USER + SEGMENT_ORGS);
 		else {
 			StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-			uri.append('/').append(user);
+			uri.append('/').append(UrlUtils.encode(user));
 			uri.append(SEGMENT_ORGS);
 			request.setUri(uri);
 		}
@@ -254,7 +255,7 @@ public class OrganizationService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_ORGS);
 		uri.append('/').append(organization);
 		uri.append(SEGMENT_MEMBERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		return check(uri.toString());
 	}
 
@@ -280,7 +281,7 @@ public class OrganizationService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_ORGS);
 		uri.append('/').append(organization);
 		uri.append(SEGMENT_PUBLIC_MEMBERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		return check(uri.toString());
 	}
 
@@ -305,7 +306,7 @@ public class OrganizationService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_ORGS);
 		uri.append('/').append(organization);
 		uri.append(SEGMENT_PUBLIC_MEMBERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		client.put(uri.toString());
 	}
 
@@ -330,7 +331,7 @@ public class OrganizationService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_ORGS);
 		uri.append('/').append(organization);
 		uri.append(SEGMENT_PUBLIC_MEMBERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		client.delete(uri.toString());
 	}
 
@@ -355,7 +356,7 @@ public class OrganizationService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_ORGS);
 		uri.append('/').append(organization);
 		uri.append(SEGMENT_MEMBERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		client.delete(uri.toString());
 	}
 }

@@ -33,6 +33,7 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.util.UrlUtils;
 
 /**
  * Service class for working with organization teams
@@ -202,7 +203,7 @@ public class TeamService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_TEAMS);
 		uri.append('/').append(id);
 		uri.append(SEGMENT_MEMBERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		return check(uri.toString());
 	}
 
@@ -222,7 +223,7 @@ public class TeamService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_TEAMS);
 		uri.append('/').append(id);
 		uri.append(SEGMENT_MEMBERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		client.put(uri.toString());
 	}
 
@@ -242,7 +243,7 @@ public class TeamService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_TEAMS);
 		uri.append('/').append(id);
 		uri.append(SEGMENT_MEMBERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		client.delete(uri.toString());
 	}
 
@@ -255,7 +256,7 @@ public class TeamService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_TEAMS);
 		uri.append('/').append(id);
 		uri.append(SEGMENT_MEMBERSHIPS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 
 		GitHubRequest request = createRequest();
 		request.setUri(uri);
@@ -272,7 +273,7 @@ public class TeamService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_TEAMS);
 		uri.append('/').append(id);
 		uri.append(SEGMENT_MEMBERSHIPS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		return client.put(uri.toString(), null, TeamMembership.class);
 	}
 
@@ -285,7 +286,7 @@ public class TeamService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_TEAMS);
 		uri.append('/').append(id);
 		uri.append(SEGMENT_MEMBERSHIPS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		client.delete(uri.toString());
 	}
 

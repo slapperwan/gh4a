@@ -45,6 +45,7 @@ import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.GitHubResponse;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.util.UrlUtils;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -900,7 +901,7 @@ public class IssueService extends GitHubService {
 
 		GitHubRequest request = createRequest();
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-		uri.append('/').append(user).append('/').append(repository);
+		uri.append('/').append(UrlUtils.encode(user)).append('/').append(repository);
 		uri.append(SEGMENT_ISSUES).append(SEGMENT_COMMENTS);
 		uri.append('/').append(commentId);
 		request.setUri(uri);
@@ -1094,7 +1095,7 @@ public class IssueService extends GitHubService {
 
 		PagedRequest<IssueEvent> request = createPagedRequest(start, size);
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-		uri.append('/').append(user).append('/').append(repository);
+		uri.append('/').append(UrlUtils.encode(user)).append('/').append(repository);
 		uri.append(SEGMENT_ISSUES);
 		uri.append(SEGMENT_EVENTS);
 		request.setUri(uri);
@@ -1159,7 +1160,7 @@ public class IssueService extends GitHubService {
 
 		PagedRequest<IssueEvent> request = createPagedRequest(start, size);
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-		uri.append('/').append(user).append('/').append(repository);
+		uri.append('/').append(UrlUtils.encode(user)).append('/').append(repository);
 		uri.append(SEGMENT_ISSUES);
 		uri.append('/').append(issueId);
 		uri.append(SEGMENT_EVENTS);
@@ -1184,7 +1185,7 @@ public class IssueService extends GitHubService {
 
 		GitHubRequest request = createRequest();
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
-		uri.append('/').append(user).append('/').append(repository);
+		uri.append('/').append(UrlUtils.encode(user)).append('/').append(repository);
 		uri.append(SEGMENT_ISSUES);
 		uri.append(SEGMENT_EVENTS);
 		uri.append('/').append(eventId);

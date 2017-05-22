@@ -20,6 +20,7 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.util.UrlUtils;
 
 public class StarService extends GitHubService {
 
@@ -127,7 +128,7 @@ public class StarService extends GitHubService {
 		}
 		PagedRequest request = createPagedRequest(start, size);
 		StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		uri.append(SEGMENT_STARRED);
 		request.setParams(filterData);
 		request.setUri(uri);

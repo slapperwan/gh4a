@@ -22,6 +22,7 @@ import org.eclipse.egit.github.core.IRepositoryIdProvider;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.util.UrlUtils;
 
 /**
  * Service for interacting with the collaborators on a GitHub repository
@@ -85,7 +86,7 @@ public class CollaboratorService extends GitHubService {
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
 		uri.append('/').append(id);
 		uri.append(SEGMENT_COLLABORATORS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		return uri.toString();
 	}
 

@@ -29,6 +29,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
 import org.eclipse.egit.github.core.event.Event;
+import org.eclipse.egit.github.core.util.UrlUtils;
 
 /**
  * Service class for interacting with Events
@@ -450,7 +451,7 @@ public class EventService extends GitHubService {
 	protected PagedRequest<Event> createUserReceivedEventRequest(String user,
 			boolean isPublic, int start, int size) {
 		StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		uri.append(SEGMENT_RECEIVED_EVENTS);
 		if (isPublic)
 			uri.append(SEGMENT_PUBLIC);
@@ -475,7 +476,7 @@ public class EventService extends GitHubService {
 	protected PagedRequest<Event> createUserEventRequest(String user,
 			boolean isPublic, int start, int size) {
 		StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		uri.append(SEGMENT_EVENTS);
 		if (isPublic)
 			uri.append(SEGMENT_PUBLIC);
@@ -499,7 +500,7 @@ public class EventService extends GitHubService {
 	protected PagedRequest<Event> createUserOrgEventRequest(String user,
 			String org, int start, int size) {
 		StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		uri.append(SEGMENT_EVENTS).append(SEGMENT_ORGS);
 		uri.append('/').append(org);
 		PagedRequest<Event> request = createPagedRequest(start, size);

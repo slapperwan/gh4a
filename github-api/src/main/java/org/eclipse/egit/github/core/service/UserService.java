@@ -36,6 +36,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.util.UrlUtils;
 
 /**
  * User service class.
@@ -93,7 +94,7 @@ public class UserService extends GitHubService {
 
 		GitHubRequest request = createRequest();
 		StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-		uri.append('/').append(login);
+		uri.append('/').append(UrlUtils.encode(login));
 		request.setUri(uri);
 		request.setType(User.class);
 		return (User) client.get(request).getBody();
@@ -141,7 +142,7 @@ public class UserService extends GitHubService {
 			request.setUri(SEGMENT_USER + SEGMENT_FOLLOWERS);
 		else {
 			StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-			uri.append('/').append(user);
+			uri.append('/').append(UrlUtils.encode(user));
 			uri.append(SEGMENT_FOLLOWERS);
 			request.setUri(uri);
 		}
@@ -165,7 +166,7 @@ public class UserService extends GitHubService {
 			request.setUri(SEGMENT_USER + SEGMENT_FOLLOWING);
 		else {
 			StringBuilder uri = new StringBuilder(SEGMENT_USERS);
-			uri.append('/').append(user);
+			uri.append('/').append(UrlUtils.encode(user));
 			uri.append(SEGMENT_FOLLOWING);
 			request.setUri(uri);
 		}
@@ -372,7 +373,7 @@ public class UserService extends GitHubService {
 			throw new IllegalArgumentException("User cannot be empty"); //$NON-NLS-1$
 
 		StringBuilder uri = new StringBuilder(SEGMENT_USER + SEGMENT_FOLLOWING);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		return check(uri.toString());
 	}
 
@@ -389,7 +390,7 @@ public class UserService extends GitHubService {
 			throw new IllegalArgumentException("User cannot be empty"); //$NON-NLS-1$
 
 		StringBuilder uri = new StringBuilder(SEGMENT_USER + SEGMENT_FOLLOWING);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		client.put(uri.toString());
 	}
 
@@ -406,7 +407,7 @@ public class UserService extends GitHubService {
 			throw new IllegalArgumentException("User cannot be empty"); //$NON-NLS-1$
 
 		StringBuilder uri = new StringBuilder(SEGMENT_USER + SEGMENT_FOLLOWING);
-		uri.append('/').append(user);
+		uri.append('/').append(UrlUtils.encode(user));
 		client.delete(uri.toString());
 	}
 
