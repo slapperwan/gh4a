@@ -11,8 +11,8 @@ import com.gh4a.utils.TypefaceCache;
 public class CustomTypefaceSpan extends MetricAffectingSpan {
     private final Typeface mTypeface;
 
-    public CustomTypefaceSpan(Context context, int typefaceValue, int style) {
-        mTypeface = TypefaceCache.getTypeface(context, typefaceValue, style);
+    public CustomTypefaceSpan(int typefaceValue, int style) {
+        mTypeface = TypefaceCache.getTypeface(typefaceValue, style);
     }
 
     @Override

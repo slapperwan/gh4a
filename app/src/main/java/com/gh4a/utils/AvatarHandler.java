@@ -27,6 +27,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.LruCache;
@@ -119,7 +120,7 @@ public class AvatarHandler {
             return;
         }
 
-        view.setDrawable(new DefaultAvatarDrawable(view.getContext(), userName));
+        view.setDrawable(new DefaultAvatarDrawable(userName, userId));
         if (userId <= 0) {
             return;
         }
@@ -315,24 +316,37 @@ public class AvatarHandler {
         private final Paint mPaint;
         private final @ColorInt int mColor;
         private final char[] mLetter = new char[1];
+        private final UserNameState mState;
         private static final Rect sRect = new Rect();
 
-        public DefaultAvatarDrawable(Context context, String userName) {
+        public DefaultAvatarDrawable(String userName, Object identifier) {
+            mState = new UserNameState(userName, identifier);
+
             mPaint = new Paint();
-            mPaint.setTypeface(TypefaceCache.getTypeface(context, TypefaceCache.TF_MEDIUM));
+            mPaint.setTypeface(TypefaceCache.getTypeface(TypefaceCache.TF_MEDIUM));
             mPaint.setTextAlign(Paint.Align.CENTER);
             mPaint.setAntiAlias(true);
 
             final int colorIndex;
             if (TextUtils.isEmpty(userName)) {
                 mLetter[0] = '?';
-                colorIndex = (int) (Math.random() * COLOR_PALETTE.length);
+                if (mState.mIdentifier != null) {
+                    colorIndex = Math.abs(mState.mIdentifier.hashCode()) % COLOR_PALETTE.length;
+                } else {
+                    colorIndex = (int) (Math.random() * COLOR_PALETTE.length);
+                }
             } else {
                 mLetter[0] = Character.toUpperCase(userName.charAt(0));
                 colorIndex = Math.abs(userName.hashCode()) % COLOR_PALETTE.length;
             }
 
             mColor = COLOR_PALETTE[colorIndex];
+        }
+
+        @Nullable
+        @Override
+        public ConstantState getConstantState() {
+            return mState;
         }
 
         @Override
@@ -369,6 +383,27 @@ public class AvatarHandler {
         @Override
         public int getOpacity() {
             return android.graphics.PixelFormat.OPAQUE;
+        }
+
+        private static class UserNameState extends ConstantState {
+            private final String mUserName;
+            private final Object mIdentifier;
+
+            public UserNameState(String userName, Object identifier) {
+                mUserName = userName;
+                mIdentifier = identifier;
+            }
+
+            @NonNull
+            @Override
+            public Drawable newDrawable() {
+                return new DefaultAvatarDrawable(mUserName, mIdentifier);
+            }
+
+            @Override
+            public int getChangingConfigurations() {
+                return 0;
+            }
         }
     }
 

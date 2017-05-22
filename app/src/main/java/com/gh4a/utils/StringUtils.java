@@ -128,7 +128,7 @@ public class StringUtils {
                 ssb.append(input.substring(pos, start));
                 ssb.append(input.substring(start + 3, end));
 
-                Object span = new CustomTypefaceSpan(context, baseTypefaceValue, Typeface.BOLD);
+                Object span = new CustomTypefaceSpan(baseTypefaceValue, Typeface.BOLD);
                 ssb.setSpan(span, ssb.length() - tokenLength, ssb.length(), 0);
 
                 pos = end + 4;

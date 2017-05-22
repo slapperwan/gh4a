@@ -235,7 +235,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                     String text = res.getString(R.string.event_push_desc, count - max);
                     ssb.append("\n");
                     ssb.append(text);
-                    ssb.setSpan(new CustomTypefaceSpan(mContext, typefaceValue, Typeface.ITALIC),
+                    ssb.setSpan(new CustomTypefaceSpan(typefaceValue, Typeface.ITALIC),
                             ssb.length() - text.length(), ssb.length(), 0);
                 }
                 return ssb;

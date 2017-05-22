@@ -6,6 +6,8 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.util.SparseArray;
 
+import com.gh4a.Gh4Application;
+
 public class TypefaceCache {
     public static final int TF_REGULAR = 0;
     public static final int TF_MEDIUM = 1;
@@ -42,7 +44,7 @@ public class TypefaceCache {
 
     private static final SparseArray<Typeface> sTypefaces = new SparseArray<>();
 
-    public static Typeface getTypeface(Context context, int typeface, int style) {
+    public static Typeface getTypeface(int typeface, int style) {
         switch (style) {
             case Typeface.BOLD:
                 switch (typeface) {
@@ -56,10 +58,10 @@ public class TypefaceCache {
                 }
                 break;
         }
-        return getTypeface(context, typeface);
+        return getTypeface(typeface);
     }
 
-    public static Typeface getTypeface(Context context, int typeface) {
+    public static Typeface getTypeface(int typeface) {
         if (typeface < TF_REGULAR || typeface > TF_BOLDCONDENSED) {
             return null;
         }
@@ -71,7 +73,7 @@ public class TypefaceCache {
                 tf = Typeface.create(FONT_FAMILIES[typeface], FONT_STYLES[typeface]);
             } else {
                 // use our fonts
-                AssetManager assets = context.getApplicationContext().getAssets();
+                AssetManager assets = Gh4Application.get().getAssets();
                 tf = Typeface.createFromAsset(assets, FONT_FILENAMES[typeface]);
             }
             sTypefaces.put(typeface, tf);

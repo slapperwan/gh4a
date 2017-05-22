@@ -88,7 +88,7 @@ public class StyleableTextView extends AppCompatTextView {
         a.recycle();
 
         if (!isInEditMode()) {
-            setTypeface(TypefaceCache.getTypeface(getContext(), mTypefaceValue));
+            setTypeface(TypefaceCache.getTypeface(mTypefaceValue));
         }
         if (allCaps) {
             setTransformationMethod(new AllCapsTransformationMethod(getContext()));
@@ -98,7 +98,7 @@ public class StyleableTextView extends AppCompatTextView {
     @Override
     public void setTypeface(Typeface tf, int style) {
         if (tf == getTypeface()) {
-            setTypeface(TypefaceCache.getTypeface(getContext(), mTypefaceValue, style));
+            setTypeface(TypefaceCache.getTypeface(mTypefaceValue, style));
         } else {
             super.setTypeface(tf, style);
         }

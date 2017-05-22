@@ -31,7 +31,9 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.CommitUser;
 import org.eclipse.egit.github.core.RepositoryCommit;
+import org.eclipse.egit.github.core.User;
 
 public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.ViewHolder> {
     public CommitAdapter(Context context) {
@@ -48,7 +50,14 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
 
     @Override
     public void onBindViewHolder(ViewHolder holder, RepositoryCommit commit) {
-        AvatarHandler.assignAvatar(holder.ivGravatar, commit.getAuthor());
+        User author = commit.getAuthor();
+        if (author != null) {
+            AvatarHandler.assignAvatar(holder.ivGravatar, author);
+        } else {
+            CommitUser commitAuthor = commit.getCommit().getAuthor();
+            String email = commitAuthor != null ? commitAuthor.getEmail() : null;
+            holder.ivGravatar.setImageDrawable(new AvatarHandler.DefaultAvatarDrawable(null, email));
+        }
         holder.ivGravatar.setTag(commit);
 
         String message = commit.getCommit().getMessage();

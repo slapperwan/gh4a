@@ -29,7 +29,9 @@ import com.gh4a.widget.StyleableTextView;
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
+import org.eclipse.egit.github.core.CommitUser;
 import org.eclipse.egit.github.core.RepositoryCommit;
+import org.eclipse.egit.github.core.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +101,14 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         final Gh4Application app = Gh4Application.get();
 
         ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
-        AvatarHandler.assignAvatar(ivGravatar, mCommit.getAuthor());
+        User author = mCommit.getAuthor();
+        if (author != null) {
+            AvatarHandler.assignAvatar(ivGravatar, author);
+        } else {
+            CommitUser commitAuthor = mCommit.getCommit().getAuthor();
+            String email = commitAuthor != null ? commitAuthor.getEmail() : null;
+            ivGravatar.setImageDrawable(new AvatarHandler.DefaultAvatarDrawable(null, email));
+        }
 
         String login = ApiHelpers.getAuthorLogin(mCommit);
         if (login != null) {
