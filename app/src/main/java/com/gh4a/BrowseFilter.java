@@ -70,7 +70,8 @@ public class BrowseFilter extends AppCompatActivity {
     private static final Pattern SHA1_PATTERN = Pattern.compile("[a-z0-9]{40}");
 
     private static final List<String> RESERVED_NAMES = Arrays.asList(
-        "login", "logout", "sessions", "settings"
+        "apps", "integrations", "login", "logout",
+        "marketplace", "sessions", "settings", "updates"
     );
 
     public void onCreate(Bundle savedInstanceState) {
