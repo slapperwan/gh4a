@@ -11,11 +11,11 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.FilterQueryProvider;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -56,7 +57,8 @@ import java.io.IOException;
 import java.util.List;
 
 public class SearchFragment extends LoadingListFragmentBase implements
-        SearchView.OnQueryTextListener, SearchView.OnCloseListener, SearchView.OnSuggestionListener,
+        SearchView.OnQueryTextListener, SearchView.OnCloseListener,
+        SearchView.OnSuggestionListener, FilterQueryProvider,
         AdapterView.OnItemSelectedListener, RootAdapter.OnItemClickListener {
     public static SearchFragment newInstance(int initialType, String initialQuery) {
         SearchFragment f = new SearchFragment();
@@ -153,27 +155,6 @@ public class SearchFragment extends LoadingListFragmentBase implements
         }
     };
 
-    private final LoaderManager.LoaderCallbacks<Cursor> mSuggestionCallback =
-            new LoaderManager.LoaderCallbacks<Cursor>() {
-        @Override
-        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            int type = mSearchType.getSelectedItemPosition();
-            return new CursorLoader(getActivity(), SuggestionsProvider.Columns.CONTENT_URI,
-                    SUGGESTION_PROJECTION, SUGGESTION_SELECTION,
-                    new String[] { String.valueOf(type), mQuery + "%" }, SUGGESTION_ORDER);
-        }
-
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            mSearch.getSuggestionsAdapter().changeCursor(data);
-        }
-
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-            mSearch.getSuggestionsAdapter().changeCursor(null);
-        }
-    };
-
     private RecyclerView mRecyclerView;
     private RootAdapter<?, ?> mAdapter;
 
@@ -215,6 +196,9 @@ public class SearchFragment extends LoadingListFragmentBase implements
             mInitialSearchType = SEARCH_TYPE_NONE;
         }
 
+        SuggestionAdapter adapter = new SuggestionAdapter(getActivity());
+        adapter.setFilterQueryProvider(this);
+
         mSearch = (SearchView) menu.findItem(R.id.search).getActionView();
         mSearch.setIconifiedByDefault(true);
         mSearch.requestFocus();
@@ -223,12 +207,11 @@ public class SearchFragment extends LoadingListFragmentBase implements
         mSearch.setOnQueryTextListener(this);
         mSearch.setOnCloseListener(this);
         mSearch.setOnSuggestionListener(this);
-        mSearch.setSuggestionsAdapter(new SuggestionAdapter(getActivity()));
+        mSearch.setSuggestionsAdapter(adapter);
         if (mQuery != null) {
             mSearch.setQuery(mQuery, false);
         }
 
-        getLoaderManager().initLoader(1, null, mSuggestionCallback);
         updateSelectedSearchType();
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -285,37 +268,17 @@ public class SearchFragment extends LoadingListFragmentBase implements
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        LoaderManager lm = getLoaderManager();
-        int type = mSearchType.getSelectedItemPosition();
-        switch (type) {
-            case SEARCH_TYPE_USER: lm.restartLoader(0, null, mUserCallback); break;
-            case SEARCH_TYPE_CODE: lm.restartLoader(0, null, mCodeCallback); break;
-            default: lm.restartLoader(0, null, mRepoCallback); break;
-        }
         mQuery = query;
         if (!StringUtils.isBlank(query)) {
+            int type = mSearchType.getSelectedItemPosition();
             new SaveSearchSuggestionTask(query, type).schedule();
         }
-        setContentShown(false);
-        mSearch.clearFocus();
+        loadResults();
         return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        CursorAdapter adapter = mSearch.getSuggestionsAdapter();
-        if (adapter != null) {
-            Cursor cursor = adapter.getCursor();
-            int count = cursor != null ? cursor.getCount() - 1 : -1;
-            //noinspection StatementWithEmptyBody
-            if (mQuery != null && newText.startsWith(mQuery) && count == 0) {
-                // nothing found on previous query
-            } else {
-                mQuery = newText;
-                adapter.changeCursor(null);
-                getLoaderManager().restartLoader(1, null, mSuggestionCallback);
-            }
-        }
         mQuery = newText;
         return true;
     }
@@ -352,7 +315,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         updateSelectedSearchType();
         if (getLoaderManager().getLoader(0) != null) {
-            onQueryTextSubmit(mQuery);
+            loadResults();
         }
     }
 
@@ -361,12 +324,35 @@ public class SearchFragment extends LoadingListFragmentBase implements
         updateSelectedSearchType();
     }
 
+    @Override
+    public Cursor runQuery(CharSequence query) {
+        if (TextUtils.isEmpty(query)) {
+            return null;
+        }
+        int type = mSearchType.getSelectedItemPosition();
+        return getContext().getContentResolver().query(SuggestionsProvider.Columns.CONTENT_URI,
+                SUGGESTION_PROJECTION, SUGGESTION_SELECTION,
+                new String[] { String.valueOf(type), query + "%" }, SUGGESTION_ORDER);
+    }
+
+    private void loadResults() {
+        LoaderManager lm = getLoaderManager();
+        switch (mSearchType.getSelectedItemPosition()) {
+            case SEARCH_TYPE_USER: lm.restartLoader(0, null, mUserCallback); break;
+            case SEARCH_TYPE_CODE: lm.restartLoader(0, null, mCodeCallback); break;
+            default: lm.restartLoader(0, null, mRepoCallback); break;
+        }
+        setContentShown(false);
+        mSearch.clearFocus();
+    }
+
     private void updateSelectedSearchType() {
         int[] hintAndEmptyTextResIds = HINT_AND_EMPTY_TEXTS[mSearchType.getSelectedItemPosition()];
         mSearch.setQueryHint(getString(hintAndEmptyTextResIds[0]));
         updateEmptyText(hintAndEmptyTextResIds[1]);
-        mSearch.getSuggestionsAdapter().changeCursor(null);
-        getLoaderManager().restartLoader(1, null, mSuggestionCallback);
+
+        // force re-filtering of the view
+        mSearch.setQuery(mQuery, false);
     }
 
     private void setAdapter(RootAdapter<?, ?> adapter) {
@@ -425,7 +411,6 @@ public class SearchFragment extends LoadingListFragmentBase implements
 
         @Override
         protected void onSuccess(Void result) {
-            mSearch.getSuggestionsAdapter().changeCursor(null);
         }
     }
 
