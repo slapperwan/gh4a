@@ -16,7 +16,7 @@ public class CrashReportingHelper {
 
     public static void onCreate(Application app) {
         boolean isDebuggable = (app.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-        sHasCrashlytics = (!isDebuggable && !TextUtils.equals(Build.DEVICE, "sdk"));
+        sHasCrashlytics = !isDebuggable && !isEmulator();
 
         if (sHasCrashlytics) {
             Fabric.with(app, new Crashlytics());
@@ -30,5 +30,11 @@ public class CrashReportingHelper {
                 sNextUrlTrackingPosition = 0;
             }
         }
+    }
+
+    private static boolean isEmulator() {
+        return Build.FINGERPRINT.startsWith("unknown")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"));
     }
 }
