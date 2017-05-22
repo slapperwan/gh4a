@@ -386,6 +386,8 @@ public class HtmlUtils {
                 startCssStyle(mSpannableStringBuilder, attributes);
             } else if (tag.equalsIgnoreCase("hr")) {
                 HorizontalLineSpan span = new HorizontalLineSpan(mDividerHeight, 0x60aaaaaa);
+                // enforce the following newlines to be written
+                mSpannableStringBuilder.append(' ');
                 appendNewlines(mSpannableStringBuilder, 2);
                 int len = mSpannableStringBuilder.length();
                 mSpannableStringBuilder.setSpan(span, len - 1, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -681,17 +683,17 @@ public class HtmlUtils {
             if (style != null) {
                 Matcher m = getForegroundColorPattern().matcher(style);
                 if (m.find()) {
-                    int c = Color.parseColor(m.group(1));
-                    if (c != -1) {
-                        start(text, new Foreground(c | 0xFF000000));
+                    Integer c = parseColor(m.group(1));
+                    if (c != null) {
+                        start(text, new Foreground(c));
                     }
                 }
 
                 m = getBackgroundColorPattern().matcher(style);
                 if (m.find()) {
-                    int c = Color.parseColor(m.group(1));
-                    if (c != -1) {
-                        start(text, new Background(c | 0xFF000000));
+                    Integer c = parseColor(m.group(1));
+                    if (c != null) {
+                        start(text, new Background(c));
                     }
                 }
 
@@ -722,6 +724,18 @@ public class HtmlUtils {
             }
         }
 
+        private static Integer parseColor(String colorString) {
+            if (colorString == null) {
+                return null;
+            }
+            try {
+                int color = Color.parseColor(colorString);
+                return color | 0xff000000;
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+
         private static void startImg(Editable text, Attributes attributes,
                 android.text.Html.ImageGetter img) {
             String src = attributes.getValue("", "src");
@@ -739,9 +753,9 @@ public class HtmlUtils {
             String face = attributes.getValue("", "face");
 
             if (!TextUtils.isEmpty(color)) {
-                int c = Color.parseColor(color);
-                if (c != -1) {
-                    start(text, new Foreground(c | 0xFF000000));
+                Integer c = parseColor(color);
+                if (c != null) {
+                    start(text, new Foreground(c));
                 }
             }
 

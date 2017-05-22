@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.v4.content.Loader;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -149,14 +150,17 @@ public class PullRequestFragment extends IssueFragmentBase {
                 getString(formatResId), view.getTypefaceValue());
         int pos = builder.toString().indexOf("[ref]");
         if (pos >= 0) {
-            builder.replace(pos, pos + 5, marker.getLabel());
-            builder.setSpan(new IntentSpan(getActivity()) {
-                @Override
-                protected Intent getIntent() {
-                    return RepositoryActivity.makeIntent(getActivity(),
-                            marker.getRepo(), marker.getRef());
-                }
-            }, pos, pos + marker.getLabel().length(), 0);
+            String label = TextUtils.isEmpty(marker.getLabel()) ? marker.getRef() : marker.getLabel();
+            final Repository repo = marker.getRepo();
+            builder.replace(pos, pos + 5, label);
+            if (repo != null) {
+                builder.setSpan(new IntentSpan(getActivity()) {
+                    @Override
+                    protected Intent getIntent() {
+                        return RepositoryActivity.makeIntent(getActivity(), repo, marker.getRef());
+                    }
+                }, pos, pos + label.length(), 0);
+            }
         }
 
         view.setText(builder);

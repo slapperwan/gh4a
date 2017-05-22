@@ -275,7 +275,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
                     mObjectSha, file.getFilename());
         } else {
             intent = CommitDiffViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mObjectSha, file.getFilename(), file.getPatch(), mComments, -1, -1, false, null);
+                    mObjectSha, file.getFilename(), file.getPatch(),
+                    commentsForFile(file), -1, -1, false, null);
         }
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);
     }
@@ -292,5 +293,23 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private ArrayList<CommitComment> commentsForFile(CommitFile file) {
+        if (mComments == null) {
+            return null;
+        }
+        String path = file.getFilename();
+        ArrayList<CommitComment> result = null;
+        for (CommitComment comment : mComments) {
+            if (!TextUtils.equals(comment.getPath(), path)) {
+                continue;
+            }
+            if (result == null) {
+                result = new ArrayList<>();
+            }
+            result.add(comment);
+        }
+        return result;
     }
 }

@@ -267,6 +267,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             }
         });
 
+        supportInvalidateOptionsMenu();
         forceLoaderReload(0, 1);
         super.onRefresh();
     }

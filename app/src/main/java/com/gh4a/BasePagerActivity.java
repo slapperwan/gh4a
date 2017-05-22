@@ -31,6 +31,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
     private boolean mScrolling;
     private boolean mErrorViewVisible;
     private int mCurrentHeaderColor;
+    private int mLastTabCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +142,11 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     private void updateTabVisibility() {
         int count = mAdapter.getCount();
+
+        if (count != mLastTabCount) {
+            mAdapter.notifyDataSetChanged();
+            mLastTabCount = count;
+        }
 
         // We never have many pages, make sure to keep them all alive
         mPager.setOffscreenPageLimit(Math.max(1, count - 1));

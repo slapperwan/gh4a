@@ -121,12 +121,19 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             new MarkReadTask(null, item.notification).schedule();
 
             NotificationSubject subject = item.notification.getSubject();
-            Uri uri = ApiHelpers.normalizeUri(Uri.parse(subject.getUrl()));
-            intent = BrowseFilter.makeRedirectionIntent(getActivity(), uri,
-                    new IntentUtils.InitialCommentMarker(item.notification.getLastReadAt()));
+            String url = subject.getUrl();
+            if (url != null) {
+                Uri uri = ApiHelpers.normalizeUri(Uri.parse(url));
+                intent = BrowseFilter.makeRedirectionIntent(getActivity(), uri,
+                        new IntentUtils.InitialCommentMarker(item.notification.getLastReadAt()));
+            } else {
+                intent = null;
+            }
         }
 
-        startActivity(intent);
+        if (intent != null) {
+            startActivity(intent);
+        }
     }
 
     @Override
