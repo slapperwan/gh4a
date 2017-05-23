@@ -10,6 +10,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -28,6 +29,7 @@ import com.gh4a.activities.SettingsActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 import com.gh4a.fragment.SettingsFragment;
+import com.gh4a.loader.HasNotificationsLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.UserLoader;
@@ -83,6 +85,22 @@ public class HomeActivity extends BasePagerActivity implements
         }
     };
 
+    private final LoaderCallbacks<Boolean> mHasNotificationsCallback = new LoaderCallbacks<Boolean>(this) {
+        @Override
+        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
+            return new HasNotificationsLoader(HomeActivity.this);
+        }
+        @Override
+        protected void onResultReady(Boolean result) {
+            MenuItem item = mLeftDrawerMenu.findItem(R.id.notifications);
+            if (result) {
+                MenuItemCompat.setActionView(item, R.layout.notifications_indicator);
+            } else {
+                MenuItemCompat.setActionView(item, null);
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         mUserLogin = Gh4Application.get().getAuthLogin();
@@ -102,6 +120,7 @@ public class HomeActivity extends BasePagerActivity implements
         actionBar.setTitle(mFactory.getTitleResId());
 
         getSupportLoaderManager().initLoader(0, null, mUserCallback);
+        getSupportLoaderManager().initLoader(1, null, mHasNotificationsCallback);
     }
 
     @Override
