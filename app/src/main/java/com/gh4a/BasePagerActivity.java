@@ -28,7 +28,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
     private boolean mErrorViewVisible;
     private int mCurrentHeaderColor;
     private int mLastTabCount;
-    private boolean mAppBarLocked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +128,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     private void updateToolbarScrollableState() {
-        setToolbarScrollable(mAdapter.getCount() > 1 && (!hasTabsInToolbar() || mAppBarLocked));
+        setToolbarScrollable(mAdapter.getCount() > 1 && !hasTabsInToolbar());
     }
 
     private void updateTabVisibility() {
@@ -154,13 +153,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
             lp.weight = 1;
             tab.setLayoutParams(lp);
         }
-    }
-
-    @Override
-    public void setAppBarLocked(boolean locked) {
-        mAppBarLocked = locked;
-        updateToolbarScrollableState();
-        super.setAppBarLocked(locked);
     }
 
     @Override
