@@ -178,6 +178,8 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         if (mAdvancedEditor != null) {
             mAdvancedEditor.setLocked(locked);
         }
+        mAdvancedEditorToggle.setVisibility(locked ? View.GONE : View.VISIBLE);
+        setAdvancedMode(false);
     }
 
     public void setMentionUsers(Set<User> users) {
