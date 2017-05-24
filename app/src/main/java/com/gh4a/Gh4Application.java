@@ -237,6 +237,17 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 .apply();
     }
 
+    public User getCurrentAccountInfoForAvatar() {
+        String login = getAuthLogin();
+        if (login != null) {
+            int userId = getPrefs().getInt(KEY_PREFIX_USER_ID + login, -1);
+            if (userId >= 0) {
+                return new User().setLogin(login).setId(userId);
+            }
+        }
+        return null;
+    }
+
     public void setCurrentAccountInfo(User user) {
         getPrefs().edit()
                 .putInt(KEY_PREFIX_USER_ID + user.getLogin(), user.getId())

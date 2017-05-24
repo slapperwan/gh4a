@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -211,6 +212,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
     private static class ReactionUserPopup extends ListPopupWindow {
         private Callback mCallback;
         private Item mItem;
+        private List<Reaction> mLastKnownDetails;
         private ReactionDetailsCache mDetailsCache;
         private ReactionUserAdapter mAdapter;
         private String mContent;
@@ -235,7 +237,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
         public void show(String content) {
             if (!TextUtils.equals(content, mContent)) {
-                mAdapter.setUsers(null);
+                mAdapter.setReactions(null);
                 mContent = content;
             }
             show();
@@ -254,15 +256,22 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             }
         }
 
+        public void toggleOwnReaction(Reaction currentReaction) {
+            final int id = currentReaction != null ? currentReaction.getId() : 0;
+            new ToggleReactionTask(mContent, id, mLastKnownDetails, mCallback, mItem, mDetailsCache)
+                    .execute();
+        }
+
         private void populateAdapter(List<Reaction> details) {
             if (details != null) {
-                List<User> users = new ArrayList<>();
+                List<Reaction> reactions = new ArrayList<>();
                 for (Reaction reaction : details) {
                     if (TextUtils.equals(mContent, reaction.getContent())) {
-                        users.add(reaction.getUser());
+                        reactions.add(reaction);
                     }
                 }
-                mAdapter.setUsers(users);
+                mLastKnownDetails = details;
+                mAdapter.setReactions(reactions);
             } else {
                 dismiss();
             }
@@ -271,18 +280,39 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
     private static class ReactionUserAdapter extends BaseAdapter implements View.OnClickListener {
         private Context mContext;
-        private ListPopupWindow mParent;
+        private ReactionUserPopup mParent;
         private LayoutInflater mInflater;
         private List<User> mUsers;
+        private Reaction mOwnReaction;
 
-        public ReactionUserAdapter(Context context, ListPopupWindow popup) {
+        public ReactionUserAdapter(Context context, ReactionUserPopup popup) {
             mContext = context;
             mParent = popup;
             mInflater = LayoutInflater.from(context);
         }
 
-        public void setUsers(List<User> users) {
-            mUsers = users;
+        public void setReactions(List<Reaction> reactions) {
+            mOwnReaction = null;
+            if (reactions != null) {
+                User ownUser = Gh4Application.get().getCurrentAccountInfoForAvatar();
+                String ownLogin = ownUser != null ? ownUser.getLogin() : null;
+
+                mUsers = new ArrayList<>();
+                for (Reaction reaction : reactions) {
+                    if (ApiHelpers.loginEquals(reaction.getUser(), ownLogin)) {
+                        mOwnReaction = reaction;
+                    } else {
+                        mUsers.add(reaction.getUser());
+                    }
+                }
+                if (ownUser != null) {
+                    mUsers.add(null);
+                    mUsers.add(ownUser);
+                }
+            } else {
+                mUsers = null;
+            }
+
             notifyDataSetChanged();
         }
 
@@ -293,12 +323,15 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
         @Override
         public int getItemViewType(int position) {
-            return mUsers != null ? 0 : 1;
+            if (mUsers == null) {
+                return 1;
+            }
+            return getItem(position) == null ? 2 : 0;
         }
 
         @Override
         public int getViewTypeCount() {
-            return 2;
+            return 3;
         }
 
         @Override
@@ -313,33 +346,50 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            if (mUsers == null) {
-                return convertView != null
-                        ? convertView
-                        : mInflater.inflate(R.layout.reaction_details_progress, parent, false);
-            }
+            int viewType = getItemViewType(position);
+            @LayoutRes int layoutResId =
+                    viewType == 0 ? R.layout.row_reaction_details :
+                    viewType == 1 ? R.layout.reaction_details_progress :
+                    R.layout.reaction_details_divider;
 
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.row_reaction_details, parent, false);
+                convertView = mInflater.inflate(layoutResId, parent, false);
             }
 
-            User user = mUsers.get(position);
-            ImageView avatar = (ImageView) convertView.findViewById(R.id.avatar);
-            TextView name = (TextView) convertView.findViewById(R.id.name);
+            if (viewType == 0) {
+                ImageView avatar = (ImageView) convertView.findViewById(R.id.avatar);
+                TextView name = (TextView) convertView.findViewById(R.id.name);
+                String ownLogin = Gh4Application.get().getAuthLogin();
+                User user = mUsers.get(position);
 
-            AvatarHandler.assignAvatar(avatar, user);
-            name.setText(ApiHelpers.getUserLogin(mContext, user));
-            convertView.setTag(user);
-            convertView.setOnClickListener(this);
+                AvatarHandler.assignAvatar(avatar, user);
+                convertView.setOnClickListener(this);
+
+                if (ApiHelpers.loginEquals(user, ownLogin)) {
+                    avatar.setAlpha(mOwnReaction != null ? 1.0f : 0.4f);
+                    name.setText(mOwnReaction != null
+                            ? R.string.remove_reaction : R.string.add_reaction);
+                    convertView.setTag(mOwnReaction);
+                } else {
+                    avatar.setAlpha(1.0f);
+                    name.setText(ApiHelpers.getUserLogin(mContext, user));
+                    convertView.setTag(user);
+                }
+            }
 
             return convertView;
         }
 
         @Override
         public void onClick(View view) {
-            User user = (User) view.getTag();
-            mParent.dismiss();
-            mContext.startActivity(UserActivity.makeIntent(mContext, user));
+            if (view.getTag() instanceof User) {
+                User user = (User) view.getTag();
+                mParent.dismiss();
+                mContext.startActivity(UserActivity.makeIntent(mContext, user));
+            } else {
+                // own entry
+                mParent.toggleOwnReaction(mOwnReaction);
+            }
         }
     }
 
@@ -380,6 +430,63 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         protected void onPostExecute(List<Reaction> reactions) {
             mDetailsCache.putEntry(mItem, reactions);
             super.onPostExecute(reactions);
+        }
+    }
+
+    private static class ToggleReactionTask extends AsyncTask<Void, Void, Pair<Boolean, Reaction>> {
+        private String mContent;
+        private int mId;
+        private List<Reaction> mExistingDetails;
+        private Callback mCallback;
+        private Item mItem;
+        private ReactionDetailsCache mDetailsCache;
+
+        public ToggleReactionTask(String content, int id, List<Reaction> existingDetails,
+                Callback callback, Item item, ReactionDetailsCache detailsCache) {
+            mContent = content;
+            mId = id;
+            mExistingDetails = existingDetails;
+            mCallback = callback;
+            mItem = item;
+            mDetailsCache = detailsCache;
+        }
+
+        @Override
+        protected Pair<Boolean, Reaction> doInBackground(Void... voids) {
+            try {
+                if (mId == 0) {
+                    Reaction result = mCallback.addReactionInBackground(mItem, mContent);
+                    return Pair.create(true, result);
+                } else {
+                    ReactionService service = (ReactionService)
+                            Gh4Application.get().getService(Gh4Application.REACTION_SERVICE);
+                    service.deleteReaction(mId);
+                    return Pair.create(true, null);
+                }
+            } catch (IOException e) {
+                android.util.Log.d("foo", "save fail", e);
+                return Pair.create(false, null);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Pair<Boolean, Reaction> result) {
+            if (!result.first) {
+                return;
+            }
+
+            if (result.second != null) {
+                mExistingDetails.add(result.second);
+            } else {
+                for (int i = 0; i < mExistingDetails.size(); i++) {
+                    Reaction reaction = mExistingDetails.get(i);
+                    if (reaction.getId() == mId) {
+                        mExistingDetails.remove(i);
+                        break;
+                    }
+                }
+            }
+            mDetailsCache.putEntry(mItem, mExistingDetails);
         }
     }
 
@@ -496,50 +603,20 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
 
         private void addOrRemoveReaction(final String content, final int id) {
-            new AsyncTask<Void, Void, Pair<Boolean, Reaction>>() {
-                @Override
-                protected Pair<Boolean, Reaction> doInBackground(Void... voids) {
-                    try {
-                        if (id == 0) {
-                            Reaction result = mCallback.addReactionInBackground(mItem, content);
-                            return Pair.create(true, result);
-                        } else {
-                            ReactionService service = (ReactionService)
-                                    Gh4Application.get().getService(Gh4Application.REACTION_SERVICE);
-                            service.deleteReaction(id);
-                            return Pair.create(true, null);
-                        }
-                    } catch (IOException e) {
-                        android.util.Log.d("foo", "save fail", e);
-                        return Pair.create(false, null);
-                    }
-                }
-
+            new ToggleReactionTask(content, id, mLastKnownDetails, mCallback, mItem,
+                    mDetailsCache) {
                 @Override
                 protected void onPostExecute(Pair<Boolean, Reaction> result) {
-                    if (!result.first) {
-                        return;
-                    }
-
-                    for (int i = 0; i < CONTENTS.length; i++) {
-                        if (TextUtils.equals(CONTENTS[i], content)) {
-                            mOldReactionIds[i] = result.second != null ? result.second.getId() : 0;
-                            break;
-                        }
-                    }
-                    if (result.second != null) {
-                        mLastKnownDetails.add(result.second);
-                    } else {
-                        for (int i = 0; i < mLastKnownDetails.size(); i++) {
-                            Reaction reaction = mLastKnownDetails.get(i);
-                            if (reaction.getId() == id) {
-                                mLastKnownDetails.remove(i);
+                    if (result.first) {
+                        for (int i = 0; i < CONTENTS.length; i++) {
+                            if (TextUtils.equals(CONTENTS[i], content)) {
+                                mOldReactionIds[i] =
+                                        result.second != null ? result.second.getId() : 0;
                                 break;
                             }
                         }
                     }
-                    mDetailsCache.putEntry(mItem, mLastKnownDetails);
-                    syncCheckStates();
+                    super.onPostExecute(result);
                 }
             }.execute();
         }
