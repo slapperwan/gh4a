@@ -16,9 +16,6 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.os.ParcelableCompat;
-import android.support.v4.os.ParcelableCompatCreatorCallbacks;
-import android.support.v4.view.AbsSavedState;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
@@ -482,34 +479,29 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         final SavedState ss = new SavedState(superState);
 
         ss.isInAdvancedMode = isInAdvancedMode();
-        ss.commentText = getCommentText().toString();
 
         return ss;
     }
 
     @Override
     protected void onRestoreInstanceState(Parcelable state) {
-        if (state instanceof SavedState) {
-            final SavedState ss = (SavedState) state;
-            super.onRestoreInstanceState(ss.getSuperState());
-            setAdvancedMode(ss.isInAdvancedMode);
-            mBasicEditor.setText(ss.commentText);
-            if (mAdvancedEditor != null) {
-                mAdvancedEditor.setText(ss.commentText);
-            }
-        } else {
+        if (!(state instanceof SavedState)) {
             super.onRestoreInstanceState(state);
+            return;
         }
+
+        final SavedState ss = (SavedState) state;
+        super.onRestoreInstanceState(ss.getSuperState());
+
+        setAdvancedMode(ss.isInAdvancedMode);
     }
 
-    private static class SavedState extends AbsSavedState {
+    private static class SavedState extends BaseSavedState {
         boolean isInAdvancedMode;
-        String commentText;
 
-        public SavedState(Parcel source, ClassLoader loader) {
-            super(source, loader);
+        public SavedState(Parcel source) {
+            super(source);
             isInAdvancedMode = source.readByte() == 1;
-            commentText = source.readString();
         }
 
         public SavedState(Parcelable superState) {
@@ -520,20 +512,19 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
             out.writeByte((byte) (isInAdvancedMode ? 1 : 0));
-            out.writeString(commentText);
         }
 
         public static final Parcelable.Creator<SavedState> CREATOR =
-                ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<SavedState>() {
+                new Parcelable.Creator<SavedState>() {
             @Override
-            public SavedState createFromParcel(Parcel in, ClassLoader loader) {
-                return new SavedState(in, loader);
+            public SavedState createFromParcel(Parcel source) {
+                return new SavedState(source);
             }
 
             @Override
             public SavedState[] newArray(int size) {
                 return new SavedState[size];
             }
-        });
+        };
     }
 }
