@@ -10,7 +10,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -92,12 +91,7 @@ public class HomeActivity extends BasePagerActivity implements
         }
         @Override
         protected void onResultReady(Boolean result) {
-            MenuItem item = mLeftDrawerMenu.findItem(R.id.notifications);
-            if (result) {
-                MenuItemCompat.setActionView(item, R.layout.notifications_indicator);
-            } else {
-                MenuItemCompat.setActionView(item, null);
-            }
+            setNotificationsIndicatorVisible(result);
         }
     };
 

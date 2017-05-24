@@ -58,6 +58,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             mAdapter.notifyDataSetChanged();
             updateEmptyState();
             updateMenuItemVisibility();
+            getBaseActivity().setNotificationsIndicatorVisible(!result.notifications.isEmpty());
         }
     };
 
@@ -201,7 +202,14 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             return;
         }
 
-        mMarkAllAsReadMenuItem.setVisible(isContentShown() && mAdapter.getCount() > 0);
+        mMarkAllAsReadMenuItem.setVisible(isContentShown() && mAdapter.hasUnreadNotifications());
+    }
+
+    private void markAsRead(Repository repository, Notification notification) {
+        if (mAdapter.markAsRead(repository, notification)) {
+            getBaseActivity().setNotificationsIndicatorVisible(false);
+        }
+        updateMenuItemVisibility();
     }
 
     private class MarkReadTask extends BackgroundTask<Void> {
@@ -234,7 +242,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
 
         @Override
         protected void onSuccess(Void result) {
-            mAdapter.markAsRead(mRepository, mNotification);
+            markAsRead(mRepository, mNotification);
         }
     }
 
@@ -257,7 +265,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
 
         @Override
         protected void onSuccess(Void result) {
-            mAdapter.markAsRead(null, mNotification);
+            markAsRead(null, mNotification);
         }
     }
 }
