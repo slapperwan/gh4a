@@ -26,75 +26,81 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         tools:text="Short repository description" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:orientation="horizontal">
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_private"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
-            android:drawableLeft="?attr/privateSmallIcon"
-            android:drawablePadding="4dp"
-            android:text="@string/repo_type_private"
-            android:textAppearance="@style/TextAppearance.VerySmall.Bold"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal">
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_fork"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
-            android:drawableLeft="?attr/forkSmallBoldIcon"
-            android:drawablePadding="4dp"
-            android:text="@string/fork"
-            android:textAppearance="@style/TextAppearance.VerySmall.Bold"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_private"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:drawableLeft="?attr/privateSmallIcon"
+                android:drawablePadding="4dp"
+                android:text="@string/repo_type_private"
+                android:textAppearance="@style/TextAppearance.VerySmall.Bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_language"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableLeft="?attr/languageSmallIcon"
-            android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall"
-            tools:text="Language" />
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_fork"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:drawableLeft="?attr/forkSmallBoldIcon"
+                android:drawablePadding="4dp"
+                android:text="@string/fork"
+                android:textAppearance="@style/TextAppearance.VerySmall.Bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_forks"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:drawableLeft="?attr/forkSmallIcon"
-            android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall"
-            tools:text="0" />
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_language"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="?attr/languageSmallIcon"
+                android:drawablePadding="4dp"
+                android:textAppearance="@style/TextAppearance.VerySmall"
+                tools:text="Language" />
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_stars"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:drawableLeft="?attr/starSmallIcon"
-            android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall"
-            tools:text="0" />
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_forks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:drawableLeft="?attr/forkSmallIcon"
+                android:drawablePadding="4dp"
+                android:textAppearance="@style/TextAppearance.VerySmall"
+                tools:text="0" />
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_size"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:drawableLeft="?attr/sizeSmallIcon"
-            android:drawablePadding="4dp"
-            android:textAppearance="@style/TextAppearance.VerySmall"
-            tools:text="0" />
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_stars"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:drawableLeft="?attr/starSmallIcon"
+                android:drawablePadding="4dp"
+                android:textAppearance="@style/TextAppearance.VerySmall"
+                tools:text="0" />
 
-    </LinearLayout>
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:drawableLeft="?attr/sizeSmallIcon"
+                android:drawablePadding="4dp"
+                android:textAppearance="@style/TextAppearance.VerySmall"
+                tools:text="0" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
 
 </LinearLayout>
