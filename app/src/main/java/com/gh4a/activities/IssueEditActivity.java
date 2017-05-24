@@ -102,6 +102,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
     private EditText mDescView;
+    private FloatingActionButton mFab;
 
     private View mRootView;
     private MarkdownButtonsBar mMarkdownButtons;
@@ -225,10 +226,10 @@ public class IssueEditActivity extends BasePagerActivity implements
         findViewById(R.id.label_container).setOnClickListener(this);
 
         CoordinatorLayout rootLayout = getRootLayout();
-        FloatingActionButton fab = (FloatingActionButton)
+        mFab = (FloatingActionButton)
                 getLayoutInflater().inflate(R.layout.accept_fab, rootLayout, false);
-        fab.setOnClickListener(this);
-        rootLayout.addView(fab);
+        mFab.setOnClickListener(this);
+        rootLayout.addView(mFab);
 
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
 
@@ -247,7 +248,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         mTitleView.setText(mEditIssue.getTitle());
         mDescView.setText(mEditIssue.getBody());
 
-        mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, fab));
+        mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, mFab));
         mTitleView.addTextChangedListener(new UiUtils.EmptinessWatchingTextWatcher(mTitleView) {
             @Override
             public void onIsEmpty(boolean isEmpty) {
@@ -256,6 +257,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 } else {
                     mTitleWrapper.setErrorEnabled(false);
                 }
+                mFab.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
             }
         });
 
