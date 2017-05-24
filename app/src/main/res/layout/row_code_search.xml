@@ -25,11 +25,10 @@
         android:textColor="?android:attr/textColorPrimary"
         tools:text="username/repository" />
 
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_matches"
+    <LinearLayout
+        android:id="@+id/matches_container"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.VerySmall"
-        tools:text="code matches" />
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

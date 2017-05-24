@@ -37,10 +37,12 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.FieldError;
 import org.eclipse.egit.github.core.RepositoryContents;
 import org.eclipse.egit.github.core.RequestError;
+import org.eclipse.egit.github.core.TextMatch;
 import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
@@ -50,18 +52,30 @@ import java.util.Locale;
 public class FileViewerActivity extends WebViewerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             String ref, String fullPath) {
-        return makeIntentWithHighlight(context, repoOwner, repoName, ref, fullPath, -1, -1);
+        return makeIntent(context, repoOwner, repoName, ref, fullPath, -1, -1, null);
     }
 
     public static Intent makeIntentWithHighlight(Context context, String repoOwner, String repoName,
             String ref, String fullPath, int highlightStart, int highlightEnd) {
+        return makeIntent(context, repoOwner, repoName, ref, fullPath, highlightStart, highlightEnd,
+                null);
+    }
+
+    public static Intent makeIntentWithSearchMatch(Context context, String repoOwner,
+            String repoName, String ref, String fullPath, TextMatch textMatch) {
+        return makeIntent(context, repoOwner, repoName, ref, fullPath, -1, -1, textMatch);
+    }
+
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, String ref,
+            String fullPath, int highlightStart, int highlightEnd, TextMatch textMatch) {
         return new Intent(context, FileViewerActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("path", fullPath)
                 .putExtra("ref", ref)
                 .putExtra("highlight_start", highlightStart)
-                .putExtra("highlight_end", highlightEnd);
+                .putExtra("highlight_end", highlightEnd)
+                .putExtra("text_match", textMatch);
     }
 
     private String mRepoName;
@@ -70,6 +84,7 @@ public class FileViewerActivity extends WebViewerActivity {
     private String mRef;
     private int mHighlightStart;
     private int mHighlightEnd;
+    private TextMatch mTextMatch;
     private RepositoryContents mContent;
 
     private static final int MENU_ITEM_HISTORY = 10;
@@ -138,6 +153,7 @@ public class FileViewerActivity extends WebViewerActivity {
         mRef = extras.getString("ref");
         mHighlightStart = extras.getInt("highlight_start", -1);
         mHighlightEnd = extras.getInt("highlight_end", -1);
+        mTextMatch = (TextMatch) extras.getSerializable("text_match");
     }
 
     @Override
@@ -165,8 +181,21 @@ public class FileViewerActivity extends WebViewerActivity {
                     mRepoOwner, mRepoName, mRef, cssTheme, addTitleHeader);
         } else {
             String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
+            findMatchingLines(data);
             return generateCodeHtml(data, mPath,
                     mHighlightStart, mHighlightEnd, cssTheme, addTitleHeader);
+        }
+    }
+
+    private void findMatchingLines(String data) {
+        if (mTextMatch == null) {
+            return;
+        }
+
+        int[] matchingLines = StringUtils.findMatchingLines(data, mTextMatch.getFragment());
+        if (matchingLines != null) {
+            mHighlightStart = matchingLines[0];
+            mHighlightEnd = matchingLines[1];
         }
     }
 

@@ -36,7 +36,7 @@ public class TextMatch implements Serializable {
 		/**
 		 * @return End position of text in fragment
 		 */
-		public int getEdndPos() {
+		public int getEndPos() {
 			return indices != null && indices.size() >= 2 ? indices.get(1) : -1;
 		}
 	}
