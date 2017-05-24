@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
-import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +19,15 @@ import org.eclipse.egit.github.core.TextMatch;
 import java.util.List;
 
 public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchAdapter.ViewHolder> {
-    public CodeSearchAdapter(Context context) {
+    public interface Callback {
+        void onSearchFragmentClick(CodeSearchResult result, int matchIndex);
+    }
+
+    private final Callback mCallback;
+
+    public CodeSearchAdapter(Context context, Callback callback) {
         super(context);
+        this.mCallback = callback;
     }
 
     @Override
@@ -38,33 +44,51 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
 
         List<TextMatch> matches = result.getTextMatches();
         if (matches != null && !matches.isEmpty()) {
-            SpannableStringBuilder builder = new SpannableStringBuilder();
 
-            for (TextMatch match : matches) {
-                int pos = builder.length();
-                if (pos > 0) {
-                    builder.append("\n\n");
-                    builder.setSpan(new RelativeSizeSpan(0.5f), pos, pos + 2, 0);
-                    pos += 2;
-                }
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            holder.matchesContainer.removeAllViews();
+
+            for (int i = 0; i < matches.size(); i++) {
+                TextMatch match = matches.get(i);
+                SpannableStringBuilder builder = new SpannableStringBuilder();
                 builder.append(match.getFragment());
 
                 List<TextMatch.MatchItem> items = match.getMatches();
                 if (items != null) {
                     for (TextMatch.MatchItem item : items) {
                         int start = item.getStartPos();
-                        int end = item.getEdndPos();
+                        int end = item.getEndPos();
                         if (start >= 0 && end > start) {
-                            builder.setSpan(new StyleSpan(Typeface.BOLD), pos + start, pos + end, 0);
+                            builder.setSpan(new StyleSpan(Typeface.BOLD), start, end, 0);
                         }
                     }
                 }
+
+                View row =
+                        inflater.inflate(R.layout.row_search_match, holder.matchesContainer, false);
+                TextView tvMatch = (TextView) row.findViewById(R.id.tv_match);
+                tvMatch.setOnClickListener(this);
+                tvMatch.setText(builder);
+                tvMatch.setTag(result);
+                tvMatch.setTag(R.id.search_match_index, i);
+
+                holder.matchesContainer.addView(row);
             }
-            holder.tvMatches.setText(builder);
-            holder.tvMatches.setVisibility(View.VISIBLE);
+            holder.matchesContainer.setVisibility(View.VISIBLE);
         } else {
-            holder.tvMatches.setVisibility(View.GONE);
+            holder.matchesContainer.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.tv_match) {
+            CodeSearchResult searchResult = (CodeSearchResult) view.getTag();
+            mCallback.onSearchFragmentClick(searchResult, (int) view.getTag(R.id.search_match_index));
+            return;
+        }
+
+        super.onClick(view);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -72,11 +96,11 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
             super(view);
             tvTitle = (TextView) view.findViewById(R.id.tv_title);
             tvRepo = (TextView) view.findViewById(R.id.tv_repo);
-            tvMatches = (TextView) view.findViewById(R.id.tv_matches);
+            matchesContainer = (ViewGroup) view.findViewById(R.id.matches_container);
         }
 
         private final TextView tvTitle;
         private final TextView tvRepo;
-        private final TextView tvMatches;
+        private final ViewGroup matchesContainer;
     }
 }

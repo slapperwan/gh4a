@@ -17,6 +17,7 @@ package com.gh4a.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
 
@@ -138,5 +139,31 @@ public class StringUtils {
             }
         }
         return ssb;
+    }
+
+    @Nullable
+    public static int[] findMatchingLines(String input, String match) {
+        String[] lines = input.split("\n");
+        String[] matchLines = match.split("\n");
+
+        for (int i = 0; i < lines.length - matchLines.length; i++) {
+            boolean isMatch = true;
+            for (int j = 0; j < matchLines.length; j++) {
+                String cLine = lines[i + j];
+                String fLine = matchLines[j];
+                if ((j == 0 && !cLine.endsWith(fLine)) ||
+                        (j != 0 && j != matchLines.length - 1 && !cLine.equals(fLine)) ||
+                        (j == matchLines.length - 1 && !cLine.startsWith(fLine))) {
+                    isMatch = false;
+                    break;
+                }
+            }
+
+            if (isMatch) {
+                return new int[] { i + 1, i + matchLines.length };
+            }
+        }
+
+        return null;
     }
 }

@@ -51,6 +51,7 @@ import org.eclipse.egit.github.core.CodeSearchResult;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RequestError;
 import org.eclipse.egit.github.core.SearchUser;
+import org.eclipse.egit.github.core.TextMatch;
 import org.eclipse.egit.github.core.client.RequestException;
 
 import java.io.IOException;
@@ -59,7 +60,8 @@ import java.util.List;
 public class SearchFragment extends LoadingListFragmentBase implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
         SearchView.OnSuggestionListener, FilterQueryProvider,
-        AdapterView.OnItemSelectedListener, RootAdapter.OnItemClickListener {
+        AdapterView.OnItemSelectedListener, RootAdapter.OnItemClickListener,
+        CodeSearchAdapter.Callback {
     public static SearchFragment newInstance(int initialType, String initialQuery) {
         SearchFragment f = new SearchFragment();
         Bundle args = new Bundle();
@@ -132,7 +134,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
 
         @Override
         protected void onResultReady(List<CodeSearchResult> result) {
-            CodeSearchAdapter adapter = new CodeSearchAdapter(getActivity());
+            CodeSearchAdapter adapter = new CodeSearchAdapter(getActivity(), SearchFragment.this);
             adapter.addAll(result);
             setAdapter(adapter);
         }
@@ -254,12 +256,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
             Repository repository = (Repository) item;
             startActivity(RepositoryActivity.makeIntent(getActivity(), repository));
         } else if (item instanceof CodeSearchResult) {
-            CodeSearchResult result = (CodeSearchResult) item;
-            Repository repo = result.getRepository();
-            Uri uri = Uri.parse(result.getUrl());
-            String ref = uri.getQueryParameter("ref");
-            startActivity(FileViewerActivity.makeIntent(getActivity(),
-                    repo.getOwner().getLogin(), repo.getName(), ref, result.getPath()));
+            openFileViewer((CodeSearchResult) item, -1);
         } else {
             SearchUser user = (SearchUser) item;
             startActivity(UserActivity.makeIntent(getActivity(), user.getLogin(), user.getName()));
@@ -325,6 +322,11 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     @Override
+    public void onSearchFragmentClick(CodeSearchResult result, int matchIndex) {
+        openFileViewer(result, matchIndex);
+    }
+
+    @Override
     public Cursor runQuery(CharSequence query) {
         if (TextUtils.isEmpty(query)) {
             return null;
@@ -333,6 +335,16 @@ public class SearchFragment extends LoadingListFragmentBase implements
         return getContext().getContentResolver().query(SuggestionsProvider.Columns.CONTENT_URI,
                 SUGGESTION_PROJECTION, SUGGESTION_SELECTION,
                 new String[] { String.valueOf(type), query + "%" }, SUGGESTION_ORDER);
+    }
+
+    private void openFileViewer(CodeSearchResult result, int matchIndex) {
+        Repository repo = result.getRepository();
+        Uri uri = Uri.parse(result.getUrl());
+        String ref = uri.getQueryParameter("ref");
+        TextMatch textMatch = matchIndex >= 0 ? result.getTextMatches().get(matchIndex) : null;
+        startActivity(FileViewerActivity.makeIntentWithSearchMatch(getActivity(),
+                repo.getOwner().getLogin(), repo.getName(), ref, result.getPath(),
+                textMatch));
     }
 
     private void loadResults() {
