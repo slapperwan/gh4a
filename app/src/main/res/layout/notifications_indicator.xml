@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:gravity="center_vertical">
@@ -11,5 +12,7 @@
         android:layout_height="24dp"
         android:padding="16dp"
         android:scaleType="centerInside"
-        android:src="?circleIcon" />
+        android:src="?circleIcon"
+        android:visibility="gone"
+        tools:visibility="visible" />
 </LinearLayout>

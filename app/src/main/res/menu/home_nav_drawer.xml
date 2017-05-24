@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
     <group
         android:id="@+id/my_items"
         android:checkableBehavior="single">
@@ -10,9 +11,9 @@
             android:checked="true" />
         <item
             android:id="@+id/notifications"
-            android:title="@string/notifications"
             android:icon="@drawable/icon_notifications"
-            android:checked="false" />
+            android:title="@string/notifications"
+            app:actionLayout="@layout/notifications_indicator" />
         <item
             android:id="@+id/my_repos"
             android:title="@string/my_repositories"
