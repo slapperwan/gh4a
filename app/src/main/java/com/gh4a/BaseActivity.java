@@ -41,6 +41,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -93,6 +94,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private CoordinatorLayout mCoordinatorLayout;
     private Toolbar mToolbar;
     private NavigationView mRightDrawer;
+    private NavigationView mLeftDrawer;
     private View mLeftDrawerHeader;
     private View mRightDrawerHeader;
     private SupportMenuInflater mMenuInflater;
@@ -444,6 +446,18 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return false;
     }
 
+    public void setNotificationsIndicatorVisible(boolean visible) {
+        MenuItem item = mLeftDrawer.getMenu().findItem(R.id.notifications);
+        if (item == null) {
+            return;
+        }
+        if (visible) {
+            MenuItemCompat.setActionView(item, R.layout.notifications_indicator);
+        } else {
+            MenuItemCompat.setActionView(item, null);
+        }
+    }
+
     public void setRightDrawerLockedClosed(boolean locked) {
         mDrawerLayout.setDrawerLockMode(
                 locked ? DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED,
@@ -590,8 +604,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private void setupNavigationDrawer() {
-        NavigationView leftDrawer = (NavigationView) findViewById(R.id.left_drawer);
-        applyHighlightColor(leftDrawer);
+        mLeftDrawer = (NavigationView) findViewById(R.id.left_drawer);
+        applyHighlightColor(mLeftDrawer);
         mRightDrawer = (NavigationView) findViewById(R.id.right_drawer);
         applyHighlightColor(mRightDrawer);
 
@@ -619,12 +633,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         int drawerMenuResId = getLeftNavigationDrawerMenuResource();
         if (drawerMenuResId != 0) {
-            leftDrawer.inflateMenu(drawerMenuResId);
-            leftDrawer.setNavigationItemSelectedListener(this);
+            mLeftDrawer.inflateMenu(drawerMenuResId);
+            mLeftDrawer.setNavigationItemSelectedListener(this);
 
-            int initialLeftDrawerSelection = getInitialLeftDrawerSelection(leftDrawer.getMenu());
+            int initialLeftDrawerSelection = getInitialLeftDrawerSelection(mLeftDrawer.getMenu());
             if (initialLeftDrawerSelection != 0) {
-                leftDrawer.setCheckedItem(initialLeftDrawerSelection);
+                mLeftDrawer.setCheckedItem(initialLeftDrawerSelection);
             }
 
             ActionBar supportActionBar = getSupportActionBar();
@@ -643,7 +657,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 }
             });
 
-            mLeftDrawerHeader = leftDrawer.inflateHeaderView(R.layout.drawer_header_left);
+            mLeftDrawerHeader = mLeftDrawer.inflateHeaderView(R.layout.drawer_header_left);
             configureLeftDrawerHeader(mLeftDrawerHeader);
         } else {
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, Gravity.LEFT);

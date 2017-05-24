@@ -46,9 +46,23 @@ public class NotificationAdapter extends
         mBottomMargin = context.getResources().getDimensionPixelSize(R.dimen.card_margin);
     }
 
-    public void markAsRead(@Nullable Repository repository, @Nullable Notification notification) {
+    public boolean hasUnreadNotifications() {
+        for (int i = 0; i < getCount(); i++) {
+            NotificationHolder item = getItem(i);
+
+            if (item.notification != null && !item.isRead()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean markAsRead(@Nullable Repository repository,
+            @Nullable Notification notification) {
         NotificationHolder previousRepoItem = null;
         int unreadNotificationsInSameRepoCount = 0;
+        boolean hasReadEverything = true;
 
         boolean isMarkingSingleNotification = repository == null && notification != null;
 
@@ -76,6 +90,10 @@ public class NotificationAdapter extends
                     unreadNotificationsInSameRepoCount += 1;
                 }
             }
+
+            if (item.notification != null && !item.isRead()) {
+                hasReadEverything = false;
+            }
         }
 
         // Additional check for the very last notification
@@ -86,6 +104,7 @@ public class NotificationAdapter extends
         }
 
         notifyDataSetChanged();
+        return hasReadEverything;
     }
 
     @Override
