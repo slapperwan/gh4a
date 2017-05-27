@@ -7,12 +7,13 @@ import android.text.InputType;
 import android.util.AttributeSet;
 
 import com.gh4a.R;
-import com.gh4a.utils.MarkdownUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.User;
 
 import java.util.Set;
+
+import me.thanel.markdownedit.MarkdownEdit;
 
 public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
     private DropDownUserAdapter mMentionAdapter;
@@ -74,7 +75,7 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
             return;
         }
 
-        MarkdownUtils.addQuote(this, text);
+        MarkdownEdit.addQuote(this, text);
 
         requestFocus();
         setSelection(length());

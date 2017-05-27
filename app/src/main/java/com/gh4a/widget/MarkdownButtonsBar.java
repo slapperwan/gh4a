@@ -9,7 +9,8 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import com.gh4a.R;
-import com.gh4a.utils.MarkdownUtils;
+
+import me.thanel.markdownedit.MarkdownEdit;
 
 public class MarkdownButtonsBar extends FrameLayout implements View.OnClickListener,
         View.OnTouchListener {
@@ -91,46 +92,46 @@ public class MarkdownButtonsBar extends FrameLayout implements View.OnClickListe
 
         switch (v.getId()) {
             case R.id.md_h1:
-                MarkdownUtils.addHeader(mEditText, 1);
+                MarkdownEdit.addHeader(mEditText, 1);
                 break;
             case R.id.md_h2:
-                MarkdownUtils.addHeader(mEditText, 2);
+                MarkdownEdit.addHeader(mEditText, 2);
                 break;
             case R.id.md_h3:
-                MarkdownUtils.addHeader(mEditText, 3);
+                MarkdownEdit.addHeader(mEditText, 3);
                 break;
             case R.id.md_bold:
-                MarkdownUtils.addBold(mEditText);
+                MarkdownEdit.addBold(mEditText);
                 break;
             case R.id.md_italic:
-                MarkdownUtils.addItalic(mEditText);
+                MarkdownEdit.addItalic(mEditText);
                 break;
             case R.id.md_strikethrough:
-                MarkdownUtils.addStrikeThrough(mEditText);
+                MarkdownEdit.addStrikeThrough(mEditText);
                 break;
             case R.id.md_bullet_list:
-                MarkdownUtils.addList(mEditText, MarkdownUtils.LIST_TYPE_BULLETS);
+                MarkdownEdit.addList(mEditText, MarkdownEdit.LIST_TYPE_BULLETS);
                 break;
             case R.id.md_number_list:
-                MarkdownUtils.addList(mEditText, MarkdownUtils.LIST_TYPE_NUMBERS);
+                MarkdownEdit.addList(mEditText, MarkdownEdit.LIST_TYPE_NUMBERS);
                 break;
             case R.id.md_task_list:
-                MarkdownUtils.addList(mEditText, MarkdownUtils.LIST_TYPE_TASKS);
+                MarkdownEdit.addList(mEditText, MarkdownEdit.LIST_TYPE_TASKS);
                 break;
             case R.id.md_divider:
-                MarkdownUtils.addDivider(mEditText);
+                MarkdownEdit.addDivider(mEditText);
                 break;
             case R.id.md_code:
-                MarkdownUtils.addCode(mEditText);
+                MarkdownEdit.addCode(mEditText);
                 break;
             case R.id.md_quote:
-                MarkdownUtils.addQuote(mEditText);
+                MarkdownEdit.addQuote(mEditText);
                 break;
             case R.id.md_link:
-                MarkdownUtils.addLink(mEditText);
+                MarkdownEdit.addLink(mEditText);
                 break;
             case R.id.md_image:
-                MarkdownUtils.addImage(mEditText);
+                MarkdownEdit.addImage(mEditText);
                 break;
         }
     }
