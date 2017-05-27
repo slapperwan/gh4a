@@ -30,6 +30,7 @@ import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
@@ -151,7 +152,8 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
                                     mRepoOwner, mRepoName, mIssueId,
                                     commitComment.getCommitId(), commitComment.getPath(),
                                     file.getPatch(), null, commitComment.getPosition(),
-                                    -1, -1, false);
+                                    -1, -1, false,
+                                    new IntentUtils.InitialCommentMarker(commitComment.getId()));
                         }
                     }, pos, pos + fileName.length(), 0);
                 }

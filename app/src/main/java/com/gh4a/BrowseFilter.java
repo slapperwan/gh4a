@@ -180,7 +180,7 @@ public class BrowseFilter extends AppCompatActivity {
                         try {
                             intent = IssueActivity.makeIntent(this, user, repo,
                                     Integer.parseInt(id),
-                                    generateInitialCommentMarker(uri.getFragment(), "issue"));
+                                    generateInitialCommentMarker(uri.getFragment(), "issuecomment-"));
                         } catch (NumberFormatException e) {
                             // ignored
                         }
@@ -210,10 +210,18 @@ public class BrowseFilter extends AppCompatActivity {
                     } else {
                         String target = parts.size() >= 5 ? parts.get(4) : null;
                         int page = "commits".equals(action) ? PullRequestActivity.PAGE_COMMITS
-                                : "files".equals(target) ? PullRequestActivity.PAGE_FILES
-                                : -1;
+                                : "files".equals(target) ? PullRequestActivity.PAGE_FILES : -1;
+                        IntentUtils.InitialCommentMarker initialDiffComment =
+                                generateInitialCommentMarker(uri.getFragment(), "r");
+                        if (initialDiffComment != null) {
+                            new PullRequestDiffCommentLoadTask(user, repo, pullRequestNumber,
+                                    initialDiffComment, page).execute();
+                            return; // avoid finish() for now
+                        }
+                        IntentUtils.InitialCommentMarker initialComment =
+                                generateInitialCommentMarker(uri.getFragment(), "issuecomment-");
                         intent = PullRequestActivity.makeIntent(this, user, repo, pullRequestNumber,
-                                page, generateInitialCommentMarker(uri.getFragment(), "issue"));
+                                page, initialComment);
                     }
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
@@ -223,13 +231,13 @@ public class BrowseFilter extends AppCompatActivity {
                     return; // avoid finish() for now
                 } else {
                     IntentUtils.InitialCommentMarker initialComment =
-                            generateInitialCommentMarker(uri.getFragment(), "commit");
+                            generateInitialCommentMarker(uri.getFragment(), "commitcomment-");
                     if (initialComment != null) {
                         new CommitCommentLoadTask(user, repo, id, initialComment).execute();
                         return; // avoid finish() for now
                     }
                     intent = CommitActivity.makeIntent(this, user, repo, id,
-                            generateInitialCommentMarker(uri.getFragment(), "commit"));
+                            generateInitialCommentMarker(uri.getFragment(), "commitcomment-"));
                 }
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 4) {
                 String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
@@ -245,8 +253,8 @@ public class BrowseFilter extends AppCompatActivity {
         finish();
     }
 
-    private IntentUtils.InitialCommentMarker generateInitialCommentMarker(String fragment, String type) {
-        String prefix = type + "comment-";
+    private IntentUtils.InitialCommentMarker generateInitialCommentMarker(String fragment,
+            String prefix) {
         if (fragment != null && fragment.startsWith(prefix)) {
             try {
                 long commentId = Long.parseLong(fragment.substring(prefix.length()));
@@ -448,6 +456,78 @@ public class BrowseFilter extends AppCompatActivity {
         }
     }
 
+    private class PullRequestDiffCommentLoadTask extends UrlLoadTask {
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final int mPullRequestNumber;
+        private final IntentUtils.InitialCommentMarker mMarker;
+        private final int mPage;
+
+        public PullRequestDiffCommentLoadTask(String repoOwner, String repoName,
+                int pullRequestNumber, IntentUtils.InitialCommentMarker marker, int page) {
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mPullRequestNumber = pullRequestNumber;
+            mMarker = marker;
+            mPage = page;
+        }
+
+        @Override
+        protected Intent run() throws Exception {
+            PullRequest pullRequest =
+                    PullRequestLoader.loadPullRequest(mRepoOwner, mRepoName, mPullRequestNumber);
+            if (pullRequest == null || isFinishing()) {
+                return null;
+            }
+
+            List<CommitComment> comments =
+                    PullRequestCommentsLoader.loadComments(mRepoOwner, mRepoName,
+                            mPullRequestNumber);
+            if (comments == null || isFinishing()) {
+                return null;
+            }
+
+            List<CommitFile> files =
+                    PullRequestFilesLoader.loadFiles(mRepoOwner, mRepoName, mPullRequestNumber);
+            if (files == null || isFinishing()) {
+                return null;
+            }
+
+            boolean foundComment = false;
+            CommitFile resultFile = null;
+            for (CommitComment comment : comments) {
+                if (mMarker.matches(comment.getId(), comment.getCreatedAt())) {
+                    foundComment = true;
+                    for (CommitFile commitFile : files) {
+                        if (commitFile.getFilename().equals(comment.getPath())) {
+                            resultFile = commitFile;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (!foundComment || isFinishing()) {
+                return null;
+            }
+
+            Intent intent = null;
+            if (resultFile != null) {
+                if (!FileUtils.isImage(resultFile.getFilename())) {
+                    intent = PullRequestDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner,
+                            mRepoName, mPullRequestNumber, pullRequest.getHead().getSha(),
+                            resultFile.getFilename(), resultFile.getPatch(), comments, -1, -1, -1,
+                            false, mMarker);
+                }
+            } else {
+                PullRequestActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                        mPullRequestNumber, mPage, mMarker);
+            }
+            return intent;
+        }
+    }
+
     private class CommitCommentLoadTask extends UrlLoadTask {
         private final String mRepoOwner;
         private final String mRepoName;
@@ -563,7 +643,7 @@ public class BrowseFilter extends AppCompatActivity {
                 List<CommitComment> comments, DiffHighlightId diffId) {
             return PullRequestDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner,
                     mRepoName, mPullRequestNumber, sha, file.getFilename(), file.getPatch(),
-                    comments, -1, diffId.startLine, diffId.endLine, diffId.right);
+                    comments, -1, diffId.startLine, diffId.endLine, diffId.right, null);
         }
 
         @Override
