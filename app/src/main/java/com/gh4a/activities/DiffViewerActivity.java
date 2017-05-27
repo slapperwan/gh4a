@@ -237,10 +237,10 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             }
 
             int pos = mHighlightIsRight ? rightDiffPosition : leftDiffPosition;
-            if (pos != -1 && pos == mHighlightStartLine) {
+            if (pos != -1 && pos == mHighlightStartLine && highlightStartLine == -1) {
                 highlightStartLine = i;
             }
-            if (pos != -1 && pos == mHighlightEndLine) {
+            if (pos != -1 && pos == mHighlightEndLine && highlightEndLine == -1) {
                 highlightEndLine = i;
             }
 
