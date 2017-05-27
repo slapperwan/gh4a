@@ -35,7 +35,8 @@
             android:layout_marginLeft="2dp"
             android:layout_width="2dp"
             android:layout_height="2dp"
-            android:background="@drawable/top_left_shadow" />
+            android:background="@drawable/top_left_shadow"
+            tools:ignore="InconsistentLayout" />
 
         <View
             android:layout_width="4dp"
