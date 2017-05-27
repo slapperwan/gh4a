@@ -24,6 +24,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -34,14 +35,14 @@ import java.util.List;
 
 public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number,
-                String commitSha, String path, String diff,
-                List<CommitComment> comments, int initialLine,
-                int highlightStartLine, int highlightEndLine, boolean highlightIsRight) {
+            String commitSha, String path, String diff, List<CommitComment> comments,
+            int initialLine, int highlightStartLine, int highlightEndLine, boolean highlightIsRight,
+            IntentUtils.InitialCommentMarker initialComment) {
         Intent intent = new Intent(context, PullRequestDiffViewerActivity.class)
                 .putExtra("number", number);
         return DiffViewerActivity.fillInIntent(intent, repoOwner, repoName, commitSha, path,
                 diff, comments, initialLine, highlightStartLine, highlightEndLine,
-                highlightIsRight, null);
+                highlightIsRight, initialComment);
     }
 
     private int mPullRequestNumber;

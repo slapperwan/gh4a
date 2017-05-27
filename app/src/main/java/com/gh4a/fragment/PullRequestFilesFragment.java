@@ -130,7 +130,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         } else {
             intent = PullRequestDiffViewerActivity.makeIntent(getActivity(),
                     mRepoOwner, mRepoName, mPullRequestNumber, mHeadSha, file.getFilename(),
-                    file.getPatch(), mComments, -1, -1, -1, false);
+                    file.getPatch(), mComments, -1, -1, -1, false, null);
         }
 
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);
