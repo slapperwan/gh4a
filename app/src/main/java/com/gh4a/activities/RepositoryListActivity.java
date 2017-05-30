@@ -29,13 +29,20 @@ import com.gh4a.fragment.RepositoryListContainerFragment;
 public class RepositoryListActivity extends FragmentContainerActivity implements
         RepositoryListContainerFragment.Callback {
     public static Intent makeIntent(Context context, String user, boolean userIsOrg) {
+        return makeIntent(context, user, userIsOrg, null);
+    }
+
+    public static Intent makeIntent(Context context, String user, boolean userIsOrg,
+            String defaultFilter) {
         return new Intent(context, RepositoryListActivity.class)
                 .putExtra("user", user)
-                .putExtra("is_org", userIsOrg);
+                .putExtra("is_org", userIsOrg)
+                .putExtra("filter_type", defaultFilter);
     }
 
     private String mUserLogin;
     private boolean mUserIsOrg;
+    private String mFilterType;
     private RepositoryListContainerFragment mFragment;
     private RepositoryListContainerFragment.FilterDrawerHelper mFilterDrawerHelper;
     private RepositoryListContainerFragment.SortDrawerHelper mSortDrawerHelper;
@@ -60,15 +67,19 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
         Bundle data = getIntent().getExtras();
         mUserLogin = data.getString("user");
         mUserIsOrg = data.getBoolean("is_org");
+        mFilterType = data.getString("filter_type");
 
         mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(
                 mUserLogin, mUserIsOrg);
         mSortDrawerHelper = new RepositoryListContainerFragment.SortDrawerHelper();
+        if (mFilterType != null) {
+            mSortDrawerHelper.setFilterType(mFilterType);
+        }
     }
 
     @Override
     protected Fragment onCreateFragment() {
-        return RepositoryListContainerFragment.newInstance(mUserLogin, mUserIsOrg);
+        return RepositoryListContainerFragment.newInstance(mUserLogin, mUserIsOrg, mFilterType);
     }
 
     @Override
@@ -118,5 +129,10 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
     @Override
     public void supportInvalidateOptionsMenu() {
         // happens when load is done; we ignore it as we don't want to close the IME in that case
+    }
+
+    @Override
+    protected Intent navigateUp() {
+        return UserActivity.makeIntent(this, mUserLogin);
     }
 }

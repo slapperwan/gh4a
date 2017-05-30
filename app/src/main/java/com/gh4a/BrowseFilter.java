@@ -18,24 +18,29 @@ import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.FileViewerActivity;
+import com.gh4a.activities.FollowerFollowingListActivity;
 import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
 import com.gh4a.activities.IssueListActivity;
+import com.gh4a.activities.OrganizationMemberListActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
+import com.gh4a.activities.RepositoryListActivity;
 import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
+import com.gh4a.fragment.RepositoryListContainerFragment;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.loader.PullRequestFilesLoader;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.loader.ReleaseListLoader;
+import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
@@ -50,6 +55,7 @@ import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
+import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.IGitHubConstants;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
@@ -102,6 +108,17 @@ public class BrowseFilter extends AppCompatActivity {
             if (parts.size() == 1) {
                 intent = new Intent(this, BlogListActivity.class);
             }
+        } else if ("orgs".equals(first)) {
+            String org = parts.size() >= 2 ? parts.get(1) : null;
+            String action = parts.size() >= 3 ? parts.get(2) : null;
+
+            if (org != null) {
+                if (action == null) {
+                    intent = UserActivity.makeIntent(this, org);
+                } else if ("people".equals(action)) {
+                    intent = OrganizationMemberListActivity.makeIntent(this, org);
+                }
+            }
         } else if (first != null) {
             String user = first;
             String repo = parts.size() >= 2 ? parts.get(1) : null;
@@ -109,7 +126,28 @@ public class BrowseFilter extends AppCompatActivity {
             String id = parts.size() >= 4 ? parts.get(3) : null;
 
             if (repo == null && action == null) {
-                intent = UserActivity.makeIntent(this, user);
+                String tab = uri.getQueryParameter("tab");
+                if (tab != null) {
+                    switch (tab) {
+                        case "repositories":
+                            new UserReposLoadTask(user, false).execute();
+                            return; // avoid finish() for now
+                        case "stars":
+                            new UserReposLoadTask(user, true).execute();
+                            return; // avoid finish() for now
+                        case "followers":
+                            new UserFollowersLoadTask(user, true).execute();
+                            return; // avoid finish() for now
+                        case "following":
+                            new UserFollowersLoadTask(user, false).execute();
+                            return; // avoid finish() for now
+                        default:
+                            intent = UserActivity.makeIntent(this, user);
+                            break;
+                    }
+                } else {
+                    intent = UserActivity.makeIntent(this, user);
+                }
             } else if (action == null) {
                 intent = RepositoryActivity.makeIntent(this, user, repo);
             } else if ("downloads".equals(action)) {
@@ -321,6 +359,63 @@ public class BrowseFilter extends AppCompatActivity {
         protected void onError(Exception e) {
             IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
             finish();
+        }
+    }
+
+    private abstract class UserLoadTask extends UrlLoadTask {
+        private final String mUserLogin;
+
+        public UserLoadTask(String userLogin) {
+            super();
+            this.mUserLogin = userLogin;
+        }
+
+        @Override
+        protected Intent run() throws Exception {
+            User user = UserLoader.loadUser(mUserLogin);
+            if (user == null) {
+                return null;
+            }
+            return getIntent(user);
+        }
+
+        protected abstract Intent getIntent(User user);
+    }
+
+    private class UserFollowersLoadTask extends UserLoadTask {
+        private boolean mShowFollowers;
+
+        public UserFollowersLoadTask(String userLogin, boolean showFollowers) {
+            super(userLogin);
+            mShowFollowers = showFollowers;
+        }
+
+        @Override
+        protected Intent getIntent(User user) {
+            if (ApiHelpers.UserType.ORG.equals(user.getType())) {
+                return UserActivity.makeIntent(BrowseFilter.this, user);
+            }
+            return FollowerFollowingListActivity.makeIntent(BrowseFilter.this, user.getLogin(),
+                    mShowFollowers);
+        }
+    }
+
+    private class UserReposLoadTask extends UserLoadTask {
+        private boolean mShowStars;
+
+        public UserReposLoadTask(String userLogin, boolean showStars) {
+            super(userLogin);
+            mShowStars = showStars;
+        }
+
+        @Override
+        protected Intent getIntent(User user) {
+            boolean isOrg = ApiHelpers.UserType.ORG.equals(user.getType());
+            String filter = mShowStars && !isOrg
+                    ? RepositoryListContainerFragment.FILTER_TYPE_STARRED
+                    : null;
+            return RepositoryListActivity.makeIntent(BrowseFilter.this, user.getLogin(), isOrg,
+                    filter);
         }
     }
 

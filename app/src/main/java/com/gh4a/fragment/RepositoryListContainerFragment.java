@@ -30,19 +30,27 @@ public class RepositoryListContainerFragment extends Fragment implements
         LoaderCallbacks.ParentCallback, SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItemCompat.OnActionExpandListener, SwipeRefreshLayout.ChildScrollDelegate {
     public static RepositoryListContainerFragment newInstance(String userLogin, boolean isOrg) {
+        return newInstance(userLogin, isOrg, null);
+    }
+
+    public static RepositoryListContainerFragment newInstance(String userLogin, boolean isOrg,
+            String defaultFilter) {
         RepositoryListContainerFragment f = new RepositoryListContainerFragment();
         Bundle args = new Bundle();
 
         args.putString("user", userLogin);
         args.putBoolean("is_org", isOrg);
+        args.putString("filter_type", defaultFilter);
         f.setArguments(args);
 
         return f;
     }
 
+    public static String FILTER_TYPE_STARRED = "starred";
+
     private String mUserLogin;
     private boolean mIsOrg;
-    private String mFilterType = "all";
+    private String mFilterType;
     private String mSortOrder = "full_name";
     private String mSortDirection = "asc";
     private boolean mSearchVisible;
@@ -67,6 +75,7 @@ public class RepositoryListContainerFragment extends Fragment implements
         Bundle data = getArguments();
         mUserLogin = data.getString("user");
         mIsOrg = data.getBoolean("is_org");
+        mFilterType = data.getString("filter_type", "all");
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_FILTER_TYPE)) {
             mFilterType = savedInstanceState.getString(STATE_KEY_FILTER_TYPE);
