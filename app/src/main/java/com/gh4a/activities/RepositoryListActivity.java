@@ -130,4 +130,9 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
     public void supportInvalidateOptionsMenu() {
         // happens when load is done; we ignore it as we don't want to close the IME in that case
     }
+
+    @Override
+    protected Intent navigateUp() {
+        return UserActivity.makeIntent(this, mUserLogin);
+    }
 }
