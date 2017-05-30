@@ -23,6 +23,7 @@ import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
 import com.gh4a.activities.IssueListActivity;
+import com.gh4a.activities.OrganizationMemberListActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.activities.ReleaseInfoActivity;
@@ -106,6 +107,17 @@ public class BrowseFilter extends AppCompatActivity {
         } else if ("blog".equals(first)) {
             if (parts.size() == 1) {
                 intent = new Intent(this, BlogListActivity.class);
+            }
+        } else if ("orgs".equals(first)) {
+            String org = parts.size() >= 2 ? parts.get(1) : null;
+            String action = parts.size() >= 3 ? parts.get(2) : null;
+
+            if (org != null) {
+                if (action == null) {
+                    intent = UserActivity.makeIntent(this, org);
+                } else if ("people".equals(action)) {
+                    intent = OrganizationMemberListActivity.makeIntent(this, org);
+                }
             }
         } else if (first != null) {
             String user = first;
