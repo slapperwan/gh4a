@@ -66,6 +66,7 @@ import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.BottomSheetFixScrollingViewBehavior;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
 
@@ -88,6 +89,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private AppBarLayout mHeader;
     private ToggleableAppBarLayoutBehavior mHeaderBehavior;
+    private BottomSheetFixScrollingViewBehavior mSwipeLayoutBehavior;
     private SmoothProgressBar mProgress;
     private SwipeRefreshLayout mSwipeLayout;
     private DrawerLayout mDrawerLayout;
@@ -613,7 +615,17 @@ public abstract class BaseActivity extends AppCompatActivity implements
                     UiUtils.resolveColor(this, R.attr.colorPrimaryDark), 0
             );
         }
+
+        mSwipeLayoutBehavior = new BottomSheetFixScrollingViewBehavior();
+        CoordinatorLayout.LayoutParams lp =
+                (CoordinatorLayout.LayoutParams) mSwipeLayout.getLayoutParams();
+        lp.setBehavior(mSwipeLayoutBehavior);
+
         updateSwipeToRefreshState();
+    }
+
+    public void setBottomSheetFixEnabled(boolean enabled) {
+        mSwipeLayoutBehavior.setFixEnabled(enabled);
     }
 
     private void setupNavigationDrawer() {
