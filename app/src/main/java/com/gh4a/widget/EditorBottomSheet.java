@@ -209,7 +209,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         }
 
         boolean down = action == MotionEvent.ACTION_DOWN;
-        if (view != mBasicEditor) {
+        if (view != mBasicEditor && view != mBasicEditorScrollView) {
             getBehavior().setEnabled(!down);
         }
         if ((view == mBasicEditor || view == mBasicEditorScrollView) && mListener != null) {
