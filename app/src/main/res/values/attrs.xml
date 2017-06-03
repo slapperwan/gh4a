@@ -79,8 +79,6 @@
     <attr name="releaseIcon" format="reference" />
     <attr name="checkboxCheckedSmallIcon" format="reference" />
     <attr name="checkboxUncheckedSmallIcon" format="reference" />
-    <attr name="circleIcon" format="reference" />
-    <attr name="circleCheckedIcon" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension" />
