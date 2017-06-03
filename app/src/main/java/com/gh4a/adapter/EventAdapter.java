@@ -15,7 +15,29 @@
  */
 package com.gh4a.adapter;
 
-import java.util.List;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Typeface;
+import android.support.v7.widget.RecyclerView;
+import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
+import android.text.style.TextAppearanceSpan;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.StringUtils;
+import com.gh4a.widget.CustomTypefaceSpan;
+import com.gh4a.widget.EllipsizeLineSpan;
+import com.gh4a.widget.StyleableTextView;
+import com.vdurmont.emoji.EmojiParser;
 
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.CommitComment;
@@ -47,28 +69,7 @@ import org.eclipse.egit.github.core.event.PushPayload;
 import org.eclipse.egit.github.core.event.ReleasePayload;
 import org.eclipse.egit.github.core.event.TeamAddPayload;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Typeface;
-import android.support.v7.widget.RecyclerView;
-import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
-import android.text.style.TextAppearanceSpan;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.gh4a.R;
-import com.gh4a.activities.UserActivity;
-import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.StringUtils;
-import com.gh4a.widget.CustomTypefaceSpan;
-import com.gh4a.widget.EllipsizeLineSpan;
-import com.gh4a.widget.StyleableTextView;
+import java.util.List;
 
 public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolder> {
     public EventAdapter(Context context) {
@@ -134,7 +135,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
             CommitComment comment = payload.getComment();
             if (comment != null) {
-                return comment.getBody();
+                return EmojiParser.parseToUnicode(comment.getBody());
             }
 
         } else if (Event.TYPE_CREATE.equals(eventType)) {
@@ -172,7 +173,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
         } else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
             IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
             if (payload != null && payload.getComment() != null) {
-                return payload.getComment().getBody();
+                return EmojiParser.parseToUnicode(payload.getComment().getBody());
             }
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
@@ -197,7 +198,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                     (PullRequestReviewCommentPayload) event.getPayload();
             CommitComment comment = payload.getComment();
             if (comment != null) {
-                return comment.getBody();
+                return EmojiParser.parseToUnicode(comment.getBody());
             }
 
         } else if (Event.TYPE_PUSH.equals(eventType)) {
@@ -227,7 +228,7 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
                             ssb.length() - sha.length(), ssb.length(), 0);
 
                     ssb.append(" ");
-                    ssb.append(getFirstLine(commit.getMessage()));
+                    ssb.append(getFirstLine(EmojiParser.parseToUnicode(commit.getMessage())));
                     ssb.setSpan(new EllipsizeLineSpan(i == (count - 1) ? 0 : bottomMargin),
                             lastLength, ssb.length(), 0);
                 }

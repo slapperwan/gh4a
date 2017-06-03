@@ -25,6 +25,7 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
+import com.vdurmont.emoji.EmojiParser;
 
 import org.eclipse.egit.github.core.Commit;
 import org.eclipse.egit.github.core.CommitComment;
@@ -127,6 +128,9 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             pos++;
         }
         message = pos > 0 && pos < length ? message.substring(pos) : null;
+        if (message != null) {
+            message = EmojiParser.parseToUnicode(message);
+        }
 
         tvTitle.setText(title);
         tvMessage.setText(message);

@@ -50,6 +50,7 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
+import com.vdurmont.emoji.EmojiParser;
 
 import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
@@ -254,7 +255,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         TextView view = (TextView) mContentView.findViewById(id);
 
         if (!StringUtils.isBlank(text)) {
-            view.setText(stringId != 0 ? getString(stringId, text) : text);
+            if (stringId != 0) {
+                view.setText(getString(stringId, text));
+            } else {
+                view.setText(EmojiParser.parseToUnicode(text));
+            }
             view.setVisibility(View.VISIBLE);
         } else {
             view.setVisibility(View.GONE);
