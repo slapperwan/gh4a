@@ -27,7 +27,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,9 +40,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -61,7 +58,6 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.activities.Github4AndroidActivity;
@@ -100,11 +96,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private View mLeftDrawerHeader;
     private View mRightDrawerHeader;
     private SupportMenuInflater mMenuInflater;
-    private ImageView mNotificationsIndicator;
-    private MenuItem mNotificationsMenuItem;
-
-    private Drawable mTintedCircleIcon;
-    private Drawable mCircleIcon;
 
     private ActivityCompat.OnRequestPermissionsResultCallback mPendingPermissionCb;
 
@@ -130,7 +121,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         super.setContentView(R.layout.base_activity);
 
-        setupIndicatorIcon();
         setupSwipeToRefresh();
         setupNavigationDrawer();
         setupHeaderDrawable();
@@ -450,25 +440,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        updateNotificationIndicator(item.getItemId());
         mDrawerLayout.closeDrawers();
         return false;
-    }
-
-    private void updateNotificationIndicator(int checkedItemId) {
-        if (mNotificationsIndicator != null) {
-            mNotificationsIndicator.setImageDrawable(
-                    checkedItemId == R.id.notifications ? mTintedCircleIcon : mCircleIcon);
-        }
-    }
-
-    public void setNotificationsIndicatorVisible(boolean visible) {
-        if (mNotificationsIndicator != null) {
-            mNotificationsIndicator.setVisibility(visible ? View.VISIBLE : View.GONE);
-            mNotificationsMenuItem.setIcon(visible
-                    ? R.drawable.icon_notifications_unread
-                    : R.drawable.icon_notifications);
-        }
     }
 
     public void setRightDrawerLockedClosed(boolean locked) {
@@ -573,16 +546,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mSwipeLayout.setEnabled(mContentShown && !mErrorShown && canSwipeToRefresh());
     }
 
-    private void setupIndicatorIcon() {
-        int circleIconRes = UiUtils.resolveDrawable(this, R.attr.circleIcon);
-
-        mCircleIcon = DrawableCompat.wrap(ContextCompat.getDrawable(this, circleIconRes).mutate());
-        DrawableCompat.setTint(mCircleIcon, UiUtils.resolveColor(this, android.R.attr.textColorPrimary));
-
-        mTintedCircleIcon = DrawableCompat.wrap(ContextCompat.getDrawable(this, circleIconRes).mutate());
-        DrawableCompat.setTint(mTintedCircleIcon, UiUtils.resolveColor(this, R.attr.colorAccent));
-    }
-
     private void setupHeaderDrawable() {
         ensureContent();
 
@@ -659,17 +622,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
             leftDrawer.inflateMenu(drawerMenuResId);
             leftDrawer.setNavigationItemSelectedListener(this);
 
-            mNotificationsMenuItem = leftDrawer.getMenu().findItem(R.id.notifications);
-            if (mNotificationsMenuItem != null) {
-                View actionView = MenuItemCompat.getActionView(mNotificationsMenuItem);
-                mNotificationsIndicator =
-                        (ImageView) actionView.findViewById(R.id.notifications_indicator);
-            }
-
             int initialLeftDrawerSelection = getInitialLeftDrawerSelection(leftDrawer.getMenu());
             if (initialLeftDrawerSelection != 0) {
                 leftDrawer.setCheckedItem(initialLeftDrawerSelection);
-                updateNotificationIndicator(initialLeftDrawerSelection);
             }
 
             ActionBar supportActionBar = getSupportActionBar();

@@ -1,5 +1,6 @@
 package com.gh4a.fragment;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -58,13 +59,29 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             mAdapter.notifyDataSetChanged();
             updateEmptyState();
             updateMenuItemVisibility();
-            getBaseActivity().setNotificationsIndicatorVisible(!result.notifications.isEmpty());
+            mCallback.setNotificationsIndicatorVisible(!result.notifications.isEmpty());
         }
     };
 
     private NotificationAdapter mAdapter;
     private Date mNotificationsLoadTime;
     private MenuItem mMarkAllAsReadMenuItem;
+    private ParentCallback mCallback;
+
+    public interface ParentCallback {
+        void setNotificationsIndicatorVisible(boolean visible);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        if (!(context instanceof ParentCallback)) {
+            throw new IllegalStateException("context must implement ParentCallback");
+        }
+
+        mCallback = (ParentCallback) context;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -207,7 +224,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
 
     private void markAsRead(Repository repository, Notification notification) {
         if (mAdapter.markAsRead(repository, notification)) {
-            getBaseActivity().setNotificationsIndicatorVisible(false);
+            mCallback.setNotificationsIndicatorVisible(false);
         }
         updateMenuItemVisibility();
     }
