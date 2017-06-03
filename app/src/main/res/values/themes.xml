@@ -66,7 +66,6 @@
         <item name="releaseIcon">@drawable/release_dark</item>
         <item name="checkboxCheckedSmallIcon">@drawable/checkbox_checked_small_dark</item>
         <item name="checkboxUncheckedSmallIcon">@drawable/checkbox_unchecked_small_dark</item>
-        <item name="circleIcon">@drawable/circle_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
@@ -177,7 +176,6 @@
         <item name="releaseIcon">@drawable/release</item>
         <item name="checkboxCheckedSmallIcon">@drawable/checkbox_checked_small</item>
         <item name="checkboxUncheckedSmallIcon">@drawable/checkbox_unchecked_small</item>
-        <item name="circleIcon">@drawable/circle</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>

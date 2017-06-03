@@ -60,8 +60,7 @@ public class HomeActivity extends BasePagerActivity implements
     private Menu mLeftDrawerMenu;
     private ImageView mNotificationsIndicator;
     private MenuItem mNotificationsMenuItem;
-    private Drawable mTintedCircleIcon;
-    private Drawable mCircleIcon;
+    private Drawable mNotificationsIndicatorIcon;
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
 
@@ -116,7 +115,8 @@ public class HomeActivity extends BasePagerActivity implements
         }
         mFactory = getFactoryForItem(mSelectedFactoryId);
 
-        setupIndicatorIcon();
+        mNotificationsIndicatorIcon =
+                DrawableCompat.wrap(ContextCompat.getDrawable(this, R.drawable.circle).mutate());
 
         super.onCreate(savedInstanceState);
 
@@ -130,21 +130,16 @@ public class HomeActivity extends BasePagerActivity implements
         getSupportLoaderManager().initLoader(1, null, mHasNotificationsCallback);
     }
 
-    private void setupIndicatorIcon() {
-        int circleIconRes = UiUtils.resolveDrawable(this, R.attr.circleIcon);
-
-        mCircleIcon = DrawableCompat.wrap(ContextCompat.getDrawable(this, circleIconRes).mutate());
-        DrawableCompat.setTint(mCircleIcon, UiUtils.resolveColor(this, android.R.attr.textColorPrimary));
-
-        mTintedCircleIcon = DrawableCompat.wrap(ContextCompat.getDrawable(this, circleIconRes).mutate());
-        DrawableCompat.setTint(mTintedCircleIcon, UiUtils.resolveColor(this, R.attr.colorAccent));
-    }
-
     private void updateNotificationIndicator(int checkedItemId) {
-        if (mNotificationsIndicator != null) {
-            mNotificationsIndicator.setImageDrawable(
-                    checkedItemId == R.id.notifications ? mTintedCircleIcon : mCircleIcon);
+        if (mNotificationsIndicator == null) {
+            return;
         }
+
+        boolean isChecked = checkedItemId == R.id.notifications;
+        int colorResId = isChecked ? R.attr.colorAccent : android.R.attr.textColorPrimary;
+        int tint = UiUtils.resolveColor(this, colorResId);
+        DrawableCompat.setTint(mNotificationsIndicatorIcon, tint);
+        mNotificationsIndicator.setImageDrawable(mNotificationsIndicatorIcon);
     }
 
     public void setNotificationsIndicatorVisible(boolean visible) {
