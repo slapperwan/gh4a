@@ -101,6 +101,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private View mRightDrawerHeader;
     private SupportMenuInflater mMenuInflater;
     private ImageView mNotificationsIndicator;
+    private MenuItem mNotificationsMenuItem;
 
     private Drawable mTintedCircleIcon;
     private Drawable mCircleIcon;
@@ -464,6 +465,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public void setNotificationsIndicatorVisible(boolean visible) {
         if (mNotificationsIndicator != null) {
             mNotificationsIndicator.setVisibility(visible ? View.VISIBLE : View.GONE);
+            mNotificationsMenuItem.setIcon(visible
+                    ? R.drawable.icon_notifications_unread
+                    : R.drawable.icon_notifications);
         }
     }
 
@@ -655,9 +659,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
             leftDrawer.inflateMenu(drawerMenuResId);
             leftDrawer.setNavigationItemSelectedListener(this);
 
-            MenuItem notificationsItem = leftDrawer.getMenu().findItem(R.id.notifications);
-            if (notificationsItem != null) {
-                View actionView = MenuItemCompat.getActionView(notificationsItem);
+            mNotificationsMenuItem = leftDrawer.getMenu().findItem(R.id.notifications);
+            if (mNotificationsMenuItem != null) {
+                View actionView = MenuItemCompat.getActionView(mNotificationsMenuItem);
                 mNotificationsIndicator =
                         (ImageView) actionView.findViewById(R.id.notifications_indicator);
             }
