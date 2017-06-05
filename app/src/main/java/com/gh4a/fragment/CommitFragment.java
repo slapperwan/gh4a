@@ -132,6 +132,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         tvMessage.setText(message);
         tvTitle.setVisibility(StringUtils.isBlank(title) ? View.GONE : View.VISIBLE);
         tvMessage.setVisibility(StringUtils.isBlank(message) ? View.GONE : View.VISIBLE);
+        tvMessage.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
         Commit commit = mCommit.getCommit();
 
