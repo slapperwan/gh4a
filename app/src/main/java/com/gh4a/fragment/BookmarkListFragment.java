@@ -17,7 +17,7 @@ import com.gh4a.adapter.BookmarkAdapter;
 import com.gh4a.db.BookmarksProvider;
 
 public class BookmarkListFragment extends LoadingListFragmentBase implements
-        LoaderManager.LoaderCallbacks<Cursor>, BookmarkAdapter.OnItemClickListener {
+        LoaderManager.LoaderCallbacks<Cursor>, BookmarkAdapter.OnItemInteractListener {
     public static BookmarkListFragment newInstance() {
         return new BookmarkListFragment();
     }
@@ -76,5 +76,10 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
     @Override
     public void onItemClick(long id, String url) {
         startActivity(BrowseFilter.makeRedirectionIntent(getActivity(), Uri.parse(url), null));
+    }
+
+    @Override
+    public void onItemDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
     }
 }

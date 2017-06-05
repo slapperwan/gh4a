@@ -28,4 +28,9 @@ public class BookmarkDragHelperCallback extends ItemTouchHelper.SimpleCallback {
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
         mAdapter.onItemSwiped(viewHolder);
     }
+
+    @Override
+    public boolean isLongPressDragEnabled() {
+        return false;
+    }
 }

@@ -5,8 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -20,11 +22,12 @@ import com.gh4a.utils.UiUtils;
 
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder> implements
         View.OnClickListener {
-    public interface OnItemClickListener {
+    public interface OnItemInteractListener {
         void onItemClick(long id, String url);
+        void onItemDrag(RecyclerView.ViewHolder viewHolder);
     }
 
-    private final OnItemClickListener mItemClickListener;
+    private final OnItemInteractListener mItemInteractListener;
     private final int mRepoIconResId;
     private final int mUserIconResId;
     private final LayoutInflater mInflater;
@@ -36,13 +39,13 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     private int mExtraColumnIndex;
     private int mUrlColumnIndex;
 
-    public BookmarkAdapter(Context context, OnItemClickListener listener) {
+    public BookmarkAdapter(Context context, OnItemInteractListener listener) {
         super();
         setHasStableIds(true);
         mInflater = LayoutInflater.from(context);
         mRepoIconResId = UiUtils.resolveDrawable(context, R.attr.repoBookmarkIcon);
         mUserIconResId = UiUtils.resolveDrawable(context, R.attr.userBookmarkIcon);
-        mItemClickListener = listener;
+        mItemInteractListener = listener;
     }
 
     public void swapCursor(Cursor cursor) {
@@ -67,7 +70,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.row_bookmark, parent, false);
         ViewHolder vh = new ViewHolder(view);
-        if (mItemClickListener != null) {
+        if (mItemInteractListener != null) {
             view.setOnClickListener(this);
             view.setTag(vh);
         }
@@ -115,7 +118,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         ViewHolder vh = (ViewHolder) view.getTag();
         int position = vh.getAdapterPosition();
         if (position != RecyclerView.NO_POSITION && mCursor.moveToPosition(position)) {
-            mItemClickListener.onItemClick(mCursor.getLong(mIdColumnIndex),
+            mItemInteractListener.onItemClick(mCursor.getLong(mIdColumnIndex),
                     mCursor.getString(mUrlColumnIndex));
         }
     }
@@ -157,7 +160,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
                 }).show();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
         private ImageView mIcon;
         private TextView mTitle;
         private TextView mExtra;
@@ -167,6 +170,15 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
             mIcon = (ImageView) view.findViewById(R.id.iv_icon);
             mTitle = (TextView) view.findViewById(R.id.tv_title);
             mExtra = (TextView) view.findViewById(R.id.tv_extra);
+            view.findViewById(R.id.iv_drag_handle).setOnTouchListener(this);
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                mItemInteractListener.onItemDrag(this);
+            }
+            return false;
         }
     }
 }
