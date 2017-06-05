@@ -18,6 +18,9 @@ import com.gh4a.db.BookmarksProvider;
 
 public class BookmarkListFragment extends LoadingListFragmentBase implements
         LoaderManager.LoaderCallbacks<Cursor>, BookmarkAdapter.OnItemInteractListener {
+
+    private ItemTouchHelper mItemTouchHelper;
+
     public static BookmarkListFragment newInstance() {
         return new BookmarkListFragment();
     }
@@ -37,9 +40,17 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
         mAdapter = new BookmarkAdapter(getActivity(), this);
         view.setAdapter(mAdapter);
 
-        BookmarkDragHelperCallback callback = new BookmarkDragHelperCallback(mAdapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(view);
+        BookmarkDragHelperCallback callback = new BookmarkDragHelperCallback(mAdapter) {
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+                super.onSelectedChanged(viewHolder, actionState);
+
+                boolean isDragging = actionState == ItemTouchHelper.ACTION_STATE_DRAG;
+                getBaseActivity().setCanSwipeToRefresh(!isDragging);
+            }
+        };
+        mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(view);
 
         updateEmptyState();
     }
