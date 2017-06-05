@@ -95,6 +95,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:autoLink="web|email"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textIsSelectable="true"
                     tools:text="Commit message" />
