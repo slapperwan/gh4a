@@ -2,7 +2,7 @@ OctoDroid
 =========
 This application provides access to [GitHub](https://github.com/) and lets you stay connected with your network
 
-![Octodroid](https://raw.githubusercontent.com/slapperwan/gh4a/master/res/drawable-xxhdpi/octodroid.png)
+![Octodroid](https://raw.githubusercontent.com/slapperwan/gh4a/master/app/src/main/res/drawable-xxhdpi/octodroid.png)
 
 Download
 --------
@@ -97,3 +97,4 @@ Contributions
 * [extremis (Steven Mautone)](https://github.com/extremis) - OctoDroid name and the new icon
 * [zquestz](https://github.com/zquestz) - Thanks for the application icon
 * [cketti](https://github.com/cketti)
+* [Tunous](https://github.com/Tunous) - Improvements, bug fixes and new features
