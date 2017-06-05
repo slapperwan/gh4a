@@ -1,7 +1,5 @@
 package com.gh4a.fragment;
 
-import android.content.ContentUris;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,8 +7,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 
 import com.gh4a.BrowseFilter;
@@ -34,17 +32,22 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
     }
 
     @Override
-    protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
+    protected void onRecyclerViewInflated(final RecyclerView view, LayoutInflater inflater) {
         super.onRecyclerViewInflated(view, inflater);
         mAdapter = new BookmarkAdapter(getActivity(), this);
         view.setAdapter(mAdapter);
+
+        BookmarkDragHelperCallback callback = new BookmarkDragHelperCallback(mAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(view);
+
         updateEmptyState();
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(getActivity(), BookmarksProvider.Columns.CONTENT_URI,
-                null, null, null, null);
+                null, null, null, BookmarksProvider.Columns.ORDER_ID + " ASC");
     }
 
     @Override
@@ -73,21 +76,5 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
     @Override
     public void onItemClick(long id, String url) {
         startActivity(BrowseFilter.makeRedirectionIntent(getActivity(), Uri.parse(url), null));
-    }
-
-    @Override
-    public void onItemLongClick(final long id) {
-        new AlertDialog.Builder(getActivity())
-                .setMessage(R.string.remove_bookmark_confirm)
-                .setIconAttribute(android.R.attr.alertDialogIcon)
-                .setCancelable(false)
-                .setPositiveButton(getString(R.string.remove), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        Uri uri = ContentUris.withAppendedId(BookmarksProvider.Columns.CONTENT_URI, id);
-                        getActivity().getContentResolver().delete(uri, null, null);
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), null)
-                .show();
     }
 }

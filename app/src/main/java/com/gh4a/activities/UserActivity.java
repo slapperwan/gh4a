@@ -189,7 +189,7 @@ public class UserActivity extends BasePagerActivity {
                     BookmarksProvider.removeBookmark(this, url);
                 } else {
                     BookmarksProvider.saveBookmark(this, mUserLogin,
-                            BookmarksProvider.Columns.TYPE_USER, url, mUserName);
+                            BookmarksProvider.Columns.TYPE_USER, url, mUserName, true);
                 }
                 return true;
         }

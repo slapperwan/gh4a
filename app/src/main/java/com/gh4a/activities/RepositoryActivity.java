@@ -418,7 +418,7 @@ public class RepositoryActivity extends BasePagerActivity {
                     BookmarksProvider.removeBookmark(this, bookmarkUrl);
                 } else {
                     BookmarksProvider.saveBookmark(this, mActionBar.getTitle().toString(),
-                            BookmarksProvider.Columns.TYPE_REPO, bookmarkUrl, getCurrentRef());
+                            BookmarksProvider.Columns.TYPE_REPO, bookmarkUrl, getCurrentRef(), true);
                 }
                 return true;
             case R.id.zip_download:
