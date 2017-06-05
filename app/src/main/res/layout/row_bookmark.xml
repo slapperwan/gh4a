@@ -53,7 +53,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="16dp"
             android:padding="8dp"
-            android:src="@drawable/drag" />
+            android:src="?dragHandleIcon" />
     </LinearLayout>
 
 </FrameLayout>

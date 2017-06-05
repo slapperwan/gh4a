@@ -72,6 +72,7 @@
         <item name="reactionLaughIcon">@drawable/reaction_laugh_dark</item>
         <item name="reactionMinusOneIcon">@drawable/reaction_minus_one_dark</item>
         <item name="reactionPlusOneIcon">@drawable/reaction_plus_one_dark</item>
+        <item name="dragHandleIcon">@drawable/drag_handle_dark</item>
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
@@ -188,6 +189,7 @@
         <item name="reactionLaughIcon">@drawable/reaction_laugh</item>
         <item name="reactionMinusOneIcon">@drawable/reaction_minus_one</item>
         <item name="reactionPlusOneIcon">@drawable/reaction_plus_one</item>
+        <item name="dragHandleIcon">@drawable/drag_handle</item>
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
