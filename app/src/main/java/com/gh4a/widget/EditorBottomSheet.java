@@ -79,7 +79,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             new BottomSheetBehavior.BottomSheetCallback() {
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
-            if (mAdvancedEditorContainer != null
+            if (isInAdvancedMode()
                     && mIsCollapsible
                     && newState == BottomSheetBehavior.STATE_COLLAPSED) {
                 setAdvancedEditorVisible(false);
