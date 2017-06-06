@@ -105,9 +105,8 @@ public class BookmarksProvider extends ContentProvider {
     public static void reorderBookmark(Context context, long id, int orderId) {
         ContentValues cv = new ContentValues();
         cv.put(Columns.ORDER_ID, orderId);
-        context.getContentResolver().update(Columns.CONTENT_URI, cv,
-                Columns._ID + " = ?",
-                new String[] { String.valueOf(id) });
+        Uri uri = ContentUris.withAppendedId(Columns.CONTENT_URI, id);
+        context.getContentResolver().update(uri, cv, null, null);
     }
 
     @Override
