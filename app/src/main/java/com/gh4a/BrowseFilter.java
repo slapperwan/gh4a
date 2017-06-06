@@ -480,9 +480,8 @@ public class BrowseFilter extends AppCompatActivity {
                 return null;
             }
 
-            List<CommitComment> comments =
-                    PullRequestCommentsLoader.loadComments(mRepoOwner, mRepoName,
-                            mPullRequestNumber);
+            List<CommitComment> comments = PullRequestCommentsLoader.loadComments(mRepoOwner,
+                    mRepoName, mPullRequestNumber);
             if (comments == null || isFinishing()) {
                 return null;
             }
@@ -521,8 +520,8 @@ public class BrowseFilter extends AppCompatActivity {
                             false, mMarker);
                 }
             } else {
-                PullRequestActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
-                        mPullRequestNumber, mPage, mMarker);
+                intent = PullRequestActivity.makeIntent(BrowseFilter.this,
+                        mRepoOwner, mRepoName, mPullRequestNumber, mPage, mMarker);
             }
             return intent;
         }
