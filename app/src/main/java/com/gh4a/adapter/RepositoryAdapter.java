@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
+import com.vdurmont.emoji.EmojiParser;
 
 import org.eclipse.egit.github.core.Repository;
 
@@ -49,7 +50,8 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
 
         if (!StringUtils.isBlank(repository.getDescription())) {
             holder.tvDesc.setVisibility(View.VISIBLE);
-            holder.tvDesc.setText(StringUtils.doTeaser(repository.getDescription()));
+            holder.tvDesc.setText(
+                    EmojiParser.parseToUnicode(StringUtils.doTeaser(repository.getDescription())));
         } else {
             holder.tvDesc.setVisibility(View.GONE);
         }
