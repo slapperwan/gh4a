@@ -12,7 +12,9 @@ import com.gh4a.fragment.RepositoryListContainerFragment;
 
 public class RepositoryFactory extends FragmentFactory {
     private static final int[] TAB_TITLES = new int[] {
-        R.string.my_repositories
+            R.string.my,
+            R.string.starred,
+            R.string.repo_type_watched
     };
 
     private final String mUserLogin;
@@ -37,7 +39,7 @@ public class RepositoryFactory extends FragmentFactory {
 
     @Override
     protected @StringRes int getTitleResId() {
-        return R.string.my_repositories;
+        return R.string.repositories;
     }
 
     @Override
@@ -117,8 +119,21 @@ public class RepositoryFactory extends FragmentFactory {
     }
 
     @Override
+    protected boolean onCreateOptionsMenu(Menu menu) {
+        boolean result = super.onCreateOptionsMenu(menu);
+        // TODO
+        return result;
+    }
+
+    @Override
     protected Fragment makeFragment(int position) {
-        return RepositoryListContainerFragment.newInstance(mUserLogin, false);
+        String filterType = "all";
+        if (position == 1) {
+            filterType = "starred";
+        } else if (position == 2) {
+            filterType = "watched";
+        }
+        return RepositoryListContainerFragment.newInstance(mUserLogin, false, filterType);
     }
 
     @Override

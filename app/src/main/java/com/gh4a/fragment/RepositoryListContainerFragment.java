@@ -360,8 +360,6 @@ public class RepositoryListContainerFragment extends Fragment implements
             FILTER_LOOKUP.put(R.id.filter_type_private, "private");
             FILTER_LOOKUP.put(R.id.filter_type_sources, "sources");
             FILTER_LOOKUP.put(R.id.filter_type_forks, "forks");
-            FILTER_LOOKUP.put(R.id.filter_type_watched, "watched");
-            FILTER_LOOKUP.put(R.id.filter_type_starred, "starred");
         }
 
         public static FilterDrawerHelper create(String userLogin, boolean isOrg) {
