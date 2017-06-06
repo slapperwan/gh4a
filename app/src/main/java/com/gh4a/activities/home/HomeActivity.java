@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -135,9 +137,9 @@ public class HomeActivity extends BasePagerActivity implements
             return;
         }
 
-        boolean isChecked = checkedItemId == R.id.notifications;
-        int colorResId = isChecked ? R.attr.colorAccent : android.R.attr.textColorPrimary;
-        int tint = UiUtils.resolveColor(this, colorResId);
+        @ColorRes  int colorResId = checkedItemId == R.id.notifications
+                ? R.attr.colorAccent : android.R.attr.textColorPrimary;
+        @ColorInt int tint = UiUtils.resolveColor(this, colorResId);
         DrawableCompat.setTint(mNotificationsIndicatorIcon, tint);
         mNotificationsIndicator.setImageDrawable(mNotificationsIndicatorIcon);
     }
@@ -378,8 +380,7 @@ public class HomeActivity extends BasePagerActivity implements
 
     @Override
     public void onRefresh() {
-        forceLoaderReload(0);
-        forceLoaderReload(1);
+        forceLoaderReload(0, 1);
         mFactory.onRefresh();
         super.onRefresh();
     }
