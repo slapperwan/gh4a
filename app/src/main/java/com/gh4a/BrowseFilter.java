@@ -212,7 +212,7 @@ public class BrowseFilter extends AppCompatActivity {
                         int page = "commits".equals(action) ? PullRequestActivity.PAGE_COMMITS
                                 : "files".equals(target) ? PullRequestActivity.PAGE_FILES : -1;
                         IntentUtils.InitialCommentMarker initialDiffComment =
-                                generateInitialCommentMarker(uri.getFragment(), "r");
+                                generateInitialCommentMarkerWithoutFallback(uri.getFragment(), "r");
                         if (initialDiffComment != null) {
                             new PullRequestDiffCommentLoadTask(user, repo, pullRequestNumber,
                                     initialDiffComment, page).execute();
@@ -236,8 +236,7 @@ public class BrowseFilter extends AppCompatActivity {
                         new CommitCommentLoadTask(user, repo, id, initialComment).execute();
                         return; // avoid finish() for now
                     }
-                    intent = CommitActivity.makeIntent(this, user, repo, id,
-                            generateInitialCommentMarker(uri.getFragment(), "commitcomment-"));
+                    intent = CommitActivity.makeIntent(this, user, repo, id, null);
                 }
             } else if ("blob".equals(action) && !StringUtils.isBlank(id) && parts.size() >= 4) {
                 String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
@@ -253,8 +252,8 @@ public class BrowseFilter extends AppCompatActivity {
         finish();
     }
 
-    private IntentUtils.InitialCommentMarker generateInitialCommentMarker(String fragment,
-            String prefix) {
+    private IntentUtils.InitialCommentMarker generateInitialCommentMarkerWithoutFallback(
+            String fragment, String prefix) {
         if (fragment != null && fragment.startsWith(prefix)) {
             try {
                 long commentId = Long.parseLong(fragment.substring(prefix.length()));
@@ -263,7 +262,17 @@ public class BrowseFilter extends AppCompatActivity {
                 // fall through
             }
         }
-        return getIntent().getParcelableExtra("initial_comment");
+        return null;
+    }
+
+    private IntentUtils.InitialCommentMarker generateInitialCommentMarker(String fragment,
+            String prefix) {
+        IntentUtils.InitialCommentMarker initialCommentMarker =
+                generateInitialCommentMarkerWithoutFallback(fragment, prefix);
+        if (initialCommentMarker == null) {
+            return getIntent().getParcelableExtra("initial_comment");
+        }
+        return initialCommentMarker;
     }
 
     private DiffHighlightId extractCommitDiffId(String fragment) {
