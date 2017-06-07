@@ -49,6 +49,10 @@ public class NotificationService extends GitHubService {
 	 */
 	public static final String FIELD_IGNORED = "ignored";
 
+	public static final String FIELD_ALL = "all";
+
+	public  static final String FIELD_PARTICIPATING = "participating";
+
 	/**
 	 * Notification reason for being assigned to the issue
 	 */
@@ -118,27 +122,32 @@ public class NotificationService extends GitHubService {
 	 * @return non-null but possibly empty list of notifications
 	 * @throws IOException if something went wrong
 	 */
-	public List<Notification> getNotifications() throws IOException {
-		return getAll(pageNotifications());
+	public List<Notification> getNotifications(boolean all,
+			boolean participating) throws IOException {
+		return getAll(pageNotifications(all, participating));
 	}
 
 	/**
 	 * Page notifications for currently authenticated user
 	 *
 	 * @return iterator over pages of notifications
+	 ** @param all
+	 *** @param participating
 	 */
-	public PageIterator<Notification> pageNotifications() {
-		return pageNotifications(PAGE_SIZE);
+	public PageIterator<Notification> pageNotifications(boolean all, boolean participating) {
+		return pageNotifications(PAGE_SIZE, all, participating);
 	}
 
 	/**
 	 * Page notifications for currently authenticated user
 	 *
 	 * @param size the number of pages
-	 * @return iterator over pages of notifications
+	 * @param all
+	 **@param participating @return iterator over pages of notifications
 	 */
-	public PageIterator<Notification> pageNotifications(int size) {
-		return pageNotifications(PAGE_FIRST, size);
+	public PageIterator<Notification> pageNotifications(int size, boolean all,
+			boolean participating) {
+		return pageNotifications(PAGE_FIRST, size, all, participating);
 	}
 
 	/**
@@ -146,13 +155,21 @@ public class NotificationService extends GitHubService {
 	 *
 	 * @param start the number of first page to load
 	 * @param size  the number of pages
-	 * @return iterator over pages of notifications
+	 * @param all
+	 *@param participating @return iterator over pages of notifications
 	 */
-	public PageIterator<Notification> pageNotifications(int start, int size) {
+	public PageIterator<Notification> pageNotifications(int start, int size, boolean all,
+			boolean participating) {
 		PagedRequest<Notification> request = createPagedRequest(start, size);
 		request.setUri(SEGMENT_NOTIFICATIONS);
 		request.setType(new TypeToken<List<Notification>>() {
 		}.getType());
+
+		Map<String, String> params = new HashMap<>();
+		params.put(FIELD_ALL, String.valueOf(all));
+		params.put(FIELD_PARTICIPATING, String.valueOf(participating));
+		request.setParams(params);
+
 		return createPageIterator(request);
 	}
 

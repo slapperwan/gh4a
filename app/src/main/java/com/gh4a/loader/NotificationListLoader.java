@@ -37,38 +37,62 @@ public class NotificationListLoader extends BaseLoader<NotificationListLoadResul
         }
     };
 
-    public NotificationListLoader(Context context) {
+    private final boolean mAll;
+    private final boolean mParticipating;
+
+    public NotificationListLoader(Context context, boolean all, boolean participating) {
         super(context);
+        mAll = all;
+        mParticipating = participating;
     }
 
     @Override
     protected NotificationListLoadResult doLoadInBackground() throws Exception {
         NotificationService notificationService = (NotificationService)
                 Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
-        List<Notification> notifications = notificationService.getNotifications();
+        List<Notification> notifications =
+                notificationService.getNotifications(mAll, mParticipating);
         Collections.sort(notifications, SORTER);
 
         Repository previousRepository = null;
         List<NotificationHolder> result = new ArrayList<>();
+        int unreadNotificationsCount = 0;
+        NotificationHolder previousRepositoryHolder = null;
 
         for (Notification notification : notifications) {
             Repository repository = notification.getRepository();
+
             if (!repository.equals(previousRepository)) {
-                int size = result.size();
-                if (size > 0) {
-                    result.get(size - 1).setIsLastRepositoryNotification(true);
-                }
-                result.add(new NotificationHolder(repository));
+                markHolder(result, unreadNotificationsCount, previousRepositoryHolder);
+
+                previousRepositoryHolder = new NotificationHolder(repository);
+                result.add(previousRepositoryHolder);
+
+                unreadNotificationsCount = 0;
             }
+
+            if (notification.isUnread()) {
+                unreadNotificationsCount += 1;
+            }
+
             result.add(new NotificationHolder(notification));
             previousRepository = repository;
+        }
+
+        markHolder(result, unreadNotificationsCount, previousRepositoryHolder);
+
+        return new NotificationListLoadResult(result);
+    }
+
+    private void markHolder(List<NotificationHolder> result, int unreadNotificationsCount,
+            NotificationHolder previousRepositoryHolder) {
+        if (previousRepositoryHolder != null && unreadNotificationsCount == 0) {
+            previousRepositoryHolder.setIsRead(true);
         }
 
         int size = result.size();
         if (size > 0) {
             result.get(size - 1).setIsLastRepositoryNotification(true);
         }
-
-        return new NotificationListLoadResult(result);
     }
 }

@@ -20,7 +20,7 @@ public class HasNotificationsLoader extends BaseLoader<Boolean> {
     public Boolean doLoadInBackground() throws IOException {
         NotificationService notificationService = (NotificationService)
                 Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
-        PageIterator<Notification> notifications = notificationService.pageNotifications(1);
+        PageIterator<Notification> notifications = notificationService.pageNotifications(1, false, false);
         return notifications.hasNext() && !notifications.next().isEmpty();
     }
 }
