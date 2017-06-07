@@ -32,6 +32,8 @@ public class CommitComment extends Comment {
 
 	private String diffHunk;
 
+	private long pullRequestReviewId;
+
 	/**
 	 * @return line
 	 */
@@ -133,6 +135,15 @@ public class CommitComment extends Comment {
 	 */
 	public String getDiffHunk() {
 		return diffHunk;
+	}
+
+	public long getPullRequestReviewId() {
+		return pullRequestReviewId;
+	}
+
+	public CommitComment setPullRequestReviewId(long pullRequestReviewId) {
+		this.pullRequestReviewId = pullRequestReviewId;
+		return this;
 	}
 
 	/**

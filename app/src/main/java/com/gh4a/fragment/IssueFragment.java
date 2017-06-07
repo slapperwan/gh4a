@@ -1,17 +1,15 @@
 package com.gh4a.fragment;
 
-import android.content.Intent;
 import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.loader.IssueCommentListLoader;
-import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 
@@ -67,16 +65,17 @@ public class IssueFragment extends IssueFragmentBase {
     }
 
     @Override
-    public Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader() {
+    public Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
         return new IssueCommentListLoader(getActivity(), mRepoOwner, mRepoName, mIssue.getNumber());
     }
 
-    @Override
-    public void editComment(IssueEventHolder item) {
-        Intent intent = EditIssueCommentActivity.makeIntent(getActivity(),
-                mRepoOwner, mRepoName, mIssue.getNumber(), item.comment);
-        startActivityForResult(intent, REQUEST_EDIT);
-    }
+    // TODO
+//    @Override
+//    public void editComment(IssueEventHolder item) {
+//        Intent intent = EditIssueCommentActivity.makeIntent(getActivity(),
+//                mRepoOwner, mRepoName, mIssue.getNumber(), item.comment);
+//        startActivityForResult(intent, REQUEST_EDIT);
+//    }
 
     @Override
     protected void deleteCommentInBackground(RepositoryId repoId, Comment comment) throws Exception {

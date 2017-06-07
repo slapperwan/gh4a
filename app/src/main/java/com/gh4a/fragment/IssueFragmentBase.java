@@ -16,12 +16,10 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -40,9 +38,9 @@ import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
-import com.gh4a.adapter.IssueEventAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.IssueEventHolder;
+import com.gh4a.adapter.timeline.TimelineItemAdapter;
+import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
@@ -62,12 +60,11 @@ import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
-public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventHolder> implements
+// TODO: Re-enable commented out code
+public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
         View.OnClickListener, ReactionBar.Callback, ReactionBar.Item,
         ReactionBar.ReactionDetailsCache.Listener,
-        IssueEventAdapter.OnCommentAction<IssueEventHolder>,
         CommentBoxFragment.Callback {
     protected static final int REQUEST_EDIT = 1000;
 
@@ -82,7 +79,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
     private ReactionBar.ReactionDetailsCache mReactionDetailsCache =
             new ReactionBar.ReactionDetailsCache(this);
-    private IssueEventAdapter mAdapter;
+    private TimelineItemAdapter mAdapter;
     private HttpImageGetter mImageGetter;
 
     protected static Bundle buildArgs(String repoOwner, String repoName,
@@ -226,32 +223,33 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
     }
 
     @Override
-    protected RootAdapter<IssueEventHolder, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        mAdapter = new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName,
-                mIssue.getNumber(), this);
-        mAdapter.setLocked(isLocked());
+    protected RootAdapter<TimelineItem, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
+        mAdapter = new TimelineItemAdapter(getActivity());
+//        mAdapter = new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName,
+//                mIssue.getNumber(), this);
+//        mAdapter.setLocked(isLocked());
         return mAdapter;
     }
 
-    @Override
-    protected void onAddData(RootAdapter<IssueEventHolder, ?> adapter, List<IssueEventHolder> data) {
-        super.onAddData(adapter, data);
-        if (mInitialComment != null) {
-            for (int i = 0; i < data.size(); i++) {
-                IssueEventHolder event = data.get(i);
-                if (event.comment == null) {
-                    continue;
-                }
-                if (mInitialComment.matches(event.comment.getId(), event.getCreatedAt())) {
-                    scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
-                    break;
-                }
-            }
-            mInitialComment = null;
-        }
-
-        updateMentionUsers();
-    }
+//    @Override
+//    protected void onAddData(RootAdapter<TimelineItem, ?> adapter, List<TimelineItem> data) {
+//        super.onAddData(adapter, data);
+//        if (mInitialComment != null) {
+//            for (int i = 0; i < data.size(); i++) {
+//                IssueEventHolder event = data.get(i);
+//                if (event.comment == null) {
+//                    continue;
+//                }
+//                if (mInitialComment.matches(event.comment.getId(), event.getCreatedAt())) {
+//                    scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
+//                    break;
+//                }
+//            }
+//            mInitialComment = null;
+//        }
+//
+//        updateMentionUsers();
+//    }
 
     @Override
     protected int getEmptyTextResId() {
@@ -284,13 +282,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         return mIssue.isLocked() && !mIsCollaborator;
     }
 
-    private void updateMentionUsers() {
-        Set<User> users = mAdapter.getUsers();
-        if (mIssue.getUser() != null) {
-            users.add(mIssue.getUser());
-        }
-        mCommentFragment.setMentionUsers(users);
-    }
+//    private void updateMentionUsers() {
+//        Set<User> users = mAdapter.getUsers();
+//        if (mIssue.getUser() != null) {
+//            users.add(mIssue.getUser());
+//        }
+//        mCommentFragment.setMentionUsers(users);
+//    }
 
     private void updateCommentLockState() {
         if (mCommentFragment != null) {
@@ -317,17 +315,17 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         if (!StringUtils.isBlank(body)) {
             mImageGetter.bind(descriptionView, body, mIssue.getId());
 
-            if (!isLocked()) {
-                descriptionView.setCustomSelectionActionModeCallback(
-                        new UiUtils.QuoteActionModeCallback(descriptionView) {
-                    @Override
-                    public void onTextQuoted(CharSequence text) {
-                        quoteText(text);
-                    }
-                });
-            } else {
-                descriptionView.setCustomSelectionActionModeCallback(null);
-            }
+//            if (!isLocked()) {
+//                descriptionView.setCustomSelectionActionModeCallback(
+//                        new UiUtils.QuoteActionModeCallback(descriptionView) {
+//                    @Override
+//                    public void onTextQuoted(CharSequence text) {
+//                        quoteText(text);
+//                    }
+//                });
+//            } else {
+//                descriptionView.setCustomSelectionActionModeCallback(null);
+//            }
         } else {
             SpannableString noDescriptionString = new SpannableString(getString(R.string.issue_no_description));
             noDescriptionString.setSpan(new StyleSpan(Typeface.ITALIC), 0, noDescriptionString.length(), 0);
@@ -440,10 +438,10 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         }
     }
 
-    @Override
-    public void quoteText(CharSequence text) {
-        mCommentFragment.addQuote(text);
-    }
+//    @Override
+//    public void quoteText(CharSequence text) {
+//        mCommentFragment.addQuote(text);
+//    }
 
     @Override
     public void onSendCommentInBackground(String comment) throws IOException {
@@ -460,19 +458,19 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<IssueEventH
         }
     }
 
-    @Override
-    public void deleteComment(final IssueEventHolder comment) {
-        new AlertDialog.Builder(getActivity())
-                .setMessage(R.string.delete_comment_message)
-                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new DeleteCommentTask(getBaseActivity(), comment.comment).schedule();
-                    }
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
+//    @Override
+//    public void deleteComment(final IssueEventHolder comment) {
+//        new AlertDialog.Builder(getActivity())
+//                .setMessage(R.string.delete_comment_message)
+//                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        new DeleteCommentTask(getBaseActivity(), comment.comment).schedule();
+//                    }
+//                })
+//                .setNegativeButton(R.string.cancel, null)
+//                .show();
+//    }
 
     protected abstract void bindSpecialViews(View headerView);
     protected abstract void assignHighlightColor();

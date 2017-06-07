@@ -12,11 +12,9 @@ import org.eclipse.egit.github.core.service.IssueService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
+public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
     private final boolean mIsPullRequest;
 
     protected final String mRepoOwner;
@@ -31,12 +29,13 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
         IssueEvent.TYPE_RENAMED
     );
 
-    protected static final Comparator<IssueEventHolder> SORTER = new Comparator<IssueEventHolder>() {
-        @Override
-        public int compare(IssueEventHolder lhs, IssueEventHolder rhs) {
-            return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
-        }
-    };
+    // TODO
+//    protected static final Comparator<IssueEventHolder> SORTER = new Comparator<IssueEventHolder>() {
+//        @Override
+//        public int compare(IssueEventHolder lhs, IssueEventHolder rhs) {
+//            return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
+//        }
+//    };
 
     public IssueCommentListLoader(Context context, String repoOwner, String repoName,
             int issueNumber) {
@@ -53,24 +52,24 @@ public class IssueCommentListLoader extends BaseLoader<List<IssueEventHolder>> {
     }
 
     @Override
-    protected List<IssueEventHolder> doLoadInBackground() throws IOException {
+    protected List<TimelineItem> doLoadInBackground() throws IOException {
         IssueService issueService = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         List<Comment> comments = issueService.getComments(
                 new RepositoryId(mRepoOwner, mRepoName), mIssueNumber);
         List<IssueEvent> events = issueService.getIssueEvents(mRepoOwner, mRepoName, mIssueNumber);
-        List<IssueEventHolder> result = new ArrayList<>();
+        List<TimelineItem> result = new ArrayList<>();
 
         for (Comment comment : comments) {
-            result.add(new IssueEventHolder(comment, mIsPullRequest));
+            result.add(new TimelineItem.TimelineComment(comment));
         }
         for (IssueEvent event : events) {
             if (INTERESTING_EVENTS.contains(event.getEvent())) {
-                result.add(new IssueEventHolder(event, mIsPullRequest));
+                result.add(new TimelineItem.TimelineEvent(event));
             }
         }
 
-        Collections.sort(result, SORTER);
+//        Collections.sort(result, SORTER);
 
         return result;
     }

@@ -29,14 +29,12 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.EditIssueCommentActivity;
-import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.loader.CommitStatusLoader;
-import com.gh4a.loader.IssueEventHolder;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentListLoader;
+import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -240,20 +238,21 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     @Override
-    public Loader<LoaderResult<List<IssueEventHolder>>> onCreateLoader() {
+    public Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
         return new PullRequestCommentListLoader(getActivity(),
                 mRepoOwner, mRepoName, mPullRequest.getNumber());
     }
 
-    @Override
-    public void editComment(IssueEventHolder item) {
-        Intent intent = item.comment instanceof CommitComment
-                ? EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mPullRequest.getNumber(), (CommitComment) item.comment)
-                : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mIssue.getNumber(), item.comment);
-        startActivityForResult(intent, REQUEST_EDIT);
-    }
+    // TODO
+//    @Override
+//    public void editComment(IssueEventHolder item) {
+//        Intent intent = item.comment instanceof CommitComment
+//                ? EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+//                        mPullRequest.getNumber(), (CommitComment) item.comment)
+//                : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+//                        mIssue.getNumber(), item.comment);
+//        startActivityForResult(intent, REQUEST_EDIT);
+//    }
 
     @Override
     protected void deleteCommentInBackground(RepositoryId repoId, Comment comment) throws Exception {

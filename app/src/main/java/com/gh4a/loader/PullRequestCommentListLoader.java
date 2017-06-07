@@ -1,18 +1,24 @@
 package com.gh4a.loader;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.gh4a.Gh4Application;
 
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PullRequestCommentListLoader extends IssueCommentListLoader {
 
@@ -22,9 +28,9 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
     }
 
     @Override
-    public List<IssueEventHolder> doLoadInBackground() throws IOException {
+    public List<TimelineItem> doLoadInBackground() throws IOException {
         // combine issue comments and pull request comments (to get comments on diff)
-        List<IssueEventHolder> events = super.doLoadInBackground();
+        List<TimelineItem> events = super.doLoadInBackground();
 
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
@@ -36,16 +42,119 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
             filesByName.put(file.getFilename(), file);
         }
 
-        // only add comment that is not outdated
-        for (CommitComment commitComment: commitComments) {
-            if (commitComment.getPosition() != -1) {
-                CommitFile file = filesByName.get(commitComment.getPath());
-                events.add(new IssueEventHolder(commitComment, file));
+        final Map<String, CommitComment> data = new HashMap<>();
+        for (CommitComment commitComment : commitComments) {
+            CommitFile file = filesByName.get(commitComment.getPath());
+            events.add(new TimelineItem.TimelineComment(commitComment, file));
+
+            String id = commitComment.getOriginalCommitId() + commitComment.getOriginalPosition();
+            if (data.containsKey(id)) {
+                if (data.get(id).getCreatedAt().after(commitComment.getCreatedAt())) {
+                    data.put(id, commitComment);
+                }
+            } else {
+                data.put(id, commitComment);
             }
         }
 
-        Collections.sort(events, SORTER);
+        final List<Review> reviews = pullRequestService.getReviews(repoId, mIssueNumber);
 
+        for (CommitComment commitComment : data.values()) {
+            for (Review review : reviews) {
+                if (commitComment.getPullRequestReviewId() == review.getId()) {
+                    events.add(new TimelineItem.TimelineReview(review));
+                    reviews.remove(review);
+                    break;
+                }
+            }
+        }
+
+        for (Review review : reviews) {
+            if (!TextUtils.isEmpty(review.getBody()) ||
+                    !review.getState().equals(Review.STATE_COMMENTED)) {
+                events.add(new TimelineItem.TimelineReview(review));
+            }
+        }
+
+        Collections.sort(events, new Comparator<TimelineItem>() {
+            @Override
+            public int compare(TimelineItem lhs, TimelineItem rhs) {
+                Comment leftComment = lhs instanceof TimelineItem.TimelineComment
+                        ? ((TimelineItem.TimelineComment) lhs).comment
+                        : null;
+                Comment rightComment = rhs instanceof TimelineItem.TimelineComment
+                        ? ((TimelineItem.TimelineComment) rhs).comment
+                        : null;
+
+                CommitComment leftCommitComment =
+                        leftComment instanceof CommitComment ? (CommitComment) leftComment : null;
+                CommitComment rightCommitComment =
+                        rightComment instanceof CommitComment ? (CommitComment) rightComment : null;
+
+                if (leftCommitComment != null && rightCommitComment != null) {
+                    String leftId = leftCommitComment.getOriginalCommitId() +
+                            leftCommitComment.getOriginalPosition();
+                    String rightId = rightCommitComment.getOriginalCommitId() +
+                            rightCommitComment.getOriginalPosition();
+                    if (leftId.equals(rightId)) {
+                        return compareByTime(lhs, rhs);
+                    }
+
+                    return data.get(leftId).getCreatedAt()
+                            .compareTo(data.get(rightId).getCreatedAt());
+                }
+
+                if (leftCommitComment != null && rhs instanceof TimelineItem.TimelineReview ||
+                        lhs instanceof TimelineItem.TimelineReview && rightCommitComment != null) {
+                    CommitComment comment =
+                            leftCommitComment != null ? leftCommitComment : rightCommitComment;
+                    Review review = ((TimelineItem.TimelineReview) (
+                            lhs instanceof TimelineItem.TimelineReview ? lhs : rhs)).review;
+
+                    String id = comment.getOriginalCommitId() + comment.getOriginalPosition();
+
+                    if (data.get(id).getPullRequestReviewId() == review.getId()) {
+                        return lhs instanceof TimelineItem.TimelineReview ? -1 : 1;
+                    }
+
+                    if (lhs instanceof TimelineItem.TimelineReview) {
+                        return Long.valueOf(review.getId())
+                                .compareTo(data.get(id).getPullRequestReviewId());
+                    }
+                    return Long.valueOf(data.get(id).getPullRequestReviewId())
+                            .compareTo(review.getId());
+                }
+
+                return compareByTime(lhs, rhs);
+            }
+        });
+
+        List<String> addedDiffIds = new ArrayList<>();
+
+        int i = 0;
+        while (i < events.size()) {
+            TimelineItem item = events.get(i);
+            if (item instanceof TimelineItem.TimelineComment) {
+                TimelineItem.TimelineComment comment = (TimelineItem.TimelineComment) item;
+                if (comment.comment instanceof CommitComment) {
+                    CommitComment commitComment = (CommitComment) comment.comment;
+                    String id = commitComment.getOriginalCommitId() +
+                            commitComment.getOriginalPosition();
+
+                    if (!addedDiffIds.contains(id)) {
+                        addedDiffIds.add(id);
+                        events.add(i, new TimelineItem.Diff());
+                        i += 1;
+                    }
+                }
+            }
+
+            i += 1;
+        }
         return events;
+    }
+
+    private int compareByTime(TimelineItem lhs, TimelineItem rhs) {
+        return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
     }
 }
