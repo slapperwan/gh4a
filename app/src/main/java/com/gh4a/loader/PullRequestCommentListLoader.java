@@ -130,6 +130,7 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
         });
 
         List<String> addedDiffIds = new ArrayList<>();
+        boolean previousWasDiffComment = false;
 
         int i = 0;
         while (i < events.size()) {
@@ -144,13 +145,29 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
                     if (!addedDiffIds.contains(id)) {
                         addedDiffIds.add(id);
                         events.add(i, new TimelineItem.Diff());
-                        i += 1;
+                        if (previousWasDiffComment) {
+                            events.add(i, new TimelineItem.Reply());
+                            previousWasDiffComment = false;
+                        }
+                    } else {
+                        previousWasDiffComment = true;
                     }
+                } else if (previousWasDiffComment) {
+                    events.add(i, new TimelineItem.Reply());
+                    previousWasDiffComment = false;
                 }
+            } else if (previousWasDiffComment) {
+                events.add(i, new TimelineItem.Reply());
+                previousWasDiffComment = false;
             }
 
             i += 1;
         }
+
+        if (previousWasDiffComment) {
+            events.add(i, new TimelineItem.Reply());
+        }
+
         return events;
     }
 
