@@ -120,6 +120,7 @@
     <string name="browser_logout_completed_dialog_text">You can now proceed in the login process for the new account.</string>
     <string name="go_to_logout_page">Go to logout page</string>
     <string name="continue_login">Continue new login</string>
+    <string name="unread">Unread</string>
 
     <string name="reaction_plus_one" translatable="false">+1</string>
     <string name="reaction_minus_one" translatable="false">-1</string>

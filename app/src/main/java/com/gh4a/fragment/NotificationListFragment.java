@@ -39,15 +39,20 @@ import java.util.Date;
 
 public class NotificationListFragment extends LoadingListFragmentBase implements
         RootAdapter.OnItemClickListener<NotificationHolder>,NotificationAdapter.OnNotificationActionCallback {
-    public static NotificationListFragment newInstance() {
-        return new NotificationListFragment();
+    public static NotificationListFragment newInstance(boolean all, boolean participating) {
+        NotificationListFragment fragment = new NotificationListFragment();
+        Bundle args = new Bundle();
+        args.putBoolean("all", all);
+        args.putBoolean("participating", participating);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     private final LoaderCallbacks<NotificationListLoadResult> mNotificationsCallback =
             new LoaderCallbacks<NotificationListLoadResult>(this) {
         @Override
         protected Loader<LoaderResult<NotificationListLoadResult>> onCreateLoader() {
-            return new NotificationListLoader(getContext());
+            return new NotificationListLoader(getContext(), mAll, mParticipating);
         }
 
         @Override
@@ -67,6 +72,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     private Date mNotificationsLoadTime;
     private MenuItem mMarkAllAsReadMenuItem;
     private ParentCallback mCallback;
+    private boolean mAll;
+    private boolean mParticipating;
 
     public interface ParentCallback {
         void setNotificationsIndicatorVisible(boolean visible);
@@ -87,6 +94,10 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        Bundle args = getArguments();
+        mAll = args.getBoolean("all");
+        mParticipating = args.getBoolean("participating");
     }
 
     @Override

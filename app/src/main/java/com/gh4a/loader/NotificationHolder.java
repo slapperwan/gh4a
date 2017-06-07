@@ -24,6 +24,7 @@ public class NotificationHolder {
     public NotificationHolder(@NonNull Notification notification) {
         this.notification = notification;
         repository = notification.getRepository();
+        mRead = !notification.isUnread();
     }
 
     public boolean isLastRepositoryNotification() {
