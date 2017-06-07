@@ -64,7 +64,9 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             mAdapter.notifyDataSetChanged();
             updateEmptyState();
             updateMenuItemVisibility();
-            mCallback.setNotificationsIndicatorVisible(!result.notifications.isEmpty());
+            if (!mAll && !mParticipating) {
+                mCallback.setNotificationsIndicatorVisible(!result.notifications.isEmpty());
+            }
         }
     };
 
@@ -235,7 +237,9 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
 
     private void markAsRead(Repository repository, Notification notification) {
         if (mAdapter.markAsRead(repository, notification)) {
-            mCallback.setNotificationsIndicatorVisible(false);
+            if (!mAll && !mParticipating) {
+                mCallback.setNotificationsIndicatorVisible(false);
+            }
         }
         updateMenuItemVisibility();
     }
