@@ -209,7 +209,7 @@ public class BrowseFilter extends AppCompatActivity {
                         return; // avoid finish() for now
                     } else {
                         String target = parts.size() >= 5 ? parts.get(4) : null;
-                        int page = "commits".equals(action) ? PullRequestActivity.PAGE_COMMITS
+                        int page = "commits".equals(target) ? PullRequestActivity.PAGE_COMMITS
                                 : "files".equals(target) ? PullRequestActivity.PAGE_FILES : -1;
                         IntentUtils.InitialCommentMarker initialDiffComment =
                                 generateInitialCommentMarkerWithoutFallback(uri.getFragment(), "r");
