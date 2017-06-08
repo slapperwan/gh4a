@@ -20,6 +20,9 @@ import com.gh4a.db.BookmarksProvider.Columns;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHolder> implements
         View.OnClickListener {
     public interface OnItemInteractListener {
@@ -38,6 +41,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     private int mNameColumnIndex;
     private int mExtraColumnIndex;
     private int mUrlColumnIndex;
+
+    private List<Integer> mPositions = new ArrayList<>();
 
     public BookmarkAdapter(Context context, OnItemInteractListener listener) {
         super();
@@ -62,8 +67,27 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
             mNameColumnIndex = cursor.getColumnIndexOrThrow(Columns.NAME);
             mExtraColumnIndex = cursor.getColumnIndexOrThrow(Columns.EXTRA);
             mUrlColumnIndex = cursor.getColumnIndexOrThrow(Columns.URI);
+
+            mPositions.clear();
+            for (int i = 0; i < mCursor.getCount(); i++) {
+                mPositions.add(i);
+            }
         }
         notifyDataSetChanged();
+    }
+
+    public void updateOrder(Context context) {
+        for (int oldPosition = 0; oldPosition < mPositions.size(); oldPosition++) {
+            Integer newPosition = mPositions.get(oldPosition);
+            if (oldPosition != newPosition && mCursor.moveToPosition(oldPosition)) {
+                long id = mCursor.getLong(mIdColumnIndex);
+                BookmarksProvider.reorderBookmark(context, id, newPosition);
+            }
+        }
+    }
+
+    private boolean moveCursorToPosition(int position) {
+        return mCursor.moveToPosition(mPositions.get(position));
     }
 
     @Override
@@ -77,10 +101,9 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         return vh;
     }
 
-
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (!mCursor.moveToPosition(position)) {
+        if (!moveCursorToPosition(position)) {
             return;
         }
 
@@ -110,34 +133,27 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
     @Override
     public long getItemId(int position) {
-        return mCursor.moveToPosition(position) ? mCursor.getLong(mIdColumnIndex) : -1;
+        return moveCursorToPosition(position) ? mCursor.getLong(mIdColumnIndex) : -1;
     }
 
     @Override
     public void onClick(View view) {
         ViewHolder vh = (ViewHolder) view.getTag();
         int position = vh.getAdapterPosition();
-        if (position != RecyclerView.NO_POSITION && mCursor.moveToPosition(position)) {
+        if (position != RecyclerView.NO_POSITION && moveCursorToPosition(position)) {
             mItemInteractListener.onItemClick(mCursor.getLong(mIdColumnIndex),
                     mCursor.getString(mUrlColumnIndex));
         }
     }
 
-    public void onItemMoved(Context context, int fromPos, int toPos) {
-        if (mCursor.moveToPosition(fromPos)) {
-            long firstId = mCursor.getLong(mIdColumnIndex);
-            BookmarksProvider.reorderBookmark(context, firstId, toPos);
-        }
-
-        if (mCursor.moveToPosition(toPos)) {
-            long secondId = mCursor.getLong(mIdColumnIndex);
-            BookmarksProvider.reorderBookmark(context, secondId, fromPos);
-        }
+    public void onItemMoved(int fromPos, int toPos) {
+        mPositions.add(toPos, mPositions.remove(fromPos));
+        notifyItemMoved(fromPos, toPos);
     }
 
     public void onItemSwiped(RecyclerView.ViewHolder viewHolder) {
         int position = viewHolder.getAdapterPosition();
-        if (position == RecyclerView.NO_POSITION || !mCursor.moveToPosition(position)) {
+        if (position == RecyclerView.NO_POSITION || !moveCursorToPosition(position)) {
             return;
         }
 

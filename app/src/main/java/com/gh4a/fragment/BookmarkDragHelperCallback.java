@@ -20,7 +20,7 @@ public class BookmarkDragHelperCallback extends ItemTouchHelper.SimpleCallback {
         int fromPos = viewHolder.getAdapterPosition();
         int toPos = target.getAdapterPosition();
 
-        mAdapter.onItemMoved(recyclerView.getContext(), fromPos, toPos);
+        mAdapter.onItemMoved(fromPos, toPos);
         return false;
     }
 

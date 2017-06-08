@@ -69,6 +69,14 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
     }
 
     @Override
+    public void onStop() {
+        if (mAdapter != null) {
+            mAdapter.updateOrder(getActivity());
+        }
+        super.onStop();
+    }
+
+    @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
         updateEmptyState();
