@@ -7,7 +7,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.fabric.tools:gradle:1.22.2'
     }
 }
 
@@ -27,11 +27,11 @@ android {
     signingConfigs {
         playStore
     }
-    compileSdkVersion 24
-    buildToolsVersion '25.0.2'
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 25
         versionCode 53
         versionName "4.1.2"
     }
@@ -63,18 +63,22 @@ android {
     }
 }
 
+ext {
+    supportLibraryVersion = '25.3.1'
+}
+
 dependencies {
     compile project(':github-api')
-    compile 'com.android.support:support-v4:24.1.1'
-    compile 'com.android.support:appcompat-v7:24.1.1'
-    compile 'com.android.support:cardview-v7:24.1.1'
-    compile 'com.android.support:preference-v7:24.1.1'
-    compile 'com.android.support:preference-v14:24.1.1'
-    compile 'com.android.support:customtabs:24.1.1'
-    compile 'com.android.support:design:24.1.1'
+    compile "com.android.support:support-v4:$supportLibraryVersion"
+    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
+    compile "com.android.support:cardview-v7:$supportLibraryVersion"
+    compile "com.android.support:preference-v7:$supportLibraryVersion"
+    compile "com.android.support:preference-v14:$supportLibraryVersion"
+    compile "com.android.support:customtabs:$supportLibraryVersion"
+    compile "com.android.support:design:$supportLibraryVersion"
     compile 'com.larswerkman:HoloColorPicker:1.5@aar'
     compile 'com.caverock:androidsvg:1.2.2-beta-1@aar'
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.17'
     compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
