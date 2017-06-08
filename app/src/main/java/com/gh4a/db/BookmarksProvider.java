@@ -65,7 +65,7 @@ public class BookmarksProvider extends ContentProvider {
 
     private static int getNextOrderId(ContentResolver cr) {
         Cursor query = cr.query(Columns.CONTENT_URI,
-                new String[] { "IFNULL(MAX(" + Columns.ORDER_ID + "), 0) + 1" },
+                new String[] { "COUNT(*)" },
                 null, null, null);
 
         int orderId = 0;

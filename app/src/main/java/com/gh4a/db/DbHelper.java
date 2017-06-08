@@ -111,7 +111,9 @@ public class DbHelper extends SQLiteOpenHelper {
         String tempName = "temp_bookmarks";
         createBookmarksTable(db, tempName);
         db.execSQL("INSERT INTO temp_bookmarks (_id, name, type, uri, extra_data, order_id) " +
-                "SELECT _id, name, type, uri, extra_data, _id FROM " + BOOKMARKS_TABLE + ";");
+                "SELECT _id, name, type, uri, extra_data, " +
+                "(SELECT COUNT(*) - 1 FROM " + BOOKMARKS_TABLE + " b WHERE a._id >= b._id) " +
+                "FROM " + BOOKMARKS_TABLE + " a;");
         db.execSQL("DROP TABLE " + BOOKMARKS_TABLE + ";");
         db.execSQL("ALTER TABLE " + tempName + " RENAME TO " + BOOKMARKS_TABLE + ";");
     }
