@@ -50,9 +50,14 @@ public class CommitDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    protected String createUrl() {
-        return "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha
-                + "#diff-" + ApiHelpers.md5(mPath);
+    protected String createUrl(String lineId, long replyId) {
+        String link = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mSha;
+        if (replyId > 0L) {
+            link += "#commitcomment-" + replyId;
+        } else {
+            link += "#diff-" + ApiHelpers.md5(mPath) + lineId;
+        }
+        return link;
     }
 
     @Override
