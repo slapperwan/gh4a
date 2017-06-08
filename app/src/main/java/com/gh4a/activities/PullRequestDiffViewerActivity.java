@@ -61,9 +61,15 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    protected String createUrl() {
-        return "https://github.com/" + mRepoOwner + "/" + mRepoName + "/pull/" + mPullRequestNumber
-                + "/files#diff-" + ApiHelpers.md5(mPath);
+    protected String createUrl(String lineId, long replyId) {
+        String link = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/pull/"
+                + mPullRequestNumber + "/files";
+        if (replyId > 0L) {
+            link += "#r" + replyId;
+        } else {
+            link += "#diff-" + ApiHelpers.md5(mPath) + lineId;
+        }
+        return link;
     }
 
     @Override
