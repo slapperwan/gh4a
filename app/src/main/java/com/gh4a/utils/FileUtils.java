@@ -25,6 +25,8 @@ public class FileUtils {
         // .ts can be both a TypeScript file and a MPEG2 transport stream file. As the former is the
         // more likely case for us and the framework returns the latter, override to assume a text file.
         MIME_TYPE_OVERRIDES.put("ts", "text/x-typescript");
+        // there is no general MIME type mapping for Java properties files, but they're text
+        MIME_TYPE_OVERRIDES.put("properties", "text/x-java-properties");
     }
 
     public static boolean save(File file, InputStream inputStream) {
