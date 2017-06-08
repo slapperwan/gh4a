@@ -77,9 +77,9 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     }
 
     public void updateOrder(Context context) {
-        for (int oldPosition = 0; oldPosition < mPositions.size(); oldPosition++) {
-            Integer newPosition = mPositions.get(oldPosition);
-            if (oldPosition != newPosition && mCursor.moveToPosition(oldPosition)) {
+        for (int newPosition = 0; newPosition < mPositions.size(); newPosition++) {
+            Integer oldPosition = mPositions.get(newPosition);
+            if (newPosition != oldPosition && mCursor.moveToPosition(oldPosition)) {
                 long id = mCursor.getLong(mIdColumnIndex);
                 BookmarksProvider.reorderBookmark(context, id, newPosition);
             }
@@ -163,6 +163,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         final int type = mCursor.getInt(mTypeColumnIndex);
         final String url = mCursor.getString(mUrlColumnIndex);
         final String extraData = mCursor.getString(mExtraColumnIndex);
+
+        updateOrder(context);
 
         Uri uri = ContentUris.withAppendedId(BookmarksProvider.Columns.CONTENT_URI, id);
         context.getContentResolver().delete(uri, null, null);
