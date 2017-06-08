@@ -8,9 +8,7 @@ import com.gh4a.fragment.NotificationListFragment;
 
 public class NotificationListFactory extends FragmentFactory {
     private static final int[] TAB_TITLES =  new int[] {
-            R.string.unread,
-            R.string.repo_type_all,
-            R.string.participating
+            R.string.notifications,
     };
 
     protected NotificationListFactory(HomeActivity activity) {
@@ -29,8 +27,6 @@ public class NotificationListFactory extends FragmentFactory {
 
     @Override
     protected Fragment makeFragment(int position) {
-        boolean all = position == 1;
-        boolean participating = position == 2;
-        return NotificationListFragment.newInstance(all, participating);
+        return NotificationListFragment.newInstance();
     }
 }

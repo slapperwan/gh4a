@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/mark_all_as_read"
         android:icon="@drawable/mark_read_all_white"
         android:title="@string/mark_all_as_read"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/notifications_type"
+        android:icon="@drawable/filter"
+        android:title="@string/issue_filter"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/notification_filter_unread"
+                    android:checked="true"
+                    android:title="@string/unread" />
+                <item
+                    android:id="@+id/notification_filter_all"
+                    android:title="@string/repo_type_all" />
+                <item
+                    android:id="@+id/notification_filter_participating"
+                    android:title="@string/participating" />
+            </group>
+        </menu>
+    </item>
 </menu>

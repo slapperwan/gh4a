@@ -39,11 +39,9 @@ import java.util.Date;
 
 public class NotificationListFragment extends LoadingListFragmentBase implements
         RootAdapter.OnItemClickListener<NotificationHolder>,NotificationAdapter.OnNotificationActionCallback {
-    public static NotificationListFragment newInstance(boolean all, boolean participating) {
+    public static NotificationListFragment newInstance() {
         NotificationListFragment fragment = new NotificationListFragment();
         Bundle args = new Bundle();
-        args.putBoolean("all", all);
-        args.putBoolean("participating", participating);
         fragment.setArguments(args);
         return fragment;
     }
@@ -96,10 +94,6 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        Bundle args = getArguments();
-        mAll = args.getBoolean("all");
-        mParticipating = args.getBoolean("participating");
     }
 
     @Override
@@ -178,7 +172,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
+        int itemId = item.getItemId();
+        switch (itemId) {
             case R.id.mark_all_as_read:
                 new AlertDialog.Builder(getActivity())
                         .setMessage(R.string.mark_all_as_read_question)
@@ -192,9 +187,28 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
                         .setNegativeButton(R.string.cancel, null)
                         .show();
                 return true;
+            case R.id.notification_filter_unread:
+            case R.id.notification_filter_all:
+            case R.id.notification_filter_participating:
+                mAll = itemId == R.id.notification_filter_all;
+                mParticipating = itemId == R.id.notification_filter_participating;
+                item.setChecked(true);
+                reloadNotification();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void reloadNotification() {
+        if (mAdapter != null) {
+            mAdapter.clear();
+        }
+        setContentShown(false);
+        updateMenuItemVisibility();
+
+        getLoaderManager().destroyLoader(0);
+        getLoaderManager().initLoader(0, null, mNotificationsCallback);
     }
 
     @Override
