@@ -48,8 +48,7 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
 
             for (int i = 0; i < matches.size(); i++) {
                 TextMatch match = matches.get(i);
-                SpannableStringBuilder builder = new SpannableStringBuilder();
-                builder.append(match.getFragment());
+                SpannableStringBuilder builder = new SpannableStringBuilder(match.getFragment());
 
                 List<TextMatch.MatchItem> items = match.getMatches();
                 if (items != null) {
