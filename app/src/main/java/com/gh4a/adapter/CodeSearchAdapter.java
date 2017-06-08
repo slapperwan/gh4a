@@ -44,9 +44,7 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
 
         List<TextMatch> matches = result.getTextMatches();
         if (matches != null && !matches.isEmpty()) {
-
             LayoutInflater inflater = LayoutInflater.from(mContext);
-            holder.matchesContainer.removeAllViews();
 
             for (int i = 0; i < matches.size(); i++) {
                 TextMatch match = matches.get(i);
@@ -64,15 +62,22 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
                     }
                 }
 
-                View row =
-                        inflater.inflate(R.layout.row_search_match, holder.matchesContainer, false);
+                View row = holder.matchesContainer.getChildAt(i);
+                if (row == null) {
+                    row = inflater.inflate(R.layout.row_search_match,
+                            holder.matchesContainer, false);
+                    holder.matchesContainer.addView(row);
+                }
+
                 TextView tvMatch = (TextView) row.findViewById(R.id.tv_match);
                 tvMatch.setOnClickListener(this);
                 tvMatch.setText(builder);
                 tvMatch.setTag(result);
                 tvMatch.setTag(R.id.search_match_index, i);
-
-                holder.matchesContainer.addView(row);
+                row.setVisibility(View.VISIBLE);
+            }
+            for (int i = matches.size(); i < holder.matchesContainer.getChildCount(); i++) {
+                holder.matchesContainer.getChildAt(i).setVisibility(View.GONE);
             }
             holder.matchesContainer.setVisibility(View.VISIBLE);
         } else {
