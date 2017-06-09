@@ -59,6 +59,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
     private boolean mStarted;
     private boolean mHasData;
     private boolean mRequiresJsInterface;
+    private boolean mPageFinished;
+    private boolean mRenderingDone;
     private final Handler mHandler = new Handler();
 
     private static final String DARK_CSS_THEME = "dark";
@@ -78,8 +80,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    applyLineWrapping(shouldWrapLines());
-                    setContentShown(true);
+                    mRenderingDone = true;
+                    showContentIfDone();
                 }
             });
         }
@@ -102,10 +104,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
     private final WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public void onPageFinished(WebView view, String url) {
-            if (!mRequiresJsInterface) {
-                applyLineWrapping(shouldWrapLines());
-                setContentShown(true);
-            }
+            mPageFinished = true;
+            showContentIfDone();
         }
 
         @Override
@@ -296,7 +296,16 @@ public abstract class WebViewerActivity extends BaseActivity implements
         super.setContentShown(shown);
         if (!shown) {
             mHasData = false;
+            mRenderingDone = false;
+            mPageFinished = false;
             supportInvalidateOptionsMenu();
+        }
+    }
+
+    private void showContentIfDone() {
+        if (mPageFinished && (mRenderingDone || !mRequiresJsInterface)) {
+            applyLineWrapping(shouldWrapLines());
+            setContentShown(true);
         }
     }
 
