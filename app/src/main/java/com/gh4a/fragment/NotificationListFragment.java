@@ -40,10 +40,7 @@ import java.util.Date;
 public class NotificationListFragment extends LoadingListFragmentBase implements
         RootAdapter.OnItemClickListener<NotificationHolder>,NotificationAdapter.OnNotificationActionCallback {
     public static NotificationListFragment newInstance() {
-        NotificationListFragment fragment = new NotificationListFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+        return new NotificationListFragment();
     }
 
     private final LoaderCallbacks<NotificationListLoadResult> mNotificationsCallback =
