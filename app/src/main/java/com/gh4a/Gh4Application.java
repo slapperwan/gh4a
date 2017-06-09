@@ -19,10 +19,8 @@ package com.gh4a;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.os.Build;
-import android.text.TextUtils;
 import android.util.SparseArray;
 
 import com.gh4a.fragment.SettingsFragment;
@@ -33,6 +31,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.CommitService;
 import org.eclipse.egit.github.core.service.ContentsService;
+import org.eclipse.egit.github.core.service.DataService;
 import org.eclipse.egit.github.core.service.DownloadService;
 import org.eclipse.egit.github.core.service.EventService;
 import org.eclipse.egit.github.core.service.GistService;
@@ -65,6 +64,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public static final String COLLAB_SERVICE = "github.collaborator";
     public static final String COMMIT_SERVICE = "github.commit";
     public static final String CONTENTS_SERVICE = "github.contents";
+    public static final String DATA_SERVICE = "github.data";
     public static final String DOWNLOAD_SERVICE = "github.download";
     public static final String EVENT_SERVICE = "github.event";
     public static final String GIST_SERVICE = "github.gist";
@@ -142,6 +142,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mServices.put(COLLAB_SERVICE, new CollaboratorService(mClient));
         mServices.put(COMMIT_SERVICE, new CommitService(mClient));
         mServices.put(CONTENTS_SERVICE, new ContentsService(mClient));
+        mServices.put(DATA_SERVICE, new DataService(mClient));
         mServices.put(DOWNLOAD_SERVICE, new DownloadService(mClient));
         mServices.put(EVENT_SERVICE, new EventService(mClient));
         mServices.put(GIST_SERVICE, new GistService(mClient));

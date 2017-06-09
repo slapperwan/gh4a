@@ -126,6 +126,13 @@
     <string name="reviewed_files">Reviewed files:</string>
     <string name="show_details">Show details</string>
     <string name="preview">Preview</string>
+    <string name="restore">Restore</string>
+    <string name="restore_branch">Restore branch</string>
+    <string name="delete_branch">Delete branch</string>
+    <string name="restore_branch_question">Do you really want to restore the pull request branch?</string>
+    <string name="delete_branch_question">Do you really want to delete the pull request branch?</string>
+    <string name="restore_branch_error">Restoring branch failed</string>
+    <string name="delete_branch_error">Deleting branch failed</string>
 
     <string name="reaction_plus_one" translatable="false">+1</string>
     <string name="reaction_minus_one" translatable="false">-1</string>
