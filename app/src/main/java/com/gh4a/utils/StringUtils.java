@@ -143,27 +143,13 @@ public class StringUtils {
 
     @Nullable
     public static int[] findMatchingLines(String input, String match) {
-        String[] lines = input.split("\n");
-        String[] matchLines = match.split("\n");
-
-        for (int i = 0; i < lines.length - matchLines.length; i++) {
-            boolean isMatch = true;
-            for (int j = 0; j < matchLines.length; j++) {
-                String cLine = lines[i + j];
-                String fLine = matchLines[j];
-                if ((j == 0 && !cLine.endsWith(fLine)) ||
-                        (j != 0 && j != matchLines.length - 1 && !cLine.equals(fLine)) ||
-                        (j == matchLines.length - 1 && !cLine.startsWith(fLine))) {
-                    isMatch = false;
-                    break;
-                }
-            }
-
-            if (isMatch) {
-                return new int[] { i + 1, i + matchLines.length };
-            }
+        int pos = input.indexOf(match);
+        if (pos < 0) {
+            return null;
         }
 
-        return null;
+        int start = input.substring(0, pos).split("\n").length;
+        int end = start + match.split("\n").length - 1;
+        return new int[] { start, end };
     }
 }
