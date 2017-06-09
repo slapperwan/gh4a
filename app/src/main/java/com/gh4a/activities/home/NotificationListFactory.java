@@ -8,7 +8,7 @@ import com.gh4a.fragment.NotificationListFragment;
 
 public class NotificationListFactory extends FragmentFactory {
     private static final int[] TAB_TITLES =  new int[] {
-            R.string.notifications,
+        R.string.notifications
     };
 
     protected NotificationListFactory(HomeActivity activity) {
