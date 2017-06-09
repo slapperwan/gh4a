@@ -45,4 +45,15 @@
         android:textIsSelectable="true"
         tools:text="Review body" />
 
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_desc"
+        android:layout_marginTop="16dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textIsSelectable="true"
+        tools:text="Review body" />
+
 </RelativeLayout>

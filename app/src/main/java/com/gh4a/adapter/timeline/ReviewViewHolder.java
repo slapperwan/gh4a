@@ -16,6 +16,7 @@ class ReviewViewHolder
     private final ImageView mAvatarView;
     private final TextView mMessageView;
     private final TextView mBodyView;
+    private final TextView mDetailsView;
 
     public ReviewViewHolder(View itemView) {
         super(itemView);
@@ -23,6 +24,7 @@ class ReviewViewHolder
         mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
         mMessageView = (TextView) itemView.findViewById(R.id.tv_message);
         mBodyView = (TextView) itemView.findViewById(R.id.tv_desc);
+        mDetailsView = (TextView) itemView.findViewById(R.id.tv_details);
     }
 
     @Override
@@ -40,5 +42,7 @@ class ReviewViewHolder
         } else {
             mBodyView.setVisibility(View.GONE);
         }
+
+        mDetailsView.setText(item.comments.size() + " comments");
     }
 }

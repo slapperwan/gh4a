@@ -1,13 +1,13 @@
 package com.gh4a.loader;
 
 import android.content.Context;
+import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 
 import com.gh4a.Gh4Application;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.service.PullRequestService;
@@ -36,45 +36,71 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
         RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
         List<CommitComment> commitComments = pullRequestService.getComments(repoId, mIssueNumber);
-        HashMap<String, CommitFile> filesByName = new HashMap<>();
 
-        for (CommitFile file : pullRequestService.getFiles(repoId, mIssueNumber)) {
-            filesByName.put(file.getFilename(), file);
+//        HashMap<String, CommitFile> filesByName = new HashMap<>();
+//        for (CommitFile file : pullRequestService.getFiles(repoId, mIssueNumber)) {
+//            filesByName.put(file.getFilename(), file);
+//        }
+        Map<String, TimelineItem.TimelineReview> reviewsBySpecialId = new HashMap<>();
+        LongSparseArray<TimelineItem.TimelineReview> reviewsById = new LongSparseArray<>();
+        List<TimelineItem.TimelineReview> reviews = new ArrayList<>();
+        for (Review review : pullRequestService.getReviews(repoId, mIssueNumber)) {
+            TimelineItem.TimelineReview timelineReview = new TimelineItem.TimelineReview(review);
+            reviewsById.put(review.getId(), timelineReview);
+            reviews.add(timelineReview);
         }
 
-        final Map<String, CommitComment> data = new HashMap<>();
         for (CommitComment commitComment : commitComments) {
-            CommitFile file = filesByName.get(commitComment.getPath());
-            events.add(new TimelineItem.TimelineComment(commitComment, file));
+            String id = commitComment.getOriginalCommitId() + commitComment.getPath() +
+                    commitComment.getOriginalPosition();
+            TimelineItem.TimelineReview review = reviewsBySpecialId.get(id);
+            if (review == null) {
+                review = reviewsById.get(commitComment.getPullRequestReviewId());
+                reviewsBySpecialId.put(id, review);
+            }
 
-            String id = commitComment.getOriginalCommitId() + commitComment.getOriginalPosition();
-            if (data.containsKey(id)) {
-                if (data.get(id).getCreatedAt().after(commitComment.getCreatedAt())) {
-                    data.put(id, commitComment);
-                }
-            } else {
-                data.put(id, commitComment);
+            review.comments.add(commitComment);
+        }
+
+        for (TimelineItem.TimelineReview review : reviews) {
+            if (!review.review.getState().equals(Review.STATE_COMMENTED) ||
+                    !TextUtils.isEmpty(review.review.getBody()) ||
+                    review.comments.size() > 0) {
+                events.add(review);
             }
         }
 
-        final List<Review> reviews = pullRequestService.getReviews(repoId, mIssueNumber);
-
-        for (CommitComment commitComment : data.values()) {
-            for (Review review : reviews) {
-                if (commitComment.getPullRequestReviewId() == review.getId()) {
-                    events.add(new TimelineItem.TimelineReview(review));
-                    reviews.remove(review);
-                    break;
-                }
-            }
-        }
-
-        for (Review review : reviews) {
-            if (!TextUtils.isEmpty(review.getBody()) ||
-                    !review.getState().equals(Review.STATE_COMMENTED)) {
-                events.add(new TimelineItem.TimelineReview(review));
-            }
-        }
+//        final Map<String, CommitComment> data = new HashMap<>();
+//        for (CommitComment commitComment : commitComments) {
+//            CommitFile file = filesByName.get(commitComment.getPath());
+//            events.add(new TimelineItem.TimelineComment(commitComment, file));
+//
+//            String id = commitComment.getOriginalCommitId() + commitComment.getOriginalPosition();
+//            if (data.containsKey(id)) {
+//                if (data.get(id).getCreatedAt().after(commitComment.getCreatedAt())) {
+//                    data.put(id, commitComment);
+//                }
+//            } else {
+//                data.put(id, commitComment);
+//            }
+//        }
+//
+//        for (CommitComment commitComment : data.values()) {
+//            for (Review review : reviews) {
+//                if (commitComment.getPullRequestReviewId() == review.getId()) {
+//                    events.add(new TimelineItem.TimelineReview(review));
+//                    reviews.remove(review);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        for (Review review : reviews) {
+//            if (!TextUtils.isEmpty(review.getBody()) ||
+//                    !review.getState().equals(Review.STATE_COMMENTED)) {
+//                events.add(new TimelineItem.TimelineReview(review));
+//            }
+//        }
 
         Collections.sort(events, new Comparator<TimelineItem>() {
             @Override
@@ -91,18 +117,18 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
                 CommitComment rightCommitComment =
                         rightComment instanceof CommitComment ? (CommitComment) rightComment : null;
 
-                if (leftCommitComment != null && rightCommitComment != null) {
-                    String leftId = leftCommitComment.getOriginalCommitId() +
-                            leftCommitComment.getOriginalPosition();
-                    String rightId = rightCommitComment.getOriginalCommitId() +
-                            rightCommitComment.getOriginalPosition();
-                    if (leftId.equals(rightId)) {
-                        return compareByTime(lhs, rhs);
-                    }
-
-                    return data.get(leftId).getCreatedAt()
-                            .compareTo(data.get(rightId).getCreatedAt());
-                }
+//                if (leftCommitComment != null && rightCommitComment != null) {
+//                    String leftId = leftCommitComment.getOriginalCommitId() +
+//                            leftCommitComment.getOriginalPosition();
+//                    String rightId = rightCommitComment.getOriginalCommitId() +
+//                            rightCommitComment.getOriginalPosition();
+//                    if (leftId.equals(rightId)) {
+//                        return compareByTime(lhs, rhs);
+//                    }
+//
+//                    return data.get(leftId).getCreatedAt()
+//                            .compareTo(data.get(rightId).getCreatedAt());
+//                }
 
                 if (leftCommitComment != null && rhs instanceof TimelineItem.TimelineReview ||
                         lhs instanceof TimelineItem.TimelineReview && rightCommitComment != null) {
@@ -113,16 +139,16 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
 
                     String id = comment.getOriginalCommitId() + comment.getOriginalPosition();
 
-                    if (data.get(id).getPullRequestReviewId() == review.getId()) {
-                        return lhs instanceof TimelineItem.TimelineReview ? -1 : 1;
-                    }
-
-                    if (lhs instanceof TimelineItem.TimelineReview) {
-                        return Long.valueOf(review.getId())
-                                .compareTo(data.get(id).getPullRequestReviewId());
-                    }
-                    return Long.valueOf(data.get(id).getPullRequestReviewId())
-                            .compareTo(review.getId());
+//                    if (data.get(id).getPullRequestReviewId() == review.getId()) {
+//                        return lhs instanceof TimelineItem.TimelineReview ? -1 : 1;
+//                    }
+//
+//                    if (lhs instanceof TimelineItem.TimelineReview) {
+//                        return Long.valueOf(review.getId())
+//                                .compareTo(data.get(id).getPullRequestReviewId());
+//                    }
+//                    return Long.valueOf(data.get(id).getPullRequestReviewId())
+//                            .compareTo(review.getId());
                 }
 
                 return compareByTime(lhs, rhs);
