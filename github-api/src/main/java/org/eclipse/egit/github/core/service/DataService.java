@@ -10,6 +10,7 @@
  *****************************************************************************/
 package org.eclipse.egit.github.core.service;
 
+import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_BLOBS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COMMITS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_GIT;
@@ -40,6 +41,7 @@ import org.eclipse.egit.github.core.TypedResource;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PagedRequest;
+import org.eclipse.egit.github.core.client.RequestException;
 
 /**
  * Data service class for low-level access to Git repository data.
@@ -229,7 +231,15 @@ public class DataService extends GitHubService {
 		GitHubRequest request = createRequest();
 		request.setType(Reference.class);
 		request.setUri(uri);
-		return (Reference) client.get(request).getBody();
+
+		try {
+			return (Reference) client.get(request).getBody();
+		} catch (RequestException e) {
+			if (e.getStatus() == HTTP_NOT_FOUND) {
+				return null;
+			}
+			throw e;
+		}
 	}
 
 	/**
@@ -294,6 +304,28 @@ public class DataService extends GitHubService {
 	public Reference editReference(IRepositoryIdProvider repository,
 			Reference reference) throws IOException {
 		return editReference(repository, reference, false);
+	}
+
+	public void deleteReference(IRepositoryIdProvider repository,
+			Reference reference) throws IOException {
+		String id = getId(repository);
+
+		String ref = reference.getRef();
+		if (ref == null)
+			throw new IllegalArgumentException("Ref cannot be null"); //$NON-NLS-1$
+		if (ref.length() == 0)
+			throw new IllegalArgumentException("Ref cannot be empty"); //$NON-NLS-1$
+
+		StringBuilder uri = new StringBuilder();
+		uri.append(SEGMENT_REPOS);
+		uri.append("/").append(id);
+		uri.append(SEGMENT_GIT);
+		if (!ref.startsWith("refs/")) { //$NON-NLS-1$
+			uri.append(SEGMENT_REFS);
+		}
+		uri.append("/").append(ref);
+
+		client.delete(uri.toString());
 	}
 
 	/**
