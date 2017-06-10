@@ -12,9 +12,8 @@ import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 
-import org.eclipse.egit.github.core.CommitComment;
-
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 class ReviewViewHolder
         extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineReview>
@@ -55,8 +54,20 @@ class ReviewViewHolder
             mBodyView.setVisibility(View.GONE);
         }
 
-        if (!item.comments.isEmpty()) {
-            mDetailsView.setText(item.comments.size() + " chunks");
+        if (!item.chunks.isEmpty()) {
+            String text = "Code comments in ";
+            Set<String> usedNames = new HashSet<>();
+            for (TimelineItem.Diff diff : item.chunks.values()) {
+                if (!diff.comments.isEmpty()) {
+                    String filename = diff.comments.get(0).file.getFilename();
+                    if (!usedNames.contains(filename)) {
+                        text += filename + ", ";
+                        usedNames.add(filename);
+                    }
+                }
+            }
+            mDetailsView.setText(text);
+
             mDetailsView.setVisibility(View.VISIBLE);
             mShowDetailsButton.setVisibility(View.VISIBLE);
         } else {
@@ -70,13 +81,13 @@ class ReviewViewHolder
         TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
 
         StringBuilder builder = new StringBuilder();
-        for (List<CommitComment> commitComments : review.comments.values()) {
+        for (TimelineItem.Diff chunk : review.chunks.values()) {
             builder.append("\nDIFF\n\n");
 
-            int size = commitComments.size();
+            int size = chunk.comments.size();
             for (int i = 0; i < size; i++) {
-                CommitComment comment = commitComments.get(i);
-                builder.append(comment.getBody());
+                TimelineItem.TimelineComment comment = chunk.comments.get(i);
+                builder.append(comment.comment.getBody());
                 if (i < size - 1) {
                     builder.append("\n\n");
                 }

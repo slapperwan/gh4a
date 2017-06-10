@@ -1,11 +1,11 @@
 package com.gh4a.loader;
 
 import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Review;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -45,19 +45,9 @@ public abstract class TimelineItem {
         }
     }
 
-//    public static class TimelineCommitComment extends TimelineItem {
-//        public final CommitComment comment;
-//        public final CommitFile file;
-//
-//        public TimelineCommitComment(CommitComment comment, CommitFile file) {
-//            this.comment = comment;
-//            this.file = file;
-//        }
-//    }
-
     public static class TimelineReview extends TimelineItem {
         public final Review review;
-        public final Map<String, List<CommitComment>> comments = new HashMap<>();
+        public final Map<String, Diff> chunks = new HashMap<>();
 
         public TimelineReview(Review review) {
             this.review = review;
@@ -70,6 +60,8 @@ public abstract class TimelineItem {
     }
 
     public static class Diff extends TimelineItem {
+        public final List<TimelineComment> comments = new ArrayList<>();
+
         @Override
         public Date getCreatedAt() {
             return null;

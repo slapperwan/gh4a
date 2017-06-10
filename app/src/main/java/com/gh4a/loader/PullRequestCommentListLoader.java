@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.gh4a.Gh4Application;
 
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.service.PullRequestService;
@@ -35,10 +36,11 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
         RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
         List<CommitComment> commitComments = pullRequestService.getComments(repoId, mIssueNumber);
 
-//        HashMap<String, CommitFile> filesByName = new HashMap<>();
-//        for (CommitFile file : pullRequestService.getFiles(repoId, mIssueNumber)) {
-//            filesByName.put(file.getFilename(), file);
-//        }
+        HashMap<String, CommitFile> filesByName = new HashMap<>();
+        for (CommitFile file : pullRequestService.getFiles(repoId, mIssueNumber)) {
+            filesByName.put(file.getFilename(), file);
+        }
+
         Map<String, TimelineItem.TimelineReview> reviewsBySpecialId = new HashMap<>();
         LongSparseArray<TimelineItem.TimelineReview> reviewsById = new LongSparseArray<>();
         List<TimelineItem.TimelineReview> reviews = new ArrayList<>();
@@ -57,18 +59,20 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
                 reviewsBySpecialId.put(id, review);
             }
 
-            List<CommitComment> idComments = review.comments.get(id);
-            if (idComments == null) {
-                idComments = new ArrayList<>();
-                review.comments.put(id, idComments);
+            TimelineItem.Diff reviewChunk = review.chunks.get(id);
+            if (reviewChunk == null) {
+                reviewChunk = new TimelineItem.Diff();
+                review.chunks.put(id, reviewChunk);
             }
-            idComments.add(commitComment);
+
+            CommitFile file = filesByName.get(commitComment.getPath());
+            reviewChunk.comments.add(new TimelineItem.TimelineComment(commitComment, file));
         }
 
         for (TimelineItem.TimelineReview review : reviews) {
             if (!review.review.getState().equals(Review.STATE_COMMENTED) ||
                     !TextUtils.isEmpty(review.review.getBody()) ||
-                    review.comments.size() > 0) {
+                    !review.chunks.isEmpty()) {
                 events.add(review);
             }
         }
