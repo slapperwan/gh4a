@@ -95,6 +95,7 @@
             android:configChanges="orientation|screenSize" />
         <activity android:name=".activities.WikiListActivity" android:exported="false" />
         <activity android:name=".activities.home.HomeActivity" android:exported="false" />
+        <activity android:name=".activities.ReviewCommentsActivity" android:exported="false" />
 
         <activity
             android:name=".activities.SettingsActivity"

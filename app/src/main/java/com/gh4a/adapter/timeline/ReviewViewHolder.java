@@ -1,6 +1,6 @@
 package com.gh4a.adapter.timeline;
 
-import android.support.v7.app.AlertDialog;
+import android.content.Context;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -8,16 +8,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.ReviewCommentsActivity;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 class ReviewViewHolder
         extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineReview>
         implements View.OnClickListener {
+
+    private final Context mContext;
 
     private final ImageView mAvatarView;
     private final TextView mMessageView;
@@ -27,6 +32,8 @@ class ReviewViewHolder
 
     public ReviewViewHolder(View itemView) {
         super(itemView);
+
+        mContext = itemView.getContext();
 
         mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
         mMessageView = (TextView) itemView.findViewById(R.id.tv_message);
@@ -80,22 +87,26 @@ class ReviewViewHolder
     public void onClick(View v) {
         TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
 
-        StringBuilder builder = new StringBuilder();
-        for (TimelineItem.Diff chunk : review.chunks.values()) {
-            builder.append("\nDIFF\n\n");
-
-            int size = chunk.comments.size();
-            for (int i = 0; i < size; i++) {
-                TimelineItem.TimelineComment comment = chunk.comments.get(i);
-                builder.append(comment.comment.getBody());
-                if (i < size - 1) {
-                    builder.append("\n\n");
-                }
-            }
-        }
-        new AlertDialog.Builder(v.getContext())
-                .setMessage(builder.toString())
-                .setNegativeButton("Close", null)
-                .show();
+        Collection<TimelineItem.Diff> chunks = review.chunks.values();
+        mContext.startActivity(ReviewCommentsActivity.makeIntent(mContext, "Tunous", true,
+                new ArrayList<>(chunks)));
+//
+//        StringBuilder builder = new StringBuilder();
+//        for (TimelineItem.Diff chunk : review.chunks.values()) {
+//            builder.append("\nDIFF\n\n");
+//
+//            int size = chunk.comments.size();
+//            for (int i = 0; i < size; i++) {
+//                TimelineItem.TimelineComment comment = chunk.comments.get(i);
+//                builder.append(comment.comment.getBody());
+//                if (i < size - 1) {
+//                    builder.append("\n\n");
+//                }
+//            }
+//        }
+//        new AlertDialog.Builder(v.getContext())
+//                .setMessage(builder.toString())
+//                .setNegativeButton("Close", null)
+//                .show();
     }
 }

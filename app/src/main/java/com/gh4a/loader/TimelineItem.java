@@ -5,13 +5,14 @@ import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Review;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class TimelineItem {
+public abstract class TimelineItem implements Serializable {
     public static class TimelineComment extends TimelineItem {
         public final Comment comment;
         public final CommitFile file;
