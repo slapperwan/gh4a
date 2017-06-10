@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<HorizontalScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/light_primary"
-    android:padding="@dimen/content_padding">
+    android:fillViewport="true">
 
     <TextView
-        android:text="DIFF"
-        android:gravity="center_horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+        android:id="@+id/diff_hunk"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/code_diff_padding"
+        android:paddingBottom="@dimen/code_diff_padding"
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="+Diff lines\n+Are cool" />
+</HorizontalScrollView>

@@ -46,4 +46,7 @@
 
     <color name="nav_header_primary_text">#ffffffff</color>
     <color name="nav_header_secondary_text">#b3ffffff</color>
+
+    <color name="diff_add_light">#eaffea</color>
+    <color name="diff_remove_light">#ffecec</color>
 </resources>

@@ -13,6 +13,8 @@ import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.CommitFile;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -66,10 +68,13 @@ class ReviewViewHolder
             Set<String> usedNames = new HashSet<>();
             for (TimelineItem.Diff diff : item.chunks.values()) {
                 if (!diff.comments.isEmpty()) {
-                    String filename = diff.comments.get(0).file.getFilename();
-                    if (!usedNames.contains(filename)) {
-                        text += filename + ", ";
-                        usedNames.add(filename);
+                    CommitFile file = diff.comments.get(0).file;
+                    if (file != null) {
+                        String filename = file.getFilename();
+                        if (!usedNames.contains(filename)) {
+                            text += filename + ", ";
+                            usedNames.add(filename);
+                        }
                     }
                 }
             }
