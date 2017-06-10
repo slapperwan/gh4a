@@ -59,7 +59,12 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
                 reviewsBySpecialId.put(id, review);
             }
 
-            review.comments.add(commitComment);
+            List<CommitComment> idComments = review.comments.get(id);
+            if (idComments == null) {
+                idComments = new ArrayList<>();
+                review.comments.put(id, idComments);
+            }
+            idComments.add(commitComment);
         }
 
         for (TimelineItem.TimelineReview review : reviews) {

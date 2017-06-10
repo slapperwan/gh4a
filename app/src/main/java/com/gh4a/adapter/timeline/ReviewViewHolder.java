@@ -56,7 +56,7 @@ class ReviewViewHolder
         }
 
         if (!item.comments.isEmpty()) {
-            mDetailsView.setText(item.comments.size() + " comments");
+            mDetailsView.setText(item.comments.size() + " chunks");
             mDetailsView.setVisibility(View.VISIBLE);
             mShowDetailsButton.setVisibility(View.VISIBLE);
         } else {
@@ -70,13 +70,16 @@ class ReviewViewHolder
         TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
 
         StringBuilder builder = new StringBuilder();
-        List<CommitComment> comments = review.comments;
-        int size = comments.size();
-        for (int i = 0; i < size; i++) {
-            CommitComment comment = comments.get(i);
-            builder.append(comment.getBody());
-            if (i < size - 1) {
-                builder.append("\n\n");
+        for (List<CommitComment> commitComments : review.comments.values()) {
+            builder.append("\nDIFF\n\n");
+
+            int size = commitComments.size();
+            for (int i = 0; i < size; i++) {
+                CommitComment comment = commitComments.get(i);
+                builder.append(comment.getBody());
+                if (i < size - 1) {
+                    builder.append("\n\n");
+                }
             }
         }
         new AlertDialog.Builder(v.getContext())

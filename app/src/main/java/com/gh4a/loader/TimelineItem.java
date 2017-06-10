@@ -6,9 +6,10 @@ import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Review;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class TimelineItem {
     public static class TimelineComment extends TimelineItem {
@@ -56,7 +57,7 @@ public abstract class TimelineItem {
 
     public static class TimelineReview extends TimelineItem {
         public final Review review;
-        public final List<CommitComment> comments = new ArrayList<>();
+        public final Map<String, List<CommitComment>> comments = new HashMap<>();
 
         public TimelineReview(Review review) {
             this.review = review;
