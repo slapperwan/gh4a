@@ -7,10 +7,11 @@ import java.util.Date;
 
 public class Review implements Serializable {
 
-    public static final String STATE_COMMENTED = "COMMENTED";
     public static final String STATE_APPROVED = "APPROVED";
-    public static final String STATE_PENDING = "PENDING";
+    public static final String STATE_CHANGES_REQUESTED = "CHANGES_REQUESTED";
+    public static final String STATE_COMMENTED = "COMMENTED";
     public static final String STATE_DISMISSED = "DISMISSED";
+    public static final String STATE_PENDING = "PENDING";
 
     private long id;
 

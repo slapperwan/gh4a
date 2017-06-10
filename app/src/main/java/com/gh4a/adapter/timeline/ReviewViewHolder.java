@@ -14,6 +14,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.CommitFile;
+import org.eclipse.egit.github.core.Review;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,17 +57,16 @@ class ReviewViewHolder
 
     @Override
     public void bind(TimelineItem.TimelineReview item) {
+        Review review = item.review;
         mShowDetailsButton.setTag(item);
 
-        AvatarHandler.assignAvatar(mAvatarView, item.review.getUser());
-        mAvatarView.setTag(item.review.getUser());
+        AvatarHandler.assignAvatar(mAvatarView, review.getUser());
+        mAvatarView.setTag(review.getUser());
 
-        CharSequence time =
-                StringUtils.formatRelativeTime(mContext, item.review.getSubmittedAt(), true);
-        mMessageView.setText(item.review.getUser().getLogin() + " reviewed this " + time);
+        formatTitle(review);
 
-        if (!TextUtils.isEmpty(item.review.getBody())) {
-            mBodyView.setText(item.review.getBody());
+        if (!TextUtils.isEmpty(review.getBody())) {
+            mBodyView.setText(review.getBody());
             mBodyView.setVisibility(View.VISIBLE);
         } else {
             mBodyView.setVisibility(View.GONE);
@@ -94,6 +94,28 @@ class ReviewViewHolder
         } else {
             mDetailsView.setVisibility(View.GONE);
             mShowDetailsButton.setVisibility(View.GONE);
+        }
+    }
+
+    private void formatTitle(Review review) {
+        String login = review.getUser().getLogin();
+        CharSequence time = review.getSubmittedAt() != null
+                ? StringUtils.formatRelativeTime(mContext, review.getSubmittedAt(), true) : "";
+
+        switch (review.getState()) {
+            case Review.STATE_APPROVED:
+                mMessageView.setText(login + " approved these changes " + time);
+                break;
+            case Review.STATE_CHANGES_REQUESTED:
+                mMessageView.setText(login + " requested changes" + time);
+                break;
+            case Review.STATE_DISMISSED:
+            case Review.STATE_COMMENTED:
+                mMessageView.setText(login + " reviewed " + time);
+                break;
+            case Review.STATE_PENDING:
+                mMessageView.setText(login + " started a review " + time);
+                break;
         }
     }
 

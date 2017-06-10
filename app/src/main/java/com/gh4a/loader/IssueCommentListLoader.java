@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
@@ -34,7 +35,11 @@ public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
     public static final Comparator<TimelineItem> SORTER = new Comparator<TimelineItem>() {
         @Override
         public int compare(TimelineItem lhs, TimelineItem rhs) {
-            return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
+            Date createdAt = lhs.getCreatedAt();
+            if (createdAt == null) {
+                return 0;
+            }
+            return createdAt.compareTo(rhs.getCreatedAt());
         }
     };
 
