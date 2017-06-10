@@ -12,6 +12,8 @@ import org.eclipse.egit.github.core.service.IssueService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
@@ -29,13 +31,12 @@ public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
         IssueEvent.TYPE_RENAMED
     );
 
-    // TODO
-//    protected static final Comparator<IssueEventHolder> SORTER = new Comparator<IssueEventHolder>() {
-//        @Override
-//        public int compare(IssueEventHolder lhs, IssueEventHolder rhs) {
-//            return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
-//        }
-//    };
+    protected static final Comparator<TimelineItem> SORTER = new Comparator<TimelineItem>() {
+        @Override
+        public int compare(TimelineItem lhs, TimelineItem rhs) {
+            return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
+        }
+    };
 
     public IssueCommentListLoader(Context context, String repoOwner, String repoName,
             int issueNumber) {
@@ -69,7 +70,7 @@ public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
             }
         }
 
-//        Collections.sort(result, SORTER);
+        Collections.sort(result, SORTER);
 
         return result;
     }

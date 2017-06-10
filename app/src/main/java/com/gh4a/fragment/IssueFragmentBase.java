@@ -16,10 +16,12 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -63,9 +65,8 @@ import java.util.List;
 
 // TODO: Re-enable commented out code
 public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
-        View.OnClickListener, ReactionBar.Callback, ReactionBar.Item,
-        ReactionBar.ReactionDetailsCache.Listener,
-        CommentBoxFragment.Callback {
+        View.OnClickListener, CommentBoxFragment.Callback, TimelineItemAdapter.OnCommentAction,
+        ReactionBar.Callback, ReactionBar.Item, ReactionBar.ReactionDetailsCache.Listener {
     protected static final int REQUEST_EDIT = 1000;
 
     protected View mListHeaderView;
@@ -224,10 +225,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     protected RootAdapter<TimelineItem, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        mAdapter = new TimelineItemAdapter(getActivity());
-//        mAdapter = new IssueEventAdapter(getActivity(), mRepoOwner, mRepoName,
-//                mIssue.getNumber(), this);
-//        mAdapter.setLocked(isLocked());
+        mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, this);
+        mAdapter.setLocked(isLocked());
         return mAdapter;
     }
 
@@ -315,17 +314,17 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         if (!StringUtils.isBlank(body)) {
             mImageGetter.bind(descriptionView, body, mIssue.getId());
 
-//            if (!isLocked()) {
-//                descriptionView.setCustomSelectionActionModeCallback(
-//                        new UiUtils.QuoteActionModeCallback(descriptionView) {
-//                    @Override
-//                    public void onTextQuoted(CharSequence text) {
-//                        quoteText(text);
-//                    }
-//                });
-//            } else {
-//                descriptionView.setCustomSelectionActionModeCallback(null);
-//            }
+            if (!isLocked()) {
+                descriptionView.setCustomSelectionActionModeCallback(
+                        new UiUtils.QuoteActionModeCallback(descriptionView) {
+                    @Override
+                    public void onTextQuoted(CharSequence text) {
+                        quoteText(text);
+                    }
+                });
+            } else {
+                descriptionView.setCustomSelectionActionModeCallback(null);
+            }
         } else {
             SpannableString noDescriptionString = new SpannableString(getString(R.string.issue_no_description));
             noDescriptionString.setSpan(new StyleSpan(Typeface.ITALIC), 0, noDescriptionString.length(), 0);
@@ -438,11 +437,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         }
     }
 
-//    @Override
-//    public void quoteText(CharSequence text) {
-//        mCommentFragment.addQuote(text);
-//    }
-
     @Override
     public void onSendCommentInBackground(String comment) throws IOException {
         IssueService issueService = (IssueService)
@@ -458,24 +452,35 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         }
     }
 
-//    @Override
-//    public void deleteComment(final IssueEventHolder comment) {
-//        new AlertDialog.Builder(getActivity())
-//                .setMessage(R.string.delete_comment_message)
-//                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        new DeleteCommentTask(getBaseActivity(), comment.comment).schedule();
-//                    }
-//                })
-//                .setNegativeButton(R.string.cancel, null)
-//                .show();
-//    }
-
     protected abstract void bindSpecialViews(View headerView);
     protected abstract void assignHighlightColor();
     protected abstract void deleteCommentInBackground(RepositoryId repoId, Comment comment)
             throws Exception;
+
+    @Override
+    public void deleteComment(final Comment comment) {
+        new AlertDialog.Builder(getActivity())
+                .setMessage(R.string.delete_comment_message)
+                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new DeleteCommentTask(getBaseActivity(), comment).schedule();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    @Override
+    public void quoteText(CharSequence text) {
+        mCommentFragment.addQuote(text);
+    }
+
+    @Override
+    public String getShareSubject(Comment comment) {
+        return getString(R.string.share_comment_subject, comment.getId(), mIssue.getNumber(),
+                mRepoOwner + "/" + mRepoName);
+    }
 
     private class DeleteCommentTask extends ProgressDialogTask<Void> {
         private final Comment mComment;

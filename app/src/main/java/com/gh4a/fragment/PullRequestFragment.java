@@ -29,6 +29,8 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.EditIssueCommentActivity;
+import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.loader.CommitStatusLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -243,16 +245,15 @@ public class PullRequestFragment extends IssueFragmentBase {
                 mRepoOwner, mRepoName, mPullRequest.getNumber());
     }
 
-    // TODO
-//    @Override
-//    public void editComment(IssueEventHolder item) {
-//        Intent intent = item.comment instanceof CommitComment
-//                ? EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-//                        mPullRequest.getNumber(), (CommitComment) item.comment)
-//                : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-//                        mIssue.getNumber(), item.comment);
-//        startActivityForResult(intent, REQUEST_EDIT);
-//    }
+    @Override
+    public void editComment(Comment comment) {
+        Intent intent = comment instanceof CommitComment
+                ? EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                        mPullRequest.getNumber(), (CommitComment) comment)
+                : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                        mIssue.getNumber(), comment);
+        startActivityForResult(intent, REQUEST_EDIT);
+    }
 
     @Override
     protected void deleteCommentInBackground(RepositoryId repoId, Comment comment) throws Exception {
