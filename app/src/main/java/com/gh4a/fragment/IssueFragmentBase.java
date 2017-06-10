@@ -231,25 +231,33 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         return mAdapter;
     }
 
-//    @Override
-//    protected void onAddData(RootAdapter<TimelineItem, ?> adapter, List<TimelineItem> data) {
-//        super.onAddData(adapter, data);
-//        if (mInitialComment != null) {
-//            for (int i = 0; i < data.size(); i++) {
-//                IssueEventHolder event = data.get(i);
-//                if (event.comment == null) {
-//                    continue;
-//                }
-//                if (mInitialComment.matches(event.comment.getId(), event.getCreatedAt())) {
-//                    scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
-//                    break;
-//                }
-//            }
-//            mInitialComment = null;
-//        }
-//
+    @Override
+    protected void onAddData(RootAdapter<TimelineItem, ?> adapter, List<TimelineItem> data) {
+        super.onAddData(adapter, data);
+        if (mInitialComment != null) {
+            for (int i = 0; i < data.size(); i++) {
+                TimelineItem item = data.get(i);
+
+                if (item instanceof TimelineItem.TimelineComment) {
+                    TimelineItem.TimelineComment comment = (TimelineItem.TimelineComment) item;
+                    if (mInitialComment.matches(comment.comment.getId(), comment.getCreatedAt())) {
+                        scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
+                        break;
+                    }
+                } else if (item instanceof TimelineItem.TimelineReview) {
+                    TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) item;
+                    if (mInitialComment.matches(review.review.getId(), review.getCreatedAt())) {
+                        scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
+                        break;
+                    }
+                }
+            }
+            mInitialComment = null;
+        }
+
+        // TODO
 //        updateMentionUsers();
-//    }
+    }
 
     @Override
     protected int getEmptyTextResId() {
