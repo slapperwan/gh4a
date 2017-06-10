@@ -225,7 +225,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     protected RootAdapter<TimelineItem, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, this);
+        mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner,
+                mIssue.getPullRequest() != null, this);
         mAdapter.setLocked(isLocked());
         return mAdapter;
     }

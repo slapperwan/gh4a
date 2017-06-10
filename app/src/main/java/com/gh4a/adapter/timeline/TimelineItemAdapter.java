@@ -28,6 +28,7 @@ public class TimelineItemAdapter extends
 
     private final HttpImageGetter mImageGetter;
     private final String mRepoOwner;
+    private final boolean mIsPullRequest;
     private final OnCommentAction mActionCallback;
 
     private boolean mDontClearCacheOnClear;
@@ -78,10 +79,12 @@ public class TimelineItemAdapter extends
         }
     };
 
-    public TimelineItemAdapter(Context context, String repoOwner, OnCommentAction callback) {
+    public TimelineItemAdapter(Context context, String repoOwner, boolean isPullRequest,
+            OnCommentAction callback) {
         super(context);
         mImageGetter = new HttpImageGetter(context);
         mRepoOwner = repoOwner;
+        mIsPullRequest = isPullRequest;
         mActionCallback = callback;
     }
 
@@ -132,7 +135,7 @@ public class TimelineItemAdapter extends
                 break;
             case VIEW_TYPE_EVENT:
                 view = inflater.inflate(R.layout.row_timeline_event, parent, false);
-                holder = new EventViewHolder(view);
+                holder = new EventViewHolder(view, mIsPullRequest);
                 break;
             case VIEW_TYPE_REVIEW:
                 view = inflater.inflate(R.layout.row_timeline_review, parent, false);

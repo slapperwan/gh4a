@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.gh4a.R;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueLabelSpan;
@@ -44,21 +45,30 @@ class EventViewHolder
     }
 
     private final Context mContext;
+    private final boolean mIsPullRequest;
 
     private final ImageView mEventIconView;
     private final StyleableTextView mMessageView;
+    private final ImageView mAvatarView;
 
-    public EventViewHolder(View itemView) {
+    public EventViewHolder(View itemView, boolean isPullRequest) {
         super(itemView);
 
         mContext = itemView.getContext();
+        mIsPullRequest = isPullRequest;
 
         mEventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
         mMessageView = (StyleableTextView) itemView.findViewById(R.id.tv_message);
+        mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
     }
 
     @Override
     public void bind(TimelineItem.TimelineEvent item) {
+        User user = item.event.getAssigner() != null
+                ? item.event.getAssigner() : item.event.getActor();
+        AvatarHandler.assignAvatar(mAvatarView, user);
+        mAvatarView.setTag(user);
+
         Integer eventIconAttr = EVENT_ICONS.get(item.event.getEvent());
         if (eventIconAttr != null) {
             mEventIconView.setImageResource(UiUtils.resolveDrawable(mContext, eventIconAttr));
@@ -67,11 +77,8 @@ class EventViewHolder
             mEventIconView.setVisibility(View.GONE);
         }
 
-        User user = item.event.getAssigner() != null
-                ? item.event.getAssigner() : item.event.getActor();
-
         mMessageView.setText(formatEvent(item.event, user,
-                mMessageView.getTypefaceValue(), true/*TODO*/));
+                mMessageView.getTypefaceValue(), mIsPullRequest));
     }
 
     private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue,
