@@ -11,8 +11,8 @@
         android:id="@+id/iv_event_icon"
         android:layout_width="18dp"
         android:layout_height="18dp"
-        android:layout_gravity="center_vertical"
         android:layout_above="@+id/tv_desc"
+        android:layout_gravity="center_vertical"
         android:layout_marginRight="8dp"
         android:src="?searchUserIcon" />
     <!--TODO: Eye icon-->
@@ -50,10 +50,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_desc"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
         android:textIsSelectable="true"
         tools:text="Review body" />
+
+    <Button
+        android:id="@+id/btn_show_details"
+        style="?buttonBarButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_details"
+        android:layout_marginTop="8dp"
+        android:text="Show details" />
 
 </RelativeLayout>
