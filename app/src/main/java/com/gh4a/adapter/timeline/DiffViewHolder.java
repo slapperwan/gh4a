@@ -12,33 +12,53 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.loader.TimelineItem;
+import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
 
-class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Diff> {
+class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Diff>
+        implements View.OnClickListener {
 
-    private final TextView mDiffHunkTextView;
     private final int mAddedLineColor;
     private final int mRemovedLineColor;
     private final int mPadding;
 
-    public DiffViewHolder(View itemView) {
+    private final TextView mDiffHunkTextView;
+    private final TextView mFileTextView;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mIssueNumber;
+
+    public DiffViewHolder(View itemView, String repoOwner, String repoName, int issueNumber) {
         super(itemView);
 
-        mDiffHunkTextView = (TextView) itemView.findViewById(R.id.diff_hunk);
+        mRepoOwner = repoOwner;
+        mRepoName = repoName;
+        mIssueNumber = issueNumber;
 
         Context context = itemView.getContext();
         mAddedLineColor = ContextCompat.getColor(context, R.color.diff_add_light);
         mRemovedLineColor = ContextCompat.getColor(context, R.color.diff_remove_light);
         mPadding = context.getResources().getDimensionPixelSize(R.dimen.code_diff_padding);
         // TODO: Dark theme colors
+
+        mDiffHunkTextView = (TextView) itemView.findViewById(R.id.diff_hunk);
+        mFileTextView = (TextView) itemView.findViewById(R.id.tv_file);
+        mFileTextView.setOnClickListener(this);
     }
 
     @Override
     public void bind(TimelineItem.Diff item) {
         TimelineItem.TimelineComment timelineComment = item.comments.get(0);
         CommitComment comment = (CommitComment) timelineComment.comment;
+
+        boolean isOutdated = comment.getPosition() == -1;
+        mFileTextView.setText(comment.getPath() + (isOutdated ? " (Outdated)" : ""));
+        mFileTextView.setTag(timelineComment);
+
+        mFileTextView.setClickable(!isOutdated);
 
         String[] lines = comment.getDiffHunk().split("\n");
 
@@ -69,6 +89,25 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
             builder.setSpan(span, spanStart, spanEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         mDiffHunkTextView.setText(builder);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.tv_file) {
+            TimelineItem.TimelineComment timelineComment =
+                    (TimelineItem.TimelineComment) v.getTag();
+            CommitComment commitComment = (CommitComment) timelineComment.comment;
+
+            // TODO: Get commit files
+            v.getContext().startActivity(
+                    PullRequestDiffViewerActivity.makeIntent(mContext,
+                            mRepoOwner, mRepoName, mIssueNumber,
+                            commitComment.getCommitId(), commitComment.getPath(),
+                            timelineComment.file.getPatch(), null, commitComment.getPosition(),
+                            -1, -1, false,
+                            new IntentUtils.InitialCommentMarker(commitComment.getId()))
+            );
+        }
     }
 
     private static class PaddingCodeBlockSpan implements LineBackgroundSpan {

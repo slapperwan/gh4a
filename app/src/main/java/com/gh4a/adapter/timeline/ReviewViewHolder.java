@@ -25,6 +25,10 @@ class ReviewViewHolder
         implements View.OnClickListener {
 
     private final Context mContext;
+    private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mIssueNumber;
+    private final boolean mIsPullRequest;
 
     private final ImageView mAvatarView;
     private final TextView mMessageView;
@@ -32,10 +36,15 @@ class ReviewViewHolder
     private final TextView mDetailsView;
     private final Button mShowDetailsButton;
 
-    public ReviewViewHolder(View itemView) {
+    public ReviewViewHolder(View itemView, String repoOwner, String repoName, int issueNumber,
+            boolean isPullRequest) {
         super(itemView);
 
         mContext = itemView.getContext();
+        mRepoOwner = repoOwner;
+        mRepoName = repoName;
+        mIssueNumber = issueNumber;
+        mIsPullRequest = isPullRequest;
 
         mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
         mMessageView = (TextView) itemView.findViewById(R.id.tv_message);
@@ -93,25 +102,7 @@ class ReviewViewHolder
         TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
 
         Collection<TimelineItem.Diff> chunks = review.chunks.values();
-        mContext.startActivity(ReviewCommentsActivity.makeIntent(mContext, "Tunous", true,
-                new ArrayList<>(chunks)));
-//
-//        StringBuilder builder = new StringBuilder();
-//        for (TimelineItem.Diff chunk : review.chunks.values()) {
-//            builder.append("\nDIFF\n\n");
-//
-//            int size = chunk.comments.size();
-//            for (int i = 0; i < size; i++) {
-//                TimelineItem.TimelineComment comment = chunk.comments.get(i);
-//                builder.append(comment.comment.getBody());
-//                if (i < size - 1) {
-//                    builder.append("\n\n");
-//                }
-//            }
-//        }
-//        new AlertDialog.Builder(v.getContext())
-//                .setMessage(builder.toString())
-//                .setNegativeButton("Close", null)
-//                .show();
+        mContext.startActivity(ReviewCommentsActivity.makeIntent(mContext, mRepoOwner, mRepoName,
+                mIssueNumber, mIsPullRequest, new ArrayList<>(chunks)));
     }
 }

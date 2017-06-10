@@ -1,17 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HorizontalScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:fillViewport="true">
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/diff_hunk"
-        android:layout_width="wrap_content"
+        android:id="@+id/tv_file"
+        android:layout_width="match_parent"
+        android:textColor="?colorPrimary"
+        android:textStyle="bold"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/code_diff_padding"
-        android:paddingBottom="@dimen/code_diff_padding"
-        android:textColor="?android:attr/textColorPrimary"
-        tools:text="+Diff lines\n+Are cool" />
-</HorizontalScrollView>
+        android:background="?selectableItemBackground"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        tools:text="/path/to/filename.txt" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_file"
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/diff_hunk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/code_diff_padding"
+            android:paddingTop="@dimen/code_diff_padding"
+            android:textColor="?android:attr/textColorPrimary"
+            tools:text="+Diff lines\n+Are cool" />
+    </HorizontalScrollView>
+
+</LinearLayout>

@@ -28,6 +28,8 @@ public class TimelineItemAdapter extends
 
     private final HttpImageGetter mImageGetter;
     private final String mRepoOwner;
+    private final String mRepoName;
+    private final int mIssueNumber;
     private final boolean mIsPullRequest;
     private final OnCommentAction mActionCallback;
 
@@ -79,11 +81,13 @@ public class TimelineItemAdapter extends
         }
     };
 
-    public TimelineItemAdapter(Context context, String repoOwner, boolean isPullRequest,
-            OnCommentAction callback) {
+    public TimelineItemAdapter(Context context, String repoOwner, String repoName, int issueNumber,
+            boolean isPullRequest, OnCommentAction callback) {
         super(context);
         mImageGetter = new HttpImageGetter(context);
         mRepoOwner = repoOwner;
+        mRepoName = repoName;
+        mIssueNumber = issueNumber;
         mIsPullRequest = isPullRequest;
         mActionCallback = callback;
     }
@@ -139,11 +143,12 @@ public class TimelineItemAdapter extends
                 break;
             case VIEW_TYPE_REVIEW:
                 view = inflater.inflate(R.layout.row_timeline_review, parent, false);
-                holder = new ReviewViewHolder(view);
+                holder = new ReviewViewHolder(view, mRepoOwner, mRepoName, mIssueNumber,
+                        mIsPullRequest);
                 break;
             case VIEW_TYPE_DIFF:
                 view = inflater.inflate(R.layout.row_timeline_diff, parent, false);
-                holder = new DiffViewHolder(view);
+                holder = new DiffViewHolder(view, mRepoOwner, mRepoName, mIssueNumber);
                 break;
             case VIEW_TYPE_REPLY:
                 view = inflater.inflate(R.layout.row_timeline_reply, parent, false);
