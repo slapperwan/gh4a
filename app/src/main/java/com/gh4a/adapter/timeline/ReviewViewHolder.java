@@ -16,8 +16,6 @@ import com.gh4a.utils.StringUtils;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.Review;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -123,8 +121,7 @@ class ReviewViewHolder
     public void onClick(View v) {
         TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
 
-        Collection<TimelineItem.Diff> chunks = review.chunks.values();
         mContext.startActivity(ReviewCommentsActivity.makeIntent(mContext, mRepoOwner, mRepoName,
-                mIssueNumber, mIsPullRequest, new ArrayList<>(chunks)));
+                mIssueNumber, mIsPullRequest, review));
     }
 }

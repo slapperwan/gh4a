@@ -38,18 +38,16 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase {
                     return null;
                 }
             };
-    private TimelineItemAdapter mAdapter;
 
     public static ReviewCommentsFragment newInstance(String repoOwner, String repoName,
-            int issueNumber, boolean isPullRequest,
-            ArrayList<TimelineItem.Diff> chunks) {
+            int issueNumber, boolean isPullRequest, TimelineItem.TimelineReview review) {
         ReviewCommentsFragment f = new ReviewCommentsFragment();
         Bundle args = new Bundle();
         args.putString("repo_owner", repoOwner);
         args.putString("repo_name", repoName);
         args.putInt("issue_number", issueNumber);
         args.putBoolean("is_pr", isPullRequest);
-        args.putSerializable("chunks", chunks);
+        args.putSerializable("review", review);
         f.setArguments(args);
         return f;
     }
@@ -58,7 +56,7 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase {
     private String mRepoName;
     private int mIssueNumber;
     private boolean mIsPullRequest;
-    private List<TimelineItem.Diff> mChunks;
+    private TimelineItem.TimelineReview mReview;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,25 +66,27 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase {
         mRepoName = args.getString("repo_name");
         mIssueNumber = args.getInt("issue_number");
         mIsPullRequest = args.getBoolean("is_pr");
-        mChunks = (List<TimelineItem.Diff>) args.getSerializable("chunks");
+        mReview = (TimelineItem.TimelineReview) args.getSerializable("review");
     }
 
     @Override
     protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
         super.onRecyclerViewInflated(view, inflater);
-        mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
-                mIsPullRequest, mCallback);
 
-        Collections.sort(mChunks, IssueCommentListLoader.SORTER);
+        TimelineItemAdapter adapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName,
+                mIssueNumber, mIsPullRequest, mCallback);
 
-        for (TimelineItem.Diff chunk : mChunks) {
-            mAdapter.add(chunk);
+        List<TimelineItem.Diff> chunks = new ArrayList<>(mReview.chunks.values());
+        Collections.sort(chunks, IssueCommentListLoader.SORTER);
+
+        for (TimelineItem.Diff chunk : chunks) {
+            adapter.add(chunk);
             for (TimelineItem.TimelineComment comment : chunk.comments) {
-                mAdapter.add(comment);
+                adapter.add(comment);
             }
-            mAdapter.add(new TimelineItem.Reply());
+            adapter.add(new TimelineItem.Reply());
         }
-        view.setAdapter(mAdapter);
+        view.setAdapter(adapter);
     }
 
     @Override
