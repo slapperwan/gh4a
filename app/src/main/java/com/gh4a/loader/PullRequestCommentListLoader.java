@@ -15,6 +15,7 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,13 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
             reviewsById.put(review.getId(), timelineReview);
             reviews.add(timelineReview);
         }
+
+        Collections.sort(commitComments, new Comparator<CommitComment>() {
+            @Override
+            public int compare(CommitComment o1, CommitComment o2) {
+                return o1.getCreatedAt().compareTo(o2.getCreatedAt());
+            }
+        });
 
         for (CommitComment commitComment : commitComments) {
             String id = commitComment.getOriginalCommitId() + commitComment.getPath() +

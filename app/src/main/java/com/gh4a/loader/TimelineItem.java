@@ -65,7 +65,8 @@ public abstract class TimelineItem implements Serializable {
 
         @Override
         public Date getCreatedAt() {
-            return null;
+            TimelineComment timelineComment = comments.get(0);
+            return timelineComment != null ? timelineComment.getCreatedAt() : null;
         }
     }
 

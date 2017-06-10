@@ -6,36 +6,38 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
+import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.TimelineItem;
 
 import org.eclipse.egit.github.core.Comment;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class ReviewCommentsFragment extends LoadingListFragmentBase {
-    private TimelineItemAdapter.OnCommentAction mCallback = new TimelineItemAdapter.OnCommentAction() {
-        @Override
-        public void editComment(Comment comment) {
+    private TimelineItemAdapter.OnCommentAction mCallback =
+            new TimelineItemAdapter.OnCommentAction() {
+                @Override
+                public void editComment(Comment comment) {
 
-        }
+                }
 
-        @Override
-        public void deleteComment(Comment comment) {
+                @Override
+                public void deleteComment(Comment comment) {
 
-        }
+                }
 
-        @Override
-        public void quoteText(CharSequence text) {
+                @Override
+                public void quoteText(CharSequence text) {
 
-        }
+                }
 
-        @Override
-        public String getShareSubject(Comment comment) {
-            return null;
-        }
-    };
+                @Override
+                public String getShareSubject(Comment comment) {
+                    return null;
+                }
+            };
     private TimelineItemAdapter mAdapter;
 
     public static ReviewCommentsFragment newInstance(String repoOwner, String repoName,
@@ -56,7 +58,7 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase {
     private String mRepoName;
     private int mIssueNumber;
     private boolean mIsPullRequest;
-    private Collection<TimelineItem.Diff> mChunks;
+    private List<TimelineItem.Diff> mChunks;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,6 +76,9 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase {
         super.onRecyclerViewInflated(view, inflater);
         mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
                 mIsPullRequest, mCallback);
+
+        Collections.sort(mChunks, IssueCommentListLoader.SORTER);
+
         for (TimelineItem.Diff chunk : mChunks) {
             mAdapter.add(chunk);
             for (TimelineItem.TimelineComment comment : chunk.comments) {

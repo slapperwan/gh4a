@@ -31,7 +31,7 @@ public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
         IssueEvent.TYPE_RENAMED
     );
 
-    protected static final Comparator<TimelineItem> SORTER = new Comparator<TimelineItem>() {
+    public static final Comparator<TimelineItem> SORTER = new Comparator<TimelineItem>() {
         @Override
         public int compare(TimelineItem lhs, TimelineItem rhs) {
             return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
