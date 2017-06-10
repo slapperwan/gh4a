@@ -29,5 +29,5 @@
     <dimen name="bullet_span_margin">6dp</dimen>
     <dimen name="divider_span_height">1dp</dimen>
 
-    <dimen name="code_diff_padding">16dp</dimen>
+    <dimen name="code_diff_padding">8dp</dimen>
 </resources>

@@ -54,8 +54,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class DiffViewerActivity extends WebViewerActivity implements
         ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
@@ -76,8 +74,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 .putExtra("initial_comment", initialComment);
     }
 
-    private static final Pattern HUNK_START_PATTERN =
-            Pattern.compile("@@ -(\\d+),\\d+ \\+(\\d+),\\d+.*");
     private static final String COMMENT_ADD_URI_FORMAT =
             "comment://add?position=%d&l=%d&r=%d&isRightLine=%b";
     private static final String COMMENT_EDIT_URI_FORMAT =
@@ -263,10 +259,10 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             String line = mDiffLines[i];
             String cssClass = null;
             if (line.startsWith("@@")) {
-                Matcher matcher = HUNK_START_PATTERN.matcher(line);
-                if (matcher.matches()) {
-                    leftDiffPosition = Integer.parseInt(matcher.group(1)) - 1;
-                    rightDiffPosition = Integer.parseInt(matcher.group(2)) - 1;
+                int[] lineNumbers = StringUtils.extractDiffHunkLineNumbers(line);
+                if (lineNumbers != null) {
+                    leftDiffPosition = lineNumbers[0];
+                    rightDiffPosition = lineNumbers[1];
                 }
                 cssClass = "change";
             } else if (line.startsWith("+")) {

@@ -49,4 +49,6 @@
 
     <color name="diff_add_light">#eaffea</color>
     <color name="diff_remove_light">#ffecec</color>
+    <color name="diff_add_line_number_light">#dbffdb</color>
+    <color name="diff_remove_line_number_light">#ffdddd</color>
 </resources>

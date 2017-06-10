@@ -17,6 +17,7 @@ package com.gh4a.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
@@ -26,6 +27,7 @@ import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.StyleableTextView;
 
 import java.util.Date;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -40,6 +42,9 @@ public class StringUtils {
             "\\." +
             "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
             ")+");
+
+    private static final Pattern HUNK_START_PATTERN =
+            Pattern.compile("@@ -(\\d+),\\d+ \\+(\\d+),\\d+.*");
 
     /**
      * Checks if is blank.
@@ -151,5 +156,20 @@ public class StringUtils {
         int start = input.substring(0, pos).split("\n").length;
         int end = start + match.split("\n").length - 1;
         return new int[] { start, end };
+    }
+
+    public static int[] extractDiffHunkLineNumbers(@NonNull String diffHunk) {
+        if (!diffHunk.startsWith("@@")) {
+            return null;
+        }
+
+        Matcher matcher = HUNK_START_PATTERN.matcher(diffHunk);
+        if (matcher.matches()) {
+            int leftLine = Integer.parseInt(matcher.group(1)) - 1;
+            int rightLine = Integer.parseInt(matcher.group(2)) - 1;
+            return new int[] { leftLine, rightLine };
+        }
+
+        return null;
     }
 }
