@@ -1,6 +1,7 @@
 package com.gh4a.adapter.timeline;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -149,21 +150,22 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
     }
 
     @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.tv_file) {
+    public void onClick(View view) {
+        if (view.getId() == R.id.tv_file) {
             TimelineItem.TimelineComment timelineComment =
-                    (TimelineItem.TimelineComment) v.getTag();
+                    (TimelineItem.TimelineComment) view.getTag();
             CommitComment commitComment = timelineComment.getCommitComment();
 
-            // TODO: Get commit files
-            v.getContext().startActivity(
-                    PullRequestDiffViewerActivity.makeIntent(mContext,
-                            mRepoOwner, mRepoName, mIssueNumber,
-                            commitComment.getCommitId(), commitComment.getPath(),
-                            timelineComment.file.getPatch(), null, commitComment.getPosition(),
-                            -1, -1, false,
-                            new IntentUtils.InitialCommentMarker(commitComment.getId()))
-            );
+            if (timelineComment.file == null || commitComment == null) {
+                return;
+            }
+
+            Intent intent = PullRequestDiffViewerActivity.makeIntent(mContext, mRepoOwner,
+                    mRepoName, mIssueNumber, commitComment.getCommitId(), commitComment.getPath(),
+                    timelineComment.file.getPatch(), null, commitComment.getPosition(), -1, -1,
+                    false, new IntentUtils.InitialCommentMarker(commitComment.getId()));
+
+            view.getContext().startActivity(intent);
         }
     }
 
