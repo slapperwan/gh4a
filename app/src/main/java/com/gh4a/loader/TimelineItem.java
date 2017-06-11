@@ -1,6 +1,10 @@
 package com.gh4a.loader;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.IssueEvent;
 import org.eclipse.egit.github.core.Review;
@@ -14,17 +18,25 @@ import java.util.Map;
 
 public abstract class TimelineItem implements Serializable {
     public static class TimelineComment extends TimelineItem {
+        @NonNull
         public final Comment comment;
+
+        @Nullable
         public final CommitFile file;
 
-        public TimelineComment(Comment comment) {
+        public TimelineComment(@NonNull Comment comment) {
             this.comment = comment;
             this.file = null;
         }
 
-        public TimelineComment(Comment comment, CommitFile file) {
-            this.comment = comment;
+        public TimelineComment(@NonNull CommitComment commitComment, @NonNull CommitFile file) {
+            this.comment = commitComment;
             this.file = file;
+        }
+
+        @Nullable
+        public CommitComment getCommitComment() {
+            return comment instanceof CommitComment ? (CommitComment) comment : null;
         }
 
         @Override
@@ -34,9 +46,10 @@ public abstract class TimelineItem implements Serializable {
     }
 
     public static class TimelineEvent extends TimelineItem {
+        @NonNull
         public final IssueEvent event;
 
-        public TimelineEvent(IssueEvent event) {
+        public TimelineEvent(@NonNull IssueEvent event) {
             this.event = event;
         }
 
@@ -47,10 +60,13 @@ public abstract class TimelineItem implements Serializable {
     }
 
     public static class TimelineReview extends TimelineItem {
+        @NonNull
         public final Review review;
+
+        @NonNull
         public final Map<String, Diff> chunks = new HashMap<>();
 
-        public TimelineReview(Review review) {
+        public TimelineReview(@NonNull Review review) {
             this.review = review;
         }
 
@@ -60,13 +76,68 @@ public abstract class TimelineItem implements Serializable {
         }
     }
 
-    public static class Diff extends TimelineItem {
+    public static class Diff extends TimelineItem implements Comparable<Diff> {
+        @NonNull
         public final List<TimelineComment> comments = new ArrayList<>();
+
+        @NonNull
+        public TimelineComment getInitialTimelineComment() {
+            TimelineComment timelineComment = comments.get(0);
+
+            if (timelineComment == null) {
+                throw new AssertionError("Missing required initial comment.");
+            }
+
+            return timelineComment;
+        }
+
+        @NonNull
+        public CommitComment getInitialComment() {
+            TimelineComment comment = getInitialTimelineComment();
+
+            if (comment.getCommitComment() == null) {
+                throw new AssertionError("Missing required initial commit comment.");
+            }
+
+            return comment.getCommitComment();
+        }
 
         @Override
         public Date getCreatedAt() {
-            TimelineComment timelineComment = comments.get(0);
-            return timelineComment != null ? timelineComment.getCreatedAt() : null;
+            return getInitialComment().getCreatedAt();
+        }
+
+        @Override
+        public int compareTo(@NonNull Diff other) {
+            CommitComment comment = getInitialComment();
+            CommitComment otherComment = other.getInitialComment();
+
+            // Outdated comments should be located after these that are still up-to date
+            if (comment.getPosition() == -1 && otherComment.getPosition() != -1) {
+                return 1;
+            }
+            if (comment.getPosition() != -1 && otherComment.getPosition() == -1) {
+                return -1;
+            }
+
+            Date createdAt = getCreatedAt();
+            Date otherCreatedAt = other.getCreatedAt();
+
+            if (createdAt == null && otherCreatedAt == null) {
+                // TODO: Figure out how to sort hunks if both are for pending reviews.
+                return 0;
+            }
+
+            // Null created date means that the diff is for a pending review, place these after
+            // other diffs.
+            if (createdAt == null) {
+                return 1;
+            }
+            if (otherCreatedAt == null) {
+                return -1;
+            }
+
+            return createdAt.compareTo(otherCreatedAt);
         }
     }
 
@@ -77,5 +148,6 @@ public abstract class TimelineItem implements Serializable {
         }
     }
 
+    @Nullable
     public abstract Date getCreatedAt();
 }

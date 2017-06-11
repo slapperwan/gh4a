@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
-import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.TimelineItem;
 
 import org.eclipse.egit.github.core.Comment;
@@ -77,7 +76,7 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase {
                 mIssueNumber, mIsPullRequest, mCallback);
 
         List<TimelineItem.Diff> chunks = new ArrayList<>(mReview.chunks.values());
-        Collections.sort(chunks, IssueCommentListLoader.SORTER);
+        Collections.sort(chunks);
 
         for (TimelineItem.Diff chunk : chunks) {
             adapter.add(chunk);

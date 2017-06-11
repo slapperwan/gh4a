@@ -60,12 +60,11 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
     @Override
     public void bind(TimelineItem.Diff item) {
-        TimelineItem.TimelineComment timelineComment = item.comments.get(0);
-        CommitComment comment = (CommitComment) timelineComment.comment;
+        CommitComment comment = item.getInitialComment();
 
         boolean isOutdated = comment.getPosition() == -1;
         mFileTextView.setText(comment.getPath() + (isOutdated ? " (Outdated)" : ""));
-        mFileTextView.setTag(timelineComment);
+        mFileTextView.setTag(item.getInitialTimelineComment());
 
         mFileTextView.setClickable(!isOutdated);
 
@@ -154,7 +153,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         if (v.getId() == R.id.tv_file) {
             TimelineItem.TimelineComment timelineComment =
                     (TimelineItem.TimelineComment) v.getTag();
-            CommitComment commitComment = (CommitComment) timelineComment.comment;
+            CommitComment commitComment = timelineComment.getCommitComment();
 
             // TODO: Get commit files
             v.getContext().startActivity(

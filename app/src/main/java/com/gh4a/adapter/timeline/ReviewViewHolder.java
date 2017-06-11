@@ -75,7 +75,7 @@ class ReviewViewHolder
             Set<String> usedNames = new HashSet<>();
             for (TimelineItem.Diff diff : item.chunks.values()) {
                 if (!diff.comments.isEmpty()) {
-                    CommitFile file = diff.comments.get(0).file;
+                    CommitFile file = diff.getInitialTimelineComment().file;
                     if (file != null) {
                         String filename = file.getFilename();
                         if (!usedNames.contains(filename)) {
