@@ -81,7 +81,11 @@ class CommentViewHolder
         ivGravatar.setTag(user);
 
         tvTimestamp.setText(StringUtils.formatRelativeTime(mContext, createdAt, true));
-        if (createdAt.equals(updatedAt)) {
+        if (createdAt.equals(updatedAt) || item.getCommitComment() != null) {
+            // Unlike issue comments, the update timestamp for commit comments also changes
+            // when e.g. the line number changes due to the diff the comment was made on
+            // becoming outdated. As we can't distinguish those updates from comment body
+            // updates, hide the edit timestamp for all commit comments.
             tvEditTimestamp.setVisibility(View.GONE);
         } else {
             tvEditTimestamp.setText(StringUtils.formatRelativeTime(mContext, updatedAt, true));
