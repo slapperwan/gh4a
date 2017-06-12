@@ -13,6 +13,7 @@ import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 
+import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.Review;
 
@@ -71,21 +72,34 @@ class ReviewViewHolder
         }
 
         if (!item.chunks.isEmpty()) {
-            String text = "Code comments in ";
+            StringBuilder builder = new StringBuilder("Code comments in ");
             Set<String> usedNames = new HashSet<>();
+
+            boolean isOutdated = true;
+
             for (TimelineItem.Diff diff : item.chunks.values()) {
-                if (!diff.comments.isEmpty()) {
-                    CommitFile file = diff.getInitialTimelineComment().file;
-                    if (file != null) {
-                        String filename = file.getFilename();
-                        if (!usedNames.contains(filename)) {
-                            text += filename + ", ";
-                            usedNames.add(filename);
-                        }
+                TimelineItem.TimelineComment timelineComment = diff.getInitialTimelineComment();
+
+                CommitComment commitComment = timelineComment.getCommitComment();
+                if (commitComment != null && commitComment.getPosition() != -1) {
+                    isOutdated = false;
+                }
+                CommitFile file = timelineComment.file;
+
+                if (file != null) {
+                    String filename = file.getFilename();
+                    if (!usedNames.contains(filename)) {
+                        builder.append(filename).append(", ");
+                        usedNames.add(filename);
                     }
                 }
             }
-            mDetailsView.setText(text);
+
+            if (isOutdated) {
+                builder.append("\n\nAll comments are outdated");
+            }
+
+            mDetailsView.setText(builder.toString());
 
             mDetailsView.setVisibility(View.VISIBLE);
             mShowDetailsButton.setVisibility(View.VISIBLE);
