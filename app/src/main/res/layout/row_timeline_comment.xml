@@ -67,7 +67,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_edit_timestamp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_toLeftOf="@id/iv_menu"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"

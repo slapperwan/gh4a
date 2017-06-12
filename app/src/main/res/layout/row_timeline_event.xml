@@ -4,25 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="@dimen/content_padding">
 
-    <com.gh4a.widget.FixedSizeImageView
-        android:id="@+id/iv_event_icon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginRight="8dp"
-        tools:src="@drawable/issue_event_closed" />
+    <FrameLayout
+        android:id="@+id/avatar_container"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginRight="8dp">
 
-    <com.gh4a.widget.FixedSizeImageView
-        android:id="@+id/iv_gravatar"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginRight="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        tools:src="@drawable/default_avatar" />
+        <com.gh4a.widget.FixedSizeImageView
+            android:id="@+id/iv_gravatar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            tools:src="@drawable/default_avatar" />
+
+        <com.gh4a.widget.FixedSizeImageView
+            android:id="@+id/iv_event_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_gravity="end|bottom"
+            android:visibility="gone"
+            tools:src="@drawable/issue_event_closed"
+            tools:visibility="visible" />
+    </FrameLayout>
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_message"
