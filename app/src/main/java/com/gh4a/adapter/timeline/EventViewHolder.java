@@ -1,6 +1,7 @@
 package com.gh4a.adapter.timeline;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.TypefaceSpan;
@@ -8,11 +9,13 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.gh4a.R;
+import com.gh4a.activities.CommitActivity;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.StyleableTextView;
 
@@ -22,10 +25,14 @@ import org.eclipse.egit.github.core.Rename;
 import org.eclipse.egit.github.core.User;
 
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class EventViewHolder
         extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineEvent> {
 
+    private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
+            Pattern.compile(".*github.com/repos/([^/]+)/([^/]+)/commits");
     private static final HashMap<String, Integer> EVENT_ICONS = new HashMap<>();
 
     static {
@@ -45,21 +52,27 @@ class EventViewHolder
     }
 
     private final Context mContext;
+    private final String mRepoOwner;
+    private final String mRepoName;
     private final boolean mIsPullRequest;
 
+    private final ImageView mAvatarView;
     private final ImageView mEventIconView;
     private final StyleableTextView mMessageView;
-    private final ImageView mAvatarView;
 
-    public EventViewHolder(View itemView, boolean isPullRequest) {
+    public EventViewHolder(View itemView, String repoOwner, String repoName,
+            boolean isPullRequest) {
         super(itemView);
 
         mContext = itemView.getContext();
+        mRepoOwner = repoOwner;
+        mRepoName = repoName;
         mIsPullRequest = isPullRequest;
 
+        mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
         mEventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
         mMessageView = (StyleableTextView) itemView.findViewById(R.id.tv_message);
-        mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
+        mMessageView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
     }
 
     @Override
@@ -192,26 +205,27 @@ class EventViewHolder
         int pos = text.toString().indexOf("[commit]");
         if (event.getCommitId() != null && pos >= 0) {
             text.replace(pos, pos + 8, event.getCommitId().substring(0, 7));
+            text.setSpan(new IntentSpan(mContext) {
+                @Override
+                protected Intent getIntent() {
+                    // The commit might be in a different repo. The API doesn't provide
+                    // that information directly, so get it indirectly by parsing the URL
+                    String repoOwner = mRepoOwner;
+                    String repoName = mRepoName;
+                    String url = event.getCommitUrl();
+                    if (url != null) {
+                        Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
+                        if (matcher.find()) {
+                            repoOwner = matcher.group(1);
+                            repoName = matcher.group(2);
+                        }
+                    }
+
+                    return CommitActivity.makeIntent(mContext, repoOwner, repoName,
+                            event.getCommitId());
+                }
+            }, pos, pos + 7, 0);
             text.setSpan(new TypefaceSpan("monospace"), pos, pos + 7, 0);
-//            text.setSpan(new IntentSpan(mContext) {
-//                @Override
-//                protected Intent getIntent() {
-//                    // The commit might be in a different repo. The API doesn't provide
-//                    // that information directly, so get it indirectly by parsing the URL
-//                    String repoOwner = mRepoOwner, repoName = mRepoName;
-//                    String url = event.getCommitUrl();
-//                    if (url != null) {
-//                        Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
-//                        if (matcher.find()) {
-//                            repoOwner = matcher.group(1);
-//                            repoName = matcher.group(2);
-//                        }
-//                    }
-//
-//                    return CommitActivity.makeIntent(mContext,
-//                            repoOwner, repoName, event.getCommitId());
-//                }
-//            }, pos, pos + 7, 0);
         }
 
         pos = text.toString().indexOf("[label]");

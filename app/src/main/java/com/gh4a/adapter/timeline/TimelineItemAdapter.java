@@ -149,7 +149,7 @@ public class TimelineItemAdapter extends
                 break;
             case VIEW_TYPE_EVENT:
                 view = inflater.inflate(R.layout.row_timeline_event, parent, false);
-                holder = new EventViewHolder(view, mIsPullRequest);
+                holder = new EventViewHolder(view, mRepoOwner, mRepoName, mIsPullRequest);
                 break;
             case VIEW_TYPE_REVIEW:
                 view = inflater.inflate(R.layout.row_timeline_review, parent, false);
