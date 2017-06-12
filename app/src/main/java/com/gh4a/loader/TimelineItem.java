@@ -112,12 +112,18 @@ public abstract class TimelineItem implements Serializable {
             CommitComment comment = getInitialComment();
             CommitComment otherComment = other.getInitialComment();
 
-            // Outdated comments should be located after these that are still up-to date
-            if (comment.getPosition() == -1 && otherComment.getPosition() != -1) {
-                return 1;
+            // First sort by filename
+            int byPath = comment.getPath().compareTo(otherComment.getPath());
+            if (byPath != 0) {
+                return byPath;
             }
-            if (comment.getPosition() != -1 && otherComment.getPosition() == -1) {
+
+            // Then by line numbers
+            if (comment.getOriginalPosition() < otherComment.getOriginalPosition()) {
                 return -1;
+            }
+            if (comment.getOriginalPosition() > otherComment.getOriginalPosition()) {
+                return 1;
             }
 
             Date createdAt = getCreatedAt();

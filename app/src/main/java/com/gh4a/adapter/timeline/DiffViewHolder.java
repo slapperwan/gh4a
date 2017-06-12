@@ -101,10 +101,10 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
             int spanStart = builder.length();
 
-            String leftLineText = leftLine > 0 ? String.valueOf(leftLine) : "";
+            String leftLineText = leftLine > 0 ? String.valueOf(leftLine - 1) : "";
             appendLineNumber(builder, maxLineLength, leftLineText);
 
-            String rightLineText = rightLine > 0 ? String.valueOf(rightLine) : "";
+            String rightLineText = rightLine > 0 ? String.valueOf(rightLine - 1) : "";
             appendLineNumber(builder, maxLineLength, rightLineText);
 
             // Add additional padding between line numbers and code
