@@ -89,7 +89,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
                 app.getService(Gh4Application.PULL_SERVICE);
         RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
         if (replyToCommentId != 0L) {
-            pullRequestService.replyToComment(repoId, mPullRequestNumber, (int) replyToCommentId,
+            pullRequestService.replyToComment(repoId, mPullRequestNumber, replyToCommentId,
                     comment.getBody());
         } else {
             comment.setCommitId(mSha);

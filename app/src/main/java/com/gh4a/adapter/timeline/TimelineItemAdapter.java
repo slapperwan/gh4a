@@ -46,6 +46,7 @@ public class TimelineItemAdapter extends
         void editComment(Comment comment);
         void deleteComment(Comment comment);
         void quoteText(CharSequence text);
+        void replyToComment(long replyToId, String text);
         String getShareSubject(Comment comment);
     }
 
@@ -85,6 +86,13 @@ public class TimelineItemAdapter extends
             }
 
             return false;
+        }
+    };
+
+    private ReplyViewHolder.Callback mReplyCallback = new ReplyViewHolder.Callback() {
+        @Override
+        public void reply(long replyToId, String text) {
+            mActionCallback.replyToComment(replyToId, text);
         }
     };
 
@@ -159,7 +167,7 @@ public class TimelineItemAdapter extends
                 break;
             case VIEW_TYPE_REPLY:
                 view = inflater.inflate(R.layout.row_timeline_reply, parent, false);
-                holder = new ReplyViewHolder(view);
+                holder = new ReplyViewHolder(view, mReplyCallback);
                 break;
             default:
                 throw new IllegalArgumentException("viewType: Unknown timeline item type.");

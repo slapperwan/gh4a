@@ -90,4 +90,9 @@ public class IssueFragment extends IssueFragmentBase {
     public int getCommentEditorHintResId() {
         return R.string.issue_comment_hint;
     }
+
+    @Override
+    public void replyToComment(long replyToId, String text) {
+        // TODO
+    }
 }

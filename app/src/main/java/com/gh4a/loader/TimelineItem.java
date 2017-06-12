@@ -70,8 +70,8 @@ public abstract class TimelineItem implements Serializable {
 
                 return PullRequestDiffViewerActivity.makeIntent(context, repoOwner,
                         repoName, pullRequestNumber, commitComment.getCommitId(),
-                        commitComment.getPath(), file.getPatch(), null, commitComment.getPosition(),
-                        -1, -1, false, new IntentUtils.InitialCommentMarker(commitComment.getId()));
+                        commitComment.getPath(), file.getPatch(), null, -1, -1, -1, false,
+                        new IntentUtils.InitialCommentMarker(commitComment.getId()));
             }
 
             return null;
@@ -181,6 +181,13 @@ public abstract class TimelineItem implements Serializable {
     }
 
     public static class Reply extends TimelineItem {
+        @NonNull
+        public final TimelineComment timelineComment;
+
+        public Reply(@NonNull TimelineComment timelineComment) {
+            this.timelineComment = timelineComment;
+        }
+
         @Override
         public Date getCreatedAt() {
             return null;

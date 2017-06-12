@@ -5,38 +5,27 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 
+import com.gh4a.BaseActivity;
+import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
+import com.gh4a.R;
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
 import com.gh4a.loader.TimelineItem;
 
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.service.PullRequestService;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ReviewCommentsFragment extends LoadingListFragmentBase {
-    private TimelineItemAdapter.OnCommentAction mCallback =
-            new TimelineItemAdapter.OnCommentAction() {
-                @Override
-                public void editComment(Comment comment) {
+public class ReviewCommentsFragment extends LoadingListFragmentBase
+        implements TimelineItemAdapter.OnCommentAction {
 
-                }
-
-                @Override
-                public void deleteComment(Comment comment) {
-
-                }
-
-                @Override
-                public void quoteText(CharSequence text) {
-
-                }
-
-                @Override
-                public String getShareSubject(Comment comment) {
-                    return null;
-                }
-            };
+    private TimelineItemAdapter mAdapter;
 
     public static ReviewCommentsFragment newInstance(String repoOwner, String repoName,
             int issueNumber, boolean isPullRequest, TimelineItem.TimelineReview review) {
@@ -72,20 +61,21 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase {
     protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
         super.onRecyclerViewInflated(view, inflater);
 
-        TimelineItemAdapter adapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName,
-                mIssueNumber, mIsPullRequest, mCallback);
+        mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName,
+                mIssueNumber, mIsPullRequest, this);
 
         List<TimelineItem.Diff> chunks = new ArrayList<>(mReview.chunks.values());
         Collections.sort(chunks);
 
         for (TimelineItem.Diff chunk : chunks) {
-            adapter.add(chunk);
+            mAdapter.add(chunk);
             for (TimelineItem.TimelineComment comment : chunk.comments) {
-                adapter.add(comment);
+                mAdapter.add(comment);
             }
-            adapter.add(new TimelineItem.Reply());
+
+            mAdapter.add(new TimelineItem.Reply(chunk.getInitialTimelineComment()));
         }
-        view.setAdapter(adapter);
+        view.setAdapter(mAdapter);
     }
 
     @Override
@@ -95,5 +85,68 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase {
     @Override
     protected int getEmptyTextResId() {
         return 0;
+    }
+
+    @Override
+    public void editComment(Comment comment) {
+
+    }
+
+    @Override
+    public void deleteComment(Comment comment) {
+
+    }
+
+    @Override
+    public void quoteText(CharSequence text) {
+
+    }
+
+    @Override
+    public void replyToComment(long replyToId, String text) {
+        new ReplyTask(getBaseActivity(), replyToId, text).schedule();
+    }
+
+    @Override
+    public String getShareSubject(Comment comment) {
+        return null;
+    }
+
+    private class ReplyTask extends ProgressDialogTask<CommitComment> {
+        private final BaseActivity mBaseActivity;
+        private final String mBody;
+        private final long mReplyToId;
+
+        public ReplyTask(BaseActivity baseActivity, long replyToId, String body) {
+            super(baseActivity, R.string.saving_msg);
+            mBaseActivity = baseActivity;
+            mReplyToId = replyToId;
+            mBody = body;
+        }
+
+        @Override
+        protected ProgressDialogTask<CommitComment> clone() {
+            return new ReplyTask(mBaseActivity, mReplyToId, mBody);
+        }
+
+        @Override
+        protected CommitComment run() throws IOException {
+            PullRequestService pullRequestService =
+                    (PullRequestService) Gh4Application.get()
+                            .getService(Gh4Application.PULL_SERVICE);
+
+            return pullRequestService.replyToComment(new RepositoryId(mRepoOwner, mRepoName),
+                    mIssueNumber, mReplyToId, mBody);
+        }
+
+        @Override
+        protected void onSuccess(CommitComment result) {
+            // TODO: Refresh comments
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.issue_error_comment);
+        }
     }
 }

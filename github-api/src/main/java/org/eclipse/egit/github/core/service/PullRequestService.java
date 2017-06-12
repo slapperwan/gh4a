@@ -607,7 +607,7 @@ public class PullRequestService extends GitHubService {
 	 * @throws IOException
 	 */
 	public CommitComment replyToComment(IRepositoryIdProvider repository,
-			int pullRequestId, int commentId, String body) throws IOException {
+			int pullRequestId, long commentId, String body) throws IOException {
 		String repoId = getId(repository);
 		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
 		uri.append('/').append(repoId);

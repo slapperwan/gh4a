@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gh4a.R;
 import com.gh4a.loader.TimelineItem;
@@ -16,20 +15,36 @@ import com.gh4a.utils.UiUtils;
 class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Reply>
         implements View.OnClickListener {
 
-    public ReplyViewHolder(View itemView) {
+    public interface Callback {
+        void reply(long replyToId, String text);
+    }
+
+    private final Callback mCallback;
+
+    private final Button mReplyButton;
+
+    public ReplyViewHolder(View itemView, Callback callback) {
         super(itemView);
 
-        Button replyButton = (Button) itemView.findViewById(R.id.btn_reply);
-        replyButton.setOnClickListener(this);
+        mCallback = callback;
+
+        mReplyButton = (Button) itemView.findViewById(R.id.btn_reply);
+        mReplyButton.setOnClickListener(this);
     }
 
     @Override
     public void bind(TimelineItem.Reply item) {
+        mReplyButton.setTag(item.timelineComment);
     }
 
     @Override
     public void onClick(final View v) {
         if (v.getId() == R.id.btn_reply) {
+            TimelineItem.TimelineComment timelineComment =
+                    (TimelineItem.TimelineComment) v.getTag();
+
+            final long replyToId = timelineComment.comment.getId();
+
             LayoutInflater inflater = LayoutInflater.from(v.getContext());
             View commentDialog = inflater.inflate(R.layout.commit_comment_dialog, null);
 
@@ -42,7 +57,7 @@ class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timelin
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     String text = body.getText().toString();
-                    Toast.makeText(v.getContext(), text, Toast.LENGTH_SHORT).show();
+                    mCallback.reply(replyToId, text);
                 }
             };
 
