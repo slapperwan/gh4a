@@ -10,6 +10,7 @@ import android.widget.ImageView;
 
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
@@ -29,7 +30,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class EventViewHolder
-        extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineEvent> {
+        extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineEvent>
+        implements View.OnClickListener {
 
     private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
             Pattern.compile(".*github.com/repos/([^/]+)/([^/]+)/commits");
@@ -59,6 +61,7 @@ class EventViewHolder
     private final ImageView mAvatarView;
     private final ImageView mEventIconView;
     private final StyleableTextView mMessageView;
+    private final View mAvatarContainer;
 
     public EventViewHolder(View itemView, String repoOwner, String repoName,
             boolean isPullRequest) {
@@ -73,6 +76,8 @@ class EventViewHolder
         mEventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
         mMessageView = (StyleableTextView) itemView.findViewById(R.id.tv_message);
         mMessageView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+        mAvatarContainer = itemView.findViewById(R.id.avatar_container);
+        mAvatarContainer.setOnClickListener(this);
     }
 
     @Override
@@ -80,7 +85,7 @@ class EventViewHolder
         User user = item.event.getAssigner() != null
                 ? item.event.getAssigner() : item.event.getActor();
         AvatarHandler.assignAvatar(mAvatarView, user);
-        mAvatarView.setTag(user);
+        mAvatarContainer.setTag(user);
 
         Integer eventIconAttr = EVENT_ICONS.get(item.event.getEvent());
         if (eventIconAttr != null) {
@@ -237,5 +242,16 @@ class EventViewHolder
         }
 
         return text;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.avatar_container) {
+            User user = (User) v.getTag();
+            Intent intent = UserActivity.makeIntent(mContext, user);
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
+        }
     }
 }

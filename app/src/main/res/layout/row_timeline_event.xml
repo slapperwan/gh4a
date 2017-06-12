@@ -12,13 +12,13 @@
         android:id="@+id/avatar_container"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginRight="8dp">
+        android:layout_marginRight="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless">
 
         <com.gh4a.widget.FixedSizeImageView
             android:id="@+id/iv_gravatar"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
             tools:src="@drawable/default_avatar" />
 
         <com.gh4a.widget.FixedSizeImageView
