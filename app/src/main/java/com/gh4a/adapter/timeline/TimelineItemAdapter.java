@@ -12,10 +12,16 @@ import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Comment;
 
 import java.util.Collection;
+
+import static com.gh4a.R.id.delete;
+import static com.gh4a.R.id.edit;
+import static com.gh4a.R.id.share;
+import static com.gh4a.R.id.view_in_file;
 
 public class TimelineItemAdapter extends
         RootAdapter<TimelineItem, TimelineItemAdapter.TimelineItemViewHolder> {
@@ -57,26 +63,20 @@ public class TimelineItemAdapter extends
         @Override
         public boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem) {
             switch (menuItem.getItemId()) {
-                case R.id.edit:
+                case edit:
                     mActionCallback.editComment(comment.comment);
                     return true;
 
-                case R.id.delete:
+                case delete:
                     mActionCallback.deleteComment(comment.comment);
                     return true;
 
-                case R.id.share:
-                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("text/plain");
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                            mActionCallback.getShareSubject(comment.comment));
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, comment.comment.getHtmlUrl());
-                    shareIntent = Intent.createChooser(shareIntent,
-                            mContext.getString(R.string.share_title));
-                    mContext.startActivity(shareIntent);
+                case share:
+                    IntentUtils.share(mContext, mActionCallback.getShareSubject(comment.comment),
+                            comment.comment.getHtmlUrl());
                     return true;
 
-                case R.id.view_in_file:
+                case view_in_file:
                     Intent intent = comment.makeDiffIntent(mContext);
                     if (intent != null) {
                         mContext.startActivity(intent);
