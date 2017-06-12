@@ -4,43 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
-    android:padding="@dimen/content_padding">
+    android:orientation="vertical">
 
-    <com.gh4a.widget.FixedSizeImageView
-        android:id="@+id/iv_event_icon"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_above="@+id/tv_desc"
-        android:layout_gravity="center_vertical"
-        android:layout_marginRight="8dp"
-        android:src="?searchUserIcon" />
-    <!--TODO: Eye icon-->
-
-    <com.gh4a.widget.FixedSizeImageView
-        android:id="@+id/iv_gravatar"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginRight="8dp"
-        android:layout_toRightOf="@id/iv_event_icon"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        tools:src="@drawable/default_avatar" />
-
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:text="octopus reviewed about 4 hours ago"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+    <include
+        android:id="@+id/header"
+        layout="@layout/row_timeline_event" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_message"
-        android:layout_marginTop="8dp"
+        android:layout_below="@id/header"
+        android:layout_marginBottom="16dp"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
         android:textIsSelectable="true"
@@ -51,11 +28,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_desc"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
         android:textIsSelectable="true"
-        tools:text="Review body" />
+        tools:text="Code comments in:\nFile one\nFile two" />
 
     <Button
         android:id="@+id/btn_show_details"
@@ -63,7 +42,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_details"
-        android:layout_marginTop="8dp"
         android:text="Show details" />
 
 </RelativeLayout>

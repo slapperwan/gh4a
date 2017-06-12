@@ -26,9 +26,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_gravity="end|bottom"
-            android:visibility="gone"
-            tools:src="@drawable/issue_event_closed"
-            tools:visibility="visible" />
+            tools:src="@drawable/issue_event_closed" />
     </FrameLayout>
 
     <com.gh4a.widget.StyleableTextView

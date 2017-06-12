@@ -1,6 +1,7 @@
 package com.gh4a.adapter.timeline;
 
 import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -9,13 +10,15 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.activities.ReviewCommentsActivity;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
 import org.eclipse.egit.github.core.Review;
+import org.eclipse.egit.github.core.User;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,6 +38,7 @@ class ReviewViewHolder
     private final TextView mBodyView;
     private final TextView mDetailsView;
     private final Button mShowDetailsButton;
+    private final View mAvatarContainer;
 
     public ReviewViewHolder(View itemView, String repoOwner, String repoName, int issueNumber,
             boolean isPullRequest) {
@@ -52,6 +56,13 @@ class ReviewViewHolder
         mDetailsView = (TextView) itemView.findViewById(R.id.tv_details);
         mShowDetailsButton = (Button) itemView.findViewById(R.id.btn_show_details);
         mShowDetailsButton.setOnClickListener(this);
+        mAvatarContainer = itemView.findViewById(R.id.avatar_container);
+        mAvatarContainer.setOnClickListener(this);
+
+        ImageView eventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
+        // TODO: Eye icon
+        int iconResId = UiUtils.resolveDrawable(mContext, R.attr.issueEventAssignedIcon);
+        eventIconView.setImageResource(iconResId);
     }
 
     @Override
@@ -60,7 +71,7 @@ class ReviewViewHolder
         mShowDetailsButton.setTag(item);
 
         AvatarHandler.assignAvatar(mAvatarView, review.getUser());
-        mAvatarView.setTag(review.getUser());
+        mAvatarContainer.setTag(review.getUser());
 
         formatTitle(review);
 
@@ -78,20 +89,17 @@ class ReviewViewHolder
             boolean isOutdated = true;
 
             for (TimelineItem.Diff diff : item.chunks.values()) {
-                TimelineItem.TimelineComment timelineComment = diff.getInitialTimelineComment();
+                CommitComment commitComment = diff.getInitialComment();
 
-                CommitComment commitComment = timelineComment.getCommitComment();
-                if (commitComment != null && commitComment.getPosition() != -1) {
+                if (commitComment.getPosition() != -1) {
                     isOutdated = false;
                 }
-                CommitFile file = timelineComment.file;
 
-                if (file != null) {
-                    String filename = file.getFilename();
-                    if (!usedNames.contains(filename)) {
-                        builder.append(filename).append(", ");
-                        usedNames.add(filename);
-                    }
+                String filename = commitComment.getPath();
+
+                if (!usedNames.contains(filename)) {
+                    builder.append(filename).append(", ");
+                    usedNames.add(filename);
                 }
             }
 
@@ -133,9 +141,18 @@ class ReviewViewHolder
 
     @Override
     public void onClick(View v) {
-        TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
+        if (v.getId() == R.id.avatar_container) {
+            User user = (User) v.getTag();
+            Intent intent = UserActivity.makeIntent(mContext, user);
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
+        } else if (v.getId() == R.id.btn_show_details) {
+            TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
 
-        mContext.startActivity(ReviewCommentsActivity.makeIntent(mContext, mRepoOwner, mRepoName,
-                mIssueNumber, mIsPullRequest, review));
+            Intent intent = ReviewCommentsActivity.makeIntent(mContext, mRepoOwner, mRepoName,
+                    mIssueNumber, mIsPullRequest, review);
+            mContext.startActivity(intent);
+        }
     }
 }
