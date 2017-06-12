@@ -2,9 +2,12 @@ package com.gh4a.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.gh4a.R;
 import com.gh4a.fragment.ReviewCommentsFragment;
@@ -12,6 +15,8 @@ import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.IntentUtils;
 
 public class ReviewCommentsActivity extends FragmentContainerActivity {
+
+    private String mTitle;
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             int issueNumber, boolean isPullRequest, TimelineItem.TimelineReview review) {
@@ -34,7 +39,8 @@ public class ReviewCommentsActivity extends FragmentContainerActivity {
         super.onCreate(savedInstanceState);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getResources().getString(R.string.pull_request_title) + " #" + mIssueNumber + " - Review");
+        mTitle = getResources().getString(R.string.pull_request_title) + " #" + mIssueNumber + " - Review";
+        actionBar.setTitle(mTitle);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }
@@ -47,6 +53,27 @@ public class ReviewCommentsActivity extends FragmentContainerActivity {
         mIssueNumber = extras.getInt("issue_number");
         mIsPullRequest = extras.getBoolean("is_pr");
         mReview = (TimelineItem.TimelineReview) extras.getSerializable("review");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.review_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.share:
+                IntentUtils.share(this, mTitle, mReview.review.getHtmlUrl());
+                return true;
+
+            case R.id.browser:
+                IntentUtils.launchBrowser(this, Uri.parse(mReview.review.getHtmlUrl()));
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
