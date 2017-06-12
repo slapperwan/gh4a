@@ -83,9 +83,9 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         int maxLineLength = String.valueOf(maxLine).length();
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
-        int start = Math.max(0, lines.length - 4);
+        int start = Math.max(1, lines.length - 4);
 
-        for (int i = 0; i < lines.length; i++) {
+        for (int i = 1; i < lines.length; i++) {
             boolean isLeftLine = false;
             boolean isRightLine = false;
             if (lines[i].startsWith("-")) {
