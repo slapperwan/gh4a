@@ -9,18 +9,17 @@
     <TextView
         android:id="@+id/tv_file"
         android:layout_width="match_parent"
-        android:textColor="?colorPrimary"
-        android:textStyle="bold"
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground"
         android:gravity="center_vertical"
         android:padding="8dp"
+        android:textColor="?colorPrimary"
+        android:textStyle="bold"
         tools:text="/path/to/filename.txt" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tv_file"
         android:fillViewport="true">
 
         <TextView
@@ -30,6 +29,7 @@
             android:paddingBottom="@dimen/code_diff_padding"
             android:paddingTop="@dimen/code_diff_padding"
             android:textColor="?android:attr/textColorPrimary"
+            android:textIsSelectable="true"
             tools:text="+Diff lines\n+Are cool" />
     </HorizontalScrollView>
 
