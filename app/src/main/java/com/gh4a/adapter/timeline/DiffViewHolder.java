@@ -86,10 +86,14 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         int start = Math.max(0, lines.length - 4);
 
         for (int i = 0; i < lines.length; i++) {
+            boolean isLeftLine = false;
+            boolean isRightLine = false;
             if (lines[i].startsWith("-")) {
                 leftLine += 1;
+                isLeftLine = true;
             } else if (lines[i].startsWith("+")) {
                 rightLine += 1;
+                isRightLine = true;
             } else {
                 leftLine += 1;
                 rightLine += 1;
@@ -101,10 +105,10 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
             int spanStart = builder.length();
 
-            String leftLineText = leftLine > 0 ? String.valueOf(leftLine - 1) : "";
+            String leftLineText = !isRightLine && leftLine > 0 ? String.valueOf(leftLine - 1) : "";
             appendLineNumber(builder, maxLineLength, leftLineText);
 
-            String rightLineText = rightLine > 0 ? String.valueOf(rightLine - 1) : "";
+            String rightLineText = !isLeftLine && rightLine > 0 ? String.valueOf(rightLine - 1) : "";
             appendLineNumber(builder, maxLineLength, rightLineText);
 
             // Add additional padding between line numbers and code
