@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/header"
         android:layout_marginBottom="16dp"
+        android:layout_marginTop="-8dp"
         android:paddingLeft="@dimen/content_padding"
         android:paddingRight="@dimen/content_padding"
         android:textAppearance="?android:attr/textAppearanceSmall"
@@ -29,19 +30,24 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_desc"
         android:layout_marginBottom="16dp"
+        android:layout_marginTop="-8dp"
+        android:layout_toLeftOf="@+id/btn_show_details"
+        android:gravity="center_vertical"
         android:paddingLeft="@dimen/content_padding"
         android:paddingRight="@dimen/content_padding"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textColor="?android:attr/textColorSecondary"
         android:textIsSelectable="true"
-        tools:text="Code comments in:\nFile one\nFile two" />
+        tools:text="Code comments in\n/path/to/file.txt\n/path/to/other/file.txt" />
 
     <Button
         android:id="@+id/btn_show_details"
         style="?buttonBarButtonStyle"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_details"
+        android:layout_alignBottom="@id/tv_details"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:text="Show details" />
 
 </RelativeLayout>

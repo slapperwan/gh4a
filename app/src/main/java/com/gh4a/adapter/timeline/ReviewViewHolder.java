@@ -98,7 +98,7 @@ class ReviewViewHolder
                 String filename = commitComment.getPath();
 
                 if (!usedNames.contains(filename)) {
-                    builder.append(filename).append(", ");
+                    builder.append("\n").append(filename);
                     usedNames.add(filename);
                 }
             }
