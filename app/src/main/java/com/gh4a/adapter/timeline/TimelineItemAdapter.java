@@ -18,11 +18,6 @@ import org.eclipse.egit.github.core.Comment;
 
 import java.util.Collection;
 
-import static com.gh4a.R.id.delete;
-import static com.gh4a.R.id.edit;
-import static com.gh4a.R.id.share;
-import static com.gh4a.R.id.view_in_file;
-
 public class TimelineItemAdapter extends
         RootAdapter<TimelineItem, TimelineItemAdapter.TimelineItemViewHolder> {
 
@@ -64,20 +59,20 @@ public class TimelineItemAdapter extends
         @Override
         public boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem) {
             switch (menuItem.getItemId()) {
-                case edit:
+                case R.id.edit:
                     mActionCallback.editComment(comment.comment);
                     return true;
 
-                case delete:
+                case R.id.delete:
                     mActionCallback.deleteComment(comment.comment);
                     return true;
 
-                case share:
+                case R.id.share:
                     IntentUtils.share(mContext, mActionCallback.getShareSubject(comment.comment),
                             comment.comment.getHtmlUrl());
                     return true;
 
-                case view_in_file:
+                case R.id.view_in_file:
                     Intent intent = comment.makeDiffIntent(mContext);
                     if (intent != null) {
                         mContext.startActivity(intent);
