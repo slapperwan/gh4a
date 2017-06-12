@@ -153,7 +153,7 @@ public class IssueEventAdapter extends CommentAdapterBase<IssueEventHolder> {
                 final CommitFile file = item.file;
 
                 text.replace(pos, pos + 6, fileName);
-                if (file != null) {
+                if (file != null && file.getPatch() != null) {
                     text.setSpan(new IntentSpan(mContext) {
                         @Override
                         protected Intent getIntent() {
