@@ -123,6 +123,7 @@
     <string name="unread">Unread</string>
     <string name="undo">Undo</string>
     <string name="raw">Raw</string>
+    <string name="view_in_file">View in file</string>
 
     <string name="reaction_plus_one" translatable="false">+1</string>
     <string name="reaction_minus_one" translatable="false">-1</string>

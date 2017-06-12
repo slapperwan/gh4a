@@ -19,4 +19,8 @@
         android:id="@+id/delete"
         android:title="@string/delete"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/view_in_file"
+        android:title="@string/view_in_file"
+        app:showAsAction="never" />
 </menu>

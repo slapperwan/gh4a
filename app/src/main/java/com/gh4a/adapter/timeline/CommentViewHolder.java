@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -44,8 +45,10 @@ class CommentViewHolder
 
     public interface Callback {
         boolean canQuote(Comment comment);
+
         void quoteText(CharSequence text);
-        boolean onMenItemClick(Comment comment, MenuItem menuItem);
+
+        boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem);
     }
 
     public CommentViewHolder(View view, HttpImageGetter imageGetter, String repoOwner,
@@ -113,16 +116,18 @@ class CommentViewHolder
             tvDesc.setCustomSelectionActionModeCallback(null);
         }
 
-        ivMenu.setTag(item.comment);
+        ivMenu.setTag(item);
 
         String ourLogin = Gh4Application.get().getAuthLogin();
         boolean canEdit = ApiHelpers.loginEquals(user, ourLogin) ||
                 ApiHelpers.loginEquals(mRepoOwner, ourLogin);
-        MenuItem editMenuItem = mPopupMenu.getMenu().findItem(R.id.edit);
-        MenuItem deleteMenuItem = mPopupMenu.getMenu().findItem(R.id.delete);
 
-        editMenuItem.setVisible(canEdit);
-        deleteMenuItem.setVisible(canEdit);
+        Menu menu = mPopupMenu.getMenu();
+        menu.findItem(R.id.edit).setVisible(canEdit);
+        menu.findItem(R.id.delete).setVisible(canEdit);
+        menu.findItem(R.id.view_in_file).setVisible(
+                item.file != null && item.getCommitComment() != null &&
+                        item.getCommitComment().getPosition() != -1);
     }
 
     @Override
@@ -134,7 +139,7 @@ class CommentViewHolder
 
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
-        Comment comment = (Comment) ivMenu.getTag();
+        TimelineItem.TimelineComment comment = (TimelineItem.TimelineComment) ivMenu.getTag();
         return mCallback.onMenItemClick(comment, menuItem);
     }
 }

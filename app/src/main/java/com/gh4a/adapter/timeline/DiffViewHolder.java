@@ -14,9 +14,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.gh4a.R;
-import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.loader.TimelineItem;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -158,18 +156,11 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         if (view.getId() == R.id.tv_file) {
             TimelineItem.TimelineComment timelineComment =
                     (TimelineItem.TimelineComment) view.getTag();
-            CommitComment commitComment = timelineComment.getCommitComment();
+            Intent intent = timelineComment.makeDiffIntent(mContext);
 
-            if (timelineComment.file == null || commitComment == null) {
-                return;
+            if (intent != null) {
+                view.getContext().startActivity(intent);
             }
-
-            Intent intent = PullRequestDiffViewerActivity.makeIntent(mContext, mRepoOwner,
-                    mRepoName, mIssueNumber, commitComment.getCommitId(), commitComment.getPath(),
-                    timelineComment.file.getPatch(), null, commitComment.getPosition(), -1, -1,
-                    false, new IntentUtils.InitialCommentMarker(commitComment.getId()));
-
-            view.getContext().startActivity(intent);
         }
     }
 

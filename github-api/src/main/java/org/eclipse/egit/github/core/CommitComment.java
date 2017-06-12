@@ -34,6 +34,8 @@ public class CommitComment extends Comment {
 
 	private long pullRequestReviewId;
 
+	private String pullRequestUrl;
+
 	/**
 	 * @return line
 	 */
@@ -137,6 +139,15 @@ public class CommitComment extends Comment {
 		return diffHunk;
 	}
 
+	/**
+	 * @param diffHunk
+	 * @return this commit comment
+	 */
+	public CommitComment setDiffHunk(String diffHunk) {
+		this.diffHunk = diffHunk;
+		return this;
+	}
+
 	public long getPullRequestReviewId() {
 		return pullRequestReviewId;
 	}
@@ -146,12 +157,12 @@ public class CommitComment extends Comment {
 		return this;
 	}
 
-	/**
-	 * @param diffHunk
-	 * @return this commit comment
-	 */
-	public CommitComment setDiffHunk(String diffHunk) {
-		this.diffHunk = diffHunk;
-		return this;
+	public String getPullRequestUrl() {
+		return pullRequestUrl;
+	}
+
+	public CommitComment setPullRequestUrl(String pullRequestUrl) {
+		this.pullRequestUrl = pullRequestUrl;
+        return this;
 	}
 }

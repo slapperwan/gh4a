@@ -1,7 +1,12 @@
 package com.gh4a.loader;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import com.gh4a.activities.PullRequestDiffViewerActivity;
+import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
@@ -15,9 +20,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class TimelineItem implements Serializable {
     public static class TimelineComment extends TimelineItem {
+        private static final Pattern PULL_REQUEST_PATTERN =
+                Pattern.compile(".+/repos/(.+)/(.+)/pulls/(\\d+)");
+
         @NonNull
         public final Comment comment;
 
@@ -42,6 +52,29 @@ public abstract class TimelineItem implements Serializable {
         @Override
         public Date getCreatedAt() {
             return comment.getCreatedAt();
+        }
+
+        @Nullable
+        public Intent makeDiffIntent(Context context) {
+            CommitComment commitComment = getCommitComment();
+
+            if (file == null || commitComment == null) {
+                return null;
+            }
+
+            Matcher matcher = PULL_REQUEST_PATTERN.matcher(commitComment.getPullRequestUrl());
+            if (matcher.matches()) {
+                String repoOwner = matcher.group(1);
+                String repoName = matcher.group(2);
+                int pullRequestNumber = Integer.parseInt(matcher.group(3));
+
+                return PullRequestDiffViewerActivity.makeIntent(context, repoOwner,
+                        repoName, pullRequestNumber, commitComment.getCommitId(),
+                        commitComment.getPath(), file.getPatch(), null, commitComment.getPosition(),
+                        -1, -1, false, new IntentUtils.InitialCommentMarker(commitComment.getId()));
+            }
+
+            return null;
         }
     }
 

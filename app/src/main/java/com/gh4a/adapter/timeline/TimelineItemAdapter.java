@@ -55,25 +55,32 @@ public class TimelineItemAdapter extends
         }
 
         @Override
-        public boolean onMenItemClick(Comment comment, MenuItem menuItem) {
+        public boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem) {
             switch (menuItem.getItemId()) {
                 case R.id.edit:
-                    mActionCallback.editComment(comment);
+                    mActionCallback.editComment(comment.comment);
                     return true;
 
                 case R.id.delete:
-                    mActionCallback.deleteComment(comment);
+                    mActionCallback.deleteComment(comment.comment);
                     return true;
 
                 case R.id.share:
                     Intent shareIntent = new Intent(Intent.ACTION_SEND);
                     shareIntent.setType("text/plain");
                     shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                            mActionCallback.getShareSubject(comment));
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, comment.getHtmlUrl());
+                            mActionCallback.getShareSubject(comment.comment));
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, comment.comment.getHtmlUrl());
                     shareIntent = Intent.createChooser(shareIntent,
                             mContext.getString(R.string.share_title));
                     mContext.startActivity(shareIntent);
+                    return true;
+
+                case R.id.view_in_file:
+                    Intent intent = comment.makeDiffIntent(mContext);
+                    if (intent != null) {
+                        mContext.startActivity(intent);
+                    }
                     return true;
             }
 
