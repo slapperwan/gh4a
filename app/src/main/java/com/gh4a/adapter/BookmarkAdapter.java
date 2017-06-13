@@ -93,7 +93,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = mInflater.inflate(R.layout.row_bookmark, parent, false);
-        ViewHolder vh = new ViewHolder(view);
+        ViewHolder vh = new ViewHolder(view, mItemInteractListener);
         if (mItemInteractListener != null) {
             view.setOnClickListener(this);
             view.setTag(vh);
@@ -175,16 +175,20 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
                     public void onClick(View v) {
                         BookmarksProvider.saveBookmark(context, name, type, url, extraData, false);
                     }
-                }).show();
+                })
+                .show();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
-        private ImageView mIcon;
-        private TextView mTitle;
-        private TextView mExtra;
+    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
 
-        public ViewHolder(View view) {
+        private final OnItemInteractListener mItemInteractListener;
+        private final ImageView mIcon;
+        private final TextView mTitle;
+        private final TextView mExtra;
+
+        public ViewHolder(View view, OnItemInteractListener itemInteractListener) {
             super(view);
+            mItemInteractListener = itemInteractListener;
             mIcon = (ImageView) view.findViewById(R.id.iv_icon);
             mTitle = (TextView) view.findViewById(R.id.tv_title);
             mExtra = (TextView) view.findViewById(R.id.tv_extra);

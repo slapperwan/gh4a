@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.BrowseFilter;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
@@ -40,15 +41,8 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
         mAdapter = new BookmarkAdapter(getActivity(), this);
         view.setAdapter(mAdapter);
 
-        BookmarkDragHelperCallback callback = new BookmarkDragHelperCallback(mAdapter) {
-            @Override
-            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
-                super.onSelectedChanged(viewHolder, actionState);
-
-                boolean isDragging = actionState == ItemTouchHelper.ACTION_STATE_DRAG;
-                getBaseActivity().setCanSwipeToRefresh(!isDragging);
-            }
-        };
+        BookmarkDragHelperCallback callback =
+                new BookmarkDragHelperCallback(getBaseActivity(), mAdapter);
         mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(view);
 
@@ -100,5 +94,45 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
     @Override
     public void onItemDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
+    }
+
+    public static class BookmarkDragHelperCallback extends ItemTouchHelper.SimpleCallback {
+        private final BaseActivity mBaseActivity;
+        private final BookmarkAdapter mAdapter;
+
+        public BookmarkDragHelperCallback(BaseActivity baseActivity, BookmarkAdapter adapter) {
+            super(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                    ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+            mBaseActivity = baseActivity;
+            mAdapter = adapter;
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                RecyclerView.ViewHolder target) {
+            int fromPos = viewHolder.getAdapterPosition();
+            int toPos = target.getAdapterPosition();
+
+            mAdapter.onItemMoved(fromPos, toPos);
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            mAdapter.onItemSwiped(viewHolder);
+        }
+
+        @Override
+        public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+            super.onSelectedChanged(viewHolder, actionState);
+
+            boolean isDragging = actionState == ItemTouchHelper.ACTION_STATE_DRAG;
+            mBaseActivity.setCanSwipeToRefresh(!isDragging);
+        }
+
+        @Override
+        public boolean isLongPressDragEnabled() {
+            return false;
+        }
     }
 }
