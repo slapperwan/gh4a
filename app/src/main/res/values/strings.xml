@@ -121,6 +121,7 @@
     <string name="go_to_logout_page">Go to logout page</string>
     <string name="continue_login">Continue new login</string>
     <string name="unread">Unread</string>
+    <string name="undo">Undo</string>
 
     <string name="reaction_plus_one" translatable="false">+1</string>
     <string name="reaction_minus_one" translatable="false">-1</string>

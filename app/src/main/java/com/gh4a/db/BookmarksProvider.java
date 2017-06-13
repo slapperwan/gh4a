@@ -27,13 +27,14 @@ public class BookmarksProvider extends ContentProvider {
         String TYPE = "type";
         String URI = "uri";
         String EXTRA = "extra_data";
+        String ORDER_ID = "order_id";
 
         int TYPE_USER = 0;
         int TYPE_REPO = 1;
     }
 
     private static final int MATCH_ALL = 0;
-    private static final int MATCH_ID  = 1;
+    private static final int MATCH_ID = 1;
 
     private static final UriMatcher
             sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -46,17 +47,35 @@ public class BookmarksProvider extends ContentProvider {
     private DbHelper mDbHelper;
 
     // url must be resolvable by BrowseFilter!
-    public static void saveBookmark(Context context, String name,
-                                    int type, String url, String extraData) {
+    public static void saveBookmark(Context context, String name, int type, String url,
+            String extraData, boolean showToast) {
         ContentResolver cr = context.getContentResolver();
+
         ContentValues cv = new ContentValues();
         cv.put(BookmarksProvider.Columns.NAME, name);
         cv.put(BookmarksProvider.Columns.TYPE, type);
         cv.put(BookmarksProvider.Columns.URI, url);
         cv.put(BookmarksProvider.Columns.EXTRA, extraData);
-        if (cr.insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null) {
+        cv.put(BookmarksProvider.Columns.ORDER_ID, getNextOrderId(cr));
+
+        if (cr.insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null && showToast) {
             Toast.makeText(context, R.string.bookmark_saved, Toast.LENGTH_LONG).show();
         }
+    }
+
+    private static int getNextOrderId(ContentResolver cr) {
+        Cursor query = cr.query(Columns.CONTENT_URI,
+                new String[] { "COUNT(*)" },
+                null, null, null);
+
+        int orderId = 0;
+        if (query != null) {
+            if (query.moveToFirst()) {
+                orderId = query.getInt(0);
+            }
+            query.close();
+        }
+        return orderId;
     }
 
     public static void removeBookmark(Context context, String url) {
@@ -81,6 +100,13 @@ public class BookmarksProvider extends ContentProvider {
             cursor.close();
         }
         return hasBookmarked;
+    }
+
+    public static void reorderBookmark(Context context, long id, int orderId) {
+        ContentValues cv = new ContentValues();
+        cv.put(Columns.ORDER_ID, orderId);
+        Uri uri = ContentUris.withAppendedId(Columns.CONTENT_URI, id);
+        context.getContentResolver().update(uri, cv, null, null);
     }
 
     @Override
@@ -143,7 +169,8 @@ public class BookmarksProvider extends ContentProvider {
     }
 
     @Override
-    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+    public int update(@NonNull Uri uri, ContentValues values, String selection,
+            String[] selectionArgs) {
         int count;
         int match = sURIMatcher.match(uri);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();

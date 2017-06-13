@@ -84,6 +84,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private boolean mContentShown;
     private boolean mContentEmpty;
     private boolean mErrorShown;
+    private boolean mCanSwipeToRefresh = true;
 
     private AppBarLayout mHeader;
     private ToggleableAppBarLayoutBehavior mHeaderBehavior;
@@ -190,7 +191,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     protected boolean canSwipeToRefresh() {
-        return true;
+        return mCanSwipeToRefresh;
+    }
+
+    public void setCanSwipeToRefresh(boolean canSwipeToRefresh) {
+        mCanSwipeToRefresh = canSwipeToRefresh;
+        updateSwipeToRefreshState();
     }
 
     protected void setChildScrollDelegate(SwipeRefreshLayout.ChildScrollDelegate delegate) {

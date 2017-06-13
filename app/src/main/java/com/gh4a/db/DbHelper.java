@@ -11,7 +11,7 @@ import java.net.URISyntaxException;
 
 public class DbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "gh4adb.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     static final String BOOKMARKS_TABLE = "bookmarks";
     static final String SUGGESTIONS_TABLE = "suggestions";
@@ -22,7 +22,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        createBookmarksTable(db);
+        createBookmarksTable(db, BOOKMARKS_TABLE);
         createSuggestionsTable(db);
     }
 
@@ -34,15 +34,19 @@ public class DbHelper extends SQLiteOpenHelper {
         if (oldVersion < 3) {
             updateBookmarkUris(db);
         }
+        if (oldVersion < 4) {
+            addBookmarksOrderIdColumn(db);
+        }
     }
 
-    private void createBookmarksTable(SQLiteDatabase db) {
-        db.execSQL("create table " + BOOKMARKS_TABLE + " ("
+    private void createBookmarksTable(SQLiteDatabase db, String tableName) {
+        db.execSQL("create table " + tableName + " ("
                 + "_id integer primary key autoincrement, "
                 + "name text not null, "
                 + "type integer not null, "
                 + "uri text not null, "
-                + "extra_data text);");
+                + "extra_data text, "
+                + "order_id integer not null);");
     }
 
     private void createSuggestionsTable(SQLiteDatabase db) {
@@ -101,6 +105,17 @@ public class DbHelper extends SQLiteOpenHelper {
         } finally {
             c.close();
         }
+    }
+
+    private void addBookmarksOrderIdColumn(SQLiteDatabase db) {
+        String tempName = "temp_bookmarks";
+        createBookmarksTable(db, tempName);
+        db.execSQL("INSERT INTO temp_bookmarks (_id, name, type, uri, extra_data, order_id) " +
+                "SELECT _id, name, type, uri, extra_data, " +
+                "(SELECT COUNT(*) - 1 FROM " + BOOKMARKS_TABLE + " b WHERE a._id >= b._id) " +
+                "FROM " + BOOKMARKS_TABLE + " a;");
+        db.execSQL("DROP TABLE " + BOOKMARKS_TABLE + ";");
+        db.execSQL("ALTER TABLE " + tempName + " RENAME TO " + BOOKMARKS_TABLE + ";");
     }
 
     private String resolveExtra(Intent intent, String[] names) {

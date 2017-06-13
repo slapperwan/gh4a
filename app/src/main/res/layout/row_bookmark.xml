@@ -1,42 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight"
-    android:orientation="horizontal"
-    android:padding="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding">
-
-    <ImageView
-        android:id="@+id/iv_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginRight="16dp"
-        tools:src="@drawable/repo_bookmark" />
+    android:background="?android:colorBackground"
+    android:foreground="?selectableItemBackground"
+    android:minHeight="?android:attr/listPreferredItemHeight">
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:padding="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding">
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_title"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:textAppearance="@style/TextAppearance.ItemTitle"
-            tools:text="username/repository" />
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="16dp"
+            tools:src="@drawable/repo_bookmark" />
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_extra"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.VerySmall"
-            tools:text="branch" />
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:textAppearance="@style/TextAppearance.ItemTitle"
+                tools:text="username/repository" />
+
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/tv_extra"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.VerySmall"
+                tools:text="branch" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_drag_handle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            android:padding="8dp"
+            android:src="?dragHandleIcon" />
     </LinearLayout>
-</LinearLayout>
+
+</FrameLayout>
