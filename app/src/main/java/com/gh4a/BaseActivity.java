@@ -66,7 +66,6 @@ import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.BottomSheetFixScrollingViewBehavior;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
 
@@ -89,7 +88,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private AppBarLayout mHeader;
     private ToggleableAppBarLayoutBehavior mHeaderBehavior;
-    private BottomSheetFixScrollingViewBehavior mSwipeLayoutBehavior;
+    private AppBarLayout.ScrollingViewBehavior mSwipeLayoutBehavior;
     private SmoothProgressBar mProgress;
     private SwipeRefreshLayout mSwipeLayout;
     private DrawerLayout mDrawerLayout;
@@ -616,7 +615,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
             );
         }
 
-        mSwipeLayoutBehavior = new BottomSheetFixScrollingViewBehavior();
+        mSwipeLayoutBehavior = onCreateSwipeLayoutBehavior();
         CoordinatorLayout.LayoutParams lp =
                 (CoordinatorLayout.LayoutParams) mSwipeLayout.getLayoutParams();
         lp.setBehavior(mSwipeLayoutBehavior);
@@ -624,8 +623,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         updateSwipeToRefreshState();
     }
 
-    public void setBottomSheetFixEnabled(boolean enabled) {
-        mSwipeLayoutBehavior.setFixEnabled(enabled);
+    protected AppBarLayout.ScrollingViewBehavior onCreateSwipeLayoutBehavior() {
+        return new AppBarLayout.ScrollingViewBehavior();
     }
 
     private void setupNavigationDrawer() {
