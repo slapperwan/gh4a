@@ -18,6 +18,7 @@
             android:id="@+id/editor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:dropDownAnchor="@id/editor_scroller"
             android:gravity="top"
             android:inputType="textMultiLine|textCapSentences"
             tools:text="Enter comment" />
@@ -31,10 +32,10 @@
 
         <View
             android:id="@+id/markdown_buttons_top_left_shadow"
-            android:layout_marginTop="2dp"
-            android:layout_marginLeft="2dp"
             android:layout_width="2dp"
             android:layout_height="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginTop="2dp"
             android:background="@drawable/top_left_shadow"
             tools:ignore="InconsistentLayout" />
 

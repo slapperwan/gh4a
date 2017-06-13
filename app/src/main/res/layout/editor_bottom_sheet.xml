@@ -45,6 +45,7 @@
                 android:id="@+id/et_basic_editor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:dropDownAnchor="@id/basic_editor_scroll"
                 android:inputType="textMultiLine|textCapSentences"
                 android:minHeight="48dp"
                 android:padding="8dp"
