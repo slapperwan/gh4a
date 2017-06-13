@@ -125,8 +125,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         mBottomSheet.setResizingView(listContainer);
         mBottomSheet.setListener(this);
 
-        getBaseActivity().setBottomSheetFixEnabled(true);
-
         mImageGetter = new HttpImageGetter(inflater.getContext());
         updateCommentSectionVisibility(v);
         updateCommentLockState();

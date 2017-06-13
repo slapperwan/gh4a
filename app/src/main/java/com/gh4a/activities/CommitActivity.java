@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -35,6 +36,7 @@ import com.gh4a.loader.CommitLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -135,6 +137,11 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
 
         getSupportLoaderManager().initLoader(0, null, mCommitCallback);
         getSupportLoaderManager().initLoader(1, null, mCommentCallback);
+    }
+
+    @Override
+    protected AppBarLayout.ScrollingViewBehavior onCreateSwipeLayoutBehavior() {
+        return new BottomSheetCompatibleScrollingViewBehavior();
     }
 
     @Override

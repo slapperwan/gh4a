@@ -105,8 +105,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mBottomSheet.setResizingView(listContainer);
         mBottomSheet.setListener(this);
 
-        getBaseActivity().setBottomSheetFixEnabled(true);
-
         if (!Gh4Application.get().isAuthorized()) {
             mBottomSheet.setVisibility(View.GONE);
         }

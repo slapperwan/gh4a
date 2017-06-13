@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.StringRes;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -47,6 +48,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
 import org.eclipse.egit.github.core.Issue;
@@ -132,6 +134,11 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
+    }
+
+    @Override
+    protected AppBarLayout.ScrollingViewBehavior onCreateSwipeLayoutBehavior() {
+        return new BottomSheetCompatibleScrollingViewBehavior();
     }
 
     @Override
