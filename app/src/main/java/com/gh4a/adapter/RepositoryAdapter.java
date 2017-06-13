@@ -19,6 +19,7 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filterable;
@@ -72,7 +73,8 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
         return name.contains(lcFilter);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
+            View.OnTouchListener {
         private ViewHolder(View view) {
             super(view);
             tvTitle = (TextView) view.findViewById(R.id.tv_title);
@@ -83,6 +85,9 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
             tvSize = (TextView) view.findViewById(R.id.tv_size);
             tvPrivate = (TextView) view.findViewById(R.id.tv_private);
             tvFork = (TextView) view.findViewById(R.id.tv_fork);
+
+            view.findViewById(R.id.attributes).setOnClickListener(this);
+            view.findViewById(R.id.scrollView).setOnTouchListener(this);
         }
 
         private final TextView tvTitle;
@@ -93,5 +98,17 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
         private final TextView tvSize;
         private final TextView tvPrivate;
         private final TextView tvFork;
+
+        @Override
+        public void onClick(View v) {
+            // Workaround to make it possible to open repositories when clicking inside of
+            // attributes ScrollView
+            itemView.performClick();
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            return false;
+        }
     }
 }

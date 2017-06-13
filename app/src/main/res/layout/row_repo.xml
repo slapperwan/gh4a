@@ -27,10 +27,13 @@
         tools:text="Short repository description" />
 
     <HorizontalScrollView
+        android:id="@+id/scrollView"
+        android:clickable="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
+            android:id="@+id/attributes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
