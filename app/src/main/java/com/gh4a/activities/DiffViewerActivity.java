@@ -561,17 +561,11 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     openCommentDialog(0L, 0L, mLineText, mPosition, mLeftLine, mRightLine);
                     break;
                 case R.id.share:
-                    String url = createUrl(
-                            createLineLinkId(mIsRightLine ? mRightLine : mLeftLine, mIsRightLine),
-                            mId);
-                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("text/plain");
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                            getString(R.string.share_commit_subject, mSha.substring(0, 7),
-                                    mRepoOwner + "/" + mRepoName));
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-                    shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                    startActivity(shareIntent);
+                    String url = createUrl(createLineLinkId(mIsRightLine ? mRightLine : mLeftLine,
+                            mIsRightLine), mId);
+                    String subject = getString(R.string.share_commit_subject, mSha.substring(0, 7),
+                            mRepoOwner + "/" + mRepoName);
+                    IntentUtils.share(DiffViewerActivity.this, subject, url);
                     break;
             }
             return true;
