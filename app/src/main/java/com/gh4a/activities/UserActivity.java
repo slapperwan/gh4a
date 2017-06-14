@@ -172,14 +172,9 @@ public class UserActivity extends BasePagerActivity {
                 new UpdateFollowTask().schedule();
                 return true;
             case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 int subjectId = StringUtils.isBlank(mUserName)
                         ? R.string.share_user_subject_loginonly : R.string.share_user_subject;
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(subjectId, mUserLogin, mUserName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  url);
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
+                IntentUtils.share(this, getString(subjectId, mUserLogin, mUserName), url);
                 return true;
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(url));

@@ -237,14 +237,9 @@ public class PullRequestActivity extends BasePagerActivity implements
                 showOpenCloseConfirmDialog(item.getItemId() == R.id.pull_reopen);
                 break;
             case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_pull_subject,
+                IntentUtils.share(this, getString(R.string.share_pull_subject,
                         mPullRequest.getNumber(), mPullRequest.getTitle(),
-                        mRepoOwner + "/" + mRepoName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT, mPullRequest.getHtmlUrl());
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
+                        mRepoOwner + "/" + mRepoName), mPullRequest.getHtmlUrl());
                 break;
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(mPullRequest.getHtmlUrl()));

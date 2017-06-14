@@ -385,13 +385,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 IntentUtils.launchBrowser(this, Uri.parse(url));
                 return true;
             case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_commit_subject,
-                        mSha.substring(0, 7), mRepoOwner + "/" + mRepoName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
+                IntentUtils.share(this, getString(R.string.share_commit_subject,
+                        mSha.substring(0, 7), mRepoOwner + "/" + mRepoName), url);
                 return true;
             case MENU_ITEM_VIEW:
                 startActivity(FileViewerActivity.makeIntent(this, mRepoOwner, mRepoName, mSha, mPath));
