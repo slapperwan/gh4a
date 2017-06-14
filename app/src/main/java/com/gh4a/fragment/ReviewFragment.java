@@ -30,7 +30,7 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 import java.io.IOException;
 import java.util.List;
 
-public class ReviewCommentsFragment extends ListDataBaseFragment<TimelineItem>
+public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         implements TimelineItemAdapter.OnCommentAction {
 
     private static final int REQUEST_EDIT = 1000;
@@ -38,9 +38,9 @@ public class ReviewCommentsFragment extends ListDataBaseFragment<TimelineItem>
     @Nullable
     private TimelineItemAdapter mAdapter;
 
-    public static ReviewCommentsFragment newInstance(String repoOwner, String repoName,
+    public static ReviewFragment newInstance(String repoOwner, String repoName,
             int issueNumber, boolean isPullRequest, TimelineItem.TimelineReview review) {
-        ReviewCommentsFragment f = new ReviewCommentsFragment();
+        ReviewFragment f = new ReviewFragment();
         Bundle args = new Bundle();
         args.putString("repo_owner", repoOwner);
         args.putString("repo_name", repoName);

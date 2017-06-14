@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.R;
-import com.gh4a.activities.ReviewCommentsActivity;
+import com.gh4a.activities.ReviewActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.AvatarHandler;
@@ -150,7 +150,7 @@ class ReviewViewHolder
         } else if (v.getId() == R.id.btn_show_details) {
             TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
 
-            Intent intent = ReviewCommentsActivity.makeIntent(mContext, mRepoOwner, mRepoName,
+            Intent intent = ReviewActivity.makeIntent(mContext, mRepoOwner, mRepoName,
                     mIssueNumber, mIsPullRequest, review);
             mContext.startActivity(intent);
         }

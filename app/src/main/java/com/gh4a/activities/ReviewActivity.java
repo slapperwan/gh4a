@@ -10,17 +10,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.gh4a.R;
-import com.gh4a.fragment.ReviewCommentsFragment;
+import com.gh4a.fragment.ReviewFragment;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.IntentUtils;
 
-public class ReviewCommentsActivity extends FragmentContainerActivity {
+public class ReviewActivity extends FragmentContainerActivity {
 
     private String mTitle;
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             int issueNumber, boolean isPullRequest, TimelineItem.TimelineReview review) {
-        return new Intent(context, ReviewCommentsActivity.class)
+        return new Intent(context, ReviewActivity.class)
                 .putExtra("repo_owner", repoOwner)
                 .putExtra("repo_name", repoName)
                 .putExtra("issue_number", issueNumber)
@@ -78,7 +78,7 @@ public class ReviewCommentsActivity extends FragmentContainerActivity {
 
     @Override
     protected Fragment onCreateFragment() {
-        return ReviewCommentsFragment.newInstance(mRepoOwner, mRepoName, mIssueNumber,
+        return ReviewFragment.newInstance(mRepoOwner, mRepoName, mIssueNumber,
                 mIsPullRequest, mReview);
     }
 
