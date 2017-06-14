@@ -18,7 +18,7 @@ import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.ReviewCommentListLoader;
+import com.gh4a.loader.ReviewTimelineLoader;
 import com.gh4a.loader.TimelineItem;
 
 import org.eclipse.egit.github.core.Comment;
@@ -70,14 +70,14 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
     @Override
     protected Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
-        return new ReviewCommentListLoader(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
+        return new ReviewTimelineLoader(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
                 mReview.review.getId());
     }
 
     @Override
     protected RootAdapter<TimelineItem, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
-                mIsPullRequest, this);
+                mIsPullRequest, false, this);
         return mAdapter;
     }
 

@@ -32,6 +32,7 @@ public class TimelineItemAdapter extends
     private final String mRepoName;
     private final int mIssueNumber;
     private final boolean mIsPullRequest;
+    private final boolean mDisplayReviewDetails;
     private final OnCommentAction mActionCallback;
 
     private boolean mDontClearCacheOnClear;
@@ -92,13 +93,14 @@ public class TimelineItemAdapter extends
     };
 
     public TimelineItemAdapter(Context context, String repoOwner, String repoName, int issueNumber,
-            boolean isPullRequest, OnCommentAction callback) {
+            boolean isPullRequest, boolean displayReviewDetails, OnCommentAction callback) {
         super(context);
         mImageGetter = new HttpImageGetter(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mIssueNumber = issueNumber;
         mIsPullRequest = isPullRequest;
+        mDisplayReviewDetails = displayReviewDetails;
         mActionCallback = callback;
     }
 
@@ -154,7 +156,7 @@ public class TimelineItemAdapter extends
             case VIEW_TYPE_REVIEW:
                 view = inflater.inflate(R.layout.row_timeline_review, parent, false);
                 holder = new ReviewViewHolder(view, mRepoOwner, mRepoName, mIssueNumber,
-                        mIsPullRequest);
+                        mIsPullRequest, mDisplayReviewDetails);
                 break;
             case VIEW_TYPE_DIFF:
                 view = inflater.inflate(R.layout.row_timeline_diff, parent, false);

@@ -17,14 +17,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-public class ReviewCommentListLoader extends BaseLoader<List<TimelineItem>> {
+public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
 
     private final String mRepoOwner;
     private final String mRepoName;
     private final int mPullRequestNumber;
     private final long mReviewId;
 
-    public ReviewCommentListLoader(Context context, String repoOwner, String repoName,
+    public ReviewTimelineLoader(Context context, String repoOwner, String repoName,
             int pullRequestNumber, long reviewId) {
         super(context);
         mRepoOwner = repoOwner;
@@ -86,6 +86,7 @@ public class ReviewCommentListLoader extends BaseLoader<List<TimelineItem>> {
         Collections.sort(diffHunks);
 
         List<TimelineItem> items = new ArrayList<>();
+        items.add(timelineReview);
 
         for (TimelineItem.Diff diffHunk : diffHunks) {
             items.add(diffHunk);

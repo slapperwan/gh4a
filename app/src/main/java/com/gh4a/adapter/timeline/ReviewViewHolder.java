@@ -32,6 +32,7 @@ class ReviewViewHolder
     private final String mRepoName;
     private final int mIssueNumber;
     private final boolean mIsPullRequest;
+    private final boolean mDisplayReviewDetails;
 
     private final ImageView mAvatarView;
     private final TextView mMessageView;
@@ -41,7 +42,7 @@ class ReviewViewHolder
     private final View mAvatarContainer;
 
     public ReviewViewHolder(View itemView, String repoOwner, String repoName, int issueNumber,
-            boolean isPullRequest) {
+            boolean isPullRequest, boolean displayReviewDetails) {
         super(itemView);
 
         mContext = itemView.getContext();
@@ -49,6 +50,7 @@ class ReviewViewHolder
         mRepoName = repoName;
         mIssueNumber = issueNumber;
         mIsPullRequest = isPullRequest;
+        mDisplayReviewDetails = displayReviewDetails;
 
         mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
         mMessageView = (TextView) itemView.findViewById(R.id.tv_message);
@@ -82,7 +84,7 @@ class ReviewViewHolder
             mBodyView.setVisibility(View.GONE);
         }
 
-        if (!item.chunks.isEmpty()) {
+        if (mDisplayReviewDetails && !item.chunks.isEmpty()) {
             StringBuilder builder = new StringBuilder("Code comments in ");
             Set<String> usedNames = new HashSet<>();
 
