@@ -272,16 +272,9 @@ public class FileViewerActivity extends WebViewerActivity
         switch (item.getItemId()) {
             case R.id.share:
                 if (mLastTouchedLine > 0) {
-                    // TODO: Use new share intent utility method
-                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("text/plain");
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                            getString(R.string.share_line_subject, mLastTouchedLine, mPath,
-                                    mRepoOwner + "/" + mRepoName));
-                    shareIntent.putExtra(Intent.EXTRA_TEXT,  createUrl());
-                    shareIntent = Intent.createChooser(shareIntent,
-                            getString(R.string.share_title));
-                    startActivity(shareIntent);
+                    String subject = getString(R.string.share_line_subject, mLastTouchedLine, mPath,
+                            mRepoOwner + "/" + mRepoName);
+                    IntentUtils.share(this, subject, createUrl());
                 }
                 return true;
         }
