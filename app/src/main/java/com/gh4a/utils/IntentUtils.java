@@ -85,8 +85,8 @@ public class IntentUtils {
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
         shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-        shareIntent = Intent.createChooser(shareIntent, context.getString(R.string.share_title));
-        context.startActivity(shareIntent);
+        context.startActivity(
+                Intent.createChooser(shareIntent, context.getString(R.string.share_title));
     }
 
     private static Intent createActivityChooserIntent(Context context, Intent intent, Uri uri) {
