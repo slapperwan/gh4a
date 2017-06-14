@@ -5,9 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
@@ -15,7 +15,10 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
+import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
+import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.ReviewCommentListLoader;
 import com.gh4a.loader.TimelineItem;
 
 import org.eclipse.egit.github.core.Comment;
@@ -25,15 +28,14 @@ import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class ReviewCommentsFragment extends LoadingListFragmentBase
+public class ReviewCommentsFragment extends ListDataBaseFragment<TimelineItem>
         implements TimelineItemAdapter.OnCommentAction {
 
     private static final int REQUEST_EDIT = 1000;
 
+    @Nullable
     private TimelineItemAdapter mAdapter;
 
     public static ReviewCommentsFragment newInstance(String repoOwner, String repoName,
@@ -67,24 +69,16 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase
     }
 
     @Override
-    protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {
-        super.onRecyclerViewInflated(view, inflater);
+    protected Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
+        return new ReviewCommentListLoader(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
+                mReview.review.getId());
+    }
 
-        mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName,
-                mIssueNumber, mIsPullRequest, this);
-
-        List<TimelineItem.Diff> chunks = new ArrayList<>(mReview.chunks.values());
-        Collections.sort(chunks);
-
-        for (TimelineItem.Diff chunk : chunks) {
-            mAdapter.add(chunk);
-            for (TimelineItem.TimelineComment comment : chunk.comments) {
-                mAdapter.add(comment);
-            }
-
-            mAdapter.add(new TimelineItem.Reply(chunk.getInitialTimelineComment()));
-        }
-        view.setAdapter(mAdapter);
+    @Override
+    protected RootAdapter<TimelineItem, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
+        mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
+                mIsPullRequest, this);
+        return mAdapter;
     }
 
     @Override
@@ -96,11 +90,6 @@ public class ReviewCommentsFragment extends LoadingListFragmentBase
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
-    }
-
-    @Override
-    public void onRefresh() {
-        // TODO
     }
 
     private void reloadComments( boolean alsoClearCaches) {

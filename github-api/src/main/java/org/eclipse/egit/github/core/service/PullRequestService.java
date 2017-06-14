@@ -538,6 +538,98 @@ public class PullRequestService extends GitHubService {
 	}
 
 	/**
+	 * Get pull request review with the given id.
+     *
+	 * @param repository
+	 * @param pullRequestNumber
+	 * @param reviewId
+	 * @return review
+	 * @throws IOException
+	 */
+	public Review getReview(IRepositoryIdProvider repository, int pullRequestNumber,
+			long reviewId) throws IOException {
+		String repoId = getId(repository);
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+		uri.append('/').append(repoId);
+		uri.append(SEGMENT_PULLS);
+		uri.append('/').append(pullRequestNumber);
+		uri.append(SEGMENT_REVIEWS);
+		uri.append('/').append(reviewId);
+		GitHubRequest request = createRequest();
+		request.setUri(uri);
+		request.setType(Review.class);
+		return (Review) client.get(request).getBody();
+	}
+
+	/**
+	 * Get all comments on a review in given pull request.
+	 *
+	 * @param repository
+	 * @param pullRequestNumber
+	 * @param reviewId
+	 * @return non-null list of comments
+	 * @throws IOException
+	 */
+	public List<CommitComment> getReviewComments(IRepositoryIdProvider repository,
+			int pullRequestNumber, long reviewId) throws IOException {
+		return getAll(pageReviewComments(repository, pullRequestNumber, reviewId));
+	}
+
+	/**
+	 * Page pull request review comments
+	 *
+	 * @param repository
+	 * @param pullRequestNumber
+	 * @param reviewId
+	 * @return iterator over pages of review comments
+	 */
+	public PageIterator<CommitComment> pageReviewComments(IRepositoryIdProvider repository,
+			int pullRequestNumber, long reviewId) {
+		return pageReviewComments(repository, pullRequestNumber, reviewId, PAGE_SIZE);
+	}
+
+	/**
+	 * Page pull request review comments
+	 *
+	 * @param repository
+	 * @param pullRequestNumber
+	 * @param reviewId
+	 * @param size
+	 *  @return iterator over pages of review comments
+	 */
+	public PageIterator<CommitComment> pageReviewComments(IRepositoryIdProvider repository,
+			int pullRequestNumber, long reviewId, int size) {
+		return pageReviewComments(repository, pullRequestNumber, reviewId, PAGE_FIRST, size);
+	}
+
+	/**
+	 * Page pull request review comments
+	 *
+	 * @param repository
+	 * @param pullRequestNumber
+	 * @param reviewId
+	 * @param start
+	 * @param size
+	 * @return iterator over pages of review comments
+	 */
+	public PageIterator<CommitComment> pageReviewComments(IRepositoryIdProvider repository,
+			int pullRequestNumber, long reviewId, int start, int size) {
+		String repoId = getId(repository);
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+		uri.append('/').append(repoId);
+		uri.append(SEGMENT_PULLS);
+		uri.append('/').append(pullRequestNumber);
+		uri.append(SEGMENT_REVIEWS);
+		uri.append('/').append(reviewId);
+		uri.append(SEGMENT_COMMENTS);
+		PagedRequest<CommitComment> request = createPagedRequest(start, size);
+		request.setUri(uri);
+		request.setType(new TypeToken<List<CommitComment>>() {
+		}.getType());
+		return createPageIterator(request);
+	}
+
+	/**
 	 * Get commit comment with given id
 	 *
 	 * @param repository
