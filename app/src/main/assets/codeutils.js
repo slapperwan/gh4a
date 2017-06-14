@@ -9,6 +9,22 @@ window.applyLineWrapping = function(enabled) {
     s.textContent = enabled ? 'pre { white-space: pre-wrap }' : '';
 };
 
+window.addClickListeners = function() {
+    var pre = document.getElementById("content");
+    var ol = pre != null ? pre.getElementsByTagName("ol")[0] : null;
+    var lines = ol != null ? ol.getElementsByTagName("li") : null;
+    if (lines != null) {
+        function listener(target, line, event) {
+            if (event.target === target) {
+                NativeClient.onLineTouched(line);
+            }
+        }
+        for (i = 0; i < lines.length; i++) {
+            lines[i].addEventListener('click', listener.bind(null, lines[i], i + 1));
+        }
+    }
+};
+
 window.scrollToHighlight = function() {
     if (!window.highlightTop || !window.highlightBottom || !window.innerHeight) {
         return;

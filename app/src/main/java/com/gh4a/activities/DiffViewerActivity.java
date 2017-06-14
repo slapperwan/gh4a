@@ -17,7 +17,6 @@ package com.gh4a.activities;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -32,7 +31,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -60,7 +58,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class DiffViewerActivity extends WebViewerActivity implements
-        ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener, View.OnTouchListener {
+        ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
             String commitSha, String path, String diff, List<CommitComment> comments,
             int initialLine, int highlightStartLine, int highlightEndLine,
@@ -147,8 +145,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     private final SparseArray<List<CommitComment>> mCommitCommentsByPos = new SparseArray<>();
     private final LongSparseArray<CommitCommentWrapper> mCommitComments = new LongSparseArray<>();
 
-    private final Point mLastTouchDown = new Point();
-
     private static final int MENU_ITEM_VIEW = 10;
 
     private final LoaderCallbacks<List<CommitComment>> mCommentCallback =
@@ -174,8 +170,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         actionBar.setTitle(FileUtils.getFileName(mPath));
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
-
-        mWebView.setOnTouchListener(this);
 
         List<CommitComment> comments = (ArrayList<CommitComment>)
                 getIntent().getSerializableExtra("comments");
@@ -466,14 +460,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         CommentActionPopup p = new CommentActionPopup(id, line, lineText, leftLine, rightLine,
                 mLastTouchDown.x, mLastTouchDown.y, isComment, isRightLine);
         p.show();
-    }
-
-    @Override
-    public boolean onTouch(View view, MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            mLastTouchDown.set((int) event.getX(), (int) event.getY());
-        }
-        return false;
     }
 
     private void refresh() {

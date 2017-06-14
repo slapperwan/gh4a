@@ -26,6 +26,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.print.PrintHelper;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -49,7 +50,8 @@ import org.eclipse.egit.github.core.util.EncodingUtils;
 import java.util.List;
 import java.util.Locale;
 
-public class FileViewerActivity extends WebViewerActivity {
+public class FileViewerActivity extends WebViewerActivity
+        implements PopupMenu.OnMenuItemClickListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             String ref, String fullPath) {
         return makeIntent(context, repoOwner, repoName, ref, fullPath, -1, -1, null);
@@ -86,6 +88,7 @@ public class FileViewerActivity extends WebViewerActivity {
     private int mHighlightEnd;
     private TextMatch mTextMatch;
     private RepositoryContents mContent;
+    private int mLastTouchedLine = 0;
 
     private static final int MENU_ITEM_HISTORY = 10;
     private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
@@ -262,6 +265,46 @@ public class FileViewerActivity extends WebViewerActivity {
     @Override
     protected Intent navigateUp() {
         return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.share:
+                if (mLastTouchedLine > 0) {
+                    // TODO: Use new share intent utility method
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_SUBJECT,
+                            getString(R.string.share_line_subject, mLastTouchedLine, mPath,
+                                    mRepoOwner + "/" + mRepoName));
+                    shareIntent.putExtra(Intent.EXTRA_TEXT,  createUrl());
+                    shareIntent = Intent.createChooser(shareIntent,
+                            getString(R.string.share_title));
+                    startActivity(shareIntent);
+                }
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void onLineTouched(int line, int x, int y) {
+        super.onLineTouched(line, x, y);
+
+        mLastTouchedLine = line;
+
+        View anchor = findViewById(R.id.popup_helper);
+        anchor.layout(x, y, x + 1, y + 1);
+        PopupMenu popupMenu = new PopupMenu(this, anchor);
+        popupMenu.getMenuInflater().inflate(R.menu.file_line_menu, popupMenu.getMenu());
+        popupMenu.show();
+        popupMenu.setOnMenuItemClickListener(this);
+    }
+
+    private String createUrl() {
+        return "https://github.com/" + mRepoOwner + "/" + mRepoName + "/blob/" + mRef + "/" +
+                mPath + "#L" + mLastTouchedLine;
     }
 
     private void openUnsuitableFileAndFinish() {
