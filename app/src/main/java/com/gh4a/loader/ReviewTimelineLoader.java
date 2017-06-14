@@ -1,7 +1,6 @@
 package com.gh4a.loader;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.gh4a.Gh4Application;
 
@@ -52,13 +51,8 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
             }
 
             for (CommitComment reviewComment : reviewComments) {
-                String id = reviewComment.getOriginalCommitId() + reviewComment.getPath() +
-                        reviewComment.getOriginalPosition();
-
-                TimelineItem.Diff diffHunk = getDiffHunk(timelineReview, id);
-
                 CommitFile file = filesByName.get(reviewComment.getPath());
-                diffHunk.comments.add(new TimelineItem.TimelineComment(reviewComment, file));
+                timelineReview.addComment(reviewComment, file, true);
             }
 
             List<CommitComment> commitComments =
@@ -72,17 +66,15 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
             });
 
             for (CommitComment commitComment : commitComments) {
-                String id = commitComment.getOriginalCommitId() + commitComment.getPath() +
-                        commitComment.getOriginalPosition();
-
-                TimelineItem.Diff diffHunk = getDiffHunk(timelineReview, id);
-
+                if (reviewComments.contains(commitComment)) {
+                    continue;
+                }
                 CommitFile file = filesByName.get(commitComment.getPath());
-                diffHunk.comments.add(new TimelineItem.TimelineComment(commitComment, file));
+                timelineReview.addComment(commitComment, file, false);
             }
         }
 
-        List<TimelineItem.Diff> diffHunks = new ArrayList<>(timelineReview.chunks.values());
+        List<TimelineItem.Diff> diffHunks = new ArrayList<>(timelineReview.getDiffHunks());
         Collections.sort(diffHunks);
 
         List<TimelineItem> items = new ArrayList<>();
@@ -98,15 +90,5 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
         }
 
         return items;
-    }
-
-    @NonNull
-    private TimelineItem.Diff getDiffHunk(TimelineItem.TimelineReview timelineReview, String id) {
-        TimelineItem.Diff reviewChunk = timelineReview.chunks.get(id);
-        if (reviewChunk == null) {
-            reviewChunk = new TimelineItem.Diff();
-            timelineReview.chunks.put(id, reviewChunk);
-        }
-        return reviewChunk;
     }
 }

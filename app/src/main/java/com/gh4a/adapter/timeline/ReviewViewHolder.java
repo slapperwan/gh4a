@@ -84,13 +84,13 @@ class ReviewViewHolder
             mBodyView.setVisibility(View.GONE);
         }
 
-        if (mDisplayReviewDetails && !item.chunks.isEmpty()) {
+        if (mDisplayReviewDetails && !item.getDiffHunks().isEmpty()) {
             StringBuilder builder = new StringBuilder("Code comments in ");
             Set<String> usedNames = new HashSet<>();
 
             boolean isOutdated = true;
 
-            for (TimelineItem.Diff diff : item.chunks.values()) {
+            for (TimelineItem.Diff diff : item.getDiffHunks()) {
                 CommitComment commitComment = diff.getInitialComment();
 
                 if (commitComment.getPosition() != -1) {

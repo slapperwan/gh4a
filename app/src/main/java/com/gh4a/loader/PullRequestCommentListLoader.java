@@ -67,20 +67,14 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
                 reviewsBySpecialId.put(id, review);
             }
 
-            TimelineItem.Diff reviewChunk = review.chunks.get(id);
-            if (reviewChunk == null) {
-                reviewChunk = new TimelineItem.Diff();
-                review.chunks.put(id, reviewChunk);
-            }
-
             CommitFile file = filesByName.get(commitComment.getPath());
-            reviewChunk.comments.add(new TimelineItem.TimelineComment(commitComment, file));
+            review.addComment(commitComment, file, true);
         }
 
         for (TimelineItem.TimelineReview review : reviews) {
             if (!review.review.getState().equals(Review.STATE_COMMENTED) ||
                     !TextUtils.isEmpty(review.review.getBody()) ||
-                    !review.chunks.isEmpty()) {
+                    !review.getDiffHunks().isEmpty()) {
                 events.add(review);
             }
         }

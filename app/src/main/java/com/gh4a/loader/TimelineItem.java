@@ -16,6 +16,7 @@ import org.eclipse.egit.github.core.Review;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +40,7 @@ public abstract class TimelineItem implements Serializable {
             this.file = null;
         }
 
-        public TimelineComment(@NonNull CommitComment commitComment, @NonNull CommitFile file) {
+        public TimelineComment(@NonNull CommitComment commitComment, @Nullable CommitFile file) {
             this.comment = commitComment;
             this.file = file;
         }
@@ -97,7 +98,7 @@ public abstract class TimelineItem implements Serializable {
         public final Review review;
 
         @NonNull
-        public final Map<String, Diff> chunks = new HashMap<>();
+        private final Map<String, Diff> diffHunksBySpecialId = new HashMap<>();
 
         public TimelineReview(@NonNull Review review) {
             this.review = review;
@@ -107,11 +108,37 @@ public abstract class TimelineItem implements Serializable {
         public Date getCreatedAt() {
             return review.getSubmittedAt();
         }
+
+        public Collection<Diff> getDiffHunks() {
+            return diffHunksBySpecialId.values();
+        }
+
+        public void addComment(@NonNull CommitComment comment, @Nullable CommitFile file,
+                boolean addNewDiffHunk) {
+            String id = comment.getOriginalCommitId() + comment.getPath() +
+                    comment.getOriginalPosition();
+
+            TimelineComment timelineComment = new TimelineComment(comment, file);
+
+            Diff diffHunk = diffHunksBySpecialId.get(id);
+            if (diffHunk == null) {
+                if (addNewDiffHunk) {
+                    diffHunk = new Diff(timelineComment);
+                    diffHunksBySpecialId.put(id, diffHunk);
+                }
+            } else {
+                diffHunk.comments.add(timelineComment);
+            }
+        }
     }
 
     public static class Diff extends TimelineItem implements Comparable<Diff> {
         @NonNull
         public final List<TimelineComment> comments = new ArrayList<>();
+
+        public Diff(TimelineComment timelineComment) {
+            comments.add(timelineComment);
+        }
 
         @NonNull
         public TimelineComment getInitialTimelineComment() {
