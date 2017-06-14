@@ -507,9 +507,6 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                 return true;
             }
 
-            CommitCommentWrapper wrapper = mCommitComments.get(mId);
-            CommitComment comment = wrapper != null ? wrapper.comment : null;
-
             switch (item.getItemId()) {
                 case R.id.delete:
                     new AlertDialog.Builder(DiffViewerActivity.this)
@@ -524,13 +521,15 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                             .show();
                     break;
                 case R.id.reply:
-                    openCommentDialog(0L, mId, mLineText, mPosition, mLeftLine, mRightLine, comment);
+                    openCommentDialog(0L, mId, mLineText, mPosition, mLeftLine, mRightLine, null);
                     break;
                 case R.id.edit:
+                    CommitCommentWrapper wrapper = mCommitComments.get(mId);
+                    CommitComment comment = wrapper != null ? wrapper.comment : null;
                     openCommentDialog(mId, 0L, mLineText, mPosition, mLeftLine, mRightLine, comment);
                     break;
                 case R.id.add_comment:
-                    openCommentDialog(0L, 0L, mLineText, mPosition, mLeftLine, mRightLine, comment);
+                    openCommentDialog(0L, 0L, mLineText, mPosition, mLeftLine, mRightLine, null);
                     break;
                 case R.id.share:
                     String url = createUrl(createLineLinkId(mIsRightLine ? mRightLine : mLeftLine,
