@@ -86,7 +86,9 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
                 items.add(comment);
             }
 
-            items.add(new TimelineItem.Reply(diffHunk.getInitialTimelineComment()));
+            if (!diffHunk.getInitialTimelineComment().isReply()) {
+                items.add(new TimelineItem.Reply(diffHunk.getInitialTimelineComment()));
+            }
         }
 
         return items;

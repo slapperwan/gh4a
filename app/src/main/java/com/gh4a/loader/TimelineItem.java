@@ -29,6 +29,8 @@ public abstract class TimelineItem implements Serializable {
         private static final Pattern PULL_REQUEST_PATTERN =
                 Pattern.compile(".+/repos/(.+)/(.+)/pulls/(\\d+)");
 
+        private boolean mIsReply = false;
+
         @NonNull
         public final Comment comment;
 
@@ -76,6 +78,16 @@ public abstract class TimelineItem implements Serializable {
             }
 
             return null;
+        }
+
+        // TODO: Explain what these mean
+
+        public void setIsReply(boolean isReply) {
+            mIsReply = isReply;
+        }
+
+        public boolean isReply() {
+            return mIsReply;
         }
     }
 
@@ -127,7 +139,12 @@ public abstract class TimelineItem implements Serializable {
                     diffHunksBySpecialId.put(id, diffHunk);
                 }
             } else {
-                diffHunk.comments.add(timelineComment);
+                TimelineComment initialTimelineComment = diffHunk.getInitialTimelineComment();
+                if (diffHunk.getCreatedAt().after(comment.getCreatedAt())) {
+                    initialTimelineComment.setIsReply(true);
+                } else if (!initialTimelineComment.isReply()) {
+                    diffHunk.comments.add(timelineComment);
+                }
             }
         }
     }
