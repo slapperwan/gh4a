@@ -80,6 +80,15 @@ public class IntentUtils {
         }
     }
 
+    public static void share(Context context, String subject, String url) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+        context.startActivity(
+                Intent.createChooser(shareIntent, context.getString(R.string.share_title));
+    }
+
     private static Intent createActivityChooserIntent(Context context, Intent intent, Uri uri) {
         final PackageManager pm = context.getPackageManager();
         final List<ResolveInfo> activities = pm.queryIntentActivities(intent,

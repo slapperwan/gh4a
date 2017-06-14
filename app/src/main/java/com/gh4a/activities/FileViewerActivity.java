@@ -248,13 +248,8 @@ public class FileViewerActivity extends WebViewerActivity {
                 IntentUtils.launchBrowser(this, Uri.parse(url));
                 return true;
             case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_file_subject,
-                        FileUtils.getFileName(mPath), mRepoOwner + "/" + mRepoName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT, url);
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
+                IntentUtils.share(this, getString(R.string.share_file_subject,
+                        FileUtils.getFileName(mPath), mRepoOwner + "/" + mRepoName), url);
                 return true;
             case MENU_ITEM_HISTORY:
                 startActivity(CommitHistoryActivity.makeIntent(this,

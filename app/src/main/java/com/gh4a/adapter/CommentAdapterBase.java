@@ -33,6 +33,7 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
@@ -68,13 +69,7 @@ abstract class CommentAdapterBase<T> extends RootAdapter<T, CommentAdapterBase.V
                     return true;
 
                 case R.id.share:
-                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                    shareIntent.setType("text/plain");
-                    shareIntent.putExtra(Intent.EXTRA_SUBJECT, getShareSubject(item));
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, getUrl(item));
-                    shareIntent = Intent.createChooser(shareIntent,
-                            mContext.getString(R.string.share_title));
-                    mContext.startActivity(shareIntent);
+                    IntentUtils.share(mContext, getShareSubject(item), getUrl(item));
                     return true;
             }
             return false;

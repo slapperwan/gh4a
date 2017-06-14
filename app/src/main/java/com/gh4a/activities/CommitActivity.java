@@ -204,13 +204,8 @@ public class CommitActivity extends BasePagerActivity implements
                 IntentUtils.launchBrowser(this, Uri.parse(diffUrl));
                 return true;
             case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_commit_subject,
-                        mObjectSha.substring(0, 7), mRepoOwner + "/" + mRepoName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT, diffUrl);
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
+                IntentUtils.share(this, getString(R.string.share_commit_subject,
+                        mObjectSha.substring(0, 7), mRepoOwner + "/" + mRepoName), diffUrl);
                 return true;
         }
         return super.onOptionsItemSelected(item);

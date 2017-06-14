@@ -227,13 +227,9 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                 }
                 return true;
             case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_issue_subject,
-                        mIssueNumber, mIssue.getTitle(), mRepoOwner + "/" + mRepoName));
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  mIssue.getHtmlUrl());
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
+                IntentUtils.share(this, getString(R.string.share_issue_subject,
+                        mIssueNumber, mIssue.getTitle(), mRepoOwner + "/" + mRepoName),
+                        mIssue.getHtmlUrl());
                 return true;
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(mIssue.getHtmlUrl()));

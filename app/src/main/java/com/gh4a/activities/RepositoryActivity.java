@@ -397,12 +397,7 @@ public class RepositoryActivity extends BasePagerActivity {
                 }
                 return true;
             case R.id.share:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, mRepoOwner + "/" + mRepoName);
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  url);
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
+                IntentUtils.share(this, mRepoOwner + "/" + mRepoName, url);
                 return true;
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(url));

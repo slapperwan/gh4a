@@ -15,13 +15,6 @@
  */
 package com.gh4a.activities;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.eclipse.egit.github.core.Gist;
-import org.eclipse.egit.github.core.GistFile;
-import org.eclipse.egit.github.core.service.GistService;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -45,8 +38,16 @@ import com.gh4a.loader.GistStarLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+
+import org.eclipse.egit.github.core.Gist;
+import org.eclipse.egit.github.core.GistFile;
+import org.eclipse.egit.github.core.service.GistService;
+
+import java.io.IOException;
+import java.util.Map;
 
 public class GistActivity extends BaseActivity implements View.OnClickListener {
     public static Intent makeIntent(Context context, String gistId) {
@@ -197,13 +198,8 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         switch (item.getItemId()) {
             case R.id.share:
                 String login = ApiHelpers.getUserLogin(this, mGist.getOwner());
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.setType("text/plain");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT,
-                        getString(R.string.share_gist_subject, mGistId, login));
-                shareIntent.putExtra(Intent.EXTRA_TEXT,  mGist.getHtmlUrl());
-                shareIntent = Intent.createChooser(shareIntent, getString(R.string.share_title));
-                startActivity(shareIntent);
+                IntentUtils.share(this, getString(R.string.share_gist_subject, mGistId, login),
+                        mGist.getHtmlUrl());
                 return true;
             case R.id.star:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
