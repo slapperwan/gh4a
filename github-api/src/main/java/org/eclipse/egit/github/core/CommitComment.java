@@ -13,7 +13,7 @@ package org.eclipse.egit.github.core;
 /**
  * Commit comment model class.
  */
-public class CommitComment extends Comment {
+public class CommitComment extends Comment implements Comparable<CommitComment> {
 
 	/** serialVersionUID */
 	private static final long serialVersionUID = 5932088388457362322L;
@@ -164,5 +164,16 @@ public class CommitComment extends Comment {
 	public CommitComment setPullRequestUrl(String pullRequestUrl) {
 		this.pullRequestUrl = pullRequestUrl;
         return this;
+	}
+
+	@Override
+	public int compareTo(CommitComment other) {
+		if (getCreatedAt() == null) {
+			return 1;
+		}
+		if (other.getCreatedAt() == null) {
+            return -1;
+		}
+		return getCreatedAt().compareTo(other.getCreatedAt());
 	}
 }

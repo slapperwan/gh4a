@@ -12,7 +12,6 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,11 +44,14 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
                 pullRequestService.getReviewComments(repoId, mPullRequestNumber, mReviewId);
 
         if (!reviewComments.isEmpty()) {
+            Collections.sort(reviewComments);
+
             HashMap<String, CommitFile> filesByName = new HashMap<>();
             for (CommitFile file : pullRequestService.getFiles(repoId, mPullRequestNumber)) {
                 filesByName.put(file.getFilename(), file);
             }
 
+            // Add all of the review comments to the review item creating necessary diff hunks
             for (CommitComment reviewComment : reviewComments) {
                 CommitFile file = filesByName.get(reviewComment.getPath());
                 timelineReview.addComment(reviewComment, file, true);
@@ -58,27 +60,25 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
             List<CommitComment> commitComments =
                     pullRequestService.getComments(repoId, mPullRequestNumber);
 
-            Collections.sort(commitComments, new Comparator<CommitComment>() {
-                @Override
-                public int compare(CommitComment o1, CommitComment o2) {
-                    return o1.getCreatedAt().compareTo(o2.getCreatedAt());
-                }
-            });
+            Collections.sort(commitComments);
 
             for (CommitComment commitComment : commitComments) {
                 if (reviewComments.contains(commitComment)) {
                     continue;
                 }
+
+                // Rest of the comments should be added only if they are under the same diff hunks
+                // as the original review comments.
                 CommitFile file = filesByName.get(commitComment.getPath());
                 timelineReview.addComment(commitComment, file, false);
             }
         }
 
-        List<TimelineItem.Diff> diffHunks = new ArrayList<>(timelineReview.getDiffHunks());
-        Collections.sort(diffHunks);
-
         List<TimelineItem> items = new ArrayList<>();
         items.add(timelineReview);
+
+        List<TimelineItem.Diff> diffHunks = new ArrayList<>(timelineReview.getDiffHunks());
+        Collections.sort(diffHunks);
 
         for (TimelineItem.Diff diffHunk : diffHunks) {
             items.add(diffHunk);
@@ -86,7 +86,7 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
                 items.add(comment);
             }
 
-            if (!diffHunk.getInitialTimelineComment().isReply()) {
+            if (!diffHunk.isReply()) {
                 items.add(new TimelineItem.Reply(diffHunk.getInitialTimelineComment()));
             }
         }

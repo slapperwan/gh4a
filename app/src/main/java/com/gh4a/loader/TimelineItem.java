@@ -29,8 +29,6 @@ public abstract class TimelineItem implements Serializable {
         private static final Pattern PULL_REQUEST_PATTERN =
                 Pattern.compile(".+/repos/(.+)/(.+)/pulls/(\\d+)");
 
-        private boolean mIsReply = false;
-
         @NonNull
         public final Comment comment;
 
@@ -79,16 +77,6 @@ public abstract class TimelineItem implements Serializable {
 
             return null;
         }
-
-        // TODO: Explain what these mean
-
-        public void setIsReply(boolean isReply) {
-            mIsReply = isReply;
-        }
-
-        public boolean isReply() {
-            return mIsReply;
-        }
     }
 
     public static class TimelineEvent extends TimelineItem {
@@ -125,25 +113,48 @@ public abstract class TimelineItem implements Serializable {
             return diffHunksBySpecialId.values();
         }
 
+        /**
+         * Add the specified commend and it's matching commit file to correct diff hunk inside of
+         * this review.
+         * NOTE: This method expects to be called first with comments from this review in a sorted
+         * order.
+         *
+         * @param comment The comment to add to this review.
+         * @param file The commit file in which the comment was created.
+         * @param addNewDiffHunk {@code true} if new diff hunk should be created if it's not found.
+         */
         public void addComment(@NonNull CommitComment comment, @Nullable CommitFile file,
                 boolean addNewDiffHunk) {
+            // Comments are grouped by a special diff hunk id which is a combination of these 3
+            // fields. By using this id we can display comments and their replies together under
+            // a single diff hunk.
+            // NOTE: Using this id is not correct in all of the possible cases (Comments created
+            // with "Start new conversation" are incorrect). Sadly the GitHub API doesn't provide
+            // better information than that so this is all that we can rely on.
             String id = comment.getOriginalCommitId() + comment.getPath() +
                     comment.getOriginalPosition();
-
-            TimelineComment timelineComment = new TimelineComment(comment, file);
 
             Diff diffHunk = diffHunksBySpecialId.get(id);
             if (diffHunk == null) {
                 if (addNewDiffHunk) {
-                    diffHunk = new Diff(timelineComment);
+                    diffHunk = new Diff(new TimelineComment(comment, file));
                     diffHunksBySpecialId.put(id, diffHunk);
                 }
             } else {
-                TimelineComment initialTimelineComment = diffHunk.getInitialTimelineComment();
-                if (diffHunk.getCreatedAt().after(comment.getCreatedAt())) {
-                    initialTimelineComment.setIsReply(true);
-                } else if (!initialTimelineComment.isReply()) {
-                    diffHunk.comments.add(timelineComment);
+                if (diffHunk.isReply()) {
+                    // To match how GitHub web interface works diff hunks with this property set to
+                    // true should display only the initial comments.
+                    return;
+                }
+
+                if (diffHunk.getCreatedAt() != null &&
+                        diffHunk.getCreatedAt().after(comment.getCreatedAt())) {
+                    // Because we are adding all of the comments in order based on their creation
+                    // date and also first add only comments from the initial review we know that
+                    // if something comes out of order then our initial comment was a reply.
+                    diffHunk.setIsReply(true);
+                } else {
+                    diffHunk.comments.add(new TimelineComment(comment, file));
                 }
             }
         }
@@ -153,8 +164,30 @@ public abstract class TimelineItem implements Serializable {
         @NonNull
         public final List<TimelineComment> comments = new ArrayList<>();
 
+        private boolean mIsReply;
+
         public Diff(TimelineComment timelineComment) {
             comments.add(timelineComment);
+        }
+
+        /**
+         * Indicates whether this diff hunk corresponds to an initial review comment which was
+         * created as a reply to different review comment.
+         * <p>
+         * This property is used to match how GitHub web interface works. These comments are special
+         * because for them reply button is not displayed and they are the only comments that should
+         * be visible in the corresponding diff hunk.
+         */
+        public boolean isReply() {
+            return mIsReply;
+        }
+
+        /**
+         * Mark that this diff hunk corresponds to an initial review comment that was created as
+         * reply to different review comment.
+         */
+        public void setIsReply(boolean isReply) {
+            mIsReply = isReply;
         }
 
         @NonNull
