@@ -6,15 +6,22 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.PopupMenu;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.TextUtils;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.LineBackgroundSpan;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.loader.TimelineItem;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -53,6 +60,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         // TODO: Dark theme colors
 
         mDiffHunkTextView = (TextView) itemView.findViewById(R.id.diff_hunk);
+        mDiffHunkTextView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         mFileTextView = (TextView) itemView.findViewById(R.id.tv_file);
         mFileTextView.setOnClickListener(this);
     }
@@ -103,11 +111,11 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
             int spanStart = builder.length();
 
-            String leftLineText = !isRightLine && leftLine > 0 ? String.valueOf(leftLine - 1) : "";
-            appendLineNumber(builder, maxLineLength, leftLineText);
+            String leftLineText = !isRightLine && leftLine > 0 ? String.valueOf(leftLine) : "";
+            appendLineNumber(builder, maxLineLength, leftLineText, leftLine, item, false);
 
-            String rightLineText = !isLeftLine && rightLine > 0 ? String.valueOf(rightLine - 1) : "";
-            appendLineNumber(builder, maxLineLength, rightLineText);
+            String rightLineText = !isLeftLine && rightLine > 0 ? String.valueOf(rightLine) : "";
+            appendLineNumber(builder, maxLineLength, rightLineText, rightLine, item, true);
 
             // Add additional padding between line numbers and code
             builder.append("  ");
@@ -139,16 +147,33 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mDiffHunkTextView.setText(builder);
     }
 
-    private void appendLineNumber(SpannableStringBuilder builder, int maxLength, String number) {
+    private void appendLineNumber(SpannableStringBuilder builder, int maxLength, String numberText,
+            final int number, final TimelineItem.Diff diff, final boolean isRightNumber) {
+        int start = builder.length();
+
         // Add padding at the start of text
         builder.append("    ");
 
         // Right align the number if necessary
-        for (int i = 0; i < maxLength - number.length(); i++) {
+        for (int i = 0; i < maxLength - numberText.length(); i++) {
             builder.append("  ");
         }
 
-        builder.append(number);
+        builder.append(numberText);
+
+        if (!TextUtils.isEmpty(numberText)) {
+            builder.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    showPopupMenu(diff, number, isRightNumber);
+                }
+
+                @Override
+                public void updateDrawState(TextPaint ds) {
+                    ds.setColor(ds.linkColor);
+                }
+            }, start, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
     }
 
     @Override
@@ -162,6 +187,40 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
                 view.getContext().startActivity(intent);
             }
         }
+    }
+
+    private String createUrl(TimelineItem.Diff diff, int line, boolean isRightLine) {
+        CommitComment comment = diff.getInitialComment();
+        return "https://github.com/" + mRepoOwner + "/" + mRepoName + "/pull/" + mIssueNumber +
+                "#discussion-diff-" + comment.getId() + (isRightLine ? "R" : "L") + line;
+    }
+
+    private void showPopupMenu(final TimelineItem.Diff diff, final int line,
+            final boolean isRightLine) {
+        PopupMenu popupMenu = new PopupMenu(mContext, mDiffHunkTextView);
+
+        Menu menu = popupMenu.getMenu();
+        popupMenu.getMenuInflater().inflate(R.menu.review_diff_hunk_menu, menu);
+
+        menu.findItem(R.id.view_in_file).setVisible(diff.getInitialComment().getPosition() != -1);
+
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.share:
+                        IntentUtils.share(mContext, "Line", createUrl(diff, line, isRightLine));
+                        return true;
+                    case R.id.view_in_file:
+                        Intent intent = diff.getInitialTimelineComment()
+                                .makeDiffIntent(mContext, line, isRightLine);
+                        mContext.startActivity(intent);
+                        return true;
+                }
+                return false;
+            }
+        });
+        popupMenu.show();
     }
 
     private static class DiffLineSpan implements LineBackgroundSpan {

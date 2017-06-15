@@ -57,6 +57,11 @@ public abstract class TimelineItem implements Serializable {
 
         @Nullable
         public Intent makeDiffIntent(Context context) {
+            return makeDiffIntent(context, -1, false);
+        }
+
+        @Nullable
+        public Intent makeDiffIntent(Context context, int line, boolean isRightNumber) {
             CommitComment commitComment = getCommitComment();
 
             if (file == null || commitComment == null) {
@@ -69,10 +74,12 @@ public abstract class TimelineItem implements Serializable {
                 String repoName = matcher.group(2);
                 int pullRequestNumber = Integer.parseInt(matcher.group(3));
 
-                return PullRequestDiffViewerActivity.makeIntent(context, repoOwner,
-                        repoName, pullRequestNumber, commitComment.getCommitId(),
-                        commitComment.getPath(), file.getPatch(), null, -1, -1, -1, false,
-                        new IntentUtils.InitialCommentMarker(commitComment.getId()));
+                IntentUtils.InitialCommentMarker initialComment = line == -1
+                        ? new IntentUtils.InitialCommentMarker(commitComment.getId()) : null;
+
+                return PullRequestDiffViewerActivity.makeIntent(context, repoOwner, repoName,
+                        pullRequestNumber, commitComment.getCommitId(), commitComment.getPath(),
+                        file.getPatch(), null, -1, line, line, isRightNumber, initialComment);
             }
 
             return null;
