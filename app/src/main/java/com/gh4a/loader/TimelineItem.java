@@ -121,7 +121,7 @@ public abstract class TimelineItem implements Serializable {
         }
 
         /**
-         * Add the specified commend and it's matching commit file to correct diff hunk inside of
+         * Add the specified comment and its matching commit file to correct diff hunk inside of
          * this review.
          * NOTE: This method expects to be called first with comments from this review in a sorted
          * order.

@@ -163,7 +163,7 @@ public class CommitComment extends Comment implements Comparable<CommitComment> 
 
 	public CommitComment setPullRequestUrl(String pullRequestUrl) {
 		this.pullRequestUrl = pullRequestUrl;
-        return this;
+		return this;
 	}
 
 	@Override
@@ -172,7 +172,7 @@ public class CommitComment extends Comment implements Comparable<CommitComment> 
 			return 1;
 		}
 		if (other.getCreatedAt() == null) {
-            return -1;
+			return -1;
 		}
 		return getCreatedAt().compareTo(other.getCreatedAt());
 	}
