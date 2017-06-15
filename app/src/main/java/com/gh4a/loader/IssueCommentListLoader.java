@@ -14,11 +14,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
-    private final boolean mIsPullRequest;
 
     protected final String mRepoOwner;
     protected final String mRepoName;
@@ -32,29 +30,25 @@ public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
         IssueEvent.TYPE_RENAMED
     );
 
-    public static final Comparator<TimelineItem> SORTER = new Comparator<TimelineItem>() {
+    public static final Comparator<TimelineItem> TIMELINE_ITEM_COMPARATOR = new Comparator<TimelineItem>() {
         @Override
         public int compare(TimelineItem lhs, TimelineItem rhs) {
-            Date createdAt = lhs.getCreatedAt();
-            if (createdAt == null) {
-                return 0;
+            if (lhs.getCreatedAt() == null) {
+                return 1;
             }
-            return createdAt.compareTo(rhs.getCreatedAt());
+            if (rhs.getCreatedAt() == null) {
+                return -1;
+            }
+            return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
         }
     };
 
     public IssueCommentListLoader(Context context, String repoOwner, String repoName,
             int issueNumber) {
-        this(context, repoOwner, repoName, issueNumber, false);
-    }
-
-    protected IssueCommentListLoader(Context context, String repoOwner, String repoName,
-            int issueNumber, boolean isPullRequest) {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mIssueNumber = issueNumber;
-        mIsPullRequest = isPullRequest;
     }
 
     @Override
@@ -75,7 +69,7 @@ public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
             }
         }
 
-        Collections.sort(result, SORTER);
+        Collections.sort(result, TIMELINE_ITEM_COMPARATOR);
 
         return result;
     }

@@ -15,7 +15,6 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,7 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
 
     public PullRequestCommentListLoader(Context context, String repoOwner,
             String repoName, int issueNumber) {
-        super(context, repoOwner, repoName, issueNumber, true);
+        super(context, repoOwner, repoName, issueNumber);
     }
 
     @Override
@@ -35,14 +34,12 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
         PullRequestService pullRequestService = (PullRequestService)
                 Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
         RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-        List<CommitComment> commitComments = pullRequestService.getComments(repoId, mIssueNumber);
 
         HashMap<String, CommitFile> filesByName = new HashMap<>();
         for (CommitFile file : pullRequestService.getFiles(repoId, mIssueNumber)) {
             filesByName.put(file.getFilename(), file);
         }
 
-        Map<String, TimelineItem.TimelineReview> reviewsBySpecialId = new HashMap<>();
         LongSparseArray<TimelineItem.TimelineReview> reviewsById = new LongSparseArray<>();
         List<TimelineItem.TimelineReview> reviews = new ArrayList<>();
         for (Review review : pullRequestService.getReviews(repoId, mIssueNumber)) {
@@ -51,24 +48,25 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
             reviews.add(timelineReview);
         }
 
-        Collections.sort(commitComments, new Comparator<CommitComment>() {
-            @Override
-            public int compare(CommitComment o1, CommitComment o2) {
-                return o1.getCreatedAt().compareTo(o2.getCreatedAt());
-            }
-        });
+        List<CommitComment> commitComments = pullRequestService.getComments(repoId, mIssueNumber);
 
-        for (CommitComment commitComment : commitComments) {
-            String id = commitComment.getOriginalCommitId() + commitComment.getPath() +
-                    commitComment.getOriginalPosition();
-            TimelineItem.TimelineReview review = reviewsBySpecialId.get(id);
-            if (review == null) {
-                review = reviewsById.get(commitComment.getPullRequestReviewId());
-                reviewsBySpecialId.put(id, review);
-            }
+        if (!commitComments.isEmpty()) {
+            Collections.sort(commitComments);
 
-            CommitFile file = filesByName.get(commitComment.getPath());
-            review.addComment(commitComment, file, true);
+            Map<String, TimelineItem.TimelineReview> reviewsBySpecialId = new HashMap<>();
+
+            for (CommitComment commitComment : commitComments) {
+                String id = TimelineItem.Diff.getDiffHunkId(commitComment);
+
+                TimelineItem.TimelineReview review = reviewsBySpecialId.get(id);
+                if (review == null) {
+                    review = reviewsById.get(commitComment.getPullRequestReviewId());
+                    reviewsBySpecialId.put(id, review);
+                }
+
+                CommitFile file = filesByName.get(commitComment.getPath());
+                review.addComment(commitComment, file, true);
+            }
         }
 
         for (TimelineItem.TimelineReview review : reviews) {
@@ -79,7 +77,7 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
             }
         }
 
-        Collections.sort(events, SORTER);
+        Collections.sort(events, TIMELINE_ITEM_COMPARATOR);
 
         return events;
     }

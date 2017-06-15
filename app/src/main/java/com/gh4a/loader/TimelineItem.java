@@ -131,8 +131,7 @@ public abstract class TimelineItem implements Serializable {
             // NOTE: Using this id is not correct in all of the possible cases (Comments created
             // with "Start new conversation" are incorrect). Sadly the GitHub API doesn't provide
             // better information than that so this is all that we can rely on.
-            String id = comment.getOriginalCommitId() + comment.getPath() +
-                    comment.getOriginalPosition();
+            String id = Diff.getDiffHunkId(comment);
 
             Diff diffHunk = diffHunksBySpecialId.get(id);
             if (diffHunk == null) {
@@ -165,6 +164,17 @@ public abstract class TimelineItem implements Serializable {
         public final List<TimelineComment> comments = new ArrayList<>();
 
         private boolean mIsReply;
+
+        /**
+         * Returns special id that is used to group comments together with all replies to them
+         * under the same diff hunk.
+         *
+         * @param comment The comment for which to return the special id.
+         */
+        public static String getDiffHunkId(CommitComment comment) {
+            return comment.getOriginalCommitId() + comment.getPath() +
+                    comment.getOriginalPosition();
+        }
 
         public Diff(TimelineComment timelineComment) {
             comments.add(timelineComment);
