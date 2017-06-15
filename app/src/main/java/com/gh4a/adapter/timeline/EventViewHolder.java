@@ -34,7 +34,7 @@ class EventViewHolder
         implements View.OnClickListener {
 
     private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
-            Pattern.compile(".*github.com/repos/([^/]+)/([^/]+)/commits");
+            Pattern.compile(".*github\\.com/repos/([^/]+)/([^/]+)/commits");
     private static final HashMap<String, Integer> EVENT_ICONS = new HashMap<>();
 
     static {

@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 public abstract class TimelineItem implements Serializable {
     public static class TimelineComment extends TimelineItem {
         private static final Pattern PULL_REQUEST_PATTERN =
-                Pattern.compile(".+/repos/(.+)/(.+)/pulls/(\\d+)");
+                Pattern.compile(".*github\\.com/repos/([^/]+)/([^/]+)/pulls/(\\d+)");
 
         @NonNull
         public final Comment comment;
