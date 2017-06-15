@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.BrowseFilter;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
@@ -156,11 +157,10 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
             CommitComment comment = payload.getComment();
             if (comment != null) {
-                intent = CommitActivity.makeIntent(getActivity(),
-                        repoOwner, repoName, comment.getCommitId(),
-                        new IntentUtils.InitialCommentMarker(comment.getId()));
+                new BrowseFilter.CommitCommentLoadTask(getActivity(), repoOwner, repoName,
+                        comment.getCommitId(),
+                        new IntentUtils.InitialCommentMarker(comment.getId())).schedule();
             }
-
         } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();
             String ref = null;

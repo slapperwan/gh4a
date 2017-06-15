@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -233,7 +234,8 @@ public class BrowseFilter extends AppCompatActivity {
                     IntentUtils.InitialCommentMarker initialComment =
                             generateInitialCommentMarker(uri.getFragment(), "commitcomment-");
                     if (initialComment != null) {
-                        new CommitCommentLoadTask(user, repo, id, initialComment).execute();
+                        new CommitCommentLoadTask(BrowseFilter.this, user, repo, id,
+                                initialComment).execute();
                         return; // avoid finish() for now
                     }
                     intent = CommitActivity.makeIntent(this, user, repo, id, null);
@@ -347,35 +349,38 @@ public class BrowseFilter extends AppCompatActivity {
         }
     }
 
-    private abstract class UrlLoadTask extends BackgroundTask<Intent> {
-        public UrlLoadTask() {
-            super(BrowseFilter.this);
+    private static abstract class UrlLoadTask extends BackgroundTask<Intent> {
+        protected FragmentActivity mActivity;
+
+        public UrlLoadTask(FragmentActivity activity) {
+            super(activity);
+            mActivity = activity;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            new ProgressDialogFragment().show(getSupportFragmentManager(), "progress");
+            new ProgressDialogFragment().show(mActivity.getSupportFragmentManager(), "progress");
         }
 
         @Override
         protected void onSuccess(Intent result) {
-            if (isFinishing()) {
+            if (mActivity.isFinishing()) {
                 return;
             }
 
             if (result != null) {
-                startActivity(result);
+                mActivity.startActivity(result);
             } else {
-                IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
+                IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData());
             }
-            finish();
+            mActivity.finish();
         }
 
         @Override
         protected void onError(Exception e) {
-            IntentUtils.launchBrowser(BrowseFilter.this, getIntent().getData());
-            finish();
+            IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData());
+            mActivity.finish();
         }
     }
 
@@ -383,7 +388,7 @@ public class BrowseFilter extends AppCompatActivity {
         private final String mUserLogin;
 
         public UserLoadTask(String userLogin) {
-            super();
+            super(BrowseFilter.this);
             this.mUserLogin = userLogin;
         }
 
@@ -442,7 +447,7 @@ public class BrowseFilter extends AppCompatActivity {
         private final String mTagName;
 
         public ReleaseLoadTask(String repoOwner, String repoName, String tagName) {
-            super();
+            super(BrowseFilter.this);
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mTagName = tagName;
@@ -474,6 +479,7 @@ public class BrowseFilter extends AppCompatActivity {
 
         public PullRequestDiffCommentLoadTask(String repoOwner, String repoName,
                 int pullRequestNumber, IntentUtils.InitialCommentMarker marker, int page) {
+            super(BrowseFilter.this);
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mPullRequestNumber = pullRequestNumber;
@@ -536,14 +542,15 @@ public class BrowseFilter extends AppCompatActivity {
         }
     }
 
-    private class CommitCommentLoadTask extends UrlLoadTask {
+    public static class CommitCommentLoadTask extends UrlLoadTask {
         private final String mRepoOwner;
         private final String mRepoName;
         private final String mCommitSha;
         private final IntentUtils.InitialCommentMarker mMarker;
 
-        public CommitCommentLoadTask(String repoOwner, String repoName, String commitSha,
-                IntentUtils.InitialCommentMarker marker) {
+        public CommitCommentLoadTask(FragmentActivity activity, String repoOwner, String repoName,
+                String commitSha, IntentUtils.InitialCommentMarker marker) {
+            super(activity);
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mCommitSha = commitSha;
@@ -571,19 +578,19 @@ public class BrowseFilter extends AppCompatActivity {
                 }
             }
 
-            if (!foundComment || isFinishing()) {
+            if (!foundComment || mActivity.isFinishing()) {
                 return null;
             }
 
             Intent intent = null;
             if (resultFile != null) {
                 if (!FileUtils.isImage(resultFile.getFilename())) {
-                    intent = CommitDiffViewerActivity.makeIntent(BrowseFilter.this, mRepoOwner,
+                    intent = CommitDiffViewerActivity.makeIntent(mActivity, mRepoOwner,
                             mRepoName, mCommitSha, resultFile.getFilename(), resultFile.getPatch(),
                             comments, -1, -1, false, mMarker);
                 }
             } else {
-                intent = CommitActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                intent = CommitActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                         mCommitSha, mMarker);
             }
             return intent;
@@ -596,7 +603,7 @@ public class BrowseFilter extends AppCompatActivity {
         protected final DiffHighlightId mDiffId;
 
         public DiffLoadTask(String repoOwner, String repoName, DiffHighlightId diffId) {
-            super();
+            super(BrowseFilter.this);
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mDiffId = diffId;
@@ -717,7 +724,7 @@ public class BrowseFilter extends AppCompatActivity {
 
         public RefPathDisambiguationTask(String repoOwner, String repoName,
                 String refAndPath, int initialPage) {
-            super();
+            super(BrowseFilter.this);
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mRefAndPath = refAndPath;
@@ -728,7 +735,7 @@ public class BrowseFilter extends AppCompatActivity {
 
         public RefPathDisambiguationTask(String repoOwner, String repoName,
                 String refAndPath, String fragment) {
-            super();
+            super(BrowseFilter.this);
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mRefAndPath = refAndPath;
