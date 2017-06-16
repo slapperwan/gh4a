@@ -21,7 +21,6 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 
-import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.User;
 
 import java.util.Date;
@@ -44,7 +43,7 @@ class CommentViewHolder
     private final PopupMenu mPopupMenu;
 
     public interface Callback {
-        boolean canQuote(Comment comment);
+        boolean canQuote();
 
         void quoteText(CharSequence text);
 
@@ -104,7 +103,7 @@ class CommentViewHolder
         userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
         tvExtra.setText(userName);
 
-        if (mCallback.canQuote(item.comment)) {
+        if (mCallback.canQuote()) {
             tvDesc.setCustomSelectionActionModeCallback(
                     new UiUtils.QuoteActionModeCallback(tvDesc) {
                 @Override

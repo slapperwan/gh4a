@@ -60,7 +60,7 @@ public class TimelineItemAdapter extends
 
     private CommentViewHolder.Callback mCommentCallback = new CommentViewHolder.Callback() {
         @Override
-        public boolean canQuote(Comment comment) {
+        public boolean canQuote() {
             return !mLocked;
         }
 
@@ -208,19 +208,12 @@ public class TimelineItemAdapter extends
     public void onBindViewHolder(TimelineItemViewHolder holder, TimelineItem item) {
         switch (getItemViewType(item)) {
             case VIEW_TYPE_COMMENT:
-                ((CommentViewHolder) holder).bind((TimelineItem.TimelineComment) item);
-                break;
             case VIEW_TYPE_EVENT:
-                ((EventViewHolder) holder).bind((TimelineItem.TimelineEvent) item);
-                break;
             case VIEW_TYPE_REVIEW:
-                ((ReviewViewHolder) holder).bind((TimelineItem.TimelineReview) item);
-                break;
             case VIEW_TYPE_DIFF:
-                ((DiffViewHolder) holder).bind((TimelineItem.Diff) item);
-                break;
             case VIEW_TYPE_REPLY:
-                ((ReplyViewHolder) holder).bind((TimelineItem.Reply) item);
+                //noinspection unchecked
+                holder.bind(item);
                 break;
         }
     }
