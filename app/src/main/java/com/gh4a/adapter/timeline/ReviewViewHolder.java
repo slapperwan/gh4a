@@ -35,7 +35,6 @@ class ReviewViewHolder
     private final String mRepoOwner;
     private final String mRepoName;
     private final int mIssueNumber;
-    private final boolean mIsPullRequest;
     private final boolean mDisplayReviewDetails;
     private final Callback mCallback;
 
@@ -55,14 +54,13 @@ class ReviewViewHolder
     }
 
     public ReviewViewHolder(View itemView, String repoOwner, String repoName, int issueNumber,
-            boolean isPullRequest, boolean displayReviewDetails, Callback callback) {
+            boolean displayReviewDetails, Callback callback) {
         super(itemView);
 
         mContext = itemView.getContext();
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mIssueNumber = issueNumber;
-        mIsPullRequest = isPullRequest;
         mDisplayReviewDetails = displayReviewDetails;
         mCallback = callback;
 
@@ -90,7 +88,7 @@ class ReviewViewHolder
     @Override
     public void bind(TimelineItem.TimelineReview item) {
         Review review = item.review;
-        mShowDetailsButton.setTag(item);
+        mShowDetailsButton.setTag(review);
 
         AvatarHandler.assignAvatar(mAvatarView, review.getUser());
         mAvatarContainer.setTag(review.getUser());
@@ -151,7 +149,7 @@ class ReviewViewHolder
         }
 
         ivMenu.setVisibility(mDisplayReviewDetails ? View.VISIBLE : View.GONE);
-        ivMenu.setTag(item);
+        ivMenu.setTag(review);
     }
 
     private void formatTitle(Review review) {
@@ -188,10 +186,9 @@ class ReviewViewHolder
                 break;
             }
             case R.id.btn_show_details:
-                TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
-
+                Review review = (Review) v.getTag();
                 mContext.startActivity(ReviewActivity.makeIntent(mContext, mRepoOwner, mRepoName,
-                        mIssueNumber, mIsPullRequest, review));
+                        mIssueNumber, review));
                 break;
             case R.id.iv_menu:
                 mPopupMenu.show();
@@ -201,8 +198,7 @@ class ReviewViewHolder
 
     @Override
     public boolean onMenuItemClick(MenuItem item) {
-        TimelineItem.TimelineReview timelineReview = (TimelineItem.TimelineReview) ivMenu.getTag();
-        Review review = timelineReview.review;
+        Review review = (Review) ivMenu.getTag();
 
         switch (item.getItemId()) {
             case R.id.share:

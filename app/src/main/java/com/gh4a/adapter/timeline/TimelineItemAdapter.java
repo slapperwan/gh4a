@@ -168,7 +168,7 @@ public class TimelineItemAdapter extends
             case VIEW_TYPE_REVIEW:
                 view = inflater.inflate(R.layout.row_timeline_review, parent, false);
                 holder = new ReviewViewHolder(view, mRepoOwner, mRepoName, mIssueNumber,
-                        mIsPullRequest, mDisplayReviewDetails, mReviewCallback);
+                        mDisplayReviewDetails, mReviewCallback);
                 break;
             case VIEW_TYPE_DIFF:
                 view = inflater.inflate(R.layout.row_timeline_diff, parent, false);

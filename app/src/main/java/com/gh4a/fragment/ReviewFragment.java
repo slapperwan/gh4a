@@ -24,6 +24,7 @@ import com.gh4a.loader.TimelineItem;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
@@ -38,14 +39,13 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     @Nullable
     private TimelineItemAdapter mAdapter;
 
-    public static ReviewFragment newInstance(String repoOwner, String repoName,
-            int issueNumber, boolean isPullRequest, TimelineItem.TimelineReview review) {
+    public static ReviewFragment newInstance(String repoOwner, String repoName, int issueNumber,
+            Review review) {
         ReviewFragment f = new ReviewFragment();
         Bundle args = new Bundle();
         args.putString("repo_owner", repoOwner);
         args.putString("repo_name", repoName);
         args.putInt("issue_number", issueNumber);
-        args.putBoolean("is_pr", isPullRequest);
         args.putSerializable("review", review);
         f.setArguments(args);
         return f;
@@ -54,8 +54,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
-    private boolean mIsPullRequest;
-    private TimelineItem.TimelineReview mReview;
+    private Review mReview;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,20 +63,19 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         mRepoOwner = args.getString("repo_owner");
         mRepoName = args.getString("repo_name");
         mIssueNumber = args.getInt("issue_number");
-        mIsPullRequest = args.getBoolean("is_pr");
-        mReview = (TimelineItem.TimelineReview) args.getSerializable("review");
+        mReview = (Review) args.getSerializable("review");
     }
 
     @Override
     protected Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
         return new ReviewTimelineLoader(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
-                mReview.review.getId());
+                mReview.getId());
     }
 
     @Override
     protected RootAdapter<TimelineItem, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
-                mIsPullRequest, false, this);
+                true, false, this);
         return mAdapter;
     }
 

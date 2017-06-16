@@ -11,28 +11,27 @@ import android.view.MenuItem;
 
 import com.gh4a.R;
 import com.gh4a.fragment.ReviewFragment;
-import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.IntentUtils;
+
+import org.eclipse.egit.github.core.Review;
 
 public class ReviewActivity extends FragmentContainerActivity {
 
     private String mTitle;
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            int issueNumber, boolean isPullRequest, TimelineItem.TimelineReview review) {
+            int issueNumber, Review review) {
         return new Intent(context, ReviewActivity.class)
                 .putExtra("repo_owner", repoOwner)
                 .putExtra("repo_name", repoName)
                 .putExtra("issue_number", issueNumber)
-                .putExtra("is_pr", isPullRequest)
                 .putExtra("review", review);
     }
 
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
-    private boolean mIsPullRequest;
-    private TimelineItem.TimelineReview mReview;
+    private Review mReview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +50,7 @@ public class ReviewActivity extends FragmentContainerActivity {
         mRepoOwner = extras.getString("repo_owner");
         mRepoName = extras.getString("repo_name");
         mIssueNumber = extras.getInt("issue_number");
-        mIsPullRequest = extras.getBoolean("is_pr");
-        mReview = (TimelineItem.TimelineReview) extras.getSerializable("review");
+        mReview = (Review) extras.getSerializable("review");
     }
 
     @Override
@@ -65,11 +63,11 @@ public class ReviewActivity extends FragmentContainerActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share:
-                IntentUtils.share(this, mTitle, mReview.review.getHtmlUrl());
+                IntentUtils.share(this, mTitle, mReview.getHtmlUrl());
                 return true;
 
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(mReview.review.getHtmlUrl()));
+                IntentUtils.launchBrowser(this, Uri.parse(mReview.getHtmlUrl()));
                 return true;
         }
 
@@ -78,14 +76,13 @@ public class ReviewActivity extends FragmentContainerActivity {
 
     @Override
     protected Fragment onCreateFragment() {
-        return ReviewFragment.newInstance(mRepoOwner, mRepoName, mIssueNumber,
-                mIsPullRequest, mReview);
+        return ReviewFragment.newInstance(mRepoOwner, mRepoName, mIssueNumber, mReview);
     }
 
     @Override
     protected Intent navigateUp() {
         return PullRequestActivity.makeIntent(this, mRepoOwner, mRepoName, mIssueNumber,
                 PullRequestActivity.PAGE_CONVERSATION,
-                new IntentUtils.InitialCommentMarker(mReview.review.getId()));
+                new IntentUtils.InitialCommentMarker(mReview.getId()));
     }
 }
