@@ -15,8 +15,12 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.IssueEvent;
+import org.eclipse.egit.github.core.User;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TimelineItemAdapter extends
         RootAdapter<TimelineItem, TimelineItemAdapter.TimelineItemViewHolder> {
@@ -135,6 +139,31 @@ public class TimelineItemAdapter extends
 
     public void suppressCacheClearOnNextClear() {
         mDontClearCacheOnClear = true;
+    }
+
+    public Set<User> getUsers() {
+        final HashSet<User> users = new HashSet<>();
+        for (int i = 0; i < getCount(); i++) {
+            User user = null;
+            TimelineItem item = getItem(i);
+
+            if (item instanceof TimelineItem.TimelineComment) {
+                user = ((TimelineItem.TimelineComment) item).comment.getUser();
+            } else if (item instanceof TimelineItem.TimelineReview) {
+                user = ((TimelineItem.TimelineReview) item).review.getUser();
+            } else if (item instanceof TimelineItem.TimelineEvent) {
+                IssueEvent event = ((TimelineItem.TimelineEvent) item).event;
+                user = event.getAssigner();
+                if (user == null) {
+                    user = event.getActor();
+                }
+            }
+
+            if (user != null) {
+                users.add(user);
+            }
+        }
+        return users;
     }
 
     @Override

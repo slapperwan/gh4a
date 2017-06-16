@@ -62,6 +62,7 @@ import org.eclipse.egit.github.core.service.IssueService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 // TODO: Re-enable commented out code
 public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
@@ -255,8 +256,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             mInitialComment = null;
         }
 
-        // TODO
-//        updateMentionUsers();
+        updateMentionUsers();
     }
 
     @Override
@@ -290,13 +290,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         return mIssue.isLocked() && !mIsCollaborator;
     }
 
-//    private void updateMentionUsers() {
-//        Set<User> users = mAdapter.getUsers();
-//        if (mIssue.getUser() != null) {
-//            users.add(mIssue.getUser());
-//        }
-//        mCommentFragment.setMentionUsers(users);
-//    }
+    private void updateMentionUsers() {
+        Set<User> users = mAdapter.getUsers();
+        if (mIssue.getUser() != null) {
+            users.add(mIssue.getUser());
+        }
+        mCommentFragment.setMentionUsers(users);
+    }
 
     private void updateCommentLockState() {
         if (mCommentFragment != null) {
