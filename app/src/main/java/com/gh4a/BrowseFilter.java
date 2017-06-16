@@ -503,6 +503,7 @@ public class BrowseFilter extends AppCompatActivity {
 
         public PullRequestReviewCommentLoadTask(String repoOwner, String repoName,
                 int pullRequestNumber, IntentUtils.InitialCommentMarker marker) {
+            super(BrowseFilter.this);
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mPullRequestNumber = pullRequestNumber;
@@ -555,6 +556,7 @@ public class BrowseFilter extends AppCompatActivity {
 
         public PullRequestReviewLoadTask(String repoOwner, String repoName, int pullRequestNumber,
                 IntentUtils.InitialCommentMarker marker) {
+            super(BrowseFilter.this);
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mPullRequestNumber = pullRequestNumber;
