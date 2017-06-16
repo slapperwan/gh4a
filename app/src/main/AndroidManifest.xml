@@ -57,21 +57,31 @@
         <activity android:name=".activities.CompareActivity" android:exported="false" />
         <activity android:name=".activities.ContributorListActivity" android:exported="false" />
         <activity android:name=".activities.DownloadsActivity" android:exported="false" />
-        <activity android:name=".activities.EditCommitCommentActivity"
+        <activity
+            android:name=".activities.EditCommitCommentActivity"
+            android:exported="false"
             android:theme="@style/BottomSheetLightTheme"
-            android:exported="false" />
-        <activity android:name=".activities.EditIssueCommentActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.EditIssueCommentActivity"
+            android:exported="false"
             android:theme="@style/BottomSheetLightTheme"
-            android:exported="false" />
-        <activity android:name=".activities.EditPullRequestCommentActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.EditPullRequestCommentActivity"
+            android:exported="false"
             android:theme="@style/BottomSheetLightTheme"
-            android:exported="false" />
-        <activity android:name=".activities.EditDiffCommentActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.EditDiffCommentActivity"
+            android:exported="false"
             android:theme="@style/BottomSheetLightTheme"
-            android:exported="false" />
-        <activity android:name=".activities.EditPullRequestDiffCommentActivity"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.EditPullRequestDiffCommentActivity"
+            android:exported="false"
             android:theme="@style/BottomSheetLightTheme"
-            android:exported="false" />
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".activities.FileViewerActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize" />
