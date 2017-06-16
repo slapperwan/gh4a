@@ -46,7 +46,19 @@ public class TimelineItemAdapter extends
         String getShareSubject(Comment comment);
     }
 
-    private CommentViewHolder.Callback mCallback = new CommentViewHolder.Callback() {
+    private ReviewViewHolder.Callback mReviewCallback = new ReviewViewHolder.Callback() {
+        @Override
+        public boolean canQuote() {
+            return !mLocked && mDisplayReviewDetails;
+        }
+
+        @Override
+        public void quoteText(CharSequence text) {
+            mActionCallback.quoteText(text);
+        }
+    };
+
+    private CommentViewHolder.Callback mCommentCallback = new CommentViewHolder.Callback() {
         @Override
         public boolean canQuote(Comment comment) {
             return !mLocked;
@@ -147,7 +159,7 @@ public class TimelineItemAdapter extends
         switch (viewType) {
             case VIEW_TYPE_COMMENT:
                 view = inflater.inflate(R.layout.row_timeline_comment, parent, false);
-                holder = new CommentViewHolder(view, mImageGetter, mRepoOwner, mCallback);
+                holder = new CommentViewHolder(view, mImageGetter, mRepoOwner, mCommentCallback);
                 break;
             case VIEW_TYPE_EVENT:
                 view = inflater.inflate(R.layout.row_timeline_event, parent, false);
@@ -156,7 +168,7 @@ public class TimelineItemAdapter extends
             case VIEW_TYPE_REVIEW:
                 view = inflater.inflate(R.layout.row_timeline_review, parent, false);
                 holder = new ReviewViewHolder(view, mRepoOwner, mRepoName, mIssueNumber,
-                        mIsPullRequest, mDisplayReviewDetails);
+                        mIsPullRequest, mDisplayReviewDetails, mReviewCallback);
                 break;
             case VIEW_TYPE_DIFF:
                 view = inflater.inflate(R.layout.row_timeline_diff, parent, false);

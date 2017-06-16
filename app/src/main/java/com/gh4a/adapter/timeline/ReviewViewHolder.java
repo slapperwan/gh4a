@@ -37,6 +37,7 @@ class ReviewViewHolder
     private final int mIssueNumber;
     private final boolean mIsPullRequest;
     private final boolean mDisplayReviewDetails;
+    private final Callback mCallback;
 
     private final ImageView mAvatarView;
     private final TextView mMessageView;
@@ -47,8 +48,14 @@ class ReviewViewHolder
     private final ImageView ivMenu;
     private final PopupMenu mPopupMenu;
 
+    public interface Callback {
+        boolean canQuote();
+
+        void quoteText(CharSequence text);
+    }
+
     public ReviewViewHolder(View itemView, String repoOwner, String repoName, int issueNumber,
-            boolean isPullRequest, boolean displayReviewDetails) {
+            boolean isPullRequest, boolean displayReviewDetails, Callback callback) {
         super(itemView);
 
         mContext = itemView.getContext();
@@ -57,6 +64,7 @@ class ReviewViewHolder
         mIssueNumber = issueNumber;
         mIsPullRequest = isPullRequest;
         mDisplayReviewDetails = displayReviewDetails;
+        mCallback = callback;
 
         mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
         mMessageView = (TextView) itemView.findViewById(R.id.tv_message);
@@ -94,6 +102,18 @@ class ReviewViewHolder
             mBodyView.setVisibility(View.VISIBLE);
         } else {
             mBodyView.setVisibility(View.GONE);
+        }
+
+        if (mCallback.canQuote()) {
+            mBodyView.setCustomSelectionActionModeCallback(
+                    new UiUtils.QuoteActionModeCallback(mBodyView) {
+                        @Override
+                        public void onTextQuoted(CharSequence text) {
+                            mCallback.quoteText(text);
+                        }
+                    });
+        } else {
+            mBodyView.setCustomSelectionActionModeCallback(null);
         }
 
         if (mDisplayReviewDetails && !item.getDiffHunks().isEmpty()) {
