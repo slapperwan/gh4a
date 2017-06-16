@@ -5,6 +5,9 @@ import android.support.annotation.StringRes;
 import android.support.v7.widget.AppCompatMultiAutoCompleteTextView;
 import android.text.InputType;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
@@ -15,7 +18,8 @@ import java.util.Set;
 
 import me.thanel.markdownedit.MarkdownEdit;
 
-public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
+public class CommentEditor extends AppCompatMultiAutoCompleteTextView
+        implements TextView.OnEditorActionListener {
     private DropDownUserAdapter mMentionAdapter;
     private boolean mLocked;
     private @StringRes int mCommentEditorHintResId;
@@ -46,6 +50,8 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
         setThreshold(1);
 
         updateLockState();
+
+        setOnEditorActionListener(this);
     }
 
     public void setMentionUsers(Set<User> users) {
@@ -95,5 +101,14 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView {
         } else {
             setHint(null);
         }
+    }
+
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+            UiUtils.hideImeForView(this);
+            return true;
+        }
+        return false;
     }
 }
