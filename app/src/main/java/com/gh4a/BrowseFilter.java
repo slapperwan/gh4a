@@ -209,7 +209,7 @@ public class BrowseFilter extends AppCompatActivity {
                 }
 
                 if (pullRequestNumber > 0) {
-                    DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
+                    DiffHighlightId diffId = extractDiffId(uri.getFragment(), "diff-", true);
 
                     if (diffId != null) {
                         new PullRequestDiffLoadTask(user, repo, diffId, pullRequestNumber)
@@ -244,6 +244,14 @@ public class BrowseFilter extends AppCompatActivity {
                             return; // avoid finish() for now
                         }
 
+                        DiffHighlightId reviewDiffHunkId =
+                                extractDiffId(uri.getFragment(), "discussion-diff-", false);
+                        if (reviewDiffHunkId != null) {
+                            new PullRequestReviewDiffLoadTask(user, repo, reviewDiffHunkId,
+                                    pullRequestNumber).execute();
+                            return; // avoid finish() for now
+                        }
+
                         IntentUtils.InitialCommentMarker initialComment =
                                 generateInitialCommentMarker(uri.getFragment(), "issuecomment-");
                         intent = PullRequestActivity.makeIntent(this, user, repo, pullRequestNumber,
@@ -251,7 +259,7 @@ public class BrowseFilter extends AppCompatActivity {
                     }
                 }
             } else if ("commit".equals(action) && !StringUtils.isBlank(id)) {
-                DiffHighlightId diffId = extractCommitDiffId(uri.getFragment());
+                DiffHighlightId diffId = extractDiffId(uri.getFragment(), "diff-", true);
                 if (diffId != null) {
                     new CommitDiffLoadTask(user, repo, diffId, id).execute();
                     return; // avoid finish() for now
@@ -302,8 +310,7 @@ public class BrowseFilter extends AppCompatActivity {
         return initialCommentMarker;
     }
 
-    private DiffHighlightId extractCommitDiffId(String fragment) {
-        String prefix = "diff-";
+    private DiffHighlightId extractDiffId(String fragment, String prefix, boolean isMd5Hash) {
         if (fragment == null || !fragment.startsWith(prefix)) {
             return null;
         }
@@ -318,7 +325,7 @@ public class BrowseFilter extends AppCompatActivity {
         String fileHash = typePos > 0
                 ? fragment.substring(prefix.length(), typePos)
                 : fragment.substring(prefix.length());
-        if (fileHash.length() != 32) { // MD5 hash length
+        if (isMd5Hash && fileHash.length() != 32) { // MD5 hash length
             return null;
         }
         if (typePos < 0) {
@@ -748,6 +755,48 @@ public class BrowseFilter extends AppCompatActivity {
         protected abstract List<CommitComment> getComments() throws Exception;
         protected abstract Intent getLaunchIntent(String sha, CommitFile file,
                 List<CommitComment> comments, DiffHighlightId diffId);
+    }
+
+    private class PullRequestReviewDiffLoadTask extends UrlLoadTask {
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final DiffHighlightId mDiffId;
+        private final int mPullRequestNumber;
+
+        public PullRequestReviewDiffLoadTask(String repoOwner, String repoName,
+                DiffHighlightId diffId, int pullRequestNumber) {
+            super(BrowseFilter.this);
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mDiffId = diffId;
+            mPullRequestNumber = pullRequestNumber;
+        }
+
+        @Override
+        protected Intent run() throws Exception {
+            PullRequestService pullRequestService = (PullRequestService) Gh4Application.get()
+                    .getService(Gh4Application.PULL_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+
+            List<CommitComment> comments = pullRequestService.getComments(repoId,
+                    mPullRequestNumber);
+
+            long diffCommentId = Long.parseLong(mDiffId.fileHash);
+
+            for (CommitComment comment : comments) {
+                if (diffCommentId == comment.getId()) {
+                    long reviewId = comment.getPullRequestReviewId();
+
+                    Review review = pullRequestService.getReview(repoId, mPullRequestNumber,
+                            reviewId);
+                    return ReviewActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                            mPullRequestNumber, review,
+                            new IntentUtils.InitialCommentMarker(diffCommentId));
+                }
+            }
+
+            return null;
+        }
     }
 
     private class PullRequestDiffLoadTask extends DiffLoadTask {
