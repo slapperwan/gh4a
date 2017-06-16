@@ -31,6 +31,7 @@ import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.RepositoryListActivity;
+import com.gh4a.activities.ReviewActivity;
 import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
@@ -56,8 +57,10 @@ import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryCommit;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
+import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.IGitHubConstants;
+import org.eclipse.egit.github.core.service.PullRequestService;
 import org.eclipse.egit.github.core.service.RepositoryService;
 
 import java.util.ArrayList;
@@ -219,6 +222,16 @@ public class BrowseFilter extends AppCompatActivity {
                                     initialDiffComment, page).execute();
                             return; // avoid finish() for now
                         }
+
+                        IntentUtils.InitialCommentMarker reviewMarker =
+                                generateInitialCommentMarker(uri.getFragment(),
+                                        "pullrequestreview-");
+                        if (reviewMarker != null) {
+                            new PullRequestReviewLoadTask(user, repo, pullRequestNumber,
+                                    reviewMarker).execute();
+                            return; // avoid finish() for now
+                        }
+
                         IntentUtils.InitialCommentMarker initialComment =
                                 generateInitialCommentMarker(uri.getFragment(), "issuecomment-");
                         intent = PullRequestActivity.makeIntent(this, user, repo, pullRequestNumber,
@@ -467,6 +480,33 @@ public class BrowseFilter extends AppCompatActivity {
             }
 
             return null;
+        }
+    }
+
+    private class PullRequestReviewLoadTask extends UrlLoadTask {
+        private final String mRepoOwner;
+        private final String mRepoName;
+        private final int mPullRequestNumber;
+        private final IntentUtils.InitialCommentMarker mMarker;
+
+        public PullRequestReviewLoadTask(String repoOwner, String repoName, int pullRequestNumber,
+                IntentUtils.InitialCommentMarker marker) {
+            mRepoOwner = repoOwner;
+            mRepoName = repoName;
+            mPullRequestNumber = pullRequestNumber;
+            mMarker = marker;
+        }
+
+        @Override
+        protected Intent run() throws Exception {
+            PullRequestService pullRequestService = (PullRequestService) Gh4Application.get()
+                    .getService(Gh4Application.PULL_SERVICE);
+
+            Review review = pullRequestService.getReview(new RepositoryId(mRepoOwner, mRepoName),
+                    mPullRequestNumber, mMarker.commentId);
+
+            return ReviewActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                    mPullRequestNumber, review);
         }
     }
 
