@@ -276,6 +276,6 @@ public class PullRequestFragment extends IssueFragmentBase {
 
     @Override
     public void replyToComment(long replyToId, String text) {
-        // TODO
+        // Not used in this screen
     }
 }

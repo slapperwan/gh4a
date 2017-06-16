@@ -64,7 +64,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-// TODO: Re-enable commented out code
 public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
         View.OnClickListener, CommentBoxFragment.Callback, TimelineItemAdapter.OnCommentAction,
         ReactionBar.Callback, ReactionBar.Item, ReactionBar.ReactionDetailsCache.Listener {

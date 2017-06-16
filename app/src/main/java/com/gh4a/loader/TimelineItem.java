@@ -256,7 +256,6 @@ public abstract class TimelineItem {
             Date otherCreatedAt = other.getCreatedAt();
 
             if (createdAt == null && otherCreatedAt == null) {
-                // TODO: Figure out how to sort hunks if both are for pending reviews.
                 return 0;
             }
 
