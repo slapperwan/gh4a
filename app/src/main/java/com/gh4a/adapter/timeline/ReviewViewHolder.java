@@ -2,7 +2,10 @@ package com.gh4a.adapter.timeline;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -13,6 +16,7 @@ import com.gh4a.activities.ReviewActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
@@ -25,7 +29,7 @@ import java.util.Set;
 
 class ReviewViewHolder
         extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineReview>
-        implements View.OnClickListener {
+        implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
     private final Context mContext;
     private final String mRepoOwner;
@@ -40,6 +44,8 @@ class ReviewViewHolder
     private final TextView mDetailsView;
     private final Button mShowDetailsButton;
     private final View mAvatarContainer;
+    private final ImageView ivMenu;
+    private final PopupMenu mPopupMenu;
 
     public ReviewViewHolder(View itemView, String repoOwner, String repoName, int issueNumber,
             boolean isPullRequest, boolean displayReviewDetails) {
@@ -60,6 +66,12 @@ class ReviewViewHolder
         mShowDetailsButton.setOnClickListener(this);
         mAvatarContainer = itemView.findViewById(R.id.avatar_container);
         mAvatarContainer.setOnClickListener(this);
+        ivMenu = (ImageView) itemView.findViewById(R.id.iv_menu);
+        ivMenu.setOnClickListener(this);
+
+        mPopupMenu = new PopupMenu(mContext, ivMenu);
+        mPopupMenu.getMenuInflater().inflate(R.menu.review_menu, mPopupMenu.getMenu());
+        mPopupMenu.setOnMenuItemClickListener(this);
 
         ImageView eventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
         // TODO: Eye icon
@@ -117,6 +129,9 @@ class ReviewViewHolder
             mDetailsView.setVisibility(View.GONE);
             mShowDetailsButton.setVisibility(View.GONE);
         }
+
+        ivMenu.setVisibility(mDisplayReviewDetails ? View.VISIBLE : View.GONE);
+        ivMenu.setTag(item);
     }
 
     private void formatTitle(Review review) {
@@ -143,18 +158,42 @@ class ReviewViewHolder
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.avatar_container) {
-            User user = (User) v.getTag();
-            Intent intent = UserActivity.makeIntent(mContext, user);
-            if (intent != null) {
-                mContext.startActivity(intent);
+        switch (v.getId()) {
+            case R.id.avatar_container: {
+                User user = (User) v.getTag();
+                Intent intent = UserActivity.makeIntent(mContext, user);
+                if (intent != null) {
+                    mContext.startActivity(intent);
+                }
+                break;
             }
-        } else if (v.getId() == R.id.btn_show_details) {
-            TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
+            case R.id.btn_show_details:
+                TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) v.getTag();
 
-            Intent intent = ReviewActivity.makeIntent(mContext, mRepoOwner, mRepoName,
-                    mIssueNumber, mIsPullRequest, review);
-            mContext.startActivity(intent);
+                mContext.startActivity(ReviewActivity.makeIntent(mContext, mRepoOwner, mRepoName,
+                        mIssueNumber, mIsPullRequest, review));
+                break;
+            case R.id.iv_menu:
+                mPopupMenu.show();
+                break;
         }
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+        TimelineItem.TimelineReview timelineReview = (TimelineItem.TimelineReview) ivMenu.getTag();
+        Review review = timelineReview.review;
+
+        switch (item.getItemId()) {
+            case R.id.share:
+                IntentUtils.share(mContext, "Pull Request #" + mIssueNumber + " - Review",
+                        review.getHtmlUrl());
+                return true;
+
+            case R.id.browser:
+                IntentUtils.launchBrowser(mContext, Uri.parse(review.getHtmlUrl()));
+                return true;
+        }
+        return false;
     }
 }

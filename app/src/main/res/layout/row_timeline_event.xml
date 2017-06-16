@@ -31,9 +31,21 @@
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_message"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textAppearance="?android:attr/textAppearanceSmall"
         tools:text="octopus closed this 25 days ago" />
+
+    <ImageView
+        android:id="@+id/iv_menu"
+        style="@style/SelectableBorderlessItem"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginRight="-8dp"
+        android:scaleType="center"
+        android:src="?overflowIcon"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
 </LinearLayout>
