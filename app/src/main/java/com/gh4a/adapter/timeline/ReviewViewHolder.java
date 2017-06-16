@@ -188,7 +188,7 @@ class ReviewViewHolder
             case R.id.btn_show_details:
                 Review review = (Review) v.getTag();
                 mContext.startActivity(ReviewActivity.makeIntent(mContext, mRepoOwner, mRepoName,
-                        mIssueNumber, review));
+                        mIssueNumber, review, null));
                 break;
             case R.id.iv_menu:
                 mPopupMenu.show();

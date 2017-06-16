@@ -20,18 +20,20 @@ public class ReviewActivity extends FragmentContainerActivity {
     private String mTitle;
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-            int issueNumber, Review review) {
+            int issueNumber, Review review, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, ReviewActivity.class)
                 .putExtra("repo_owner", repoOwner)
                 .putExtra("repo_name", repoName)
                 .putExtra("issue_number", issueNumber)
-                .putExtra("review", review);
+                .putExtra("review", review)
+                .putExtra("initial_comment", initialComment);
     }
 
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
     private Review mReview;
+    private IntentUtils.InitialCommentMarker mInitialComment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,8 @@ public class ReviewActivity extends FragmentContainerActivity {
         mRepoName = extras.getString("repo_name");
         mIssueNumber = extras.getInt("issue_number");
         mReview = (Review) extras.getSerializable("review");
+        mInitialComment = extras.getParcelable("initial_comment");
+        extras.remove("initial_comment");
     }
 
     @Override
@@ -76,7 +80,8 @@ public class ReviewActivity extends FragmentContainerActivity {
 
     @Override
     protected Fragment onCreateFragment() {
-        return ReviewFragment.newInstance(mRepoOwner, mRepoName, mIssueNumber, mReview);
+        return ReviewFragment.newInstance(mRepoOwner, mRepoName, mIssueNumber, mReview,
+                mInitialComment);
     }
 
     @Override

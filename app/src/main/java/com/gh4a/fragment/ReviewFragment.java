@@ -20,6 +20,7 @@ import com.gh4a.adapter.timeline.TimelineItemAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReviewTimelineLoader;
 import com.gh4a.loader.TimelineItem;
+import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
@@ -40,13 +41,14 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     private TimelineItemAdapter mAdapter;
 
     public static ReviewFragment newInstance(String repoOwner, String repoName, int issueNumber,
-            Review review) {
+            Review review, IntentUtils.InitialCommentMarker mInitialComment) {
         ReviewFragment f = new ReviewFragment();
         Bundle args = new Bundle();
         args.putString("repo_owner", repoOwner);
         args.putString("repo_name", repoName);
         args.putInt("issue_number", issueNumber);
         args.putSerializable("review", review);
+        args.putParcelable("initial_comment", mInitialComment);
         f.setArguments(args);
         return f;
     }
@@ -55,6 +57,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     private String mRepoName;
     private int mIssueNumber;
     private Review mReview;
+    private IntentUtils.InitialCommentMarker mInitialComment;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,6 +67,8 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         mRepoName = args.getString("repo_name");
         mIssueNumber = args.getInt("issue_number");
         mReview = (Review) args.getSerializable("review");
+        mInitialComment = args.getParcelable("initial_comment");
+        args.remove("initial_comment");
     }
 
     @Override
@@ -77,6 +82,26 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
                 true, false, this);
         return mAdapter;
+    }
+
+    @Override
+    protected void onAddData(RootAdapter<TimelineItem, ?> adapter, List<TimelineItem> data) {
+        super.onAddData(adapter, data);
+
+        if (mInitialComment != null) {
+            for (int i = 0; i < data.size(); i++) {
+                TimelineItem item = data.get(i);
+
+                if (item instanceof TimelineItem.TimelineComment) {
+                    TimelineItem.TimelineComment comment = (TimelineItem.TimelineComment) item;
+                    if (mInitialComment.matches(comment.comment.getId(), comment.getCreatedAt())) {
+                        scrollToAndHighlightPosition(i);
+                        break;
+                    }
+                }
+            }
+            mInitialComment = null;
+        }
     }
 
     @Override
