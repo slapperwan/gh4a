@@ -20,7 +20,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -90,6 +89,7 @@ public class IssueListActivity extends BasePagerActivity implements
     private String mSelectedAssignee;
     private String mSearchQuery;
     private boolean mSearchMode;
+    private boolean mSearchIsExpanded;
     private int mSelectedParticipatingStatus = 0;
 
     private FloatingActionButton mCreateFab;
@@ -104,6 +104,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     private static final String STATE_KEY_SEARCH_QUERY = "search_query";
     private static final String STATE_KEY_SEARCH_MODE = "search_mode";
+    private static final String STATE_KEY_SEARCH_IS_EXPANDED = "search_is_expanded";
 
     private static final String LIST_QUERY = "is:%s %s repo:%s/%s %s %s %s %s";
     private static final String SEARCH_QUERY = "is:%s %s repo:%s/%s %s";
@@ -194,6 +195,7 @@ public class IssueListActivity extends BasePagerActivity implements
         if (savedInstanceState != null) {
             mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
             mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
+            mSearchIsExpanded = savedInstanceState.getBoolean(STATE_KEY_SEARCH_IS_EXPANDED);
         }
 
         if (!mIsPullRequest && Gh4Application.get().isAuthorized()) {
@@ -241,6 +243,7 @@ public class IssueListActivity extends BasePagerActivity implements
         super.onSaveInstanceState(outState);
         outState.putString(STATE_KEY_SEARCH_QUERY, mSearchQuery);
         outState.putBoolean(STATE_KEY_SEARCH_MODE, mSearchMode);
+        outState.putBoolean(STATE_KEY_SEARCH_IS_EXPANDED, mSearchIsExpanded);
     }
 
     @Override
@@ -396,7 +399,7 @@ public class IssueListActivity extends BasePagerActivity implements
         MenuItemCompat.setOnActionExpandListener(searchItem, this);
 
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        if (mSearchQuery != null) {
+        if (mSearchIsExpanded) {
             MenuItemCompat.expandActionView(searchItem);
             searchView.setQuery(mSearchQuery, false);
         }
@@ -417,11 +420,13 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     public boolean onMenuItemActionExpand(MenuItem item) {
+        mSearchIsExpanded = true;
         return true;
     }
 
     @Override
     public boolean onMenuItemActionCollapse(MenuItem item) {
+        mSearchIsExpanded = false;
         mSearchQuery = null;
         setSearchMode(false);
         return true;
@@ -429,6 +434,7 @@ public class IssueListActivity extends BasePagerActivity implements
 
     @Override
     public boolean onClose() {
+        mSearchIsExpanded = false;
         mSearchQuery = null;
         setSearchMode(false);
         return true;
