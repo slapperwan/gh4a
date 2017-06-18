@@ -237,8 +237,8 @@ public class IssueListActivity extends BasePagerActivity implements
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putString(STATE_KEY_SEARCH_QUERY, mSearchQuery);
         outState.putBoolean(STATE_KEY_SEARCH_MODE, mSearchMode);
     }
