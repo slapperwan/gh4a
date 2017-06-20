@@ -12,7 +12,6 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
-import android.text.style.ForegroundColorSpan;
 import android.text.style.LineBackgroundSpan;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -126,9 +125,6 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
             int lineNumberLength = builder.length() - spanStart;
 
-            builder.setSpan(new ForegroundColorSpan(mSecondaryTextColor), spanStart,
-                    builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
             builder.append("  ").append(lines[i]).append("  ");
             if (i < lines.length - 1) {
                 builder.append("\n");
@@ -174,7 +170,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
                 @Override
                 public void updateDrawState(TextPaint ds) {
-                    ds.setColor(ds.linkColor);
+                    ds.setColor(mSecondaryTextColor);
                 }
             }, start, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
