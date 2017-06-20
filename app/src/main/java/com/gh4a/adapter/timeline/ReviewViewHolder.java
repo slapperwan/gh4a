@@ -16,6 +16,7 @@ import com.gh4a.activities.ReviewActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -32,6 +33,7 @@ class ReviewViewHolder
         implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
     private final Context mContext;
+    private final HttpImageGetter mImageGetter;
     private final String mRepoOwner;
     private final String mRepoName;
     private final int mIssueNumber;
@@ -53,11 +55,13 @@ class ReviewViewHolder
         void quoteText(CharSequence text);
     }
 
-    public ReviewViewHolder(View itemView, String repoOwner, String repoName, int issueNumber,
+    public ReviewViewHolder(View itemView, HttpImageGetter imageGetter,
+            String repoOwner, String repoName, int issueNumber,
             boolean displayReviewDetails, Callback callback) {
         super(itemView);
 
         mContext = itemView.getContext();
+        mImageGetter = imageGetter;
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mIssueNumber = issueNumber;
@@ -96,7 +100,7 @@ class ReviewViewHolder
         formatTitle(review);
 
         if (!TextUtils.isEmpty(review.getBody())) {
-            mBodyView.setText(review.getBody());
+            mImageGetter.bind(mBodyView, review.getBodyHtml(), review.getId());
             mBodyView.setVisibility(View.VISIBLE);
         } else {
             mBodyView.setVisibility(View.GONE);

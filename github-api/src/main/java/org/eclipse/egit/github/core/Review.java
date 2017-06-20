@@ -19,6 +19,8 @@ public class Review implements Serializable {
 
     private String body;
 
+    private String bodyHtml;
+
     private String state;
 
     private String htmlUrl;
@@ -53,6 +55,15 @@ public class Review implements Serializable {
 
     public Review setBody(String body) {
         this.body = body;
+        return this;
+    }
+
+    public String getBodyHtml() {
+        return bodyHtml;
+    }
+
+    public Review setBodyHtml(String bodyHtml) {
+        this.bodyHtml = bodyHtml;
         return this;
     }
 
