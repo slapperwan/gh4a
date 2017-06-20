@@ -19,15 +19,21 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
+import org.eclipse.egit.github.core.Reaction;
+import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.User;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 class CommentViewHolder
         extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineComment>
-        implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+        implements View.OnClickListener, ReactionBar.Item, ReactionBar.Callback,
+        PopupMenu.OnMenuItemClickListener {
 
     private final Context mContext;
     private final HttpImageGetter mImageGetter;
@@ -40,18 +46,24 @@ class CommentViewHolder
     private final TextView tvTimestamp;
     private final TextView tvEditTimestamp;
     private final ImageView ivMenu;
+    private final ReactionBar reactions;
     private final PopupMenu mPopupMenu;
+    private final ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
+
+    private TimelineItem.TimelineComment mBoundItem;
 
     public interface Callback {
         boolean canQuote();
-
         void quoteText(CharSequence text);
-
         boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem);
+        List<Reaction> loadReactionDetailsInBackground(TimelineItem.TimelineComment item)
+                throws IOException;
+        Reaction addReactionInBackground(TimelineItem.TimelineComment item, String content)
+                throws IOException;
     }
 
     public CommentViewHolder(View view, HttpImageGetter imageGetter, String repoOwner,
-            Callback callback) {
+            ReactionBar.ReactionDetailsCache reactionDetailsCache, Callback callback) {
         super(view);
 
         mContext = view.getContext();
@@ -65,16 +77,27 @@ class CommentViewHolder
         tvExtra = (StyleableTextView) view.findViewById(R.id.tv_extra);
         tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
         tvEditTimestamp = (TextView) view.findViewById(R.id.tv_edit_timestamp);
+        reactions = (ReactionBar) view.findViewById(R.id.reactions);
+        reactions.setCallback(this, this);
+        reactions.setDetailsCache(reactionDetailsCache);
         ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
         ivMenu.setOnClickListener(this);
 
         mPopupMenu = new PopupMenu(view.getContext(), ivMenu);
         mPopupMenu.getMenuInflater().inflate(R.menu.comment_menu, mPopupMenu.getMenu());
         mPopupMenu.setOnMenuItemClickListener(this);
+
+        MenuItem reactItem = mPopupMenu.getMenu().findItem(R.id.react);
+        mPopupMenu.getMenuInflater().inflate(R.menu.reaction_menu, reactItem.getSubMenu());
+
+        mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(view.getContext(),
+                reactItem.getSubMenu(), this, this, reactionDetailsCache);
     }
 
     @Override
     public void bind(TimelineItem.TimelineComment item) {
+        mBoundItem = item;
+
         User user = item.comment.getUser();
         Date createdAt = item.comment.getCreatedAt();
         Date updatedAt = item.comment.getUpdatedAt();
@@ -117,6 +140,9 @@ class CommentViewHolder
 
         ivMenu.setTag(item);
 
+        // Reactions
+        reactions.setReactions(item.comment.getReactions());
+
         String ourLogin = Gh4Application.get().getAuthLogin();
         boolean canEdit = ApiHelpers.loginEquals(user, ourLogin) ||
                 ApiHelpers.loginEquals(mRepoOwner, ourLogin);
@@ -132,6 +158,7 @@ class CommentViewHolder
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_menu) {
+            mReactionMenuHelper.startLoadingIfNeeded();
             mPopupMenu.show();
         }
     }
@@ -139,6 +166,34 @@ class CommentViewHolder
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         TimelineItem.TimelineComment comment = (TimelineItem.TimelineComment) ivMenu.getTag();
+        if (mReactionMenuHelper.onItemClick(menuItem)) {
+            return true;
+        }
         return mCallback.onMenItemClick(comment, menuItem);
+    }
+
+    @Override
+    public Object getCacheKey() {
+        return mBoundItem.comment;
+    }
+
+    public void updateReactions(Reactions reactions) {
+        if (mBoundItem != null) {
+            mBoundItem.comment.setReactions(reactions);
+        }
+        this.reactions.setReactions(reactions);
+        mReactionMenuHelper.update();
+    }
+
+    @Override
+    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws
+            IOException {
+        return mCallback.loadReactionDetailsInBackground(mBoundItem);
+    }
+
+    @Override
+    public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws
+            IOException {
+        return mCallback.addReactionInBackground(mBoundItem, content);
     }
 }

@@ -413,6 +413,21 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
+    public List<Reaction> loadReactionDetailsInBackground(Comment comment) throws IOException {
+        IssueService service = (IssueService)
+                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
+        return service.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName), comment.getId());
+    }
+
+    @Override
+    public Reaction addReactionInBackground(Comment comment, String content) throws IOException {
+        IssueService service = (IssueService)
+                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
+        return service.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName),
+                comment.getId(), content);
+    }
+
+    @Override
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         mIssue.setReactions(reactions);
         if (mListHeaderView != null) {

@@ -24,6 +24,7 @@ import com.gh4a.utils.IntentUtils;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
+import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.service.IssueService;
@@ -170,6 +171,36 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     @Override
     public String getShareSubject(Comment comment) {
         return null;
+    }
+
+    @Override
+    public List<Reaction> loadReactionDetailsInBackground(Comment comment) throws IOException {
+        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        Gh4Application app = Gh4Application.get();
+        if (comment instanceof CommitComment) {
+            PullRequestService pullService =
+                    (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
+            return pullService.getCommentReactions(repoId, comment.getId());
+        } else {
+            IssueService issueService =
+                    (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
+            return issueService.getCommentReactions(repoId, comment.getId());
+        }
+    }
+
+    @Override
+    public Reaction addReactionInBackground(Comment comment, String content) throws IOException {
+        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        Gh4Application app = Gh4Application.get();
+        if (comment instanceof CommitComment) {
+            PullRequestService pullService =
+                    (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
+            return pullService.addCommentReaction(repoId, comment.getId(), content);
+        } else {
+            IssueService issueService =
+                    (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
+            return issueService.addCommentReaction(repoId, comment.getId(), content);
+        }
     }
 
     private class ReplyTask extends ProgressDialogTask<CommitComment> {

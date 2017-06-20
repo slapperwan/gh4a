@@ -74,4 +74,12 @@
         android:textIsSelectable="true"
         tools:text="Comment text" />
 
+    <com.gh4a.widget.ReactionBar
+        android:id="@+id/reactions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_desc"
+        android:layout_marginTop="2dp"
+        android:layout_toLeftOf="@id/iv_menu" />
+
 </RelativeLayout>

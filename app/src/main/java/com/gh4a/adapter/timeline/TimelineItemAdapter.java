@@ -13,17 +13,23 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.widget.ReactionBar;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.IssueEvent;
+import org.eclipse.egit.github.core.Reaction;
+import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.User;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class TimelineItemAdapter extends
-        RootAdapter<TimelineItem, TimelineItemAdapter.TimelineItemViewHolder> {
+public class TimelineItemAdapter
+        extends RootAdapter<TimelineItem, TimelineItemAdapter.TimelineItemViewHolder>
+        implements ReactionBar.ReactionDetailsCache.Listener {
 
     private static final int VIEW_TYPE_COMMENT = CUSTOM_VIEW_TYPE_START + 1;
     private static final int VIEW_TYPE_EVENT = CUSTOM_VIEW_TYPE_START + 2;
@@ -37,6 +43,8 @@ public class TimelineItemAdapter extends
     private final int mIssueNumber;
     private final boolean mIsPullRequest;
     private final boolean mDisplayReviewDetails;
+    private final ReactionBar.ReactionDetailsCache mReactionDetailsCache =
+            new ReactionBar.ReactionDetailsCache(this);
     private final OnCommentAction mActionCallback;
 
     private boolean mDontClearCacheOnClear;
@@ -48,6 +56,8 @@ public class TimelineItemAdapter extends
         void quoteText(CharSequence text);
         void replyToComment(long replyToId, String text);
         String getShareSubject(Comment comment);
+        List<Reaction> loadReactionDetailsInBackground(Comment comment) throws IOException;
+        Reaction addReactionInBackground(Comment comment, String content) throws IOException;
     }
 
     private ReviewViewHolder.Callback mReviewCallback = new ReviewViewHolder.Callback() {
@@ -98,6 +108,18 @@ public class TimelineItemAdapter extends
             }
 
             return false;
+        }
+
+        @Override
+        public List<Reaction> loadReactionDetailsInBackground(TimelineItem.TimelineComment item)
+                throws  IOException {
+            return mActionCallback.loadReactionDetailsInBackground(item.comment);
+        }
+
+        @Override
+        public Reaction addReactionInBackground(TimelineItem.TimelineComment item,
+                String content) throws IOException {
+            return mActionCallback.addReactionInBackground(item.comment, content);
         }
     };
 
@@ -188,7 +210,8 @@ public class TimelineItemAdapter extends
         switch (viewType) {
             case VIEW_TYPE_COMMENT:
                 view = inflater.inflate(R.layout.row_timeline_comment, parent, false);
-                holder = new CommentViewHolder(view, mImageGetter, mRepoOwner, mCommentCallback);
+                holder = new CommentViewHolder(view, mImageGetter, mRepoOwner,
+                        mReactionDetailsCache, mCommentCallback);
                 break;
             case VIEW_TYPE_EVENT:
                 view = inflater.inflate(R.layout.row_timeline_event, parent, false);
@@ -245,6 +268,12 @@ public class TimelineItemAdapter extends
                 holder.bind(item);
                 break;
         }
+    }
+
+    @Override
+    public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
+        CommentViewHolder holder = (CommentViewHolder) item;
+        holder.updateReactions(reactions);
     }
 
     public static abstract class TimelineItemViewHolder<TItem extends TimelineItem> extends
