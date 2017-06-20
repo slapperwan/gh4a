@@ -54,7 +54,8 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mAddedLineColor = ContextCompat.getColor(context, R.color.diff_add_light);
         mRemovedLineColor = ContextCompat.getColor(context, R.color.diff_remove_light);
         mAddedLineNumberColor = ContextCompat.getColor(context, R.color.diff_add_line_number_light);
-        mRemovedLineNumberColor = ContextCompat.getColor(context, R.color.diff_remove_line_number_light);
+        mRemovedLineNumberColor =
+                ContextCompat.getColor(context, R.color.diff_remove_line_number_light);
         mSecondaryTextColor = UiUtils.resolveColor(context, android.R.attr.textColorSecondary);
         mPadding = context.getResources().getDimensionPixelSize(R.dimen.code_diff_padding);
         // TODO: Dark theme colors
@@ -69,10 +70,13 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
     public void bind(TimelineItem.Diff item) {
         CommitComment comment = item.getInitialComment();
 
-        boolean isOutdated = comment.getPosition() == -1;
-        mFileTextView.setText(comment.getPath() + (isOutdated ? " (Outdated)" : ""));
         mFileTextView.setTag(item.getInitialTimelineComment());
+        mFileTextView.setText(comment.getPath());
 
+        boolean isOutdated = comment.getPosition() == -1;
+        mFileTextView.setPaintFlags(isOutdated
+                ? mFileTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
+                : mFileTextView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
         mFileTextView.setClickable(!isOutdated);
 
         String[] lines = comment.getDiffHunk().split("\n");
