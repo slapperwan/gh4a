@@ -2,11 +2,14 @@ package com.gh4a.adapter.timeline;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,8 +28,7 @@ import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.User;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 class ReviewViewHolder
         extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineReview>
@@ -43,11 +45,12 @@ class ReviewViewHolder
     private final ImageView mAvatarView;
     private final TextView mMessageView;
     private final TextView mBodyView;
-    private final TextView mDetailsView;
     private final Button mShowDetailsButton;
     private final View mAvatarContainer;
     private final ImageView ivMenu;
     private final PopupMenu mPopupMenu;
+    private final ViewGroup mDetailsContainer;
+    private final View mDetailsHeader;
 
     public interface Callback {
         boolean canQuote();
@@ -71,13 +74,14 @@ class ReviewViewHolder
         mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
         mMessageView = (TextView) itemView.findViewById(R.id.tv_message);
         mBodyView = (TextView) itemView.findViewById(R.id.tv_desc);
-        mDetailsView = (TextView) itemView.findViewById(R.id.tv_details);
         mShowDetailsButton = (Button) itemView.findViewById(R.id.btn_show_details);
         mShowDetailsButton.setOnClickListener(this);
         mAvatarContainer = itemView.findViewById(R.id.avatar_container);
         mAvatarContainer.setOnClickListener(this);
         ivMenu = (ImageView) itemView.findViewById(R.id.iv_menu);
         ivMenu.setOnClickListener(this);
+        mDetailsContainer = (ViewGroup) itemView.findViewById(R.id.details_container);
+        mDetailsHeader = itemView.findViewById(R.id.details_container_divider);
 
         mPopupMenu = new PopupMenu(mContext, ivMenu);
         mPopupMenu.getMenuInflater().inflate(R.menu.review_menu, mPopupMenu.getMenu());
@@ -99,7 +103,8 @@ class ReviewViewHolder
 
         formatTitle(review);
 
-        if (!TextUtils.isEmpty(review.getBody())) {
+        boolean hasBody = !TextUtils.isEmpty(review.getBody());
+        if (hasBody) {
             mImageGetter.bind(mBodyView, review.getBodyHtml(), review.getId());
             mBodyView.setVisibility(View.VISIBLE);
         } else {
@@ -118,38 +123,58 @@ class ReviewViewHolder
             mBodyView.setCustomSelectionActionModeCallback(null);
         }
 
-        if (mDisplayReviewDetails && !item.getDiffHunks().isEmpty()) {
-            StringBuilder builder = new StringBuilder("Code comments in ");
-            Set<String> usedNames = new HashSet<>();
+        boolean hasDiffs = !item.getDiffHunks().isEmpty();
+        if (mDisplayReviewDetails && hasDiffs) {
+            ArrayList<TimelineItem.Diff> diffHunks = new ArrayList<>(item.getDiffHunks());
+            LayoutInflater inflater = LayoutInflater.from(mContext);
 
-            boolean isOutdated = true;
-
-            for (TimelineItem.Diff diff : item.getDiffHunks()) {
+            for (int i = 0; i < diffHunks.size(); i++) {
+                TimelineItem.Diff diff = diffHunks.get(i);
                 CommitComment commitComment = diff.getInitialComment();
-
-                if (commitComment.getPosition() != -1) {
-                    isOutdated = false;
-                }
-
                 String filename = commitComment.getPath();
+                int commentCount = diff.comments.size();
 
-                if (!usedNames.contains(filename)) {
-                    builder.append("\n").append(filename);
-                    usedNames.add(filename);
+                View row = mDetailsContainer.getChildAt(i);
+                if (row == null) {
+                    row = inflater.inflate(R.layout.row_timeline_review_file_details,
+                            mDetailsContainer, false);
+                    mDetailsContainer.addView(row);
+                    row.setOnClickListener(this);
                 }
+                row.setTag(review);
+                row.setTag(R.id.review_comment_id, commitComment.getId());
+
+                TextView tvFile = (TextView) row.findViewById(R.id.tv_file);
+                tvFile.setText("• " + filename);
+
+                boolean isOutdated = commitComment.getPosition() == -1;
+                if (isOutdated) {
+                    tvFile.setPaintFlags(tvFile.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    tvFile.setPaintFlags(tvFile.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+                }
+
+                TextView tvFileComments = (TextView) row.findViewById(R.id.tv_file_comments);
+                tvFileComments.setText(String.valueOf(commentCount));
+
+                row.setVisibility(View.VISIBLE);
             }
 
-            if (isOutdated) {
-                builder.append("\n\nAll comments are outdated");
+            for (int i = diffHunks.size(); i < mDetailsContainer.getChildCount(); i++) {
+                mDetailsContainer.getChildAt(i).setVisibility(View.GONE);
             }
 
-            mDetailsView.setText(builder.toString());
-
-            mDetailsView.setVisibility(View.VISIBLE);
+            mDetailsContainer.setVisibility(View.VISIBLE);
             mShowDetailsButton.setVisibility(View.VISIBLE);
         } else {
-            mDetailsView.setVisibility(View.GONE);
+            mDetailsContainer.setVisibility(View.GONE);
             mShowDetailsButton.setVisibility(View.GONE);
+        }
+
+        if (hasBody && mDisplayReviewDetails && hasDiffs) {
+            mDetailsHeader.setVisibility(View.VISIBLE);
+        } else {
+            mDetailsHeader.setVisibility(View.GONE);
         }
 
         ivMenu.setVisibility(mDisplayReviewDetails ? View.VISIBLE : View.GONE);
@@ -189,14 +214,22 @@ class ReviewViewHolder
                 }
                 break;
             }
-            case R.id.btn_show_details:
+            case R.id.btn_show_details: {
                 Review review = (Review) v.getTag();
                 mContext.startActivity(ReviewActivity.makeIntent(mContext, mRepoOwner, mRepoName,
                         mIssueNumber, review, null));
                 break;
+            }
             case R.id.iv_menu:
                 mPopupMenu.show();
                 break;
+            case R.id.review_file_details: {
+                Review review = (Review) v.getTag();
+                long commentId = (long) v.getTag(R.id.review_comment_id);
+                mContext.startActivity(ReviewActivity.makeIntent(mContext, mRepoOwner, mRepoName,
+                        mIssueNumber, review, new IntentUtils.InitialCommentMarker(commentId)));
+                break;
+            }
         }
     }
 

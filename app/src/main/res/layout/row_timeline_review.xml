@@ -24,30 +24,29 @@
         android:textIsSelectable="true"
         tools:text="Review body" />
 
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_details"
+    <View
+        android:id="@+id/details_container_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/tv_desc"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="32dp"
+        android:layout_marginRight="32dp"
+        android:background="?android:attr/listDivider" />
+
+    <LinearLayout
+        android:id="@+id/details_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_desc"
-        android:layout_marginBottom="16dp"
-        android:layout_marginTop="-8dp"
-        android:layout_toLeftOf="@+id/btn_show_details"
-        android:gravity="center_vertical"
-        android:paddingLeft="@dimen/content_padding"
-        android:paddingRight="@dimen/content_padding"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorSecondary"
-        android:textIsSelectable="true"
-        tools:text="Code comments in\n/path/to/file.txt\n/path/to/other/file.txt" />
+        android:layout_below="@id/details_container_divider"
+        android:orientation="vertical" />
 
     <Button
         android:id="@+id/btn_show_details"
         style="?buttonBarButtonStyle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/tv_details"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_below="@id/details_container"
         android:text="Show details" />
 
 </RelativeLayout>
