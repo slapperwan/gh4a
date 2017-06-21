@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.support.annotation.AttrRes;
+import android.support.annotation.DrawableRes;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -51,6 +53,7 @@ class ReviewViewHolder
     private final PopupMenu mPopupMenu;
     private final ViewGroup mDetailsContainer;
     private final View mDetailsHeader;
+    private final ImageView mEventIconView;
 
     public interface Callback {
         boolean canQuote();
@@ -87,10 +90,7 @@ class ReviewViewHolder
         mPopupMenu.getMenuInflater().inflate(R.menu.review_menu, mPopupMenu.getMenu());
         mPopupMenu.setOnMenuItemClickListener(this);
 
-        ImageView eventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
-        // TODO: Eye icon
-        int iconResId = UiUtils.resolveDrawable(mContext, R.attr.issueEventAssignedIcon);
-        eventIconView.setImageResource(iconResId);
+        mEventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
     }
 
     @Override
@@ -179,6 +179,22 @@ class ReviewViewHolder
 
         ivMenu.setVisibility(mDisplayReviewDetails ? View.VISIBLE : View.GONE);
         ivMenu.setTag(review);
+
+        mEventIconView.setImageResource(getEventIconResId(review));
+    }
+
+    @DrawableRes
+    private int getEventIconResId(Review review) {
+        @AttrRes int iconResAttr = R.attr.timelineEventReviewed;
+        switch (review.getState()) {
+            case Review.STATE_APPROVED:
+                iconResAttr = R.attr.timelineEventApproved;
+                break;
+            case Review.STATE_CHANGES_REQUESTED:
+                iconResAttr = R.attr.timelineEventRequestedChanges;
+                break;
+        }
+        return UiUtils.resolveDrawable(mContext, iconResAttr);
     }
 
     private void formatTitle(Review review) {

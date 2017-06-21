@@ -86,6 +86,9 @@
     <attr name="reactionMinusOneIcon" format="reference" />
     <attr name="reactionPlusOneIcon" format="reference" />
     <attr name="dragHandleIcon" format="reference" />
+    <attr name="timelineEventApproved" format="reference" />
+    <attr name="timelineEventRequestedChanges" format="reference" />
+    <attr name="timelineEventReviewed" format="reference" />
 
     <declare-styleable name="LabelBadgeView">
         <attr name="badgeSize" format="dimension" />

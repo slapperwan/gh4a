@@ -73,6 +73,10 @@
         <item name="reactionMinusOneIcon">@drawable/reaction_minus_one_dark</item>
         <item name="reactionPlusOneIcon">@drawable/reaction_plus_one_dark</item>
         <item name="dragHandleIcon">@drawable/drag_handle_dark</item>
+        <item name="timelineEventApproved">@drawable/timeline_event_approved_dark</item>
+        <item name="timelineEventRequestedChanges">@drawable/timeline_event_requested_changes_dark</item>
+        <item name="timelineEventReviewed">@drawable/timeline_event_reviewed_dark</item>
+
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
         <item name="colorAccent">@color/dark_accent</item>
@@ -190,6 +194,10 @@
         <item name="reactionMinusOneIcon">@drawable/reaction_minus_one</item>
         <item name="reactionPlusOneIcon">@drawable/reaction_plus_one</item>
         <item name="dragHandleIcon">@drawable/drag_handle</item>
+        <item name="timelineEventApproved">@drawable/timeline_event_approved</item>
+        <item name="timelineEventRequestedChanges">@drawable/timeline_event_requested_changes</item>
+        <item name="timelineEventReviewed">@drawable/timeline_event_reviewed</item>
+
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
