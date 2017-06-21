@@ -31,6 +31,8 @@ import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.User;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 class ReviewViewHolder
         extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineReview>
@@ -127,14 +129,23 @@ class ReviewViewHolder
         if (mDisplayReviewDetails && hasDiffs) {
             ArrayList<TimelineItem.Diff> diffHunks = new ArrayList<>(item.getDiffHunks());
             LayoutInflater inflater = LayoutInflater.from(mContext);
+            Map<String, FileDetails> files = new HashMap<>();
 
-            for (int i = 0; i < diffHunks.size(); i++) {
-                TimelineItem.Diff diff = diffHunks.get(i);
-                CommitComment commitComment = diff.getInitialComment();
+            int viewIndex = 0;
+            for (TimelineItem.Diff diffHunk : diffHunks) {
+                CommitComment commitComment = diffHunk.getInitialComment();
                 String filename = commitComment.getPath();
-                int commentCount = diff.comments.size();
+                int commentCount = diffHunk.comments.size();
+                boolean isOutdated = commitComment.getPosition() == -1;
 
-                View row = mDetailsContainer.getChildAt(i);
+                if (files.containsKey(filename)) {
+                    FileDetails details = files.get(filename);
+                    details.isOutdated = details.isOutdated && isOutdated;
+                    details.count += commentCount;
+                    continue;
+                }
+
+                View row = mDetailsContainer.getChildAt(viewIndex);
                 if (row == null) {
                     row = inflater.inflate(R.layout.row_timeline_review_file_details,
                             mDetailsContainer, false);
@@ -144,23 +155,30 @@ class ReviewViewHolder
                 row.setTag(review);
                 row.setTag(R.id.review_comment_id, commitComment.getId());
 
-                TextView tvFile = (TextView) row.findViewById(R.id.tv_file);
-                tvFile.setText("• " + filename);
+                files.put(filename, new FileDetails(row, isOutdated, commentCount));
 
-                boolean isOutdated = commitComment.getPosition() == -1;
-                if (isOutdated) {
+                viewIndex += 1;
+            }
+
+            for (Map.Entry<String, FileDetails> detailsEntry : files.entrySet()) {
+                FileDetails fileDetails = detailsEntry.getValue();
+                TextView tvFile = (TextView) fileDetails.row.findViewById(R.id.tv_file);
+                tvFile.setText("• " + detailsEntry.getKey());
+
+                if (fileDetails.isOutdated) {
                     tvFile.setPaintFlags(tvFile.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 } else {
                     tvFile.setPaintFlags(tvFile.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
                 }
 
-                TextView tvFileComments = (TextView) row.findViewById(R.id.tv_file_comments);
-                tvFileComments.setText(String.valueOf(commentCount));
+                TextView tvFileComments =
+                        (TextView) fileDetails.row.findViewById(R.id.tv_file_comments);
+                tvFileComments.setText(String.valueOf(fileDetails.count));
 
-                row.setVisibility(View.VISIBLE);
+                fileDetails.row.setVisibility(View.VISIBLE);
             }
 
-            for (int i = diffHunks.size(); i < mDetailsContainer.getChildCount(); i++) {
+            for (int i = viewIndex; i < mDetailsContainer.getChildCount(); i++) {
                 mDetailsContainer.getChildAt(i).setVisibility(View.GONE);
             }
 
@@ -264,5 +282,17 @@ class ReviewViewHolder
                 return true;
         }
         return false;
+    }
+
+    private static class FileDetails {
+        public final View row;
+        public boolean isOutdated;
+        public int count;
+
+        public FileDetails(View row, boolean isOutdated, int count) {
+            this.row = row;
+            this.isOutdated = isOutdated;
+            this.count = count;
+        }
     }
 }
