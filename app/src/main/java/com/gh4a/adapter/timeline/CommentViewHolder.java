@@ -52,6 +52,8 @@ class CommentViewHolder
 
     private TimelineItem.TimelineComment mBoundItem;
 
+    private final UiUtils.QuoteActionModeCallback mQuoteActionModeCallback;
+
     public interface Callback {
         boolean canQuote();
         void quoteText(CharSequence text);
@@ -92,6 +94,12 @@ class CommentViewHolder
 
         mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(view.getContext(),
                 reactItem.getSubMenu(), this, this, reactionDetailsCache);
+        mQuoteActionModeCallback = new UiUtils.QuoteActionModeCallback(tvDesc) {
+            @Override
+            public void onTextQuoted(CharSequence text) {
+                mCallback.quoteText(text);
+            }
+        };
     }
 
     @Override
@@ -127,13 +135,7 @@ class CommentViewHolder
         tvExtra.setText(userName);
 
         if (mCallback.canQuote()) {
-            tvDesc.setCustomSelectionActionModeCallback(
-                    new UiUtils.QuoteActionModeCallback(tvDesc) {
-                @Override
-                public void onTextQuoted(CharSequence text) {
-                    mCallback.quoteText(text);
-                }
-            });
+            tvDesc.setCustomSelectionActionModeCallback(mQuoteActionModeCallback);
         } else {
             tvDesc.setCustomSelectionActionModeCallback(null);
         }
@@ -144,15 +146,14 @@ class CommentViewHolder
         reactions.setReactions(item.comment.getReactions());
 
         String ourLogin = Gh4Application.get().getAuthLogin();
-        boolean canEdit = ApiHelpers.loginEquals(user, ourLogin) ||
-                ApiHelpers.loginEquals(mRepoOwner, ourLogin);
+        boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
+                || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
 
         Menu menu = mPopupMenu.getMenu();
         menu.findItem(R.id.edit).setVisible(canEdit);
         menu.findItem(R.id.delete).setVisible(canEdit);
-        menu.findItem(R.id.view_in_file).setVisible(
-                item.file != null && item.getCommitComment() != null &&
-                        item.getCommitComment().getPosition() != -1);
+        menu.findItem(R.id.view_in_file).setVisible(item.file != null
+                && item.getCommitComment() != null && item.getCommitComment().getPosition() != -1);
     }
 
     @Override

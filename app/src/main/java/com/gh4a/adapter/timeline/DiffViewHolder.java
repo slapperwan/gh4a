@@ -34,6 +34,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
     private final int mAddedLineNumberColor;
     private final int mRemovedLineNumberColor;
     private final int mSecondaryTextColor;
+    private final int mPrimaryColor;
     private final int mPadding;
 
     private final TextView mDiffHunkTextView;
@@ -56,6 +57,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mRemovedLineNumberColor =
                 ContextCompat.getColor(context, R.color.diff_remove_line_number_light);
         mSecondaryTextColor = UiUtils.resolveColor(context, android.R.attr.textColorSecondary);
+        mPrimaryColor = UiUtils.resolveColor(context, R.attr.colorPrimary);
         mPadding = context.getResources().getDimensionPixelSize(R.dimen.code_diff_padding);
         // TODO: Dark theme colors
 
@@ -77,6 +79,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
                 ? mFileTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : mFileTextView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
         mFileTextView.setClickable(!isOutdated);
+        mFileTextView.setTextColor(isOutdated ? mSecondaryTextColor : mPrimaryColor);
 
         String[] lines = comment.getDiffHunk().split("\n");
 

@@ -30,7 +30,6 @@ import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.User;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,8 +53,11 @@ class ReviewViewHolder
     private final ImageView ivMenu;
     private final PopupMenu mPopupMenu;
     private final ViewGroup mDetailsContainer;
+    private final View mDetailsDivider;
     private final View mDetailsHeader;
     private final ImageView mEventIconView;
+
+    private final UiUtils.QuoteActionModeCallback mQuoteActionModeCallback;
 
     public interface Callback {
         boolean canQuote();
@@ -86,13 +88,20 @@ class ReviewViewHolder
         ivMenu = (ImageView) itemView.findViewById(R.id.iv_menu);
         ivMenu.setOnClickListener(this);
         mDetailsContainer = (ViewGroup) itemView.findViewById(R.id.details_container);
-        mDetailsHeader = itemView.findViewById(R.id.details_container_divider);
+        mDetailsDivider = itemView.findViewById(R.id.details_container_divider);
+        mDetailsHeader = itemView.findViewById(R.id.details_container_header);
 
         mPopupMenu = new PopupMenu(mContext, ivMenu);
         mPopupMenu.getMenuInflater().inflate(R.menu.review_menu, mPopupMenu.getMenu());
         mPopupMenu.setOnMenuItemClickListener(this);
 
         mEventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
+        mQuoteActionModeCallback = new UiUtils.QuoteActionModeCallback(mBodyView) {
+            @Override
+            public void onTextQuoted(CharSequence text) {
+                mCallback.quoteText(text);
+            }
+        };
     }
 
     @Override
@@ -114,25 +123,18 @@ class ReviewViewHolder
         }
 
         if (mCallback.canQuote()) {
-            mBodyView.setCustomSelectionActionModeCallback(
-                    new UiUtils.QuoteActionModeCallback(mBodyView) {
-                        @Override
-                        public void onTextQuoted(CharSequence text) {
-                            mCallback.quoteText(text);
-                        }
-                    });
+            mBodyView.setCustomSelectionActionModeCallback(mQuoteActionModeCallback);
         } else {
             mBodyView.setCustomSelectionActionModeCallback(null);
         }
 
         boolean hasDiffs = !item.getDiffHunks().isEmpty();
         if (mDisplayReviewDetails && hasDiffs) {
-            ArrayList<TimelineItem.Diff> diffHunks = new ArrayList<>(item.getDiffHunks());
             LayoutInflater inflater = LayoutInflater.from(mContext);
             Map<String, FileDetails> files = new HashMap<>();
 
             int viewIndex = 0;
-            for (TimelineItem.Diff diffHunk : diffHunks) {
+            for (TimelineItem.Diff diffHunk : item.getDiffHunks()) {
                 CommitComment commitComment = diffHunk.getInitialComment();
                 String filename = commitComment.getPath();
                 int commentCount = diffHunk.comments.size();
@@ -184,15 +186,17 @@ class ReviewViewHolder
 
             mDetailsContainer.setVisibility(View.VISIBLE);
             mShowDetailsButton.setVisibility(View.VISIBLE);
+            mDetailsHeader.setVisibility(View.VISIBLE);
         } else {
             mDetailsContainer.setVisibility(View.GONE);
             mShowDetailsButton.setVisibility(View.GONE);
+            mDetailsHeader.setVisibility(View.GONE);
         }
 
         if (hasBody && mDisplayReviewDetails && hasDiffs) {
-            mDetailsHeader.setVisibility(View.VISIBLE);
+            mDetailsDivider.setVisibility(View.VISIBLE);
         } else {
-            mDetailsHeader.setVisibility(View.GONE);
+            mDetailsDivider.setVisibility(View.GONE);
         }
 
         ivMenu.setVisibility(mDisplayReviewDetails ? View.VISIBLE : View.GONE);

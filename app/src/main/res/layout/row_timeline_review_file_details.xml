@@ -24,8 +24,10 @@
         android:id="@+id/tv_file_comments"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
         android:drawableLeft="?commentsIcon"
         android:drawablePadding="8dp"
+        android:gravity="center_vertical"
         tools:text="5" />
 
 </LinearLayout>

@@ -34,11 +34,20 @@
         android:layout_marginRight="32dp"
         android:background="?android:attr/listDivider" />
 
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/details_container_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/details_container_divider"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding"
+        android:text="Reviewed files:" />
+
     <LinearLayout
         android:id="@+id/details_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/details_container_divider"
+        android:layout_below="@id/details_container_header"
         android:orientation="vertical" />
 
     <Button
