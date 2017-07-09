@@ -6,7 +6,7 @@ This application provides access to [GitHub](https://github.com/) and lets you s
 
 Download
 --------
-[![Download OctoDroid from Google Play](http://www.android.com/images/brand/android_app_on_play_large.png)](https://play.google.com/store/apps/details?id=com.gh4a) [![Download OctoDroid from F-Droid.org](https://raw.githubusercontent.com/kageiit/images-host/master/badges/fdroid-badge.png)](http://f-droid.org/repository/browse/?fdfilter=octodroid&fdid=com.gh4a)
+[![Download OctoDroid from Google Play](http://www.android.com/images/brand/android_app_on_play_large.png)](https://play.google.com/store/apps/details?id=com.gh4a) [![Download OctoDroid from F-Droid.org](https://raw.githubusercontent.com/kageiit/images-host/master/badges/fdroid-badge.png)](https://f-droid.org/packages/com.gh4a/)
 
 Main features
 -------------
