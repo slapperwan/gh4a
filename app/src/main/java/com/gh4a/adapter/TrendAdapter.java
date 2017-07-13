@@ -53,7 +53,10 @@ public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
         title.append(owner).append("/").append(name);
         title.setSpan(new StyleSpan(Typeface.BOLD), 0, owner.length(), 0);
         holder.tvTitle.setText(title);
-        holder.tvDesc.setText(EmojiParser.parseToUnicode(trend.getDescription()));
+
+        String desc = trend.getDescription();
+        holder.tvDesc.setText(desc != null ? EmojiParser.parseToUnicode(desc) : null);
+
         holder.tvStars.setText(mContext.getString(mStarsTemplate,
                 trend.getNewStars(), trend.getStars()));
         holder.tvForks.setText(String.valueOf(trend.getForks()));
