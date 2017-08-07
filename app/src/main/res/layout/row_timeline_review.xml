@@ -41,7 +41,7 @@
         android:layout_below="@id/details_container_divider"
         android:paddingLeft="@dimen/content_padding"
         android:paddingRight="@dimen/content_padding"
-        android:text="Reviewed files:" />
+        android:text="@string/reviewed_files" />
 
     <LinearLayout
         android:id="@+id/details_container"
@@ -56,6 +56,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/details_container"
-        android:text="Show details" />
+        android:text="@string/show_details" />
 
 </RelativeLayout>

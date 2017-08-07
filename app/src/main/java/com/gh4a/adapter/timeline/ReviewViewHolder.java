@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.support.annotation.AttrRes;
 import android.support.annotation.DrawableRes;
 import android.support.v7.widget.PopupMenu;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -25,6 +26,7 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.StyleableTextView;
 
 import org.eclipse.egit.github.core.CommitComment;
 import org.eclipse.egit.github.core.Review;
@@ -46,7 +48,7 @@ class ReviewViewHolder
     private final Callback mCallback;
 
     private final ImageView mAvatarView;
-    private final TextView mMessageView;
+    private final StyleableTextView mMessageView;
     private final TextView mBodyView;
     private final Button mShowDetailsButton;
     private final View mAvatarContainer;
@@ -79,7 +81,7 @@ class ReviewViewHolder
         mCallback = callback;
 
         mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
-        mMessageView = (TextView) itemView.findViewById(R.id.tv_message);
+        mMessageView = (StyleableTextView) itemView.findViewById(R.id.tv_message);
         mBodyView = (TextView) itemView.findViewById(R.id.tv_desc);
         mShowDetailsButton = (Button) itemView.findViewById(R.id.btn_show_details);
         mShowDetailsButton.setOnClickListener(this);
@@ -220,25 +222,31 @@ class ReviewViewHolder
     }
 
     private void formatTitle(Review review) {
-        String login = review.getUser().getLogin();
-        CharSequence time = review.getSubmittedAt() != null
-                ? StringUtils.formatRelativeTime(mContext, review.getSubmittedAt(), true) : "";
-
+        int textResId;
         switch (review.getState()) {
             case Review.STATE_APPROVED:
-                mMessageView.setText(login + " approved these changes " + time);
+                textResId = R.string.pull_request_event_review_approved;
                 break;
             case Review.STATE_CHANGES_REQUESTED:
-                mMessageView.setText(login + " requested changes" + time);
+                textResId = R.string.pull_request_event_review_requested_changes;
                 break;
             case Review.STATE_DISMISSED:
             case Review.STATE_COMMENTED:
-                mMessageView.setText(login + " reviewed " + time);
+            default:
+                textResId = R.string.pull_request_event_review_reviewed;
                 break;
             case Review.STATE_PENDING:
-                mMessageView.setText(login + " started a review " + time);
+                textResId = R.string.pull_request_event_review_started_review;
                 break;
         }
+
+        String login = review.getUser().getLogin();
+        CharSequence time = review.getSubmittedAt() != null
+                ? StringUtils.formatRelativeTime(mContext, review.getSubmittedAt(), true) : "";
+        String rawMessage = mContext.getString(textResId, login, time);
+        SpannableStringBuilder message = StringUtils.applyBoldTags(mContext, rawMessage,
+                mMessageView.getTypefaceValue());
+        mMessageView.setText(message);
     }
 
     @Override

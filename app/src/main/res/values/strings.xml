@@ -124,6 +124,9 @@
     <string name="undo">Undo</string>
     <string name="raw">Raw</string>
     <string name="view_in_file">View in file</string>
+    <string name="reply_to_review_comments">Reply to review comments</string>
+    <string name="reviewed_files">Reviewed files:</string>
+    <string name="show_details">Show details</string>
 
     <string name="reaction_plus_one" translatable="false">+1</string>
     <string name="reaction_minus_one" translatable="false">-1</string>
@@ -299,6 +302,10 @@
     <string name="pull_request_event_unassigned_self">Pull request was self-unassigned from %1$s</string>
     <string name="pull_request_event_locked">Pull request was [b]locked[/b] by %1$s</string>
     <string name="pull_request_event_unlocked">Pull request was unlocked by %1$s</string>
+    <string name="pull_request_event_review_approved">[b]%1$s[/b] approved these changes %2$s</string>
+    <string name="pull_request_event_review_requested_changes">[b]%1$s[/b] requested changes %2$s</string>
+    <string name="pull_request_event_review_reviewed">[b]%1$s[/b] reviewed %2$s</string>
+    <string name="pull_request_event_review_started_review">[b]%1$s[/b] started a review %2$s</string>
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>
@@ -405,6 +412,7 @@
 
     <!-- Pull Request -->
     <string name="pull_request_title">Pull Request</string>
+    <string name="review_title_format">Pull Request #%1$d - Review</string>
     <string name="pull_request_conversation">Conversation</string>
     <string name="pull_request_files">Files</string>
     <string name="pull_requests">Pull Requests</string>

@@ -63,7 +63,7 @@ class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timelin
 
             AlertDialog d = new AlertDialog.Builder(v.getContext())
                     .setCancelable(true)
-                    .setTitle("Reply to review comments")
+                    .setTitle(R.string.reply_to_review_comments)
                     .setView(commentDialog)
                     .setPositiveButton(R.string.reply, saveCb)
                     .setNegativeButton(R.string.cancel, null)

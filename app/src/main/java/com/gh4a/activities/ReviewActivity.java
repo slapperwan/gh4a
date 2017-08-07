@@ -40,7 +40,7 @@ public class ReviewActivity extends FragmentContainerActivity {
         super.onCreate(savedInstanceState);
 
         ActionBar actionBar = getSupportActionBar();
-        mTitle = getResources().getString(R.string.pull_request_title) + " #" + mIssueNumber + " - Review";
+        mTitle = getString(R.string.review_title_format, mIssueNumber);
         actionBar.setTitle(mTitle);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
