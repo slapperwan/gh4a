@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/code
+    docker:
+      - image: circleci/android:api-26-alpha
+    environment:
+      # Customize the JVM maximum heap limit
+      JVM_OPTS: -Xmx3200m
+    steps:
+      - checkout
+      - run:
+          name: Create Local Config
+          command: echo -e 'ClientId="'$CLIENT_ID'"\nClientSecret="'$CLIENT_SECRET'"' > gradle.properties
+      # Download and cache dependencies
+      - restore_cache:
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "github-api/build.gradle" }}
+      - run:
+          name: Download Dependencies
+          command: ./gradlew androidDependencies
+      - save_cache:
+          paths:
+            - ~/.gradle
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "github-api/build.gradle" }}
+      - run:
+          name: Build Foss
+          command: ./gradlew assembleFossDebug
+      - store_artifacts:
+          path: app/build/outputs/apk
+          destination: apk
