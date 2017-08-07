@@ -16,7 +16,7 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="8dp"
-        android:textColor="?colorPrimary"
+        android:textColor="?colorAccent"
         android:textStyle="bold"
         tools:text="/path/to/filename.txt" />
 

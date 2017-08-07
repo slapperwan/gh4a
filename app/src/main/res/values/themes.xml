@@ -101,6 +101,10 @@
         <item name="colorPrimaryTextEmphasized">@android:color/white</item>
         <item name="colorWebViewBackground">#111111</item>
         <item name="colorScrollbarThumb">@color/scrollbar_thumb_dark</item>
+        <item name="colorDiffAddBackground">@color/diff_add_dark</item>
+        <item name="colorDiffRemoveBackground">@color/diff_remove_dark</item>
+        <item name="colorDiffAddLineNumberBackground">@color/diff_add_line_number_dark</item>
+        <item name="colorDiffRemoveLineNumberBackground">@color/diff_remove_line_number_dark</item>
     </style>
 
     <style name="DarkTheme" parent="DarkThemeBase" />
@@ -223,6 +227,10 @@
         <item name="colorPrimaryTextEmphasized">@android:color/black</item>
         <item name="colorWebViewBackground">#f7f7f9</item>
         <item name="colorScrollbarThumb">@color/scrollbar_thumb_light</item>
+        <item name="colorDiffAddBackground">@color/diff_add_light</item>
+        <item name="colorDiffRemoveBackground">@color/diff_remove_light</item>
+        <item name="colorDiffAddLineNumberBackground">@color/diff_add_line_number_light</item>
+        <item name="colorDiffRemoveLineNumberBackground">@color/diff_remove_line_number_light</item>
     </style>
 
     <style name="LightTheme" parent="LightThemeBase" />

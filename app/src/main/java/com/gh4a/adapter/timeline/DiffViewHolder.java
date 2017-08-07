@@ -3,7 +3,6 @@ package com.gh4a.adapter.timeline;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
@@ -29,12 +28,14 @@ import org.eclipse.egit.github.core.CommitComment;
 class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Diff>
         implements View.OnClickListener {
 
-    private final int mAddedLineColor;
-    private final int mRemovedLineColor;
-    private final int mAddedLineNumberColor;
-    private final int mRemovedLineNumberColor;
+    private final int mAddedLineBackgroundColor;
+    private final int mRemovedLineBackgroundColor;
+    private final int mAddedLineNumberBackgroundColor;
+    private final int mRemovedLineNumberBackgroundColor;
     private final int mSecondaryTextColor;
-    private final int mPrimaryColor;
+    private final int mDefaultBackgroundColor;
+    private final int mDefaultLineNumberBackgroundColor;
+    private final int mAccentColor;
     private final int mPadding;
 
     private final TextView mDiffHunkTextView;
@@ -51,15 +52,18 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mIssueNumber = issueNumber;
 
         Context context = itemView.getContext();
-        mAddedLineColor = ContextCompat.getColor(context, R.color.diff_add_light);
-        mRemovedLineColor = ContextCompat.getColor(context, R.color.diff_remove_light);
-        mAddedLineNumberColor = ContextCompat.getColor(context, R.color.diff_add_line_number_light);
-        mRemovedLineNumberColor =
-                ContextCompat.getColor(context, R.color.diff_remove_line_number_light);
+        mAddedLineBackgroundColor = UiUtils.resolveColor(context, R.attr.colorDiffAddBackground);
+        mRemovedLineBackgroundColor = UiUtils.resolveColor(context, R.attr.colorDiffRemoveBackground);
+        mAddedLineNumberBackgroundColor =
+                UiUtils.resolveColor(context, R.attr.colorDiffAddLineNumberBackground);
+        mRemovedLineNumberBackgroundColor =
+                UiUtils.resolveColor(context, R.attr.colorDiffRemoveLineNumberBackground);
         mSecondaryTextColor = UiUtils.resolveColor(context, android.R.attr.textColorSecondary);
-        mPrimaryColor = UiUtils.resolveColor(context, R.attr.colorPrimary);
+        mDefaultBackgroundColor = ContextCompat.getColor(context, R.color.diff_default_background);
+        mDefaultLineNumberBackgroundColor =
+                ContextCompat.getColor(context, R.color.diff_default_line_number_background);
+        mAccentColor = UiUtils.resolveColor(context, R.attr.colorAccent);
         mPadding = context.getResources().getDimensionPixelSize(R.dimen.code_diff_padding);
-        // TODO: Dark theme colors
 
         mDiffHunkTextView = (TextView) itemView.findViewById(R.id.diff_hunk);
         mDiffHunkTextView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
@@ -79,7 +83,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
                 ? mFileTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : mFileTextView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
         mFileTextView.setClickable(!isOutdated);
-        mFileTextView.setTextColor(isOutdated ? mSecondaryTextColor : mPrimaryColor);
+        mFileTextView.setTextColor(isOutdated ? mSecondaryTextColor : mAccentColor);
 
         String[] lines = comment.getDiffHunk().split("\n");
 
@@ -133,17 +137,17 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
                 builder.append("\n");
             }
 
-            int color = Color.WHITE;
-            int lineNumberColor = Color.WHITE;
+            int backgroundColor = mDefaultBackgroundColor;
+            int lineNumberBackgroundColor = mDefaultLineNumberBackgroundColor;
             if (lines[i].startsWith("+")) {
-                color = mAddedLineColor;
-                lineNumberColor = mAddedLineNumberColor;
+                backgroundColor = mAddedLineBackgroundColor;
+                lineNumberBackgroundColor = mAddedLineNumberBackgroundColor;
             } else if (lines[i].startsWith("-")) {
-                color = mRemovedLineColor;
-                lineNumberColor = mRemovedLineNumberColor;
+                backgroundColor = mRemovedLineBackgroundColor;
+                lineNumberBackgroundColor = mRemovedLineNumberBackgroundColor;
             }
 
-            DiffLineSpan span = new DiffLineSpan(color, lineNumberColor, mPadding, i == start,
+            DiffLineSpan span = new DiffLineSpan(backgroundColor, lineNumberBackgroundColor, mPadding, i == start,
                     i == lines.length - 1, lineNumberLength);
             builder.setSpan(span, spanStart, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }

@@ -51,4 +51,10 @@
     <color name="diff_remove_light">#ffecec</color>
     <color name="diff_add_line_number_light">#dbffdb</color>
     <color name="diff_remove_line_number_light">#ffdddd</color>
+    <color name="diff_add_dark">#103810</color>
+    <color name="diff_remove_dark">#481010</color>
+    <color name="diff_add_line_number_dark">#244224</color>
+    <color name="diff_remove_line_number_dark">#581616</color>
+    <color name="diff_default_background">#14aaaaaa</color>
+    <color name="diff_default_line_number_background">#30aaaaaa</color>
 </resources>
