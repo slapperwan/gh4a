@@ -339,7 +339,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    private boolean shouldWrapLines() {
+    protected boolean shouldWrapLines() {
         return getPrefs().getBoolean("line_wrapping", false);
     }
 
@@ -443,6 +443,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
         content.append("</body></html>");
 
+        mRequiresJsInterface = false;
         return content.toString();
     }
 

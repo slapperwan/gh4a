@@ -89,6 +89,7 @@ public class FileViewerActivity extends WebViewerActivity
     private TextMatch mTextMatch;
     private RepositoryContents mContent;
     private int mLastTouchedLine = 0;
+    private boolean mViewRawText;
 
     private static final int MENU_ITEM_HISTORY = 10;
     private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
@@ -179,7 +180,7 @@ public class FileViewerActivity extends WebViewerActivity
             String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) +
                     ";base64," + base64Data;
             return highlightImage(imageUrl, cssTheme, title);
-        } else if (base64Data != null && FileUtils.isMarkdown(mPath)) {
+        } else if (base64Data != null && FileUtils.isMarkdown(mPath) && !mViewRawText) {
             return generateMarkdownHtml(base64Data,
                     mRepoOwner, mRepoName, mRef, cssTheme, addTitleHeader);
         } else {
@@ -231,8 +232,15 @@ public class FileViewerActivity extends WebViewerActivity
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.file_viewer_menu, menu);
 
-        if (FileUtils.isImage(mPath) || FileUtils.isMarkdown(mPath)) {
+        boolean isMarkdown = FileUtils.isMarkdown(mPath);
+        if (FileUtils.isImage(mPath) || (isMarkdown && !mViewRawText)) {
             menu.removeItem(R.id.wrap);
+        }
+        MenuItem viewRawItem = menu.findItem(R.id.view_raw);
+        if (isMarkdown) {
+            viewRawItem.setChecked(mViewRawText);
+        } else {
+            viewRawItem.setVisible(false);
         }
 
         MenuItem item = menu.add(0, MENU_ITEM_HISTORY, Menu.NONE, R.string.history);
@@ -257,6 +265,11 @@ public class FileViewerActivity extends WebViewerActivity
             case MENU_ITEM_HISTORY:
                 startActivity(CommitHistoryActivity.makeIntent(this,
                         mRepoOwner, mRepoName, mRef, mPath));
+                return true;
+            case R.id.view_raw:
+                mViewRawText = !mViewRawText;
+                item.setChecked(mViewRawText);
+                onRefresh();
                 return true;
          }
          return super.onOptionsItemSelected(item);
@@ -293,6 +306,12 @@ public class FileViewerActivity extends WebViewerActivity
         popupMenu.getMenuInflater().inflate(R.menu.file_line_menu, popupMenu.getMenu());
         popupMenu.show();
         popupMenu.setOnMenuItemClickListener(this);
+    }
+
+    @Override
+    protected boolean shouldWrapLines() {
+        boolean displayingMarkdown = FileUtils.isMarkdown(mPath) && !mViewRawText;
+        return !displayingMarkdown && super.shouldWrapLines();
     }
 
     private String createUrl() {
