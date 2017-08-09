@@ -106,7 +106,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    app:font="italic"
+                    app:ghFont="italic"
                     tools:text="10 files added with 42 additions and 32 deletions." />
 
             </LinearLayout>

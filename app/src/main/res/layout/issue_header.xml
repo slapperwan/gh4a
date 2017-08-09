@@ -39,7 +39,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             android:textColor="?android:attr/textColorPrimary"
             android:textIsSelectable="true"
-            app:font="condensed"
+            app:ghFont="condensed"
             tools:text="Issue title that is long enought to make the content scrollable nice" />
 
     </HorizontalScrollView>

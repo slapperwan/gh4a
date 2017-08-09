@@ -25,7 +25,7 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="@style/TextAppearance.ItemTitle"
-        app:font="boldCondensed"
+        app:ghFont="boldCondensed"
         tools:text="Username" />
 
     <com.gh4a.widget.StyleableTextView
@@ -35,7 +35,7 @@
         android:layout_below="@id/tv_title"
         android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="@style/TextAppearance.VerySmall"
-        app:font="italic"
+        app:ghFont="italic"
         tools:text="Extra text" />
 
 </RelativeLayout>

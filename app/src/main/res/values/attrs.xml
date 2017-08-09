@@ -106,7 +106,7 @@
     </declare-styleable>
 
     <declare-styleable name="StyleableTextView">
-        <attr name="font" format="enum">
+        <attr name="ghFont" format="enum">
             <enum name="regular" value="0" />
             <enum name="medium" value="1" />
             <enum name="bold" value="2" />
