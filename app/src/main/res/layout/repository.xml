@@ -38,7 +38,7 @@
                     android:layout_marginTop="8dp"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="?android:attr/textColorLink"
-                    app:font="italic"
+                    app:ghFont="italic"
                     tools:text="forked from other/repository" />
 
                 <com.gh4a.widget.StyleableTextView

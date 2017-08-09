@@ -38,7 +38,7 @@
         android:text="@string/try_again"
         android:textColor="?attr/colorAccent"
         app:allCaps="true"
-        app:font="medium" />
+        app:ghFont="medium" />
 
     <View
         android:layout_width="match_parent"

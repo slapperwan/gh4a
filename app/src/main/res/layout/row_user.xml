@@ -28,6 +28,6 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:textAppearance="@style/TextAppearance.ItemTitle"
-        app:font="boldCondensed" />
+        app:ghFont="boldCondensed" />
 
 </LinearLayout>

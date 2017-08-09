@@ -39,7 +39,7 @@
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:font="bold"
+                app:ghFont="bold"
                 tools:text="username" />
 
             <com.gh4a.widget.StyleableTextView
