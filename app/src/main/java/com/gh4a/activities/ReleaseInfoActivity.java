@@ -17,12 +17,15 @@ package com.gh4a.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,6 +41,7 @@ import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
@@ -128,6 +132,21 @@ public class ReleaseInfoActivity extends BaseActivity implements
         mRepoName = extras.getString("repo");
         mRelease = (Release) extras.getSerializable("release");
         mReleaseId = extras.getLong("id");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.release, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.browser) {
+            IntentUtils.launchBrowser(this, Uri.parse(mRelease.getHtmlUrl()));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
