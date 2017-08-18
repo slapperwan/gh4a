@@ -239,8 +239,8 @@ public class BrowseFilter extends AppCompatActivity {
                         IntentUtils.InitialCommentMarker reviewCommentMarker =
                                 generateInitialCommentMarker(uri.getFragment(), "discussion_r");
                         if (reviewCommentMarker != null) {
-                            new PullRequestReviewCommentLoadTask(user, repo, pullRequestNumber,
-                                    reviewCommentMarker).execute();
+                            new PullRequestReviewCommentLoadTask(BrowseFilter.this, user, repo,
+                                    pullRequestNumber, reviewCommentMarker, true).execute();
                             return; // avoid finish() for now
                         }
 
@@ -350,6 +350,14 @@ public class BrowseFilter extends AppCompatActivity {
     }
 
     public static class ProgressDialogFragment extends DialogFragment {
+        public static ProgressDialogFragment newInstance(boolean finishCurrentActivity) {
+            Bundle args = new Bundle();
+            args.putBoolean("finish_activity", finishCurrentActivity);
+            ProgressDialogFragment dialogFragment = new ProgressDialogFragment();
+            dialogFragment.setArguments(args);
+            return dialogFragment;
+        }
+
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -359,9 +367,12 @@ public class BrowseFilter extends AppCompatActivity {
         @Override
         public void onDismiss(DialogInterface dialog) {
             super.onDismiss(dialog);
-            Activity activity = getActivity();
-            if (activity != null) {
-                activity.finish();
+            Bundle args = getArguments();
+            if (args != null && args.getBoolean("finish_activity")) {
+                Activity activity = getActivity();
+                if (activity != null) {
+                    activity.finish();
+                }
             }
         }
     }
@@ -383,16 +394,24 @@ public class BrowseFilter extends AppCompatActivity {
 
     private static abstract class UrlLoadTask extends BackgroundTask<Intent> {
         protected FragmentActivity mActivity;
+        private final boolean mFinishCurrentActivity;
+        private ProgressDialogFragment mProgressDialog;
 
         public UrlLoadTask(FragmentActivity activity) {
+            this(activity, true);
+        }
+
+        public UrlLoadTask(FragmentActivity activity, boolean finishCurrentActivity) {
             super(activity);
             mActivity = activity;
+            mFinishCurrentActivity = finishCurrentActivity;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            new ProgressDialogFragment().show(mActivity.getSupportFragmentManager(), "progress");
+            mProgressDialog = ProgressDialogFragment.newInstance(mFinishCurrentActivity);
+            mProgressDialog.show(mActivity.getSupportFragmentManager(), "progress");
         }
 
         @Override
@@ -406,13 +425,23 @@ public class BrowseFilter extends AppCompatActivity {
             } else {
                 IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData());
             }
-            mActivity.finish();
+
+            dismiss();
         }
 
         @Override
         protected void onError(Exception e) {
             IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData());
-            mActivity.finish();
+            dismiss();
+        }
+
+        private void dismiss() {
+            if (mProgressDialog != null) {
+                // Progress dialog will automatically finish current activity if necessary
+                mProgressDialog.dismiss();
+            } else if (mFinishCurrentActivity) {
+                mActivity.finish();
+            }
         }
     }
 
@@ -502,15 +531,16 @@ public class BrowseFilter extends AppCompatActivity {
         }
     }
 
-    private class PullRequestReviewCommentLoadTask extends UrlLoadTask {
+    public static class PullRequestReviewCommentLoadTask extends UrlLoadTask {
         private final String mRepoOwner;
         private final String mRepoName;
         private final int mPullRequestNumber;
         private final IntentUtils.InitialCommentMarker mMarker;
 
-        public PullRequestReviewCommentLoadTask(String repoOwner, String repoName,
-                int pullRequestNumber, IntentUtils.InitialCommentMarker marker) {
-            super(BrowseFilter.this);
+        public PullRequestReviewCommentLoadTask(FragmentActivity activity, String repoOwner,
+                String repoName, int pullRequestNumber, IntentUtils.InitialCommentMarker marker,
+                boolean finishCurrentActivity) {
+            super(activity, finishCurrentActivity);
             mRepoOwner = repoOwner;
             mRepoName = repoName;
             mPullRequestNumber = pullRequestNumber;
@@ -547,7 +577,7 @@ public class BrowseFilter extends AppCompatActivity {
 
                     Review review = pullRequestService.getReview(repoId, mPullRequestNumber,
                             reviewId);
-                    return ReviewActivity.makeIntent(BrowseFilter.this, mRepoOwner, mRepoName,
+                    return ReviewActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                             mPullRequestNumber, review, mMarker);
                 }
             }
@@ -555,6 +585,7 @@ public class BrowseFilter extends AppCompatActivity {
             return null;
         }
     }
+
     private class PullRequestReviewLoadTask extends UrlLoadTask {
         private final String mRepoOwner;
         private final String mRepoName;

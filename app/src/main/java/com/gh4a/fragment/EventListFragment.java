@@ -246,10 +246,13 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
                     ? new IntentUtils.InitialCommentMarker(comment.getId()) : null;
 
             if (pr != null) {
-                intent = PullRequestActivity.makeIntent(getActivity(),
-                        repoOwner, repoName, pr.getNumber(),
-                        initialComment != null ? PullRequestActivity.PAGE_CONVERSATION : -1,
-                        initialComment);
+                if (initialComment != null) {
+                    new BrowseFilter.PullRequestReviewCommentLoadTask(getActivity(), repoOwner,
+                            repoName, pr.getNumber(), initialComment, false).schedule();
+                } else {
+                    intent = PullRequestActivity.makeIntent(getActivity(), repoOwner, repoName,
+                            pr.getNumber(), -1, null);
+                }
             } else if (comment != null) {
                 intent = CommitActivity.makeIntent(getActivity(), repoOwner, repoName,
                         comment.getCommitId(), initialComment);
