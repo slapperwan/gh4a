@@ -128,11 +128,11 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
             appendLineNumber(builder, maxLineLength, rightLineText, rightLine, item, true);
 
             // Add additional padding between line numbers and code
-            builder.append("  ");
+            builder.append(" ");
 
             int lineNumberLength = builder.length() - spanStart;
 
-            builder.append("  ").append(lines[i]).append("  ");
+            builder.append(" ").append(lines[i]).append(" ");
             if (i < lines.length - 1) {
                 builder.append("\n");
             }
@@ -159,11 +159,11 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         int start = builder.length();
 
         // Add padding at the start of text
-        builder.append("    ");
+        builder.append("  ");
 
         // Right align the number if necessary
         for (int i = 0; i < maxLength - numberText.length(); i++) {
-            builder.append("  ");
+            builder.append(" ");
         }
 
         builder.append(numberText);
