@@ -228,7 +228,7 @@ public class BrowseFilter extends AppCompatActivity {
                         }
 
                         IntentUtils.InitialCommentMarker reviewMarker =
-                                generateInitialCommentMarker(uri.getFragment(),
+                                generateInitialCommentMarkerWithoutFallback(uri.getFragment(),
                                         "pullrequestreview-");
                         if (reviewMarker != null) {
                             new PullRequestReviewLoadTask(user, repo, pullRequestNumber,
@@ -237,7 +237,8 @@ public class BrowseFilter extends AppCompatActivity {
                         }
 
                         IntentUtils.InitialCommentMarker reviewCommentMarker =
-                                generateInitialCommentMarker(uri.getFragment(), "discussion_r");
+                                generateInitialCommentMarkerWithoutFallback(uri.getFragment(),
+                                        "discussion_r");
                         if (reviewCommentMarker != null) {
                             new PullRequestReviewCommentLoadTask(BrowseFilter.this, user, repo,
                                     pullRequestNumber, reviewCommentMarker, true).execute();
