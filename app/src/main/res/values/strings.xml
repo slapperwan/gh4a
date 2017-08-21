@@ -312,6 +312,8 @@
     <string name="pull_request_event_review_requested_changes">[b]%1$s[/b] requested changes %2$s</string>
     <string name="pull_request_event_review_reviewed">[b]%1$s[/b] reviewed %2$s</string>
     <string name="pull_request_event_review_started_review">[b]%1$s[/b] started a review %2$s</string>
+    <string name="pull_request_event_ref_deleted">[b]%1$s[/b] deleted the pull request branch</string>
+    <string name="pull_request_event_ref_restored">[b]%1$s[/b] restored the pull request branch</string>
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>

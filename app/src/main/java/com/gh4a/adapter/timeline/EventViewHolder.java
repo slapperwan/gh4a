@@ -51,6 +51,8 @@ class EventViewHolder
         EVENT_ICONS.put(IssueEvent.TYPE_MILESTONED, R.attr.issueEventMilestonedIcon);
         EVENT_ICONS.put(IssueEvent.TYPE_DEMILESTONED, R.attr.issueEventDemilestonedIcon);
         EVENT_ICONS.put(IssueEvent.TYPE_RENAMED, R.attr.issueEventRenamedIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_HEAD_REF_DELETED, R.attr.timelineEventBranchIcon);
+        EVENT_ICONS.put(IssueEvent.TYPE_HEAD_REF_RESTORED, R.attr.timelineEventBranchIcon);
     }
 
     private final Context mContext;
@@ -198,6 +200,12 @@ class EventViewHolder
                         rename.getFrom(), rename.getTo(), ApiHelpers.getUserLogin(mContext, user));
                 break;
             }
+            case IssueEvent.TYPE_HEAD_REF_DELETED:
+                textResId = R.string.pull_request_event_ref_deleted;
+                break;
+            case IssueEvent.TYPE_HEAD_REF_RESTORED:
+                textResId = R.string.pull_request_event_ref_restored;
+                break;
             default:
                 return null;
         }
