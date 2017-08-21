@@ -105,18 +105,6 @@ public class CommitActivity extends BasePagerActivity implements
         @Override
         protected void onResultReady(List<CommitComment> result) {
             mComments = result;
-            boolean foundComment = false;
-            if (mInitialComment != null) {
-                for (CommitComment comment : result) {
-                    if (comment.getId() == mInitialComment.commentId) {
-                        foundComment = comment.getPosition() < 0;
-                        break;
-                    }
-                }
-                if (!foundComment) {
-                    mInitialComment = null;
-                }
-            }
             showContentIfReady();
         }
     };

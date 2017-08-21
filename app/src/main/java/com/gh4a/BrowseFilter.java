@@ -691,7 +691,7 @@ public class BrowseFilter extends AppCompatActivity {
         private final String mRepoOwner;
         private final String mRepoName;
         private final String mCommitSha;
-        private final IntentUtils.InitialCommentMarker mMarker;
+        private IntentUtils.InitialCommentMarker mMarker;
 
         public CommitCommentLoadTask(FragmentActivity activity, String repoOwner, String repoName,
                 String commitSha, IntentUtils.InitialCommentMarker marker) {
@@ -708,11 +708,9 @@ public class BrowseFilter extends AppCompatActivity {
                     CommitCommentListLoader.loadComments(mRepoOwner, mRepoName, mCommitSha);
             RepositoryCommit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mCommitSha);
 
-            boolean foundComment = false;
             CommitFile resultFile = null;
             for (CommitComment comment : comments) {
                 if (mMarker.matches(comment.getId(), comment.getCreatedAt())) {
-                    foundComment = true;
                     for (CommitFile commitFile : commit.getFiles()) {
                         if (commitFile.getFilename().equals(comment.getPath())) {
                             resultFile = commitFile;
@@ -723,7 +721,7 @@ public class BrowseFilter extends AppCompatActivity {
                 }
             }
 
-            if (!foundComment || mActivity.isFinishing()) {
+            if (mActivity.isFinishing()) {
                 return null;
             }
 
