@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/browser"
         android:icon="@drawable/web_site"
@@ -23,7 +23,8 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/view_raw"
-        android:title="@string/raw"
         android:checkable="true"
+        android:title="@string/raw"
+        android:visible="false"
         app:showAsAction="never" />
 </menu>

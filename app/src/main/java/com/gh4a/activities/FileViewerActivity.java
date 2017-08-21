@@ -236,11 +236,10 @@ public class FileViewerActivity extends WebViewerActivity
         if (FileUtils.isImage(mPath) || (isMarkdown && !mViewRawText)) {
             menu.removeItem(R.id.wrap);
         }
-        MenuItem viewRawItem = menu.findItem(R.id.view_raw);
         if (isMarkdown) {
+            MenuItem viewRawItem = menu.findItem(R.id.view_raw);
             viewRawItem.setChecked(mViewRawText);
-        } else {
-            viewRawItem.setVisible(false);
+            viewRawItem.setVisible(true);
         }
 
         MenuItem item = menu.add(0, MENU_ITEM_HISTORY, Menu.NONE, R.string.history);
