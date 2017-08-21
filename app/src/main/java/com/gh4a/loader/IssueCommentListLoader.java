@@ -27,7 +27,7 @@ public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
         IssueEvent.TYPE_REFERENCED, IssueEvent.TYPE_ASSIGNED, IssueEvent.TYPE_UNASSIGNED,
         IssueEvent.TYPE_LABELED, IssueEvent.TYPE_UNLABELED, IssueEvent.TYPE_LOCKED,
         IssueEvent.TYPE_UNLOCKED, IssueEvent.TYPE_MILESTONED, IssueEvent.TYPE_DEMILESTONED,
-        IssueEvent.TYPE_RENAMED
+        IssueEvent.TYPE_RENAMED, IssueEvent.TYPE_HEAD_REF_DELETED, IssueEvent.TYPE_HEAD_REF_RESTORED
     );
 
     public static final Comparator<TimelineItem> TIMELINE_ITEM_COMPARATOR = new Comparator<TimelineItem>() {
