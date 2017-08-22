@@ -20,6 +20,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -436,7 +437,12 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         }
         if (mReactionMenuHelper != null) {
             mReactionMenuHelper.update();
-            getActivity().supportInvalidateOptionsMenu();
+            FragmentActivity activity = getActivity();
+            if (activity != null) {
+                // The activity could be already destroyed when this method is called because
+                // it is executed from background AsyncTask.
+                activity.supportInvalidateOptionsMenu();
+            }
         }
     }
 
