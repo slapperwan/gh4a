@@ -691,7 +691,7 @@ public class BrowseFilter extends AppCompatActivity {
         private final String mRepoOwner;
         private final String mRepoName;
         private final String mCommitSha;
-        private IntentUtils.InitialCommentMarker mMarker;
+        private final IntentUtils.InitialCommentMarker mMarker;
 
         public CommitCommentLoadTask(FragmentActivity activity, String repoOwner, String repoName,
                 String commitSha, IntentUtils.InitialCommentMarker marker) {
