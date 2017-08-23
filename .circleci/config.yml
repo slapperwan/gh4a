@@ -10,8 +10,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Create Local Config
-          command: echo -e 'ClientId="'$CLIENT_ID'"\nClientSecret="'$CLIENT_SECRET'"' > gradle.properties
+          name: Copy gradle.properties
+          command: cp .circleci/gradle.properties.build gradle.properties
       # Download and cache dependencies
       - restore_cache:
           key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}-{{ checksum  "github-api/build.gradle" }}
