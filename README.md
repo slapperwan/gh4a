@@ -59,7 +59,7 @@ Main features
 
 How to Build Octodroid
 ----------------------
-- Ensure Android SDK platform version 24 and build-tools version 24.0.0 are installed
+- Ensure Android SDK platform version 26 and build-tools version 26.0.1 are installed
 - Register an application for your OctoDroid usage under your [GitHub settings](https://github.com/settings/developers)
   * naming is up to you
   * callback URL must be gh4a://oauth
