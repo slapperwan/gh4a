@@ -423,11 +423,10 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         boolean isRightLine = Boolean.parseBoolean(uri.getQueryParameter("isRightLine"));
         String lineText = mDiffLines[line];
         String idParam = uri.getQueryParameter("id");
-        boolean isComment = idParam != null;
-        long id = isComment ? Long.parseLong(idParam) : 0L;
+        long id = idParam != null ? Long.parseLong(idParam) : 0L;
 
         CommentActionPopup p = new CommentActionPopup(id, line, lineText, leftLine, rightLine,
-                mLastTouchDown.x, mLastTouchDown.y, isComment, isRightLine);
+                mLastTouchDown.x, mLastTouchDown.y, isRightLine);
         p.show();
     }
 
@@ -460,8 +459,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
 
         public CommentActionPopup(long id, int position, String lineText,
-                int leftLine, int rightLine, int x, int y, boolean isComment,
-                boolean isRightLine) {
+                int leftLine, int rightLine, int x, int y, boolean isRightLine) {
             super(DiffViewerActivity.this, findViewById(R.id.popup_helper));
 
             mId = id;
@@ -476,15 +474,15 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             String ownLogin = Gh4Application.get().getAuthLogin();
 
             getMenuInflater().inflate(R.menu.commit_comment_actions, menu);
-            if (!isComment || !canReply()) {
+            if (id == 0 || !canReply()) {
                 menu.removeItem(R.id.reply);
             }
-            if (!isComment || !ApiHelpers.loginEquals(comment.comment.getUser(), ownLogin)) {
+            if (id == 0|| !ApiHelpers.loginEquals(comment.comment.getUser(), ownLogin)) {
                 menu.removeItem(R.id.edit);
                 menu.removeItem(R.id.delete);
             }
 
-            if (isComment) {
+            if (id != 0) {
                 Menu reactionMenu = menu.findItem(R.id.react).getSubMenu();
                 getMenuInflater().inflate(R.menu.reaction_menu, reactionMenu);
 
