@@ -99,16 +99,16 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            tvSha = (TextView) view.findViewById(R.id.tv_sha);
+            tvSha = view.findViewById(R.id.tv_sha);
             tvSha.setTypeface(Typeface.MONOSPACE);
 
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvExtra = (TextView) view.findViewById(R.id.tv_extra);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            tvComments = (TextView) view.findViewById(R.id.tv_comments);
+            tvDesc = view.findViewById(R.id.tv_desc);
+            tvExtra = view.findViewById(R.id.tv_extra);
+            tvTimestamp = view.findViewById(R.id.tv_timestamp);
+            tvComments = view.findViewById(R.id.tv_comments);
 
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            ivDescriptionIndicator = (ImageView) view.findViewById(R.id.iv_description_indicator);
+            ivGravatar = view.findViewById(R.id.iv_gravatar);
+            ivDescriptionIndicator = view.findViewById(R.id.iv_description_indicator);
         }
 
         private final ImageView ivGravatar;

@@ -72,9 +72,9 @@ class EventViewHolder
         mRepoName = repoName;
         mIsPullRequest = isPullRequest;
 
-        mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
-        mEventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
-        mMessageView = (StyleableTextView) itemView.findViewById(R.id.tv_message);
+        mAvatarView = itemView.findViewById(R.id.iv_gravatar);
+        mEventIconView = itemView.findViewById(R.id.iv_event_icon);
+        mMessageView = itemView.findViewById(R.id.tv_message);
         mMessageView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         mAvatarContainer = itemView.findViewById(R.id.avatar_container);
         mAvatarContainer.setOnClickListener(this);

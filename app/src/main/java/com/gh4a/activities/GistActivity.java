@@ -121,16 +121,16 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
             getSupportActionBar().setSubtitle(gist.getOwner().getLogin());
         }
 
-        TextView tvDesc = (TextView) findViewById(R.id.tv_desc);
+        TextView tvDesc = findViewById(R.id.tv_desc);
         tvDesc.setText(TextUtils.isEmpty(gist.getDescription())
                 ? getString(R.string.gist_no_description) : gist.getDescription());
 
-        TextView tvCreatedAt = (TextView) findViewById(R.id.tv_created_at);
+        TextView tvCreatedAt = findViewById(R.id.tv_created_at);
         tvCreatedAt.setText(StringUtils.formatRelativeTime(this, gist.getCreatedAt(), true));
 
         Map<String, GistFile> files = gist.getFiles();
         if (files != null && !files.isEmpty()) {
-            ViewGroup container = (ViewGroup) findViewById(R.id.file_container);
+            ViewGroup container = findViewById(R.id.file_container);
             LayoutInflater inflater = getLayoutInflater();
 
             container.removeAllViews();

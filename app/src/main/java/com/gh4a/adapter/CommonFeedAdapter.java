@@ -94,11 +94,11 @@ public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewH
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvExtra = (TextView) view.findViewById(R.id.tv_extra);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            ivGravatar = view.findViewById(R.id.iv_gravatar);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvDesc = view.findViewById(R.id.tv_desc);
+            tvExtra = view.findViewById(R.id.tv_extra);
+            tvTimestamp = view.findViewById(R.id.tv_timestamp);
         }
 
         private final ImageView ivGravatar;

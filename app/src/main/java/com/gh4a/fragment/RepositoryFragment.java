@@ -80,7 +80,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         }
         @Override
         protected void onResultReady(String result) {
-            TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
+            TextView readmeView = mContentView.findViewById(R.id.readme);
             View progress = mContentView.findViewById(R.id.pb_readme);
             AsyncTaskCompat.executeParallel(new FillReadmeTask(
                     mRepository.getId(), readmeView, progress, mImageGetter), result);
@@ -99,10 +99,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
             v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
 
-            TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
+            TextView tvIssuesCount = mContentView.findViewById(R.id.tv_issues_count);
             tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues() - result));
 
-            TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
+            TextView tvPullRequestsCountView = v.findViewById(R.id.tv_pull_requests_count);
             tvPullRequestsCountView.setText(String.valueOf(result));
         }
     };
@@ -176,7 +176,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     private void fillData() {
-        TextView tvRepoName = (TextView) mContentView.findViewById(R.id.tv_repo_name);
+        TextView tvRepoName = mContentView.findViewById(R.id.tv_repo_name);
         SpannableStringBuilder repoName = new SpannableStringBuilder();
         repoName.append(mRepository.getOwner().getLogin());
         repoName.append("/");
@@ -190,7 +190,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         tvRepoName.setText(repoName);
         tvRepoName.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
-        TextView tvParentRepo = (TextView) mContentView.findViewById(R.id.tv_parent);
+        TextView tvParentRepo = mContentView.findViewById(R.id.tv_parent);
         if (mRepository.isFork() && mRepository.getParent() != null) {
             Repository parent = mRepository.getParent();
             tvParentRepo.setVisibility(View.VISIBLE);
@@ -220,13 +220,13 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         updateClickableLabel(R.id.tv_downloads_label, mRepository.isHasDownloads());
         updateClickableLabel(R.id.tv_wiki_label, mRepository.isHasWiki());
 
-        TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
+        TextView tvStargazersCount = mContentView.findViewById(R.id.tv_stargazers_count);
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
 
-        TextView tvForksCount = (TextView) mContentView.findViewById(R.id.tv_forks_count);
+        TextView tvForksCount = mContentView.findViewById(R.id.tv_forks_count);
         tvForksCount.setText(String.valueOf(mRepository.getForks()));
 
-        LinearLayout llIssues = (LinearLayout) mContentView.findViewById(R.id.cell_issues);
+        LinearLayout llIssues = mContentView.findViewById(R.id.cell_issues);
 
         if (mRepository.isHasIssues()) {
             llIssues.setVisibility(View.VISIBLE);
@@ -252,7 +252,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     private void fillTextView(int id, int stringId, String text) {
-        TextView view = (TextView) mContentView.findViewById(id);
+        TextView view = mContentView.findViewById(id);
 
         if (!StringUtils.isBlank(text)) {
             if (stringId != 0) {
@@ -273,7 +273,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             mRepository.setWatchers(mRepository.getWatchers() - 1);
         }
 
-        TextView tvStargazersCount = (TextView) mContentView.findViewById(R.id.tv_stargazers_count);
+        TextView tvStargazersCount = mContentView.findViewById(R.id.tv_stargazers_count);
         tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
     }
 

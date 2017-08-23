@@ -80,16 +80,16 @@ class ReviewViewHolder
         mDisplayReviewDetails = displayReviewDetails;
         mCallback = callback;
 
-        mAvatarView = (ImageView) itemView.findViewById(R.id.iv_gravatar);
-        mMessageView = (StyleableTextView) itemView.findViewById(R.id.tv_message);
-        mBodyView = (TextView) itemView.findViewById(R.id.tv_desc);
-        mShowDetailsButton = (Button) itemView.findViewById(R.id.btn_show_details);
+        mAvatarView = itemView.findViewById(R.id.iv_gravatar);
+        mMessageView = itemView.findViewById(R.id.tv_message);
+        mBodyView = itemView.findViewById(R.id.tv_desc);
+        mShowDetailsButton = itemView.findViewById(R.id.btn_show_details);
         mShowDetailsButton.setOnClickListener(this);
         mAvatarContainer = itemView.findViewById(R.id.avatar_container);
         mAvatarContainer.setOnClickListener(this);
-        ivMenu = (ImageView) itemView.findViewById(R.id.iv_menu);
+        ivMenu = itemView.findViewById(R.id.iv_menu);
         ivMenu.setOnClickListener(this);
-        mDetailsContainer = (ViewGroup) itemView.findViewById(R.id.details_container);
+        mDetailsContainer = itemView.findViewById(R.id.details_container);
         mDetailsDivider = itemView.findViewById(R.id.details_container_divider);
         mDetailsHeader = itemView.findViewById(R.id.details_container_header);
 
@@ -97,7 +97,7 @@ class ReviewViewHolder
         mPopupMenu.getMenuInflater().inflate(R.menu.review_menu, mPopupMenu.getMenu());
         mPopupMenu.setOnMenuItemClickListener(this);
 
-        mEventIconView = (ImageView) itemView.findViewById(R.id.iv_event_icon);
+        mEventIconView = itemView.findViewById(R.id.iv_event_icon);
         mQuoteActionModeCallback = new UiUtils.QuoteActionModeCallback(mBodyView) {
             @Override
             public void onTextQuoted(CharSequence text) {
@@ -166,7 +166,7 @@ class ReviewViewHolder
 
             for (Map.Entry<String, FileDetails> detailsEntry : files.entrySet()) {
                 FileDetails fileDetails = detailsEntry.getValue();
-                TextView tvFile = (TextView) fileDetails.row.findViewById(R.id.tv_file);
+                TextView tvFile = fileDetails.row.findViewById(R.id.tv_file);
                 tvFile.setText("• " + detailsEntry.getKey());
 
                 if (fileDetails.isOutdated) {
@@ -176,7 +176,7 @@ class ReviewViewHolder
                 }
 
                 TextView tvFileComments =
-                        (TextView) fileDetails.row.findViewById(R.id.tv_file_comments);
+                        fileDetails.row.findViewById(R.id.tv_file_comments);
                 tvFileComments.setText(String.valueOf(fileDetails.count));
 
                 fileDetails.row.setVisibility(View.VISIBLE);

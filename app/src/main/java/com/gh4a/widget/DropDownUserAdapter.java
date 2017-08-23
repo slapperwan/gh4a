@@ -183,8 +183,8 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
 
     private static class ViewHolder {
         private ViewHolder(View view) {
-            ivUser = (ImageView) view.findViewById(R.id.iv_user);
-            tvUser = (TextView) view.findViewById(R.id.tv_user);
+            ivUser = view.findViewById(R.id.iv_user);
+            tvUser = view.findViewById(R.id.tv_user);
         }
 
         private final ImageView ivUser;

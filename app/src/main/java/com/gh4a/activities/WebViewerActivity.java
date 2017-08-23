@@ -185,7 +185,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     private void setupWebView() {
-        mWebView = (WebView) findViewById(R.id.web_view);
+        mWebView = findViewById(R.id.web_view);
 
         WebSettings s = mWebView.getSettings();
         initWebViewSettings(s);

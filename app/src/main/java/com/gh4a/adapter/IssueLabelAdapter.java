@@ -76,7 +76,7 @@ public class IssueLabelAdapter extends
         Typeface labelTf = TypefaceCache.getTypeface(holder.label.getTypefaceValue());
         holder.editor.setTypeface(labelTf);
 
-        ViewGroup colors = (ViewGroup) v.findViewById(R.id.colors);
+        ViewGroup colors = v.findViewById(R.id.colors);
         int count = colors.getChildCount();
         for (int i = 0; i < count; i++) {
             View child = colors.getChildAt(i);
@@ -147,11 +147,11 @@ public class IssueLabelAdapter extends
         private ViewHolder(View view) {
             super(view);
             color = view.findViewById(R.id.view_color);
-            label = (StyleableTextView) view.findViewById(R.id.tv_title);
-            editor = (EditText) view.findViewById(R.id.et_label);
+            label = view.findViewById(R.id.tv_title);
+            editor = view.findViewById(R.id.et_label);
             collapsedContainer = view.findViewById(R.id.collapsed);
             expandedContainer = view.findViewById(R.id.expanded);
-            customColorButton = (TextView) view.findViewById(R.id.custom);
+            customColorButton = view.findViewById(R.id.custom);
         }
 
         private EditableLabel lastAssignedLabel;

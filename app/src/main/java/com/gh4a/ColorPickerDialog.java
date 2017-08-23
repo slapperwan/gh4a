@@ -33,7 +33,7 @@ public class ColorPickerDialog extends AlertDialog {
 
         View view = LayoutInflater.from(context).inflate(R.layout.color_picker_dialog, null);
 
-        mColorPicker = (ColorPicker) view.findViewById(R.id.color_picker);
+        mColorPicker = view.findViewById(R.id.color_picker);
         mColorPicker.addSaturationBar((SaturationBar) view.findViewById(R.id.saturation));
         mColorPicker.addValueBar((ValueBar) view.findViewById(R.id.value));
         setColor(color);

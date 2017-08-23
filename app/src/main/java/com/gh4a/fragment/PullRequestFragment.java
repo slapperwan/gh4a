@@ -127,10 +127,10 @@ public class PullRequestFragment extends IssueFragmentBase {
         View branchGroup = headerView.findViewById(R.id.pr_container);
         branchGroup.setVisibility(View.VISIBLE);
 
-        StyleableTextView fromBranch = (StyleableTextView) branchGroup.findViewById(R.id.tv_pr_from);
+        StyleableTextView fromBranch = branchGroup.findViewById(R.id.tv_pr_from);
         formatMarkerText(fromBranch, R.string.pull_request_from, mPullRequest.getHead());
 
-        StyleableTextView toBranch = (StyleableTextView) branchGroup.findViewById(R.id.tv_pr_to);
+        StyleableTextView toBranch = branchGroup.findViewById(R.id.tv_pr_to);
         formatMarkerText(toBranch, R.string.pull_request_to, mPullRequest.getBase());
     }
 
@@ -200,14 +200,14 @@ public class PullRequestFragment extends IssueFragmentBase {
             statusLabelResId = R.string.pull_merge_status_unknown;
         }
 
-        ImageView statusIcon = (ImageView) mListHeaderView.findViewById(R.id.iv_merge_status_icon);
+        ImageView statusIcon = mListHeaderView.findViewById(R.id.iv_merge_status_icon);
         statusIcon.setImageResource(UiUtils.resolveDrawable(getActivity(),
                 statusIconDrawableAttrId));
 
-        TextView statusLabel = (TextView) mListHeaderView.findViewById(R.id.merge_status_label);
+        TextView statusLabel = mListHeaderView.findViewById(R.id.merge_status_label);
         statusLabel.setText(statusLabelResId);
 
-        ViewGroup statusContainer = (ViewGroup)
+        ViewGroup statusContainer =
                 mListHeaderView.findViewById(R.id.merge_commit_status_container);
         LayoutInflater inflater = getLayoutInflater(null);
         statusContainer.removeAllViews();
@@ -223,13 +223,13 @@ public class PullRequestFragment extends IssueFragmentBase {
             } else {
                 iconDrawableAttrId = R.attr.commitStatusUnknownIcon;
             }
-            ImageView icon = (ImageView) statusRow.findViewById(R.id.iv_status_icon);
+            ImageView icon = statusRow.findViewById(R.id.iv_status_icon);
             icon.setImageResource(UiUtils.resolveDrawable(getActivity(), iconDrawableAttrId));
 
-            TextView context = (TextView) statusRow.findViewById(R.id.tv_context);
+            TextView context = statusRow.findViewById(R.id.tv_context);
             context.setText(status.getContext());
 
-            TextView description = (TextView) statusRow.findViewById(R.id.tv_desc);
+            TextView description = statusRow.findViewById(R.id.tv_desc);
             description.setText(status.getDescription());
 
             statusContainer.addView(statusRow);

@@ -109,17 +109,17 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         View header = headerInflater.inflate(R.layout.issue_create_header, null);
         addHeaderView(header, false);
 
-        mTitleWrapper = (TextInputLayout) header.findViewById(R.id.title_wrapper);
-        mTitleView = (EditText) header.findViewById(R.id.et_title);
+        mTitleWrapper = header.findViewById(R.id.title_wrapper);
+        mTitleView = header.findViewById(R.id.et_title);
         mTitleView.setOnFocusChangeListener(this);
 
-        mDescriptionView = (EditText) findViewById(R.id.editor);
-        mDueView = (TextView) findViewById(R.id.tv_due);
+        mDescriptionView = findViewById(R.id.editor);
+        mDueView = findViewById(R.id.tv_due);
 
-        mMarkdownButtons = (MarkdownButtonsBar) findViewById(R.id.markdown_buttons);
+        mMarkdownButtons = findViewById(R.id.markdown_buttons);
         mMarkdownButtons.setEditText(mDescriptionView);
 
-        MarkdownPreviewWebView preview = (MarkdownPreviewWebView) findViewById(R.id.preview);
+        MarkdownPreviewWebView preview = findViewById(R.id.preview);
         preview.setEditText(mDescriptionView);
 
         CoordinatorLayout rootLayout = getRootLayout();

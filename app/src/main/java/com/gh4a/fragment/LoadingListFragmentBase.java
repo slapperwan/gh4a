@@ -38,15 +38,15 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
     protected View onCreateContentView(LayoutInflater inflater, ViewGroup parent) {
         View view = inflater.inflate(R.layout.list_fragment_content, parent, false);
 
-        mEmptyViewContainer = (NestedScrollView) view.findViewById(R.id.empty_view_container);
-        TextView emptyView = (TextView) view.findViewById(android.R.id.empty);
+        mEmptyViewContainer = view.findViewById(R.id.empty_view_container);
+        TextView emptyView = view.findViewById(android.R.id.empty);
         int emptyTextResId = getEmptyTextResId();
         if (emptyTextResId != 0) {
             emptyView.setText(emptyTextResId);
         }
 
         mLayoutManager = new LinearLayoutManager(view.getContext());
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.list);
+        mRecyclerView = view.findViewById(R.id.list);
         mRecyclerView.setLayoutManager(mLayoutManager);
         onRecyclerViewInflated(mRecyclerView, inflater);
         if (hasDividers()) {
@@ -57,7 +57,7 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
                     UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
         }
 
-        mFastScroller = (RecyclerFastScroller) view.findViewById(R.id.fast_scroller);
+        mFastScroller = view.findViewById(R.id.fast_scroller);
         mFastScroller.attachRecyclerView(mRecyclerView);
         mFastScroller.setOnHandleTouchListener(new View.OnTouchListener() {
             @Override

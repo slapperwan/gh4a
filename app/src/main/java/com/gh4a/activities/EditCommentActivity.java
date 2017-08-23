@@ -42,11 +42,11 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
 
         setContentView(R.layout.comment_editor);
 
-        mRootLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-        mEditorSheet = (EditorBottomSheet) findViewById(R.id.bottom_sheet);
+        mRootLayout = findViewById(R.id.coordinator_layout);
+        mEditorSheet = findViewById(R.id.bottom_sheet);
 
         if (getIntent().getLongExtra("id", 0L) != 0L) {
-            ImageView saveButton = (ImageView) mEditorSheet.findViewById(R.id.send_button);
+            ImageView saveButton = mEditorSheet.findViewById(R.id.send_button);
             saveButton.setImageResource(UiUtils.resolveDrawable(this, R.attr.saveIcon));
         }
 

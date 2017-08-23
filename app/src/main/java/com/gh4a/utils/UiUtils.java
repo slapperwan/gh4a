@@ -229,7 +229,7 @@ public class UiUtils {
 
     public static Dialog createProgressDialog(Context context, @StringRes int messageResId) {
         View content = LayoutInflater.from(context).inflate(R.layout.progress_dialog, null);
-        TextView message = (TextView) content.findViewById(R.id.message);
+        TextView message = content.findViewById(R.id.message);
 
         message.setText(messageResId);
         return new AlertDialog.Builder(context)

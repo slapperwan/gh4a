@@ -76,11 +76,11 @@ public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.Vi
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvOpen = (TextView) view.findViewById(R.id.tv_open);
-            tvClosed = (TextView) view.findViewById(R.id.tv_closed);
-            tvDue = (TextView) view.findViewById(R.id.tv_due);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvDesc = view.findViewById(R.id.tv_desc);
+            tvOpen = view.findViewById(R.id.tv_open);
+            tvClosed = view.findViewById(R.id.tv_closed);
+            tvDue = view.findViewById(R.id.tv_due);
         }
 
         private final TextView tvTitle;

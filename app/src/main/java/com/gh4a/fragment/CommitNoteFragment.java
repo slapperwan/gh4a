@@ -97,10 +97,10 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         View listContent = super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.comment_list, container, false);
 
-        FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
+        FrameLayout listContainer = v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
-        mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
+        mBottomSheet = v.findViewById(R.id.bottom_sheet);
         mBottomSheet.setCallback(this);
         mBottomSheet.setResizingView(listContainer);
         mBottomSheet.setListener(this);

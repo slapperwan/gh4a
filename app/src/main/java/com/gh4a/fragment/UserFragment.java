@@ -139,10 +139,10 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     private void fillData() {
-        ImageView gravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
+        ImageView gravatar = mContentView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mUser);
 
-        TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
+        TextView tvFollowersCount = mContentView.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
 
         View llOrgMembers = mContentView.findViewById(R.id.cell_org_members);
@@ -158,7 +158,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         mContentView.findViewById(R.id.cell_repos).setOnClickListener(this);
 
-        TextView tvReposCount = (TextView) mContentView.findViewById(R.id.tv_repos_count);
+        TextView tvReposCount = mContentView.findViewById(R.id.tv_repos_count);
         if (ApiHelpers.loginEquals(mUserLogin, Gh4Application.get().getAuthLogin())) {
             tvReposCount.setText(String.valueOf(mUser.getTotalPrivateRepos() + mUser.getPublicRepos()));
         } else {
@@ -171,7 +171,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         //hide following if organization
         fillCountIfUser(R.id.cell_following, R.id.tv_following_count, mUser.getFollowing());
 
-        TextView tvName = (TextView) mContentView.findViewById(R.id.tv_name);
+        TextView tvName = mContentView.findViewById(R.id.tv_name);
         String name = StringUtils.isBlank(mUser.getName()) ? mUser.getLogin() : mUser.getName();
         if (ApiHelpers.UserType.ORG.equals(mUser.getType())) {
             tvName.setText(getString(R.string.org_user_template, name));
@@ -179,7 +179,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             tvName.setText(name);
         }
 
-        TextView tvCreated = (TextView) mContentView.findViewById(R.id.tv_created_at);
+        TextView tvCreated = mContentView.findViewById(R.id.tv_created_at);
         if (mUser.getCreatedAt() != null) {
             tvCreated.setText(getString(R.string.user_created_at,
                     DateFormat.getMediumDateFormat(getActivity()).format(mUser.getCreatedAt())));
@@ -204,7 +204,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     private void fillCountIfUser(int layoutId, int countId, int count) {
         View layout = mContentView.findViewById(layoutId);
         if (ApiHelpers.UserType.USER.equals(mUser.getType())) {
-            TextView countView = (TextView) mContentView.findViewById(countId);
+            TextView countView = mContentView.findViewById(countId);
             countView.setText(String.valueOf(count));
             layout.setOnClickListener(this);
         } else {
@@ -213,7 +213,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     private void fillTextView(int id, String text) {
-        TextView view = (TextView) mContentView.findViewById(id);
+        TextView view = mContentView.findViewById(id);
         if (!StringUtils.isBlank(text)) {
             view.setText(text);
             view.setVisibility(View.VISIBLE);
@@ -253,7 +253,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     private void fillTopRepos(Collection<Repository> topRepos) {
-        LinearLayout ll = (LinearLayout) mContentView.findViewById(R.id.ll_top_repos);
+        LinearLayout ll = mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
 
         LayoutInflater inflater = getLayoutInflater(null);
@@ -264,10 +264,10 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                 rowView.setOnClickListener(this);
                 rowView.setTag(repo);
 
-                TextView tvTitle = (TextView) rowView.findViewById(R.id.tv_title);
+                TextView tvTitle = rowView.findViewById(R.id.tv_title);
                 tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
 
-                TextView tvDesc = (TextView) rowView.findViewById(R.id.tv_desc);
+                TextView tvDesc = rowView.findViewById(R.id.tv_desc);
                 if (!StringUtils.isBlank(repo.getDescription())) {
                     tvDesc.setVisibility(View.VISIBLE);
                     tvDesc.setText(repo.getDescription());
@@ -275,10 +275,10 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                     tvDesc.setVisibility(View.GONE);
                 }
 
-                TextView tvForks = (TextView) rowView.findViewById(R.id.tv_forks);
+                TextView tvForks = rowView.findViewById(R.id.tv_forks);
                 tvForks.setText(String.valueOf(repo.getForks()));
 
-                TextView tvStars = (TextView) rowView.findViewById(R.id.tv_stars);
+                TextView tvStars = rowView.findViewById(R.id.tv_stars);
                 tvStars.setText(String.valueOf(repo.getWatchers()));
 
                 ll.addView(rowView);
@@ -300,8 +300,8 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     private void fillOrganizations(List<User> organizations) {
-        ViewGroup llOrgs = (ViewGroup) mContentView.findViewById(R.id.ll_orgs);
-        LinearLayout llOrg = (LinearLayout) mContentView.findViewById(R.id.ll_org);
+        ViewGroup llOrgs = mContentView.findViewById(R.id.ll_orgs);
+        LinearLayout llOrg = mContentView.findViewById(R.id.ll_org);
         int count = organizations != null ? organizations.size() : 0;
         LayoutInflater inflater = getLayoutInflater(null);
 
@@ -315,10 +315,10 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             rowView.setOnClickListener(this);
             rowView.setTag(org);
 
-            ImageView avatar = (ImageView) rowView.findViewById(R.id.iv_gravatar);
+            ImageView avatar = rowView.findViewById(R.id.iv_gravatar);
             AvatarHandler.assignAvatar(avatar, org);
 
-            TextView nameView = (TextView) rowView.findViewById(R.id.tv_title);
+            TextView nameView = rowView.findViewById(R.id.tv_title);
             nameView.setText(org.getLogin());
 
             llOrg.addView(rowView);
@@ -335,7 +335,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         } else {
             mUser.setFollowers(mUser.getFollowers() - 1);
         }
-        TextView tvFollowersCount = (TextView) mContentView.findViewById(R.id.tv_followers_count);
+        TextView tvFollowersCount = mContentView.findViewById(R.id.tv_followers_count);
         tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
     }
 }

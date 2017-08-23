@@ -22,7 +22,7 @@ class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timelin
 
         mCallback = callback;
 
-        mReplyButton = (Button) itemView.findViewById(R.id.btn_reply);
+        mReplyButton = itemView.findViewById(R.id.btn_reply);
         mReplyButton.setOnClickListener(this);
     }
 

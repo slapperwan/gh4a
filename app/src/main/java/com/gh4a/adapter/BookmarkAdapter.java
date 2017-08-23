@@ -189,9 +189,9 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         public ViewHolder(View view, OnItemInteractListener itemInteractListener) {
             super(view);
             mItemInteractListener = itemInteractListener;
-            mIcon = (ImageView) view.findViewById(R.id.iv_icon);
-            mTitle = (TextView) view.findViewById(R.id.tv_title);
-            mExtra = (TextView) view.findViewById(R.id.tv_extra);
+            mIcon = view.findViewById(R.id.iv_icon);
+            mTitle = view.findViewById(R.id.tv_title);
+            mExtra = view.findViewById(R.id.tv_extra);
             view.findViewById(R.id.iv_drag_handle).setOnTouchListener(this);
         }
 

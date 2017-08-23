@@ -376,7 +376,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     private void updateEmptyText(@StringRes int emptyTextResId) {
-        TextView emptyView = (TextView) getView().findViewById(android.R.id.empty);
+        TextView emptyView = getView().findViewById(android.R.id.empty);
         emptyView.setText(emptyTextResId);
     }
 
@@ -467,7 +467,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
                 convertView = mInflater.inflate(R.layout.search_type_small, null);
             }
 
-            ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
+            ImageView icon = convertView.findViewById(R.id.icon);
             icon.setImageResource(mResources[position][1]);
 
             return convertView;
@@ -479,10 +479,10 @@ public class SearchFragment extends LoadingListFragmentBase implements
                 convertView = mPopupInflater.inflate(R.layout.search_type_popup, null);
             }
 
-            ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
+            ImageView icon = convertView.findViewById(R.id.icon);
             icon.setImageResource(mResources[position][3]);
 
-            TextView label = (TextView) convertView.findViewById(R.id.label);
+            TextView label = convertView.findViewById(R.id.label);
             label.setText(mResources[position][0]);
 
             return convertView;

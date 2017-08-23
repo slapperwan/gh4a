@@ -525,8 +525,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.row_branch, parent, false);
             }
-            ImageView icon = (ImageView) convertView.findViewById(R.id.icon);
-            TextView title = (TextView) convertView.findViewById(R.id.title);
+            ImageView icon = convertView.findViewById(R.id.icon);
+            TextView title = convertView.findViewById(R.id.title);
 
             icon.setImageResource(mItems.get(position) instanceof RepositoryTag
                     ? mTagDrawableResId : mBranchDrawableResId);
