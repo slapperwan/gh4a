@@ -68,7 +68,7 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
                     holder.matchesContainer.addView(row);
                 }
 
-                TextView tvMatch = (TextView) row.findViewById(R.id.tv_match);
+                TextView tvMatch = row.findViewById(R.id.tv_match);
                 tvMatch.setOnClickListener(this);
                 tvMatch.setText(builder);
                 tvMatch.setTag(result);
@@ -98,9 +98,9 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvRepo = (TextView) view.findViewById(R.id.tv_repo);
-            matchesContainer = (ViewGroup) view.findViewById(R.id.matches_container);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvRepo = view.findViewById(R.id.tv_repo);
+            matchesContainer = view.findViewById(R.id.matches_container);
         }
 
         private final TextView tvTitle;

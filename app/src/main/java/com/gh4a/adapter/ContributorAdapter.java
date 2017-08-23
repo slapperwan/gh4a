@@ -57,9 +57,9 @@ public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdap
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvExtra = (TextView) view.findViewById(R.id.tv_extra);
+            ivGravatar = view.findViewById(R.id.iv_gravatar);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvExtra = view.findViewById(R.id.tv_extra);
         }
 
         private final TextView tvTitle;

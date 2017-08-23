@@ -405,7 +405,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
 
         final View editorNotice = view.findViewById(R.id.notice);
-        final EditText editor = (EditText) view.findViewById(R.id.et_commit_message);
+        final EditText editor = view.findViewById(R.id.et_commit_message);
         editor.setText(mPullRequest.getTitle());
 
         final ArrayAdapter<MergeMethodDesc> adapter = new ArrayAdapter<>(this,
@@ -417,7 +417,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         adapter.add(new MergeMethodDesc(R.string.pull_merge_method_rebase,
                 PullRequestService.MERGE_METHOD_REBASE));
 
-        final Spinner mergeMethod = (Spinner) view.findViewById(R.id.merge_method);
+        final Spinner mergeMethod = view.findViewById(R.id.merge_method);
         mergeMethod.setAdapter(adapter);
         mergeMethod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -493,10 +493,10 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             };
         }
 
-        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
+        TextView tvState = mHeader.findViewById(R.id.tv_state);
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
 
-        TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
+        TextView tvTitle = mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mPullRequest.getTitle());
 
         mHeader.setVisibility(View.VISIBLE);

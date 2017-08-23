@@ -549,7 +549,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 // to be visible, so there's nothing to do
                 return;
             }
-            ViewStub errorStub = (ViewStub) findViewById(R.id.error_stub);
+            ViewStub errorStub = findViewById(R.id.error_stub);
             error = errorStub.inflate();
 
             error.findViewById(R.id.retry_button).setOnClickListener(new View.OnClickListener() {
@@ -606,7 +606,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private void setupSwipeToRefresh() {
-        mSwipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        mSwipeLayout = findViewById(R.id.swipe_container);
         if (canSwipeToRefresh()) {
             mSwipeLayout.setOnRefreshListener(this);
             mSwipeLayout.setColorSchemeColors(
@@ -628,12 +628,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private void setupNavigationDrawer() {
-        NavigationView leftDrawer = (NavigationView) findViewById(R.id.left_drawer);
+        NavigationView leftDrawer = findViewById(R.id.left_drawer);
         applyHighlightColor(leftDrawer);
-        mRightDrawer = (NavigationView) findViewById(R.id.right_drawer);
+        mRightDrawer = findViewById(R.id.right_drawer);
         applyHighlightColor(mRightDrawer);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_container);
+        mDrawerLayout = findViewById(R.id.drawer_container);
         mDrawerLayout.addDrawerListener(new DrawerLayout.DrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
@@ -652,7 +652,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
             }
         });
 
-        Toolbar toolBar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolBar = findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
 
         int drawerMenuResId = getLeftNavigationDrawerMenuResource();
@@ -761,17 +761,17 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (mContentContainer != null && mProgress != null) {
             return;
         }
-        mProgress = (SmoothProgressBar) findViewById(R.id.progress);
+        mProgress = findViewById(R.id.progress);
         mProgressColors[0] = UiUtils.resolveColor(this, R.attr.colorPrimary);
         mProgressColors[1] = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
         mProgress.setSmoothProgressDrawableColors(mProgressColors);
 
-        mCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-        mContentContainer = (ViewGroup) findViewById(R.id.content_container);
-        mEmptyView = (TextView) findViewById(android.R.id.empty);
+        mCoordinatorLayout = findViewById(R.id.coordinator_layout);
+        mContentContainer = findViewById(R.id.content_container);
+        mEmptyView = findViewById(android.R.id.empty);
 
-        mHeader = (AppBarLayout) findViewById(R.id.header);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mHeader = findViewById(R.id.header);
+        mToolbar = findViewById(R.id.toolbar);
 
         mHeaderBehavior = new ToggleableAppBarLayoutBehavior();
         CoordinatorLayout.LayoutParams lp =

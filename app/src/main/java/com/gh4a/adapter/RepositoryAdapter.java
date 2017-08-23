@@ -77,14 +77,14 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
             View.OnTouchListener {
         private ViewHolder(View view) {
             super(view);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvLanguage = (TextView) view.findViewById(R.id.tv_language);
-            tvForks = (TextView) view.findViewById(R.id.tv_forks);
-            tvStars = (TextView) view.findViewById(R.id.tv_stars);
-            tvSize = (TextView) view.findViewById(R.id.tv_size);
-            tvPrivate = (TextView) view.findViewById(R.id.tv_private);
-            tvFork = (TextView) view.findViewById(R.id.tv_fork);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvDesc = view.findViewById(R.id.tv_desc);
+            tvLanguage = view.findViewById(R.id.tv_language);
+            tvForks = view.findViewById(R.id.tv_forks);
+            tvStars = view.findViewById(R.id.tv_stars);
+            tvSize = view.findViewById(R.id.tv_size);
+            tvPrivate = view.findViewById(R.id.tv_private);
+            tvFork = view.findViewById(R.id.tv_fork);
 
             view.findViewById(R.id.attributes).setOnClickListener(this);
             view.findViewById(R.id.scrollView).setOnTouchListener(this);

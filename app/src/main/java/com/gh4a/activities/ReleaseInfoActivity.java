@@ -199,17 +199,17 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     private void fillData() {
-        ImageView gravatar = (ImageView) findViewById(R.id.iv_gravatar);
+        ImageView gravatar = findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mRelease.getAuthor());
         gravatar.setOnClickListener(this);
 
-        StyleableTextView details = (StyleableTextView) findViewById(R.id.tv_releaseinfo);
+        StyleableTextView details = findViewById(R.id.tv_releaseinfo);
         String detailsText = getString(R.string.release_details,
                 ApiHelpers.getUserLogin(this, mRelease.getAuthor()),
                 StringUtils.formatRelativeTime(this, mRelease.getCreatedAt(), true));
         StringUtils.applyBoldTagsAndSetText(details, detailsText);
 
-        TextView releaseType = (TextView) findViewById(R.id.tv_releasetype);
+        TextView releaseType = findViewById(R.id.tv_releasetype);
         if (mRelease.isDraft()) {
             releaseType.setText(R.string.release_type_draft);
         } else if (mRelease.isPrerelease()) {
@@ -218,12 +218,12 @@ public class ReleaseInfoActivity extends BaseActivity implements
             releaseType.setText(R.string.release_type_final);
         }
 
-        TextView tag = (TextView) findViewById(R.id.tv_releasetag);
+        TextView tag = findViewById(R.id.tv_releasetag);
         tag.setText(getString(R.string.release_tag, mRelease.getTagName()));
         tag.setOnClickListener(this);
 
         if (mRelease.getAssets() != null && !mRelease.getAssets().isEmpty()) {
-            RecyclerView downloadsList = (RecyclerView) findViewById(R.id.download_list);
+            RecyclerView downloadsList = findViewById(R.id.download_list);
             DownloadAdapter adapter = new DownloadAdapter(this);
             adapter.addAll(mRelease.getAssets());
             adapter.setOnItemClickListener(this);
@@ -243,7 +243,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     private void fillNotes(String bodyHtml) {
-        TextView body = (TextView) findViewById(R.id.tv_release_notes);
+        TextView body = findViewById(R.id.tv_release_notes);
 
         if (!StringUtils.isBlank(bodyHtml)) {
             mImageGetter.bind(body, bodyHtml, mRelease.getId());

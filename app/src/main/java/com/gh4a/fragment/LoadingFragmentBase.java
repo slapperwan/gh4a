@@ -38,7 +38,7 @@ public abstract class LoadingFragmentBase extends Fragment implements
             Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.loading_fragment, container, false);
 
-        mContentContainer = (ViewGroup) view.findViewById(R.id.content_container);
+        mContentContainer = view.findViewById(R.id.content_container);
         mContentView = onCreateContentView(inflater, mContentContainer);
         mContentContainer.addView(mContentView);
 
@@ -49,7 +49,7 @@ public abstract class LoadingFragmentBase extends Fragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mProgress = (SmoothProgressBar) view.findViewById(R.id.progress);
+        mProgress = view.findViewById(R.id.progress);
         mProgressColors[0] = UiUtils.resolveColor(mProgress.getContext(), R.attr.colorPrimary);
         mProgressColors[1] = UiUtils.resolveColor(mProgress.getContext(), R.attr.colorPrimaryDark);
         mProgress.setSmoothProgressDrawableColors(mProgressColors);

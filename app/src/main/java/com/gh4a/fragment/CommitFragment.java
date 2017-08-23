@@ -101,7 +101,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         final Activity activity = getActivity();
         final Gh4Application app = Gh4Application.get();
 
-        ImageView ivGravatar = (ImageView) mContentView.findViewById(R.id.iv_gravatar);
+        ImageView ivGravatar = mContentView.findViewById(R.id.iv_gravatar);
         User author = mCommit.getAuthor();
         if (author != null) {
             AvatarHandler.assignAvatar(ivGravatar, author);
@@ -117,8 +117,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             ivGravatar.setTag(login);
         }
 
-        TextView tvMessage = (TextView) mContentView.findViewById(R.id.tv_message);
-        TextView tvTitle = (TextView) mContentView.findViewById(R.id.tv_title);
+        TextView tvMessage = mContentView.findViewById(R.id.tv_message);
+        TextView tvTitle = mContentView.findViewById(R.id.tv_title);
 
         String message = mCommit.getCommit().getMessage();
         int pos = message.indexOf('\n');
@@ -140,19 +140,19 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
         Commit commit = mCommit.getCommit();
 
-        TextView tvAuthor = (TextView) mContentView.findViewById(R.id.tv_author);
+        TextView tvAuthor = mContentView.findViewById(R.id.tv_author);
         tvAuthor.setText(ApiHelpers.getAuthorName(app, mCommit));
 
-        TextView tvTimestamp = (TextView) mContentView.findViewById(R.id.tv_timestamp);
+        TextView tvTimestamp = mContentView.findViewById(R.id.tv_timestamp);
         tvTimestamp.setText(StringUtils.formatRelativeTime(
                 activity, commit.getAuthor().getDate(), true));
 
         View committerContainer = mContentView.findViewById(R.id.committer);
 
         if (!ApiHelpers.authorEqualsCommitter(mCommit)) {
-            ImageView commitGravatar = (ImageView) mContentView.findViewById(R.id.iv_commit_gravatar);
+            ImageView commitGravatar = mContentView.findViewById(R.id.iv_commit_gravatar);
             StyleableTextView commitExtra =
-                    (StyleableTextView) mContentView.findViewById(R.id.tv_commit_extra);
+                    mContentView.findViewById(R.id.tv_commit_extra);
 
             AvatarHandler.assignAvatar(commitGravatar, mCommit.getCommitter());
             String committerText = getString(R.string.commit_details,
@@ -167,10 +167,10 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     }
 
     protected void fillStats(List<CommitFile> files, List<CommitComment> comments) {
-        LinearLayout llChanged = (LinearLayout) mContentView.findViewById(R.id.ll_changed);
-        LinearLayout llAdded = (LinearLayout) mContentView.findViewById(R.id.ll_added);
-        LinearLayout llRenamed = (LinearLayout) mContentView.findViewById(R.id.ll_renamed);
-        LinearLayout llDeleted = (LinearLayout) mContentView.findViewById(R.id.ll_deleted);
+        LinearLayout llChanged = mContentView.findViewById(R.id.ll_changed);
+        LinearLayout llAdded = mContentView.findViewById(R.id.ll_added);
+        LinearLayout llRenamed = mContentView.findViewById(R.id.ll_renamed);
+        LinearLayout llDeleted = mContentView.findViewById(R.id.ll_deleted);
         final LayoutInflater inflater = getLayoutInflater(null);
         int added = 0, changed = 0, renamed = 0, deleted = 0;
         int additions = 0, deletions = 0;
@@ -222,10 +222,10 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             }
 
             ViewGroup fileView = (ViewGroup) inflater.inflate(R.layout.commit_filename, parent, false);
-            TextView fileNameView = (TextView) fileView.findViewById(R.id.filename);
+            TextView fileNameView = fileView.findViewById(R.id.filename);
             fileNameView.setText(file.getFilename());
 
-            TextView statsView = (TextView) fileView.findViewById(R.id.stats);
+            TextView statsView = fileView.findViewById(R.id.stats);
             if (file.getPatch() != null) {
                 SpannableStringBuilder stats = new SpannableStringBuilder();
                 stats.append("+").append(String.valueOf(file.getAdditions()));
@@ -246,7 +246,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
                 fileView.setTag(file);
             }
             if (commentCount > 0) {
-                TextView commentView = (TextView) fileView.findViewById(R.id.comments);
+                TextView commentView = fileView.findViewById(R.id.comments);
                 commentView.setText(String.valueOf(commentCount));
                 commentView.setVisibility(View.VISIBLE);
             }
@@ -259,7 +259,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         adjustVisibility(R.id.card_renamed, renamed);
         adjustVisibility(R.id.card_deleted, deleted);
 
-        TextView tvSummary = (TextView) mContentView.findViewById(R.id.tv_desc);
+        TextView tvSummary = mContentView.findViewById(R.id.tv_desc);
         tvSummary.setText(getString(R.string.commit_summary, added + changed + renamed + deleted,
                 additions, deletions));
     }

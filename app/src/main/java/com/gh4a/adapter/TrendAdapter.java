@@ -65,10 +65,10 @@ public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvStars = (TextView) view.findViewById(R.id.tv_stars);
-            tvForks = (TextView) view.findViewById(R.id.tv_forks);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvDesc = view.findViewById(R.id.tv_desc);
+            tvStars = view.findViewById(R.id.tv_stars);
+            tvForks = view.findViewById(R.id.tv_forks);
         }
 
         private final TextView tvTitle;

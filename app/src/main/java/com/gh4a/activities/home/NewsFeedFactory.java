@@ -176,10 +176,10 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
             User user = getItem(position);
 
-            ImageView avatar = (ImageView) convertView.findViewById(R.id.iv_gravatar);
+            ImageView avatar = convertView.findViewById(R.id.iv_gravatar);
             AvatarHandler.assignAvatar(avatar, user);
 
-            TextView nameView = (TextView) convertView.findViewById(R.id.tv_title);
+            TextView nameView = convertView.findViewById(R.id.tv_title);
             nameView.setText(user.getLogin());
 
             return convertView;

@@ -238,8 +238,8 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
             super(view);
             mCallback = callback;
 
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            tvDesc = (StyleableTextView) view.findViewById(R.id.tv_desc);
+            ivGravatar = view.findViewById(R.id.iv_gravatar);
+            tvDesc = view.findViewById(R.id.tv_desc);
             tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
             tvDesc.setCustomSelectionActionModeCallback(new UiUtils.QuoteActionModeCallback(tvDesc) {
                 @Override
@@ -248,12 +248,12 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
                 }
             });
 
-            tvExtra = (StyleableTextView) view.findViewById(R.id.tv_extra);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            tvEditTimestamp = (TextView) view.findViewById(R.id.tv_edit_timestamp);
-            ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
+            tvExtra = view.findViewById(R.id.tv_extra);
+            tvTimestamp = view.findViewById(R.id.tv_timestamp);
+            tvEditTimestamp = view.findViewById(R.id.tv_edit_timestamp);
+            ivMenu = view.findViewById(R.id.iv_menu);
             ivMenu.setOnClickListener(this);
-            reactions = (ReactionBar) view.findViewById(R.id.reactions);
+            reactions = view.findViewById(R.id.reactions);
             reactions.setCallback(reactionCallback, this);
             reactions.setDetailsCache(reactionDetailsCache);
 

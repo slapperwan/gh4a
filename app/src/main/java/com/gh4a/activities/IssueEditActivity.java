@@ -197,16 +197,16 @@ public class IssueEditActivity extends BasePagerActivity implements
         View header = headerInflater.inflate(R.layout.issue_create_header, null);
         addHeaderView(header, false);
 
-        mTitleWrapper = (TextInputLayout) header.findViewById(R.id.title_wrapper);
-        mTitleView = (EditText) header.findViewById(R.id.et_title);
+        mTitleWrapper = header.findViewById(R.id.title_wrapper);
+        mTitleView = header.findViewById(R.id.et_title);
         mTitleView.setOnFocusChangeListener(this);
 
-        mDescView = (EditText) findViewById(R.id.editor);
-        mSelectedMilestoneView = (TextView) findViewById(R.id.tv_milestone);
-        mSelectedAssigneeContainer = (ViewGroup) findViewById(R.id.assignee_list);
-        mLabelsView = (TextView) findViewById(R.id.tv_labels);
+        mDescView = findViewById(R.id.editor);
+        mSelectedMilestoneView = findViewById(R.id.tv_milestone);
+        mSelectedAssigneeContainer = findViewById(R.id.assignee_list);
+        mLabelsView = findViewById(R.id.tv_labels);
 
-        mMarkdownButtons = (MarkdownButtonsBar) findViewById(R.id.markdown_buttons);
+        mMarkdownButtons = findViewById(R.id.markdown_buttons);
         mMarkdownButtons.setEditText(mDescView);
 
         View topLeftShadow = findViewById(R.id.markdown_buttons_top_left_shadow);
@@ -218,7 +218,7 @@ public class IssueEditActivity extends BasePagerActivity implements
             topShadow.setVisibility(View.GONE);
         }
 
-        MarkdownPreviewWebView preview = (MarkdownPreviewWebView) findViewById(R.id.preview);
+        MarkdownPreviewWebView preview = findViewById(R.id.preview);
         preview.setEditText(mDescView);
 
         findViewById(R.id.milestone_container).setOnClickListener(this);
@@ -490,7 +490,7 @@ public class IssueEditActivity extends BasePagerActivity implements
             final List<Label> selectedLabels = mEditIssue.getLabels() != null
                     ? new ArrayList<>(mEditIssue.getLabels()) : new ArrayList<Label>();
             View labelContainerView = inflater.inflate(R.layout.generic_linear_container, null);
-            ViewGroup container = (ViewGroup) labelContainerView.findViewById(R.id.container);
+            ViewGroup container = labelContainerView.findViewById(R.id.container);
 
             View.OnClickListener clickListener = new View.OnClickListener() {
                 @Override
@@ -511,7 +511,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 View viewColor = rowView.findViewById(R.id.view_color);
                 viewColor.setBackgroundColor(ApiHelpers.colorForLabel(label));
 
-                final TextView tvLabel = (TextView) rowView.findViewById(R.id.tv_title);
+                final TextView tvLabel = rowView.findViewById(R.id.tv_title);
                 tvLabel.setText(label.getName());
                 tvLabel.setOnClickListener(clickListener);
                 tvLabel.setTag(label);
@@ -575,17 +575,17 @@ public class IssueEditActivity extends BasePagerActivity implements
         if (assignees != null && !assignees.isEmpty()) {
             for (User assignee : assignees) {
                 View row = inflater.inflate(R.layout.row_assignee, mSelectedAssigneeContainer, false);
-                TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
+                TextView tvAssignee = row.findViewById(R.id.tv_assignee);
                 tvAssignee.setText(ApiHelpers.getUserLogin(this, assignee));
 
-                ImageView ivAssignee = (ImageView) row.findViewById(R.id.iv_assignee);
+                ImageView ivAssignee = row.findViewById(R.id.iv_assignee);
                 AvatarHandler.assignAvatar(ivAssignee, assignee);
 
                 mSelectedAssigneeContainer.addView(row);
             }
         } else {
             View row = inflater.inflate(R.layout.row_assignee, mSelectedAssigneeContainer, false);
-            TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
+            TextView tvAssignee = row.findViewById(R.id.tv_assignee);
             tvAssignee.setText(R.string.issue_clear_assignee);
             row.findViewById(R.id.iv_assignee).setVisibility(View.GONE);
             mSelectedAssigneeContainer.addView(row);

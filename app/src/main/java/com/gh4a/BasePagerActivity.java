@@ -107,7 +107,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     private ViewPager setupPager() {
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        ViewPager pager = findViewById(R.id.pager);
         mAdapter = createAdapter(pager);
         pager.setAdapter(mAdapter);
         pager.addOnPageChangeListener(this);
@@ -116,7 +116,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mTabs.setupWithViewPager(pager);
 
         if (hasTabsInToolbar()) {
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            Toolbar toolbar = findViewById(R.id.toolbar);
             toolbar.addView(mTabs, new Toolbar.LayoutParams(
                     Toolbar.LayoutParams.WRAP_CONTENT,
                     Toolbar.LayoutParams.MATCH_PARENT));

@@ -64,8 +64,8 @@ public class UserAdapter extends RootAdapter<User, UserAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
+            ivGravatar = view.findViewById(R.id.iv_gravatar);
+            tvTitle = view.findViewById(R.id.tv_title);
         }
 
         private final TextView tvTitle;

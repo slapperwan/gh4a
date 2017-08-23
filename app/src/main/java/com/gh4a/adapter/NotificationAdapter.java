@@ -190,11 +190,11 @@ public class NotificationAdapter extends
             super(view);
             mActionCallback = actionCallback;
 
-            ivAction = (ImageView) view.findViewById(R.id.iv_action);
+            ivAction = view.findViewById(R.id.iv_action);
             ivAction.setOnClickListener(this);
-            ivIcon = (ImageView) view.findViewById(R.id.iv_icon);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
+            ivIcon = view.findViewById(R.id.iv_icon);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvTimestamp = view.findViewById(R.id.tv_timestamp);
             vNotificationContent = view.findViewById(R.id.v_notification_content);
             vBottomShadow = view.findViewById(R.id.v_bottom_shadow);
 

@@ -89,14 +89,14 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvCreator = (TextView) view.findViewById(R.id.tv_creator);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            tvNumber = (TextView) view.findViewById(R.id.tv_number);
-            lvLabels = (LabelBadgeView) view.findViewById(R.id.labels);
-            tvComments = (TextView) view.findViewById(R.id.tv_comments);
-            tvMilestone = (TextView) view.findViewById(R.id.tv_milestone);
+            ivGravatar = view.findViewById(R.id.iv_gravatar);
+            tvDesc = view.findViewById(R.id.tv_desc);
+            tvCreator = view.findViewById(R.id.tv_creator);
+            tvTimestamp = view.findViewById(R.id.tv_timestamp);
+            tvNumber = view.findViewById(R.id.tv_number);
+            lvLabels = view.findViewById(R.id.labels);
+            tvComments = view.findViewById(R.id.tv_comments);
+            tvMilestone = view.findViewById(R.id.tv_milestone);
         }
 
         final ImageView ivGravatar;

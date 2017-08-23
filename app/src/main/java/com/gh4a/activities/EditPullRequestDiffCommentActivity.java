@@ -38,11 +38,11 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
         View header = getLayoutInflater().inflate(R.layout.edit_commit_comment_header, null);
         mEditorSheet.addHeaderView(header);
 
-        TextView line = (TextView) header.findViewById(R.id.line);
+        TextView line = header.findViewById(R.id.line);
         Bundle extras = getIntent().getExtras();
         line.setText(extras.getString("line"));
 
-        TextView title = (TextView) header.findViewById(R.id.title);
+        TextView title = header.findViewById(R.id.title);
         title.setText(getString(R.string.commit_comment_dialog_title, extras.getInt("left_line"),
                 extras.getInt("right_line")));
     }

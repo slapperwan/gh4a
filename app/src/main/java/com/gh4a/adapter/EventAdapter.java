@@ -472,11 +472,11 @@ public class EventAdapter extends RootAdapter<Event, EventAdapter.EventViewHolde
     public static class EventViewHolder extends RecyclerView.ViewHolder {
         private EventViewHolder(View view) {
             super(view);
-            ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-            tvActor = (TextView) view.findViewById(R.id.tv_actor);
-            tvTitle = (StyleableTextView) view.findViewById(R.id.tv_title);
-            tvDesc = (StyleableTextView) view.findViewById(R.id.tv_desc);
-            tvCreatedAt = (TextView) view.findViewById(R.id.tv_created_at);
+            ivGravatar = view.findViewById(R.id.iv_gravatar);
+            tvActor = view.findViewById(R.id.tv_actor);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvDesc = view.findViewById(R.id.tv_desc);
+            tvCreatedAt = view.findViewById(R.id.tv_created_at);
         }
 
         private final ImageView ivGravatar;

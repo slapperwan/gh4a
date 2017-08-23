@@ -118,7 +118,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
             setContentView(R.layout.about_dialog);
 
-            TextView tvCopyright = (TextView) findViewById(R.id.copyright);
+            TextView tvCopyright = findViewById(R.id.copyright);
             tvCopyright.setText(R.string.copyright_notice);
 
             findViewById(R.id.btn_by_email).setOnClickListener(this);
@@ -208,8 +208,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 convertView = mInflater.inflate(R.layout.open_source_component_item, parent, false);
             }
 
-            TextView title = (TextView) convertView.findViewById(R.id.title);
-            TextView url = (TextView) convertView.findViewById(R.id.url);
+            TextView title = convertView.findViewById(R.id.title);
+            TextView url = convertView.findViewById(R.id.url);
 
             title.setText(COMPONENTS[position][0]);
             url.setText(COMPONENTS[position][1]);

@@ -39,7 +39,7 @@ public class IssueFragment extends IssueFragmentBase {
 
     @Override
     protected void bindSpecialViews(View headerView) {
-        TextView tvPull = (TextView) headerView.findViewById(R.id.tv_pull);
+        TextView tvPull = headerView.findViewById(R.id.tv_pull);
         if (mIssue.getPullRequest() != null && mIssue.getPullRequest().getDiffUrl() != null) {
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);

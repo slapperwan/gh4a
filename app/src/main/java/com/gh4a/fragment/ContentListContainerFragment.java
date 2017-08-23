@@ -189,7 +189,7 @@ public class ContentListContainerFragment extends Fragment implements
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mBreadcrumbs = (PathBreadcrumbs) view.findViewById(R.id.breadcrumbs);
+        mBreadcrumbs = view.findViewById(R.id.breadcrumbs);
         mBreadcrumbs.setCallback(this);
         mStateSaved = false;
         updateBreadcrumbs();

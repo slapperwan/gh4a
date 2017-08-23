@@ -73,16 +73,16 @@ class CommentViewHolder
         mCallback = callback;
         mRepoOwner = repoOwner;
 
-        ivGravatar = (ImageView) view.findViewById(R.id.iv_gravatar);
-        tvDesc = (StyleableTextView) view.findViewById(R.id.tv_desc);
+        ivGravatar = view.findViewById(R.id.iv_gravatar);
+        tvDesc = view.findViewById(R.id.tv_desc);
         tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-        tvExtra = (StyleableTextView) view.findViewById(R.id.tv_extra);
-        tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-        tvEditTimestamp = (TextView) view.findViewById(R.id.tv_edit_timestamp);
-        reactions = (ReactionBar) view.findViewById(R.id.reactions);
+        tvExtra = view.findViewById(R.id.tv_extra);
+        tvTimestamp = view.findViewById(R.id.tv_timestamp);
+        tvEditTimestamp = view.findViewById(R.id.tv_edit_timestamp);
+        reactions = view.findViewById(R.id.reactions);
         reactions.setCallback(this, this);
         reactions.setDetailsCache(reactionDetailsCache);
-        ivMenu = (ImageView) view.findViewById(R.id.iv_menu);
+        ivMenu = view.findViewById(R.id.iv_menu);
         ivMenu.setOnClickListener(this);
 
         mPopupMenu = new PopupMenu(view.getContext(), ivMenu);

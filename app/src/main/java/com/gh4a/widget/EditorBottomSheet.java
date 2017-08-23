@@ -122,7 +122,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
         View view = View.inflate(getContext(), R.layout.editor_bottom_sheet, this);
 
-        mAdvancedEditorToggle = (ImageView) view.findViewById(R.id.iv_advanced_editor_toggle);
+        mAdvancedEditorToggle = view.findViewById(R.id.iv_advanced_editor_toggle);
         mAdvancedEditorToggle.setOnClickListener(this);
         if (!mIsCollapsible) {
             mAdvancedEditorToggle.setVisibility(View.GONE);
@@ -131,15 +131,15 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         View sendButton = view.findViewById(R.id.send_button);
         sendButton.setOnClickListener(this);
 
-        mBasicEditor = (CommentEditor) view.findViewById(R.id.et_basic_editor);
+        mBasicEditor = view.findViewById(R.id.et_basic_editor);
         mBasicEditor.addTextChangedListener(
                 new UiUtils.ButtonEnableTextWatcher(mBasicEditor, sendButton));
         mBasicEditor.setOnTouchListener(this);
 
-        mBasicEditorScrollView = (NestedScrollView) view.findViewById(R.id.basic_editor_scroll);
+        mBasicEditorScrollView = view.findViewById(R.id.basic_editor_scroll);
         mBasicEditorScrollView.setOnTouchListener(this);
 
-        mContainer = (ViewGroup) view.findViewById(R.id.bottom_sheet_header_container);
+        mContainer = view.findViewById(R.id.bottom_sheet_header_container);
 
         post(new Runnable() {
             @Override
@@ -348,13 +348,13 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     }
 
     private void initAdvancedMode() {
-        ViewStub stub = (ViewStub) findViewById(R.id.advanced_editor_stub);
+        ViewStub stub = findViewById(R.id.advanced_editor_stub);
         mAdvancedEditorContainer = stub.inflate();
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.view_pager);
+        ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(new AdvancedEditorPagerAdapter(getContext()));
 
-        mTabs = (TabLayout) findViewById(R.id.tabs);
+        mTabs = findViewById(R.id.tabs);
         mTabs.setupWithViewPager(viewPager);
 
         LinearLayout tabStrip = (LinearLayout) mTabs.getChildAt(0);
@@ -366,7 +366,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             tab.setLayoutParams(lp);
         }
 
-        mAdvancedEditor = (CommentEditor) mAdvancedEditorContainer.findViewById(R.id.editor);
+        mAdvancedEditor = mAdvancedEditorContainer.findViewById(R.id.editor);
         mAdvancedEditor.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor,
                 findViewById(R.id.send_button)));
 
@@ -377,13 +377,13 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mAdvancedEditor.setMentionUsers(mBasicEditor.getMentionUsers());
 
         mMarkdownButtons =
-                (MarkdownButtonsBar) mAdvancedEditorContainer.findViewById(R.id.markdown_buttons);
+                mAdvancedEditorContainer.findViewById(R.id.markdown_buttons);
         mMarkdownButtons.setEditText(mAdvancedEditor);
         if (mHighlightColor != Color.TRANSPARENT) {
             mMarkdownButtons.setButtonsBackgroundColor(mHighlightColor);
         }
 
-        MarkdownPreviewWebView previewWebView = (MarkdownPreviewWebView) findViewById(R.id.preview);
+        MarkdownPreviewWebView previewWebView = findViewById(R.id.preview);
         previewWebView.setEditText(mAdvancedEditor);
 
         mMarkdownButtons.setBottomSheetBehavior(getBehavior());

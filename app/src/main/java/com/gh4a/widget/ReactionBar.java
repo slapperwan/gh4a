@@ -104,12 +104,12 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         setOrientation(HORIZONTAL);
         inflate(context, R.layout.reaction_bar, this);
 
-        mPlusOneView = (TextView) findViewById(R.id.plus_one);
-        mMinusOneView = (TextView) findViewById(R.id.minus_one);
-        mLaughView = (TextView) findViewById(R.id.laugh);
-        mHoorayView = (TextView) findViewById(R.id.hooray);
-        mConfusedView = (TextView) findViewById(R.id.confused);
-        mHeartView = (TextView) findViewById(R.id.heart);
+        mPlusOneView = findViewById(R.id.plus_one);
+        mMinusOneView = findViewById(R.id.minus_one);
+        mLaughView = findViewById(R.id.laugh);
+        mHoorayView = findViewById(R.id.hooray);
+        mConfusedView = findViewById(R.id.confused);
+        mHeartView = findViewById(R.id.heart);
         mReactButton = findViewById(R.id.react);
 
         setReactions(null);
@@ -357,8 +357,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             }
 
             if (viewType == 0) {
-                ImageView avatar = (ImageView) convertView.findViewById(R.id.avatar);
-                TextView name = (TextView) convertView.findViewById(R.id.name);
+                ImageView avatar = convertView.findViewById(R.id.avatar);
+                TextView name = convertView.findViewById(R.id.name);
                 String ownLogin = Gh4Application.get().getAuthLogin();
                 User user = mUsers.get(position);
 

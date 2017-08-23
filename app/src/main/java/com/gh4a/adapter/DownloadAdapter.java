@@ -43,11 +43,11 @@ public class DownloadAdapter extends RootAdapter<Download, DownloadAdapter.ViewH
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvDesc = (TextView) view.findViewById(R.id.tv_desc);
-            tvCreatedAt = (TextView) view.findViewById(R.id.tv_created_at);
-            tvSize = (TextView) view.findViewById(R.id.tv_size);
-            tvDownloads = (TextView) view.findViewById(R.id.tv_downloads);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvDesc = view.findViewById(R.id.tv_desc);
+            tvCreatedAt = view.findViewById(R.id.tv_created_at);
+            tvSize = view.findViewById(R.id.tv_size);
+            tvDownloads = view.findViewById(R.id.tv_downloads);
         }
 
         private final TextView tvTitle;

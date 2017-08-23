@@ -173,7 +173,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void updateHeader() {
-        TextView tvState = (TextView) mHeader.findViewById(R.id.tv_state);
+        TextView tvState = mHeader.findViewById(R.id.tv_state);
         boolean closed = ApiHelpers.IssueState.CLOSED.equals(mIssue.getState());
         int stateTextResId = closed ? R.string.closed : R.string.open;
         int stateColorAttributeId = closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
@@ -182,7 +182,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         transitionHeaderToColor(stateColorAttributeId,
                 closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
 
-        TextView tvTitle = (TextView) mHeader.findViewById(R.id.tv_title);
+        TextView tvTitle = mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.getTitle());
 
         mHeader.setVisibility(View.VISIBLE);

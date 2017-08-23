@@ -117,10 +117,10 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         View listContent = super.onCreateView(inflater, container, savedInstanceState);
         View v = inflater.inflate(R.layout.comment_list, container, false);
 
-        FrameLayout listContainer = (FrameLayout) v.findViewById(R.id.list_container);
+        FrameLayout listContainer = v.findViewById(R.id.list_container);
         listContainer.addView(listContent);
 
-        mBottomSheet = (EditorBottomSheet) v.findViewById(R.id.bottom_sheet);
+        mBottomSheet = v.findViewById(R.id.bottom_sheet);
         mBottomSheet.setCallback(this);
         mBottomSheet.setResizingView(listContainer);
         mBottomSheet.setListener(this);
@@ -331,20 +331,20 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     private void fillData() {
-        ImageView ivGravatar = (ImageView) mListHeaderView.findViewById(R.id.iv_gravatar);
+        ImageView ivGravatar = mListHeaderView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
         ivGravatar.setTag(mIssue.getUser());
         ivGravatar.setOnClickListener(this);
 
-        TextView tvExtra = (TextView) mListHeaderView.findViewById(R.id.tv_extra);
+        TextView tvExtra = mListHeaderView.findViewById(R.id.tv_extra);
         tvExtra.setText(ApiHelpers.getUserLogin(getActivity(), mIssue.getUser()));
 
-        TextView tvTimestamp = (TextView) mListHeaderView.findViewById(R.id.tv_timestamp);
+        TextView tvTimestamp = mListHeaderView.findViewById(R.id.tv_timestamp);
         tvTimestamp.setText(StringUtils.formatRelativeTime(getActivity(),
                 mIssue.getCreatedAt(), true));
 
         String body = mIssue.getBodyHtml();
-        TextView descriptionView = (TextView) mListHeaderView.findViewById(R.id.tv_desc);
+        TextView descriptionView = mListHeaderView.findViewById(R.id.tv_desc);
         descriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         if (!StringUtils.isBlank(body)) {
             mImageGetter.bind(descriptionView, body, mIssue.getId());
@@ -368,7 +368,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
         View milestoneGroup = mListHeaderView.findViewById(R.id.milestone_container);
         if (mIssue.getMilestone() != null) {
-            TextView tvMilestone = (TextView) mListHeaderView.findViewById(R.id.tv_milestone);
+            TextView tvMilestone = mListHeaderView.findViewById(R.id.tv_milestone);
             tvMilestone.setText(mIssue.getMilestone().getTitle());
             milestoneGroup.setVisibility(View.VISIBLE);
         } else {
@@ -378,15 +378,15 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         View assigneeGroup = mListHeaderView.findViewById(R.id.assignee_container);
         List<User> assignees = mIssue.getAssignees();
         if (assignees != null && !assignees.isEmpty()) {
-            ViewGroup assigneeContainer = (ViewGroup) mListHeaderView.findViewById(R.id.assignee_list);
+            ViewGroup assigneeContainer = mListHeaderView.findViewById(R.id.assignee_list);
             LayoutInflater inflater = getLayoutInflater(null);
             assigneeContainer.removeAllViews();
             for (User assignee : assignees) {
                 View row = inflater.inflate(R.layout.row_assignee, assigneeContainer, false);
-                TextView tvAssignee = (TextView) row.findViewById(R.id.tv_assignee);
+                TextView tvAssignee = row.findViewById(R.id.tv_assignee);
                 tvAssignee.setText(ApiHelpers.getUserLogin(getActivity(), assignee));
 
-                ImageView ivAssignee = (ImageView) row.findViewById(R.id.iv_assignee);
+                ImageView ivAssignee = row.findViewById(R.id.iv_assignee);
                 AvatarHandler.assignAvatar(ivAssignee, assignee);
                 ivAssignee.setTag(assignee);
                 ivAssignee.setOnClickListener(this);
@@ -398,7 +398,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             assigneeGroup.setVisibility(View.GONE);
         }
 
-        ReactionBar reactions = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
+        ReactionBar reactions = mListHeaderView.findViewById(R.id.reactions);
         reactions.setCallback(this, this);
         reactions.setDetailsCache(mReactionDetailsCache);
         reactions.setReactions(mIssue.getReactions());
@@ -410,7 +410,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     private void fillLabels(List<Label> labels) {
         View labelGroup = mListHeaderView.findViewById(R.id.label_container);
         if (labels != null && !labels.isEmpty()) {
-            TextView labelView = (TextView) mListHeaderView.findViewById(R.id.labels);
+            TextView labelView = mListHeaderView.findViewById(R.id.labels);
             labelView.setText(UiUtils.formatLabelList(getActivity(), labels));
             labelGroup.setVisibility(View.VISIBLE);
         } else {
@@ -458,7 +458,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         mIssue.setReactions(reactions);
         if (mListHeaderView != null) {
-            ReactionBar bar = (ReactionBar) mListHeaderView.findViewById(R.id.reactions);
+            ReactionBar bar = mListHeaderView.findViewById(R.id.reactions);
             bar.setReactions(reactions);
         }
         if (mReactionMenuHelper != null) {

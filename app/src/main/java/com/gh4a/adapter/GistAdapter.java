@@ -68,12 +68,12 @@ public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvCreator = (TextView) view.findViewById(R.id.tv_creator);
-            tvTimestamp = (TextView) view.findViewById(R.id.tv_timestamp);
-            tvSha = (TextView) view.findViewById(R.id.tv_sha);
-            tvFiles = (TextView) view.findViewById(R.id.tv_files);
-            tvPrivate = (TextView) view.findViewById(R.id.tv_private);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvCreator = view.findViewById(R.id.tv_creator);
+            tvTimestamp = view.findViewById(R.id.tv_timestamp);
+            tvSha = view.findViewById(R.id.tv_sha);
+            tvFiles = view.findViewById(R.id.tv_files);
+            tvPrivate = view.findViewById(R.id.tv_private);
         }
 
         private final TextView tvCreator;

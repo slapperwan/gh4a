@@ -186,7 +186,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         if (mNotificationsMenuItem != null) {
             View actionView = MenuItemCompat.getActionView(mNotificationsMenuItem);
             mNotificationsIndicator =
-                    (ImageView) actionView.findViewById(R.id.notifications_indicator);
+                    actionView.findViewById(R.id.notifications_indicator);
             updateNotificationIndicator(mSelectedFactoryId);
         }
 
@@ -213,15 +213,15 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     protected void configureLeftDrawerHeader(View header) {
         super.configureLeftDrawerHeader(header);
 
-        mAvatarView = (ImageView) header.findViewById(R.id.avatar);
-        mUserExtraView = (TextView) header.findViewById(R.id.user_extra);
+        mAvatarView = header.findViewById(R.id.avatar);
+        mUserExtraView = header.findViewById(R.id.user_extra);
 
-        TextView userNameView = (TextView) header.findViewById(R.id.user_name);
+        TextView userNameView = header.findViewById(R.id.user_name);
         userNameView.setText(mUserLogin);
 
         updateUserInfo();
 
-        mDrawerSwitcher = (ImageView) header.findViewById(R.id.switcher);
+        mDrawerSwitcher = header.findViewById(R.id.switcher);
         mDrawerSwitcher.setVisibility(View.VISIBLE);
 
         mDrawerSwitcher.setOnClickListener(this);

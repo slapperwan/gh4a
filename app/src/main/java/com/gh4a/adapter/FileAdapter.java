@@ -84,9 +84,9 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            icon = (ImageView) view.findViewById(R.id.iv_icon);
-            fileName = (TextView) view.findViewById(R.id.tv_text);
-            fileSize = (TextView) view.findViewById(R.id.tv_size);
+            icon = view.findViewById(R.id.iv_icon);
+            fileName = view.findViewById(R.id.tv_text);
+            fileSize = view.findViewById(R.id.tv_size);
         }
 
         private final ImageView icon;

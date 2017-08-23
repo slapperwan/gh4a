@@ -49,9 +49,9 @@ public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private ViewHolder(View view) {
             super(view);
-            tvTitle = (TextView) view.findViewById(R.id.tv_title);
-            tvType = (TextView) view.findViewById(R.id.tv_type);
-            tvCreatedAt  = (TextView) view.findViewById(R.id.tv_created_at);
+            tvTitle = view.findViewById(R.id.tv_title);
+            tvType = view.findViewById(R.id.tv_type);
+            tvCreatedAt  = view.findViewById(R.id.tv_created_at);
         }
 
         private final TextView tvTitle;
