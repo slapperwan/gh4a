@@ -438,9 +438,9 @@ public class BrowseFilter extends AppCompatActivity {
 
         private void dismiss() {
             if (mProgressDialog != null) {
-                // Progress dialog will automatically finish current activity if necessary
                 mProgressDialog.dismiss();
-            } else if (mFinishCurrentActivity) {
+            }
+            if (mFinishCurrentActivity) {
                 mActivity.finish();
             }
         }
