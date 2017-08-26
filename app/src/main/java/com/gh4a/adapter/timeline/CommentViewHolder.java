@@ -1,6 +1,7 @@
 package com.gh4a.adapter.timeline;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
@@ -74,6 +76,7 @@ class CommentViewHolder
         mRepoOwner = repoOwner;
 
         ivGravatar = view.findViewById(R.id.iv_gravatar);
+        ivGravatar.setOnClickListener(this);
         tvDesc = view.findViewById(R.id.tv_desc);
         tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         tvExtra = view.findViewById(R.id.tv_extra);
@@ -161,6 +164,12 @@ class CommentViewHolder
         if (v.getId() == R.id.iv_menu) {
             mReactionMenuHelper.startLoadingIfNeeded();
             mPopupMenu.show();
+        } else if (v.getId() == R.id.iv_gravatar) {
+            User user = (User) v.getTag();
+            Intent intent = UserActivity.makeIntent(mContext, user);
+            if (intent != null) {
+                mContext.startActivity(intent);
+            }
         }
     }
 
