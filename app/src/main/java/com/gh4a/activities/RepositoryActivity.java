@@ -362,7 +362,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
             if (bookmarkAction != null) {
                 bookmarkAction.setTitle(BookmarksProvider.hasBookmarked(this, getBookmarkUrl())
                         ? R.string.remove_bookmark
-                        : R.string.bookmark_repo);
+                        : R.string.bookmark);
             }
         }
 

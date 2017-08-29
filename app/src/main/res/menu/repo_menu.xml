@@ -28,6 +28,6 @@
         android:title="@string/repo_download_action"
         app:showAsAction="never" />
     <item android:id="@+id/bookmark"
-        android:title="@string/bookmark_repo"
+        android:title="@string/bookmark"
         app:showAsAction="never" />
 </menu>
