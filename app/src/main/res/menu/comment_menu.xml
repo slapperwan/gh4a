@@ -22,5 +22,6 @@
     <item
         android:id="@+id/view_in_file"
         android:title="@string/view_in_file"
+        android:visible="false"
         app:showAsAction="never" />
 </menu>
