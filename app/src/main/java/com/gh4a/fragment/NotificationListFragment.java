@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.gh4a.BackgroundTask;
-import com.gh4a.BrowseFilter;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
@@ -26,6 +25,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoadResult;
 import com.gh4a.loader.NotificationListLoader;
+import com.gh4a.resolver.BrowseFilter;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 

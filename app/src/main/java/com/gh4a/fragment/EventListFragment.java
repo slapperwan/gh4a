@@ -28,7 +28,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.BrowseFilter;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
@@ -43,6 +42,8 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.EventAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.resolver.CommitCommentLoadTask;
+import com.gh4a.resolver.PullRequestReviewCommentLoadTask;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
@@ -157,7 +158,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
             CommitComment comment = payload.getComment();
             if (comment != null) {
-                new BrowseFilter.CommitCommentLoadTask(getActivity(), repoOwner, repoName,
+                new CommitCommentLoadTask(getActivity(), repoOwner, repoName,
                         comment.getCommitId(),
                         new IntentUtils.InitialCommentMarker(comment.getId())).schedule();
             }
@@ -247,7 +248,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
             if (pr != null) {
                 if (initialComment != null) {
-                    new BrowseFilter.PullRequestReviewCommentLoadTask(getActivity(), repoOwner,
+                    new PullRequestReviewCommentLoadTask(getActivity(), repoOwner,
                             repoName, pr.getNumber(), initialComment, false).schedule();
                 } else {
                     intent = PullRequestActivity.makeIntent(getActivity(), repoOwner, repoName,

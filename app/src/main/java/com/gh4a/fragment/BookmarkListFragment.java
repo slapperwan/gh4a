@@ -12,10 +12,10 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.BrowseFilter;
 import com.gh4a.R;
 import com.gh4a.adapter.BookmarkAdapter;
 import com.gh4a.db.BookmarksProvider;
+import com.gh4a.resolver.BrowseFilter;
 
 public class BookmarkListFragment extends LoadingListFragmentBase implements
         LoaderManager.LoaderCallbacks<Cursor>, BookmarkAdapter.OnItemInteractListener {

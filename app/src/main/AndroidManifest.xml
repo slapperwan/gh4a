@@ -123,7 +123,7 @@
             android:name=".activities.SettingsActivity"
             android:title="@string/settings" />
 
-        <activity android:name="BrowseFilter"
+        <activity android:name=".resolver.BrowseFilter"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:theme="@style/TransparentLightTheme">
