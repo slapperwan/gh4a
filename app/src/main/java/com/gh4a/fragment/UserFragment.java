@@ -84,7 +84,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             mUser = result;
             fillData();
             setContentShown(true);
-            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
         }
     };
 
@@ -178,7 +178,8 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         MenuItem followAction = menu.findItem(R.id.follow);
         if (followAction != null) {
-            if (!mIsSelf && Gh4Application.get().isAuthorized()) {
+            if (!mIsSelf && Gh4Application.get().isAuthorized() && mUser != null
+                    && !ApiHelpers.UserType.ORG.equals(mUser.getType())) {
                 followAction.setVisible(true);
                 if (mIsFollowing == null) {
                     followAction.setActionView(R.layout.ab_loading);
