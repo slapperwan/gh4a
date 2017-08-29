@@ -107,7 +107,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
             String url = "https://github.com/" + mUserLogin;
             bookmarkAction.setTitle(BookmarksProvider.hasBookmarked(this, url)
                     ? R.string.remove_bookmark
-                    : R.string.bookmark_user);
+                    : R.string.bookmark);
         }
 
         return super.onPrepareOptionsMenu(menu);

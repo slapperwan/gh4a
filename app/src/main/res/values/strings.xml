@@ -76,8 +76,6 @@
     <string name="menu_issues">Open issues</string>
     <string name="delete_comment_message">Delete this comment?</string>
     <string name="saving_comment">Saving comment\u2026</string>
-    <string name="bookmark_user">Bookmark user</string>
-    <string name="bookmark_repo">Bookmark repo</string>
     <string name="ellipse" translatable="false">\u2026</string>
     <string name="view_more">View more\u2026</string>
     <string name="pulls">Pulls</string>
@@ -467,6 +465,7 @@
     <string name="recent_wiki">Recent Wiki Updates</string>
 
     <!-- Bookmarks -->
+    <string name="bookmark">Bookmark</string>
     <string name="remove">Remove</string>
     <string name="remove_bookmark_confirm">Do you really want to remove this bookmark?</string>
     <string name="remove_bookmark">Remove bookmark</string>
