@@ -142,6 +142,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             fillHeader();
             showContentIfReady();
             supportInvalidateOptionsMenu();
+            getSupportLoaderManager().initLoader(3, null, mHeadReferenceCallback);
         }
     };
 
@@ -176,8 +177,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private final LoaderCallbacks<Reference> mHeadReferenceCallback = new LoaderCallbacks<Reference>(this) {
         @Override
         protected Loader<LoaderResult<Reference>> onCreateLoader() {
-            return new ReferenceLoader(PullRequestActivity.this, mRepoOwner, mRepoName,
-                    mPullRequestNumber);
+            return new ReferenceLoader(PullRequestActivity.this, mPullRequest);
         }
 
         @Override
@@ -186,6 +186,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             mHasLoadedHeadReference = true;
             showContentIfReady();
             supportInvalidateOptionsMenu();
+            getSupportLoaderManager().destroyLoader(3);
         }
     };
 
@@ -209,7 +210,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
         getSupportLoaderManager().initLoader(1, null, mIssueCallback);
         getSupportLoaderManager().initLoader(2, null, mCollaboratorCallback);
-        getSupportLoaderManager().initLoader(3, null, mHeadReferenceCallback);
     }
 
     @Override
@@ -254,8 +254,10 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             menu.removeItem(R.id.browser);
         }
 
+        MenuItem deleteBranchItem = menu.findItem(R.id.delete_branch);
+        deleteBranchItem.setVisible(mHasLoadedHeadReference);
         if (mHeadReference == null) {
-            menu.findItem(R.id.delete_branch).setTitle(R.string.restore_branch);
+            deleteBranchItem.setTitle(R.string.restore_branch);
         }
 
         return super.onCreateOptionsMenu(menu);
