@@ -1,92 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorPrimary"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:paddingLeft="@dimen/content_padding"
-    android:paddingRight="@dimen/content_padding">
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:scaleType="center"
-        android:src="@drawable/octodroid_bg" />
+    android:fillViewport="true">
 
     <LinearLayout
-        android:id="@+id/welcome_container"
-        android:layout_width="wrap_content"
+        android:id="@+id/main_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/content_padding"
+        android:paddingRight="@dimen/content_padding">
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/welcome_text"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:layout_marginBottom="4dp"
-            android:layout_marginTop="4dp"
-            android:gravity="center"
-            android:text="@string/introduction"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textColor="@android:color/white" />
+            android:layout_margin="16dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/octodroid_bg" />
 
-        <FrameLayout
+        <LinearLayout
+            android:id="@+id/welcome_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-            <android.support.v7.widget.AppCompatButton
-                android:id="@+id/login_button"
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/welcome_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="16dp"
-                android:padding="16dp"
-                android:text="@string/login"
-                android:textColor="?attr/colorPrimary"
-                app:backgroundTint="@android:color/white" />
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_weight="0.5"
+                android:gravity="center"
+                android:text="@string/introduction"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/white" />
 
-        </FrameLayout>
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
 
-    </LinearLayout>
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/login_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="16dp"
+                    android:padding="16dp"
+                    android:text="@string/login"
+                    android:textColor="?attr/colorPrimary"
+                    app:backgroundTint="@android:color/white" />
 
-    <LinearLayout
-        android:id="@+id/login_progress_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:visibility="gone">
+            </FrameLayout>
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/login_text"
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/login_progress_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/authenticating"
-            android:textAppearance="@style/TextAppearance.AppCompat.Title"
-            android:textColor="@android:color/white" />
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <ProgressBar
-            android:id="@+id/login_progress"
-            style="?attr/indeterminateProgressStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="1"
-            android:indeterminate="true"
-            android:visibility="visible"
-            android:indeterminateTint="@android:color/white" />
+            <com.gh4a.widget.StyleableTextView
+                android:id="@+id/login_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/authenticating"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@android:color/white" />
+
+            <ProgressBar
+                android:id="@+id/login_progress"
+                style="?attr/indeterminateProgressStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:indeterminate="true"
+                android:indeterminateTint="@android:color/white"
+                android:visibility="visible" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</ScrollView>
