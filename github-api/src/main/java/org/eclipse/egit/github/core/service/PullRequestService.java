@@ -34,6 +34,7 @@ import java.util.Map;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COMMENTS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COMMITS;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_EVENTS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_FILES;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_MERGE;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_PULLS;
@@ -769,5 +770,63 @@ public class PullRequestService extends GitHubService {
 
 		return client.post(uri.toString(), Collections.singletonMap("content", content),
 				Reaction.class);
+	}
+
+	public Review createReview(IRepositoryIdProvider repository, int pullRequestNumber,
+			String body) throws IOException {
+		String id = getId(repository);
+
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS)
+				.append('/').append(id)
+				.append(SEGMENT_PULLS)
+				.append('/').append(pullRequestNumber)
+				.append(SEGMENT_REVIEWS);
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("body", body); //$NON-NLS-1$
+
+		return client.post(uri.toString(), params, Review.class);
+	}
+
+	public Review submitReview(IRepositoryIdProvider repository, int pullRequestNumber,
+			long reviewId, String body, String event) throws IOException {
+		String id = getId(repository);
+
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS)
+				.append('/').append(id)
+				.append(SEGMENT_PULLS)
+				.append('/').append(pullRequestNumber)
+				.append(SEGMENT_REVIEWS)
+				.append('/').append(reviewId)
+				.append(SEGMENT_EVENTS);
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("body", body); //$NON-NLS-1$
+		params.put("event", event); //$NON-NLS-1$
+
+		return client.post(uri.toString(), params, Review.class);
+	}
+
+	public void deleteReview(IRepositoryIdProvider repository, int pullRequestNumber,
+			long reviewId) throws IOException {
+		String repoId = getId(repository);
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS)
+				.append('/').append(repoId)
+				.append(SEGMENT_PULLS)
+				.append('/').append(pullRequestNumber)
+				.append(SEGMENT_REVIEWS)
+				.append('/').append(reviewId);
+		client.delete(uri.toString());
+	}
+
+	public Review createReview(IRepositoryIdProvider repository, int pullRequestNumber,
+			Map<String, Object> params) throws IOException {
+		String repoId = getId(repository);
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS)
+				.append('/').append(repoId)
+				.append(SEGMENT_PULLS)
+				.append('/').append(pullRequestNumber)
+				.append(SEGMENT_REVIEWS);
+		return client.post(uri.toString(), params, Review.class);
 	}
 }

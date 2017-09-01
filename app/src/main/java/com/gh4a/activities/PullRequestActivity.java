@@ -288,6 +288,11 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             case R.id.delete_branch:
                 showDeleteRestoreBranchConfirmDialog(mHeadReference == null);
                 break;
+            case R.id.review_changes: {
+                startActivity(ReviewChangesActivity.makeIntent(this, mRepoOwner, mRepoName,
+                        mPullRequestNumber));
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
