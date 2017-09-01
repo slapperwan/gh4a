@@ -123,6 +123,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         String message = mCommit.getCommit().getMessage();
         int pos = message.indexOf('\n');
         String title = pos > 0 ? message.substring(0, pos) : message;
+        title = EmojiParser.parseToUnicode(title);
         int length = message.length();
         while (pos > 0 && pos < length && Character.isWhitespace(message.charAt(pos))) {
             pos++;

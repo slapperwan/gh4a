@@ -30,6 +30,7 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
+import com.vdurmont.emoji.EmojiParser;
 
 import org.eclipse.egit.github.core.CommitUser;
 import org.eclipse.egit.github.core.RepositoryCommit;
@@ -65,6 +66,7 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
         if (pos > 0) {
             message = message.substring(0, pos);
         }
+        message = EmojiParser.parseToUnicode(message);
 
         holder.tvDesc.setText(message);
         holder.tvSha.setText(commit.getSha().substring(0, 10));
