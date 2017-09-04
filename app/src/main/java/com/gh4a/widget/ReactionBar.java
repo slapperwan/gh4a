@@ -628,11 +628,16 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
 
         private Listener mListener;
+        private boolean mDestroyed;
         private HashMap<Object, List<Reaction>> mMap = new HashMap<>();
 
         public ReactionDetailsCache(Listener listener) {
             super();
             mListener = listener;
+        }
+
+        public void destroy() {
+            mDestroyed = true;
         }
 
         public void clear() {
@@ -650,7 +655,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         public List<Reaction> putEntry(Item item, List<Reaction> value) {
             Object key = item.getCacheKey();
             List<Reaction> result = mMap.put(key, new ArrayList<>(value));
-            if (result != null) {
+            if (result != null && !mDestroyed) {
                 mListener.onReactionsUpdated(item, buildReactions(value));
             }
             return result;

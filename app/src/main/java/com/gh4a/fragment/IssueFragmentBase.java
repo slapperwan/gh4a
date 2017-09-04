@@ -141,6 +141,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        mReactionDetailsCache.destroy();
         mImageGetter.destroy();
         mImageGetter = null;
         if (mAdapter != null) {

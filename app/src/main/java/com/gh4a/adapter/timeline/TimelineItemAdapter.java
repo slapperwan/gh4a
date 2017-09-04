@@ -149,6 +149,7 @@ public class TimelineItemAdapter
 
     public void destroy() {
         mImageGetter.destroy();
+        mReactionDetailsCache.destroy();
     }
 
     public void pause() {

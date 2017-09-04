@@ -177,6 +177,12 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     }
 
     @Override
+    protected void onDestroy() {
+        mReactionDetailsCache.destroy();
+        super.onDestroy();
+    }
+
+    @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");

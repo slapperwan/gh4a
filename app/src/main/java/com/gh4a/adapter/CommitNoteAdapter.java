@@ -107,6 +107,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
     }
 
     public void destroy() {
+        mReactionDetailsCache.destroy();
         mImageGetter.destroy();
     }
 
