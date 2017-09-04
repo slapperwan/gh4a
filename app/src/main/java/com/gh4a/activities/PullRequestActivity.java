@@ -251,6 +251,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
 
         if (mPullRequest == null) {
+            menu.removeItem(R.id.share);
             menu.removeItem(R.id.browser);
         }
 
