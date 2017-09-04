@@ -403,7 +403,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     private void showContentIfReady() {
-        if (mPullRequest != null && mIssue != null && mIsCollaborator != null && mHasLoadedHeadReference) {
+        if (mPullRequest != null && mIssue != null && mIsCollaborator != null) {
             setContentShown(true);
             invalidateTabs();
             updateFabVisibility();
