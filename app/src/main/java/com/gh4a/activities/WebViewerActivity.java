@@ -352,6 +352,10 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     protected void handleUrlLoad(Uri uri) {
+        if ("file".equals(uri.getScheme())) {
+            // Opening that URL will trigger a FileUriExposedException in API 24+
+            return;
+        }
         //noinspection TryWithIdenticalCatches
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
