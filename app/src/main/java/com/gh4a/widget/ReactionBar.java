@@ -428,7 +428,9 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
         @Override
         protected void onPostExecute(List<Reaction> reactions) {
-            mDetailsCache.putEntry(mItem, reactions);
+            if (reactions != null) {
+                mDetailsCache.putEntry(mItem, reactions);
+            }
             super.onPostExecute(reactions);
         }
     }
