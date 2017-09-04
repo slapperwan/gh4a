@@ -57,7 +57,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putString("sha", commitSha);
-        args.putSerializable("commit", commit);
+        args.putSerializable("commit_author", commit.getAuthor());
+        args.putSerializable("committer", commit.getCommitter());
         args.putSerializable("comments", comments);
         args.putParcelable("initial_comment", initialComment);
 
@@ -74,7 +75,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
-    private RepositoryCommit mCommit;
+    private User mCommitAuthor;
+    private User mCommitter;
     private IntentUtils.InitialCommentMarker mInitialComment;
 
     private CommitNoteAdapter mAdapter;
@@ -87,7 +89,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mRepoOwner = args.getString("owner");
         mRepoName = args.getString("repo");
         mObjectSha = args.getString("sha");
-        mCommit = (RepositoryCommit) args.getSerializable("commit");
+        mCommitAuthor = (User) args.getSerializable("commit_author");
+        mCommitter = (User) args.getSerializable("committer");
         mInitialComment = args.getParcelable("initial_comment");
         args.remove("initial_comment");
     }
@@ -196,11 +199,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     protected void onAddData(RootAdapter<CommitComment, ?> adapter, List<CommitComment> data) {
         super.onAddData(adapter, data);
         Set<User> users = mAdapter.getUsers();
-        if (mCommit.getAuthor() != null) {
-            users.add(mCommit.getAuthor());
+        if (mCommitAuthor != null) {
+            users.add(mCommitAuthor);
         }
-        if (mCommit.getCommitter() != null) {
-            users.add(mCommit.getCommitter());
+        if (mCommitter != null) {
+            users.add(mCommitter);
         }
         mBottomSheet.setMentionUsers(users);
 
