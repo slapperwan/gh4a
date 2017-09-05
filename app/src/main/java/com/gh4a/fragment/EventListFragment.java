@@ -158,9 +158,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             CommitCommentPayload payload = (CommitCommentPayload) event.getPayload();
             CommitComment comment = payload.getComment();
             if (comment != null) {
-                new CommitCommentLoadTask(getActivity(), repoOwner, repoName,
-                        comment.getCommitId(),
-                        new IntentUtils.InitialCommentMarker(comment.getId())).schedule();
+                new CommitCommentLoadTask(getActivity(), repoOwner, repoName, comment.getCommitId(),
+                        new IntentUtils.InitialCommentMarker(comment.getId()), false).schedule();
             }
         } else if (Event.TYPE_CREATE.equals(eventType)) {
             CreatePayload payload = (CreatePayload) event.getPayload();

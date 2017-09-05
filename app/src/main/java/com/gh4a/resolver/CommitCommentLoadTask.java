@@ -23,8 +23,9 @@ public class CommitCommentLoadTask extends UrlLoadTask {
     private final IntentUtils.InitialCommentMarker mMarker;
 
     public CommitCommentLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            String commitSha, IntentUtils.InitialCommentMarker marker) {
-        super(activity);
+            String commitSha, IntentUtils.InitialCommentMarker marker,
+            boolean finishCurrentActivity) {
+        super(activity, finishCurrentActivity);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mCommitSha = commitSha;

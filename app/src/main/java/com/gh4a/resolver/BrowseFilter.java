@@ -227,8 +227,8 @@ public class BrowseFilter extends AppCompatActivity {
                     IntentUtils.InitialCommentMarker initialComment =
                             generateInitialCommentMarker(uri.getFragment(), "commitcomment-");
                     if (initialComment != null) {
-                        new CommitCommentLoadTask(this, user, repo, id,
-                                initialComment).execute();
+                        new CommitCommentLoadTask(this, user, repo, id, initialComment, true)
+                                .execute();
                         return; // avoid finish() for now
                     }
                     intent = CommitActivity.makeIntent(this, user, repo, id, null);
