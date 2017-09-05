@@ -90,7 +90,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/milestone_container"
+        android:id="@+id/label_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/overview_item_spacing"
@@ -98,29 +98,28 @@
         tools:visibility="visible">
 
         <ImageView
-            android:id="@+id/iv_milestone"
+            android:id="@+id/iv_labels"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginRight="10dp"
-            android:src="?attr/milestoneIcon" />
+            android:src="?attr/labelsIcon" />
 
         <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_milestone_label"
+            android:id="@+id/tv_labels_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/iv_milestone"
-            android:text="@string/issue_milestone_hint"
+            android:layout_toRightOf="@id/iv_labels"
+            android:text="@string/issue_labels"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="?android:attr/textColorPrimary" />
 
         <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_milestone"
-            android:layout_width="wrap_content"
+            android:id="@+id/labels"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_milestone_label"
-            android:layout_toRightOf="@id/iv_milestone"
-            android:textAppearance="@style/TextAppearance.AppCompat.Small"
-            tools:text="v1.10.1" />
+            android:layout_below="@id/tv_labels_label"
+            android:layout_toRightOf="@id/iv_labels"
+            tools:text="colored labels here" />
 
     </RelativeLayout>
 
@@ -159,7 +158,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/label_container"
+        android:id="@+id/milestone_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="@dimen/overview_item_spacing"
@@ -167,28 +166,29 @@
         tools:visibility="visible">
 
         <ImageView
-            android:id="@+id/iv_labels"
+            android:id="@+id/iv_milestone"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginRight="10dp"
-            android:src="?attr/labelsIcon" />
+            android:src="?attr/milestoneIcon" />
 
         <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_labels_label"
+            android:id="@+id/tv_milestone_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/iv_labels"
-            android:text="@string/issue_labels"
+            android:layout_toRightOf="@id/iv_milestone"
+            android:text="@string/issue_milestone_hint"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="?android:attr/textColorPrimary" />
 
         <com.gh4a.widget.StyleableTextView
-            android:id="@+id/labels"
-            android:layout_width="match_parent"
+            android:id="@+id/tv_milestone"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv_labels_label"
-            android:layout_toRightOf="@id/iv_labels"
-            tools:text="colored labels here" />
+            android:layout_below="@id/tv_milestone_label"
+            android:layout_toRightOf="@id/iv_milestone"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            tools:text="v1.10.1" />
 
     </RelativeLayout>
 
