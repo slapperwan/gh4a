@@ -1,6 +1,7 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.loader.UserLoader;
@@ -8,7 +9,8 @@ import com.gh4a.loader.UserLoader;
 import org.eclipse.egit.github.core.User;
 
 public abstract class UserLoadTask extends UrlLoadTask {
-    private final String mUserLogin;
+    @VisibleForTesting
+    protected final String mUserLogin;
 
     public UserLoadTask(FragmentActivity activity, String userLogin) {
         super(activity);

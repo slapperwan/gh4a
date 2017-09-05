@@ -1,6 +1,7 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -20,12 +21,18 @@ import java.util.regex.Pattern;
 public class RefPathDisambiguationTask extends UrlLoadTask {
     private static final Pattern SHA1_PATTERN = Pattern.compile("[a-z0-9]{40}");
 
-    private final String mRepoOwner;
-    private final String mRepoName;
-    private final String mRefAndPath;
-    private final int mInitialPage;
-    private final String mFragment;
-    private final boolean mGoToFileViewer;
+    @VisibleForTesting
+    protected final String mRepoOwner;
+    @VisibleForTesting
+    protected final String mRepoName;
+    @VisibleForTesting
+    protected final String mRefAndPath;
+    @VisibleForTesting
+    protected final int mInitialPage;
+    @VisibleForTesting
+    protected final String mFragment;
+    @VisibleForTesting
+    protected final boolean mGoToFileViewer;
 
     public RefPathDisambiguationTask(FragmentActivity activity, String repoOwner,
             String repoName, String refAndPath, int initialPage) {

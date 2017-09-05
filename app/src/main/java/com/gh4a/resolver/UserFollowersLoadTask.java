@@ -1,6 +1,7 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.activities.FollowerFollowingListActivity;
@@ -10,7 +11,8 @@ import com.gh4a.utils.ApiHelpers;
 import org.eclipse.egit.github.core.User;
 
 public class UserFollowersLoadTask extends UserLoadTask {
-    private boolean mShowFollowers;
+    @VisibleForTesting
+    protected boolean mShowFollowers;
 
     public UserFollowersLoadTask(FragmentActivity activity, String userLogin,
             boolean showFollowers) {

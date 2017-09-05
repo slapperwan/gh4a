@@ -1,6 +1,7 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.Gh4Application;
@@ -15,13 +16,17 @@ import org.eclipse.egit.github.core.service.PullRequestService;
 import java.util.List;
 
 public class PullRequestReviewDiffLoadTask extends UrlLoadTask {
-    private final String mRepoOwner;
-    private final String mRepoName;
-    private final BrowseFilter.DiffHighlightId mDiffId;
-    private final int mPullRequestNumber;
+    @VisibleForTesting
+    protected final String mRepoOwner;
+    @VisibleForTesting
+    protected final String mRepoName;
+    @VisibleForTesting
+    protected final DiffHighlightId mDiffId;
+    @VisibleForTesting
+    protected final int mPullRequestNumber;
 
     public PullRequestReviewDiffLoadTask(FragmentActivity activity, String repoOwner,
-            String repoName, BrowseFilter.DiffHighlightId diffId, int pullRequestNumber) {
+            String repoName, DiffHighlightId diffId, int pullRequestNumber) {
         super(activity);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
