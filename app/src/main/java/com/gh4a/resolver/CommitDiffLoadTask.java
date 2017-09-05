@@ -1,6 +1,7 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.activities.CommitDiffViewerActivity;
@@ -14,17 +15,18 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 import java.util.List;
 
 public class CommitDiffLoadTask extends DiffLoadTask {
-    private String mSha;
+    @VisibleForTesting
+    protected String mSha;
 
     public CommitDiffLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            BrowseFilter.DiffHighlightId diffId, String sha) {
+            DiffHighlightId diffId, String sha) {
         super(activity, repoOwner, repoName, diffId);
         mSha = sha;
     }
 
     @Override
-    protected Intent getLaunchIntent(String sha, CommitFile file,
-            List<CommitComment> comments, BrowseFilter.DiffHighlightId diffId) {
+    protected Intent getLaunchIntent(String sha, CommitFile file, List<CommitComment> comments,
+            DiffHighlightId diffId) {
         return CommitDiffViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                 sha, file.getFilename(), file.getPatch(), comments, diffId.startLine,
                 diffId.endLine, diffId.right, null);

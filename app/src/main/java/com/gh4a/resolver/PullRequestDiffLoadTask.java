@@ -1,6 +1,7 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.activities.PullRequestDiffViewerActivity;
@@ -15,17 +16,18 @@ import org.eclipse.egit.github.core.PullRequest;
 import java.util.List;
 
 public class PullRequestDiffLoadTask extends DiffLoadTask {
-    private final int mPullRequestNumber;
+    @VisibleForTesting
+    protected final int mPullRequestNumber;
 
     public PullRequestDiffLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            BrowseFilter.DiffHighlightId diffId, int pullRequestNumber) {
+            DiffHighlightId diffId, int pullRequestNumber) {
         super(activity, repoOwner, repoName, diffId);
         mPullRequestNumber = pullRequestNumber;
     }
 
     @Override
-    protected Intent getLaunchIntent(String sha, CommitFile file,
-            List<CommitComment> comments, BrowseFilter.DiffHighlightId diffId) {
+    protected Intent getLaunchIntent(String sha, CommitFile file, List<CommitComment> comments,
+            DiffHighlightId diffId) {
         return PullRequestDiffViewerActivity.makeIntent(mActivity, mRepoOwner,
                 mRepoName, mPullRequestNumber, sha, file.getFilename(), file.getPatch(),
                 comments, -1, diffId.startLine, diffId.endLine, diffId.right, null);

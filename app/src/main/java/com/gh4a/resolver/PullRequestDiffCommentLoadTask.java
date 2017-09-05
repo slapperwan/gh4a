@@ -1,6 +1,7 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.activities.PullRequestActivity;
@@ -18,11 +19,16 @@ import org.eclipse.egit.github.core.PullRequest;
 import java.util.List;
 
 public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
-    private final String mRepoOwner;
-    private final String mRepoName;
-    private final int mPullRequestNumber;
-    private final IntentUtils.InitialCommentMarker mMarker;
-    private final int mPage;
+    @VisibleForTesting
+    protected final String mRepoOwner;
+    @VisibleForTesting
+    protected final String mRepoName;
+    @VisibleForTesting
+    protected final int mPullRequestNumber;
+    @VisibleForTesting
+    protected final IntentUtils.InitialCommentMarker mMarker;
+    @VisibleForTesting
+    protected final int mPage;
 
     public PullRequestDiffCommentLoadTask(FragmentActivity activity, String repoOwner,
             String repoName, int pullRequestNumber, IntentUtils.InitialCommentMarker marker,

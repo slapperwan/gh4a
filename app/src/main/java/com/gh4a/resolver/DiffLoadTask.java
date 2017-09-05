@@ -15,10 +15,10 @@ import java.util.List;
 public abstract class DiffLoadTask extends UrlLoadTask {
     protected final String mRepoOwner;
     protected final String mRepoName;
-    protected final BrowseFilter.DiffHighlightId mDiffId;
+    protected final DiffHighlightId mDiffId;
 
     public DiffLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            BrowseFilter.DiffHighlightId diffId) {
+            DiffHighlightId diffId) {
         super(activity);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
@@ -57,5 +57,5 @@ public abstract class DiffLoadTask extends UrlLoadTask {
     protected abstract String getSha() throws Exception;
     protected abstract List<CommitComment> getComments() throws Exception;
     protected abstract Intent getLaunchIntent(String sha, CommitFile file,
-            List<CommitComment> comments, BrowseFilter.DiffHighlightId diffId);
+            List<CommitComment> comments, DiffHighlightId diffId);
 }

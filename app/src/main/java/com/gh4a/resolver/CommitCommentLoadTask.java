@@ -1,6 +1,7 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.activities.CommitActivity;
@@ -17,10 +18,14 @@ import org.eclipse.egit.github.core.RepositoryCommit;
 import java.util.List;
 
 public class CommitCommentLoadTask extends UrlLoadTask {
-    private final String mRepoOwner;
-    private final String mRepoName;
-    private final String mCommitSha;
-    private final IntentUtils.InitialCommentMarker mMarker;
+    @VisibleForTesting
+    protected final String mRepoOwner;
+    @VisibleForTesting
+    protected final String mRepoName;
+    @VisibleForTesting
+    protected final String mCommitSha;
+    @VisibleForTesting
+    protected final IntentUtils.InitialCommentMarker mMarker;
 
     public CommitCommentLoadTask(FragmentActivity activity, String repoOwner, String repoName,
             String commitSha, IntentUtils.InitialCommentMarker marker,
