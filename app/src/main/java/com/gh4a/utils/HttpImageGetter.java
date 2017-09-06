@@ -28,7 +28,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.os.AsyncTaskCompat;
+import android.support.v7.graphics.drawable.DrawableWrapper;
 import android.text.Html.ImageGetter;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -59,23 +59,7 @@ import java.util.Map;
 
 import pl.droidsonroids.gif.GifDrawable;
 
-public class HttpImageGetter implements ImageGetter {
-
-    private static class LoadingImageGetter implements ImageGetter {
-        private final Drawable mImage;
-
-        private LoadingImageGetter(final Context context) {
-            mImage = ContextCompat.getDrawable(context,
-                    UiUtils.resolveDrawable(context, R.attr.loadingPictureIcon));
-            mImage.setBounds(0, 0, mImage.getIntrinsicWidth(), mImage.getIntrinsicHeight());
-        }
-
-        @Override
-        public Drawable getDrawable(String source) {
-            return mImage;
-        }
-    }
-
+public class HttpImageGetter {
     private static class GifCallback implements Drawable.Callback {
         private final List<WeakReference<TextView>> mViewRefs;
         private final Handler mHandler = new Handler();
@@ -136,70 +120,89 @@ public class HttpImageGetter implements ImageGetter {
         }
     }
 
-    private static class ObjectInfo {
+    private static class PlaceholderDrawable extends DrawableWrapper implements Runnable {
+        private String mUrl;
+        private ObjectInfo mInfo;
+        private Drawable mLoadedImage;
+
+        public PlaceholderDrawable(String url, ObjectInfo info, Drawable placeholder) {
+            super(placeholder);
+            setBounds(0, 0, placeholder.getIntrinsicWidth(), placeholder.getIntrinsicHeight());
+            mUrl = url;
+            mInfo = info;
+        }
+
+        public String getUrl() {
+            return mUrl;
+        }
+
+        public void addLoadedImage(Drawable image, Handler handler) {
+            synchronized (this) {
+                mLoadedImage = image;
+                handler.post(this);
+            }
+        }
+
+        @Override
+        public void run() {
+            setWrappedDrawable(mLoadedImage);
+            setBounds(0, 0, mLoadedImage.getIntrinsicWidth(), mLoadedImage.getIntrinsicHeight());
+            mInfo.invalidateViewsForNewDrawable();
+        }
+    }
+
+    private class ObjectInfo implements ImageGetter {
         private final ArrayList<WeakReference<TextView>> mViewRefs = new ArrayList<>();
         private final List<GifInfo> mGifs = new ArrayList<>();
         private final List<WeakReference<Bitmap>> mBitmaps = new ArrayList<>();
 
-        private CharSequence mRawHtml;
-        private CharSequence mEncodedHtml;
+        private CharSequence mHtml;
         private ImageGetterAsyncTask mTask;
+        private boolean mHasStartedImageLoad;
         private boolean mResumed = true;
 
-        void bind(TextView view, String html, HttpImageGetter getter) {
+        void bind(TextView view, String html) {
             addView(view);
 
-            if (mEncodedHtml != null) {
-                apply(mEncodedHtml);
-                return;
+            if (mHtml == null) {
+                encode(view.getContext(), html);
             }
 
-            if (mRawHtml == null) {
-                CharSequence encoded = HtmlUtils.encode(view.getContext(),
-                        html, getter.mLoadingGetter);
-                if (containsImages(html)) {
-                    mRawHtml = encoded;
-                } else {
-                    mRawHtml = null;
-                    mEncodedHtml = encoded;
-                    apply(mEncodedHtml);
-                    return;
+            apply(mHtml);
+
+            if (!mHasStartedImageLoad) {
+                ImageSpan[] spans = getImageSpans();
+                if (spans != null && spans.length > 0) {
+                    PlaceholderDrawable[] imagesToLoad = new PlaceholderDrawable[spans.length];
+                    for (int i = 0; i < spans.length; i++) {
+                        imagesToLoad[i] = (PlaceholderDrawable) spans[i].getDrawable();
+                    }
+                    mTask = new ImageGetterAsyncTask(HttpImageGetter.this, this);
+                    mTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imagesToLoad);
                 }
+                mHasStartedImageLoad = true;
             }
-
-            apply(mRawHtml);
-            if (mTask == null) {
-                mTask = new ImageGetterAsyncTask(getter, html, this);
-                AsyncTaskCompat.executeParallel(mTask);
-            }
-
         }
         void unbind(TextView view) {
             removeView(view);
         }
 
-        void encode(Context context, String html, ImageGetter loadingGetter) {
-            CharSequence encoded = HtmlUtils.encode(context, html, loadingGetter);
+        void encode(Context context, String html) {
+            CharSequence encoded = HtmlUtils.encode(context, html, this);
             synchronized (this) {
-                if (containsImages(html)) {
-                    mRawHtml = encoded;
-                } else {
-                    mRawHtml = null;
-                    mEncodedHtml = encoded;
-                }
+                mHtml = encoded;
             }
         }
 
-        void onEncodingDone(CharSequence encoded) {
-            mRawHtml = null;
-            mEncodedHtml = encoded;
-
+        void onImageLoadDone() {
             discardLoadedImages();
 
-            Spanned spanned = (Spanned) encoded;
-            ImageSpan[] spans = spanned.getSpans(0, encoded.length(), ImageSpan.class);
-            for (ImageSpan span : spans) {
+            for (ImageSpan span : getImageSpans()) {
                 Drawable d = span.getDrawable();
+                if (d instanceof PlaceholderDrawable) {
+                    PlaceholderDrawable phd = (PlaceholderDrawable) d;
+                    d = phd.getWrappedDrawable();
+                }
                 if (d instanceof GifDrawable) {
                     GifDrawable gd = (GifDrawable) d;
                     if (mResumed) {
@@ -211,7 +214,15 @@ public class HttpImageGetter implements ImageGetter {
                     mBitmaps.add(new WeakReference<>(bd.getBitmap()));
                 }
             }
-            apply(mEncodedHtml);
+        }
+
+        void invalidateViewsForNewDrawable() {
+            for (int i = 0; i < mViewRefs.size(); i++) {
+                TextView view = mViewRefs.get(i).get();
+                if (view != null) {
+                    view.setText(view.getText());
+                }
+            }
         }
 
         void setResumed(boolean resumed) {
@@ -229,6 +240,11 @@ public class HttpImageGetter implements ImageGetter {
             }
         }
 
+        private ImageSpan[] getImageSpans() {
+            Spanned spanned = (Spanned) mHtml;
+            return spanned.getSpans(0, spanned.length(), ImageSpan.class);
+        }
+
         private void discardLoadedImages() {
             for (WeakReference<Bitmap> ref : mBitmaps) {
                 Bitmap bitmap = ref.get();
@@ -241,6 +257,7 @@ public class HttpImageGetter implements ImageGetter {
                 info.destroy();
             }
             mGifs.clear();
+            mHasStartedImageLoad = false;
         }
 
         void clearHtmlCache() {
@@ -248,8 +265,8 @@ public class HttpImageGetter implements ImageGetter {
                 mTask.cancel(true);
                 mTask = null;
             }
-            mRawHtml = null;
-            mEncodedHtml = null;
+            mHtml = null;
+            mHasStartedImageLoad = false;
         }
 
         private void apply(CharSequence text) {
@@ -287,14 +304,15 @@ public class HttpImageGetter implements ImageGetter {
             }
         }
 
+        @Override
+        public Drawable getDrawable(String source) {
+            return new PlaceholderDrawable(source, this, mLoadingDrawable);
+        }
     }
 
-    private static boolean containsImages(final String html) {
-        return html.contains("<img");
-    }
-
+    private final Handler mHandler = new Handler();
     private Map<Object, ObjectInfo> mObjectInfos = new HashMap<>();
-    private final LoadingImageGetter mLoadingGetter;
+    private final Drawable mLoadingDrawable;
     private final Drawable mErrorDrawable;
 
     private final Context mContext;
@@ -315,10 +333,14 @@ public class HttpImageGetter implements ImageGetter {
         final Point size = new Point();
 
         wm.getDefaultDisplay().getSize(size);
-        mWidth= size.x;
+        mWidth = size.x;
         mHeight = size.y;
 
-        mLoadingGetter = new LoadingImageGetter(context);
+        mLoadingDrawable = ContextCompat.getDrawable(context,
+                UiUtils.resolveDrawable(context, R.attr.loadingPictureIcon));
+        mLoadingDrawable.setBounds(0, 0,
+                mLoadingDrawable.getIntrinsicWidth(), mLoadingDrawable.getIntrinsicHeight());
+
         mErrorDrawable = ContextCompat.getDrawable(context,
                 UiUtils.resolveDrawable(context, R.attr.contentPictureIcon));
         mErrorDrawable.setBounds(0, 0,
@@ -354,12 +376,12 @@ public class HttpImageGetter implements ImageGetter {
     }
 
     public void encode(final Context context, final Object id, final String html) {
-        findOrCreateInfo(id).encode(context, html, mLoadingGetter);
+        findOrCreateInfo(id).encode(context, html);
     }
 
     public void bind(final TextView view, final String html, final Object id) {
         unbind(view);
-        findOrCreateInfo(id).bind(view, html, this);
+        findOrCreateInfo(id).bind(view, html);
     }
 
     public void unbind(final TextView view) {
@@ -377,31 +399,35 @@ public class HttpImageGetter implements ImageGetter {
         return info;
     }
 
-    private static class ImageGetterAsyncTask extends AsyncTask<Void, Void, CharSequence> {
+    private static class ImageGetterAsyncTask extends AsyncTask<PlaceholderDrawable, Void, Void> {
         private HttpImageGetter mImageGetter;
-        private final String mHtml;
         private final ObjectInfo mInfo;
 
-        public ImageGetterAsyncTask(HttpImageGetter getter, String html, ObjectInfo info) {
+        public ImageGetterAsyncTask(HttpImageGetter getter, ObjectInfo info) {
             mImageGetter = getter;
-            mHtml = html;
             mInfo = info;
         }
 
         @Override
-        protected CharSequence doInBackground(Void... params) {
-            return HtmlUtils.encode(mImageGetter.mContext, mHtml, mImageGetter);
+        protected Void doInBackground(PlaceholderDrawable... params) {
+            for (PlaceholderDrawable placeholder : params) {
+                Drawable drawable = mImageGetter.loadImageForUrl(placeholder.getUrl());
+                if (drawable != null) {
+                    placeholder.addLoadedImage(drawable, mImageGetter.mHandler);
+                }
+            }
+            return null;
         }
 
-        protected void onPostExecute(CharSequence result) {
+        @Override
+        protected void onPostExecute(Void result) {
             if (!isCancelled()) {
-                mInfo.onEncodingDone(result);
+                mInfo.onImageLoadDone();
             }
         }
     }
 
-    @Override
-    public Drawable getDrawable(String source) {
+    private Drawable loadImageForUrl(String source) {
         Bitmap bitmap = null;
 
         if (!mDestroyed) {
