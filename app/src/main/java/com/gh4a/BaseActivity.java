@@ -440,7 +440,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void onRefresh() {
-        supportInvalidateOptionsMenu();
         mSwipeLayout.setRefreshing(false);
     }
 
