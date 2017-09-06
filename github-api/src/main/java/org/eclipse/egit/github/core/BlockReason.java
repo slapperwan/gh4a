@@ -10,46 +10,43 @@
  *******************************************************************************/
 package org.eclipse.egit.github.core;
 
+import org.eclipse.egit.github.core.util.ObjectUtils;
+
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
  * GitHub request error class
  */
-public class RequestError implements Serializable {
+public class BlockReason implements Serializable {
+    /** serialVersionUID */
+    private static final long serialVersionUID = -2491370428476460037L;
 
-	/** serialVersionUID */
-	private static final long serialVersionUID = -7842670602124573940L;
+    private String reason;
 
-	// This field is required for legacy v2 error support
-	private String error;
+    private Date createdAt;
 
-	private String message;
+    private String htmlUrl;
 
-	private List<FieldError> errors;
+    /**
+     * @return reason
+     */
+    public String getReason() {
+        return reason;
+    }
 
-	private BlockReason block;
+    /**
+     * @return createdAt
+     */
+    public Date getCreatedAt() {
+        return ObjectUtils.cloneDate(createdAt);
+    }
 
-	/**
-	 * @return message
-	 */
-	public String getMessage() {
-		return message != null ? message : error;
-	}
-
-	/**
-	 * Get errors
-	 *
-	 * @return list of errors
-	 */
-	public List<FieldError> getErrors() {
-		return errors;
-	}
-
-	/**
-	 * @return block
-	 */
-	public BlockReason getBlockReason() {
-		return block;
-	}
+    /**
+     * @return htmlUrl
+     */
+    public String getHtmlUrl() {
+        return htmlUrl;
+    }
 }

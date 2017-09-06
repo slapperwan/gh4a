@@ -14,14 +14,15 @@
         android:src="@drawable/load_failed_bg" />
 
     <com.gh4a.widget.StyleableTextView
+        android:id="@+id/error_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:autoLink="web"
         android:gravity="center_horizontal|top"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="8dp"
-        android:text="@string/load_failure_explanation"
         android:textColor="?android:attr/textColorSecondary"
         android:textSize="16sp" />
 

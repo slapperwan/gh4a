@@ -140,6 +140,11 @@ public class GitHubClient {
 	protected static final int HTTP_UNPROCESSABLE_ENTITY = 422;
 
 	/**
+	 * 451 status code for takedown for legal reasons
+	 */
+	protected static final int HTTP_UNAVAILABLE_FOR_LEGAL_REASONS = 451;
+
+	/**
 	 * Base URI
 	 */
 	protected final String baseUri;
@@ -512,6 +517,7 @@ public class GitHubClient {
 		case HTTP_CONFLICT:
 		case HTTP_GONE:
 		case HTTP_UNPROCESSABLE_ENTITY:
+		case HTTP_UNAVAILABLE_FOR_LEGAL_REASONS:
 		case HTTP_INTERNAL_ERROR:
 			return true;
 		default:

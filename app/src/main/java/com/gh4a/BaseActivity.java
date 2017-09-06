@@ -69,6 +69,10 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
 
+import org.eclipse.egit.github.core.BlockReason;
+import org.eclipse.egit.github.core.client.RequestException;
+
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -149,7 +153,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     public void handleLoadFailure(Exception e) {
-        setErrorViewVisibility(true);
+        setErrorViewVisibility(true, e);
     }
 
     protected int getLeftNavigationDrawerMenuResource() {
@@ -535,7 +539,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return reloadedAny;
     }
 
-    protected void setErrorViewVisibility(boolean visible) {
+    protected void setErrorViewVisibility(boolean visible, Exception e) {
         View content = findViewById(R.id.content);
         View error = findViewById(R.id.error);
 
@@ -555,12 +559,36 @@ public abstract class BaseActivity extends AppCompatActivity implements
             error.findViewById(R.id.retry_button).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    setErrorViewVisibility(false);
+                    setErrorViewVisibility(false, null);
                     onRefresh();
                 }
             });
         }
-        error.setVisibility(visible ? View.VISIBLE : View.GONE);
+
+        if (visible) {
+            View retryButton = error.findViewById(R.id.retry_button);
+            TextView messageView = error.findViewById(R.id.error_message);
+
+            RequestException re = e instanceof RequestException ? (RequestException) e : null;
+            BlockReason blockReason = re != null && re.getError() != null
+                    ? re.getError().getBlockReason() : null;
+
+            if (blockReason != null) {
+                messageView.setText(
+                        getString(R.string.load_failure_explanation_dmca, blockReason.getHtmlUrl()));
+                retryButton.setVisibility(View.GONE);
+            } else if (re != null && re.getMessage() != null) {
+                messageView.setText(
+                        getString(R.string.load_failure_explanation_with_reason, re.getMessage()));
+                retryButton.setVisibility(View.VISIBLE);
+            } else {
+                messageView.setText(R.string.load_failure_explanation);
+                retryButton.setVisibility(View.VISIBLE);
+            }
+            error.setVisibility(View.VISIBLE);
+        } else {
+            error.setVisibility(View.GONE);
+        }
     }
 
     protected void onDrawerOpened(boolean right) {

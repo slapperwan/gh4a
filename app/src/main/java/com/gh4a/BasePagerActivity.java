@@ -86,10 +86,10 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     @Override
-    protected void setErrorViewVisibility(boolean visible) {
+    protected void setErrorViewVisibility(boolean visible, Exception e) {
         mErrorViewVisible = visible;
         updateTabVisibility();
-        super.setErrorViewVisibility(visible);
+        super.setErrorViewVisibility(visible, e);
     }
 
     private void updateTabHeaderColors() {

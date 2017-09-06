@@ -261,7 +261,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         @Override
         protected void onError(Exception e) {
             super.onError(e);
-            setErrorViewVisibility(true);
+            setErrorViewVisibility(true, e);
         }
 
         @Override
