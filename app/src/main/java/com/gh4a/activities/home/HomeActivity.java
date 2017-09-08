@@ -502,7 +502,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         }
 
         mDrawerSwitcher.setImageResource(accountMode
-                ? R.drawable.drop_up_arrow : R.drawable.drop_down_arrow);
+                ? R.drawable.drop_up_arrow_white : R.drawable.drop_down_arrow_white);
         mDrawerInAccountMode = accountMode;
     }
 
