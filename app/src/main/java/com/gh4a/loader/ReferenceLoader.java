@@ -26,6 +26,9 @@ public class ReferenceLoader extends BaseLoader<Reference> {
                 Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
 
         PullRequestMarker head = mPullRequest.getHead();
+        if (head.getRepo() == null) {
+            return null;
+        }
         String owner = head.getRepo().getOwner().getLogin();
         String repo = head.getRepo().getName();
         String ref = "heads/" + head.getRef();

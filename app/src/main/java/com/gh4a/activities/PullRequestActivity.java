@@ -255,10 +255,14 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             menu.removeItem(R.id.browser);
         }
 
-        MenuItem deleteBranchItem = menu.findItem(R.id.delete_branch);
-        deleteBranchItem.setVisible(mHasLoadedHeadReference);
-        if (mHeadReference == null) {
-            deleteBranchItem.setTitle(R.string.restore_branch);
+        if (mPullRequest == null || mPullRequest.getHead().getRepo() == null) {
+            menu.removeItem(R.id.delete_branch);
+        } else {
+            MenuItem deleteBranchItem = menu.findItem(R.id.delete_branch);
+            deleteBranchItem.setVisible(mHasLoadedHeadReference);
+            if (mHeadReference == null) {
+                deleteBranchItem.setTitle(R.string.restore_branch);
+            }
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -597,6 +601,9 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     (DataService) Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
 
             PullRequestMarker head = mPullRequest.getHead();
+            if (head.getRepo() == null) {
+                return null;
+            }
             String owner = head.getRepo().getOwner().getLogin();
             String repo = head.getRepo().getName();
             RepositoryId repoId = new RepositoryId(owner, repo);
