@@ -219,7 +219,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
                 <com.gh4a.widget.StyleableTextView
@@ -227,11 +226,14 @@
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:drawableRight="?dropUpArrowIcon"
                     android:text="@string/readme" />
 
                 <ProgressBar
                     android:id="@+id/pb_readme"
-                    style="@style/LoadingProgress" />
+                    style="@style/LoadingProgress"
+                    android:layout_marginBottom="@dimen/content_padding" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/readme"

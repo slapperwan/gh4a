@@ -98,6 +98,8 @@
     <attr name="expandIcon" format="reference" />
     <attr name="collapseIcon" format="reference" />
     <attr name="saveIcon" format="reference" />
+    <attr name="dropDownArrowIcon" format="reference" />
+    <attr name="dropUpArrowIcon" format="reference" />
 
     <attr name="maxHeight" format="dimension" />
 
