@@ -13,4 +13,6 @@ android {
 dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.squareup.okhttp:okhttp:1.6.0'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.2'
+    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
 }

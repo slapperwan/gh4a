@@ -18,6 +18,7 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 
 if (isPlaystore) {
     apply plugin: 'io.fabric'
@@ -60,6 +61,11 @@ android {
         foss {
 
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
