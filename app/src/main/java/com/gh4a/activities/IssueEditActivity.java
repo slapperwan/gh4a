@@ -27,6 +27,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.util.ObjectsCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -98,6 +99,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     private List<User> mAllAssignee;
     private List<Label> mAllLabels;
     private Issue mEditIssue;
+    private Issue mOriginalIssue;
 
     private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
@@ -111,6 +113,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     private TextView mLabelsView;
 
     private static final String STATE_KEY_ISSUE = "issue";
+    private static final String STATE_KEY_ORIGINAL_ISSUE = "original_issue";
 
     private final LoaderCallbacks<List<Label>> mLabelCallback =
             new ProgressDialogLoaderCallbacks<List<Label>>(this, this) {
@@ -235,6 +238,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_ISSUE)) {
             mEditIssue = (Issue) savedInstanceState.getSerializable(STATE_KEY_ISSUE);
+            mOriginalIssue = (Issue) savedInstanceState.getSerializable(STATE_KEY_ORIGINAL_ISSUE);
         } else if (!isInEditMode()) {
             getSupportLoaderManager().initLoader(4, null, mIssueTemplateCallback);
             mDescView.setEnabled(false);
@@ -243,6 +247,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
         if (mEditIssue == null) {
             mEditIssue = new Issue();
+            mOriginalIssue = new Issue();
         }
 
         mTitleView.setText(mEditIssue.getTitle());
@@ -292,6 +297,13 @@ public class IssueEditActivity extends BasePagerActivity implements
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
         mEditIssue = (Issue) extras.getSerializable("issue");
+        // Save only editable fields
+        mOriginalIssue = new Issue()
+                .setTitle(mEditIssue.getTitle())
+                .setBody(mEditIssue.getBody())
+                .setMilestone(mEditIssue.getMilestone())
+                .setAssignees(mEditIssue.getAssignees())
+                .setLabels(mEditIssue.getLabels());
     }
 
     @Override
@@ -351,6 +363,9 @@ public class IssueEditActivity extends BasePagerActivity implements
         super.onSaveInstanceState(outState);
         if (mEditIssue != null) {
             outState.putSerializable(STATE_KEY_ISSUE, mEditIssue);
+        }
+        if (mOriginalIssue != null) {
+            outState.putSerializable(STATE_KEY_ORIGINAL_ISSUE, mOriginalIssue);
         }
     }
 
@@ -605,13 +620,23 @@ public class IssueEditActivity extends BasePagerActivity implements
         public SaveIssueTask(Issue issue) {
             super(IssueEditActivity.this, R.string.saving_msg);
             Milestone milestone = issue.getMilestone();
-            mIssue = new Issue()
-                    .setNumber(issue.getNumber())
-                    .setTitle(issue.getTitle())
-                    .setBody(issue.getBody())
-                    .setMilestone(milestone != null ? milestone : new Milestone())
-                    .setAssignees(issue.getAssignees())
-                    .setLabels(issue.getLabels());
+            mIssue = new Issue().setNumber(issue.getNumber());
+
+            if (!ObjectsCompat.equals(issue.getTitle(), mOriginalIssue.getTitle())) {
+                mIssue.setTitle(issue.getTitle());
+            }
+            if (!ObjectsCompat.equals(issue.getBody(), mOriginalIssue.getBody())) {
+                mIssue.setBody(issue.getBody());
+            }
+            if (!ObjectsCompat.equals(issue.getMilestone(), mOriginalIssue.getMilestone())) {
+                mIssue.setMilestone(milestone != null ? milestone : new Milestone());
+            }
+            if (!ObjectsCompat.equals(issue.getAssignees(), mOriginalIssue.getAssignees())) {
+                mIssue.setAssignees(issue.getAssignees());
+            }
+            if (!ObjectsCompat.equals(issue.getLabels(), mOriginalIssue.getLabels())) {
+                mIssue.setLabels(issue.getLabels());
+            }
         }
 
         @Override
