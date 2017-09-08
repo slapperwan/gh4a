@@ -379,6 +379,11 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
+    protected boolean fragmentNeedsRefresh(Fragment object) {
+        return true;
+    }
+
+    @Override
     protected Intent navigateUp() {
         return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName, true);
     }
