@@ -25,6 +25,8 @@ import android.os.Handler;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -155,9 +157,15 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         if (mIssue == null || mIsCollaborator == null) {
             return;
         }
-        setFragment(IssueFragment.newInstance(mRepoOwner, mRepoName,
-                mIssue, mIsCollaborator, mInitialComment));
-        getSupportFragmentManager().beginTransaction()
+        FragmentManager fm = getSupportFragmentManager();
+        IssueFragment newFragment = IssueFragment.newInstance(mRepoOwner, mRepoName,
+                mIssue, mIsCollaborator, mInitialComment);
+        if (mFragment != null) {
+            Fragment.SavedState state = fm.saveFragmentInstanceState(mFragment);
+            newFragment.setInitialSavedState(state);
+        }
+        setFragment(newFragment);
+        fm.beginTransaction()
                 .replace(R.id.details, mFragment)
                 .commitAllowingStateLoss();
         mInitialComment = null;
