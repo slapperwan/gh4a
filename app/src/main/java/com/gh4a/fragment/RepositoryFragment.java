@@ -48,6 +48,7 @@ import com.vdurmont.emoji.EmojiParser;
 import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
@@ -67,10 +68,12 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private HttpImageGetter mImageGetter;
 
     private Observable<String> mLoadReadme;
+    private Disposable[] mSubscriptions;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSubscriptions = new Disposable[2];
         mRepository = (Repository) getArguments().getSerializable("repo");
         mRef = getArguments().getString("ref");
     }
@@ -86,6 +89,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         super.onDestroyView();
         mImageGetter.destroy();
         mImageGetter = null;
+
+        for(Disposable d : mSubscriptions) if(d != null) d.dispose(); // clean up rx
     }
 
     @Override
@@ -98,21 +103,15 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         if (mImageGetter != null) {
             mImageGetter.clearHtmlCache();
         }
+
         hideContentAndRestartLoaders(0, 1);
+        RepositoryService.loadReadme = null;
+        mSubscriptions[0] = loadReadme().subscribe();
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mImageGetter = new HttpImageGetter(getActivity());
-        fillData();
-        setContentShown(true);
-
-        // Fetch Readme file
-        mLoadReadme = RepositoryService.loadReadme(getContext(), mRepository.getOwner().getLogin(),
+    public Observable<String> loadReadme() {
+        return RepositoryService.loadReadme(getContext(), mRepository.getOwner().getLogin(),
                 mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef)
-                .compose(RxTools.applySchedulers())
                 .doOnError(throwable -> Log.d("TEST", "Error downloading readme")) // No error handling
                 .flatMap(result -> { // Fill-in Readme
                     TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
@@ -131,13 +130,21 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                     progress.setVisibility(View.GONE);
 
                     return Observable.just(result);
-                }).doOnError(throwable -> Log.d("TEST", "Error filling Readme"))
-                .compose(RxTools.applySchedulers());
+                }).doOnError(throwable -> Log.d("TEST", "Error filling Readme"));
+    }
 
-        mLoadReadme.subscribe();
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-        RepositoryService.getPullRequestCount(mRepository, ApiHelpers.IssueState.OPEN)
-                .compose(RxTools.applySchedulers())
+        mImageGetter = new HttpImageGetter(getActivity());
+        fillData();
+        setContentShown(true);
+
+        // Fetch Readme file
+        mSubscriptions[0] = loadReadme().subscribe();
+
+        mSubscriptions[1] = RepositoryService.getPullRequestCount(mRepository, ApiHelpers.IssueState.OPEN)
                 .doOnError(throwable -> Log.d("TEST", "Error pullRequestCount"))
                 .doOnNext(result -> {
                     View v = getView();
@@ -169,7 +176,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         getArguments().putString("ref", ref);
 
         // reload readme
-        mLoadReadme.compose(RxTools.applySchedulers()).subscribe();
+        mSubscriptions[0] = mLoadReadme.compose(RxTools.applySchedulers()).subscribe();
 
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);

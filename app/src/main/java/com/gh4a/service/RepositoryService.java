@@ -4,6 +4,7 @@ import android.content.Context;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.HtmlUtils;
+import com.gh4a.utils.RxTools;
 
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -19,8 +20,13 @@ import java.util.Locale;
 import io.reactivex.Observable;
 
 public class RepositoryService {
+    public static Observable<String> loadReadme = null;
+    public static Observable<Integer> pullRequestCount = null;
+
     public static Observable<String> loadReadme(Context context, String repoOwner, String repoName, String ref) {
-        return Observable.create(emitter -> {
+        if(loadReadme != null) return loadReadme;
+
+        Observable<String> observable =  Observable.create(emitter -> {
             Gh4Application app = (Gh4Application) context.getApplicationContext();
             GitHubClient client = new DefaultClient("application/vnd.github.v3.html");
             client.setOAuth2Token(app.getAuthToken());
@@ -41,10 +47,17 @@ public class RepositoryService {
                 emitter.onError(ioe);
             }
         });
+
+        loadReadme = observable
+                .compose(RxTools.applySchedulers())
+                .cache();
+        return loadReadme;
     }
 
     public static Observable<Integer> getPullRequestCount(Repository repository, String state) {
-        return Observable.create(emitter -> {
+        if(pullRequestCount != null) return pullRequestCount;
+
+        Observable<Integer> observable = Observable.create(emitter -> {
             final String QUERY_FORMAT = "type:pr repo:%s/%s state:%s";
             IssueService issueService = (IssueService)
                     Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
@@ -58,5 +71,10 @@ public class RepositoryService {
                 emitter.onError(ioe);
             }
         });
+
+        pullRequestCount = observable
+                .compose(RxTools.applySchedulers())
+                .cache();
+        return pullRequestCount;
     }
 }
