@@ -15,14 +15,12 @@
  */
 package com.gh4a.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.support.v4.os.AsyncTaskCompat;
 import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -72,16 +70,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private String mRef;
     private HttpImageGetter mImageGetter;
 
-    private final Observable<String> mLoadReadme = RepositoryService.loadReadme(
-                getContext(), mRepository.getOwner().getLogin(), mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef
-            )
-            .doOnError(throwable -> {}) // No error handling
-            .doOnNext(result -> {
-                TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
-                View progress = mContentView.findViewById(R.id.pb_readme);
-                AsyncTaskCompat.executeParallel(new FillReadmeTask(
-                        mRepository.getId(), readmeView, progress, mImageGetter), result);
-            });
+    private Observable<String> mLoadReadme;
 
     private final LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>(this) {
         @Override
@@ -144,7 +133,32 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         fillData();
         setContentShown(true);
 
-        mLoadReadme.compose(RxTools.applySchedulers()).subscribe();
+        // Fetch Readme file
+        mLoadReadme = RepositoryService.loadReadme(getContext(), mRepository.getOwner().getLogin(),
+                mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef)
+                .compose(RxTools.applySchedulers())
+                .doOnError(throwable -> Log.d("TEST", "Error downloading readme")) // No error handling
+                .flatMap(result -> { // Fill-in Readme
+                    TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
+                    View progress = mContentView.findViewById(R.id.pb_readme);
+                    if (result != null)
+                        mImageGetter.encode(getContext(), mRepository.getId(), result);
+
+                    if (result != null) {
+                        readmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+                        mImageGetter.bind(readmeView, result, mRepository.getId());
+                    } else {
+                        readmeView.setText(R.string.repo_no_readme);
+                        readmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+                    }
+                    readmeView.setVisibility(View.VISIBLE);
+                    progress.setVisibility(View.GONE);
+
+                    return Observable.just(result);
+                }).doOnError(throwable -> Log.d("TEST", "Error filling Readme"))
+                .compose(RxTools.applySchedulers());
+
+        mLoadReadme.subscribe();
         getLoaderManager().initLoader(1, null, mPullRequestsCallback);
     }
 
@@ -306,45 +320,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
         if (intent != null) {
             startActivity(intent);
-        }
-    }
-
-    private static class FillReadmeTask extends AsyncTask<String, Void, String> {
-        private final Long mId;
-        private final Context mContext;
-        private final TextView mReadmeView;
-        private final View mProgressView;
-        private final HttpImageGetter mImageGetter;
-
-        public FillReadmeTask(long id, TextView readmeView, View progressView,
-                HttpImageGetter imageGetter) {
-            mId = id;
-            mContext = readmeView.getContext();
-            mReadmeView = readmeView;
-            mProgressView = progressView;
-            mImageGetter = imageGetter;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String readme = params[0];
-            if (readme != null) {
-                mImageGetter.encode(mContext, mId, readme);
-            }
-            return readme;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (result != null) {
-                mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-                mImageGetter.bind(mReadmeView, result, mId);
-            } else {
-                mReadmeView.setText(R.string.repo_no_readme);
-                mReadmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-            }
-            mReadmeView.setVisibility(View.VISIBLE);
-            mProgressView.setVisibility(View.GONE);
         }
     }
 }
