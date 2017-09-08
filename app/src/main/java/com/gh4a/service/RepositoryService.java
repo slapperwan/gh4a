@@ -28,8 +28,10 @@ public class RepositoryService {
             ContentsService contentService = new ContentsService(client);
             try {
                 String html = contentService.getReadmeHtml(new RepositoryId(repoOwner, repoName), ref);
-                if (html != null)
+                if (html != null) {
                     emitter.onNext(HtmlUtils.rewriteRelativeUrls(html, repoOwner, repoName, ref));
+                    emitter.onComplete();
+                }
             } catch (RequestException e) {
                 /* don't spam logcat with 404 errors, those are normal */
                 if (e.getStatus() != 404) {
@@ -51,6 +53,7 @@ public class RepositoryService {
                     repository.getOwner().getLogin(), repository.getName(), state));
             try {
                 emitter.onNext(issueService.getSearchIssueResultCount(filterData));
+                emitter.onComplete();
             } catch(IOException ioe) {
                 emitter.onError(ioe);
             }
