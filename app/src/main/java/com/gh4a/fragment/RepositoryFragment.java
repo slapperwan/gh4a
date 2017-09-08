@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.text.SpannableStringBuilder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,9 +37,6 @@ import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.PullRequestCountLoader;
 import com.gh4a.service.RepositoryService;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HttpImageGetter;
@@ -71,26 +67,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private HttpImageGetter mImageGetter;
 
     private Observable<String> mLoadReadme;
-
-    private final LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>(this) {
-        @Override
-        protected Loader<LoaderResult<Integer>> onCreateLoader() {
-            return new PullRequestCountLoader(getActivity(), mRepository, ApiHelpers.IssueState.OPEN);
-        }
-
-        @Override
-        protected void onResultReady(Integer result) {
-            View v = getView();
-            v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
-            v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
-
-            TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
-            tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues() - result));
-
-            TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
-            tvPullRequestsCountView.setText(String.valueOf(result));
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -159,7 +135,21 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                 .compose(RxTools.applySchedulers());
 
         mLoadReadme.subscribe();
-        getLoaderManager().initLoader(1, null, mPullRequestsCallback);
+
+        RepositoryService.getPullRequestCount(mRepository, ApiHelpers.IssueState.OPEN)
+                .compose(RxTools.applySchedulers())
+                .doOnError(throwable -> Log.d("TEST", "Error pullRequestCount"))
+                .doOnNext(result -> {
+                    View v = getView();
+                    v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
+                    v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
+
+                    TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
+                    tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues() - result));
+
+                    TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
+                    tvPullRequestsCountView.setText(String.valueOf(result));
+                }).subscribe();
     }
 
     @Override

@@ -4,11 +4,18 @@ import android.content.Context;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.HtmlUtils;
+
+import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.RequestException;
 import org.eclipse.egit.github.core.service.ContentsService;
+import org.eclipse.egit.github.core.service.IssueService;
+
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Locale;
+
 import io.reactivex.Observable;
 
 public class RepositoryService {
@@ -29,6 +36,22 @@ public class RepositoryService {
                     emitter.onError(e);
                 }
             } catch (IOException ioe) {
+                emitter.onError(ioe);
+            }
+        });
+    }
+
+    public static Observable<Integer> getPullRequestCount(Repository repository, String state) {
+        return Observable.create(emitter -> {
+            final String QUERY_FORMAT = "type:pr repo:%s/%s state:%s";
+            IssueService issueService = (IssueService)
+                    Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
+            HashMap<String, String> filterData = new HashMap<>();
+            filterData.put("q", String.format(Locale.US, QUERY_FORMAT,
+                    repository.getOwner().getLogin(), repository.getName(), state));
+            try {
+                emitter.onNext(issueService.getSearchIssueResultCount(filterData));
+            } catch(IOException ioe) {
                 emitter.onError(ioe);
             }
         });
