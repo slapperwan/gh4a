@@ -641,31 +641,41 @@ public class IssueService extends GitHubService {
 	protected Map<Object, Object> createIssueMap(Issue issue, boolean newIssue) {
 		Map<Object, Object> params = new HashMap<Object, Object>();
 		if (issue != null) {
-			params.put(FIELD_BODY, issue.getBody());
-			params.put(FIELD_TITLE, issue.getTitle());
+			String body = issue.getBody();
+			if (body != null) {
+				params.put(FIELD_BODY, body);
+			}
+
+			String title = issue.getTitle();
+			if (title != null) {
+				params.put(FIELD_TITLE, title);
+			}
+
 			List<User> assignees = issue.getAssignees();
 			if (assignees != null) {
 				List<String> assigneeLogins = new ArrayList<String>();
-				for (User assignee : assignees)
+				for (User assignee : assignees) {
 					assigneeLogins.add(assignee.getLogin());
+				}
 				params.put("assignees", assigneeLogins);
 			}
 
 			Milestone milestone = issue.getMilestone();
 			if (milestone != null) {
 				int number = milestone.getNumber();
-				if (number > 0)
+				if (number > 0) {
 					params.put(FILTER_MILESTONE, Integer.toString(number));
-				else {
-					if (!newIssue)
-						params.put(FILTER_MILESTONE, ""); //$NON-NLS-1$
+				} else if (!newIssue) {
+					params.put(FILTER_MILESTONE, ""); //$NON-NLS-1$
 				}
 			}
+
 			List<Label> labels = issue.getLabels();
 			if (labels != null) {
 				List<String> labelNames = new ArrayList<String>(labels.size());
-				for (Label label : labels)
+				for (Label label : labels) {
 					labelNames.add(label.getName());
+				}
 				params.put(FILTER_LABELS, labelNames);
 			}
 		}
