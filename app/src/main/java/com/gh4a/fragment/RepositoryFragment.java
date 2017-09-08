@@ -29,7 +29,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
+import com.gh4a.DefaultClient;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
@@ -44,16 +45,25 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCountLoader;
-import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.RxTools;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.vdurmont.emoji.EmojiParser;
-
 import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.client.RequestException;
+import org.eclipse.egit.github.core.service.ContentsService;
+import java.io.IOException;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.annotations.NonNull;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
@@ -72,20 +82,41 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private String mRef;
     private HttpImageGetter mImageGetter;
 
-    private final LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>(this) {
-        @Override
-        protected Loader<LoaderResult<String>> onCreateLoader() {
-            return new ReadmeLoader(getActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef);
+    public void loadReadme(ObservableEmitter<String> emitter, String repoOwner, String repoName, String ref) throws IOException {
+        Gh4Application app = (Gh4Application) getContext().getApplicationContext();
+        GitHubClient client = new DefaultClient("application/vnd.github.v3.html");
+        client.setOAuth2Token(app.getAuthToken());
+
+        ContentsService contentService = new ContentsService(client);
+        try {
+            String html = contentService.getReadmeHtml(new RepositoryId(repoOwner, repoName), ref);
+            if (html != null) {
+                emitter.onNext(HtmlUtils.rewriteRelativeUrls(html, repoOwner, repoName, ref));
+                emitter.onComplete();
+            }
+        } catch (RequestException e) {
+            /* don't spam logcat with 404 errors, those are normal */
+            if (e.getStatus() != 404) {
+                emitter.onError(e);
+            }
         }
-        @Override
-        protected void onResultReady(String result) {
-            TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
-            View progress = mContentView.findViewById(R.id.pb_readme);
-            AsyncTaskCompat.executeParallel(new FillReadmeTask(
-                    mRepository.getId(), readmeView, progress, mImageGetter), result);
-        }
-    };
+    }
+
+    private final Observable<String> mLoadReadme = Observable.create(
+            new ObservableOnSubscribe<String>() {
+                @Override
+                public void subscribe(@NonNull ObservableEmitter<String> e) throws Exception {
+                    loadReadme(e, mRepository.getOwner().getLogin(),
+                            mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef);
+                }
+            })
+            .doOnError(throwable -> {}) // No error handling
+            .doOnNext(result -> {
+                TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
+                View progress = mContentView.findViewById(R.id.pb_readme);
+                AsyncTaskCompat.executeParallel(new FillReadmeTask(
+                        mRepository.getId(), readmeView, progress, mImageGetter), result);
+            });
 
     private final LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>(this) {
         @Override
@@ -148,7 +179,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         fillData();
         setContentShown(true);
 
-        getLoaderManager().initLoader(0, null, mReadmeCallback);
+        mLoadReadme.compose(RxTools.applySchedulers()).subscribe();
         getLoaderManager().initLoader(1, null, mPullRequestsCallback);
     }
 
@@ -167,8 +198,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     public void setRef(String ref) {
         mRef = ref;
         getArguments().putString("ref", ref);
+
         // reload readme
-        getLoaderManager().restartLoader(0, null, mReadmeCallback);
+        mLoadReadme.compose(RxTools.applySchedulers()).subscribe();
+
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
             mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
