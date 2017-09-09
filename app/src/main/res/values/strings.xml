@@ -516,4 +516,6 @@
     <string name="gist_print_document_title">%1$s in gist %2$s of %3$s</string>
     <string name="file_print_document_title">%1$s in %2$s/%3$s</string>
     <string name="wiki_print_document_title">Wiki page %1$s in %2$s/%3$s</string>
+
+    <string name="repository_owner_avatar">Repository owner avatar</string>
 </resources>

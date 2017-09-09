@@ -1,6 +1,7 @@
 package com.gh4a.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,13 +13,16 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.activities.UserActivity;
 import com.gh4a.loader.NotificationHolder;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Notification;
 import org.eclipse.egit.github.core.NotificationSubject;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.User;
 
 public class NotificationAdapter extends
         RootAdapter<NotificationHolder, NotificationAdapter.ViewHolder> {
@@ -137,6 +141,11 @@ public class NotificationAdapter extends
 
             Repository repository = item.repository;
             holder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
+
+            User owner = item.repository.getOwner();
+            AvatarHandler.assignAvatar(holder.ivAvatar, owner);
+            holder.ivAvatar.setTag(owner);
+            holder.ivAvatar.setAlpha(alpha);
             return;
         }
 
@@ -197,6 +206,10 @@ public class NotificationAdapter extends
             tvTimestamp = view.findViewById(R.id.tv_timestamp);
             vNotificationContent = view.findViewById(R.id.v_notification_content);
             vBottomShadow = view.findViewById(R.id.v_bottom_shadow);
+            ivAvatar = view.findViewById(R.id.iv_avatar);
+            if (ivAvatar != null) {
+                ivAvatar.setOnClickListener(this);
+            }
 
             mPopupMenu = new PopupMenu(view.getContext(), ivAction);
             mPopupMenu.getMenuInflater().inflate(R.menu.notification_menu, mPopupMenu.getMenu());
@@ -205,6 +218,7 @@ public class NotificationAdapter extends
 
         private final ImageView ivIcon;
         private final ImageView ivAction;
+        private final ImageView ivAvatar;
         private final TextView tvTitle;
         private final TextView tvTimestamp;
         private final View vNotificationContent;
@@ -214,13 +228,24 @@ public class NotificationAdapter extends
 
         @Override
         public void onClick(View v) {
-            if (v.getId() == R.id.iv_action) {
-                NotificationHolder notificationHolder = (NotificationHolder) v.getTag();
+            switch (v.getId()) {
+                case R.id.iv_action: {
+                    NotificationHolder notificationHolder = (NotificationHolder) v.getTag();
 
-                if (notificationHolder.notification == null) {
-                    mActionCallback.markAsRead(notificationHolder);
-                } else {
-                    mPopupMenu.show();
+                    if (notificationHolder.notification == null) {
+                        mActionCallback.markAsRead(notificationHolder);
+                    } else {
+                        mPopupMenu.show();
+                    }
+                    break;
+                }
+                case R.id.iv_avatar: {
+                    User user = (User) v.getTag();
+                    Intent intent = UserActivity.makeIntent(v.getContext(), user);
+                    if (intent != null) {
+                        v.getContext().startActivity(intent);
+                    }
+                    break;
                 }
             }
         }
