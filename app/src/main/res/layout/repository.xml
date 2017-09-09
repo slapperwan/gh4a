@@ -82,12 +82,14 @@
                     android:visibility="gone"
                     tools:visibility="visible" />
 
+                <!-- TODO: Get rid of these -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tv_private"
                     android:layout_marginTop="@dimen/overview_item_spacing"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:id="@+id/cell_issues"
@@ -206,6 +208,46 @@
                             android:text="@string/pulls"
                             android:textAppearance="?android:attr/textAppearanceSmall" />
                     </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_private"
+                    android:layout_marginBottom="@dimen/overview_header_spacing"
+                    android:layout_marginTop="@dimen/content_padding"
+                    android:orientation="vertical">
+
+                    <com.gh4a.widget.RepositoryStatView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:buttonText="@string/repo_unwatch_action"
+                        app:mainText="54 Watchers" />
+
+                    <com.gh4a.widget.RepositoryStatView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:buttonText="@string/repo_unstar_action"
+                        app:mainText="809 Stars" />
+
+                    <com.gh4a.widget.RepositoryStatView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:buttonText="@string/fork"
+                        app:mainText="153 Forks" />
+
+                    <com.gh4a.widget.RepositoryStatView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:buttonText="View"
+                        app:mainText="85 Issues" />
+
+                    <com.gh4a.widget.RepositoryStatView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:buttonText="View"
+                        app:mainText="8 Pull Requests" />
+
                 </LinearLayout>
             </RelativeLayout>
         </android.support.v7.widget.CardView>

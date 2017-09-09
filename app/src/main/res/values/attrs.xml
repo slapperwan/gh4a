@@ -139,4 +139,10 @@
 
     <item name="EdgeColorHelper" type="id" />
     <item name="FloatingActionButtonScrollEnabled" type="id" />
+
+    <declare-styleable name="RepositoryStatView">
+        <attr name="mainText" format="string" />
+        <attr name="buttonText" format="string" />
+        <attr name="buttonDrawable" format="color|reference" />
+    </declare-styleable>
 </resources>
