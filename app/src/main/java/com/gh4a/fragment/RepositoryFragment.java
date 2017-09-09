@@ -67,6 +67,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         return f;
     }
 
+    private static final int ID_LOADER_README = 0;
+    private static final int ID_LOADER_PULL_REQUEST_COUNT = 1;
+    private static final String STATE_KEY_IS_README_EXPANDED = "is_readme_expanded";
+    private static final String STATE_KEY_IS_README_LOADED = "is_readme_loaded";
+
     private Repository mRepository;
     private View mContentView;
     private String mRef;
@@ -75,7 +80,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private View mLoadingView;
     private TextView mReadmeTitleView;
     private boolean mIsReadmeLoaded = false;
-    private boolean mIsReadmeExpanded = true;
+    private boolean mIsReadmeExpanded = false;
 
     private final LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>(this) {
         @Override
@@ -139,7 +144,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         if (mReadmeView != null) {
             mReadmeView.setVisibility(View.GONE);
         }
-        if (mLoadingView != null) {
+        if (mLoadingView != null && mIsReadmeExpanded) {
             mLoadingView.setVisibility(View.VISIBLE);
         }
         if (mContentView != null) {
@@ -148,7 +153,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         if (mImageGetter != null) {
             mImageGetter.clearHtmlCache();
         }
-        hideContentAndRestartLoaders(0, 1);
+        hideContentAndRestartLoaders(ID_LOADER_README, ID_LOADER_PULL_REQUEST_COUNT);
     }
 
     @Override
@@ -159,8 +164,16 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         fillData();
         setContentShown(true);
 
-        getLoaderManager().initLoader(0, null, mReadmeCallback);
-        getLoaderManager().initLoader(1, null, mPullRequestsCallback);
+        if (savedInstanceState != null) {
+            mIsReadmeExpanded = savedInstanceState.getBoolean(STATE_KEY_IS_README_EXPANDED, false);
+            mIsReadmeLoaded = savedInstanceState.getBoolean(STATE_KEY_IS_README_LOADED, false);
+        }
+        if (mIsReadmeExpanded || mIsReadmeLoaded) {
+            getLoaderManager().initLoader(ID_LOADER_README, null, mReadmeCallback);
+        }
+        getLoaderManager().initLoader(ID_LOADER_PULL_REQUEST_COUNT, null, mPullRequestsCallback);
+
+        updateReadmeVisibility();
     }
 
     @Override
@@ -175,15 +188,25 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         mImageGetter.pause();
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_KEY_IS_README_EXPANDED, mIsReadmeExpanded);
+        outState.putBoolean(STATE_KEY_IS_README_LOADED, mIsReadmeLoaded);
+    }
+
     public void setRef(String ref) {
         mRef = ref;
         getArguments().putString("ref", ref);
-        // reload readme
-        getLoaderManager().restartLoader(0, null, mReadmeCallback);
+
+        // Reload readme
+        if (getLoaderManager().getLoader(ID_LOADER_README) != null) {
+            getLoaderManager().restartLoader(ID_LOADER_README, null, mReadmeCallback);
+        }
         if (mReadmeView != null) {
             mReadmeView.setVisibility(View.GONE);
         }
-        if (mLoadingView != null) {
+        if (mLoadingView != null && mIsReadmeExpanded) {
             mLoadingView.setVisibility(View.VISIBLE);
         }
     }
@@ -334,6 +357,14 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private void toggleReadmeExpanded() {
         mIsReadmeExpanded = !mIsReadmeExpanded;
 
+        if (mIsReadmeExpanded && !mIsReadmeLoaded) {
+            getLoaderManager().initLoader(ID_LOADER_README, null, mReadmeCallback);
+        }
+
+        updateReadmeVisibility();
+    }
+
+    private void updateReadmeVisibility() {
         mReadmeView.setVisibility(mIsReadmeExpanded && mIsReadmeLoaded ? View.VISIBLE : View.GONE);
         mLoadingView.setVisibility(
                 mIsReadmeExpanded && !mIsReadmeLoaded ? View.VISIBLE : View.GONE);

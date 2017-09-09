@@ -227,13 +227,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackground"
-                    android:drawableRight="?dropUpArrowIcon"
+                    android:drawableRight="?dropDownArrowIcon"
                     android:text="@string/readme" />
 
                 <ProgressBar
                     android:id="@+id/pb_readme"
                     style="@style/LoadingProgress"
-                    android:layout_marginBottom="@dimen/content_padding" />
+                    android:layout_marginBottom="@dimen/content_padding"
+                    android:layout_marginTop="@dimen/content_padding"
+                    android:visibility="gone" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/readme"
