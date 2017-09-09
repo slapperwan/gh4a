@@ -15,6 +15,7 @@
  */
 package com.gh4a.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -40,7 +41,6 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.service.RepositoryService;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HttpImageGetter;
-import com.gh4a.utils.RxTools;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
@@ -66,8 +66,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private View mContentView;
     private String mRef;
     private HttpImageGetter mImageGetter;
-
-    private Observable<String> mLoadReadme;
     private Disposable[] mSubscriptions;
 
     @Override
@@ -90,7 +88,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         mImageGetter.destroy();
         mImageGetter = null;
 
-        for(Disposable d : mSubscriptions) if(d != null) d.dispose(); // clean up rx
+        for(Disposable d : mSubscriptions) {
+            if(d != null)
+                d.dispose();
+        }
     }
 
     @Override
@@ -105,7 +106,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         }
 
         hideContentAndRestartLoaders(0, 1);
-        RepositoryService.loadReadme = null;
         mSubscriptions[0] = loadReadme().subscribe();
     }
 
@@ -176,7 +176,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         getArguments().putString("ref", ref);
 
         // reload readme
-        mSubscriptions[0] = mLoadReadme.compose(RxTools.applySchedulers()).subscribe();
+        mSubscriptions[0] = loadReadme().subscribe();
 
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
@@ -293,26 +293,30 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         String name = mRepository.getName();
         Intent intent = null;
 
-        if (id == R.id.cell_pull_requests) {
-            intent = IssueListActivity.makeIntent(getActivity(), owner, name, true);
-        } else if (id == R.id.tv_contributors_label) {
-            intent = ContributorListActivity.makeIntent(getActivity(), owner, name);
-        } else if (id == R.id.tv_collaborators_label) {
-            intent = CollaboratorListActivity.makeIntent(getActivity(), owner, name);
-        } else if (id == R.id.cell_issues) {
-            intent = IssueListActivity.makeIntent(getActivity(), owner, name);
-        } else if (id == R.id.cell_stargazers) {
-            intent = WatcherListActivity.makeIntent(getActivity(), owner, name);
-        } else if (id == R.id.cell_forks) {
-            intent = ForkListActivity.makeIntent(getActivity(), owner, name);
-        } else if (id == R.id.tv_wiki_label) {
-            intent = WikiListActivity.makeIntent(getActivity(), owner, name, null);
-        } else if (id == R.id.tv_downloads_label) {
-            intent = DownloadsActivity.makeIntent(getActivity(), owner, name);
-        } else if (id == R.id.tv_releases_label) {
-            intent = ReleaseListActivity.makeIntent(getActivity(), owner, name);
-        } else if (view.getTag() instanceof Repository) {
-            intent = RepositoryActivity.makeIntent(getActivity(), (Repository) view.getTag());
+        Context c = getActivity();
+        switch (id) {
+            case R.id.cell_pull_requests:
+                intent = IssueListActivity.makeIntent(c, owner, name, true); break;
+            case R.id.tv_contributors_label:
+                intent = ContributorListActivity.makeIntent(c, owner, name); break;
+            case R.id.tv_collaborators_label:
+                intent = CollaboratorListActivity.makeIntent(c, owner, name); break;
+            case R.id.cell_issues:
+                intent = IssueListActivity.makeIntent(c, owner, name); break;
+            case R.id.cell_stargazers:
+                intent = WatcherListActivity.makeIntent(c, owner, name); break;
+            case R.id.cell_forks:
+                intent = ForkListActivity.makeIntent(c, owner, name); break;
+            case R.id.tv_wiki_label:
+                intent = WikiListActivity.makeIntent(c, owner, name, null); break;
+            case R.id.tv_downloads_label:
+                intent = DownloadsActivity.makeIntent(c, owner, name); break;
+            case R.id.tv_releases_label:
+                intent = ReleaseListActivity.makeIntent(c, owner, name); break;
+            default:
+                if (view.getTag() instanceof Repository)
+                    intent = RepositoryActivity.makeIntent(c, (Repository) view.getTag());
+                break;
         }
 
         if (intent != null) {

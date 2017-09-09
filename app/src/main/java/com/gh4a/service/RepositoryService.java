@@ -20,8 +20,8 @@ import java.util.Locale;
 import io.reactivex.Observable;
 
 public class RepositoryService {
-    public static Observable<String> loadReadme = null;
-    public static Observable<Integer> pullRequestCount = null;
+    private static Observable<String> loadReadme = null;
+    private static Observable<Integer> pullRequestCount = null;
 
     public static Observable<String> loadReadme(Context context, String repoOwner, String repoName, String ref) {
         if(loadReadme != null) return loadReadme;
