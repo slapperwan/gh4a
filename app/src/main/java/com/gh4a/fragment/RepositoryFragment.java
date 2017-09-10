@@ -48,7 +48,6 @@ import com.vdurmont.emoji.EmojiParser;
 import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
@@ -66,12 +65,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private View mContentView;
     private String mRef;
     private HttpImageGetter mImageGetter;
-    private Disposable[] mSubscriptions;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mSubscriptions = new Disposable[2];
         mRepository = (Repository) getArguments().getSerializable("repo");
         mRef = getArguments().getString("ref");
     }
@@ -87,11 +84,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         super.onDestroyView();
         mImageGetter.destroy();
         mImageGetter = null;
-
-        for(Disposable d : mSubscriptions) {
-            if(d != null)
-                d.dispose();
-        }
     }
 
     @Override
@@ -105,8 +97,17 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             mImageGetter.clearHtmlCache();
         }
 
-        hideContentAndRestartLoaders(0, 1);
-        mSubscriptions[0] = loadReadme().subscribe();
+        this.reloadData();
+    }
+
+    public void reloadData() {
+        setContentShown(false);
+        RepositoryService.emptyCache();
+
+        mCompositeDisposable.add(loadReadme()
+                .flatMap(s -> getPullRequestsCount())
+                .doOnNext(s -> setContentShown(true))
+                .subscribe());
     }
 
     public Observable<String> loadReadme() {
@@ -133,18 +134,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                 }).doOnError(throwable -> Log.d("TEST", "Error filling Readme"));
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mImageGetter = new HttpImageGetter(getActivity());
-        fillData();
-        setContentShown(true);
-
-        // Fetch Readme file
-        mSubscriptions[0] = loadReadme().subscribe();
-
-        mSubscriptions[1] = RepositoryService.getPullRequestCount(mRepository, ApiHelpers.IssueState.OPEN)
+    public Observable<Integer> getPullRequestsCount() {
+        return RepositoryService.getPullRequestCount(mRepository, ApiHelpers.IssueState.OPEN)
                 .doOnError(throwable -> Log.d("TEST", "Error pullRequestCount"))
                 .doOnNext(result -> {
                     View v = getView();
@@ -156,7 +147,20 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
                     TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
                     tvPullRequestsCountView.setText(String.valueOf(result));
-                }).subscribe();
+                });
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        mImageGetter = new HttpImageGetter(getActivity());
+        fillData();
+        setContentShown(true);
+
+        // Fetch Readme file + PullRequests Count
+        mCompositeDisposable.add(loadReadme().subscribe());
+        mCompositeDisposable.add(getPullRequestsCount().subscribe());
     }
 
     @Override
@@ -176,7 +180,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         getArguments().putString("ref", ref);
 
         // reload readme
-        mSubscriptions[0] = loadReadme().subscribe();
+        mCompositeDisposable.add(loadReadme().subscribe());
 
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
