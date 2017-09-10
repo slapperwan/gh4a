@@ -23,6 +23,11 @@ public class RepositoryService {
     private static Observable<String> loadReadme = null;
     private static Observable<Integer> pullRequestCount = null;
 
+    public static void emptyCache() {
+        loadReadme = null;
+        pullRequestCount = null;
+    }
+
     public static Observable<String> loadReadme(Context context, String repoOwner, String repoName, String ref) {
         if(loadReadme != null) return loadReadme;
 
