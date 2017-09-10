@@ -330,6 +330,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                 Intent intent = IssueActivity.makeIntent(this, mRepoOwner, mRepoName,
                         issue.getNumber());
                 startActivityForResult(intent, REQUEST_ISSUE_AFTER_CREATE);
+                // TODO: Handle this
             }
         } else if (requestCode == REQUEST_ISSUE_AFTER_CREATE) {
             // Refresh all fragments (instead of just open issues fragment) when coming back from

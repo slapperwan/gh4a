@@ -16,16 +16,20 @@
 package com.gh4a.activities;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
+import android.support.v4.util.ObjectsCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -54,6 +58,7 @@ import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.loader.ReferenceLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.TaskUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
@@ -74,17 +79,38 @@ import java.util.Locale;
 
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_NUMBER = "number";
+    private static final String EXTRA_INITIAL_PAGE = "initial_page";
+    private static final String EXTRA_INITIAL_COMMENT = "initial_comment";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
         return makeIntent(context, repoOwner, repoName, number, -1, null);
     }
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             int number, int initialPage, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, PullRequestActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("number", number)
-                .putExtra("initial_page", initialPage)
-                .putExtra("initial_comment", initialComment);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_NUMBER, number)
+                .putExtra(EXTRA_INITIAL_PAGE, initialPage)
+                .putExtra(EXTRA_INITIAL_COMMENT, initialComment);
+    }
+
+    public static void startTask(Context context, String login, String repoName, int number,
+            int initialPage, IntentUtils.InitialCommentMarker initialComment) {
+        Intent intent = makeIntent(context, login, repoName, number, initialPage, initialComment);
+        TaskUtils.startMatchingOrNewTask(context, intent, new TaskUtils.IntentMatcher() {
+            @Override
+            public boolean matches(@NonNull Bundle a, @NonNull Bundle b) {
+                b.setClassLoader(getClass().getClassLoader());
+                return ObjectsCompat.equals(a.getString(EXTRA_OWNER), b.getString(EXTRA_OWNER)) &&
+                        ObjectsCompat.equals(a.getString(EXTRA_REPO), b.getString(EXTRA_REPO)) &&
+                        a.getInt(EXTRA_NUMBER) == b.getInt(EXTRA_NUMBER);
+            }
+        });
     }
 
     public static final int PAGE_CONVERSATION = 0;
@@ -191,6 +217,15 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     };
 
     @Override
+    protected String getActivityTitle() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null || actionBar.getTitle() == null) {
+            return null;
+        }
+        return actionBar.getTitle().toString();
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -201,9 +236,17 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         addHeaderView(mHeader, !hasTabsInToolbar());
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getResources().getString(R.string.pull_request_title) + " #" + mPullRequestNumber);
+        String title =
+                getResources().getString(R.string.pull_request_title) + " #" + mPullRequestNumber;
+        actionBar.setTitle(title);
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // TODO: Better handle activity titles
+            int color = UiUtils.resolveColor(this, R.attr.colorIssueOpen);
+            setTaskDescription(new ActivityManager.TaskDescription(title, null, color));
+        }
 
         setContentShown(false);
 
@@ -308,13 +351,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mPullRequestNumber = extras.getInt("number");
-        mInitialComment = extras.getParcelable("initial_comment");
-        mInitialPage = extras.getInt("initial_page", -1);
-        extras.remove("initial_comment");
-        extras.remove("initial_page");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mPullRequestNumber = extras.getInt(EXTRA_NUMBER);
+        mInitialComment = extras.getParcelable(EXTRA_INITIAL_COMMENT);
+        mInitialPage = extras.getInt(EXTRA_INITIAL_PAGE, -1);
+        extras.remove(EXTRA_INITIAL_COMMENT);
+        extras.remove(EXTRA_INITIAL_PAGE);
     }
 
     @Override

@@ -15,8 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -39,8 +37,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class IssueListFragment extends PagedDataBaseFragment<Issue> {
-    private static final int REQUEST_ISSUE = 1000;
-
     private Map<String, String> mFilterData;
     private int mEmptyTextResId;
     private boolean mShowRepository;
@@ -102,23 +98,15 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     @Override
     public void onItemClick(Issue issue) {
         String[] urlPart = issue.getUrl().split("/");
-        Intent intent = issue.getPullRequest() != null
-                ? PullRequestActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.getNumber())
-                : IssueActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.getNumber());
-        startActivityForResult(intent, REQUEST_ISSUE);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_ISSUE) {
-            if (resultCode == Activity.RESULT_OK) {
-                super.onRefresh();
-            }
+        String login = urlPart[4];
+        String repoName = urlPart[5];
+        if (issue.getPullRequest() != null) {
+            PullRequestActivity.startTask(getActivity(), login, repoName, issue.getNumber(), -1,
+                    null);
         } else {
-            super.onActivityResult(requestCode, resultCode, data);
+            IssueActivity.startTask(getActivity(), login, repoName, issue.getNumber(), null);
         }
     }
-
 
     @Override
     protected RootAdapter<Issue, ? extends RecyclerView.ViewHolder> onCreateAdapter() {

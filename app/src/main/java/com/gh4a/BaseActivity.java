@@ -72,7 +72,6 @@ import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
 import org.eclipse.egit.github.core.BlockReason;
 import org.eclipse.egit.github.core.client.RequestException;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,7 +117,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         @TargetApi(21)
         @Override
         public void run() {
-            setTaskDescription(new ActivityManager.TaskDescription(null, null, mProgressColors[0]));
+            setTaskDescription(new ActivityManager.TaskDescription(getActivityTitle(), null,
+                    mProgressColors[0]));
         }
     };
 
@@ -257,6 +257,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mProgressColors[1] = statusBarColor;
         mProgress.invalidate();
         scheduleTaskDescriptionUpdate();
+    }
+
+    protected String getActivityTitle() {
+        return null;
     }
 
     protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
