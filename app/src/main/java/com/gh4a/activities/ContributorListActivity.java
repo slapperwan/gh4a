@@ -25,10 +25,14 @@ import com.gh4a.R;
 import com.gh4a.fragment.ContributorListFragment;
 
 public class ContributorListActivity extends FragmentContainerActivity {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return new Intent(context, ContributorListActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName);
     }
 
     private String mUserLogin;
@@ -49,8 +53,8 @@ public class ContributorListActivity extends FragmentContainerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString("owner");
-        mRepoName = extras.getString("repo");
+        mUserLogin = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
     }
 
     @Override

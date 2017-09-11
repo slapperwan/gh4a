@@ -11,12 +11,13 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class PublicEventListFragment extends EventListFragment {
+    private static final String EXTRA_LOGIN = "login";
     private String mLogin;
 
     public static PublicEventListFragment newInstance(String login) {
         PublicEventListFragment f = new PublicEventListFragment();
         Bundle args = new Bundle();
-        args.putString("login", login);
+        args.putString(EXTRA_LOGIN, login);
         f.setArguments(args);
         return f;
     }
@@ -24,7 +25,7 @@ public class PublicEventListFragment extends EventListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString("login");
+        mLogin = getArguments().getString(EXTRA_LOGIN);
     }
 
     @Override

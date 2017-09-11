@@ -44,12 +44,17 @@ import com.meisolsson.githubsdk.service.issues.IssueLabelService;
 
 public class IssueLabelListActivity extends BaseActivity implements
         RootAdapter.OnItemClickListener<IssueLabelAdapter.EditableLabel>, View.OnClickListener {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_FROM_PR = "from_pr";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             boolean fromPullRequest) {
         return new Intent(context, IssueLabelListActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("from_pr", fromPullRequest);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_FROM_PR, fromPullRequest);
     }
 
     private static final int ID_LOADER_LABELS = 0;
@@ -128,9 +133,9 @@ public class IssueLabelListActivity extends BaseActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mParentIsPullRequest = extras.getBoolean("from_pr", false);
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mParentIsPullRequest = extras.getBoolean(EXTRA_FROM_PR, false);
     }
 
     @Override

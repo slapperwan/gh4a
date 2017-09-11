@@ -21,22 +21,26 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 import java.util.List;
 
 public class PullRequestFilesFragment extends CommitFragment {
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_NUMBER = "number";
+    private static final String EXTRA_HEAD = "head";
+    private static final int REQUEST_DIFF_VIEWER = 1000;
+    private static final int ID_LOADER_FILES = 0;
+    private static final int ID_LOADER_COMMENTS = 1;
+
     public static PullRequestFilesFragment newInstance(String repoOwner, String repoName,
             int pullRequestNumber, String headSha) {
         PullRequestFilesFragment f = new PullRequestFilesFragment();
 
         Bundle args = new Bundle();
-        args.putString("owner", repoOwner);
-        args.putString("repo", repoName);
-        args.putInt("number", pullRequestNumber);
-        args.putString("head", headSha);
+        args.putString(EXTRA_OWNER, repoOwner);
+        args.putString(EXTRA_REPO, repoName);
+        args.putInt(EXTRA_NUMBER, pullRequestNumber);
+        args.putString(EXTRA_HEAD, headSha);
         f.setArguments(args);
         return f;
     }
-
-    private static final int ID_LOADER_FILES = 0;
-    private static final int ID_LOADER_COMMENTS = 1;
-    private static final int REQUEST_DIFF_VIEWER = 1000;
 
     public interface CommentUpdateListener {
         void onCommentsUpdated();
@@ -53,10 +57,10 @@ public class PullRequestFilesFragment extends CommitFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         final Bundle args = getArguments();
-        mRepoOwner = args.getString("owner");
-        mRepoName = args.getString("repo");
-        mPullRequestNumber = args.getInt("number");
-        mHeadSha = args.getString("head");
+        mRepoOwner = args.getString(EXTRA_OWNER);
+        mRepoName = args.getString(EXTRA_REPO);
+        mPullRequestNumber = args.getInt(EXTRA_NUMBER);
+        mHeadSha = args.getString(EXTRA_HEAD);
     }
 
     @Override

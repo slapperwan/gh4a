@@ -39,19 +39,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommitFragment extends LoadingFragmentBase implements OnClickListener {
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_SHA = "sha";
+    private static final String EXTRA_COMMIT = "commit";
+    private static final String EXTRA_COMMENTS = "comments";
+    private static final String STATUS_ADDED = "added";
+    private static final String STATUS_MODIFIED = "modified";
+    private static final String STATUS_RENAMED = "renamed";
+    private static final String STATUS_REMOVED = "removed";
+    private static final int REQUEST_DIFF_VIEWER = 1000;
+
     public static CommitFragment newInstance(String repoOwner, String repoName, String commitSha,
             Commit commit, List<GitComment> comments) {
         CommitFragment f = new CommitFragment();
 
         Bundle args = new Bundle();
-        args.putString("owner", repoOwner);
-        args.putString("repo", repoName);
-        args.putString("sha", commitSha);
+        args.putString(EXTRA_OWNER, repoOwner);
+        args.putString(EXTRA_REPO, repoName);
+        args.putString(EXTRA_SHA, commitSha);
         // Commit objects can be huge, depending on the number of patches attached to it.
         // In order to avoid TransactionTooLargeExceptions being thrown when the activity we're
         // attached to is recreated, store the data in compressed form
-        IntentUtils.putParcelableToBundleCompressed(args, "commit", commit, 100000);
-        args.putParcelableArrayList("comments", new ArrayList<>(comments));
+        IntentUtils.putParcelableToBundleCompressed(args, EXTRA_COMMIT, commit, 100000);
+        args.putParcelableArrayList(EXTRA_COMMENTS, new ArrayList<>(comments));
         f.setArguments(args);
         return f;
     }
@@ -59,8 +70,6 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     public interface CommentUpdateListener {
         void onCommentsUpdated();
     }
-
-    private static final int REQUEST_DIFF_VIEWER = 1000;
 
     private String mRepoOwner;
     private String mRepoName;
@@ -73,11 +82,11 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
-        mRepoOwner = args.getString("owner");
-        mRepoName = args.getString("repo");
-        mObjectSha = args.getString("sha");
-        mCommit = IntentUtils.readCompressedParcelableFromBundle(args, "commit");
-        mComments = args.getParcelableArrayList("comments");
+        mRepoOwner = args.getString(EXTRA_OWNER);
+        mRepoName = args.getString(EXTRA_REPO);
+        mObjectSha = args.getString(EXTRA_SHA);
+        mCommit = IntentUtils.readCompressedParcelableFromBundle(args, EXTRA_COMMIT);
+        mComments = args.getParcelableArrayList(EXTRA_COMMENTS);
     }
 
     @Override
@@ -197,19 +206,19 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             final LinearLayout parent;
 
             switch (file.status()) {
-                case "added":
+                case STATUS_ADDED:
                     parent = llAdded;
                     added++;
                     break;
-                case "modified":
+                case STATUS_MODIFIED:
                     parent = llChanged;
                     changed++;
                     break;
-                case "renamed":
+                case STATUS_RENAMED:
                     parent = llRenamed;
                     renamed++;
                     break;
-                case "removed":
+                case STATUS_REMOVED:
                     parent = llDeleted;
                     deleted++;
                     break;

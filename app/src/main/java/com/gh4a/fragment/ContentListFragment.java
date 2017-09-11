@@ -53,6 +53,10 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
         RootAdapter.OnItemClickListener<Content> {
     private static final int MENU_HISTORY = Menu.FIRST + 1;
     private static final int REQUEST_FILE_HISTORY = 1000;
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_PATH = "path";
+    private static final String EXTRA_REF = "ref";
+    private static final String EXTRA_CONTENTS = "contents";
 
     private static final Comparator<Content> COMPARATOR = (lhs, rhs) -> {
         boolean lhsIsDir = lhs.type() == ContentType.Directory;
@@ -89,10 +93,10 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
         ContentListFragment f = new ContentListFragment();
 
         Bundle args = new Bundle();
-        args.putString("path", path != null ? path : "");
-        args.putString("ref", ref);
-        args.putParcelable("repo", repository);
-        args.putParcelableArrayList("contents", contents);
+        args.putString(EXTRA_PATH, path != null ? path : "");
+        args.putString(EXTRA_REF, ref);
+        args.putParcelable(EXTRA_REPO, repository);
+        args.putParcelableArrayList(EXTRA_CONTENTS, contents);
         f.setArguments(args);
 
         return f;
@@ -101,9 +105,9 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepository = getArguments().getParcelable("repo");
-        mPath = getArguments().getString("path");
-        mRef = getArguments().getString("ref");
+        mRepository = getArguments().getParcelable(EXTRA_REPO);
+        mPath = getArguments().getString(EXTRA_PATH);
+        mRef = getArguments().getString(EXTRA_REF);
         if (StringUtils.isBlank(mRef)) {
             mRef = mRepository.defaultBranch();
         }

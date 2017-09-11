@@ -22,18 +22,21 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class RepositorySearchFragment extends PagedDataBaseFragment<Repository> {
+    private static final String EXTRA_USER = "user";
+    private static final String EXTRA_QUERY = "query";
+
     public static RepositorySearchFragment newInstance(String userLogin) {
         RepositorySearchFragment f = new RepositorySearchFragment();
 
         Bundle args = new Bundle();
-        args.putString("user", userLogin);
+        args.putString(EXTRA_USER, userLogin);
         f.setArguments(args);
 
         return f;
     }
 
     public void setQuery(String query) {
-        getArguments().putString("query", query);
+        getArguments().putString(EXTRA_QUERY, query);
         if (isAdded()) {
             onRefresh();
         }
@@ -41,8 +44,8 @@ public class RepositorySearchFragment extends PagedDataBaseFragment<Repository> 
 
     @Override
     protected Single<Response<Page<Repository>>> loadPage(int page, boolean bypassCache) {
-        String login = getArguments().getString("user");
-        String query = getArguments().getString("query");
+        String login = getArguments().getString(EXTRA_USER);
+        String query = getArguments().getString(EXTRA_QUERY);
 
         if (TextUtils.isEmpty(query)) {
             return Single.just(Response.success(new ApiHelpers.DummyPage<>()));

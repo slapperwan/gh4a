@@ -52,6 +52,10 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
 
     private static final int REQUEST_COMMIT = 2000;
     private static final int MENU_SELECT_AS_BASE = Menu.FIRST + 2;
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_REF = "ref";
+    private static final String EXTRA_PATH = "path";
 
     private String mRepoOwner;
     private String mRepoName;
@@ -71,10 +75,10 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
         CommitListFragment f = new CommitListFragment();
 
         Bundle args = new Bundle();
-        args.putString("owner", repoOwner);
-        args.putString("repo", repoName);
-        args.putString("ref", ref);
-        args.putString("path", filePath);
+        args.putString(EXTRA_OWNER, repoOwner);
+        args.putString(EXTRA_REPO, repoName);
+        args.putString(EXTRA_REF, ref);
+        args.putString(EXTRA_PATH, filePath);
         f.setArguments(args);
 
         return f;
@@ -83,10 +87,10 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString("owner");
-        mRepoName = getArguments().getString("repo");
-        mRef = getArguments().getString("ref");
-        mFilePath = getArguments().getString("path");
+        mRepoOwner = getArguments().getString(EXTRA_OWNER);
+        mRepoName = getArguments().getString(EXTRA_REPO);
+        mRef = getArguments().getString(EXTRA_REF);
+        mFilePath = getArguments().getString(EXTRA_PATH);
     }
 
     @Override

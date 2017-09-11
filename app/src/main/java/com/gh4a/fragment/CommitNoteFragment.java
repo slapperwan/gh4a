@@ -39,6 +39,14 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
         CommitNoteAdapter.OnCommentAction<GitComment>,
         EditorBottomSheet.Callback, EditorBottomSheet.Listener {
 
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_SHA = "sha";
+    private static final String EXTRA_COMMIT_AUTHOR = "commit_author";
+    private static final String EXTRA_COMMITTER = "committer";
+    private static final String EXTRA_COMMENTS = "comments";
+    private static final String EXTRA_INITIAL_COMMENT = "initial_comment";
+
     public static CommitNoteFragment newInstance(String repoOwner, String repoName,
             String commitSha, Commit commit,
             List<GitComment> allComments, IntentUtils.InitialCommentMarker initialComment) {
@@ -53,13 +61,13 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
         }
 
         Bundle args = new Bundle();
-        args.putString("owner", repoOwner);
-        args.putString("repo", repoName);
-        args.putString("sha", commitSha);
-        args.putParcelable("commit_author", commit.author());
-        args.putParcelable("committer", commit.committer());
-        args.putParcelableArrayList("comments", comments);
-        args.putParcelable("initial_comment", initialComment);
+        args.putString(EXTRA_OWNER, repoOwner);
+        args.putString(EXTRA_REPO, repoName);
+        args.putString(EXTRA_SHA, commitSha);
+        args.putParcelable(EXTRA_COMMIT_AUTHOR, commit.author());
+        args.putParcelable(EXTRA_COMMITTER, commit.committer());
+        args.putParcelableArrayList(EXTRA_COMMENTS, comments);
+        args.putParcelable(EXTRA_INITIAL_COMMENT, initialComment);
 
         f.setArguments(args);
         return f;
@@ -85,13 +93,13 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
-        mRepoOwner = args.getString("owner");
-        mRepoName = args.getString("repo");
-        mObjectSha = args.getString("sha");
-        mCommitAuthor = args.getParcelable("commit_author");
-        mCommitter = args.getParcelable("committer");
-        mInitialComment = args.getParcelable("initial_comment");
-        args.remove("initial_comment");
+        mRepoOwner = args.getString(EXTRA_OWNER);
+        mRepoName = args.getString(EXTRA_REPO);
+        mObjectSha = args.getString(EXTRA_SHA);
+        mCommitAuthor = args.getParcelable(EXTRA_COMMIT_AUTHOR);
+        mCommitter = args.getParcelable(EXTRA_COMMITTER);
+        mInitialComment = args.getParcelable(EXTRA_INITIAL_COMMENT);
+        args.remove(EXTRA_INITIAL_COMMENT);
     }
 
     @Override
@@ -227,7 +235,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
 
     @Override
     protected Single<List<GitComment>> onCreateDataSingle(boolean bypassCache) {
-        List<GitComment> comments = getArguments().getParcelableArrayList("comments");
+        List<GitComment> comments = getArguments().getParcelableArrayList(EXTRA_COMMENTS);
         if (comments != null && !comments.isEmpty()) {
             return Single.just(comments);
         }

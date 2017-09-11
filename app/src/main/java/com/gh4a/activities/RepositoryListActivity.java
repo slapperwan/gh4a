@@ -29,6 +29,11 @@ import com.gh4a.fragment.RepositoryListContainerFragment;
 
 public class RepositoryListActivity extends FragmentContainerActivity implements
         RepositoryListContainerFragment.Callback {
+
+    private static final String EXTRA_USER = "user";
+    private static final String EXTRA_IS_ORG = "is_org";
+    private static final String EXTRA_FILTER_TYPE = "filter_type";
+
     public static Intent makeIntent(Context context, String user, boolean userIsOrg) {
         return makeIntent(context, user, userIsOrg, null);
     }
@@ -36,9 +41,9 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
     public static Intent makeIntent(Context context, String user, boolean userIsOrg,
             String defaultFilter) {
         return new Intent(context, RepositoryListActivity.class)
-                .putExtra("user", user)
-                .putExtra("is_org", userIsOrg)
-                .putExtra("filter_type", defaultFilter);
+                .putExtra(EXTRA_USER, user)
+                .putExtra(EXTRA_IS_ORG, userIsOrg)
+                .putExtra(EXTRA_FILTER_TYPE, defaultFilter);
     }
 
     private String mUserLogin;
@@ -73,9 +78,9 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
         Bundle data = getIntent().getExtras();
-        mUserLogin = data.getString("user");
-        mUserIsOrg = data.getBoolean("is_org");
-        mFilterType = data.getString("filter_type");
+        mUserLogin = data.getString(EXTRA_USER);
+        mUserIsOrg = data.getBoolean(EXTRA_IS_ORG);
+        mFilterType = data.getString(EXTRA_FILTER_TYPE);
 
         mFilterDrawerHelper = RepositoryListContainerFragment.FilterDrawerHelper.create(
                 mUserLogin, mUserIsOrg);

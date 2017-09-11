@@ -17,10 +17,13 @@ import retrofit2.Response;
 
 public class GistListFragment extends PagedDataBaseFragment<Gist> implements
         RootAdapter.OnItemClickListener<Gist> {
+    private static final String EXTRA_USER = "user";
+    private static final String EXTRA_STARRED = "starred";
+
     public static GistListFragment newInstance(String userLogin, boolean starred) {
         Bundle args = new Bundle();
-        args.putString("user", userLogin);
-        args.putBoolean("starred", starred);
+        args.putString(EXTRA_USER, userLogin);
+        args.putBoolean(EXTRA_STARRED, starred);
 
         GistListFragment f = new GistListFragment();
         f.setArguments(args);
@@ -34,8 +37,8 @@ public class GistListFragment extends PagedDataBaseFragment<Gist> implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mUserLogin = getArguments().getString("user");
-        mShowStarred = getArguments().getBoolean("starred");
+        mUserLogin = getArguments().getString(EXTRA_USER);
+        mShowStarred = getArguments().getBoolean(EXTRA_STARRED);
     }
 
     @Override

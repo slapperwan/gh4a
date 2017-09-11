@@ -38,24 +38,38 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
-    private String mLogin;
-    private String mRepoType;
-    private final Map<String, String> mFilterData = new HashMap<>();
+    private static final String EXTRA_USER = "user";
+    private static final String EXTRA_IS_ORG = "is_org";
+    private static final String EXTRA_REPO_TYPE = "repo_type";
+    private static final String EXTRA_SORT_ORDER = "sort_order";
+    private static final String EXTRA_SORT_DIRECTION = "sort_direction";
+    private static final String REPO_TYPE_SOURCES = "sources";
+    private static final String REPO_TYPE_FORKS = "forks";
+    private static final String REPO_TYPE_ALL = "all";
+    private static final String FILTER_DATA_AFFILIATION = "affiliation";
+    private static final String FILTER_DATA_TYPE = "type";
+    private static final String FILTER_DATA_SORT = "sort";
+    private static final String FILTER_DATA_DIRECTION = "direction";
 
     public static RepositoryListFragment newInstance(String login, boolean isOrg,
             String repoType, String sortOrder, String sortDirection) {
         RepositoryListFragment f = new RepositoryListFragment();
 
         Bundle args = new Bundle();
-        args.putString("user", login);
-        args.putBoolean("is_org", isOrg);
-        args.putString("repo_type", repoType);
-        args.putString("sort_order", sortOrder);
-        args.putString("sort_direction", sortDirection);
+        args.putString(EXTRA_USER, login);
+        args.putBoolean(EXTRA_IS_ORG, isOrg);
+        args.putString(EXTRA_REPO_TYPE, repoType);
+        args.putString(EXTRA_SORT_ORDER, sortOrder);
+        args.putString(EXTRA_SORT_DIRECTION, sortDirection);
         f.setArguments(args);
 
         return f;
     }
+
+    private final Map<String, String> mFilterData = new HashMap<>();
+
+    private String mLogin;
+    private String mRepoType;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,8 +77,8 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
 
         final Bundle args = getArguments();
 
-        mLogin = args.getString("user");
-        mRepoType = args.getString("repo_type");
+        mLogin = args.getString(EXTRA_USER);
+        mRepoType = args.getString(EXTRA_REPO_TYPE);
 
         final boolean isSelf = ApiHelpers.loginEquals(mLogin, Gh4Application.get().getAuthLogin());
 
@@ -79,19 +93,19 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
         // Additionally, using affiliation together with type is not supported, so omit
         // type when adding affiliation.
 
-        String actualFilterType = "sources".equals(mRepoType) || "forks".equals(mRepoType)
-                ? "all" : mRepoType;
+        String actualFilterType = REPO_TYPE_SOURCES.equals(mRepoType) || REPO_TYPE_FORKS.equals(mRepoType)
+                ? REPO_TYPE_ALL : mRepoType;
 
-        if (isSelf && TextUtils.equals(actualFilterType, "all")) {
-            mFilterData.put("affiliation", "owner,collaborator");
-        } else if (!TextUtils.equals(actualFilterType, "all") || !args.getBoolean("is_org")) {
-            mFilterData.put("type", actualFilterType);
+        if (isSelf && TextUtils.equals(actualFilterType, REPO_TYPE_ALL)) {
+            mFilterData.put(FILTER_DATA_AFFILIATION, "owner,collaborator");
+        } else if (!TextUtils.equals(actualFilterType, REPO_TYPE_ALL) || !args.getBoolean(EXTRA_IS_ORG)) {
+            mFilterData.put(FILTER_DATA_TYPE, actualFilterType);
         }
 
-        final String sortOrder = args.getString("sort_order");
+        final String sortOrder = args.getString(EXTRA_SORT_ORDER);
         if (sortOrder != null) {
-            mFilterData.put("sort", sortOrder);
-            mFilterData.put("direction", args.getString("sort_direction"));
+            mFilterData.put(FILTER_DATA_SORT, sortOrder);
+            mFilterData.put(FILTER_DATA_DIRECTION, args.getString(EXTRA_SORT_DIRECTION));
         }
     }
 
@@ -108,11 +122,11 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     protected void onAddData(RootAdapter<Repository, ? extends RecyclerView.ViewHolder> adapter,
             Collection<Repository> repositories) {
-        if ("sources".equals(mRepoType) || "forks".equals(mRepoType)) {
+        if (REPO_TYPE_SOURCES.equals(mRepoType) || REPO_TYPE_FORKS.equals(mRepoType)) {
             for (Repository repository : repositories) {
-                if ("sources".equals(mRepoType) && !repository.isFork()) {
+                if (REPO_TYPE_SOURCES.equals(mRepoType) && !repository.isFork()) {
                     adapter.add(repository);
-                } else if ("forks".equals(mRepoType) && repository.isFork()) {
+                } else if (REPO_TYPE_FORKS.equals(mRepoType) && repository.isFork()) {
                     adapter.add(repository);
                 }
             }

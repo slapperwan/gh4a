@@ -54,6 +54,9 @@ public class ContentListContainerFragment extends Fragment implements
     private static final String STATE_KEY_DIR_STACK = "dir_stack";
     private static final String STATE_KEY_CONTENT_CACHE_PREFIX = "content_cache_";
     private static final String STATE_KEY_INITIAL_PATH = "initial_path";
+    private static final String EXTRA_REPOSITORY = "repository";
+    private static final String EXTRA_REF = "ref";
+    private static final String EXTRA_INITIAL_PATH = "initialpath";
 
     private RxLoader mRxLoader;
     private PathBreadcrumbs mBreadcrumbs;
@@ -81,9 +84,9 @@ public class ContentListContainerFragment extends Fragment implements
         ContentListContainerFragment f = new ContentListContainerFragment();
 
         Bundle args = new Bundle();
-        args.putParcelable("repository", repository);
-        args.putString("ref", ref);
-        args.putString("initialpath", initialPath);
+        args.putParcelable(EXTRA_REPOSITORY, repository);
+        args.putString(EXTRA_REF, ref);
+        args.putString(EXTRA_INITIAL_PATH, initialPath);
         f.setArguments(args);
         return f;
     }
@@ -93,8 +96,8 @@ public class ContentListContainerFragment extends Fragment implements
         super.onCreate(savedInstanceState);
 
         mRxLoader = new RxLoader(getActivity(), getLoaderManager());
-        mRepository = getArguments().getParcelable("repository");
-        mSelectedRef = getArguments().getString("ref");
+        mRepository = getArguments().getParcelable(EXTRA_REPOSITORY);
+        mSelectedRef = getArguments().getString(EXTRA_REF);
         mStateSaved = false;
 
         if (savedInstanceState != null) {
@@ -115,7 +118,7 @@ public class ContentListContainerFragment extends Fragment implements
         } else {
             mDirStack.push("");
 
-            String initialPath = getArguments().getString("initialpath");
+            String initialPath = getArguments().getString(EXTRA_INITIAL_PATH);
             if (initialPath != null) {
                 mInitialPathToLoad = new ArrayList<>();
                 int pos = initialPath.indexOf("/");
@@ -152,7 +155,7 @@ public class ContentListContainerFragment extends Fragment implements
     }
 
     public void setRef(String ref) {
-        getArguments().putString("ref", ref);
+        getArguments().putString(EXTRA_REF, ref);
         mSelectedRef = ref;
         mGitModuleMap = null;
 

@@ -66,18 +66,24 @@ import retrofit2.Response;
 
 public class IssueMilestoneEditActivity extends BasePagerActivity implements
         View.OnClickListener, View.OnFocusChangeListener, AppBarLayout.OnOffsetChangedListener {
+
+    private static final String EXTRA_MILESTONE = "milestone";
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_FROM_PR = "from_pr";
+
     public static Intent makeEditIntent(Context context, String repoOwner, String repoName,
             Milestone milestone, boolean fromPullRequest) {
         return makeCreateIntent(context, repoOwner, repoName, fromPullRequest)
-                .putExtra("milestone", milestone);
+                .putExtra(EXTRA_MILESTONE, milestone);
     }
 
     public static Intent makeCreateIntent(Context context, String repoOwner, String repoName,
             boolean fromPullRequest) {
         return new Intent(context, IssueMilestoneEditActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("from_pr", fromPullRequest);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_FROM_PR, fromPullRequest);
     }
 
     private static final int[] TITLES = {
@@ -185,14 +191,14 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mFromPullRequest = extras.getBoolean("from_pr", false);
-        mMilestone = extras.getParcelable("milestone");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mFromPullRequest = extras.getBoolean(EXTRA_FROM_PR, false);
+        mMilestone = extras.getParcelable(EXTRA_MILESTONE);
     }
 
     private boolean isInEditMode() {
-        return getIntent().hasExtra("milestone");
+        return getIntent().hasExtra(EXTRA_MILESTONE);
     }
 
     @Override

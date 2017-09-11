@@ -13,11 +13,14 @@ import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 import io.reactivex.Single;
 
 public class EditIssueCommentActivity extends EditCommentActivity {
+
+    private static final String EXTRA_ISSUE = "issue";
+
     public static Intent makeIntent(Context context, String repoOwner,
             String repoName, int issueNumber, long id, String body,
             @AttrRes int highlightColorAttr) {
         Intent intent = new Intent(context, EditIssueCommentActivity.class)
-                .putExtra("issue", issueNumber);
+                .putExtra(EXTRA_ISSUE, issueNumber);
         return EditCommentActivity.fillInIntent(intent,
                 repoOwner, repoName, id, 0L, body, highlightColorAttr);
     }
@@ -25,7 +28,7 @@ public class EditIssueCommentActivity extends EditCommentActivity {
     @Override
     protected Single<GitHubCommentBase> createComment(String repoOwner, String repoName,
             String body, long replyToCommentId) {
-        int issueNumber = getIntent().getIntExtra("issue", 0);
+        int issueNumber = getIntent().getIntExtra(EXTRA_ISSUE, 0);
         IssueCommentService service = ServiceFactory.get(IssueCommentService.class, false);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.createIssueComment(repoOwner, repoName, issueNumber, request)

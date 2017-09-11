@@ -13,10 +13,13 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
 import io.reactivex.Single;
 
 public class EditCommitCommentActivity extends EditCommentActivity {
+
+    private static final String EXTRA_COMMIT = "commit";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             String commitSha, long id, String body) {
         Intent intent = new Intent(context, EditCommitCommentActivity.class)
-                .putExtra("commit", commitSha);
+                .putExtra(EXTRA_COMMIT, commitSha);
         return EditCommentActivity.fillInIntent(intent, repoOwner, repoName, id, 0L, body, 0);
     }
 
@@ -25,7 +28,7 @@ public class EditCommitCommentActivity extends EditCommentActivity {
             String body, long replyToCommentId) {
         RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class, false);
         CreateCommitComment request = CreateCommitComment.builder().body(body).build();
-        String sha = getIntent().getStringExtra("commit");
+        String sha = getIntent().getStringExtra(EXTRA_COMMIT);
         return service.createCommitComment(repoOwner, repoName, sha, request)
                 .map(ApiHelpers::throwOnFailure);
     }

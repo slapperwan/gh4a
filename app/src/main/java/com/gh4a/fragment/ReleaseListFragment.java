@@ -18,14 +18,17 @@ import retrofit2.Response;
 
 public class ReleaseListFragment extends PagedDataBaseFragment<Release> implements
         RootAdapter.OnItemClickListener<Release> {
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+
     private String mUserLogin;
     private String mRepoName;
 
     public static ReleaseListFragment newInstance(String owner, String repo) {
         ReleaseListFragment f = new ReleaseListFragment();
         Bundle args = new Bundle();
-        args.putString("owner", owner);
-        args.putString("repo", repo);
+        args.putString(EXTRA_OWNER, owner);
+        args.putString(EXTRA_REPO, repo);
         f.setArguments(args);
         return f;
     }
@@ -33,8 +36,8 @@ public class ReleaseListFragment extends PagedDataBaseFragment<Release> implemen
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserLogin = getArguments().getString("owner");
-        mRepoName = getArguments().getString("repo");
+        mUserLogin = getArguments().getString(EXTRA_OWNER);
+        mRepoName = getArguments().getString(EXTRA_REPO);
     }
 
     @Override

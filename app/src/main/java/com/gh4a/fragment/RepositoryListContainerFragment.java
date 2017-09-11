@@ -26,6 +26,33 @@ import com.meisolsson.githubsdk.model.Repository;
 public class RepositoryListContainerFragment extends Fragment implements
         BaseActivity.RefreshableChild, SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItem.OnActionExpandListener, SwipeRefreshLayout.ChildScrollDelegate {
+    private static final String EXTRA_USER = "user";
+    private static final String EXTRA_IS_ORG = "is_org";
+    private static final String EXTRA_FILTER_TYPE = "filter_type";
+    private static final String STATE_KEY_FILTER_TYPE = "filter_type";
+    private static final String STATE_KEY_SORT_ORDER = "sort_order";
+    private static final String STATE_KEY_SORT_DIRECTION = "sort_direction";
+    private static final String STATE_KEY_SEARCH_VISIBLE = "search_visible";
+    private static final String STATE_KEY_QUERY = "search_query";
+    private static final String STATE_KEY_SEARCH_IS_EXPANDED = "search_is_expanded";
+    private static final String SORT_DIRECTION_ASC = "asc";
+    private static final String SORT_DIRECTION_DESC = "desc";
+    private static final String SORT_ORDER_FULL_NAME = "full_name";
+    private static final String SORT_ORDER_UPDATED = "updated";
+    private static final String SORT_ORDER_CREATED = "created";
+    private static final String SORT_ORDER_PUSHED = "pushed";
+    private static final String TAG_MAIN = "main";
+    private static final String TAG_SEARCH = "search";
+    private static final String FILTER_TYPE_ALL = "all";
+    private static final String FILTER_TYPE_OWNER = "owner";
+    private static final String FILTER_TYPE_MEMBER = "member";
+    private static final String FILTER_TYPE_PUBLIC = "public";
+    private static final String FILTER_TYPE_PRIVATE = "private";
+    private static final String FILTER_TYPE_SOURCES = "sources";
+    private static final String FILTER_TYPE_FORKS = "forks";
+    private static final String FILTER_TYPE_WATCHED = "watched";
+    public static final String FILTER_TYPE_STARRED = "starred";
+
     public static RepositoryListContainerFragment newInstance(String userLogin, boolean isOrg) {
         return newInstance(userLogin, isOrg, null);
     }
@@ -35,21 +62,19 @@ public class RepositoryListContainerFragment extends Fragment implements
         RepositoryListContainerFragment f = new RepositoryListContainerFragment();
         Bundle args = new Bundle();
 
-        args.putString("user", userLogin);
-        args.putBoolean("is_org", isOrg);
-        args.putString("filter_type", defaultFilter);
+        args.putString(EXTRA_USER, userLogin);
+        args.putBoolean(EXTRA_IS_ORG, isOrg);
+        args.putString(EXTRA_FILTER_TYPE, defaultFilter);
         f.setArguments(args);
 
         return f;
     }
 
-    public static final String FILTER_TYPE_STARRED = "starred";
-
     private String mUserLogin;
     private boolean mIsOrg;
     private String mFilterType;
-    private String mSortOrder = "full_name";
-    private String mSortDirection = "asc";
+    private String mSortOrder = SORT_ORDER_FULL_NAME;
+    private String mSortDirection = SORT_DIRECTION_ASC;
     private boolean mSearchVisible;
 
     private PagedDataBaseFragment<Repository> mMainFragment;
@@ -62,22 +87,15 @@ public class RepositoryListContainerFragment extends Fragment implements
         void initiateFilter();
     }
 
-    private static final String STATE_KEY_FILTER_TYPE = "filter_type";
-    private static final String STATE_KEY_SORT_ORDER = "sort_order";
-    private static final String STATE_KEY_SORT_DIRECTION = "sort_direction";
-    private static final String STATE_KEY_SEARCH_VISIBLE = "search_visible";
-    private static final String STATE_KEY_QUERY = "search_query";
-    private static final String STATE_KEY_SEARCH_IS_EXPANDED = "search_is_expanded";
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Bundle data = getArguments();
-        mUserLogin = data.getString("user");
-        mIsOrg = data.getBoolean("is_org");
+        mUserLogin = data.getString(EXTRA_USER);
+        mIsOrg = data.getBoolean(EXTRA_IS_ORG);
 
         // Only read filter type from arguments if it wasn't overridden already by our parent
         if (mFilterType == null) {
-            mFilterType = data.getString("filter_type", "all");
+            mFilterType = data.getString(EXTRA_FILTER_TYPE, FILTER_TYPE_ALL);
         }
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_FILTER_TYPE)) {
@@ -117,8 +135,8 @@ public class RepositoryListContainerFragment extends Fragment implements
         super.onActivityCreated(savedInstanceState);
 
         FragmentManager fm = getChildFragmentManager();
-        mMainFragment = (PagedDataBaseFragment<Repository>) fm.findFragmentByTag("main");
-        mSearchFragment = (RepositorySearchFragment) fm.findFragmentByTag("search");
+        mMainFragment = (PagedDataBaseFragment<Repository>) fm.findFragmentByTag(TAG_MAIN);
+        mSearchFragment = (RepositorySearchFragment) fm.findFragmentByTag(TAG_SEARCH);
 
         if (mMainFragment == null) {
             applyFilterTypeAndSortOrder();
@@ -165,18 +183,18 @@ public class RepositoryListContainerFragment extends Fragment implements
     }
 
     private void validateSortOrder() {
-        if (TextUtils.equals(mFilterType, "starred")) {
-            if (!TextUtils.equals(mSortOrder, "updated")
-                    && !TextUtils.equals(mSortOrder, "created")) {
-                mSortOrder = "created";
-                mSortDirection = "desc";
+        if (TextUtils.equals(mFilterType, FILTER_TYPE_STARRED)) {
+            if (!TextUtils.equals(mSortOrder, SORT_ORDER_UPDATED)
+                    && !TextUtils.equals(mSortOrder, SORT_ORDER_CREATED)) {
+                mSortOrder = SORT_ORDER_CREATED;
+                mSortDirection = SORT_DIRECTION_DESC;
             }
         } else {
-            if (!TextUtils.equals(mSortOrder, "full_name")
-                    && !TextUtils.equals(mSortOrder, "created")
-                    && !TextUtils.equals(mSortOrder, "pushed")) {
-                mSortOrder = "full_name";
-                mSortDirection = "asc";
+            if (!TextUtils.equals(mSortOrder, SORT_ORDER_FULL_NAME)
+                    && !TextUtils.equals(mSortOrder, SORT_ORDER_CREATED)
+                    && !TextUtils.equals(mSortOrder, SORT_ORDER_PUSHED)) {
+                mSortOrder = SORT_ORDER_FULL_NAME;
+                mSortDirection = SORT_DIRECTION_ASC;
             }
         }
     }
@@ -188,7 +206,7 @@ public class RepositoryListContainerFragment extends Fragment implements
         }
 
         switch (mFilterType) {
-            case "watched":
+            case FILTER_TYPE_WATCHED:
                 mMainFragment = WatchedRepositoryListFragment.newInstance(mUserLogin);
                 break;
             default:
@@ -199,12 +217,12 @@ public class RepositoryListContainerFragment extends Fragment implements
 
         FragmentManager fm = getChildFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        Fragment old = fm.findFragmentByTag("main");
+        Fragment old = fm.findFragmentByTag(TAG_MAIN);
 
         if (old != null) {
             ft.remove(old);
         }
-        ft.add(R.id.details, mMainFragment, "main");
+        ft.add(R.id.details, mMainFragment, TAG_MAIN);
         ft.commitAllowingStateLoss();
     }
 
@@ -226,7 +244,7 @@ public class RepositoryListContainerFragment extends Fragment implements
 
         mSearchFragment = RepositorySearchFragment.newInstance(mUserLogin);
         mSearchFragment.setUserVisibleHint(false);
-        ft.add(R.id.details, mSearchFragment, "search");
+        ft.add(R.id.details, mSearchFragment, TAG_SEARCH);
         ft.hide(mSearchFragment);
         ft.commit();
     }
@@ -236,7 +254,7 @@ public class RepositoryListContainerFragment extends Fragment implements
         getActivity().getMenuInflater().inflate(R.menu.repo_list_menu, menu);
 
         // We can only properly search the 'all repos' list
-        if ("all".equals(mFilterType)) {
+        if (FILTER_TYPE_ALL.equals(mFilterType)) {
             MenuItem searchItem = menu.findItem(R.id.search);
             searchItem.setOnActionExpandListener(this);
 
@@ -274,8 +292,8 @@ public class RepositoryListContainerFragment extends Fragment implements
     }
 
     private void setSearchVisibility(boolean visible) {
-        String hiddenTag = visible ? "main" : "search";
-        String visibleTag = visible ? "search" : "main";
+        String hiddenTag = visible ? TAG_MAIN : TAG_SEARCH;
+        String visibleTag = visible ? TAG_SEARCH : TAG_MAIN;
         FragmentManager fm = getChildFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
 
@@ -352,14 +370,14 @@ public class RepositoryListContainerFragment extends Fragment implements
 
         private static final SparseArray<String> FILTER_LOOKUP = new SparseArray<>();
         static {
-            FILTER_LOOKUP.put(R.id.filter_type_all, "all");
-            FILTER_LOOKUP.put(R.id.filter_type_owner, "owner");
-            FILTER_LOOKUP.put(R.id.filter_type_member, "member");
-            FILTER_LOOKUP.put(R.id.filter_type_public, "public");
-            FILTER_LOOKUP.put(R.id.filter_type_private, "private");
-            FILTER_LOOKUP.put(R.id.filter_type_sources, "sources");
-            FILTER_LOOKUP.put(R.id.filter_type_forks, "forks");
-            FILTER_LOOKUP.put(R.id.filter_type_watched, "watched");
+            FILTER_LOOKUP.put(R.id.filter_type_all, FILTER_TYPE_ALL);
+            FILTER_LOOKUP.put(R.id.filter_type_owner, FILTER_TYPE_OWNER);
+            FILTER_LOOKUP.put(R.id.filter_type_member, FILTER_TYPE_MEMBER);
+            FILTER_LOOKUP.put(R.id.filter_type_public, FILTER_TYPE_PUBLIC);
+            FILTER_LOOKUP.put(R.id.filter_type_private, FILTER_TYPE_PRIVATE);
+            FILTER_LOOKUP.put(R.id.filter_type_sources, FILTER_TYPE_SOURCES);
+            FILTER_LOOKUP.put(R.id.filter_type_forks, FILTER_TYPE_FORKS);
+            FILTER_LOOKUP.put(R.id.filter_type_watched, FILTER_TYPE_WATCHED);
         }
 
         public static FilterDrawerHelper create(String userLogin, boolean isOrg) {
@@ -400,18 +418,18 @@ public class RepositoryListContainerFragment extends Fragment implements
     }
 
     public static class SortDrawerHelper {
-        private String mFilterType = "all";
+        private String mFilterType = FILTER_TYPE_ALL;
 
         private static final SparseArray<String[]> SORT_LOOKUP = new SparseArray<>();
         static {
-            SORT_LOOKUP.put(R.id.sort_name_asc, new String[] { "full_name", "asc" });
-            SORT_LOOKUP.put(R.id.sort_name_desc, new String[] { "full_name", "desc" });
-            SORT_LOOKUP.put(R.id.sort_created_asc, new String[] { "created", "asc" });
-            SORT_LOOKUP.put(R.id.sort_created_desc, new String[] { "created", "desc" });
-            SORT_LOOKUP.put(R.id.sort_pushed_asc, new String[] { "pushed", "asc" });
-            SORT_LOOKUP.put(R.id.sort_pushed_desc, new String[] { "pushed", "desc" });
-            SORT_LOOKUP.put(R.id.sort_updated_asc, new String[] { "updated", "asc" });
-            SORT_LOOKUP.put(R.id.sort_updated_desc, new String[] { "updated", "desc" });
+            SORT_LOOKUP.put(R.id.sort_name_asc, new String[] { SORT_ORDER_FULL_NAME, SORT_DIRECTION_ASC });
+            SORT_LOOKUP.put(R.id.sort_name_desc, new String[] { SORT_ORDER_FULL_NAME, SORT_DIRECTION_DESC });
+            SORT_LOOKUP.put(R.id.sort_created_asc, new String[] { SORT_ORDER_CREATED, SORT_DIRECTION_ASC });
+            SORT_LOOKUP.put(R.id.sort_created_desc, new String[] { SORT_ORDER_CREATED, SORT_DIRECTION_DESC });
+            SORT_LOOKUP.put(R.id.sort_pushed_asc, new String[] { SORT_ORDER_PUSHED, SORT_DIRECTION_ASC });
+            SORT_LOOKUP.put(R.id.sort_pushed_desc, new String[] { SORT_ORDER_PUSHED, SORT_DIRECTION_DESC });
+            SORT_LOOKUP.put(R.id.sort_updated_asc, new String[] { SORT_ORDER_UPDATED, SORT_DIRECTION_ASC });
+            SORT_LOOKUP.put(R.id.sort_updated_desc, new String[] { SORT_ORDER_UPDATED, SORT_DIRECTION_DESC });
         }
 
         public SortDrawerHelper() {
@@ -422,7 +440,7 @@ public class RepositoryListContainerFragment extends Fragment implements
         }
 
         public int getMenuResId() {
-            return TextUtils.equals(mFilterType, "watched") ? 0 : R.menu.repo_sort;
+            return TextUtils.equals(mFilterType, FILTER_TYPE_WATCHED) ? 0 : R.menu.repo_sort;
         }
 
         public void selectSortType(Menu menu, String order, String direction,

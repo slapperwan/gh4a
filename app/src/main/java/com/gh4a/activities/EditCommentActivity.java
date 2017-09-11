@@ -19,14 +19,21 @@ import io.reactivex.Single;
 public abstract class EditCommentActivity extends AppCompatActivity implements
         EditorBottomSheet.Callback {
 
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_ID = "id";
+    private static final String EXTRA_REPLY_TO = "reply_to";
+    private static final String EXTRA_BODY = "body";
+    private static final String EXTRA_HIGHLIGHT_COLOR_ATTR = "highlight_color_attr";
+
     protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
             long id, long replyToId, String body, @AttrRes int highlightColorAttr) {
-        return baseIntent.putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("id", id)
-                .putExtra("reply_to", replyToId)
-                .putExtra("body", body)
-                .putExtra("highlight_color_attr", highlightColorAttr);
+        return baseIntent.putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_ID, id)
+                .putExtra(EXTRA_REPLY_TO, replyToId)
+                .putExtra(EXTRA_BODY, body)
+                .putExtra(EXTRA_HIGHLIGHT_COLOR_ATTR, highlightColorAttr);
     }
 
     private CoordinatorLayout mRootLayout;
@@ -43,18 +50,18 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
         mRootLayout = findViewById(R.id.coordinator_layout);
         mEditorSheet = findViewById(R.id.bottom_sheet);
 
-        if (getIntent().getLongExtra("id", 0L) != 0L) {
+        if (getIntent().getLongExtra(EXTRA_ID, 0L) != 0L) {
             ImageView saveButton = mEditorSheet.findViewById(R.id.send_button);
             saveButton.setImageResource(UiUtils.resolveDrawable(this, R.attr.saveIcon));
         }
 
         mEditorSheet.setCallback(this);
-        if (getIntent().hasExtra("body")) {
-            mEditorSheet.setCommentText(getIntent().getStringExtra("body"), false);
-            getIntent().removeExtra("body");
+        if (getIntent().hasExtra(EXTRA_BODY)) {
+            mEditorSheet.setCommentText(getIntent().getStringExtra(EXTRA_BODY), false);
+            getIntent().removeExtra(EXTRA_BODY);
         }
 
-        @AttrRes int highlightColorAttr = getIntent().getIntExtra("highlight_color_attr", 0);
+        @AttrRes int highlightColorAttr = getIntent().getIntExtra(EXTRA_HIGHLIGHT_COLOR_ATTR, 0);
         if (highlightColorAttr != 0) {
             mEditorSheet.setHighlightColor(highlightColorAttr);
         }
@@ -70,12 +77,12 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
     @Override
     public Single<?> onEditorDoSend(String body) {
         Bundle extras = getIntent().getExtras();
-        String repoOwner = extras.getString("owner");
-        String repoName = extras.getString("repo");
-        long id = extras.getLong("id", 0L);
+        String repoOwner = extras.getString(EXTRA_OWNER);
+        String repoName = extras.getString(EXTRA_REPO);
+        long id = extras.getLong(EXTRA_ID, 0L);
 
         if (id == 0L) {
-            return createComment(repoOwner, repoName, body, extras.getLong("reply_to"));
+            return createComment(repoOwner, repoName, body, extras.getLong(EXTRA_REPLY_TO));
         } else {
             return editComment(repoOwner, repoName, id, body);
         }

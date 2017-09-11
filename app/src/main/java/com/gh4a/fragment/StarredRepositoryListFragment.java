@@ -38,12 +38,15 @@ import retrofit2.Response;
 public class StarredRepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private static final String STATE_KEY_SORT_ORDER = "sort_order";
     private static final String STATE_KEY_SORT_DIRECTION = "sort_direction";
+    private static final String EXTRA_USER = "user";
+    private static final String FILTER_DATA_SORT = "sort";
+    private static final String FILTER_DATA_DIRECTION = "direction";
 
     public static StarredRepositoryListFragment newInstance(String login) {
         StarredRepositoryListFragment f = new StarredRepositoryListFragment();
 
         Bundle args = new Bundle();
-        args.putString("user", login);
+        args.putString(EXTRA_USER, login);
         f.setArguments(args);
 
         return f;
@@ -57,7 +60,7 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString("user");
+        mLogin = getArguments().getString(EXTRA_USER);
 
         mSortHelper = new RepositoryListContainerFragment.SortDrawerHelper();
 
@@ -114,8 +117,8 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
     protected Single<Response<Page<Repository>>> loadPage(int page, boolean bypassCache) {
         final StarringService service = ServiceFactory.get(StarringService.class, bypassCache);
         final HashMap<String, String> filterData = new HashMap<>();
-        filterData.put("sort", mSortOrder);
-        filterData.put("direction", mSortDirection);
+        filterData.put(FILTER_DATA_SORT, mSortOrder);
+        filterData.put(FILTER_DATA_DIRECTION, mSortDirection);
 
         return service.getStarredRepositories(mLogin, filterData, page);
     }

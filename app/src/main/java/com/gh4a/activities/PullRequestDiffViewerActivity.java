@@ -38,12 +38,15 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComment> {
+
+    private static final String EXTRA_NUMBER = "number";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number,
             String commitSha, String path, String diff, List<ReviewComment> comments,
             int initialLine, int highlightStartLine, int highlightEndLine, boolean highlightIsRight,
             IntentUtils.InitialCommentMarker initialComment) {
         Intent intent = new Intent(context, PullRequestDiffViewerActivity.class)
-                .putExtra("number", number);
+                .putExtra(EXTRA_NUMBER, number);
         return DiffViewerActivity.fillInIntent(intent, repoOwner, repoName, commitSha, path,
                 diff, comments, initialLine, highlightStartLine, highlightEndLine,
                 highlightIsRight, initialComment);
@@ -64,7 +67,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mPullRequestNumber = extras.getInt("number", -1);
+        mPullRequestNumber = extras.getInt(EXTRA_NUMBER, -1);
     }
 
     @Override

@@ -37,6 +37,11 @@ import io.reactivex.Single;
 
 public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> implements
         RootAdapter.OnItemClickListener<Milestone> {
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_CLOSED = "closed";
+    private static final String EXTRA_FROM_PR = "from_pr";
+
     private String mRepoOwner;
     private String mRepoName;
     private boolean mShowClosed;
@@ -47,10 +52,10 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
         IssueMilestoneListFragment f = new IssueMilestoneListFragment();
 
         Bundle args = new Bundle();
-        args.putString("owner", repoOwner);
-        args.putString("repo", repoName);
-        args.putBoolean("closed", showClosed);
-        args.putBoolean("from_pr", fromPullRequest);
+        args.putString(EXTRA_OWNER, repoOwner);
+        args.putString(EXTRA_REPO, repoName);
+        args.putBoolean(EXTRA_CLOSED, showClosed);
+        args.putBoolean(EXTRA_FROM_PR, fromPullRequest);
         f.setArguments(args);
 
         return f;
@@ -62,10 +67,10 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
-        mRepoOwner = args.getString("owner");
-        mRepoName = args.getString("repo");
-        mShowClosed = args.getBoolean("closed");
-        mFromPullRequest = args.getBoolean("from_pr", false);
+        mRepoOwner = args.getString(EXTRA_OWNER);
+        mRepoName = args.getString(EXTRA_REPO);
+        mShowClosed = args.getBoolean(EXTRA_CLOSED);
+        mFromPullRequest = args.getBoolean(EXTRA_FROM_PR, false);
     }
 
     @Override

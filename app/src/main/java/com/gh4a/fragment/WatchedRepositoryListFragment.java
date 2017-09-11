@@ -31,11 +31,13 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Repository> {
+    private static final String EXTRA_USER = "user";
+
     public static WatchedRepositoryListFragment newInstance(String login) {
         WatchedRepositoryListFragment f = new WatchedRepositoryListFragment();
 
         Bundle args = new Bundle();
-        args.putString("user", login);
+        args.putString(EXTRA_USER, login);
         f.setArguments(args);
 
         return f;
@@ -46,7 +48,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString("user");
+        mLogin = getArguments().getString(EXTRA_USER);
     }
 
     @Override

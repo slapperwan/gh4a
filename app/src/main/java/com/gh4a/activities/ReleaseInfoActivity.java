@@ -55,19 +55,25 @@ import io.reactivex.disposables.Disposable;
 public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
         RootAdapter.OnItemClickListener<ReleaseAsset> {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_ID = "id";
+    private static final String EXTRA_RELEASE = "release";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName, long id) {
         return new Intent(context, ReleaseInfoActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("id", id);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_ID, id);
     }
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
                                     Release release) {
         return new Intent(context, ReleaseInfoActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("release", release);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_RELEASE, release);
     }
 
     private static final int ID_LOADER_RELEASE = 0;
@@ -115,10 +121,10 @@ public class ReleaseInfoActivity extends BaseActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
         mRelease = extras.getParcelable("release");
-        mReleaseId = extras.getLong("id");
+        mReleaseId = extras.getLong(EXTRA_ID);
     }
 
     @Override

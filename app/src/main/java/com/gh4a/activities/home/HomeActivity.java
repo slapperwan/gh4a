@@ -52,11 +52,14 @@ import java.util.HashMap;
 public class HomeActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, RepositoryListContainerFragment.Callback,
         NotificationListFragment.ParentCallback, UserPasswordLoginDialogFragment.ParentCallback {
+
+    private static final String EXTRA_INITIAL_PAGE = "initial_page";
+
     public static Intent makeIntent(Context context, @IdRes int initialPageId) {
         String initialPage = START_PAGE_MAPPING.get(initialPageId);
         Intent intent = new Intent(context, HomeActivity.class);
         if (initialPage != null) {
-            intent.putExtra("initial_page", initialPage);
+            intent.putExtra(EXTRA_INITIAL_PAGE, initialPage);
         }
         return intent;
     }
@@ -453,8 +456,8 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     }
 
     private int determineInitialPage() {
-        String initialPage = getIntent().hasExtra("initial_page")
-                ? getIntent().getStringExtra("initial_page")
+        String initialPage = getIntent().hasExtra(EXTRA_INITIAL_PAGE)
+                ? getIntent().getStringExtra(EXTRA_INITIAL_PAGE)
                 : getPrefs().getString(SettingsFragment.KEY_START_PAGE, "newsfeed");
         if (TextUtils.equals(initialPage, "last")) {
             initialPage = getPrefs().getString("last_selected_home_page", "newsfeed");

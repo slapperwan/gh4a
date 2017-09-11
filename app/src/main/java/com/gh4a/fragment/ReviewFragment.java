@@ -25,7 +25,6 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.EditorBottomSheet;
-
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.Reaction;
@@ -33,11 +32,11 @@ import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.model.request.ReactionRequest;
 import com.meisolsson.githubsdk.model.request.pull_request.CreateReviewComment;
+import com.meisolsson.githubsdk.service.issues.IssueCommentService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 import com.meisolsson.githubsdk.service.reactions.ReactionService;
-import com.meisolsson.githubsdk.service.issues.IssueCommentService;
-import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,25 +47,25 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
-        implements TimelineItemAdapter.OnCommentAction,
+        implements TimelineItemAdapter.OnCommentAction ,
         EditorBottomSheet.Callback, EditorBottomSheet.Listener {
 
     private static final int REQUEST_EDIT = 1000;
     private static final String EXTRA_SELECTED_REPLY_COMMENT_ID = "selected_reply_comment_id";
-
-    @Nullable
-    private TimelineItemAdapter mAdapter;
-    private EditorBottomSheet mBottomSheet;
+    private static final String EXTRA_REPO_OWNER = "repo_owner";
+    private static final String EXTRA_REPO_NAME = "repo_name";
+    private static final String EXTRA_ISSUE_NUMBER = "issue_number";
+    private static final String EXTRA_INITIAL_COMMENT = "initial_comment";
 
     public static ReviewFragment newInstance(String repoOwner, String repoName, int issueNumber,
             Review review, IntentUtils.InitialCommentMarker mInitialComment) {
         ReviewFragment f = new ReviewFragment();
         Bundle args = new Bundle();
-        args.putString("repo_owner", repoOwner);
-        args.putString("repo_name", repoName);
-        args.putInt("issue_number", issueNumber);
-        args.putParcelable("review", review);
-        args.putParcelable("initial_comment", mInitialComment);
+        args.putString(EXTRA_REPO_OWNER, repoOwner);
+        args.putString(EXTRA_REPO_NAME, repoName);
+        args.putInt(EXTRA_ISSUE_NUMBER, issueNumber);
+        args.putParcelable(EXTRA_REPO_NAME, review);
+        args.putParcelable(EXTRA_INITIAL_COMMENT, mInitialComment);
         f.setArguments(args);
         return f;
     }
@@ -77,18 +76,22 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     private Review mReview;
     private IntentUtils.InitialCommentMarker mInitialComment;
     private long mSelectedReplyCommentId;
-    private @StringRes int mCommentEditorHintResId = R.string.review_reply_hint;
+    @StringRes
+    private int mCommentEditorHintResId = R.string.review_reply_hint;
+    @Nullable
+    private TimelineItemAdapter mAdapter;
+    private EditorBottomSheet mBottomSheet;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle args = getArguments();
-        mRepoOwner = args.getString("repo_owner");
-        mRepoName = args.getString("repo_name");
-        mIssueNumber = args.getInt("issue_number");
-        mReview = args.getParcelable("review");
-        mInitialComment = args.getParcelable("initial_comment");
-        args.remove("initial_comment");
+        mRepoOwner = args.getString(EXTRA_REPO_OWNER);
+        mRepoName = args.getString(EXTRA_REPO_NAME);
+        mIssueNumber = args.getInt(EXTRA_ISSUE_NUMBER);
+        mReview = args.getParcelable(EXTRA_REPO_NAME);
+        mInitialComment = args.getParcelable(EXTRA_INITIAL_COMMENT);
+        args.remove(EXTRA_INITIAL_COMMENT);
 
         if (savedInstanceState != null) {
             mSelectedReplyCommentId = savedInstanceState.getLong(EXTRA_SELECTED_REPLY_COMMENT_ID);

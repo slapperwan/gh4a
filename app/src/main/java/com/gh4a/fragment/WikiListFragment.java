@@ -20,6 +20,10 @@ import io.reactivex.Single;
 
 public class WikiListFragment extends ListDataBaseFragment<Feed> implements
         RootAdapter.OnItemClickListener<Feed> {
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_INITIAL_PAGE = "initial_page";
+
     private String mUserLogin;
     private String mRepoName;
     private String mInitialPage;
@@ -27,9 +31,9 @@ public class WikiListFragment extends ListDataBaseFragment<Feed> implements
     public static WikiListFragment newInstance(String owner, String repo, String initialPage) {
         WikiListFragment f = new WikiListFragment();
         Bundle args = new Bundle();
-        args.putString("owner", owner);
-        args.putString("repo", repo);
-        args.putString("initial_page", initialPage);
+        args.putString(EXTRA_OWNER, owner);
+        args.putString(EXTRA_REPO, repo);
+        args.putString(EXTRA_INITIAL_PAGE, initialPage);
         f.setArguments(args);
         return f;
     }
@@ -37,10 +41,10 @@ public class WikiListFragment extends ListDataBaseFragment<Feed> implements
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserLogin = getArguments().getString("owner");
-        mRepoName = getArguments().getString("repo");
-        mInitialPage = getArguments().getString("initial_page");
-        getArguments().remove("initial_page");
+        mUserLogin = getArguments().getString(EXTRA_OWNER);
+        mRepoName = getArguments().getString(EXTRA_REPO);
+        mInitialPage = getArguments().getString(EXTRA_INITIAL_PAGE);
+        getArguments().remove(EXTRA_INITIAL_PAGE);
     }
 
     @Override

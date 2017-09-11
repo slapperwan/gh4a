@@ -25,13 +25,19 @@ import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 
 public class CompareActivity extends FragmentContainerActivity {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_BASE = "base";
+    private static final String EXTRA_HEAD = "head";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             String baseRef, String headRef) {
         return new Intent(context, CompareActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("base", baseRef)
-                .putExtra("head", headRef);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_BASE, baseRef)
+                .putExtra(EXTRA_HEAD, headRef);
     }
 
     private String mRepoOwner;
@@ -52,14 +58,14 @@ public class CompareActivity extends FragmentContainerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
     }
 
     @Override
     protected Fragment onCreateFragment() {
-        String base = getIntent().getStringExtra("base");
-        String head = getIntent().getStringExtra("head");
+        String base = getIntent().getStringExtra(EXTRA_BASE);
+        String head = getIntent().getStringExtra(EXTRA_HEAD);
 
         return CommitCompareFragment.newInstance(mRepoOwner, mRepoName, base, head);
     }

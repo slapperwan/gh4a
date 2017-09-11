@@ -17,16 +17,24 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
 import io.reactivex.Single;
 
 public class EditDiffCommentActivity extends EditCommentActivity {
+
+    private static final String EXTRA_COMMIT_ID = "commit_id";
+    private static final String EXTRA_PATH = "path";
+    private static final String EXTRA_LINE = "line";
+    private static final String EXTRA_LEFT_LINE = "left_line";
+    private static final String EXTRA_RIGHT_LINE = "right_line";
+    private static final String EXTRA_POSITION = "position";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             String commitId, String path, String line, int leftLine, int rightLine, int position,
             long id, String body) {
         Intent intent = new Intent(context, EditDiffCommentActivity.class)
-                .putExtra("commit_id", commitId)
-                .putExtra("path", path)
-                .putExtra("line", line)
-                .putExtra("left_line", leftLine)
-                .putExtra("right_line", rightLine)
-                .putExtra("position", position);
+                .putExtra(EXTRA_COMMIT_ID, commitId)
+                .putExtra(EXTRA_PATH, path)
+                .putExtra(EXTRA_LINE, line)
+                .putExtra(EXTRA_LEFT_LINE, leftLine)
+                .putExtra(EXTRA_RIGHT_LINE, rightLine)
+                .putExtra(EXTRA_POSITION, position);
         return EditCommentActivity.fillInIntent(intent,
                 repoOwner, repoName, id, 0L, body, R.attr.colorIssueOpen);
     }
@@ -40,23 +48,23 @@ public class EditDiffCommentActivity extends EditCommentActivity {
 
         TextView line = header.findViewById(R.id.line);
         Bundle extras = getIntent().getExtras();
-        line.setText(extras.getString("line"));
+        line.setText(extras.getString(EXTRA_LINE));
 
         TextView title = header.findViewById(R.id.title);
-        title.setText(getString(R.string.commit_comment_dialog_title, extras.getInt("left_line"),
-                extras.getInt("right_line")));
+        title.setText(getString(R.string.commit_comment_dialog_title, extras.getInt(EXTRA_LEFT_LINE),
+                extras.getInt(EXTRA_RIGHT_LINE)));
     }
 
     @Override
     protected Single<GitHubCommentBase> createComment(String repoOwner, String repoName,
             String body, long replyToCommentId) {
         Bundle extras = getIntent().getExtras();
-        String commitId = extras.getString("commit_id");
+        String commitId = extras.getString(EXTRA_COMMIT_ID);
         RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class, false);
         CreateCommitComment request = CreateCommitComment.builder()
                 .body(body)
-                .path(extras.getString("path"))
-                .position(extras.getInt("position"))
+                .path(extras.getString(EXTRA_PATH))
+                .position(extras.getInt(EXTRA_POSITION))
                 .build();
         return service.createCommitComment(repoOwner, repoName, commitId, request)
                 .map(ApiHelpers::throwOnFailure);

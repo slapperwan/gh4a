@@ -57,12 +57,15 @@ import java.net.HttpURLConnection;
 import java.util.Locale;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_REF = "ref";
+
     public static RepositoryFragment newInstance(Repository repository, String ref) {
         RepositoryFragment f = new RepositoryFragment();
 
         Bundle args = new Bundle();
-        args.putParcelable("repo", repository);
-        args.putString("ref", ref);
+        args.putParcelable(EXTRA_REPO, repository);
+        args.putString(EXTRA_REF, ref);
         f.setArguments(args);
 
         return f;
@@ -87,8 +90,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepository = getArguments().getParcelable("repo");
-        mRef = getArguments().getString("ref");
+        mRepository = getArguments().getParcelable(EXTRA_REPO);
+        mRef = getArguments().getString(EXTRA_REF);
     }
 
     @Override
@@ -168,7 +171,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
     public void setRef(String ref) {
         mRef = ref;
-        getArguments().putString("ref", ref);
+        getArguments().putString(EXTRA_REF, ref);
 
         // Reload readme
         if (mIsReadmeLoaded) {

@@ -27,11 +27,13 @@ public class SearchActivity extends FragmentContainerActivity {
     public static final int SEARCH_TYPE_REPO = SearchFragment.SEARCH_TYPE_REPO;
     public static final int SEARCH_TYPE_USER = SearchFragment.SEARCH_TYPE_USER;
     public static final int SEARCH_TYPE_CODE = SearchFragment.SEARCH_TYPE_CODE;
+    private static final String EXTRA_INITIAL_SEARCH = "initial_search";
+    private static final String EXTRA_SEARCH_TYPE = "search_type";
 
     public static Intent makeIntent(Context context, String initialSearch, int searchType) {
         return makeIntent(context)
-                .putExtra("initial_search", initialSearch)
-                .putExtra("search_type", searchType);
+                .putExtra(EXTRA_INITIAL_SEARCH, initialSearch)
+                .putExtra(EXTRA_SEARCH_TYPE, searchType);
     }
 
     public static Intent makeIntent(Context context) {
@@ -47,8 +49,8 @@ public class SearchActivity extends FragmentContainerActivity {
     @Override
     protected Fragment onCreateFragment() {
         Intent intent = getIntent();
-        int searchType = intent.getIntExtra("search_type", SEARCH_TYPE_REPO);
-        String initialQuery = intent.getStringExtra("initial_search");
+        int searchType = intent.getIntExtra(EXTRA_SEARCH_TYPE, SEARCH_TYPE_REPO);
+        String initialQuery = intent.getStringExtra(EXTRA_INITIAL_SEARCH);
 
         return SearchFragment.newInstance(searchType, initialQuery);
     }

@@ -43,6 +43,13 @@ import java.util.List;
 
 public class CommitActivity extends BaseFragmentPagerActivity implements
         CommitFragment.CommentUpdateListener, CommitNoteFragment.CommentUpdateListener {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_PR = "pr";
+    private static final String EXTRA_SHA = "sha";
+    private static final String EXTRA_INITIAL_COMMENT = "initial_comment";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
         return makeIntent(context, repoOwner, repoName, -1, sha, null);
     }
@@ -60,11 +67,11 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     private static Intent makeIntent(Context context, String repoOwner, String repoName,
             int pullRequestNumber, String sha, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, CommitActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("pr", pullRequestNumber)
-                .putExtra("sha", sha)
-                .putExtra("initial_comment", initialComment);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_PR, pullRequestNumber)
+                .putExtra(EXTRA_SHA, sha)
+                .putExtra(EXTRA_INITIAL_COMMENT, initialComment);
     }
 
     private static final int ID_LOADER_COMMIT = 0;
@@ -112,12 +119,12 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mObjectSha = extras.getString("sha");
-        mPullRequestNumber = extras.getInt("pr", -1);
-        mInitialComment = extras.getParcelable("initial_comment");
-        extras.remove("initial_comment");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mObjectSha = extras.getString(EXTRA_SHA);
+        mPullRequestNumber = extras.getInt(EXTRA_PR, -1);
+        mInitialComment = extras.getParcelable(EXTRA_INITIAL_COMMENT);
+        extras.remove(EXTRA_INITIAL_COMMENT);
     }
 
     @Override

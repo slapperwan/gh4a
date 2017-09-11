@@ -52,6 +52,13 @@ import retrofit2.Response;
 public class RepositoryActivity extends BaseFragmentPagerActivity implements
         CommitListFragment.ContextSelectionCallback,
         ContentListContainerFragment.CommitSelectionCallback {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_REF = "ref";
+    private static final String EXTRAINITIAL_PATH = "initial_path";
+    private static final String EXTRA_INITIAL_PAGE = "initial_page";
+
     public static Intent makeIntent(Context context, Repository repo) {
         return makeIntent(context, repo, null);
     }
@@ -74,11 +81,11 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
             ref = null;
         }
         return new Intent(context, RepositoryActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("ref", ref)
-                .putExtra("initial_path", initialPath)
-                .putExtra("initial_page", initialPage);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_REF, ref)
+                .putExtra(EXTRAINITIAL_PATH, initialPath)
+                .putExtra(EXTRA_INITIAL_PAGE, initialPage);
     }
 
     private static final String STATE_KEY_SELECTED_REF = "selected_ref";
@@ -137,11 +144,11 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mSelectedRef = extras.getString("ref");
-        mInitialPage = extras.getInt("initial_page", -1);
-        mInitialPath = extras.getString("initial_path");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mSelectedRef = extras.getString(EXTRA_REF);
+        mInitialPage = extras.getInt(EXTRA_INITIAL_PAGE, -1);
+        mInitialPath = extras.getString(EXTRAINITIAL_PATH);
     }
 
     @Override

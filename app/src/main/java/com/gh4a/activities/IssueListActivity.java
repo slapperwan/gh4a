@@ -60,6 +60,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItem.OnActionExpandListener {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_IS_PULL_REQUEST = "is_pull_request";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return makeIntent(context, repoOwner, repoName, false);
     }
@@ -67,9 +72,9 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             boolean isPullRequest) {
         return new Intent(context, IssueListActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("is_pull_request", isPullRequest);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_IS_PULL_REQUEST, isPullRequest);
     }
 
     private static final int REQUEST_ISSUE_CREATE = 1001;
@@ -167,9 +172,9 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mIsPullRequest = extras.getBoolean("is_pull_request");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mIsPullRequest = extras.getBoolean(EXTRA_IS_PULL_REQUEST);
     }
 
     @Override

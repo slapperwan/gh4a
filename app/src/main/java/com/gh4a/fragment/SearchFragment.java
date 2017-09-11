@@ -54,15 +54,8 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
         SearchView.OnSuggestionListener, FilterQueryProvider,
         AdapterView.OnItemSelectedListener, SearchAdapter.Callback {
-    public static SearchFragment newInstance(int initialType, String initialQuery) {
-        SearchFragment f = new SearchFragment();
-        Bundle args = new Bundle();
-        args.putInt("search_type", initialType);
-        args.putString("initial_search", initialQuery);
-        f.setArguments(args);
-        return f;
-    }
-
+    private static final String EXTRA_SEARCH_TYPE = "search_type";
+    private static final String EXTRA_INITIAL_SEARCH = "initial_search";
     public static final int SEARCH_TYPE_REPO = 0;
     public static final int SEARCH_TYPE_USER = 1;
     public static final int SEARCH_TYPE_CODE = 2;
@@ -84,6 +77,15 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
     private static final String STATE_KEY_QUERY = "query";
     private static final String STATE_KEY_SEARCH_TYPE = "search_type";
 
+    public static SearchFragment newInstance(int initialType, String initialQuery) {
+        SearchFragment f = new SearchFragment();
+        Bundle args = new Bundle();
+        args.putInt(EXTRA_SEARCH_TYPE, initialType);
+        args.putString(EXTRA_INITIAL_SEARCH, initialQuery);
+        f.setArguments(args);
+        return f;
+    }
+
     private SearchAdapter mAdapter;
 
     private Spinner mSearchType;
@@ -100,8 +102,8 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
             mSelectedSearchType = savedInstanceState.getInt(STATE_KEY_SEARCH_TYPE, SEARCH_TYPE_REPO);
         } else {
             Bundle args = getArguments();
-            mSelectedSearchType = args.getInt("search_type", SEARCH_TYPE_REPO);
-            mQuery = args.getString("initial_search");
+            mSelectedSearchType = args.getInt(EXTRA_SEARCH_TYPE, SEARCH_TYPE_REPO);
+            mQuery = args.getString(EXTRA_INITIAL_SEARCH);
         }
     }
 
