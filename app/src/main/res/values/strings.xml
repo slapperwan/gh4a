@@ -110,6 +110,7 @@
     <string name="quote">Quote</string>
     <string name="fork">Fork</string>
     <string name="notifications">Notifications</string>
+    <string name="watching">Watching</string>
     <string name="mark_all_as_read">Mark all as read</string>
     <string name="mark_as_read">Mark as read</string>
     <string name="unsubscribe">Unsubscribe</string>
