@@ -12,6 +12,7 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,7 @@ import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxTools;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Repository;
@@ -53,6 +55,8 @@ import org.eclipse.egit.github.core.service.WatcherService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Observable;
 
 public class RepositoryActivity extends BasePagerActivity {
     public static Intent makeIntent(Context context, Repository repo) {
@@ -386,7 +390,20 @@ public class RepositoryActivity extends BasePagerActivity {
             case R.id.star:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                new UpdateStarTask().schedule();
+                this.updateStar(mRepoOwner, mRepoName, mIsStarring)
+                        .compose(RxTools.applySchedulers())
+                        .doOnTerminate(() -> {
+                            if (mIsStarring == null) {
+                                // user refreshed while the action was in progress
+                                return;
+                            }
+                            mIsStarring = !mIsStarring;
+                            if (mRepositoryFragment != null) {
+                                mRepositoryFragment.updateStargazerCount(mIsStarring);
+                            }
+                            supportInvalidateOptionsMenu();
+                        })
+                        .subscribe();
                 return true;
             case R.id.ref:
                 if (mBranches == null) {
@@ -536,36 +553,15 @@ public class RepositoryActivity extends BasePagerActivity {
         }
     }
 
-    private class UpdateStarTask extends BackgroundTask<Void> {
-        public UpdateStarTask() {
-            super(RepositoryActivity.this);
-        }
-
-        @Override
-        protected Void run() throws IOException {
+    public Observable updateStar(String repoOwner, String repoName, boolean isStarring) {
+        return Observable.fromCallable(() -> {
             StarService starService = (StarService)
                     Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            if (mIsStarring) {
-                starService.unstar(repoId);
-            } else {
-                starService.star(repoId);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            if (mIsStarring == null) {
-                // user refreshed while the action was in progress
-                return;
-            }
-            mIsStarring = !mIsStarring;
-            if (mRepositoryFragment != null) {
-                mRepositoryFragment.updateStargazerCount(mIsStarring);
-            }
-            supportInvalidateOptionsMenu();
-        }
+            RepositoryId repoId = new RepositoryId(repoOwner, repoName);
+            if (isStarring) starService.unstar(repoId);
+            else starService.star(repoId);
+            return !isStarring;
+        });
     }
 
     private class UpdateWatchTask extends BackgroundTask<Void> {
