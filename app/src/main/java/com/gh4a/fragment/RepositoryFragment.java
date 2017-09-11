@@ -15,21 +15,17 @@
  */
 package com.gh4a.fragment;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.support.v4.os.AsyncTaskCompat;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
@@ -46,12 +42,10 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCountLoader;
 import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.vdurmont.emoji.EmojiParser;
-
 import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
 
@@ -70,7 +64,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private Repository mRepository;
     private View mContentView;
     private String mRef;
-    private HttpImageGetter mImageGetter;
 
     private final LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>(this) {
         @Override
@@ -80,12 +73,22 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         }
         @Override
         protected void onResultReady(String result) {
-            TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
             View progress = mContentView.findViewById(R.id.pb_readme);
-            AsyncTaskCompat.executeParallel(new FillReadmeTask(
-                    mRepository.getId(), readmeView, progress, mImageGetter), result);
+            loadHtmlContent(result);
         }
     };
+
+    public void loadHtmlContent(String html) {
+        WebView webView = (WebView) mContentView.findViewById(R.id.webView);
+        webView.setVerticalScrollBarEnabled(false);
+        webView.setHorizontalScrollBarEnabled(true);
+
+        String mime = "text/html";
+        String encoding = "utf-8";
+
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.loadDataWithBaseURL(null, html, mime, encoding, null);
+    }
 
     private final LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>(this) {
         @Override
@@ -121,22 +124,12 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mImageGetter.destroy();
-        mImageGetter = null;
-    }
-
-    @Override
     public void onRefresh() {
         if (mContentView != null) {
-            mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
             mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
             mContentView.findViewById(R.id.pull_requests_progress).setVisibility(View.VISIBLE);
         }
-        if (mImageGetter != null) {
-            mImageGetter.clearHtmlCache();
-        }
+
         hideContentAndRestartLoaders(0, 1);
     }
 
@@ -144,24 +137,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mImageGetter = new HttpImageGetter(getActivity());
         fillData();
         setContentShown(true);
 
         getLoaderManager().initLoader(0, null, mReadmeCallback);
         getLoaderManager().initLoader(1, null, mPullRequestsCallback);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mImageGetter.resume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mImageGetter.pause();
     }
 
     public void setRef(String ref) {
@@ -170,7 +150,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         // reload readme
         getLoaderManager().restartLoader(0, null, mReadmeCallback);
         if (mContentView != null) {
-            mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
             mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
         }
     }
@@ -207,12 +186,17 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         fillTextView(R.id.tv_url, 0, !StringUtils.isBlank(mRepository.getHomepage())
                 ? mRepository.getHomepage() : mRepository.getHtmlUrl());
 
-        mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
-        mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
-        mContentView.findViewById(R.id.cell_pull_requests).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this);
-        mContentView.findViewById(R.id.other_info).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
+        // Setting Click listeners
+        int[] viewIds = new int[]{
+            R.id.cell_stargazers,
+            R.id.cell_forks,
+            R.id.cell_pull_requests,
+            R.id.tv_contributors_label,
+            R.id.other_info,
+            R.id.tv_releases_label
+        };
+        for(int id : viewIds)
+            mContentView.findViewById(id).setOnClickListener(this);
 
         Permissions permissions = mRepository.getPermissions();
         updateClickableLabel(R.id.tv_collaborators_label,
@@ -308,45 +292,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
         if (intent != null) {
             startActivity(intent);
-        }
-    }
-
-    private static class FillReadmeTask extends AsyncTask<String, Void, String> {
-        private final Long mId;
-        private final Context mContext;
-        private final TextView mReadmeView;
-        private final View mProgressView;
-        private final HttpImageGetter mImageGetter;
-
-        public FillReadmeTask(long id, TextView readmeView, View progressView,
-                HttpImageGetter imageGetter) {
-            mId = id;
-            mContext = readmeView.getContext();
-            mReadmeView = readmeView;
-            mProgressView = progressView;
-            mImageGetter = imageGetter;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String readme = params[0];
-            if (readme != null) {
-                mImageGetter.encode(mContext, mId, readme);
-            }
-            return readme;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (result != null) {
-                mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-                mImageGetter.bind(mReadmeView, result, mId);
-            } else {
-                mReadmeView.setText(R.string.repo_no_readme);
-                mReadmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-            }
-            mReadmeView.setVisibility(View.VISIBLE);
-            mProgressView.setVisibility(View.GONE);
         }
     }
 }

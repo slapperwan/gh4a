@@ -218,33 +218,19 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.StyleableTextView
-                    android:id="@+id/readme_title"
-                    style="@style/HeaderLabel"
+                <WebView
+                    android:id="@+id/webView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/readme" />
+                    android:layout_height="wrap_content">
+                </WebView>
 
                 <ProgressBar
                     android:id="@+id/pb_readme"
                     style="@style/LoadingProgress" />
-
-                <com.gh4a.widget.StyleableTextView
-                    android:id="@+id/readme"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/content_padding"
-                    android:paddingLeft="@dimen/content_padding"
-                    android:paddingRight="@dimen/content_padding"
-                    android:textIsSelectable="true"
-                    android:visibility="gone"
-                    tools:text="Readme text"
-                    tools:visibility="visible" />
-
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
