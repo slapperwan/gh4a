@@ -2,6 +2,7 @@ package com.gh4a.adapter.timeline;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.support.v4.content.ContextCompat;
@@ -12,12 +13,14 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.LineBackgroundSpan;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
@@ -27,6 +30,9 @@ import org.eclipse.egit.github.core.CommitComment;
 
 class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Diff>
         implements View.OnClickListener {
+    private static final float[] DIFF_SIZE_MULTIPLIERS = new float[] {
+            0.667F, 0.833F, 1F, 1.5F, 2F
+    };
 
     private final int mAddedLineBackgroundColor;
     private final int mRemovedLineBackgroundColor;
@@ -43,6 +49,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
     private final String mRepoOwner;
     private final String mRepoName;
     private final int mIssueNumber;
+    private final float mInitialDiffTextSize;
 
     public DiffViewHolder(View itemView, String repoOwner, String repoName, int issueNumber) {
         super(itemView);
@@ -67,6 +74,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
         mDiffHunkTextView = itemView.findViewById(R.id.diff_hunk);
         mDiffHunkTextView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+        mInitialDiffTextSize = mDiffHunkTextView.getTextSize();
         mFileTextView = itemView.findViewById(R.id.tv_file);
         mFileTextView.setOnClickListener(this);
     }
@@ -152,6 +160,17 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
             builder.setSpan(span, spanStart, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         mDiffHunkTextView.setText(builder);
+        mDiffHunkTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                mInitialDiffTextSize * getDiffSizeMultiplier());
+    }
+
+    private float getDiffSizeMultiplier() {
+        Context context = itemView.getContext();
+        SharedPreferences prefs = context.getSharedPreferences(SettingsFragment.PREF_NAME,
+                Context.MODE_PRIVATE);
+        int textSizeSetting = prefs.getInt(SettingsFragment.KEY_TEXT_SIZE, 2);
+        return textSizeSetting >= 0 && textSizeSetting < DIFF_SIZE_MULTIPLIERS.length
+                ? DIFF_SIZE_MULTIPLIERS[textSizeSetting] : 1F;
     }
 
     private void appendLineNumber(SpannableStringBuilder builder, int maxLength, String numberText,

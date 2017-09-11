@@ -33,6 +33,7 @@
             android:paddingBottom="@dimen/code_diff_padding"
             android:paddingTop="@dimen/code_diff_padding"
             android:textColor="?android:attr/textColorPrimary"
+            android:textSize="13sp"
             android:textIsSelectable="true"
             tools:text="+Diff lines\n+Are cool" />
     </HorizontalScrollView>
