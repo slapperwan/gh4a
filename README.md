@@ -1,8 +1,8 @@
+<img alt="Octodroid" align="right" src="https://raw.githubusercontent.com/slapperwan/gh4a/master/app/src/main/res/drawable-xxhdpi/octodroid.png">
+
 OctoDroid
 =========
 This application provides access to [GitHub](https://github.com/) and lets you stay connected with your network
-
-![Octodroid](https://raw.githubusercontent.com/slapperwan/gh4a/master/app/src/main/res/drawable-xxhdpi/octodroid.png)
 
 Download
 --------
