@@ -87,7 +87,7 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
         if (icon == null) {
             mIcon.setVisibility(View.GONE);
         } else {
-            Drawable wrapped = DrawableCompat.wrap(icon);
+            Drawable wrapped = DrawableCompat.wrap(icon).mutate();
             mIcon.setImageDrawable(wrapped);
             mIcon.setVisibility(View.VISIBLE);
             updateIconTint();
