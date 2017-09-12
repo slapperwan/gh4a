@@ -2,6 +2,7 @@
 <android.support.v4.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -26,7 +27,8 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/overview_item_spacing">
 
                     <com.gh4a.widget.FixedSizeImageView
                         android:id="@+id/iv_gravatar"
@@ -46,20 +48,10 @@
                         tools:text="Username" />
 
                     <com.gh4a.widget.StyleableTextView
-                        android:id="@+id/tv_created_at"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_name"
-                        android:layout_marginTop="2dp"
-                        android:layout_toRightOf="@id/iv_gravatar"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        tools:text="yesterday" />
-
-                    <com.gh4a.widget.StyleableTextView
                         android:id="@+id/tv_email"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@id/tv_created_at"
+                        android:layout_below="@id/tv_name"
                         android:layout_marginTop="2dp"
                         android:layout_toRightOf="@id/iv_gravatar"
                         android:autoLink="email"
@@ -101,133 +93,41 @@
                         tools:text="Location" />
                 </RelativeLayout>
 
-                <LinearLayout
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/join_date_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/overview_item_spacing">
+                    app:rowIcon="@drawable/icon_calendar" />
 
-                    <LinearLayout
-                        android:id="@+id/cell_org_members"
-                        style="@style/SelectableBorderlessItem"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/members_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_members" />
 
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_members_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/view"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem" />
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/followers_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_members" /> <!-- FIXME -->
 
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_members_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/user_members"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-                    </LinearLayout>
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/following_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_members" /> <!-- FIXME -->
 
-                    <LinearLayout
-                        android:id="@+id/cell_followers"
-                        style="@style/SelectableBorderlessItem"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/repos_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_repositories" />
 
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_followers_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
-                            tools:text="354" />
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_followers_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/user_followers"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/cell_following"
-                        style="@style/SelectableBorderlessItem"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_following_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
-                            tools:text="23" />
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_following_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/user_following"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/cell_repos"
-                        style="@style/SelectableBorderlessItem"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_repos_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
-                            tools:text="1" />
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_repos_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/repo_short"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/cell_gists"
-                        style="@style/SelectableBorderlessItem"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_gists_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
-                            tools:text="0" />
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_gists_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/gists"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-                    </LinearLayout>
-
-                </LinearLayout>
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/gists_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_gists" />
 
             </LinearLayout>
 
