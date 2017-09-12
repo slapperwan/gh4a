@@ -17,13 +17,17 @@ import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
 
 public class OverviewRow extends LinearLayoutCompat implements View.OnClickListener {
+    public interface OnIconClickListener {
+        void onIconClick(OverviewRow row);
+    }
+
     private final ImageView mIcon;
     private final TextView mLabel;
     private final View mRedirectNotice;
     private final View mProgress;
 
     private Intent mClickIntent;
-    private boolean mToggleActive;
+    private OnIconClickListener mIconClickListener;
 
     public OverviewRow(Context context) {
         this(context, null);
@@ -46,8 +50,7 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
                 attrs, R.styleable.RepositoryStatView, defStyle, 0);
 
         setText(a.getString(R.styleable.RepositoryStatView_rowText));
-        setIcon(a.getDrawable(R.styleable.RepositoryStatView_rowIcon),
-                a.getBoolean(R.styleable.RepositoryStatView_toggleable, false));
+        setIcon(a.getDrawable(R.styleable.RepositoryStatView_rowIcon));
 
         a.recycle();
     }
@@ -68,31 +71,44 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
         }
     }
 
-    private void setIcon(Drawable icon, boolean toggleable) {
+    public void setIconClickListener(OnIconClickListener l) {
+        mIcon.setOnClickListener(this);
+        mIcon.setClickable(l != null);
+        mIconClickListener = l;
+        updateIconTint();
+    }
+
+    public void setToggleState(boolean active) {
+        mIcon.setImageState(
+                active ? new int[] { android.R.attr.state_checked } : new int[0], true);
+    }
+
+    private void setIcon(Drawable icon) {
         if (icon == null) {
             mIcon.setVisibility(View.GONE);
+        } else {
+            Drawable wrapped = DrawableCompat.wrap(icon);
+            mIcon.setImageDrawable(wrapped);
+            mIcon.setVisibility(View.VISIBLE);
+            updateIconTint();
+        }
+    }
+
+    private void updateIconTint() {
+        Drawable drawable = mIcon.getDrawable();
+        if (drawable == null) {
             return;
         }
-
-        Drawable wrapped = DrawableCompat.wrap(icon);
         int tintColor = UiUtils.resolveColor(getContext(),
-                toggleable ? R.attr.colorAccent : R.attr.colorIconForeground);
-        DrawableCompat.setTint(wrapped, tintColor);
-        DrawableCompat.setTintMode(wrapped, PorterDuff.Mode.SRC_IN);
-
-        mIcon.setImageDrawable(wrapped);
-        mIcon.setVisibility(View.VISIBLE);
-        mIcon.setOnClickListener(this);
-        mIcon.setClickable(toggleable);
+                mIconClickListener != null ? R.attr.colorAccent : R.attr.colorIconForeground);
+        DrawableCompat.setTint(drawable, tintColor);
+        DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
     }
 
     @Override
     public void onClick(View view) {
         if (view == mIcon) {
-            mToggleActive = !mToggleActive;
-            mIcon.setImageState(
-                    mToggleActive ? new int[] { android.R.attr.state_checked } : new int[0], true);
-            // TODO: callback
+            mIconClickListener.onIconClick(this);
         } else if (mClickIntent != null) {
             getContext().startActivity(mClickIntent);
         }
