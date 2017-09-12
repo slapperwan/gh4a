@@ -144,6 +144,5 @@
     <declare-styleable name="RepositoryStatView">
         <attr name="rowText" format="string" />
         <attr name="rowIcon" format="color|reference" />
-        <attr name="toggleable" format="boolean" />
     </declare-styleable>
 </resources>

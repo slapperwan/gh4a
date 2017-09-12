@@ -109,16 +109,14 @@
                         android:id="@+id/stars_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:rowIcon="@drawable/star"
-                        app:toggleable="true" /> <!-- FIXME: state list icon -->
+                        app:rowIcon="@drawable/icon_star" />
 
                     <com.gh4a.widget.OverviewRow
                         android:id="@+id/watchers_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:rowText="54 Watchers"
-                        app:rowIcon="@drawable/ic_watch"
-                        app:toggleable="true" /> <!-- FIXME: state list icon -->
+                        app:rowIcon="@drawable/icon_watch" />
 
                 </LinearLayout>
             </RelativeLayout>

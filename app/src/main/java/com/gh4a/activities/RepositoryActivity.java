@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseFragmentPagerActivity;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.db.BookmarksProvider;
@@ -35,19 +34,13 @@ import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Branch;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.Repository;
-import com.meisolsson.githubsdk.model.Subscription;
-import com.meisolsson.githubsdk.model.request.activity.SubscriptionRequest;
-import com.meisolsson.githubsdk.service.activity.StarringService;
-import com.meisolsson.githubsdk.service.activity.WatchingService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryBranchService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
-import retrofit2.Response;
 
 public class RepositoryActivity extends BaseFragmentPagerActivity implements
         CommitListFragment.ContextSelectionCallback,
@@ -84,8 +77,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
     private static final String STATE_KEY_SELECTED_REF = "selected_ref";
 
     private static final int ID_LOADER_REPO = 0;
-    private static final int ID_LOADER_WATCHING = 1;
-    private static final int ID_LOADER_STARRING = 2;
 
     public static final int PAGE_REPO_OVERVIEW = 0;
     public static final int PAGE_FILES = 1;
@@ -107,9 +98,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
     private List<Branch> mTags;
     private String mSelectedRef;
 
-    private Boolean mIsWatching;
-    private Boolean mIsStarring;
-
     private RepositoryFragment mRepositoryFragment;
     private ContentListContainerFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
@@ -130,8 +118,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         setContentShown(false);
 
         loadRepository(false);
-        loadStarringState(false);
-        loadWatchingState(false);
     }
 
     @Override
@@ -245,16 +231,12 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         mContentListFragment = null;
         mActivityFragment = null;
         mRepository = null;
-        mIsStarring = null;
-        mIsWatching = null;
         mBranches = null;
         mTags = null;
         clearRefDependentFragments();
         setContentShown(false);
         invalidateTabs();
         loadRepository(true);
-        loadStarringState(true);
-        loadWatchingState(true);
         super.onRefresh();
     }
 
@@ -277,34 +259,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean authorized = Gh4Application.get().isAuthorized();
-        MenuItem watchAction = menu.findItem(R.id.watch);
-        watchAction.setVisible(authorized);
-        if (authorized) {
-            if (mIsWatching == null) {
-                watchAction.setActionView(R.layout.ab_loading);
-                watchAction.expandActionView();
-            } else if (mIsWatching) {
-                watchAction.setTitle(R.string.repo_unwatch_action);
-            } else {
-                watchAction.setTitle(R.string.repo_watch_action);
-            }
-        }
-
-        MenuItem starAction = menu.findItem(R.id.star);
-        starAction.setVisible(authorized);
-        if (authorized) {
-            if (mIsStarring == null) {
-                starAction.setActionView(R.layout.ab_loading);
-                starAction.expandActionView();
-            } else if (mIsStarring) {
-                starAction.setTitle(R.string.repo_unstar_action);
-                starAction.setIcon(R.drawable.unstar);
-            } else {
-                starAction.setTitle(R.string.repo_star_action);
-                starAction.setIcon(R.drawable.star);
-            }
-        }
         if (mRepository == null) {
             menu.removeItem(R.id.ref);
             menu.removeItem(R.id.bookmark);
@@ -330,20 +284,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         String url = "https://github.com/" + mRepoOwner + "/" + mRepoName;
         switch (item.getItemId()) {
-            case R.id.watch:
-                if (mIsWatching != null) {
-                    item.setActionView(R.layout.ab_loading);
-                    item.expandActionView();
-                    toggleWatchingState();
-                }
-                return true;
-            case R.id.star:
-                if (mIsStarring != null) {
-                    item.setActionView(R.layout.ab_loading);
-                    item.expandActionView();
-                    toggleStarringState();
-                }
-                return true;
             case R.id.ref:
                 loadOrShowRefSelection();
                 return true;
@@ -420,58 +360,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         mCommitListFragment = null;
     }
 
-    private void toggleStarringState() {
-        StarringService service = ServiceFactory.get(StarringService.class, false);
-        Single<Response<Void>> responseSingle = mIsStarring
-                ? service.unstarRepository(mRepoOwner, mRepoName)
-                : service.starRepository(mRepoOwner, mRepoName);
-        responseSingle.map(ApiHelpers::mapToBooleanOrThrowOnFailure)
-                .compose(RxUtils::doInBackground)
-                .subscribe(result -> {
-                    if (mIsStarring != null) {
-                        mIsStarring = !mIsStarring;
-                        if (mRepositoryFragment != null) {
-                            mRepositoryFragment.updateStargazerCount(mIsStarring);
-                        }
-                        supportInvalidateOptionsMenu();
-                    }
-                }, error -> {
-                    handleActionFailure("Updating repo starring state failed", error);
-                    supportInvalidateOptionsMenu();
-                });
-
-    }
-
-    private void toggleWatchingState() {
-        WatchingService service = ServiceFactory.get(WatchingService.class, false);
-        final Single<?> responseSingle;
-
-        if (mIsWatching) {
-            responseSingle = service.deleteRepositorySubscription(mRepoOwner, mRepoName)
-                    .map(ApiHelpers::throwOnFailure);
-        } else {
-            SubscriptionRequest request = SubscriptionRequest.builder()
-                    .subscribed(true)
-                    .build();
-            responseSingle = service.setRepositorySubscription(mRepoOwner, mRepoName, request)
-                    .map(ApiHelpers::throwOnFailure);
-        }
-
-        responseSingle.compose(RxUtils::doInBackground)
-                .subscribe(result -> {
-                    if (mIsWatching != null) {
-                        mIsWatching = !mIsWatching;
-                        if (mRepositoryFragment != null) {
-                            mRepositoryFragment.updateWatcherCount(mIsWatching);
-                        }
-                    }
-                    supportInvalidateOptionsMenu();
-                }, error -> {
-                    handleActionFailure("Updating repo watching state failed", error);
-                    supportInvalidateOptionsMenu();
-                });
-    }
-
     private void loadRepository(boolean force) {
         RepositoryService service = ServiceFactory.get(RepositoryService.class, force);
         service.getRepository(mRepoOwner, mRepoName)
@@ -487,41 +375,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
                         mInitialPage = -1;
                     }
                     setContentShown(true);
-                    supportInvalidateOptionsMenu();
-                }, this::handleLoadFailure);
-    }
-
-    private void loadStarringState(boolean force) {
-        if (!Gh4Application.get().isAuthorized()) {
-            return;
-        }
-        StarringService service = ServiceFactory.get(StarringService.class, force);
-        service.checkIfRepositoryIsStarred(mRepoOwner, mRepoName)
-                .map(ApiHelpers::throwOnFailure)
-                // success response means 'starred'
-                .map(result -> true)
-                // 404 means 'not starred'
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, false))
-                .compose(makeLoaderSingle(ID_LOADER_STARRING, force))
-                .subscribe(result -> {
-                    mIsStarring = result;
-                    supportInvalidateOptionsMenu();
-                }, this::handleLoadFailure);
-    }
-
-    private void loadWatchingState(boolean force) {
-        if (!Gh4Application.get().isAuthorized()) {
-            return;
-        }
-        WatchingService service = ServiceFactory.get(WatchingService.class, force);
-        service.getRepositorySubscription(mRepoOwner, mRepoName)
-                .map(ApiHelpers::throwOnFailure)
-                .map(Subscription::subscribed)
-                // 404 means 'not subscribed'
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, false))
-                .compose(makeLoaderSingle(ID_LOADER_WATCHING, force))
-                .subscribe(result -> {
-                    mIsWatching = result;
                     supportInvalidateOptionsMenu();
                 }, this::handleLoadFailure);
     }

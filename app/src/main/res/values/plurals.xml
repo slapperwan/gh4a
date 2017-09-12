@@ -25,6 +25,11 @@
         <item quantity="other">Followed by %d users</item>
     </plurals>
 
+    <plurals name="follower_and_self">
+        <item quantity="one">Followed by you and 1 other user</item>
+        <item quantity="other">Followed by you and %d other users</item>
+    </plurals>
+
     <plurals name="following">
         <item quantity="one">Following 1 user</item>
         <item quantity="other">Following %d users</item>

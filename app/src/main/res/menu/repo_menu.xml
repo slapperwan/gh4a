@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/star"
-        android:title="@string/repo_star_action"
-        android:icon="@drawable/star"
-        app:showAsAction="always" />
     <item android:id="@+id/ref"
         android:title="@string/repo_select_ref"
         android:icon="@drawable/branch_dark"
@@ -21,9 +17,6 @@
         android:title="@string/search_code"
         android:icon="@drawable/action_search"
         app:showAsAction="never"/>
-    <item android:id="@+id/watch"
-        android:title="@string/repo_watch_action"
-        app:showAsAction="never" />
     <item android:id="@+id/zip_download"
         android:title="@string/repo_download_action"
         app:showAsAction="never" />
