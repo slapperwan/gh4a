@@ -24,7 +24,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.R;
@@ -35,6 +34,7 @@ import com.gh4a.activities.ForkListActivity;
 import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
+import com.gh4a.activities.StargazerListActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
@@ -51,6 +51,7 @@ import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.SearchPage;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 import com.meisolsson.githubsdk.service.search.SearchService;
+import com.gh4a.widget.OverviewRow;
 import com.vdurmont.emoji.EmojiParser;
 
 import java.net.HttpURLConnection;
@@ -116,7 +117,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             mLoadingView.setVisibility(View.VISIBLE);
         }
         if (mContentView != null) {
-            mContentView.findViewById(R.id.pull_requests_progress).setVisibility(View.VISIBLE);
+            OverviewRow issuesRow = mContentView.findViewById(R.id.issues_row);
+            issuesRow.setText(null);
+            OverviewRow pullsRow = mContentView.findViewById(R.id.pulls_row);
+            pullsRow.setText(null);
         }
         if (mImageGetter != null) {
             mImageGetter.clearHtmlCache();
@@ -207,13 +211,39 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         }
 
         fillTextView(R.id.tv_desc, 0, mRepository.description());
-        fillTextView(R.id.tv_language,R.string.repo_language, mRepository.language());
         fillTextView(R.id.tv_url, 0, !StringUtils.isBlank(mRepository.homepage())
                 ? mRepository.homepage() : mRepository.htmlUrl());
 
-        mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
-        mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
-        mContentView.findViewById(R.id.cell_pull_requests).setOnClickListener(this);
+        final String owner = mRepository.owner().login();
+        final String name = mRepository.name();
+
+        OverviewRow languageRow = mContentView.findViewById(R.id.language_row);
+        languageRow.setVisibility(StringUtils.isBlank(mRepository.language())
+                ? View.GONE : View.VISIBLE);
+        languageRow.setText(getString(R.string.repo_language, mRepository.language()));
+
+        OverviewRow issuesRow = mContentView.findViewById(R.id.issues_row);
+        issuesRow.setVisibility(mRepository.hasIssues() ? View.VISIBLE : View.GONE);
+        issuesRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name));
+
+        OverviewRow pullsRow = mContentView.findViewById(R.id.pulls_row);
+        pullsRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name, true));
+
+        OverviewRow forksRow = mContentView.findViewById(R.id.forks_row);
+        forksRow.setText(getResources().getQuantityString(R.plurals.fork,
+                mRepository.forksCount(), mRepository.forksCount()));
+        forksRow.setClickIntent(ForkListActivity.makeIntent(getActivity(), owner, name));
+
+        OverviewRow starsRow = mContentView.findViewById(R.id.stars_row);
+        starsRow.setText(getResources().getQuantityString(R.plurals.star,
+                mRepository.stargazersCount(), mRepository.stargazersCount()));
+        starsRow.setClickIntent(StargazerListActivity.makeIntent(getActivity(), owner, name));
+
+        OverviewRow watcherRow = mContentView.findViewById(R.id.watchers_row);
+        watcherRow.setText(getResources().getQuantityString(R.plurals.watcher,
+                mRepository.watchersCount(), mRepository.watchersCount()));
+        watcherRow.setClickIntent(WatcherListActivity.makeIntent(getActivity(), owner, name));
+
         mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this);
         mContentView.findViewById(R.id.other_info).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
@@ -223,22 +253,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         updateClickableLabel(R.id.tv_collaborators_label,
                 permissions != null && permissions.push());
         updateClickableLabel(R.id.tv_wiki_label, mRepository.hasWiki());
-
-        TextView tvStargazersCount = mContentView.findViewById(R.id.tv_stargazers_count);
-        tvStargazersCount.setText(String.valueOf(mRepository.watchersCount()));
-
-        TextView tvForksCount = mContentView.findViewById(R.id.tv_forks_count);
-        tvForksCount.setText(String.valueOf(mRepository.forksCount()));
-
-        LinearLayout llIssues = mContentView.findViewById(R.id.cell_issues);
-
-        if (mRepository.hasIssues()) {
-            llIssues.setVisibility(View.VISIBLE);
-            llIssues.setOnClickListener(this);
-            // value will be filled when PR count arrives
-        } else {
-            llIssues.setVisibility(View.GONE);
-        }
 
         mContentView.findViewById(R.id.tv_private).setVisibility(
                 mRepository.isPrivate() ? View.VISIBLE : View.GONE);
@@ -272,11 +286,22 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
     public void updateStargazerCount(boolean starring) {
         mRepository = mRepository.toBuilder()
-                .watchersCount(mRepository.watchersCount() + (starring ? 1 : -1))
+                .stargazersCount(mRepository.stargazersCount() + (starring ? 1 : -1))
                 .build();
 
-        TextView tvStargazersCount = mContentView.findViewById(R.id.tv_stargazers_count);
-        tvStargazersCount.setText(String.valueOf(mRepository.watchersCount()));
+        OverviewRow starsRow = mContentView.findViewById(R.id.stars_row);
+        starsRow.setText(getResources().getQuantityString(R.plurals.star,
+                mRepository.stargazersCount(), mRepository.stargazersCount()));
+    }
+
+    public void updateWatcherCount(boolean watching) {
+        mRepository = mRepository.toBuilder()
+                .watchersCount(mRepository.watchersCount() + (watching ? 1 : -1))
+                .build();
+
+        OverviewRow watchersRow = mContentView.findViewById(R.id.watchers_row);
+        watchersRow.setText(getResources().getQuantityString(R.plurals.watcher,
+                mRepository.watchersCount(), mRepository.watchersCount()));
     }
 
     @Override
@@ -292,18 +317,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         String name = mRepository.name();
         Intent intent = null;
 
-        if (id == R.id.cell_pull_requests) {
-            intent = IssueListActivity.makeIntent(getActivity(), owner, name, true);
-        } else if (id == R.id.tv_contributors_label) {
+        if (id == R.id.tv_contributors_label) {
             intent = ContributorListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.tv_collaborators_label) {
             intent = CollaboratorListActivity.makeIntent(getActivity(), owner, name);
-        } else if (id == R.id.cell_issues) {
-            intent = IssueListActivity.makeIntent(getActivity(), owner, name);
-        } else if (id == R.id.cell_stargazers) {
-            intent = WatcherListActivity.makeIntent(getActivity(), owner, name);
-        } else if (id == R.id.cell_forks) {
-            intent = ForkListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.tv_wiki_label) {
             intent = WikiListActivity.makeIntent(getActivity(), owner, name, null);
         } else if (id == R.id.tv_releases_label) {
@@ -385,15 +402,13 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                 .map(SearchPage::totalCount)
                 .compose(makeLoaderSingle(ID_LOADER_PULL_REQUEST_COUNT, force))
                 .subscribe(count -> {
-                    View v = getView();
-                    v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
-                    v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
+                    int issueCount = mRepository.openIssuesCount() - count;
 
-                    TextView tvIssuesCount = mContentView.findViewById(R.id.tv_issues_count);
-                    tvIssuesCount.setText(String.valueOf(mRepository.openIssuesCount() - count));
+                    OverviewRow issuesRow = mContentView.findViewById(R.id.issues_row);
+                    issuesRow.setText(getResources().getQuantityString(R.plurals.issue, issueCount, issueCount));
 
-                    TextView tvPullRequestsCountView = v.findViewById(R.id.tv_pull_requests_count);
-                    tvPullRequestsCountView.setText(String.valueOf(count));
+                    OverviewRow pullsRow = mContentView.findViewById(R.id.pulls_row);
+                    pullsRow.setText(getResources().getQuantityString(R.plurals.pull_request, count, count));
                 }, this::handleLoadFailure);
     }
 }

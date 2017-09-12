@@ -61,19 +61,10 @@
                     tools:text="https://example.com" />
 
                 <com.gh4a.widget.StyleableTextView
-                    android:id="@+id/tv_language"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_url"
-                    android:layout_marginTop="2dp"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    tools:text="Language Java" />
-
-                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_private"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_language"
+                    android:layout_below="@id/tv_url"
                     android:layout_marginTop="2dp"
                     android:drawableLeft="?attr/privateSmallIcon"
                     android:drawablePadding="4dp"
@@ -81,134 +72,6 @@
                     android:textAppearance="@style/TextAppearance.VerySmall.Bold"
                     android:visibility="gone"
                     tools:visibility="visible" />
-
-                <!-- TODO: Get rid of these -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_private"
-                    android:layout_marginTop="@dimen/overview_item_spacing"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:id="@+id/cell_issues"
-                        style="@style/SelectableBorderlessItem"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <FrameLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <ProgressBar
-                                android:id="@+id/issues_progress"
-                                style="@style/LoadingProgress"
-                                android:layout_gravity="center" />
-
-                            <com.gh4a.widget.StyleableTextView
-                                android:id="@+id/tv_issues_count"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:textAppearance="@style/TextAppearance.CountHeaderItem" />
-
-                        </FrameLayout>
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_issues_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/issues"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/cell_stargazers"
-                        style="@style/SelectableBorderlessItem"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_stargazers_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
-                            tools:text="10" />
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_stargazers_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/repo_stargazers"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/cell_forks"
-                        style="@style/SelectableBorderlessItem"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_forks_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.CountHeaderItem"
-                            tools:text="1" />
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_forks_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/repo_forks"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/cell_pull_requests"
-                        style="@style/SelectableBorderlessItem"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:orientation="vertical">
-
-                        <FrameLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
-
-                            <ProgressBar
-                                android:id="@+id/pull_requests_progress"
-                                style="@style/LoadingProgress"
-                                android:layout_gravity="center" />
-
-                            <com.gh4a.widget.StyleableTextView
-                                android:id="@+id/tv_pull_requests_count"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:textAppearance="@style/TextAppearance.CountHeaderItem" />
-
-                        </FrameLayout>
-
-                        <com.gh4a.widget.StyleableTextView
-                            android:id="@+id/tv_pull_requests_label"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/pulls"
-                            android:textAppearance="?android:attr/textAppearanceSmall" />
-                    </LinearLayout>
-                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -218,35 +81,44 @@
                     android:layout_marginTop="@dimen/content_padding"
                     android:orientation="vertical">
 
-                    <com.gh4a.widget.RepositoryStatView
+                    <com.gh4a.widget.OverviewRow
+                        android:id="@+id/language_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:buttonText="@string/repo_unwatch_action"
-                        app:mainText="54 Watchers" />
+                        app:rowIcon="@drawable/icon_language" />
 
-                    <com.gh4a.widget.RepositoryStatView
+                    <com.gh4a.widget.OverviewRow
+                        android:id="@+id/issues_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:buttonText="@string/repo_unstar_action"
-                        app:mainText="809 Stars" />
+                        app:rowIcon="@drawable/icon_issues" />
 
-                    <com.gh4a.widget.RepositoryStatView
+                    <com.gh4a.widget.OverviewRow
+                        android:id="@+id/pulls_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:buttonText="@string/fork"
-                        app:mainText="153 Forks" />
+                        app:rowIcon="@drawable/icon_pull_request" />
 
-                    <com.gh4a.widget.RepositoryStatView
+                    <com.gh4a.widget.OverviewRow
+                        android:id="@+id/forks_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:buttonText="View"
-                        app:mainText="85 Issues" />
+                        app:rowIcon="@drawable/icon_fork" />
 
-                    <com.gh4a.widget.RepositoryStatView
+                    <com.gh4a.widget.OverviewRow
+                        android:id="@+id/stars_row"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:buttonText="View"
-                        app:mainText="8 Pull Requests" />
+                        app:rowIcon="@drawable/star"
+                        app:toggleable="true" /> <!-- FIXME: state list icon -->
+
+                    <com.gh4a.widget.OverviewRow
+                        android:id="@+id/watchers_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:rowText="54 Watchers"
+                        app:rowIcon="@drawable/ic_watch"
+                        app:toggleable="true" /> <!-- FIXME: state list icon -->
 
                 </LinearLayout>
             </RelativeLayout>

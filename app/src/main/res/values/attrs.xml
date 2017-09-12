@@ -101,6 +101,7 @@
     <attr name="saveIcon" format="reference" />
     <attr name="dropDownArrowIcon" format="reference" />
     <attr name="dropUpArrowIcon" format="reference" />
+    <attr name="arrowRightIcon" format="reference" />
 
     <attr name="maxHeight" format="dimension" />
 
@@ -141,8 +142,8 @@
     <item name="FloatingActionButtonScrollEnabled" type="id" />
 
     <declare-styleable name="RepositoryStatView">
-        <attr name="mainText" format="string" />
-        <attr name="buttonText" format="string" />
-        <attr name="buttonDrawable" format="color|reference" />
+        <attr name="rowText" format="string" />
+        <attr name="rowIcon" format="color|reference" />
+        <attr name="toggleable" format="boolean" />
     </declare-styleable>
 </resources>
