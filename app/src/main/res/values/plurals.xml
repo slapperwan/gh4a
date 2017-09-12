@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="issue">
+        <item quantity="one">1 issue</item>
+        <item quantity="other">%d issues</item>
+    </plurals>
+
+    <plurals name="pull_request">
+        <item quantity="one">1 pull request</item>
+        <item quantity="other">%d pull requests</item>
+    </plurals>
+
+    <plurals name="star">
+        <item quantity="one">1 star</item>
+        <item quantity="other">%d stars</item>
+    </plurals>
+
+    <plurals name="fork">
+        <item quantity="one">1 fork</item>
+        <item quantity="other">%d forks</item>
+    </plurals>
+
+    <plurals name="watcher">
+        <item quantity="one">1 watcher</item>
+        <item quantity="other">%d watchers</item>
+    </plurals>
+
+    <plurals name="page">
+        <item quantity="one">a page</item>
+        <item quantity="other">%d pages</item>
+    </plurals>
+
+    <plurals name="contributor_extra_data">
+        <item quantity="one">%1$d contribution</item>
+        <item quantity="other">%1$d contributions</item>
+    </plurals>
+</resources>

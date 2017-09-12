@@ -83,6 +83,7 @@
         <item name="timelineEventBranchIcon">@drawable/timeline_event_branch_dark</item>
         <item name="dropDownArrowIcon">@drawable/drop_down_arrow_dark</item>
         <item name="dropUpArrowIcon">@drawable/drop_up_arrow_dark</item>
+        <item name="arrowRightIcon">@drawable/arrow_right_dark</item>
 
         <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
@@ -219,6 +220,7 @@
         <item name="timelineEventBranchIcon">@drawable/timeline_event_branch</item>
         <item name="dropDownArrowIcon">@drawable/drop_down_arrow</item>
         <item name="dropUpArrowIcon">@drawable/drop_up_arrow</item>
+        <item name="arrowRightIcon">@drawable/arrow_right</item>
 
         <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
         <item name="cardViewTheme">@style/Theme.CardView.Light</item>

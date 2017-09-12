@@ -111,6 +111,7 @@
         <activity android:name=".activities.RepositoryActivity" android:exported="false" />
         <activity android:name=".activities.RepositoryListActivity" android:exported="false" />
         <activity android:name=".activities.SearchActivity" android:exported="false" />
+        <activity android:name=".activities.StargazerListActivity" android:exported="false" />
         <activity android:name=".activities.TimelineActivity" android:exported="false" />
         <activity android:name=".activities.TrendingActivity" android:exported="false" />
         <activity android:name=".activities.UserActivity" android:exported="false" />

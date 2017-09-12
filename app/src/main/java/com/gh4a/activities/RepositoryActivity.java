@@ -461,6 +461,9 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
                 .subscribe(result -> {
                     if (mIsWatching != null) {
                         mIsWatching = !mIsWatching;
+                        if (mRepositoryFragment != null) {
+                            mRepositoryFragment.updateWatcherCount(mIsWatching);
+                        }
                     }
                     supportInvalidateOptionsMenu();
                 }, error -> {

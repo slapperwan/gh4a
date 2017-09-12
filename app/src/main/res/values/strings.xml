@@ -156,11 +156,6 @@
     <string name="reaction_heart">Heart</string>
     <string name="reaction_hooray">Hooray</string>
 
-    <plurals name="contributor_extra_data">
-        <item quantity="one">%1$d contribution</item>
-        <item quantity="other">%1$d contributions</item>
-    </plurals>
-
     <string name="repo_type_all">All</string>
     <string name="repo_type_owner">Owner</string>
     <string name="repo_type_member">Member</string>
@@ -244,10 +239,6 @@
     <string name="event_issue_comment">Commented on issue [b]%1$d[/b] in [b]%2$s[/b]</string>
     <string name="event_pull_request_comment">Commented on pull request [b]%1$d[/b] in [b]%2$s[/b]</string>
     <string name="event_team_repo_add">Added the repository [b]%1$s[/b] to the team [b]%2$s[/b]</string>
-    <plurals name="page">
-        <item quantity="one">a page</item>
-        <item quantity="other">%d pages</item>
-    </plurals>
 
     <string name="event_pull_request_desc">%1$s\n%2$d commits with %3$d additions and %4$d deletions</string>
     <string name="event_follow_desc">%1$s has %2$d repositories and %3$d followers</string>
@@ -271,7 +262,7 @@
 
     <!-- Repository -->
     <string name="repo_forks">Forks</string>
-    <string name="repo_language">Language %1$s</string>
+    <string name="repo_language">Written in %1$s</string>
     <string name="repo_watchers">Watchers</string>
     <string name="repo_stargazers">Stargazers</string>
     <string name="repo_watch_action">Watch</string>
