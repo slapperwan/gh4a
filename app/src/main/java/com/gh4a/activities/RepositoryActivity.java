@@ -22,8 +22,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.gh4a.BackgroundTask;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -34,29 +32,23 @@ import com.gh4a.fragment.RepositoryEventListFragment;
 import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.loader.BaseLoader;
 import com.gh4a.loader.BranchListLoader;
-import com.gh4a.loader.IsStarringLoader;
-import com.gh4a.loader.IsWatchingLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ProgressDialogLoaderCallbacks;
-import com.gh4a.loader.RepositoryLoader;
+import com.gh4a.loader.RxLoader;
 import com.gh4a.loader.TagListLoader;
+import com.gh4a.service.RepositoryService;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxTools;
 import com.gh4a.utils.UiUtils;
-
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryTag;
-import org.eclipse.egit.github.core.service.StarService;
-import org.eclipse.egit.github.core.service.WatcherService;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 
 public class RepositoryActivity extends BasePagerActivity {
     public static Intent makeIntent(Context context, Repository repo) {
@@ -102,27 +94,6 @@ public class RepositoryActivity extends BasePagerActivity {
         R.string.about, R.string.repo_files, R.string.commits, R.string.repo_activity
     };
 
-    private final LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>(this) {
-        @Override
-        protected Loader<LoaderResult<Repository>> onCreateLoader() {
-            return new RepositoryLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(Repository result) {
-            mRepository = result;
-            updateTitle();
-            invalidateTabs();
-            // Apply initial page selection first time the repo is loaded
-            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
-                getPager().setCurrentItem(mInitialPage);
-                mInitialPage = -1;
-            }
-            setContentShown(true);
-            supportInvalidateOptionsMenu();
-        }
-    };
-
     private final LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>> mBranchesAndTagsCallback =
             new ProgressDialogLoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(this, this) {
         @Override
@@ -141,30 +112,6 @@ public class RepositoryActivity extends BasePagerActivity {
             mTags = result.second;
             showRefSelectionDialog();
             getSupportLoaderManager().destroyLoader(LOADER_BRANCHES_AND_TAGS);
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new IsWatchingLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
-        }
-        @Override
-        protected void onResultReady(Boolean result) {
-            mIsWatching = result;
-            supportInvalidateOptionsMenu();
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new IsStarringLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
-        }
-        @Override
-        protected void onResultReady(Boolean result) {
-            mIsStarring = result;
-            supportInvalidateOptionsMenu();
         }
     };
 
@@ -197,11 +144,30 @@ public class RepositoryActivity extends BasePagerActivity {
 
         setContentShown(false);
 
-        getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
+        this.loadRepository().subscribe();
         if (Gh4Application.get().isAuthorized()) {
-            getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
-            getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
+            this.isWatching();
+            this.isStarring();
         }
+    }
+
+    public Observable<Repository> loadRepository() {
+        return RepositoryService.loadRepository(mRepoOwner, mRepoName)
+                .compose(RxTools.applySchedulers())
+                .compose(RxLoader.compose(this, 120))
+                .doOnNext(repository -> {
+                    Log.d("TEST", "repository doOnNext method called");
+                    mRepository = repository;
+                    updateTitle();
+                    invalidateTabs();
+                    // Apply initial page selection first time the repo is loaded
+                    if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
+                        getPager().setCurrentItem(mInitialPage);
+                        mInitialPage = -1;
+                    }
+                    setContentShown(true);
+                    supportInvalidateOptionsMenu();
+                });
     }
 
     @Override
@@ -304,10 +270,20 @@ public class RepositoryActivity extends BasePagerActivity {
         mBranches = null;
         mTags = null;
         clearRefDependentFragments();
+        Log.d("TEST", "RepositoryActivity hiding content");
         setContentShown(false);
         invalidateTabs();
-        forceLoaderReload(0, 1, 2, 3);
+//        forceLoaderReload(1);
+
+        loadRepository().subscribe();
+        if (Gh4Application.get().isAuthorized()) {
+            this.isWatching();
+            this.isStarring();
+        }
+
         super.onRefresh();
+        Log.d("TEST", "RepositoryActivity after super onRefresh called");
+        setContentShown(true);
     }
 
     @Override
@@ -378,6 +354,55 @@ public class RepositoryActivity extends BasePagerActivity {
         return UserActivity.makeIntent(this, mRepoOwner);
     }
 
+    public void updateWatch(String repoOwner, String repoName, boolean isWatching) {
+        RepositoryService.updateWatch(repoOwner, repoName, isWatching)
+            .compose(RxTools.applySchedulers())
+            .doOnTerminate(() -> {
+                if (mIsWatching == null) {
+                    // user refreshed while the action was in progress
+                    return;
+                }
+                mIsWatching = !mIsWatching;
+                supportInvalidateOptionsMenu();
+            })
+            .subscribe();
+    }
+
+    public void updateStar(String repoOwner, String repoName, boolean isStarring) {
+        RepositoryService.updateStar(repoOwner, repoName, isStarring)
+            .compose(RxTools.applySchedulers())
+            .doOnNext(result -> {
+                Log.d("TEST", "doOnNext updateStar called");
+                if (mIsStarring == null) {
+                    // user refreshed while the action was in progress
+                    return;
+                }
+                mIsStarring = !mIsStarring;
+                if (mRepositoryFragment != null) {
+                    mRepositoryFragment.updateStargazerCount(mIsStarring);
+                }
+                supportInvalidateOptionsMenu();
+            });
+    }
+
+    public void isWatching() {
+        RepositoryService.isWatching(mRepoOwner, mRepoName)
+                .compose(RxTools.applySchedulers())
+                .doOnNext(result -> {
+                    mIsWatching = result;
+                    supportInvalidateOptionsMenu();
+                }).subscribe();
+    }
+
+    public void isStarring() {
+        RepositoryService.isStarring(mRepoOwner, mRepoName)
+                .compose(RxTools.applySchedulers())
+                .doOnNext(result -> {
+                    mIsStarring = result;
+                    supportInvalidateOptionsMenu();
+                }).subscribe();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         String url = "https://github.com/" + mRepoOwner + "/" + mRepoName;
@@ -385,25 +410,12 @@ public class RepositoryActivity extends BasePagerActivity {
             case R.id.watch:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                new UpdateWatchTask().schedule();
+                this.updateWatch(mRepoOwner, mRepoName, mIsWatching);
                 return true;
             case R.id.star:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                this.updateStar(mRepoOwner, mRepoName, mIsStarring)
-                        .compose(RxTools.applySchedulers())
-                        .doOnTerminate(() -> {
-                            if (mIsStarring == null) {
-                                // user refreshed while the action was in progress
-                                return;
-                            }
-                            mIsStarring = !mIsStarring;
-                            if (mRepositoryFragment != null) {
-                                mRepositoryFragment.updateStargazerCount(mIsStarring);
-                            }
-                            supportInvalidateOptionsMenu();
-                        })
-                        .subscribe();
+                this.updateStar(mRepoOwner, mRepoName, mIsStarring);
                 return true;
             case R.id.ref:
                 if (mBranches == null) {
@@ -550,46 +562,6 @@ public class RepositoryActivity extends BasePagerActivity {
             title.setText(getName(position));
 
             return convertView;
-        }
-    }
-
-    public Observable updateStar(String repoOwner, String repoName, boolean isStarring) {
-        return Observable.fromCallable(() -> {
-            StarService starService = (StarService)
-                    Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
-            RepositoryId repoId = new RepositoryId(repoOwner, repoName);
-            if (isStarring) starService.unstar(repoId);
-            else starService.star(repoId);
-            return !isStarring;
-        });
-    }
-
-    private class UpdateWatchTask extends BackgroundTask<Void> {
-        public UpdateWatchTask() {
-            super(RepositoryActivity.this);
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            WatcherService watcherService = (WatcherService)
-                    Gh4Application.get().getService(Gh4Application.WATCHER_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            if (mIsWatching) {
-                watcherService.unwatch(repoId);
-            } else {
-                watcherService.watch(repoId);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            if (mIsWatching == null) {
-                // user refreshed while the action was in progress
-                return;
-            }
-            mIsWatching = !mIsWatching;
-            supportInvalidateOptionsMenu();
         }
     }
 }

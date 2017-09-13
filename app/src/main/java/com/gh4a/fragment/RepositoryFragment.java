@@ -38,9 +38,11 @@ import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
+import com.gh4a.loader.RxLoader;
 import com.gh4a.service.RepositoryService;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.RxTools;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
@@ -48,6 +50,7 @@ import com.vdurmont.emoji.EmojiParser;
 import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
 import io.reactivex.Observable;
+import io.reactivex.android.plugins.RxAndroidPlugins;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
@@ -88,6 +91,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
     @Override
     public void onRefresh() {
+        Log.d("TEST", "onRefresh fragment called, hiding content view");
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
             mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
@@ -102,19 +106,19 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
     public void reloadData() {
         setContentShown(false);
-        RepositoryService.emptyCache();
 
-        mCompositeDisposable.add(loadReadme()
-                .flatMap(s -> getPullRequestsCount())
-                .doOnNext(s -> setContentShown(true))
-                .subscribe());
+        loadReadme().subscribe();
+        loadPullRequestsCount().subscribe();
     }
 
     public Observable<String> loadReadme() {
         return RepositoryService.loadReadme(getContext(), mRepository.getOwner().getLogin(),
                 mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef)
+                .compose(RxTools.applySchedulers())
+                .compose(RxLoader.compose(getActivity(), 200))
                 .doOnError(throwable -> Log.d("TEST", "Error downloading readme")) // No error handling
                 .flatMap(result -> { // Fill-in Readme
+                    setContentShown(true);
                     TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
                     View progress = mContentView.findViewById(R.id.pb_readme);
                     if (result != null)
@@ -131,13 +135,15 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                     progress.setVisibility(View.GONE);
 
                     return Observable.just(result);
-                }).doOnError(throwable -> Log.d("TEST", "Error filling Readme"));
+                });
     }
 
-    public Observable<Integer> getPullRequestsCount() {
-        return RepositoryService.getPullRequestCount(mRepository, ApiHelpers.IssueState.OPEN)
-                .doOnError(throwable -> Log.d("TEST", "Error pullRequestCount"))
+    public Observable<Integer> loadPullRequestsCount() {
+        return RepositoryService.loadPullRequestCount(mRepository, ApiHelpers.IssueState.OPEN)
+                .compose(RxTools.applySchedulers())
+                .compose(RxLoader.compose(getActivity(), 250))
                 .doOnNext(result -> {
+                    Log.d("TEST", "getPullRequest onNext called");
                     View v = getView();
                     v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
                     v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
@@ -159,8 +165,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         setContentShown(true);
 
         // Fetch Readme file + PullRequests Count
-        mCompositeDisposable.add(loadReadme().subscribe());
-        mCompositeDisposable.add(getPullRequestsCount().subscribe());
+        loadReadme().subscribe();
+        loadPullRequestsCount().subscribe();
     }
 
     @Override
@@ -180,7 +186,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         getArguments().putString("ref", ref);
 
         // reload readme
-        mCompositeDisposable.add(loadReadme().subscribe());
+        loadReadme().subscribe();
 
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
