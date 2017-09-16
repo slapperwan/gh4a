@@ -51,7 +51,7 @@ public abstract class UrlLoadTask extends BackgroundTask<Intent> {
 
     private void dismiss() {
         if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
+            mProgressDialog.dismissAllowingStateLoss();
         }
         if (mFinishCurrentActivity) {
             mActivity.finish();
