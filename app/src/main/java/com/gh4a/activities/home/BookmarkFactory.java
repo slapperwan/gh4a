@@ -5,19 +5,24 @@ import android.support.v4.app.Fragment;
 
 import com.gh4a.R;
 import com.gh4a.fragment.BookmarkListFragment;
+import com.gh4a.fragment.StarredRepositoryListFragment;
 
 public class BookmarkFactory extends FragmentFactory {
     private static final int[] TAB_TITLES = new int[] {
-            R.string.bookmarks
+            R.string.bookmarks, R.string.starred
     };
 
-    public BookmarkFactory(HomeActivity activity) {
+    private final String mUserLogin;
+
+    public BookmarkFactory(HomeActivity activity, String userLogin) {
         super(activity);
+        mUserLogin = userLogin;
     }
 
     @Override
-    protected @StringRes int getTitleResId() {
-        return R.string.bookmarks;
+    @StringRes
+    protected int getTitleResId() {
+        return R.string.stars_and_bookmarks;
     }
 
     @Override
@@ -27,6 +32,9 @@ public class BookmarkFactory extends FragmentFactory {
 
     @Override
     protected Fragment makeFragment(int position) {
+        if (position == 1) {
+            return StarredRepositoryListFragment.newInstance(mUserLogin, "", ""); // TODO
+        }
         return BookmarkListFragment.newInstance();
     }
 }
