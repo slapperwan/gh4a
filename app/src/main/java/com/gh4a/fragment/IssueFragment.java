@@ -60,8 +60,8 @@ public class IssueFragment extends IssueFragmentBase {
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.tv_pull) {
-            startActivity(PullRequestActivity.makeIntent(getActivity(),
-                    mRepoOwner, mRepoName, mIssue.getNumber()));
+            PullRequestActivity.startTask(getActivity(), mRepoOwner, mRepoName, mIssue.getNumber(),
+                    -1, null);
         } else {
             super.onClick(v);
         }

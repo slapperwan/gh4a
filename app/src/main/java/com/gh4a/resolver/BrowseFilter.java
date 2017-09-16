@@ -144,8 +144,7 @@ public class BrowseFilter extends AppCompatActivity {
                         intent = IssueEditActivity.makeCreateIntent(this, user, repo);
                     } else {
                         try {
-                            intent = IssueActivity.makeIntent(this, user, repo,
-                                    Integer.parseInt(id),
+                            IssueActivity.startTask(this, user, repo, Integer.parseInt(id),
                                     generateInitialCommentMarker(uri.getFragment(), "issuecomment-"));
                         } catch (NumberFormatException e) {
                             // ignored
@@ -214,7 +213,7 @@ public class BrowseFilter extends AppCompatActivity {
 
                         IntentUtils.InitialCommentMarker initialComment =
                                 generateInitialCommentMarker(uri.getFragment(), "issuecomment-");
-                        intent = PullRequestActivity.makeIntent(this, user, repo, pullRequestNumber,
+                        PullRequestActivity.startTask(this, user, repo, pullRequestNumber,
                                 page, initialComment);
                     }
                 }

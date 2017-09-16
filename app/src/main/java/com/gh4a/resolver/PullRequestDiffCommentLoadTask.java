@@ -83,6 +83,7 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
                         false, mMarker);
             }
         } else {
+            // TODO: Handle this situation
             intent = PullRequestActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                     mPullRequestNumber, mPage, mMarker);
         }
