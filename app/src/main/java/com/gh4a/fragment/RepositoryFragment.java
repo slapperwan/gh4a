@@ -27,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
@@ -38,11 +39,10 @@ import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
-import com.gh4a.loader.RxLoader;
 import com.gh4a.service.RepositoryService;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HttpImageGetter;
-import com.gh4a.utils.RxTools;
+import com.gh4a.utils.rx.RxTools;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
@@ -50,7 +50,6 @@ import com.vdurmont.emoji.EmojiParser;
 import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
 import io.reactivex.Observable;
-import io.reactivex.android.plugins.RxAndroidPlugins;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
@@ -64,6 +63,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         return f;
     }
 
+    private Gh4Application mApp;
     private Repository mRepository;
     private View mContentView;
     private String mRef;
@@ -72,6 +72,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mApp = (Gh4Application) getContext().getApplicationContext();
         mRepository = (Repository) getArguments().getSerializable("repo");
         mRef = getArguments().getString("ref");
     }
@@ -91,7 +92,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
     @Override
     public void onRefresh() {
-        Log.d("TEST", "onRefresh fragment called, hiding content view");
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);
             mContentView.findViewById(R.id.pb_readme).setVisibility(View.VISIBLE);
@@ -107,26 +107,30 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     public void reloadData() {
         setContentShown(false);
 
-        loadReadme().subscribe();
-        loadPullRequestsCount().subscribe();
+        RxTools.emptyCache(mApp, null)
+            .flatMap(o -> loadReadme())
+            .flatMap(o -> loadPullRequestsCount())
+            .subscribe(o -> {
+                Log.d("TEST", "Reloading Data");
+            });
     }
 
     public Observable<String> loadReadme() {
         return RepositoryService.loadReadme(getContext(), mRepository.getOwner().getLogin(),
                 mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef)
                 .compose(RxTools.applySchedulers())
-                .compose(RxLoader.compose(getActivity(), 200))
                 .doOnError(throwable -> Log.d("TEST", "Error downloading readme")) // No error handling
                 .flatMap(result -> { // Fill-in Readme
                     setContentShown(true);
                     TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
                     View progress = mContentView.findViewById(R.id.pb_readme);
                     if (result != null)
-                        mImageGetter.encode(getContext(), mRepository.getId(), result);
+                        mImageGetter.encode(getContext(), mRepository.getId(),
+                                String.valueOf(result));
 
                     if (result != null) {
                         readmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-                        mImageGetter.bind(readmeView, result, mRepository.getId());
+                        mImageGetter.bind(readmeView, String.valueOf(result), mRepository.getId());
                     } else {
                         readmeView.setText(R.string.repo_no_readme);
                         readmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
@@ -139,17 +143,15 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     public Observable<Integer> loadPullRequestsCount() {
-        return RepositoryService.loadPullRequestCount(mRepository, ApiHelpers.IssueState.OPEN)
-                .compose(RxTools.applySchedulers())
-                .compose(RxLoader.compose(getActivity(), 250))
+        return RepositoryService.loadPullRequestCount(getContext(), mRepository, ApiHelpers.IssueState.OPEN)
                 .doOnNext(result -> {
-                    Log.d("TEST", "getPullRequest onNext called");
+                    Log.d("TEST", "getPullRequest onNext called: " + result);
                     View v = getView();
                     v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
                     v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
 
                     TextView tvIssuesCount = (TextView) mContentView.findViewById(R.id.tv_issues_count);
-                    tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues() - result));
+                    tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues() - (Integer) result));
 
                     TextView tvPullRequestsCountView = (TextView) v.findViewById(R.id.tv_pull_requests_count);
                     tvPullRequestsCountView.setText(String.valueOf(result));
@@ -186,7 +188,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         getArguments().putString("ref", ref);
 
         // reload readme
-        loadReadme().subscribe();
+        RxTools.emptyCache(mApp, "loadReadme")
+                .flatMap(o -> loadReadme())
+                .subscribe(o -> {
+                    Log.d("TEST", "Loading Readme subscribe reloadData called: " + o);
+                });
 
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);

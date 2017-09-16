@@ -1,0 +1,57 @@
+package com.gh4a.utils.rx;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import android.util.Log;
+import com.gh4a.Gh4Application;
+
+public class RxTools {
+    public static <T> ObservableTransformer<T, T> bind(Gh4Application app) {
+        return observable -> observable.doOnSubscribe(disposable -> { // Add observable Subscription to composite disposable
+            ObservableManager manager = app.getObservableManager();
+            manager.addSubscription(disposable);
+        });
+    }
+
+    public static <T> ObservableTransformer<T, T> handleCache(Gh4Application app, String cacheKey) {
+        return observable -> {
+            ObservableManager manager = app.getObservableManager();
+
+            // If cache contains object, use it
+            if(manager.isCached(cacheKey)) {
+                return manager.getCached(cacheKey);
+            }
+
+            manager.addCache(cacheKey, observable);
+            return observable;
+        };
+    }
+
+    public static <T> ObservableTransformer<T, T> handle(Gh4Application app, String cacheKey) {
+        return observable -> observable
+                .compose(handleCache(app, cacheKey))
+                .compose(bind(app))
+                .compose(applySchedulers());
+    }
+
+    public static Observable emptyCache(Gh4Application app, String key) {
+        return Observable.fromCallable(() -> {
+            app.getObservableManager().emptyCache(key);
+            return true;
+        });
+    }
+
+    public static Observable emptyAllCache(Gh4Application app) {
+        return Observable.fromCallable(() -> {
+            app.getObservableManager().emptyCache(null);
+            return true;
+        });
+    }
+
+    public static <T> ObservableTransformer<T, T> applySchedulers() {
+        return observable -> ((Observable)observable).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+}

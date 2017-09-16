@@ -5,7 +5,8 @@ import android.util.Log;
 import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.HtmlUtils;
-import com.gh4a.utils.RxTools;
+import com.gh4a.utils.rx.RxTools;
+
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -20,10 +21,11 @@ import java.util.Locale;
 import io.reactivex.Observable;
 
 public class RepositoryService {
-    public static Observable<String> loadReadme(Context context, String repoOwner, String repoName, String ref) {
-        Observable<String> observable =  Observable.create(emitter -> {
+    public static Observable loadReadme(Context context, String repoOwner, String repoName, String ref) {
+        Gh4Application app = (Gh4Application) context.getApplicationContext();
+
+        return Observable.create(emitter -> {
             Log.d("TEST", "loading Readme file from wweb NETWORK CALL");
-            Gh4Application app = (Gh4Application) context.getApplicationContext();
             GitHubClient client = new DefaultClient("application/vnd.github.v3.html");
             client.setOAuth2Token(app.getAuthToken());
 
@@ -42,12 +44,13 @@ public class RepositoryService {
             } catch (IOException ioe) {
                 emitter.onError(ioe);
             }
-        });
-
-        return observable;
+        })
+        .cache()
+        .compose(RxTools.handle(app, "loadReadme"));
     }
 
-    public static Observable<Integer> loadPullRequestCount(Repository repository, String state) {
+    public static Observable loadPullRequestCount(Context context, Repository repository, String state) {
+        Gh4Application app = (Gh4Application) context.getApplicationContext();
         return Observable.create(emitter -> {
             final String QUERY_FORMAT = "type:pr repo:%s/%s state:%s";
             IssueService issueService = (IssueService)
@@ -56,8 +59,10 @@ public class RepositoryService {
             filterData.put("q", String.format(Locale.US, QUERY_FORMAT,
                     repository.getOwner().getLogin(), repository.getName(), state));
             try {
-                Log.d("TEST", "getPullRequestCount called --> repository service");
-                emitter.onNext(issueService.getSearchIssueResultCount(filterData));
+                int count = issueService.getSearchIssueResultCount(filterData);
+                Log.d("TEST", "getPullRequestCount called --> repository service: " + count);
+
+                emitter.onNext(count);
                 Log.d("TEST", "getPullRequestCount called --> repository service AFTER ON NEXT");
 
                 emitter.onComplete();
@@ -67,7 +72,9 @@ public class RepositoryService {
                 Log.d("TEST", "getPullRequestCount called --> ERROR: " + ioe.toString());
                 emitter.onError(ioe);
             }
-        });
+        })
+        .cache()
+        .compose(RxTools.handle(app, "loadPullRequestCount"));
     }
 
     public static Observable updateStar(String repoOwner, String repoName, boolean isStarring) {
@@ -119,12 +126,15 @@ public class RepositoryService {
         });
     }
 
-    public static Observable<Repository> loadRepository(String repoOwner, String repoName) {
+    public static Observable loadRepository(Context context, String repoOwner, String repoName) {
+        Gh4Application app = (Gh4Application) context.getApplicationContext();
         return Observable.create(e -> {
             org.eclipse.egit.github.core.service.RepositoryService repoService = (org.eclipse.egit.github.core.service.RepositoryService)
             Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
             e.onNext(repoService.getRepository(repoOwner, repoName));
             e.onComplete();
-        });
+        })
+        .cache()
+        .compose(RxTools.handle(app, "loadRepository"));
     }
 }

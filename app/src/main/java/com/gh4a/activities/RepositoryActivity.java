@@ -35,11 +35,10 @@ import com.gh4a.loader.BranchListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ProgressDialogLoaderCallbacks;
-import com.gh4a.loader.RxLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.service.RepositoryService;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.RxTools;
+import com.gh4a.utils.rx.RxTools;
 import com.gh4a.utils.UiUtils;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryBranch;
@@ -48,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
 
 public class RepositoryActivity extends BasePagerActivity {
     public static Intent makeIntent(Context context, Repository repo) {
@@ -133,10 +131,12 @@ public class RepositoryActivity extends BasePagerActivity {
     private ContentListContainerFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
     private RepositoryEventListFragment mActivityFragment;
+    private Gh4Application mApp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mApp = (Gh4Application) getApplicationContext();
 
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
@@ -152,12 +152,11 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     public Observable<Repository> loadRepository() {
-        return RepositoryService.loadRepository(mRepoOwner, mRepoName)
+        return RepositoryService.loadRepository(this, mRepoOwner, mRepoName)
                 .compose(RxTools.applySchedulers())
-                .compose(RxLoader.compose(this, 120))
                 .doOnNext(repository -> {
                     Log.d("TEST", "repository doOnNext method called");
-                    mRepository = repository;
+                    mRepository = (Repository) repository;
                     updateTitle();
                     invalidateTabs();
                     // Apply initial page selection first time the repo is loaded
@@ -270,20 +269,19 @@ public class RepositoryActivity extends BasePagerActivity {
         mBranches = null;
         mTags = null;
         clearRefDependentFragments();
-        Log.d("TEST", "RepositoryActivity hiding content");
         setContentShown(false);
         invalidateTabs();
-//        forceLoaderReload(1);
 
-        loadRepository().subscribe();
+        RxTools.emptyAllCache(mApp)
+                .flatMap(o -> loadRepository())
+                .subscribe();
+
         if (Gh4Application.get().isAuthorized()) {
             this.isWatching();
             this.isStarring();
         }
 
         super.onRefresh();
-        Log.d("TEST", "RepositoryActivity after super onRefresh called");
-        setContentShown(true);
     }
 
     @Override
