@@ -105,6 +105,12 @@ public class ObservableManager {
             Log.d("TEST", "NO LEAKS --> removing all subscriptions");
             if(subscriptions != null && subscriptions.isDisposed())
                 subscriptions.dispose();
+
+            if (activity.isFinishing()) { // Activity Destroyed, emptying cache
+                emptyCache(null);
+            } else {
+                // Orientation change case
+            }
             Log.i(activity.getClass().getSimpleName(), "LOOOOG onDestroy()");
         }
     }
