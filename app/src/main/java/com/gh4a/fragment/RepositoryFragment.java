@@ -110,16 +110,13 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         RxTools.emptyCache(mApp, null)
             .flatMap(o -> loadReadme())
             .flatMap(o -> loadPullRequestsCount())
-            .subscribe(o -> {
-                Log.d("TEST", "Reloading Data");
-            });
+            .subscribe(o -> {}, e -> {});
     }
 
     public Observable<String> loadReadme() {
-        return RepositoryService.loadReadme(getContext(), mRepository.getOwner().getLogin(),
+        return RepositoryService.loadReadme(getActivity(), mRepository.getOwner().getLogin(),
                 mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef)
                 .compose(RxTools.applySchedulers())
-                .doOnError(throwable -> Log.d("TEST", "Error downloading readme")) // No error handling
                 .flatMap(result -> { // Fill-in Readme
                     setContentShown(true);
                     TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
@@ -143,7 +140,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     public Observable<Integer> loadPullRequestsCount() {
-        return RepositoryService.loadPullRequestCount(getContext(), mRepository, ApiHelpers.IssueState.OPEN)
+        return RepositoryService.loadPullRequestCount(getActivity(), mRepository, ApiHelpers.IssueState.OPEN)
                 .doOnNext(result -> {
                     Log.d("TEST", "getPullRequest onNext called: " + result);
                     View v = getView();
@@ -167,8 +164,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         setContentShown(true);
 
         // Fetch Readme file + PullRequests Count
-        loadReadme().subscribe();
-        loadPullRequestsCount().subscribe();
+        loadReadme().subscribe(o -> {}, e -> {});
+        loadPullRequestsCount().subscribe(o -> {}, e -> {});
     }
 
     @Override
@@ -190,9 +187,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         // reload readme
         RxTools.emptyCache(mApp, "loadReadme")
                 .flatMap(o -> loadReadme())
-                .subscribe(o -> {
-                    Log.d("TEST", "Loading Readme subscribe reloadData called: " + o);
-                });
+                .subscribe(o -> {}, e -> {});
 
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);

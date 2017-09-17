@@ -4,7 +4,11 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+
+import android.app.Activity;
 import android.util.Log;
+
+import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 
 public class RxTools {
@@ -29,11 +33,31 @@ public class RxTools {
         };
     }
 
-    public static <T> ObservableTransformer<T, T> handle(Gh4Application app, String cacheKey) {
+    public static <T> ObservableTransformer<T, T> handleNoCache(Gh4Application app, Activity activity) {
         return observable -> observable
+                .compose(bind(app))
+                .compose(applySchedulers())
+                .compose(handleError(activity));
+    }
+
+    public static <T> ObservableTransformer<T, T> handle(Gh4Application app, Activity activity, String cacheKey) {
+        return observable -> observable.cache()
                 .compose(handleCache(app, cacheKey))
                 .compose(bind(app))
-                .compose(applySchedulers());
+                .compose(applySchedulers())
+                .compose(handleError(activity));
+    }
+
+    public static <T> ObservableTransformer<T, T> handleError(Activity activity) {
+        return observable -> observable
+                .doOnError(error -> {
+                    if(activity instanceof BasePagerActivity) {
+                        BasePagerActivity act = (BasePagerActivity) activity;
+                        act.setErrorViewVisibility(true);
+                    } else {
+                        Log.d("TEST", "error handling ELSE CASE");
+                    }
+                });
     }
 
     public static Observable emptyCache(Gh4Application app, String key) {

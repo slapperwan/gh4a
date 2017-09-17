@@ -46,16 +46,6 @@ public class ObservableManager {
         subscriptions.add(disposable);
     }
 
-    public Observable getObservable() {
-        String key = "test_key";
-
-        return Observable.create((ObservableOnSubscribe) e -> {
-            Log.d("TEST", "Subscribe called");
-            e.onNext(2);
-            e.onComplete();
-        }).cache().compose(RxTools.handle(app, key));
-    }
-
     public void emptyCache(String key) {
         if(key == null) { // Clear entire cache
             this.cache = new HashMap<>();

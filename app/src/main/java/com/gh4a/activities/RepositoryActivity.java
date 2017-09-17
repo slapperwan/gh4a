@@ -144,7 +144,7 @@ public class RepositoryActivity extends BasePagerActivity {
 
         setContentShown(false);
 
-        this.loadRepository().subscribe();
+        this.loadRepository().subscribe(o -> {}, e -> {});
         if (Gh4Application.get().isAuthorized()) {
             this.isWatching();
             this.isStarring();
@@ -155,7 +155,6 @@ public class RepositoryActivity extends BasePagerActivity {
         return RepositoryService.loadRepository(this, mRepoOwner, mRepoName)
                 .compose(RxTools.applySchedulers())
                 .doOnNext(repository -> {
-                    Log.d("TEST", "repository doOnNext method called");
                     mRepository = (Repository) repository;
                     updateTitle();
                     invalidateTabs();
@@ -274,7 +273,7 @@ public class RepositoryActivity extends BasePagerActivity {
 
         RxTools.emptyAllCache(mApp)
                 .flatMap(o -> loadRepository())
-                .subscribe();
+                .subscribe(o -> {}, e -> {});
 
         if (Gh4Application.get().isAuthorized()) {
             this.isWatching();
@@ -353,7 +352,7 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     public void updateWatch(String repoOwner, String repoName, boolean isWatching) {
-        RepositoryService.updateWatch(repoOwner, repoName, isWatching)
+        RepositoryService.updateWatch(mApp, this, repoOwner, repoName, isWatching)
             .compose(RxTools.applySchedulers())
             .doOnTerminate(() -> {
                 if (mIsWatching == null) {
@@ -363,11 +362,11 @@ public class RepositoryActivity extends BasePagerActivity {
                 mIsWatching = !mIsWatching;
                 supportInvalidateOptionsMenu();
             })
-            .subscribe();
+            .subscribe(o -> {}, e -> {});
     }
 
     public void updateStar(String repoOwner, String repoName, boolean isStarring) {
-        RepositoryService.updateStar(repoOwner, repoName, isStarring)
+        RepositoryService.updateStar(mApp, this, repoOwner, repoName, isStarring)
             .compose(RxTools.applySchedulers())
             .doOnNext(result -> {
                 Log.d("TEST", "doOnNext updateStar called");
@@ -384,21 +383,20 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     public void isWatching() {
-        RepositoryService.isWatching(mRepoOwner, mRepoName)
+        RepositoryService.isWatching(mApp, this, mRepoOwner, mRepoName)
                 .compose(RxTools.applySchedulers())
-                .doOnNext(result -> {
-                    mIsWatching = result;
+                .subscribe(result -> {
+                    mIsWatching = (Boolean) result;
                     supportInvalidateOptionsMenu();
-                }).subscribe();
+                }, e -> {});
     }
 
     public void isStarring() {
-        RepositoryService.isStarring(mRepoOwner, mRepoName)
-                .compose(RxTools.applySchedulers())
-                .doOnNext(result -> {
-                    mIsStarring = result;
+        RepositoryService.isStarring(mApp, this, mRepoOwner, mRepoName)
+                .subscribe(result -> {
+                    mIsStarring = (Boolean)result;
                     supportInvalidateOptionsMenu();
-                }).subscribe();
+                }, e -> {});
     }
 
     @Override
