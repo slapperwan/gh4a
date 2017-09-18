@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh4a.activities;
+package com.gh4a.activities.issues_label;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -31,11 +31,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
+import com.gh4a.activities.IssueListActivity;
 import com.gh4a.adapter.IssueLabelAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LabelListLoader;
@@ -43,13 +42,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
-
 import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.LabelService;
-
-import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.List;
 
 public class IssueLabelListActivity extends BaseActivity implements
@@ -201,7 +194,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private void startEditing(IssueLabelAdapter.EditableLabel label) {
-        mActionMode = new EditActionMode(label);
+        mActionMode = new EditActionMode(this, label);
         mAdapter.notifyDataSetChanged();
         startSupportActionMode(mActionMode);
         updateFabVisibility();
@@ -214,8 +207,10 @@ public class IssueLabelListActivity extends BaseActivity implements
 
     private final class EditActionMode implements ActionMode.Callback {
         private final IssueLabelAdapter.EditableLabel mLabel;
+        private final Activity mActivity;
 
-        public EditActionMode(IssueLabelAdapter.EditableLabel label) {
+        public EditActionMode(Activity activity, IssueLabelAdapter.EditableLabel label) {
+            mActivity = activity;
             mLabel = label;
             mLabel.isEditing = true;
         }
@@ -244,21 +239,18 @@ public class IssueLabelListActivity extends BaseActivity implements
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
             case Menu.FIRST:
-                if (mLabel == mAddedLabel) {
-                    new AddIssueLabelTask(mLabel.editedName, mLabel.editedColor).schedule();
-                } else {
-                    new EditIssueLabelTask(mLabel.getName(), mLabel.editedName, mLabel.editedColor)
-                            .schedule();
-                }
+                if (mLabel == mAddedLabel) this.addIssue();
+                else this.editIssueLabel();
                 break;
             case Menu.FIRST + 1:
                 new AlertDialog.Builder(IssueLabelListActivity.this)
                         .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.getName()))
-                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteIssueLabelTask(mLabel.getName()).schedule();
-                            }
+                        .setPositiveButton(R.string.delete, (dialog, whichButton) -> {
+                            IssuesLabelService.deleteIssueLabel(mActivity, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName())
+                                .subscribe(result -> {
+                                    forceLoaderReload(0);
+                                    setResult(RESULT_OK);
+                                }, e -> {});
                         })
                         .setNegativeButton(R.string.cancel, null)
                         .show();
@@ -284,129 +276,30 @@ public class IssueLabelListActivity extends BaseActivity implements
             mAdapter.notifyDataSetChanged();
             updateFabVisibility();
         }
-    }
 
-    private class DeleteIssueLabelTask extends ProgressDialogTask<Void> {
-        private final String mLabelName;
-
-        public DeleteIssueLabelTask(String labelName) {
-            super(IssueLabelListActivity.this, R.string.deleting_msg);
-            mLabelName = labelName;
+        public void addIssue() {
+            IssuesLabelService.addIssue(mActivity, getRootLayout(), mRepoOwner, mRepoName, mLabel.editedName, mLabel.editedColor)
+                .doOnError(error -> {
+                    mAdapter.remove(mAddedLabel);
+                    mAddedLabel = null;
+                })
+                .subscribe(result -> {
+                    forceLoaderReload(0);
+                    mAddedLabel = null;
+                    setResult(RESULT_OK);
+                }, e -> {});
         }
 
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteIssueLabelTask(mLabelName);
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            LabelService labelService = (LabelService)
-                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
-            labelService.deleteLabel(mRepoOwner, mRepoName, URLEncoder.encode(mLabelName, "UTF-8"));
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            forceLoaderReload(0);
-            setResult(RESULT_OK);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_delete_label, mLabelName);
-        }
-    }
-
-    private class EditIssueLabelTask extends ProgressDialogTask<Void> {
-        private final String mOldLabelName;
-        private final String mNewLabelName;
-        private final String mColor;
-
-        public EditIssueLabelTask(String oldLabelName, String newLabelName, String color) {
-            super(IssueLabelListActivity.this, R.string.saving_msg);
-            mOldLabelName = oldLabelName;
-            mNewLabelName = newLabelName;
-            mColor = color;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new EditIssueLabelTask(mOldLabelName, mNewLabelName, mColor);
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            LabelService labelService = (LabelService)
-                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
-
-            Label label = new Label();
-            label.setName(mNewLabelName);
-            label.setColor(mColor);
-
-            labelService.editLabel(new RepositoryId(mRepoOwner, mRepoName),
-                    URLEncoder.encode(mOldLabelName, "UTF-8"), label);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            forceLoaderReload(0);
-            setResult(RESULT_OK);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_edit_label, mOldLabelName);
-        }
-    }
-
-    private class AddIssueLabelTask extends ProgressDialogTask<Void> {
-        private final String mLabelName;
-        private final String mColor;
-
-        public AddIssueLabelTask(String labelName, String color) {
-            super(IssueLabelListActivity.this, R.string.saving_msg);
-            mLabelName = labelName;
-            mColor = color;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new AddIssueLabelTask(mLabelName, mColor);
-        }
-
-        @Override
-        protected Void run() throws IOException {
-            LabelService labelService = (LabelService)
-                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
-
-            Label label = new Label();
-            label.setName(mLabelName);
-            label.setColor(mColor);
-
-            labelService.createLabel(mRepoOwner, mRepoName, label);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            forceLoaderReload(0);
-            mAddedLabel = null;
-            setResult(RESULT_OK);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_create_label, mLabelName);
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            super.onError(e);
-            mAdapter.remove(mAddedLabel);
-            mAddedLabel = null;
+        public void editIssueLabel() {
+            IssuesLabelService.editIssueLabel(mActivity, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName(), mLabel.editedName, mLabel.editedColor)
+                .doOnError(error -> {
+                    mAdapter.remove(mAddedLabel);
+                    mAddedLabel = null;
+                })
+                .subscribe(result -> {
+                    forceLoaderReload(0);
+                    setResult(RESULT_OK);
+                }, e -> {});
         }
     }
 }

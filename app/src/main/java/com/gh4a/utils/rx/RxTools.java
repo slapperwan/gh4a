@@ -4,12 +4,12 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-
 import android.app.Activity;
-import android.util.Log;
-
+import android.support.design.widget.Snackbar;
+import android.view.View;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 
 public class RxTools {
     public static <T> ObservableTransformer<T, T> bind(Gh4Application app) {
@@ -48,6 +48,22 @@ public class RxTools {
                 .compose(handleError(activity));
     }
 
+    // Error handler showing SnackBar
+    public static <T> ObservableTransformer<T, T> onErrorSnackbar(Activity activity, View rootLayout, String errorMessage) {
+        return observable -> observable
+                .compose(RxTools.applySchedulers())
+                .doOnError(error -> {
+                    Snackbar.make(rootLayout, errorMessage, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.retry, (View.OnClickListener) activity)
+                            .show();
+                })
+                .doOnNext(result -> {
+                    String successMessage = "Operation successfull";
+                    Snackbar.make(rootLayout, successMessage, Snackbar.LENGTH_LONG)
+                            .show();
+                });
+    }
+
     public static <T> ObservableTransformer<T, T> handleError(Activity activity) {
         return observable -> observable
                 .doOnError(error -> {
@@ -55,7 +71,7 @@ public class RxTools {
                         BasePagerActivity act = (BasePagerActivity) activity;
                         act.setErrorViewVisibility(true);
                     } else {
-                        Log.d("TEST", "error handling ELSE CASE");
+                        // other cases
                     }
                 });
     }
