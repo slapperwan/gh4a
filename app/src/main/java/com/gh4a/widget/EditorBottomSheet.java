@@ -264,8 +264,12 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         final int peekHeight = isInAdvancedMode ? mAdvancedPeekHeight : mBasicPeekHeight;
 
         if (mResizingView != null) {
+            int paddingBottom = 0;
+            if (getVisibility() != View.GONE) {
+                paddingBottom = peekHeight + mLatestOffset - mTopShadowHeight;
+            }
             mResizingView.setPadding(mResizingView.getPaddingLeft(), mResizingView.getPaddingTop(),
-                    mResizingView.getPaddingRight(), peekHeight + mLatestOffset - mTopShadowHeight);
+                    mResizingView.getPaddingRight(), paddingBottom);
         }
 
         // Update peek height to keep the bottom sheet at unchanged position
