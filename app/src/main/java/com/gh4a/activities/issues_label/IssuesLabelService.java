@@ -21,7 +21,7 @@ public class IssuesLabelService {
             labelService.deleteLabel(repoOwner, repoName, URLEncoder.encode(labelName, "UTF-8"));
             return true;
         })
-        .compose(RxTools.onErrorSnackbar(activity, rootView, errorMessage));
+        .compose(RxTools.onErrorSnackbar(activity, rootView, errorMessage, R.string.deleting_msg));
     }
 
     public static Observable editIssueLabel(Activity activity, View rootLayout, String repoOwner, String repoName, String oldLabelName, String newLabelName, String color) {
@@ -39,7 +39,7 @@ public class IssuesLabelService {
                     URLEncoder.encode(oldLabelName, "UTF-8"), label);
             return true;
         })
-        .compose(RxTools.onErrorSnackbar(activity, rootLayout, errorMessage));
+        .compose(RxTools.onErrorSnackbar(activity, rootLayout, errorMessage, R.string.saving_msg));
     }
 
     public static Observable addIssue(Activity activity, View rootView, String repoOwner, String repoName, String labelName, String color) {
@@ -55,5 +55,5 @@ public class IssuesLabelService {
             labelService.createLabel(repoOwner, repoName, label);
             return true;
         })
-        .compose(RxTools.onErrorSnackbar(activity, rootView, errorMessage));
+        .compose(RxTools.onErrorSnackbar(activity, rootView, errorMessage, R.string.saving_msg));
     }}

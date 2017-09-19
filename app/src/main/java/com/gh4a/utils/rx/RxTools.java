@@ -5,11 +5,19 @@ import io.reactivex.ObservableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import android.app.Activity;
+import android.app.Dialog;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
+import com.gh4a.utils.UiUtils;
 
 public class RxTools {
     public static <T> ObservableTransformer<T, T> bind(Gh4Application app) {
@@ -49,9 +57,15 @@ public class RxTools {
     }
 
     // Error handler showing SnackBar
-    public static <T> ObservableTransformer<T, T> onErrorSnackbar(Activity activity, View rootLayout, String errorMessage) {
+    public static <T> ObservableTransformer<T, T> onErrorSnackbar(Activity activity, View rootLayout, String errorMessage, int messageRes) {
         return observable -> observable
                 .compose(RxTools.applySchedulers())
+                .doOnSubscribe(disposable -> {
+                    showProgressDialog(activity, messageRes);
+                })
+                .doOnTerminate(() -> {
+                    dismissProgressDialog();
+                })
                 .doOnError(error -> {
                     Snackbar.make(rootLayout, errorMessage, Snackbar.LENGTH_LONG)
                             .setAction(R.string.retry, (View.OnClickListener) activity)
@@ -88,5 +102,32 @@ public class RxTools {
     public static <T> ObservableTransformer<T, T> applySchedulers() {
         return observable -> ((Observable)observable).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+
+    public static ProgressDialogFragment mProgressDialogFragment;
+
+    public static class ProgressDialogFragment extends DialogFragment {
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            int messageResId = getArguments().getInt("message_res", 0);
+            return UiUtils.createProgressDialog(getActivity(), messageResId);
+        }
+    }
+
+    public static void dismissProgressDialog() {
+        if (mProgressDialogFragment.getActivity() != null) {
+            mProgressDialogFragment.dismissAllowingStateLoss();
+        }
+        mProgressDialogFragment = null;
+    }
+
+    public static void showProgressDialog(Activity activity, int messageRes) {
+        Bundle args = new Bundle();
+        args.putInt("message_res", messageRes);
+        mProgressDialogFragment = new ProgressDialogFragment();
+        mProgressDialogFragment.setArguments(args);
+        mProgressDialogFragment.show(((FragmentActivity)activity).getSupportFragmentManager(), "progressdialog");
     }
 }
