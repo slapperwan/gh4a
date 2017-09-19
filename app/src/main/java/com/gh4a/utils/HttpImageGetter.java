@@ -173,12 +173,16 @@ public class HttpImageGetter {
             if (!mHasStartedImageLoad) {
                 ImageSpan[] spans = getImageSpans();
                 if (spans != null && spans.length > 0) {
-                    PlaceholderDrawable[] imagesToLoad = new PlaceholderDrawable[spans.length];
+                    ArrayList<PlaceholderDrawable> imagesToLoad = new ArrayList<>();
                     for (int i = 0; i < spans.length; i++) {
-                        imagesToLoad[i] = (PlaceholderDrawable) spans[i].getDrawable();
+                        Drawable d = spans[i].getDrawable();
+                        if (d instanceof PlaceholderDrawable) {
+                            imagesToLoad.add((PlaceholderDrawable) d);
+                        }
                     }
                     mTask = new ImageGetterAsyncTask(HttpImageGetter.this, this);
-                    mTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imagesToLoad);
+                    mTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                            imagesToLoad.toArray(new PlaceholderDrawable[imagesToLoad.size()]));
                 }
                 mHasStartedImageLoad = true;
             }
