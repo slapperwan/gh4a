@@ -194,7 +194,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private void startEditing(IssueLabelAdapter.EditableLabel label) {
-        mActionMode = new EditActionMode(this, label);
+        mActionMode = new EditActionMode(label);
         mAdapter.notifyDataSetChanged();
         startSupportActionMode(mActionMode);
         updateFabVisibility();
@@ -207,10 +207,8 @@ public class IssueLabelListActivity extends BaseActivity implements
 
     private final class EditActionMode implements ActionMode.Callback {
         private final IssueLabelAdapter.EditableLabel mLabel;
-        private final Activity mActivity;
 
-        public EditActionMode(Activity activity, IssueLabelAdapter.EditableLabel label) {
-            mActivity = activity;
+        public EditActionMode(IssueLabelAdapter.EditableLabel label) {
             mLabel = label;
             mLabel.isEditing = true;
         }
@@ -246,7 +244,7 @@ public class IssueLabelListActivity extends BaseActivity implements
                 new AlertDialog.Builder(IssueLabelListActivity.this)
                         .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.getName()))
                         .setPositiveButton(R.string.delete, (dialog, whichButton) -> {
-                            IssuesLabelService.deleteIssueLabel(mActivity, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName())
+                            IssuesLabelService.deleteIssueLabel(IssueLabelListActivity.this, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName())
                                 .subscribe(result -> {
                                     forceLoaderReload(0);
                                     setResult(RESULT_OK);
@@ -278,7 +276,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         }
 
         public void addIssue() {
-            IssuesLabelService.addIssue(mActivity, getRootLayout(), mRepoOwner, mRepoName, mLabel.editedName, mLabel.editedColor)
+            IssuesLabelService.addIssue(IssueLabelListActivity.this, getRootLayout(), mRepoOwner, mRepoName, mLabel.editedName, mLabel.editedColor)
                 .doOnError(error -> {
                     mAdapter.remove(mAddedLabel);
                     mAddedLabel = null;
@@ -291,7 +289,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         }
 
         public void editIssueLabel() {
-            IssuesLabelService.editIssueLabel(mActivity, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName(), mLabel.editedName, mLabel.editedColor)
+            IssuesLabelService.editIssueLabel(IssueLabelListActivity.this, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName(), mLabel.editedName, mLabel.editedColor)
                 .doOnError(error -> {
                     mAdapter.remove(mAddedLabel);
                     mAddedLabel = null;

@@ -78,14 +78,14 @@ public class RepositoryService {
 
     public static Observable updateStar(Gh4Application app, Activity activity, String repoOwner, String repoName, boolean isStarring) {
         return Observable.create(e -> {
-            Log.d("TEST", "updateStar creating the observable");
+            Log.d("TEST", "updateStarringStatus creating the observable");
             StarService starService = (StarService)
                     Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
             RepositoryId repoId = new RepositoryId(repoOwner, repoName);
             if (isStarring) starService.unstar(repoId);
             else starService.star(repoId);
 
-            Log.d("TEST", "updateStar calling onNext method");
+            Log.d("TEST", "updateStarringStatus calling onNext method");
             e.onNext(!isStarring);
             e.onComplete();
         }).compose(RxTools.handleNoCache(app, activity));

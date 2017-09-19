@@ -56,11 +56,6 @@ public class RxTools {
                     Snackbar.make(rootLayout, errorMessage, Snackbar.LENGTH_LONG)
                             .setAction(R.string.retry, (View.OnClickListener) activity)
                             .show();
-                })
-                .doOnNext(result -> {
-                    String successMessage = "Operation successfull";
-                    Snackbar.make(rootLayout, successMessage, Snackbar.LENGTH_LONG)
-                            .show();
                 });
     }
 

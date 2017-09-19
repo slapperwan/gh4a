@@ -351,7 +351,7 @@ public class RepositoryActivity extends BasePagerActivity {
         return UserActivity.makeIntent(this, mRepoOwner);
     }
 
-    public void updateWatch(String repoOwner, String repoName, boolean isWatching) {
+    public void updateWatchingStatus(String repoOwner, String repoName, boolean isWatching) {
         RepositoryService.updateWatch(mApp, this, repoOwner, repoName, isWatching)
             .compose(RxTools.applySchedulers())
             .doOnTerminate(() -> {
@@ -365,11 +365,10 @@ public class RepositoryActivity extends BasePagerActivity {
             .subscribe(o -> {}, e -> {});
     }
 
-    public void updateStar(String repoOwner, String repoName, boolean isStarring) {
+    public void updateStarringStatus(String repoOwner, String repoName, boolean isStarring) {
         RepositoryService.updateStar(mApp, this, repoOwner, repoName, isStarring)
-            .compose(RxTools.applySchedulers())
             .doOnNext(result -> {
-                Log.d("TEST", "doOnNext updateStar called");
+                Log.d("TEST", "doOnNext updateStarringStatus called");
                 if (mIsStarring == null) {
                     // user refreshed while the action was in progress
                     return;
@@ -406,12 +405,12 @@ public class RepositoryActivity extends BasePagerActivity {
             case R.id.watch:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                this.updateWatch(mRepoOwner, mRepoName, mIsWatching);
+                this.updateWatchingStatus(mRepoOwner, mRepoName, mIsWatching);
                 return true;
             case R.id.star:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                this.updateStar(mRepoOwner, mRepoName, mIsStarring);
+                this.updateStarringStatus(mRepoOwner, mRepoName, mIsStarring);
                 return true;
             case R.id.ref:
                 if (mBranches == null) {
