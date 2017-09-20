@@ -538,4 +538,5 @@
         <item quantity="one">You have one unread notification</item>
         <item quantity="other">You have %1$d unread notifications</item>
     </plurals>
+    <string name="notification_interval">Sync interval</string>
 </resources>
