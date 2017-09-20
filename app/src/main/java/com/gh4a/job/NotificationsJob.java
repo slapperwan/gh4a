@@ -31,9 +31,10 @@ public class NotificationsJob extends Job {
     private static final int ID_SUMMARY = 1;
     public static final String TAG = "job_notifications";
 
-    public static void scheduleJob() {
+    public static void scheduleJob(int intervalMinutes) {
         new JobRequest.Builder(TAG)
-                .setPeriodic(TimeUnit.MINUTES.toMillis(15), TimeUnit.MINUTES.toMillis(5))
+                .setPeriodic(TimeUnit.MINUTES.toMillis(intervalMinutes),
+                        TimeUnit.MINUTES.toMillis(5))
                 .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
                 .setRequirementsEnforced(true)
                 .setUpdateCurrent(true)

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
+import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.view.LayoutInflater;
@@ -36,6 +37,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     public static final String KEY_TEXT_SIZE = "webview_initial_zoom";
     public static final String KEY_GIF_LOADING = "http_gif_load_mode";
     public static final String KEY_NOTIFICATIONS = "notifications";
+    public static final String KEY_NOTIFICATION_INTERVAL = "notification_interval";
     private static final String KEY_ABOUT = "about";
     private static final String KEY_OPEN_SOURCE_COMPONENTS = "open_source_components";
 
@@ -43,7 +45,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     private IntegerListPreference mThemePref;
     private Preference mAboutPref;
     private Preference mOpenSourcePref;
-    private Preference mNotificationsPref;
+    private CheckBoxPreference mNotificationsPref;
+    private IntegerListPreference mNotificationIntervalPref;
 
     @Override
     public void onAttach(Context context) {
@@ -74,8 +77,12 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
         mOpenSourcePref.setOnPreferenceClickListener(this);
 
-        mNotificationsPref = findPreference(KEY_NOTIFICATIONS);
+        mNotificationsPref = (CheckBoxPreference) findPreference(KEY_NOTIFICATIONS);
         mNotificationsPref.setOnPreferenceChangeListener(this);
+
+        mNotificationIntervalPref =
+                (IntegerListPreference) findPreference(KEY_NOTIFICATION_INTERVAL);
+        mNotificationIntervalPref.setOnPreferenceChangeListener(this);
     }
 
     @Override
@@ -86,9 +93,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
         if (pref == mNotificationsPref) {
             if ((boolean) newValue) {
-                NotificationsJob.scheduleJob();
+                NotificationsJob.scheduleJob(Integer.valueOf(mNotificationIntervalPref.getValue()));
             } else {
                 NotificationsJob.cancelJob();
+            }
+            return true;
+        }
+        if (pref == mNotificationIntervalPref) {
+            if (mNotificationsPref.isChecked()) {
+                NotificationsJob.scheduleJob(Integer.parseInt((String) newValue));
             }
             return true;
         }

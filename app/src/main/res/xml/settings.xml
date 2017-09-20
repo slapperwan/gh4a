@@ -38,6 +38,14 @@
         android:key="notifications"
         android:title="@string/notifications" />
 
+    <com.gh4a.widget.IntegerListPreference
+        android:defaultValue="15"
+        android:entries="@array/notification_interval_items"
+        android:entryValues="@array/notification_interval_values"
+        android:key="notification_interval"
+        android:summary="%s"
+        android:title="@string/notification_interval" />
+
     <Preference
         android:key="about"
         android:title="@string/about" />
