@@ -2,36 +2,41 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <com.gh4a.widget.IntegerListPreference
-        android:key="theme"
-        android:title="@string/theme"
-        android:summary="%s"
+        android:defaultValue="1"
         android:entries="@array/theme_items"
         android:entryValues="@array/theme_values"
-        android:defaultValue="1" />
+        android:key="theme"
+        android:summary="%s"
+        android:title="@string/theme" />
 
     <ListPreference
-        android:key="start_page"
-        android:title="@string/start_page"
-        android:summary="%s"
+        android:defaultValue="newsfeed"
         android:entries="@array/start_page_items"
         android:entryValues="@array/start_page_values"
-        android:defaultValue="newsfeed" />
+        android:key="start_page"
+        android:summary="%s"
+        android:title="@string/start_page" />
 
     <com.gh4a.widget.IntegerListPreference
-        android:key="webview_initial_zoom"
-        android:title="@string/menu_text_size"
-        android:summary="%s"
+        android:defaultValue="2"
         android:entries="@array/text_size_items"
         android:entryValues="@array/text_size_values"
-        android:defaultValue="2" />
+        android:key="webview_initial_zoom"
+        android:summary="%s"
+        android:title="@string/menu_text_size" />
 
     <com.gh4a.widget.IntegerListPreference
-        android:key="http_gif_load_mode"
-        android:title="@string/menu_gif_load_mode"
-        android:summary="%s"
+        android:defaultValue="1"
         android:entries="@array/load_gif_mode_items"
         android:entryValues="@array/load_gif_mode_values"
-        android:defaultValue="1" />
+        android:key="http_gif_load_mode"
+        android:summary="%s"
+        android:title="@string/menu_gif_load_mode" />
+
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="notifications"
+        android:title="@string/notifications" />
 
     <Preference
         android:key="about"

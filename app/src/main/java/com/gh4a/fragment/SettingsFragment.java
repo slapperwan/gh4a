@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueEditActivity;
+import com.gh4a.job.NotificationsJob;
 import com.gh4a.widget.IntegerListPreference;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements
@@ -34,6 +35,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     public static final String KEY_START_PAGE = "start_page";
     public static final String KEY_TEXT_SIZE = "webview_initial_zoom";
     public static final String KEY_GIF_LOADING = "http_gif_load_mode";
+    public static final String KEY_NOTIFICATIONS = "notifications";
     private static final String KEY_ABOUT = "about";
     private static final String KEY_OPEN_SOURCE_COMPONENTS = "open_source_components";
 
@@ -41,6 +43,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     private IntegerListPreference mThemePref;
     private Preference mAboutPref;
     private Preference mOpenSourcePref;
+    private Preference mNotificationsPref;
 
     @Override
     public void onAttach(Context context) {
@@ -70,12 +73,23 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
 
         mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
         mOpenSourcePref.setOnPreferenceClickListener(this);
+
+        mNotificationsPref = findPreference(KEY_NOTIFICATIONS);
+        mNotificationsPref.setOnPreferenceChangeListener(this);
     }
 
     @Override
     public boolean onPreferenceChange(Preference pref, Object newValue) {
         if (pref == mThemePref) {
             mListener.onThemeChanged();
+            return true;
+        }
+        if (pref == mNotificationsPref) {
+            if ((boolean) newValue) {
+                NotificationsJob.scheduleJob();
+            } else {
+                NotificationsJob.cancelJob();
+            }
             return true;
         }
         return false;
