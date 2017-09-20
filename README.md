@@ -84,6 +84,7 @@ ClientSecret="<CLIENT SECRET DISPLAYED IN APPLICATION SETTINGS>"
 Open Source Libraries
 ---------------------
 * [android-gif-drawable](https://github.com/koral--/android-gif-drawable)
+* [Android-Job](https://github.com/evernote/android-job)
 * [AndroidSVG](https://github.com/BigBadaboom/androidsvg)
 * [emoji-java](https://github.com/vdurmont/emoji-java)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)

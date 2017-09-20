@@ -178,7 +178,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             { "HoloColorPicker", "https://github.com/LarsWerkman/HoloColorPicker" },
             { "Material Design Icons", "https://github.com/google/material-design-icons" },
             { "PrettyTime", "https://github.com/ocpsoft/prettytime" },
-            { "SmoothProgressBar", "https://github.com/castorflex/SmoothProgressBar" }
+            { "SmoothProgressBar", "https://github.com/castorflex/SmoothProgressBar" },
+            { "Android-Job", "https://github.com/evernote/android-job" }
         };
 
         private final LayoutInflater mInflater;

@@ -529,4 +529,13 @@
         <item quantity="one">%1$s check</item>
         <item quantity="other">%1$s checks</item>
     </plurals>
+
+    <string name="channel_notifications_name">GitHub notifications</string>
+    <string name="channel_notifications_description">Notifications received from GitHub.</string>
+    <string name="unread_notifications_summary_title">Unread GitHub notifications</string>
+    <plurals name="unread_notifications_summary_text">
+        <item quantity="zero">You have no unread notifications</item>
+        <item quantity="one">You have one unread notification</item>
+        <item quantity="other">You have %1$d unread notifications</item>
+    </plurals>
 </resources>
