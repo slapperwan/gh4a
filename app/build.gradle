@@ -83,6 +83,7 @@ dependencies {
         exclude group: 'org.json', module : 'json'
     }
     compile 'com.github.Tunous:MarkdownEdit:0.1.1'
+    compile 'com.evernote:android-job:1.2.0-RC4'
     playstoreCompile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
