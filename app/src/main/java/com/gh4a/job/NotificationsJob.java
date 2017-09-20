@@ -8,6 +8,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.evernote.android.job.Job;
+import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -38,6 +39,10 @@ public class NotificationsJob extends Job {
                 .setUpdateCurrent(true)
                 .build()
                 .schedule();
+    }
+
+    public static void cancelJob() {
+        JobManager.instance().cancelAllForTag(NotificationsJob.TAG);
     }
 
     @NonNull

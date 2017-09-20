@@ -169,7 +169,12 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
         createNotificationChannels();
         JobManager.create(this).addJobCreator(new Gh4JobCreator());
-        NotificationsJob.scheduleJob();
+
+        if (prefs.getBoolean(SettingsFragment.KEY_NOTIFICATIONS, false)) {
+            NotificationsJob.scheduleJob();
+        } else {
+            NotificationsJob.cancelJob();
+        }
     }
 
     private void createNotificationChannels() {
