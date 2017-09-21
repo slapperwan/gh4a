@@ -1,6 +1,9 @@
 package com.gh4a.job;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,6 +14,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -18,7 +22,6 @@ import android.support.v4.app.NotificationManagerCompat;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.loader.NotificationHolder;
@@ -38,6 +41,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class NotificationsJob extends Job {
+    private static final String CHANNEL_GITHUB_NOTIFICATIONS = "channel_notifications";
     private static final String GROUP_ID_GITHUB = "github_notifications";
     private static final int ID_SUMMARY = 1;
     public static final String TAG = "job_notifications";
@@ -55,6 +59,21 @@ public class NotificationsJob extends Job {
 
     public static void cancelJob() {
         JobManager.instance().cancelAllForTag(NotificationsJob.TAG);
+    }
+
+    public static void createNotificationChannels(Context context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+
+        NotificationChannel channel = new NotificationChannel(CHANNEL_GITHUB_NOTIFICATIONS,
+                context.getString(R.string.channel_notifications_name),
+                NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setDescription(context.getString(R.string.channel_notifications_description));
+
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(channel);
     }
 
     @NonNull
@@ -102,7 +121,7 @@ public class NotificationsJob extends Job {
                 : System.currentTimeMillis();
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(),
-                Gh4Application.CHANNEL_GITHUB_NOTIFICATIONS)
+                CHANNEL_GITHUB_NOTIFICATIONS)
                 .setSmallIcon(R.drawable.octodroid)
                 .setLargeIcon(loadRoundUserAvatar(owner))
                 .setGroup(GROUP_ID_GITHUB)
@@ -140,7 +159,7 @@ public class NotificationsJob extends Job {
         PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
                 HomeActivity.makeIntent(getContext(), R.id.notifications), 0);
         notificationManager.notify(ID_SUMMARY, new NotificationCompat.Builder(
-                getContext(), Gh4Application.CHANNEL_GITHUB_NOTIFICATIONS)
+                getContext(), CHANNEL_GITHUB_NOTIFICATIONS)
                 .setSmallIcon(R.drawable.octodroid)
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupSummary(true)

@@ -17,9 +17,6 @@
 package com.gh4a;
 
 import android.app.Application;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
@@ -86,8 +83,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public static final String STAR_SERVICE = "github.star";
     public static final String USER_SERVICE = "github.user";
     public static final String WATCHER_SERVICE = "github.watcher";
-
-    public static final String CHANNEL_GITHUB_NOTIFICATIONS = "channel_notifications";
 
     private static Gh4Application sInstance;
     private GitHubClient mClient;
@@ -167,7 +162,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mServices.put(USER_SERVICE, new UserService(mClient));
         mServices.put(WATCHER_SERVICE, new WatcherService(mClient));
 
-        createNotificationChannels();
         JobManager.create(this).addJobCreator(new Gh4JobCreator());
 
         if (prefs.getBoolean(SettingsFragment.KEY_NOTIFICATIONS, false)) {
@@ -176,21 +170,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         } else {
             NotificationsJob.cancelJob();
         }
-    }
-
-    private void createNotificationChannels() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return;
-        }
-
-        NotificationChannel channel = new NotificationChannel(CHANNEL_GITHUB_NOTIFICATIONS,
-                getString(R.string.channel_notifications_name),
-                NotificationManager.IMPORTANCE_DEFAULT);
-        channel.setDescription(getString(R.string.channel_notifications_description));
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.createNotificationChannel(channel);
     }
 
     public GitHubService getService(String name) {
