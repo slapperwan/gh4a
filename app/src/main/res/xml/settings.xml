@@ -33,13 +33,14 @@
         android:summary="%s"
         android:title="@string/menu_gif_load_mode" />
 
-    <CheckBoxPreference
+    <SwitchPreference
         android:defaultValue="false"
         android:key="notifications"
         android:title="@string/notifications" />
 
     <com.gh4a.widget.IntegerListPreference
         android:defaultValue="15"
+        android:dependency="notifications"
         android:entries="@array/notification_interval_items"
         android:entryValues="@array/notification_interval_values"
         android:key="notification_interval"
