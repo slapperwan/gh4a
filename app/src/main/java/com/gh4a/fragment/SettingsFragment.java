@@ -8,9 +8,9 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
-import android.support.v7.preference.CheckBoxPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.TwoStatePreference;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +45,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     private IntegerListPreference mThemePref;
     private Preference mAboutPref;
     private Preference mOpenSourcePref;
-    private CheckBoxPreference mNotificationsPref;
+    private TwoStatePreference mNotificationsPref;
     private IntegerListPreference mNotificationIntervalPref;
 
     @Override
@@ -77,7 +77,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
         mOpenSourcePref.setOnPreferenceClickListener(this);
 
-        mNotificationsPref = (CheckBoxPreference) findPreference(KEY_NOTIFICATIONS);
+        mNotificationsPref = (TwoStatePreference) findPreference(KEY_NOTIFICATIONS);
         mNotificationsPref.setOnPreferenceChangeListener(this);
 
         mNotificationIntervalPref =
