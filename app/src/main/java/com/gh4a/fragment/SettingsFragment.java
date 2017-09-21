@@ -93,6 +93,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
         if (pref == mNotificationsPref) {
             if ((boolean) newValue) {
+                NotificationsJob.createNotificationChannels(getActivity());
                 NotificationsJob.scheduleJob(Integer.valueOf(mNotificationIntervalPref.getValue()));
             } else {
                 NotificationsJob.cancelJob();
