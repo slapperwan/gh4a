@@ -20,6 +20,7 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoader;
 import com.gh4a.resolver.BrowseFilter;
@@ -136,12 +137,15 @@ public class NotificationsJob extends Job {
         String text = getContext().getResources()
                 .getQuantityString(R.plurals.unread_notifications_summary_text, numNotifications,
                         numNotifications);
+        PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
+                HomeActivity.makeIntent(getContext(), R.id.notifications), 0);
         notificationManager.notify(ID_SUMMARY, new NotificationCompat.Builder(
                 getContext(), Gh4Application.CHANNEL_GITHUB_NOTIFICATIONS)
                 .setSmallIcon(R.drawable.octodroid)
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupSummary(true)
                 .setColor(accentColor)
+                .setContentIntent(contentIntent)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setNumber(numNotifications)
