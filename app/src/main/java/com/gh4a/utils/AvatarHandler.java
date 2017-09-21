@@ -79,7 +79,9 @@ public class AvatarHandler {
         private void processResult(int requestId, Bitmap bitmap) {
             final Request request = sRequests.get(requestId);
             if (request != null && bitmap != null) {
-                sCache.put(request.id, bitmap);
+                synchronized (AvatarHandler.class) {
+                    sCache.put(request.id, bitmap);
+                }
 
                 for (ViewDelegate view : request.views) {
                     applyAvatarToView(view, bitmap);
@@ -107,14 +109,41 @@ public class AvatarHandler {
         assignAvatarInternal(new MenuItemDelegate(context, item), userName, userId, url);
     }
 
-    public static void assignAvatarInternal(ViewDelegate view,
+    public static Bitmap loadUserAvatarSynchronously(Context context, User user) {
+        if (user == null) {
+            return null;
+        }
+        Bitmap cachedBitmap = loadBitmapFromCache(context, user.getId());
+        if (cachedBitmap != null) {
+            return cachedBitmap;
+        }
+        try {
+            Bitmap bitmap = fetchBitmap(makeUrl(user.getAvatarUrl(), user.getId()));
+            if (bitmap != null) {
+                synchronized (AvatarHandler.class) {
+                    sCache.put(user.getId(), bitmap);
+                }
+            }
+            return bitmap;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private static Bitmap loadBitmapFromCache(Context context, int id) {
+        synchronized (AvatarHandler.class) {
+            if (sCache == null) {
+                initialize(context);
+            }
+            return sCache.get(id);
+        }
+    }
+
+    private static void assignAvatarInternal(ViewDelegate view,
             String userName, int userId, String url) {
         removeOldRequest(view);
 
-        if (sCache == null) {
-            initialize(view.getContext());
-        }
-        Bitmap bitmap = sCache.get(userId);
+        Bitmap bitmap = loadBitmapFromCache(view.getContext(), userId);
         if (bitmap != null) {
             applyAvatarToView(view, bitmap);
             return;
