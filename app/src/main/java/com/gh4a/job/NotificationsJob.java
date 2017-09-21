@@ -2,6 +2,14 @@ package com.gh4a.job;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -16,10 +24,12 @@ import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoader;
 import com.gh4a.resolver.BrowseFilter;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Notification;
 import org.eclipse.egit.github.core.Repository;
+import org.eclipse.egit.github.core.User;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -84,7 +94,8 @@ public class NotificationsJob extends Job {
     private void showSingleNotification(NotificationManagerCompat notificationManager,
             int accentColor, Notification notification) {
         Repository repository = notification.getRepository();
-        String title = repository.getOwner().getLogin() + "/" + repository.getName();
+        User owner = repository.getOwner();
+        String title = owner.getLogin() + "/" + repository.getName();
         long when = notification.getUpdatedAt() != null
                 ? notification.getUpdatedAt().getTime()
                 : System.currentTimeMillis();
@@ -92,6 +103,7 @@ public class NotificationsJob extends Job {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(),
                 Gh4Application.CHANNEL_GITHUB_NOTIFICATIONS)
                 .setSmallIcon(R.drawable.octodroid)
+                .setLargeIcon(loadRoundUserAvatar(owner))
                 .setGroup(GROUP_ID_GITHUB)
                 .setWhen(when)
                 .setShowWhen(true)
@@ -134,5 +146,29 @@ public class NotificationsJob extends Job {
                 .setContentText(text)
                 .setNumber(numNotifications)
                 .build());
+    }
+
+    private Bitmap loadRoundUserAvatar(User user) {
+        Bitmap avatar = AvatarHandler.loadUserAvatarSynchronously(getContext(), user);
+        if (avatar == null) {
+            return null;
+        }
+
+        final Bitmap output = Bitmap.createBitmap(avatar.getWidth(), avatar.getHeight(),
+                Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(output);
+
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, avatar.getWidth(), avatar.getHeight());
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(Color.BLACK);
+        canvas.drawOval(new RectF(rect), paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(avatar, rect, rect, paint);
+
+        return output;
     }
 }
