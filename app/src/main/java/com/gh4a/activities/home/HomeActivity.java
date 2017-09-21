@@ -1,6 +1,7 @@
 package com.gh4a.activities.home;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -8,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -48,6 +50,15 @@ import org.eclipse.egit.github.core.User;
 public class HomeActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, RepositoryListContainerFragment.Callback,
         NotificationListFragment.ParentCallback {
+    public static Intent makeIntent(Context context, @IdRes int initialPageId) {
+        String initialPage = START_PAGE_MAPPING.get(initialPageId);
+        Intent intent = new Intent(context, HomeActivity.class);
+        if (initialPage != null) {
+            intent.putExtra("initial_page", initialPage);
+        }
+        return intent;
+    }
+
     private static final int REQUEST_SETTINGS = 10000;
 
     private FragmentFactory mFactory;
@@ -437,7 +448,9 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     }
 
     private int determineInitialPage() {
-        String initialPage = getPrefs().getString(SettingsFragment.KEY_START_PAGE, "newsfeed");
+        String initialPage = getIntent().hasExtra("initial_page")
+                ? getIntent().getStringExtra("initial_page")
+                : getPrefs().getString(SettingsFragment.KEY_START_PAGE, "newsfeed");
         if (TextUtils.equals(initialPage, "last")) {
             initialPage = getPrefs().getString("last_selected_home_page", "newsfeed");
         }
