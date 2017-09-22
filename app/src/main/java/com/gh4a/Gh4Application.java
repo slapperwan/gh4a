@@ -282,6 +282,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 .remove(KEY_PREFIX_TOKEN + login)
                 .remove(KEY_PREFIX_USER_ID + login)
                 .apply();
+
+        NotificationsJob.cancelJob();
     }
 
     private SharedPreferences getPrefs() {
