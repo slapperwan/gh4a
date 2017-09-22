@@ -143,7 +143,8 @@ public class NotificationsJob extends Job {
         String url = notification.getSubject().getUrl();
         if (url != null) {
             Uri uri = ApiHelpers.normalizeUri(Uri.parse(url));
-            Intent intent = BrowseFilter.makeRedirectionIntent(getContext(), uri, null);
+            Intent intent = BrowseFilter.makeOpenNotificationActionIntent(getContext(), uri,
+                    notification.getId());
             PendingIntent pendingIntent =
                     PendingIntent.getActivity(getContext(), 0, intent, 0);
             builder.setContentIntent(pendingIntent);
