@@ -119,6 +119,14 @@ public class NotificationsJob extends Job {
                 ? notification.getUpdatedAt().getTime()
                 : System.currentTimeMillis();
 
+        Intent markReadIntent = BrowseFilter.makeMarkNotificationAsReadActionIntent(getContext(),
+                notification.getId());
+        PendingIntent markReadPendingIntent = PendingIntent.getActivity(getContext(), 0,
+                markReadIntent, 0);
+        NotificationCompat.Action markReadAction = new NotificationCompat.Action(
+                R.drawable.mark_read, getContext().getString(R.string.mark_as_read),
+                markReadPendingIntent);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(),
                 CHANNEL_GITHUB_NOTIFICATIONS)
                 .setSmallIcon(R.drawable.octodroid)
@@ -129,6 +137,7 @@ public class NotificationsJob extends Job {
                 .setColor(accentColor)
                 .setContentTitle(title)
                 .setAutoCancel(true)
+                .addAction(markReadAction)
                 .setContentText(notification.getSubject().getTitle());
 
         String url = notification.getSubject().getUrl();
