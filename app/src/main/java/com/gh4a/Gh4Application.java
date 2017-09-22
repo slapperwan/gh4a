@@ -163,7 +163,10 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mServices.put(WATCHER_SERVICE, new WatcherService(mClient));
 
         JobManager.create(this).addJobCreator(new Gh4JobCreator());
+        updateNotificationJob(prefs);
+    }
 
+    private void updateNotificationJob(SharedPreferences prefs) {
         if (isAuthorized() && prefs.getBoolean(SettingsFragment.KEY_NOTIFICATIONS, false)) {
             int intervalMinutes = prefs.getInt(SettingsFragment.KEY_NOTIFICATION_INTERVAL, 15);
             NotificationsJob.scheduleJob(intervalMinutes);
@@ -238,16 +241,19 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     }
 
     public void addAccount(User user, String token) {
+        SharedPreferences prefs = getPrefs();
         String login = user.getLogin();
-        Set<String> logins = getPrefs().getStringSet(KEY_ALL_LOGINS, null);
+        Set<String> logins = prefs.getStringSet(KEY_ALL_LOGINS, null);
         logins.add(login);
 
-        getPrefs().edit()
+        prefs.edit()
                 .putString(KEY_ACTIVE_LOGIN, login)
                 .putStringSet(KEY_ALL_LOGINS, logins)
                 .putString(KEY_PREFIX_TOKEN + login, token)
                 .putInt(KEY_PREFIX_USER_ID + login, user.getId())
                 .apply();
+
+        updateNotificationJob(prefs);
     }
 
     public User getCurrentAccountInfoForAvatar() {
