@@ -122,7 +122,7 @@ public class NotificationsJob extends Job {
         Intent markReadIntent = BrowseFilter.makeMarkNotificationAsReadActionIntent(getContext(),
                 notification.getId());
         PendingIntent markReadPendingIntent = PendingIntent.getActivity(getContext(), 0,
-                markReadIntent, 0);
+                markReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Action markReadAction = new NotificationCompat.Action(
                 R.drawable.mark_read, getContext().getString(R.string.mark_as_read),
                 markReadPendingIntent);
@@ -146,7 +146,8 @@ public class NotificationsJob extends Job {
             Intent intent = BrowseFilter.makeOpenNotificationActionIntent(getContext(), uri,
                     notification.getId());
             PendingIntent pendingIntent =
-                    PendingIntent.getActivity(getContext(), 0, intent, 0);
+                    PendingIntent.getActivity(getContext(), 0, intent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(pendingIntent);
         }
 
