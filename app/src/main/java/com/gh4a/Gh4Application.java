@@ -62,7 +62,6 @@ import java.util.Set;
 public class Gh4Application extends Application implements OnSharedPreferenceChangeListener {
     public static final String LOG_TAG = "Gh4a";
     public static int THEME = R.style.LightTheme;
-    private ObservableManager observableManager;
 
     public static final String COLLAB_SERVICE = "github.collaborator";
     public static final String COMMIT_SERVICE = "github.commit";
@@ -105,7 +104,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public void onCreate() {
         super.onCreate();
 
-        observableManager = new ObservableManager(this);
         sInstance = this;
 
         SharedPreferences prefs = getPrefs();
@@ -160,10 +158,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mServices.put(STAR_SERVICE, new StarService(mClient));
         mServices.put(USER_SERVICE, new UserService(mClient));
         mServices.put(WATCHER_SERVICE, new WatcherService(mClient));
-    }
-
-    public ObservableManager getObservableManager() {
-        return this.observableManager;
     }
 
     public GitHubService getService(String name) {

@@ -42,7 +42,6 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.service.RepositoryService;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HttpImageGetter;
-import com.gh4a.utils.rx.RxTools;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
@@ -107,16 +106,14 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     public void reloadData() {
         setContentShown(false);
 
-        RxTools.emptyCache(mApp, null)
-            .flatMap(o -> loadReadme())
-            .flatMap(o -> loadPullRequestsCount())
-            .subscribe(o -> {}, e -> {});
+        loadReadme().subscribe();
+
+        loadPullRequestsCount().subscribe();
     }
 
     public Observable<String> loadReadme() {
         return RepositoryService.loadReadme(getActivity(), mRepository.getOwner().getLogin(),
                 mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef)
-                .compose(RxTools.applySchedulers())
                 .flatMap(result -> { // Fill-in Readme
                     setContentShown(true);
                     TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
@@ -185,9 +182,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         getArguments().putString("ref", ref);
 
         // reload readme
-        RxTools.emptyCache(mApp, "loadReadme")
-                .flatMap(o -> loadReadme())
-                .subscribe(o -> {}, e -> {});
+        loadReadme().subscribe(o -> {}, e -> {});
 
         if (mContentView != null) {
             mContentView.findViewById(R.id.readme).setVisibility(View.GONE);

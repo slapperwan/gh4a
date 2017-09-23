@@ -153,7 +153,6 @@ public class RepositoryActivity extends BasePagerActivity {
 
     public Observable<Repository> loadRepository() {
         return RepositoryService.loadRepository(this, mRepoOwner, mRepoName)
-                .compose(RxTools.applySchedulers())
                 .doOnNext(repository -> {
                     mRepository = (Repository) repository;
                     updateTitle();
@@ -271,9 +270,8 @@ public class RepositoryActivity extends BasePagerActivity {
         setContentShown(false);
         invalidateTabs();
 
-        RxTools.emptyAllCache(mApp)
-                .flatMap(o -> loadRepository())
-                .subscribe(o -> {}, e -> {});
+        loadRepository()
+            .subscribe(o -> {}, e -> {});
 
         if (Gh4Application.get().isAuthorized()) {
             this.isWatching();
@@ -352,8 +350,7 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     public void updateWatchingStatus(String repoOwner, String repoName, boolean isWatching) {
-        RepositoryService.updateWatch(mApp, this, repoOwner, repoName, isWatching)
-            .compose(RxTools.applySchedulers())
+        RepositoryService.updateWatch(this, repoOwner, repoName, isWatching)
             .doOnTerminate(() -> {
                 if (mIsWatching == null) {
                     // user refreshed while the action was in progress
@@ -382,8 +379,7 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     public void isWatching() {
-        RepositoryService.isWatching(mApp, this, mRepoOwner, mRepoName)
-                .compose(RxTools.applySchedulers())
+        RepositoryService.isWatching(this, mRepoOwner, mRepoName)
                 .subscribe(result -> {
                     mIsWatching = (Boolean) result;
                     supportInvalidateOptionsMenu();
@@ -391,7 +387,7 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     public void isStarring() {
-        RepositoryService.isStarring(mApp, this, mRepoOwner, mRepoName)
+        RepositoryService.isStarring(this, mRepoOwner, mRepoName)
                 .subscribe(result -> {
                     mIsStarring = (Boolean)result;
                     supportInvalidateOptionsMenu();
