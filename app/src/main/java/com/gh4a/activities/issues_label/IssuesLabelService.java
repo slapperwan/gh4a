@@ -12,6 +12,10 @@ import java.net.URLEncoder;
 import io.reactivex.Observable;
 
 public class IssuesLabelService {
+    public static final int DELETE_ISSUE_LABEL = 0;
+    public static final int EDIT_ISSUE_LABEL = 1;
+    public static final int ADD_ISSUE_LABEL = 2;
+
     public static Observable deleteIssueLabel(Activity activity, View rootView, String repoOwner, String repoName, String labelName) {
         String errorMessage = activity.getString(R.string.issue_error_delete_label, labelName);
 
@@ -21,7 +25,7 @@ public class IssuesLabelService {
             labelService.deleteLabel(repoOwner, repoName, URLEncoder.encode(labelName, "UTF-8"));
             return true;
         })
-        .compose(RxTools.onErrorSnackbar(activity, rootView, errorMessage, R.string.deleting_msg));
+        .compose(RxTools.onErrorSnackbar(activity, DELETE_ISSUE_LABEL, rootView, errorMessage, R.string.deleting_msg));
     }
 
     public static Observable editIssueLabel(Activity activity, View rootLayout, String repoOwner, String repoName, String oldLabelName, String newLabelName, String color) {
@@ -39,7 +43,7 @@ public class IssuesLabelService {
                     URLEncoder.encode(oldLabelName, "UTF-8"), label);
             return true;
         })
-        .compose(RxTools.onErrorSnackbar(activity, rootLayout, errorMessage, R.string.saving_msg));
+        .compose(RxTools.onErrorSnackbar(activity, EDIT_ISSUE_LABEL, rootLayout, errorMessage, R.string.saving_msg));
     }
 
     public static Observable addIssue(Activity activity, View rootView, String repoOwner, String repoName, String labelName, String color) {
@@ -55,5 +59,5 @@ public class IssuesLabelService {
             labelService.createLabel(repoOwner, repoName, label);
             return true;
         })
-        .compose(RxTools.onErrorSnackbar(activity, rootView, errorMessage, R.string.saving_msg));
+        .compose(RxTools.onErrorSnackbar(activity, ADD_ISSUE_LABEL, rootView, errorMessage, R.string.saving_msg));
     }}
