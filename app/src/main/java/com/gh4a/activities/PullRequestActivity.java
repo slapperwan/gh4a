@@ -184,7 +184,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         protected void onResultReady(Reference result) {
             mHeadReference = result;
             mHasLoadedHeadReference = true;
-            showContentIfReady();
             supportInvalidateOptionsMenu();
             getSupportLoaderManager().destroyLoader(3);
         }
