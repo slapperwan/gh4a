@@ -23,8 +23,17 @@ public class RxTools {
         return observable -> {
             final RxLoader rxLoader = new RxLoader(activity, ((AppCompatActivity)activity).getSupportLoaderManager());
             return observable
-                    .compose(rxLoader.makeObservableTransformer(id))
-                    .compose(handleError(activity));
+                    .compose(handleError(activity))
+                    .compose(rxLoader.makeObservableTransformer(id));
+        };
+    }
+
+    public static <T> ObservableTransformer<T, T> handle(Activity activity, int id, boolean refresh) {
+        return observable -> {
+            final RxLoader rxLoader = new RxLoader(activity, ((AppCompatActivity)activity).getSupportLoaderManager());
+            return observable
+                    .compose(handleError(activity))
+                    .compose(rxLoader.makeObservableTransformer(id, refresh));
         };
     }
 

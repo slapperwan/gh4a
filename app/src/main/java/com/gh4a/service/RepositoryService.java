@@ -51,8 +51,7 @@ public class RepositoryService {
             } catch (IOException ioe) {
                 emitter.onError(ioe);
             }
-        })
-        .compose(RxTools.handle(activity, LOAD_README));
+        });
     }
 
     public static Observable loadPullRequestCount(Activity activity, Repository repository, String state) {
@@ -70,8 +69,7 @@ public class RepositoryService {
             } catch(IOException ioe) {
                 emitter.onError(ioe);
             }
-        })
-        .compose(RxTools.handle(activity, LOAD_PULL_REQUESTS_COUNT));
+        });
     }
 
     public static Observable updateStar(Gh4Application app, Activity activity, String repoOwner, String repoName, boolean isStarring) {

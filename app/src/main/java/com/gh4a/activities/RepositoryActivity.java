@@ -349,35 +349,6 @@ public class RepositoryActivity extends BasePagerActivity {
         return UserActivity.makeIntent(this, mRepoOwner);
     }
 
-    public void updateWatchingStatus(String repoOwner, String repoName, boolean isWatching) {
-        RepositoryService.updateWatch(this, repoOwner, repoName, isWatching)
-            .doOnTerminate(() -> {
-                if (mIsWatching == null) {
-                    // user refreshed while the action was in progress
-                    return;
-                }
-                mIsWatching = !mIsWatching;
-                supportInvalidateOptionsMenu();
-            })
-            .subscribe(o -> {}, e -> {});
-    }
-
-    public void updateStarringStatus(String repoOwner, String repoName, boolean isStarring) {
-        RepositoryService.updateStar(mApp, this, repoOwner, repoName, isStarring)
-            .doOnNext(result -> {
-                Log.d("TEST", "doOnNext updateStarringStatus called");
-                if (mIsStarring == null) {
-                    // user refreshed while the action was in progress
-                    return;
-                }
-                mIsStarring = !mIsStarring;
-                if (mRepositoryFragment != null) {
-                    mRepositoryFragment.updateStargazerCount(mIsStarring);
-                }
-                supportInvalidateOptionsMenu();
-            });
-    }
-
     public void isWatching() {
         RepositoryService.isWatching(this, mRepoOwner, mRepoName)
                 .subscribe(result -> {
@@ -401,12 +372,34 @@ public class RepositoryActivity extends BasePagerActivity {
             case R.id.watch:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                this.updateWatchingStatus(mRepoOwner, mRepoName, mIsWatching);
+
+                RepositoryService.updateWatch(this, mRepoOwner, mRepoName, mIsWatching)
+                    .subscribe(o -> {
+                        if (mIsWatching == null) {
+                            // user refreshed while the action was in progress
+                            return;
+                        }
+                        mIsWatching = !mIsWatching;
+                        supportInvalidateOptionsMenu();
+                    }, e -> {});
                 return true;
             case R.id.star:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
-                this.updateStarringStatus(mRepoOwner, mRepoName, mIsStarring);
+
+                RepositoryService.updateStar(mApp, this, mRepoOwner, mRepoName, mIsStarring)
+                    .subscribe(result -> {
+                        if (mIsStarring == null) {
+                            // user refreshed while the action was in progress
+                            return;
+                        }
+                        mIsStarring = !mIsStarring;
+                        if (mRepositoryFragment != null) {
+                            mRepositoryFragment.updateStargazerCount(mIsStarring);
+                        }
+                        supportInvalidateOptionsMenu();
+                    }, e -> {});
+
                 return true;
             case R.id.ref:
                 if (mBranches == null) {
