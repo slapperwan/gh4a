@@ -297,13 +297,15 @@ public class IssueEditActivity extends BasePagerActivity implements
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
         mEditIssue = (Issue) extras.getSerializable("issue");
-        // Save only editable fields
-        mOriginalIssue = new Issue()
-                .setTitle(mEditIssue.getTitle())
-                .setBody(mEditIssue.getBody())
-                .setMilestone(mEditIssue.getMilestone())
-                .setAssignees(mEditIssue.getAssignees())
-                .setLabels(mEditIssue.getLabels());
+        if (mEditIssue != null) {
+            // Save only editable fields
+            mOriginalIssue = new Issue()
+                    .setTitle(mEditIssue.getTitle())
+                    .setBody(mEditIssue.getBody())
+                    .setMilestone(mEditIssue.getMilestone())
+                    .setAssignees(mEditIssue.getAssignees())
+                    .setLabels(mEditIssue.getLabels());
+        }
     }
 
     @Override
