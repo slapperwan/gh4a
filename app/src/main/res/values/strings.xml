@@ -397,7 +397,7 @@
     <string name="issue_filter_by_any_label">Any label</string>
     <string name="issue_filter_by_no_label">Unlabeled</string>
     <string name="issue_filter_by_any_milestone">Any milestone</string>
-    <string name="issue_filter_by_no_milestone">No milestone set</string>
+    <string name="issue_filter_by_no_milestone">No milestone</string>
     <string name="issue_filter_by_any_assignee">Any assignee</string>
     <string name="issue_filter_by_no_assignee">Unassigned</string>
     <string name="issue_filter_remove">Remove filter</string>

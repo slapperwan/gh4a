@@ -41,6 +41,8 @@ import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
+import com.gh4a.dialogs.MilestoneDialog;
+import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.Optional;
@@ -53,13 +55,11 @@ import com.gh4a.widget.MarkdownPreviewWebView;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.ContentType;
 import com.meisolsson.githubsdk.model.Issue;
-import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.request.issue.IssueRequest;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
-import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 import com.meisolsson.githubsdk.service.issues.IssueService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
@@ -74,7 +74,7 @@ import retrofit2.Response;
 
 public class IssueEditActivity extends BasePagerActivity implements
         AppBarLayout.OnOffsetChangedListener, View.OnClickListener,
-        View.OnFocusChangeListener {
+        View.OnFocusChangeListener, IssueMilestoneListFragment.SelectionCallback {
     public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
         // can't reuse makeEditIntent here, because even a null extra counts for hasExtra()
         return new Intent(context, IssueEditActivity.class)
@@ -91,7 +91,6 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private static final int REQUEST_MANAGE_LABELS = 1000;
-    private static final int REQUEST_MANAGE_MILESTONES = 1001;
 
     private static final int ID_LOADER_COLLABORATOR_STATUS = 0;
 
@@ -103,7 +102,6 @@ public class IssueEditActivity extends BasePagerActivity implements
     private String mRepoName;
 
     private boolean mIsCollaborator;
-    private List<Milestone> mAllMilestone;
     private List<User> mAllAssignee;
     private List<Label> mAllLabels;
     private Issue mEditIssue;
@@ -266,7 +264,6 @@ public class IssueEditActivity extends BasePagerActivity implements
     @Override
     public void onRefresh() {
         mAllAssignee = null;
-        mAllMilestone = null;
         mAllLabels = null;
         mIsCollaborator = false;
         loadCollaboratorStatus(true);
@@ -336,54 +333,26 @@ public class IssueEditActivity extends BasePagerActivity implements
                 // Require reload of labels
                 mAllLabels = null;
             }
-        } else if (requestCode == REQUEST_MANAGE_MILESTONES) {
-            if (resultCode == RESULT_OK) {
-                // Require reload of milestones
-                mAllMilestone = null;
-            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
+    @Override
+    public void onMilestoneSelected(@Nullable Milestone milestone) {
+        mEditIssue = mEditIssue.toBuilder()
+                .milestone(milestone)
+                .build();
+        updateOptionViews();
+    }
+
     private void showMilestonesDialog() {
-        if (mAllMilestone == null) {
-            loadMilestones();
-        } else {
-            final String[] milestones = new String[mAllMilestone.size() + 1];
-            Milestone selectedMilestone = mEditIssue.milestone();
-            int selected = 0;
+        MilestoneDialog dialog = MilestoneDialog.newInstance(mRepoOwner, mRepoName, false);
+        getSupportFragmentManager().beginTransaction()
+                .add(dialog, "dialog_milestone")
+                .commitAllowingStateLoss();
 
-            milestones[0] = getResources().getString(R.string.issue_clear_milestone);
-            for (int i = 1; i <= mAllMilestone.size(); i++) {
-                Milestone m = mAllMilestone.get(i - 1);
-                milestones[i] = m.title();
-                if (selectedMilestone != null && m.number().equals(selectedMilestone.number())) {
-                    selected = i;
-                }
-            }
-
-            final DialogInterface.OnClickListener selectCb = (dialog, which) -> {
-                mEditIssue = mEditIssue.toBuilder()
-                        .milestone(which == 0 ? null : mAllMilestone.get(which - 1))
-                        .build();
-                updateOptionViews();
-                dialog.dismiss();
-            };
-
-            new AlertDialog.Builder(this)
-                    .setCancelable(true)
-                    .setTitle(R.string.issue_milestone_hint)
-                    .setSingleChoiceItems(milestones, selected, selectCb)
-                    .setNegativeButton(R.string.cancel, null)
-                    .setNeutralButton(R.string.issue_manage_milestones, (dialog, which) -> {
-                        Intent intent = IssueMilestoneListActivity.makeIntent(
-                                IssueEditActivity.this, mRepoOwner, mRepoName,
-                                mEditIssue.pullRequest() != null);
-                        startActivityForResult(intent, REQUEST_MANAGE_MILESTONES);
-                    })
-                    .show();
-        }
+        // TODO: Button to manage milestones
     }
 
     private void showAssigneesDialog() {
@@ -608,18 +577,6 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .subscribe(result -> {
                     mAllLabels = result;
                     showLabelDialog();
-                }, this::handleLoadFailure));
-    }
-
-    private void loadMilestones() {
-        final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
-        registerTemporarySubscription(ApiHelpers.PageIterator
-                .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
-                .compose(RxUtils::doInBackground)
-                .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
-                .subscribe(result -> {
-                    mAllMilestone = result;
-                    showMilestonesDialog();
                 }, this::handleLoadFailure));
     }
 
