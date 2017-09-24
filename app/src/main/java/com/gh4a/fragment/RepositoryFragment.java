@@ -50,6 +50,8 @@ import com.vdurmont.emoji.EmojiParser;
 import org.eclipse.egit.github.core.Permissions;
 import org.eclipse.egit.github.core.Repository;
 import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.Single;
 import io.reactivex.functions.Consumer;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
@@ -103,7 +105,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             mImageGetter.clearHtmlCache();
         }
 
-        this.reloadData();
+        reloadData();
     }
 
     public void reloadData() {

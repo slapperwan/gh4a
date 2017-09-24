@@ -237,8 +237,11 @@ public class IssueLabelListActivity extends BaseActivity implements
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
             case Menu.FIRST:
-                if (mLabel == mAddedLabel) this.addIssue();
-                else this.editIssueLabel();
+                if (mLabel == mAddedLabel) {
+                    addIssue();
+                } else {
+                    editIssueLabel();
+                }
                 break;
             case Menu.FIRST + 1:
                 new AlertDialog.Builder(IssueLabelListActivity.this)

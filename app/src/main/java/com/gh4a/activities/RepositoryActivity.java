@@ -144,10 +144,10 @@ public class RepositoryActivity extends BasePagerActivity {
 
         setContentShown(false);
 
-        this.loadRepository().subscribe(o -> {}, e -> {});
+        loadRepository().subscribe(o -> {}, e -> {});
         if (Gh4Application.get().isAuthorized()) {
-            this.isWatching();
-            this.isStarring();
+            isWatching();
+            isStarring();
         }
     }
 
@@ -274,8 +274,8 @@ public class RepositoryActivity extends BasePagerActivity {
             .subscribe(o -> {}, e -> {});
 
         if (Gh4Application.get().isAuthorized()) {
-            this.isWatching();
-            this.isStarring();
+            isWatching();
+            isStarring();
         }
 
         super.onRefresh();
