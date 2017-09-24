@@ -49,6 +49,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -105,6 +106,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private static final String STATE_KEY_SEARCH_QUERY = "search_query";
     private static final String STATE_KEY_SEARCH_MODE = "search_mode";
     private static final String STATE_KEY_SEARCH_IS_EXPANDED = "search_is_expanded";
+    private static final String STATE_KEY_SELECTED_MILESTONE = "selected_milestone";
 
     private static final String LIST_QUERY = "is:%s %s repo:%s/%s %s %s %s %s";
     private static final String SEARCH_QUERY = "is:%s %s repo:%s/%s %s";
@@ -196,6 +198,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
             mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
             mSearchIsExpanded = savedInstanceState.getBoolean(STATE_KEY_SEARCH_IS_EXPANDED);
+            mSelectedMilestone = savedInstanceState.getString(STATE_KEY_SELECTED_MILESTONE);
         }
 
         if (!mIsPullRequest && Gh4Application.get().isAuthorized()) {
@@ -244,6 +247,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         outState.putString(STATE_KEY_SEARCH_QUERY, mSearchQuery);
         outState.putBoolean(STATE_KEY_SEARCH_MODE, mSearchMode);
         outState.putBoolean(STATE_KEY_SEARCH_IS_EXPANDED, mSearchIsExpanded);
+        outState.putString(STATE_KEY_SELECTED_MILESTONE, mSelectedMilestone);
     }
 
     @Override
@@ -357,6 +361,23 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
+    protected void onPrepareRightNavigationDrawerMenu(Menu menu) {
+        super.onPrepareRightNavigationDrawerMenu(menu);
+        MenuItem milestoneFilterItem = menu.findItem(R.id.filter_by_milestone);
+        if (milestoneFilterItem != null) {
+            String title = getString(R.string.issue_filter_by_milestone);
+            String subtitle = mSelectedMilestone;
+            if (subtitle == null) {
+                subtitle = getString(R.string.issue_filter_by_any_milestone);
+            } else if (subtitle.isEmpty()) {
+                subtitle = getString(R.string.issue_filter_by_no_milestone);
+            }
+
+            UiUtils.setMenuItemText(this, milestoneFilterItem, title, subtitle);
+        }
+    }
+
+    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         super.onNavigationItemSelected(item);
 
@@ -406,6 +427,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         searchView.setOnCloseListener(this);
         searchView.setOnQueryTextListener(this);
 
+        // TODO: More checks
+        if (mSelectedMilestone != null) {
+            menu.findItem(R.id.remove_filter).setVisible(true);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -415,7 +441,17 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             toggleRightSideDrawer();
             return true;
         }
+        if (item.getItemId() == R.id.remove_filter) {
+            removeFilter();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void removeFilter() {
+        // TODO: Reset all filter values
+        mSelectedMilestone = null;
+        onFilterUpdated();
     }
 
     @Override
@@ -571,7 +607,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                         : which == 1 ? ""
                         : milestones[which];
                 dialog.dismiss();
-                invalidateFragments();
+                onFilterUpdated();
             }
         };
 
@@ -581,6 +617,12 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                 .setSingleChoiceItems(milestones, selected, selectCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    private void onFilterUpdated() {
+        invalidateFragments();
+        invalidateOptionsMenu();
+        updateRightNavigationDrawer();
     }
 
     private void showAssigneesDialog() {
