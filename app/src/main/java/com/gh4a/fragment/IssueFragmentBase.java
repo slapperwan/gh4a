@@ -552,6 +552,17 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         getBaseActivity().setAppBarLocked(scrolling);
     }
 
+    @Override
+    public void onReplyCommentSelected(long replyToId) {
+        // Not used in this screen
+    }
+
+    @Override
+    public long getSelectedReplyCommentId() {
+        // Not used in this screen
+        return 0;
+    }
+
     protected abstract void bindSpecialViews(View headerView);
     protected abstract void assignHighlightColor();
     protected abstract void deleteCommentInBackground(RepositoryId repoId, Comment comment)

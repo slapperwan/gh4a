@@ -40,6 +40,7 @@
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="reply">Reply</string>
+    <string name="reply_selected">Reply (Selected)</string>
     <string name="add_comment">Add comment</string>
     <string name="add_reaction">Add reaction</string>
     <string name="remove_reaction">Remove reaction</string>
@@ -441,6 +442,7 @@
     <string name="close_pull_request_confirm">Do you really want to close this pull request?</string>
     <string name="reopen_pull_request_confirm">Do you really want to reopen this pull request?</string>
     <string name="pull_request_edit_title">Edit Pull Request #%1$d</string>
+    <string name="review_reply_hint">Reply to selected comment group</string>
 
     <!-- Object -->
     <string name="object_view_file_at">View file @ %1$s</string>
