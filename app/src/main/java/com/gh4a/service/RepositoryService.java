@@ -77,8 +77,11 @@ public class RepositoryService {
             StarService starService = (StarService)
                     Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
             RepositoryId repoId = new RepositoryId(repoOwner, repoName);
-            if (isStarring) starService.unstar(repoId);
-            else starService.star(repoId);
+            if (isStarring) {
+                starService.unstar(repoId);
+            } else {
+                starService.star(repoId);
+            }
 
             e.onNext(!isStarring);
             e.onComplete();

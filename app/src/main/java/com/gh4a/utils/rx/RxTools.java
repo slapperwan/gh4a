@@ -56,7 +56,7 @@ public class RxTools {
     public static <T> ObservableTransformer<T, T> handleError(Activity activity) {
         return observable -> observable
                 .doOnError(error -> {
-                    if(activity instanceof BasePagerActivity) {
+                    if (activity instanceof BasePagerActivity) {
                         BasePagerActivity act = (BasePagerActivity) activity;
                         act.setErrorViewVisibility(true);
                     } else {

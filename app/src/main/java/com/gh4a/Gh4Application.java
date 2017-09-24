@@ -27,7 +27,6 @@ import android.util.SparseArray;
 
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.CrashReportingHelper;
-import com.gh4a.utils.rx.ObservableManager;
 
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.client.GitHubClient;
