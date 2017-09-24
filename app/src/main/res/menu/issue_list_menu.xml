@@ -2,14 +2,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/search"
-        android:title="@string/search"
+    <item
+        android:id="@+id/search"
         android:icon="@drawable/action_search"
-        app:showAsAction="always|collapseActionView"
-        app:actionViewClass="android.support.v7.widget.SearchView" />
-    <item android:id="@+id/overflow"
-        android:title="@string/actions"
+        android:title="@string/search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+
+    <item
+        android:id="@+id/remove_filter"
+        android:icon="@drawable/filter_remove"
+        android:title="Remove filter"
+        android:visible="false"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/overflow"
         android:icon="@drawable/overflow_horizontal"
+        android:title="@string/actions"
         app:showAsAction="always" />
 
 </menu>

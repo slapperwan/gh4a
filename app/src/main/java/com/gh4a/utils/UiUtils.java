@@ -26,6 +26,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ForegroundColorSpan;
 import android.view.ActionMode;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -492,5 +493,19 @@ public class UiUtils {
         }
 
         return heightMeasureSpec;
+    }
+
+    public static void setMenuItemText(Context context, MenuItem item, String title,
+            String subtitle) {
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        builder.append(title).append("\n");
+
+        int start = builder.length();
+        builder.append(subtitle);
+
+        int secondaryTextColor = UiUtils.resolveColor(context, android.R.attr.textColorSecondary);
+        builder.setSpan(new ForegroundColorSpan(secondaryTextColor), start, builder.length(), 0);
+
+        item.setTitle(builder);
     }
 }
