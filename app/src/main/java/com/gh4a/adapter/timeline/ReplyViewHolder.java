@@ -10,6 +10,7 @@ class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timelin
         implements View.OnClickListener {
 
     public interface Callback {
+        long getSelectedCommentId();
         void reply(long replyToId);
     }
 
@@ -28,7 +29,9 @@ class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timelin
 
     @Override
     public void bind(TimelineItem.Reply item) {
+        boolean selected = item.timelineComment.comment.getId() == mCallback.getSelectedCommentId();
         mReplyButton.setTag(item.timelineComment);
+        mReplyButton.setText(selected ? R.string.reply_selected : R.string.reply);
     }
 
     @Override
