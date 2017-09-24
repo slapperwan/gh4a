@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gh4a.activities.issues_label;
+package com.gh4a.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,7 +33,7 @@ import android.view.View;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.IssueListActivity;
+import com.gh4a.service.IssuesLabelService;
 import com.gh4a.adapter.IssueLabelAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LabelListLoader;
@@ -247,7 +246,8 @@ public class IssueLabelListActivity extends BaseActivity implements
                 new AlertDialog.Builder(IssueLabelListActivity.this)
                         .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.getName()))
                         .setPositiveButton(R.string.delete, (dialog, whichButton) -> {
-                            IssuesLabelService.deleteIssueLabel(IssueLabelListActivity.this, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName())
+                            IssuesLabelService
+                                    .deleteIssueLabel(IssueLabelListActivity.this, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName())
                                 .subscribe(result -> {
                                     forceLoaderReload(0);
                                     setResult(RESULT_OK);

@@ -39,7 +39,6 @@ import android.view.View;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.issues_label.IssueLabelListActivity;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.loader.AssigneeListLoader;

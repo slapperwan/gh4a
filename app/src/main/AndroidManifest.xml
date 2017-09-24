@@ -72,7 +72,7 @@
             android:configChanges="orientation|screenSize" />
         <activity android:name=".activities.IssueActivity" android:exported="false" />
         <activity android:name=".activities.IssueEditActivity" android:exported="false" />
-        <activity android:name=".activities.issues_label.IssueLabelListActivity" android:exported="false" />
+        <activity android:name=".activities.IssueLabelListActivity" android:exported="false" />
         <activity android:name=".activities.IssueListActivity" android:exported="false" />
         <activity android:name=".activities.IssueMilestoneEditActivity" android:exported="false" />
         <activity android:name=".activities.IssueMilestoneListActivity" android:exported="false" />

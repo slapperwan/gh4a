@@ -1,4 +1,4 @@
-package com.gh4a.activities.issues_label;
+package com.gh4a.service;
 
 import android.app.Activity;
 import android.view.View;
