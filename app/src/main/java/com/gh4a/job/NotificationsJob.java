@@ -97,7 +97,7 @@ public class NotificationsJob extends Job {
             if (!notifications.isEmpty()) {
                 int accentColor = UiUtils.resolveColor(getContext(), R.attr.colorAccent);
 
-                showSummaryNotification(notificationManager, notifications.size(), accentColor);
+                showSummaryNotification(notificationManager, notifications, accentColor);
                 for (int i = 0; i < notifications.size(); i++) {
                     showSingleNotification(notificationManager,
                             accentColor, notifications.get(i).notification, i);
@@ -156,14 +156,14 @@ public class NotificationsJob extends Job {
     }
 
     private void showSummaryNotification(NotificationManagerCompat notificationManager,
-            int numNotifications, int accentColor) {
+            List<NotificationHolder> notifications, int accentColor) {
         String title = getContext().getString(R.string.unread_notifications_summary_title);
         String text = getContext().getResources()
-                .getQuantityString(R.plurals.unread_notifications_summary_text, numNotifications,
-                        numNotifications);
+                .getQuantityString(R.plurals.unread_notifications_summary_text,
+                        notifications.size(), notifications.size());
         PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
                 HomeActivity.makeIntent(getContext(), R.id.notifications), 0);
-        notificationManager.notify(NOTIFICATION_ID_BASE, new NotificationCompat.Builder(
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 getContext(), CHANNEL_GITHUB_NOTIFICATIONS)
                 .setSmallIcon(R.drawable.octodroid)
                 .setGroup(GROUP_ID_GITHUB)
@@ -173,8 +173,17 @@ public class NotificationsJob extends Job {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setNumber(numNotifications)
-                .build());
+                .setNumber(notifications.size());
+
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle(builder);
+        for (NotificationHolder notification : notifications) {
+            inboxStyle.addLine(notification.notification.getSubject().getTitle());
+            inboxStyle.setBigContentTitle(title);
+            inboxStyle.setSummaryText(text);
+        }
+        builder.setStyle(inboxStyle);
+
+        notificationManager.notify(NOTIFICATION_ID_BASE, builder.build());
     }
 
     private Bitmap loadRoundUserAvatar(User user) {
