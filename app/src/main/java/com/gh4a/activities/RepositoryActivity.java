@@ -12,7 +12,6 @@ import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,14 +37,12 @@ import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.service.RepositoryService;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.rx.RxTools;
 import com.gh4a.utils.UiUtils;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryTag;
 import java.util.ArrayList;
 import java.util.List;
-
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 
@@ -79,11 +76,7 @@ public class RepositoryActivity extends BasePagerActivity {
                 .putExtra("initial_page", initialPage);
     }
 
-    private static final int LOADER_REPO = 0;
     private static final int LOADER_BRANCHES_AND_TAGS = 1;
-    private static final int LOADER_WATCHING = 2;
-    private static final int LOADER_STARRING = 3;
-
     public static final int PAGE_REPO_OVERVIEW = 0;
     public static final int PAGE_FILES = 1;
     public static final int PAGE_COMMITS = 2;
@@ -133,7 +126,6 @@ public class RepositoryActivity extends BasePagerActivity {
     private CommitListFragment mCommitListFragment;
     private RepositoryEventListFragment mActivityFragment;
     private Gh4Application mApp;
-    private Consumer mLoadRepositorySubscriber;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -146,7 +138,17 @@ public class RepositoryActivity extends BasePagerActivity {
 
         setContentShown(false);
 
-        mLoadRepositorySubscriber = repository -> {
+
+        loadRepository(false);
+
+        if (Gh4Application.get().isAuthorized()) {
+            isWatching(false);
+            isStarring(false);
+        }
+    }
+
+    public void loadRepository(boolean refresh) {
+        Consumer subscriber = repository -> {
             mRepository = (Repository) repository;
             updateTitle();
             invalidateTabs();
@@ -159,17 +161,8 @@ public class RepositoryActivity extends BasePagerActivity {
             supportInvalidateOptionsMenu();
         };
 
-        loadRepository()
-                .subscribe(mLoadRepositorySubscriber, e -> {});
-
-        if (Gh4Application.get().isAuthorized()) {
-            isWatching();
-            isStarring();
-        }
-    }
-
-    public Observable<Repository> loadRepository() {
-        return RepositoryService.loadRepository(this, mRepoOwner, mRepoName);
+        RepositoryService.loadRepository(this, mRepoOwner, mRepoName, refresh)
+                .subscribe(subscriber, e -> {});
     }
 
     @Override
@@ -275,12 +268,11 @@ public class RepositoryActivity extends BasePagerActivity {
         setContentShown(false);
         invalidateTabs();
 
-        loadRepository()
-            .subscribe(mLoadRepositorySubscriber, e -> {});
+        loadRepository(true);
 
         if (Gh4Application.get().isAuthorized()) {
-            isWatching();
-            isStarring();
+            isWatching(true);
+            isStarring(true);
         }
 
         super.onRefresh();
@@ -354,16 +346,16 @@ public class RepositoryActivity extends BasePagerActivity {
         return UserActivity.makeIntent(this, mRepoOwner);
     }
 
-    public void isWatching() {
-        RepositoryService.isWatching(this, mRepoOwner, mRepoName)
+    public void isWatching(boolean refresh) {
+        RepositoryService.isWatching(this, mRepoOwner, mRepoName, refresh)
                 .subscribe(result -> {
                     mIsWatching = (Boolean) result;
                     supportInvalidateOptionsMenu();
                 }, e -> {});
     }
 
-    public void isStarring() {
-        RepositoryService.isStarring(this, mRepoOwner, mRepoName)
+    public void isStarring(boolean refresh) {
+        RepositoryService.isStarring(this, mRepoOwner, mRepoName, refresh)
                 .subscribe(result -> {
                     mIsStarring = (Boolean)result;
                     supportInvalidateOptionsMenu();

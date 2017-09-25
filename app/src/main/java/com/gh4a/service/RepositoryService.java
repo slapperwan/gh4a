@@ -28,7 +28,7 @@ public class RepositoryService {
     public static final int IS_WATCHING = 5;
     public static final int LOAD_REPOSITORY = 6;
 
-    public static Observable loadReadme(Activity activity, String repoOwner, String repoName, String ref) {
+    public static Observable loadReadme(Activity activity, String repoOwner, String repoName, String ref, boolean refresh) {
         Gh4Application app = (Gh4Application) activity.getApplicationContext();
 
         return Observable.create(emitter -> {
@@ -51,10 +51,10 @@ public class RepositoryService {
             } catch (IOException ioe) {
                 emitter.onError(ioe);
             }
-        });
+        }).compose(RxTools.handle(activity, LOAD_README, refresh));
     }
 
-    public static Observable loadPullRequestCount(Activity activity, Repository repository, String state) {
+    public static Observable loadPullRequestCount(Activity activity, Repository repository, String state, boolean refresh) {
         return Observable.create(emitter -> {
             final String QUERY_FORMAT = "type:pr repo:%s/%s state:%s";
             IssueService issueService = (IssueService)
@@ -69,7 +69,7 @@ public class RepositoryService {
             } catch(IOException ioe) {
                 emitter.onError(ioe);
             }
-        });
+        }).compose(RxTools.handle(activity, LOAD_PULL_REQUESTS_COUNT, refresh));
     }
 
     public static Observable updateStar(Gh4Application app, Activity activity, String repoOwner, String repoName, boolean isStarring) {
@@ -106,7 +106,7 @@ public class RepositoryService {
         .compose(RxTools.handle(activity, UPDATE_WATCH));
     }
 
-    public static Observable isStarring(Activity activity, String repoOwner, String repoName) {
+    public static Observable isStarring(Activity activity, String repoOwner, String repoName, boolean refresh) {
         return Observable.create(e -> {
             StarService starService = (StarService)
                     Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
@@ -118,10 +118,10 @@ public class RepositoryService {
                 e.onError(ex);
             }
         })
-        .compose(RxTools.handle(activity, IS_STARRING));
+        .compose(RxTools.handle(activity, IS_STARRING, refresh));
     }
 
-    public static Observable isWatching(Activity activity, String repoOwner, String repoName) {
+    public static Observable isWatching(Activity activity, String repoOwner, String repoName, boolean refresh) {
         return Observable.create(e -> {
             WatcherService watcherService = (WatcherService)
                     Gh4Application.get().getService(Gh4Application.WATCHER_SERVICE);
@@ -135,10 +135,10 @@ public class RepositoryService {
                 e.onError(ex);
             }
         })
-        .compose(RxTools.handle(activity, IS_WATCHING));
+        .compose(RxTools.handle(activity, IS_WATCHING, refresh));
     }
 
-    public static Observable loadRepository(Activity activity, String repoOwner, String repoName) {
+    public static Observable loadRepository(Activity activity, String repoOwner, String repoName, boolean refresh) {
         return Observable.create(e -> {
             org.eclipse.egit.github.core.service.RepositoryService repoService = (org.eclipse.egit.github.core.service.RepositoryService)
             Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
@@ -151,6 +151,6 @@ public class RepositoryService {
                 e.onError(ex);
             }
         })
-        .compose(RxTools.handle(activity, LOAD_REPOSITORY));
+        .compose(RxTools.handle(activity, LOAD_REPOSITORY, refresh));
     }
 }
