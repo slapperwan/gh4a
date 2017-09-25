@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 
 public class RepositoryActivity extends BasePagerActivity {
     public static Intent makeIntent(Context context, Repository repo) {
@@ -132,6 +133,7 @@ public class RepositoryActivity extends BasePagerActivity {
     private CommitListFragment mCommitListFragment;
     private RepositoryEventListFragment mActivityFragment;
     private Gh4Application mApp;
+    private Consumer mLoadRepositorySubscriber;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -144,7 +146,22 @@ public class RepositoryActivity extends BasePagerActivity {
 
         setContentShown(false);
 
-        loadRepository().subscribe(o -> {}, e -> {});
+        mLoadRepositorySubscriber = repository -> {
+            mRepository = (Repository) repository;
+            updateTitle();
+            invalidateTabs();
+            // Apply initial page selection first time the repo is loaded
+            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
+                getPager().setCurrentItem(mInitialPage);
+                mInitialPage = -1;
+            }
+            setContentShown(true);
+            supportInvalidateOptionsMenu();
+        };
+
+        loadRepository()
+                .subscribe(mLoadRepositorySubscriber, e -> {});
+
         if (Gh4Application.get().isAuthorized()) {
             isWatching();
             isStarring();
@@ -152,19 +169,7 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     public Observable<Repository> loadRepository() {
-        return RepositoryService.loadRepository(this, mRepoOwner, mRepoName)
-                .doOnNext(repository -> {
-                    mRepository = (Repository) repository;
-                    updateTitle();
-                    invalidateTabs();
-                    // Apply initial page selection first time the repo is loaded
-                    if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
-                        getPager().setCurrentItem(mInitialPage);
-                        mInitialPage = -1;
-                    }
-                    setContentShown(true);
-                    supportInvalidateOptionsMenu();
-                });
+        return RepositoryService.loadRepository(this, mRepoOwner, mRepoName);
     }
 
     @Override
@@ -271,7 +276,7 @@ public class RepositoryActivity extends BasePagerActivity {
         invalidateTabs();
 
         loadRepository()
-            .subscribe(o -> {}, e -> {});
+            .subscribe(mLoadRepositorySubscriber, e -> {});
 
         if (Gh4Application.get().isAuthorized()) {
             isWatching();
