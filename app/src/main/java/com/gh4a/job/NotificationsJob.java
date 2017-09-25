@@ -171,6 +171,7 @@ public class NotificationsJob extends Job {
                 .setContentIntent(contentIntent)
                 .setContentTitle(title)
                 .setContentText(text)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setNumber(numNotifications)
                 .build());
     }
