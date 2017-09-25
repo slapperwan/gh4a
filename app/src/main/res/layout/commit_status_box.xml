@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:parentTag="LinearLayout">
+
+    <RelativeLayout
+        android:id="@+id/commit_status_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/iv_merge_status_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="@dimen/content_padding"
+            android:layout_marginLeft="@dimen/content_padding"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="@dimen/content_padding"
+            tools:src="@drawable/pull_request_merge_ok" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/merge_status_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/content_padding"
+            android:layout_toLeftOf="@+id/drop_down_icon"
+            android:layout_toRightOf="@id/iv_merge_status_icon"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            tools:text="All checks have passed" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/merge_commit_summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/merge_status_label"
+            android:layout_marginBottom="@dimen/content_padding"
+            android:layout_toLeftOf="@+id/drop_down_icon"
+            android:layout_toRightOf="@id/iv_merge_status_icon"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            tools:text="2 successful checks" />
+
+        <ImageView
+            android:id="@+id/drop_down_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginBottom="@dimen/content_padding"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="@dimen/content_padding"
+            android:layout_marginTop="@dimen/content_padding"
+            android:scaleType="center"
+            app:srcCompat="?attr/dropUpArrowIcon" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/merge_commit_status_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/iv_merge_status_icon"
+        android:layout_marginBottom="@dimen/content_padding"
+        android:orientation="vertical"
+        android:visibility="gone" />
+
+</merge>

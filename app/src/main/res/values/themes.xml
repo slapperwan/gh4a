@@ -42,7 +42,6 @@
         <item name="pullRequestIcon">@drawable/pull_request_dark</item>
         <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok_dark</item>
         <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty_dark</item>
-        <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable_dark</item>
         <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown_dark</item>
         <item name="issueEventClosedIcon">@drawable/issue_event_closed_dark</item>
         <item name="issueEventReopenedIcon">@drawable/issue_event_reopened_dark</item>
@@ -177,7 +176,6 @@
         <item name="pullRequestIcon">@drawable/pull_request</item>
         <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok</item>
         <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty</item>
-        <item name="pullRequestMergeUnstableIcon">@drawable/pull_request_merge_unstable</item>
         <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown</item>
         <item name="issueEventClosedIcon">@drawable/issue_event_closed</item>
         <item name="issueEventReopenedIcon">@drawable/issue_event_reopened</item>
