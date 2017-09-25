@@ -112,6 +112,7 @@ public class NotificationsJob extends Job {
 
     private void showSingleNotification(NotificationManagerCompat notificationManager,
             int accentColor, Notification notification, int index) {
+        int id = NOTIFICATION_ID_BASE + 1 + index;
         Repository repository = notification.getRepository();
         User owner = repository.getOwner();
         String title = owner.getLogin() + "/" + repository.getName();
@@ -121,8 +122,8 @@ public class NotificationsJob extends Job {
 
         Intent markReadIntent = BrowseFilter.makeMarkNotificationAsReadActionIntent(getContext(),
                 notification.getId());
-        PendingIntent markReadPendingIntent = PendingIntent.getActivity(getContext(), 0,
-                markReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent markReadPendingIntent = PendingIntent.getActivity(getContext(), id,
+                markReadIntent, 0);
         NotificationCompat.Action markReadAction = new NotificationCompat.Action(
                 R.drawable.mark_read, getContext().getString(R.string.mark_as_read),
                 markReadPendingIntent);
@@ -151,7 +152,7 @@ public class NotificationsJob extends Job {
             builder.setContentIntent(pendingIntent);
         }
 
-        notificationManager.notify(NOTIFICATION_ID_BASE + 1 + index, builder.build());
+        notificationManager.notify(id, builder.build());
     }
 
     private void showSummaryNotification(NotificationManagerCompat notificationManager,
