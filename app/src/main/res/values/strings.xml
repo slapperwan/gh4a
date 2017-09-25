@@ -518,4 +518,10 @@
     <string name="wiki_print_document_title">Wiki page %1$s in %2$s/%3$s</string>
 
     <string name="repository_owner_avatar">Repository owner avatar</string>
+    <string name="collaborator">Collaborator</string>
+    <string name="contributor">Contributor</string>
+    <string name="first_time_contributor">First-time contributor</string>
+    <string name="first_timer">First-timer</string>
+    <string name="member">Member</string>
+    <string name="owner">Owner</string>
 </resources>

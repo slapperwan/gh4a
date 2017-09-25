@@ -23,6 +23,14 @@ public class Comment implements Serializable {
 	/** serialVersionUID */
 	private static final long serialVersionUID = 5128896032791651031L;
 
+	public static final String ASSOCIATION_COLLABORATOR = "COLLABORATOR";
+	public static final String ASSOCIATION_CONTRIBUTOR = "CONTRIBUTOR";
+	public static final String ASSOCIATION_FIRST_TIMER = "FIRST_TIMER";
+	public static final String ASSOCIATION_FIRST_TIME_CONTRIBUTOR = "FIRST_TIME_CONTRIBUTOR";
+	public static final String ASSOCIATION_MEMBER = "MEMBER";
+	public static final String ASSOCIATION_NONE = "NONE";
+	public static final String ASSOCIATION_OWNER = "OWNER";
+
 	private Date createdAt;
 
 	private Date updatedAt;
@@ -42,6 +50,8 @@ public class Comment implements Serializable {
 	private User user;
 
 	private Reactions reactions;
+
+	private String authorAssociation;
 
 	/**
 	 * @return createdAt
@@ -193,6 +203,15 @@ public class Comment implements Serializable {
 
 	public Comment setReactions(Reactions reactions) {
 		this.reactions = reactions;
+		return this;
+	}
+
+	public String getAuthorAssociation() {
+		return authorAssociation;
+	}
+
+	public Comment setAuthorAssociation(String authorAssociation) {
+		this.authorAssociation = authorAssociation;
 		return this;
 	}
 
