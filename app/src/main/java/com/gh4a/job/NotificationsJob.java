@@ -151,7 +151,7 @@ public class NotificationsJob extends Job {
             builder.setContentIntent(pendingIntent);
         }
 
-        notificationManager.notify(NOTIFICATION_ID_BASE + index, builder.build());
+        notificationManager.notify(NOTIFICATION_ID_BASE + 1 + index, builder.build());
     }
 
     private void showSummaryNotification(NotificationManagerCompat notificationManager,
