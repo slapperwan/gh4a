@@ -3,7 +3,10 @@ package com.gh4a.adapter.timeline;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.text.SpannableString;
+import android.support.annotation.Nullable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +27,7 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
 
+import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Reaction;
 import org.eclipse.egit.github.core.Reactions;
 import org.eclipse.egit.github.core.User;
@@ -133,8 +137,18 @@ class CommentViewHolder
 
         // Extra view
         String login = ApiHelpers.getUserLogin(mContext, item.comment.getUser());
-        SpannableString userName = new SpannableString(login);
+        SpannableStringBuilder userName = new SpannableStringBuilder(login);
         userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
+
+        String association = getAuthorAssociation(item);
+        if (association != null) {
+            int start = userName.length();
+            userName.append(" (").append(association).append(")");
+            userName.setSpan(new RelativeSizeSpan(0.85f), start, userName.length(), 0);
+            int color = UiUtils.resolveColor(mContext, android.R.attr.textColorSecondary);
+            userName.setSpan(new ForegroundColorSpan(color), start, userName.length(), 0);
+        }
+
         tvExtra.setText(userName);
 
         if (mCallback.canQuote()) {
@@ -157,6 +171,30 @@ class CommentViewHolder
         menu.findItem(R.id.delete).setVisible(canEdit);
         menu.findItem(R.id.view_in_file).setVisible(item.file != null
                 && item.getCommitComment() != null && item.getCommitComment().getPosition() != -1);
+    }
+
+    @Nullable
+    private String getAuthorAssociation(TimelineItem.TimelineComment item) {
+        String authorAssociation = item.comment.getAuthorAssociation();
+        if (authorAssociation == null) {
+            return null;
+        }
+        switch (authorAssociation) {
+            case Comment.ASSOCIATION_COLLABORATOR:
+                return mContext.getString(R.string.collaborator);
+            case Comment.ASSOCIATION_CONTRIBUTOR:
+                return mContext.getString(R.string.contributor);
+            case Comment.ASSOCIATION_FIRST_TIME_CONTRIBUTOR:
+                return mContext.getString(R.string.first_time_contributor);
+            case Comment.ASSOCIATION_FIRST_TIMER:
+                return mContext.getString(R.string.first_timer);
+            case Comment.ASSOCIATION_MEMBER:
+                return mContext.getString(R.string.member);
+            case Comment.ASSOCIATION_OWNER:
+                return mContext.getString(R.string.owner);
+            default:
+                return null;
+        }
     }
 
     @Override
