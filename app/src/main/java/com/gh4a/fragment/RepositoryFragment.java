@@ -302,30 +302,26 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         String name = mRepository.getName();
         Intent intent = null;
 
-        Context c = getActivity();
-        switch (id) {
-            case R.id.cell_pull_requests:
-                intent = IssueListActivity.makeIntent(c, owner, name, true); break;
-            case R.id.tv_contributors_label:
-                intent = ContributorListActivity.makeIntent(c, owner, name); break;
-            case R.id.tv_collaborators_label:
-                intent = CollaboratorListActivity.makeIntent(c, owner, name); break;
-            case R.id.cell_issues:
-                intent = IssueListActivity.makeIntent(c, owner, name); break;
-            case R.id.cell_stargazers:
-                intent = WatcherListActivity.makeIntent(c, owner, name); break;
-            case R.id.cell_forks:
-                intent = ForkListActivity.makeIntent(c, owner, name); break;
-            case R.id.tv_wiki_label:
-                intent = WikiListActivity.makeIntent(c, owner, name, null); break;
-            case R.id.tv_downloads_label:
-                intent = DownloadsActivity.makeIntent(c, owner, name); break;
-            case R.id.tv_releases_label:
-                intent = ReleaseListActivity.makeIntent(c, owner, name); break;
-            default:
-                if (view.getTag() instanceof Repository)
-                    intent = RepositoryActivity.makeIntent(c, (Repository) view.getTag());
-                break;
+        if (id == R.id.cell_pull_requests) {
+            intent = IssueListActivity.makeIntent(getActivity(), owner, name, true);
+        } else if (id == R.id.tv_contributors_label) {
+            intent = ContributorListActivity.makeIntent(getActivity(), owner, name);
+        } else if (id == R.id.tv_collaborators_label) {
+            intent = CollaboratorListActivity.makeIntent(getActivity(), owner, name);
+        } else if (id == R.id.cell_issues) {
+            intent = IssueListActivity.makeIntent(getActivity(), owner, name);
+        } else if (id == R.id.cell_stargazers) {
+            intent = WatcherListActivity.makeIntent(getActivity(), owner, name);
+        } else if (id == R.id.cell_forks) {
+            intent = ForkListActivity.makeIntent(getActivity(), owner, name);
+        } else if (id == R.id.tv_wiki_label) {
+            intent = WikiListActivity.makeIntent(getActivity(), owner, name, null);
+        } else if (id == R.id.tv_downloads_label) {
+            intent = DownloadsActivity.makeIntent(getActivity(), owner, name);
+        } else if (id == R.id.tv_releases_label) {
+            intent = ReleaseListActivity.makeIntent(getActivity(), owner, name);
+        } else if (view.getTag() instanceof Repository) {
+            intent = RepositoryActivity.makeIntent(getActivity(), (Repository) view.getTag());
         }
 
         if (intent != null) {
