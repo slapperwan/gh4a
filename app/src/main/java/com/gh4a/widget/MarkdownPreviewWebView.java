@@ -3,7 +3,7 @@ package com.gh4a.widget;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.NestedScrollingChild;
+import android.support.v4.view.NestedScrollingChild2;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ViewCompat;
 import android.text.Editable;
@@ -20,7 +20,7 @@ import com.gh4a.activities.WebViewerActivity;
 
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
-public class MarkdownPreviewWebView extends WebView implements NestedScrollingChild {
+public class MarkdownPreviewWebView extends WebView implements NestedScrollingChild2 {
     private NestedScrollingChildHelper mChildHelper;
     private final int[] mScrollOffset = new int[2];
     private final int[] mScrollConsumed = new int[2];
@@ -84,12 +84,13 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
         switch (action) {
             case MotionEvent.ACTION_DOWN:
                 mLastY = eventY;
-                startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL);
+                startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL, ViewCompat.TYPE_TOUCH);
                 result = super.onTouchEvent(event);
                 break;
             case MotionEvent.ACTION_MOVE:
                 int deltaY = mLastY - eventY;
-                if (dispatchNestedPreScroll(0, deltaY, mScrollConsumed, mScrollOffset)) {
+                if (dispatchNestedPreScroll(0, deltaY, mScrollConsumed,
+                        mScrollOffset, ViewCompat.TYPE_TOUCH)) {
                     deltaY -= mScrollConsumed[1];
                     mLastY = eventY - mScrollOffset[1];
                     event.offsetLocation(0, -mScrollOffset[1]);
@@ -98,14 +99,15 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
 
                 result = super.onTouchEvent(event);
 
-                if (dispatchNestedScroll(0, mScrollOffset[1], 0, deltaY, mScrollOffset)) {
+                if (dispatchNestedScroll(0, mScrollOffset[1], 0, deltaY,
+                        mScrollOffset, ViewCompat.TYPE_TOUCH)) {
                     event.offsetLocation(0, mScrollOffset[1]);
                     mNestedOffsetY += mScrollOffset[1];
                     mLastY -= mScrollOffset[1];
                 }
                 break;
             default:
-                stopNestedScroll();
+                stopNestedScroll(ViewCompat.TYPE_TOUCH);
                 result = super.onTouchEvent(event);
                 break;
         }
@@ -124,30 +126,31 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
     }
 
     @Override
-    public boolean startNestedScroll(int axes) {
-        return mChildHelper.startNestedScroll(axes);
+    public boolean startNestedScroll(int axes, int type) {
+        return mChildHelper.startNestedScroll(axes, type);
     }
 
     @Override
-    public void stopNestedScroll() {
-        mChildHelper.stopNestedScroll();
+    public void stopNestedScroll(int type) {
+        mChildHelper.stopNestedScroll(type);
     }
 
     @Override
-    public boolean hasNestedScrollingParent() {
-        return mChildHelper.hasNestedScrollingParent();
+    public boolean hasNestedScrollingParent(int type) {
+        return mChildHelper.hasNestedScrollingParent(type);
     }
 
     @Override
     public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed,
-            int dxUnconsumed, int dyUnconsumed,  int[] offsetInWindow) {
+            int dxUnconsumed, int dyUnconsumed,  int[] offsetInWindow, int type) {
         return mChildHelper.dispatchNestedScroll(dxConsumed, dyConsumed,
-                dxUnconsumed, dyUnconsumed, offsetInWindow);
+                dxUnconsumed, dyUnconsumed, offsetInWindow, type);
     }
 
     @Override
-    public boolean dispatchNestedPreScroll(int dx, int dy, int[] consumed, int[] offsetInWindow) {
-        return mChildHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow);
+    public boolean dispatchNestedPreScroll(int dx, int dy, int[] consumed,
+            int[] offsetInWindow, int type) {
+        return mChildHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow, type);
     }
 
     @Override
