@@ -59,6 +59,7 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
 
         mFastScroller = view.findViewById(R.id.fast_scroller);
         mFastScroller.attachRecyclerView(mRecyclerView);
+        mFastScroller.setVisibility(View.VISIBLE);
         mFastScroller.setOnHandleTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

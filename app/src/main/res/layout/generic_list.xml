@@ -15,6 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="right"
+        android:visibility="gone"
         app:rfs_barColor="@android:color/transparent"
         app:rfs_handleNormalColor="?colorScrollbarThumb"
         app:rfs_handlePressedColor="?colorPrimary" />
