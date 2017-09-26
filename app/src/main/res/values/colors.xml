@@ -56,4 +56,6 @@
     <color name="diff_remove_line_number_dark">#581616</color>
     <color name="diff_default_background">#14aaaaaa</color>
     <color name="diff_default_line_number_background">#30aaaaaa</color>
+
+    <color name="octodroid">#97C03E</color>
 </resources>
