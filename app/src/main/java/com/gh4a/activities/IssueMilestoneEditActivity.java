@@ -26,7 +26,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.PagerAdapter;
@@ -43,13 +42,13 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 import com.gh4a.widget.MarkdownButtonsBar;
 import com.gh4a.widget.MarkdownPreviewWebView;
 
@@ -88,6 +87,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
     private Milestone mMilestone;
 
     private View mRootView;
+    private IssueStateTrackingFloatingActionButton mSaveFab;
     private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
     private MarkdownButtonsBar mMarkdownButtons;
@@ -123,10 +123,10 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         preview.setEditText(mDescriptionView);
 
         CoordinatorLayout rootLayout = getRootLayout();
-        FloatingActionButton fab = (FloatingActionButton)
+        mSaveFab = (IssueStateTrackingFloatingActionButton)
                 getLayoutInflater().inflate(R.layout.accept_fab, rootLayout, false);
-        fab.setOnClickListener(this);
-        rootLayout.addView(fab);
+        mSaveFab.setOnClickListener(this);
+        rootLayout.addView(mSaveFab);
 
         findViewById(R.id.due_container).setOnClickListener(this);
 
@@ -142,7 +142,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             mMilestone.setState(ApiHelpers.IssueState.OPEN);
         }
 
-        mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, fab));
+        mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, mSaveFab));
         mTitleView.addTextChangedListener(new UiUtils.EmptinessWatchingTextWatcher(mTitleView) {
             @Override
             public void onIsEmpty(boolean isEmpty) {
@@ -156,6 +156,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
 
         mTitleView.setText(mMilestone.getTitle());
         mDescriptionView.setText(mMilestone.getDescription());
+        updateHighlightColor();
         updateLabels();
         setToolbarScrollable(false);
         adjustTabsForHeaderAlignedFab(true);
@@ -213,7 +214,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         if (view.getId() == R.id.due_container) {
             DialogFragment newFragment = new DatePickerFragment();
             newFragment.show(getSupportFragmentManager(), "datePicker");
-        } else if (view instanceof FloatingActionButton) {
+        } else if (view == mSaveFab) {
             String title = mTitleView.getText().toString();
             String desc = mDescriptionView.getText() != null ?
                     mDescriptionView.getText().toString() : null;
@@ -282,6 +283,13 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    private void updateHighlightColor() {
+        boolean closed = ApiHelpers.IssueState.CLOSED.equals(mMilestone.getState());
+        transitionHeaderToColor(closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
+                closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
+        mSaveFab.setState(mMilestone.getState());
     }
 
     private void setDueOn(int year, int month, int day) {
@@ -414,6 +422,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
 
         @Override
         protected void onSuccess(Void result) {
+            updateHighlightColor();
             supportInvalidateOptionsMenu();
             setResult(RESULT_OK);
         }
