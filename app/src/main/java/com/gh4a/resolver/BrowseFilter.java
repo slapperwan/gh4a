@@ -78,6 +78,9 @@ public class BrowseFilter extends AppCompatActivity {
 
     private boolean handleAction() {
         Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            return false;
+        }
         int action = extras.getInt(EXTRA_ACTION, -1);
         switch (action) {
             case ACTION_MARK_READ:
