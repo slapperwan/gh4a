@@ -77,7 +77,11 @@ public class RepositoryListContainerFragment extends Fragment implements
         Bundle data = getArguments();
         mUserLogin = data.getString("user");
         mIsOrg = data.getBoolean("is_org");
-        mFilterType = data.getString("filter_type", "all");
+
+        // Only read filter type from arguments if it wasn't overridden already by our parent
+        if (mFilterType == null) {
+            mFilterType = data.getString("filter_type", "all");
+        }
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_FILTER_TYPE)) {
             mFilterType = savedInstanceState.getString(STATE_KEY_FILTER_TYPE);
