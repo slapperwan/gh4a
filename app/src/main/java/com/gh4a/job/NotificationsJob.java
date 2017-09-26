@@ -19,6 +19,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
@@ -31,7 +32,6 @@ import com.gh4a.loader.NotificationListLoader;
 import com.gh4a.resolver.BrowseFilter;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.UiUtils;
 
 import org.eclipse.egit.github.core.Notification;
 import org.eclipse.egit.github.core.Repository;
@@ -108,11 +108,11 @@ public class NotificationsJob extends Job {
                     notificationManager.cancel(NOTIFICATION_ID_BASE + 1 + i);
                 }
 
-                int accentColor = UiUtils.resolveColor(getContext(), R.attr.colorAccent);
+                int color = ContextCompat.getColor(getContext(), R.color.octodroid);
 
-                showSummaryNotification(notificationManager, notifications, accentColor, lastCheck);
+                showSummaryNotification(notificationManager, notifications, color, lastCheck);
                 for (int i = 0; i < notifications.size(); i++) {
-                    showSingleNotification(notificationManager, accentColor,
+                    showSingleNotification(notificationManager, color,
                             notifications.get(i).notification, i, lastCheck);
                 }
             }
@@ -130,7 +130,7 @@ public class NotificationsJob extends Job {
     }
 
     private void showSingleNotification(NotificationManagerCompat notificationManager,
-            int accentColor, Notification notification, int index, long lastCheck) {
+            int color, Notification notification, int index, long lastCheck) {
         int id = NOTIFICATION_ID_BASE + 1 + index;
         Repository repository = notification.getRepository();
         User owner = repository.getOwner();
@@ -147,14 +147,14 @@ public class NotificationsJob extends Job {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(),
                 CHANNEL_GITHUB_NOTIFICATIONS)
-                .setSmallIcon(R.drawable.octodroid)
+                .setSmallIcon(R.drawable.octodroid_bg)
                 .setLargeIcon(loadRoundUserAvatar(owner))
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
                 .setWhen(when)
                 .setShowWhen(true)
                 .setLocalOnly(when <= lastCheck)
-                .setColor(accentColor)
+                .setColor(color)
                 .setContentTitle(title)
                 .setAutoCancel(true)
                 .addAction(markReadAction)
@@ -175,7 +175,7 @@ public class NotificationsJob extends Job {
     }
 
     private void showSummaryNotification(NotificationManagerCompat notificationManager,
-            List<NotificationHolder> notifications, int accentColor, long lastCheck) {
+            List<NotificationHolder> notifications, int color, long lastCheck) {
         String title = getContext().getString(R.string.unread_notifications_summary_title);
         String text = getContext().getResources()
                 .getQuantityString(R.plurals.unread_notifications_summary_text,
@@ -184,11 +184,11 @@ public class NotificationsJob extends Job {
                 HomeActivity.makeIntent(getContext(), R.id.notifications), 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 getContext(), CHANNEL_GITHUB_NOTIFICATIONS)
-                .setSmallIcon(R.drawable.octodroid)
+                .setSmallIcon(R.drawable.octodroid_bg)
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupSummary(true)
                 .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-                .setColor(accentColor)
+                .setColor(color)
                 .setContentIntent(contentIntent)
                 .setContentTitle(title)
                 .setContentText(text)
