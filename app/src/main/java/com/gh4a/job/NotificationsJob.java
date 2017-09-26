@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -24,6 +25,7 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.gh4a.R;
 import com.gh4a.activities.home.HomeActivity;
+import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoader;
 import com.gh4a.resolver.BrowseFilter;
@@ -90,19 +92,36 @@ public class NotificationsJob extends Job {
                 }
             }
 
+            SharedPreferences prefs = getContext().getSharedPreferences(SettingsFragment.PREF_NAME,
+                    Context.MODE_PRIVATE);
+            long lastCheck = prefs.getLong(SettingsFragment.KEY_LAST_NOTIFICATION_CHECK, 0);
+            int lastCount = prefs.getInt(SettingsFragment.KEY_LAST_NOTIFICATION_COUNT, 0);
+
             NotificationManagerCompat notificationManager =
                     NotificationManagerCompat.from(getContext());
-            notificationManager.cancelAll();
 
-            if (!notifications.isEmpty()) {
+            if (notifications.isEmpty()) {
+                notificationManager.cancelAll();
+            } else {
+                for (int i = 0; i < lastCount; i++) {
+                    // Do not cancel summary notification
+                    notificationManager.cancel(NOTIFICATION_ID_BASE + 1 + i);
+                }
+
                 int accentColor = UiUtils.resolveColor(getContext(), R.attr.colorAccent);
 
-                showSummaryNotification(notificationManager, notifications, accentColor);
+                showSummaryNotification(notificationManager, notifications, accentColor, lastCheck);
                 for (int i = 0; i < notifications.size(); i++) {
-                    showSingleNotification(notificationManager,
-                            accentColor, notifications.get(i).notification, i);
+                    showSingleNotification(notificationManager, accentColor,
+                            notifications.get(i).notification, i, lastCheck);
                 }
             }
+
+            prefs.edit()
+                    .putLong(SettingsFragment.KEY_LAST_NOTIFICATION_CHECK,
+                            System.currentTimeMillis())
+                    .putInt(SettingsFragment.KEY_LAST_NOTIFICATION_COUNT, notifications.size())
+                    .apply();
         } catch (IOException e) {
             return Result.FAILURE;
         }
@@ -111,14 +130,12 @@ public class NotificationsJob extends Job {
     }
 
     private void showSingleNotification(NotificationManagerCompat notificationManager,
-            int accentColor, Notification notification, int index) {
+            int accentColor, Notification notification, int index, long lastCheck) {
         int id = NOTIFICATION_ID_BASE + 1 + index;
         Repository repository = notification.getRepository();
         User owner = repository.getOwner();
         String title = owner.getLogin() + "/" + repository.getName();
-        long when = notification.getUpdatedAt() != null
-                ? notification.getUpdatedAt().getTime()
-                : System.currentTimeMillis();
+        long when = notification.getUpdatedAt().getTime();
 
         Intent markReadIntent = BrowseFilter.makeMarkNotificationAsReadActionIntent(getContext(),
                 notification.getId());
@@ -133,8 +150,10 @@ public class NotificationsJob extends Job {
                 .setSmallIcon(R.drawable.octodroid)
                 .setLargeIcon(loadRoundUserAvatar(owner))
                 .setGroup(GROUP_ID_GITHUB)
+                .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
                 .setWhen(when)
                 .setShowWhen(true)
+                .setLocalOnly(when <= lastCheck)
                 .setColor(accentColor)
                 .setContentTitle(title)
                 .setAutoCancel(true)
@@ -156,7 +175,7 @@ public class NotificationsJob extends Job {
     }
 
     private void showSummaryNotification(NotificationManagerCompat notificationManager,
-            List<NotificationHolder> notifications, int accentColor) {
+            List<NotificationHolder> notifications, int accentColor, long lastCheck) {
         String title = getContext().getString(R.string.unread_notifications_summary_title);
         String text = getContext().getResources()
                 .getQuantityString(R.plurals.unread_notifications_summary_text,
@@ -168,6 +187,7 @@ public class NotificationsJob extends Job {
                 .setSmallIcon(R.drawable.octodroid)
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupSummary(true)
+                .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
                 .setColor(accentColor)
                 .setContentIntent(contentIntent)
                 .setContentTitle(title)
@@ -175,13 +195,23 @@ public class NotificationsJob extends Job {
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setNumber(notifications.size());
 
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle(builder);
+        boolean hasNewNotification = false;
+        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle(builder)
+                .setBigContentTitle(title)
+                .setSummaryText(text);
         for (NotificationHolder notification : notifications) {
             inboxStyle.addLine(notification.notification.getSubject().getTitle());
-            inboxStyle.setBigContentTitle(title);
-            inboxStyle.setSummaryText(text);
+
+            if (notification.notification.getUpdatedAt().getTime() > lastCheck) {
+                hasNewNotification = true;
+            }
         }
         builder.setStyle(inboxStyle);
+
+        if (!hasNewNotification) {
+            builder.setOnlyAlertOnce(true);
+            builder.setLocalOnly(true);
+        }
 
         notificationManager.notify(NOTIFICATION_ID_BASE, builder.build());
     }
