@@ -18,12 +18,9 @@ package com.gh4a.fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
 import android.support.annotation.AttrRes;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
-import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,7 +35,6 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
-import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.loader.CommitStatusLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -47,10 +43,8 @@ import com.gh4a.loader.ReferenceLoader;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.IntentSpan;
-import com.gh4a.widget.StyleableTextView;
+import com.gh4a.widget.PullRequestBranchInfoView;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.CommitComment;
@@ -190,15 +184,9 @@ public class PullRequestFragment extends IssueFragmentBase {
             return;
         }
 
-        View branchGroup = headerView.findViewById(R.id.pr_container);
-        branchGroup.setVisibility(View.VISIBLE);
-
-        StyleableTextView fromBranch = branchGroup.findViewById(R.id.tv_pr_from);
-        formatMarkerText(fromBranch, R.string.pull_request_from, mPullRequest.getHead(),
-                mHeadReference != null);
-
-        StyleableTextView toBranch = branchGroup.findViewById(R.id.tv_pr_to);
-        formatMarkerText(toBranch, R.string.pull_request_to, mPullRequest.getBase(), true);
+        PullRequestBranchInfoView branchContainer = headerView.findViewById(R.id.branch_container);
+        branchContainer.bind(mPullRequest.getHead(), mPullRequest.getBase(), mHeadReference);
+        branchContainer.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -210,29 +198,6 @@ public class PullRequestFragment extends IssueFragmentBase {
         } else {
             setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
         }
-    }
-
-    private void formatMarkerText(StyleableTextView view, @StringRes int formatResId,
-            final PullRequestMarker marker, boolean makeClickable) {
-        SpannableStringBuilder builder = StringUtils.applyBoldTags(getString(formatResId),
-                view.getTypefaceValue());
-        int pos = builder.toString().indexOf("[ref]");
-        if (pos >= 0) {
-            String label = TextUtils.isEmpty(marker.getLabel()) ? marker.getRef() : marker.getLabel();
-            final Repository repo = marker.getRepo();
-            builder.replace(pos, pos + 5, label);
-            if (repo != null && makeClickable) {
-                builder.setSpan(new IntentSpan(getActivity()) {
-                    @Override
-                    protected Intent getIntent() {
-                        return RepositoryActivity.makeIntent(getActivity(), repo, marker.getRef());
-                    }
-                }, pos, pos + label.length(), 0);
-            }
-        }
-
-        view.setText(builder);
-        view.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
     }
 
     private void loadStatusIfOpen() {
