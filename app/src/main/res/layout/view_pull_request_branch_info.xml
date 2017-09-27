@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pr_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:parentTag="RelativeLayout"
+    tools:visibility="visible">
+
+    <ImageView
+        android:id="@+id/iv_pr"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginRight="10dp"
+        android:src="?attr/pullRequestIcon" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_pr_from"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_pr"
+        android:background="?selectableItemBackground"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        tools:text="From branch" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_pr_to"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_pr_from"
+        android:layout_toRightOf="@id/iv_pr"
+        android:background="?selectableItemBackground"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        tools:text="Into branch" />
+
+</merge>
