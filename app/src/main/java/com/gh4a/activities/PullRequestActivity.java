@@ -104,8 +104,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private PullRequest mPullRequest;
     private PullRequestFragment mPullRequestFragment;
     private IssueStateTrackingFloatingActionButton mEditFab;
-    private Reference mHeadReference;
-    private boolean mHasLoadedHeadReference;
 
     private ViewGroup mHeader;
     private int[] mHeaderColorAttrs;
@@ -142,7 +140,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             fillHeader();
             showContentIfReady();
             supportInvalidateOptionsMenu();
-            getSupportLoaderManager().initLoader(3, null, mHeadReferenceCallback);
         }
     };
 
@@ -171,21 +168,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             mIsCollaborator = result;
             showContentIfReady();
             supportInvalidateOptionsMenu();
-        }
-    };
-
-    private final LoaderCallbacks<Reference> mHeadReferenceCallback = new LoaderCallbacks<Reference>(this) {
-        @Override
-        protected Loader<LoaderResult<Reference>> onCreateLoader() {
-            return new ReferenceLoader(PullRequestActivity.this, mPullRequest);
-        }
-
-        @Override
-        protected void onResultReady(Reference result) {
-            mHeadReference = result;
-            mHasLoadedHeadReference = true;
-            supportInvalidateOptionsMenu();
-            getSupportLoaderManager().destroyLoader(3);
         }
     };
 
@@ -255,16 +237,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             menu.removeItem(R.id.copy_number);
         }
 
-        if (mPullRequest == null || mPullRequest.getHead().getRepo() == null) {
-            menu.removeItem(R.id.delete_branch);
-        } else {
-            MenuItem deleteBranchItem = menu.findItem(R.id.delete_branch);
-            deleteBranchItem.setVisible(mHasLoadedHeadReference);
-            if (mHeadReference == null) {
-                deleteBranchItem.setTitle(R.string.restore_branch);
-            }
-        }
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -290,9 +262,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 IntentUtils.copyToClipboard(this, "Pull Request #" + mPullRequest.getNumber(),
                         String.valueOf(mPullRequest.getNumber()));
                 return true;
-            case R.id.delete_branch:
-                showDeleteRestoreBranchConfirmDialog(mHeadReference == null);
-                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -326,8 +295,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         mIssue = null;
         mPullRequest = null;
         mIsCollaborator = null;
-        mHeadReference = null;
-        mHasLoadedHeadReference = false;
         setContentShown(false);
         if (mEditFab != null) {
             mEditFab.post(new Runnable() {
@@ -339,7 +306,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
         mHeader.setVisibility(View.GONE);
         mHeaderColorAttrs = null;
-        forceLoaderReload(0, 1, 2, 3);
+        forceLoaderReload(0, 1, 2);
         invalidateTabs();
         super.onRefresh();
     }
@@ -442,26 +409,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         new PullRequestOpenCloseTask(reopen).schedule();
-                    }
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
-
-    private void showDeleteRestoreBranchConfirmDialog(final boolean restore) {
-        int message = restore ? R.string.restore_branch_question : R.string.delete_branch_question;
-        int buttonText = restore ? R.string.restore : R.string.delete;
-        new AlertDialog.Builder(this)
-                .setMessage(message)
-                .setIconAttribute(android.R.attr.alertDialogIcon)
-                .setPositiveButton(buttonText, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (restore) {
-                            new RestoreBranchTask().schedule();
-                        } else {
-                            new DeleteBranchTask().schedule();
-                        }
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -587,89 +534,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         updateFabVisibility();
         transitionHeaderToColor(mHeaderColorAttrs[0], mHeaderColorAttrs[1]);
         supportInvalidateOptionsMenu();
-    }
-
-    private class RestoreBranchTask extends ProgressDialogTask<Reference> {
-        public RestoreBranchTask() {
-            super(getBaseActivity(), R.string.saving_msg);
-        }
-
-        @Override
-        protected ProgressDialogTask<Reference> clone() {
-            return new RestoreBranchTask();
-        }
-
-        @Override
-        protected Reference run() throws Exception {
-            DataService dataService =
-                    (DataService) Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
-
-            PullRequestMarker head = mPullRequest.getHead();
-            if (head.getRepo() == null) {
-                return null;
-            }
-            String owner = head.getRepo().getOwner().getLogin();
-            String repo = head.getRepo().getName();
-            RepositoryId repoId = new RepositoryId(owner, repo);
-
-            Reference reference = new Reference();
-            reference.setRef("refs/heads/" + head.getRef());
-            TypedResource object = new TypedResource();
-            object.setSha(head.getSha());
-            reference.setObject(object);
-
-            return dataService.createReference(repoId, reference);
-        }
-
-        @Override
-        protected void onSuccess(Reference result) {
-            mHeadReference = result;
-            handlePullRequestUpdate();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getString(R.string.restore_branch_error);
-        }
-    }
-
-    private class DeleteBranchTask extends ProgressDialogTask<Void> {
-        public DeleteBranchTask() {
-            super(getBaseActivity(), R.string.deleting_msg);
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteBranchTask();
-        }
-
-        @Override
-        protected Void run() throws Exception {
-            DataService dataService =
-                    (DataService) Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
-
-            PullRequestMarker head = mPullRequest.getHead();
-            String owner = head.getRepo().getOwner().getLogin();
-            String repo = head.getRepo().getName();
-            RepositoryId repoId = new RepositoryId(owner, repo);
-
-            Reference reference = new Reference();
-            reference.setRef("heads/" + head.getRef());
-
-            dataService.deleteReference(repoId, reference);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            mHeadReference = null;
-            handlePullRequestUpdate();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getString(R.string.delete_branch_error);
-        }
     }
 
     private class PullRequestOpenCloseTask extends ProgressDialogTask<PullRequest> {

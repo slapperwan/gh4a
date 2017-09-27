@@ -31,8 +31,4 @@
         android:title="@string/copy_number"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/delete_branch"
-        android:title="@string/delete_branch"
-        app:showAsAction="never" />
 </menu>
