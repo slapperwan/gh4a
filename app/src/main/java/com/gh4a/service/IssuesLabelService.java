@@ -2,14 +2,16 @@ package com.gh4a.service;
 
 import android.app.Activity;
 import android.view.View;
+
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.rx.RxTools;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.LabelService;
-import java.net.URLEncoder;
 import io.reactivex.Observable;
+
+import java.net.URLEncoder;
 
 public class IssuesLabelService {
     public static final int DELETE_ISSUE_LABEL = 0;

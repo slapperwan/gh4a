@@ -18,7 +18,14 @@ import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
 import com.philosophicalhacker.lib.RxLoader;
 
+import java.util.concurrent.Callable;
+
 public class RxTools {
+    public static Observable runCallable(Callable call, Activity activity, int loaderId, boolean refresh) {
+        return Observable.fromCallable(call)
+                .compose(RxTools.handle(activity, loaderId, refresh));
+    }
+
     public static <T> ObservableTransformer<T, T> handle(Activity activity, int id) {
         return observable -> {
             final RxLoader rxLoader = new RxLoader(activity, ((AppCompatActivity)activity).getSupportLoaderManager());

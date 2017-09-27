@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -38,13 +39,13 @@ import com.gh4a.loader.TagListLoader;
 import com.gh4a.service.RepositoryService;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
+import io.reactivex.functions.Consumer;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.RepositoryTag;
+
 import java.util.ArrayList;
 import java.util.List;
-import io.reactivex.Observable;
-import io.reactivex.functions.Consumer;
 
 public class RepositoryActivity extends BasePagerActivity {
     public static Intent makeIntent(Context context, Repository repo) {
@@ -125,12 +126,10 @@ public class RepositoryActivity extends BasePagerActivity {
     private ContentListContainerFragment mContentListFragment;
     private CommitListFragment mCommitListFragment;
     private RepositoryEventListFragment mActivityFragment;
-    private Gh4Application mApp;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mApp = (Gh4Application) getApplicationContext();
 
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
@@ -142,27 +141,9 @@ public class RepositoryActivity extends BasePagerActivity {
         loadRepository(false);
 
         if (Gh4Application.get().isAuthorized()) {
-            isWatching(false);
-            isStarring(false);
+            loadWatchingStatus(false);
+            loadStarringStatus(false);
         }
-    }
-
-    public void loadRepository(boolean refresh) {
-        Consumer subscriber = repository -> {
-            mRepository = (Repository) repository;
-            updateTitle();
-            invalidateTabs();
-            // Apply initial page selection first time the repo is loaded
-            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
-                getPager().setCurrentItem(mInitialPage);
-                mInitialPage = -1;
-            }
-            setContentShown(true);
-            supportInvalidateOptionsMenu();
-        };
-
-        RepositoryService.loadRepository(this, mRepoOwner, mRepoName, refresh)
-                .subscribe(subscriber, e -> {});
     }
 
     @Override
@@ -271,8 +252,8 @@ public class RepositoryActivity extends BasePagerActivity {
         loadRepository(true);
 
         if (Gh4Application.get().isAuthorized()) {
-            isWatching(true);
-            isStarring(true);
+            loadWatchingStatus(true);
+            loadStarringStatus(true);
         }
 
         super.onRefresh();
@@ -346,20 +327,38 @@ public class RepositoryActivity extends BasePagerActivity {
         return UserActivity.makeIntent(this, mRepoOwner);
     }
 
-    public void isWatching(boolean refresh) {
-        RepositoryService.isWatching(this, mRepoOwner, mRepoName, refresh)
+    private void loadWatchingStatus(boolean refresh) {
+        RepositoryService.loadWatchingStatus(this, mRepoOwner, mRepoName, refresh)
                 .subscribe(result -> {
                     mIsWatching = (Boolean) result;
                     supportInvalidateOptionsMenu();
-                }, e -> {});
+                }, error -> {});
     }
 
-    public void isStarring(boolean refresh) {
-        RepositoryService.isStarring(this, mRepoOwner, mRepoName, refresh)
+    private void loadStarringStatus(boolean refresh) {
+        RepositoryService.loadStarringStatus(this, mRepoOwner, mRepoName, refresh)
                 .subscribe(result -> {
                     mIsStarring = (Boolean)result;
                     supportInvalidateOptionsMenu();
-                }, e -> {});
+                }, error -> {});
+    }
+
+    private void loadRepository(boolean refresh) {
+        Consumer subscriber = repository -> {
+            mRepository = (Repository) repository;
+            updateTitle();
+            invalidateTabs();
+            // Apply initial page selection first time the repo is loaded
+            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
+                getPager().setCurrentItem(mInitialPage);
+                mInitialPage = -1;
+            }
+            setContentShown(true);
+            supportInvalidateOptionsMenu();
+        };
+
+        RepositoryService.loadRepository(this, mRepoOwner, mRepoName, refresh)
+                .subscribe(subscriber, error -> {});
     }
 
     @Override
@@ -370,7 +369,7 @@ public class RepositoryActivity extends BasePagerActivity {
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
 
-                RepositoryService.updateWatch(this, mRepoOwner, mRepoName, mIsWatching)
+                RepositoryService.setWatchingStatus(this, mRepoOwner, mRepoName, mIsWatching)
                     .subscribe(o -> {
                         if (mIsWatching == null) {
                             // user refreshed while the action was in progress
@@ -378,13 +377,13 @@ public class RepositoryActivity extends BasePagerActivity {
                         }
                         mIsWatching = !mIsWatching;
                         supportInvalidateOptionsMenu();
-                    }, e -> {});
+                    }, error -> {});
                 return true;
             case R.id.star:
                 MenuItemCompat.setActionView(item, R.layout.ab_loading);
                 MenuItemCompat.expandActionView(item);
 
-                RepositoryService.updateStar(mApp, this, mRepoOwner, mRepoName, mIsStarring)
+                RepositoryService.setStarringStatus(this, mRepoOwner, mRepoName, mIsStarring)
                     .subscribe(result -> {
                         if (mIsStarring == null) {
                             // user refreshed while the action was in progress
@@ -395,7 +394,7 @@ public class RepositoryActivity extends BasePagerActivity {
                             mRepositoryFragment.updateStargazerCount(mIsStarring);
                         }
                         supportInvalidateOptionsMenu();
-                    }, e -> {});
+                    }, error -> {});
 
                 return true;
             case R.id.ref:

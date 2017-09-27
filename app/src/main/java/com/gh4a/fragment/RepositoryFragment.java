@@ -15,19 +15,17 @@
  */
 package com.gh4a.fragment;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.gh4a.Gh4Application;
+
 import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
@@ -62,7 +60,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         return f;
     }
 
-    private Gh4Application mApp;
     private Repository mRepository;
     private View mContentView;
     private String mRef;
@@ -71,7 +68,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mApp = (Gh4Application) getContext().getApplicationContext();
         mRepository = (Repository) getArguments().getSerializable("repo");
         mRef = getArguments().getString("ref");
     }
@@ -103,17 +99,15 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         reloadData();
     }
 
-    public void reloadData() {
+    private void reloadData() {
         setContentShown(false);
 
-        Log.d("TEST", "reloadData callleeeed");
         loadReadme(true);
         loadPullRequestsCount(true);
     }
 
     public void loadReadme(boolean refresh) {
         Consumer consumer = result -> { // Fill-in readme
-            Log.d("TEST-RE", "readme flatMap called");
             setContentShown(true);
             TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
             View progress = mContentView.findViewById(R.id.pb_readme);
@@ -132,14 +126,17 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             progress.setVisibility(View.GONE);
         };
 
-        RepositoryService.loadReadme(getActivity(), mRepository.getOwner().getLogin(),
-                mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef, refresh)
-                .subscribe(consumer, e -> {});
+        RepositoryService.loadReadme(
+            getActivity(),
+            mRepository.getOwner().getLogin(),
+            mRepository.getName(),
+            StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef,
+            refresh
+        ).subscribe(consumer, error -> {});
     }
 
-    public void loadPullRequestsCount(boolean refresh) {
+    private void loadPullRequestsCount(boolean refresh) {
         Consumer consumer = result -> {
-            Log.d("TEST", "getPullRequest onNext called: " + result);
             View v = getView();
             v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
             v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
@@ -151,8 +148,12 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             tvPullRequestsCountView.setText(String.valueOf(result));
         };
 
-        RepositoryService.loadPullRequestCount(getActivity(), mRepository, ApiHelpers.IssueState.OPEN, refresh)
-                .subscribe(consumer, e -> {});
+        RepositoryService.loadPullRequestCount(
+            getActivity(),
+            mRepository,
+            ApiHelpers.IssueState.OPEN,
+            refresh
+        ).subscribe(consumer, error -> {});
     }
 
     @Override
@@ -163,7 +164,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         fillData();
         setContentShown(true);
 
-        // Fetch Readme file + PullRequests Count
         loadReadme(false);
         loadPullRequestsCount(false);
     }

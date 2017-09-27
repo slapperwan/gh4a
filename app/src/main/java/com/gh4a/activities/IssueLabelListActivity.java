@@ -30,6 +30,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -42,6 +43,7 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import org.eclipse.egit.github.core.Label;
+
 import java.util.List;
 
 public class IssueLabelListActivity extends BaseActivity implements
@@ -247,11 +249,16 @@ public class IssueLabelListActivity extends BaseActivity implements
                         .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.getName()))
                         .setPositiveButton(R.string.delete, (dialog, whichButton) -> {
                             IssuesLabelService
-                                    .deleteIssueLabel(IssueLabelListActivity.this, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName())
-                                .subscribe(result -> {
+                                .deleteIssueLabel(
+                                    IssueLabelListActivity.this,
+                                    getRootLayout(),
+                                    mRepoOwner,
+                                    mRepoName,
+                                    mLabel.getName()
+                                ).subscribe(result -> {
                                     forceLoaderReload(0);
                                     setResult(RESULT_OK);
-                                }, e -> {});
+                                }, error -> {});
                         })
                         .setNegativeButton(R.string.cancel, null)
                         .show();
@@ -278,29 +285,40 @@ public class IssueLabelListActivity extends BaseActivity implements
             updateFabVisibility();
         }
 
-        public void addIssue() {
-            IssuesLabelService.addIssue(IssueLabelListActivity.this, getRootLayout(), mRepoOwner, mRepoName, mLabel.editedName, mLabel.editedColor)
-                .doOnError(error -> {
-                    mAdapter.remove(mAddedLabel);
-                    mAddedLabel = null;
-                })
-                .subscribe(result -> {
-                    forceLoaderReload(0);
-                    mAddedLabel = null;
-                    setResult(RESULT_OK);
-                }, e -> {});
+        private void addIssue() {
+            IssuesLabelService.addIssue(
+                IssueLabelListActivity.this,
+                getRootLayout(),
+                mRepoOwner,
+                mRepoName,
+                mLabel.editedName,
+                mLabel.editedColor
+            ).subscribe(result -> {
+                forceLoaderReload(0);
+                mAddedLabel = null;
+                setResult(RESULT_OK);
+            }, error -> {
+                mAdapter.remove(mAddedLabel);
+                mAddedLabel = null;
+            });
         }
 
-        public void editIssueLabel() {
-            IssuesLabelService.editIssueLabel(IssueLabelListActivity.this, getRootLayout(), mRepoOwner, mRepoName, mLabel.getName(), mLabel.editedName, mLabel.editedColor)
-                .doOnError(error -> {
-                    mAdapter.remove(mAddedLabel);
-                    mAddedLabel = null;
-                })
-                .subscribe(result -> {
-                    forceLoaderReload(0);
-                    setResult(RESULT_OK);
-                }, e -> {});
+        private void editIssueLabel() {
+            IssuesLabelService.editIssueLabel(
+                IssueLabelListActivity.this,
+                getRootLayout(),
+                mRepoOwner,
+                mRepoName,
+                mLabel.getName(),
+                mLabel.editedName,
+                mLabel.editedColor
+            ).subscribe(result -> {
+                forceLoaderReload(0);
+                setResult(RESULT_OK);
+            }, error -> {
+                mAdapter.remove(mAddedLabel);
+                mAddedLabel = null;
+            });
         }
     }
 }
