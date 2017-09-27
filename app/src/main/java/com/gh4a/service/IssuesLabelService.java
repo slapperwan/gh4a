@@ -1,8 +1,8 @@
 package com.gh4a.service;
 
-import android.app.Activity;
 import android.view.View;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.rx.RxTools;
@@ -18,7 +18,7 @@ public class IssuesLabelService {
     public static final int EDIT_ISSUE_LABEL = 1;
     public static final int ADD_ISSUE_LABEL = 2;
 
-    public static Observable deleteIssueLabel(Activity activity, View rootView, String repoOwner, String repoName, String labelName) {
+    public static Observable deleteIssueLabel(BaseActivity activity, View rootView, String repoOwner, String repoName, String labelName) {
         String errorMessage = activity.getString(R.string.issue_error_delete_label, labelName);
 
         return Observable.fromCallable(() -> {
@@ -30,7 +30,7 @@ public class IssuesLabelService {
         .compose(RxTools.onErrorSnackbar(activity, DELETE_ISSUE_LABEL, rootView, errorMessage, R.string.deleting_msg));
     }
 
-    public static Observable editIssueLabel(Activity activity, View rootLayout, String repoOwner, String repoName, String oldLabelName, String newLabelName, String color) {
+    public static Observable editIssueLabel(BaseActivity activity, View rootLayout, String repoOwner, String repoName, String oldLabelName, String newLabelName, String color) {
         String errorMessage = activity.getString(R.string.issue_error_edit_label, oldLabelName);
 
         return Observable.fromCallable(() -> {
@@ -48,7 +48,7 @@ public class IssuesLabelService {
         .compose(RxTools.onErrorSnackbar(activity, EDIT_ISSUE_LABEL, rootLayout, errorMessage, R.string.saving_msg));
     }
 
-    public static Observable addIssue(Activity activity, View rootView, String repoOwner, String repoName, String labelName, String color) {
+    public static Observable addIssue(BaseActivity activity, View rootView, String repoOwner, String repoName, String labelName, String color) {
         String errorMessage = activity.getString(R.string.issue_error_create_label, labelName);
 
         return Observable.fromCallable(() -> {

@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
@@ -127,7 +128,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         };
 
         RepositoryService.loadReadme(
-            getActivity(),
+            (BaseActivity) getActivity(),
             mRepository.getOwner().getLogin(),
             mRepository.getName(),
             StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef,
@@ -149,7 +150,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         };
 
         RepositoryService.loadPullRequestCount(
-            getActivity(),
+            (BaseActivity) getActivity(),
             mRepository,
             ApiHelpers.IssueState.OPEN,
             refresh

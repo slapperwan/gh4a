@@ -344,8 +344,8 @@ public class RepositoryActivity extends BasePagerActivity {
     }
 
     private void loadRepository(boolean refresh) {
-        Consumer subscriber = repository -> {
-            mRepository = (Repository) repository;
+        Consumer<Repository> subscriber = repository -> {
+            mRepository = repository;
             updateTitle();
             invalidateTabs();
             // Apply initial page selection first time the repo is loaded
