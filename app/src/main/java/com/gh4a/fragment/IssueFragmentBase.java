@@ -78,7 +78,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     private IntentUtils.InitialCommentMarker mInitialComment;
     private boolean mIsCollaborator;
     private boolean mListShown;
-    private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
     private ReactionBar.ReactionDetailsCache mReactionDetailsCache =
             new ReactionBar.ReactionDetailsCache(this);
     private TimelineItemAdapter mAdapter;
@@ -224,24 +223,10 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.issue_fragment_menu, menu);
-
-        MenuItem reactItem = menu.findItem(R.id.react);
-        inflater.inflate(R.menu.reaction_menu, reactItem.getSubMenu());
-        if (mReactionMenuHelper == null) {
-            mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(getActivity(),
-                    reactItem.getSubMenu(), this, this, mReactionDetailsCache);
-        } else {
-            mReactionMenuHelper.updateFromMenu(reactItem.getSubMenu());
-        }
-        mReactionMenuHelper.startLoadingIfNeeded();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mReactionMenuHelper != null && mReactionMenuHelper.onItemClick(item)) {
-            return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -399,11 +384,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             assigneeGroup.setVisibility(View.GONE);
         }
 
-        ReactionBar reactions = mListHeaderView.findViewById(R.id.reactions);
-        reactions.setCallback(this, this);
-        reactions.setDetailsCache(mReactionDetailsCache);
-        reactions.setReactions(mIssue.getReactions());
-
         assignHighlightColor();
         bindSpecialViews(mListHeaderView);
     }
@@ -461,10 +441,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         if (mListHeaderView != null) {
             ReactionBar bar = mListHeaderView.findViewById(R.id.reactions);
             bar.setReactions(reactions);
-        }
-        if (mReactionMenuHelper != null) {
-            mReactionMenuHelper.update();
-            getActivity().supportInvalidateOptionsMenu();
         }
     }
 
