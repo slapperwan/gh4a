@@ -151,7 +151,8 @@ public class PullRequestFragment extends IssueFragmentBase {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.pull_request_fragment_menu, menu);
 
-        if (mPullRequest == null || mPullRequest.getHead().getRepo() == null) {
+        if (mPullRequest == null || mPullRequest.getHead().getRepo() == null
+                || ApiHelpers.IssueState.OPEN.equals(mPullRequest.getState())) {
             menu.removeItem(R.id.delete_branch);
         } else {
             MenuItem deleteBranchItem = menu.findItem(R.id.delete_branch);
