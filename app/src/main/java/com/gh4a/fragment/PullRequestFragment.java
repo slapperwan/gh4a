@@ -15,28 +15,37 @@
  */
 package com.gh4a.fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.annotation.AttrRes;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AlertDialog;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
+import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.loader.CommitStatusLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentListLoader;
+import com.gh4a.loader.ReferenceLoader;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -51,8 +60,11 @@ import org.eclipse.egit.github.core.CommitStatus;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.PullRequestMarker;
+import org.eclipse.egit.github.core.Reference;
 import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.TypedResource;
+import org.eclipse.egit.github.core.service.DataService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
@@ -62,7 +74,12 @@ import java.util.List;
 import java.util.Map;
 
 public class PullRequestFragment extends IssueFragmentBase {
+    private static final int ID_LOADER_STATUS = 1;
+    private static final int ID_LOADER_HEAD_REF = 2;
+
     private PullRequest mPullRequest;
+    private Reference mHeadReference;
+    private boolean mHasLoadedHeadReference;
 
     private final LoaderCallbacks<List<CommitStatus>> mStatusCallback =
             new LoaderCallbacks<List<CommitStatus>>(this) {
@@ -75,6 +92,21 @@ public class PullRequestFragment extends IssueFragmentBase {
         @Override
         protected void onResultReady(List<CommitStatus> result) {
             fillStatus(result);
+        }
+    };
+
+    private final LoaderCallbacks<Reference> mHeadReferenceCallback = new LoaderCallbacks<Reference>(this) {
+        @Override
+        protected Loader<LoaderResult<Reference>> onCreateLoader() {
+            return new ReferenceLoader(getActivity(), mPullRequest);
+        }
+
+        @Override
+        protected void onResultReady(Reference result) {
+            mHeadReference = result;
+            mHasLoadedHeadReference = true;
+            getActivity().invalidateOptionsMenu();
+            getLoaderManager().destroyLoader(ID_LOADER_HEAD_REF);
         }
     };
 
@@ -105,6 +137,8 @@ public class PullRequestFragment extends IssueFragmentBase {
     public void onCreate(Bundle savedInstanceState) {
         mPullRequest = (PullRequest) getArguments().getSerializable("pr");
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        getLoaderManager().initLoader(ID_LOADER_HEAD_REF, null, mHeadReferenceCallback);
     }
 
     @Override
@@ -114,11 +148,39 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.pull_request_fragment_menu, menu);
+
+        if (mPullRequest == null || mPullRequest.getHead().getRepo() == null) {
+            menu.removeItem(R.id.delete_branch);
+        } else {
+            MenuItem deleteBranchItem = menu.findItem(R.id.delete_branch);
+            deleteBranchItem.setVisible(mHasLoadedHeadReference);
+            if (mHeadReference == null) {
+                deleteBranchItem.setTitle(R.string.restore_branch);
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.delete_branch:
+                showDeleteRestoreBranchConfirmDialog(mHeadReference == null);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onRefresh() {
+        mHeadReference = null;
+        mHasLoadedHeadReference = false;
         if (mListHeaderView != null) {
             fillStatus(new ArrayList<CommitStatus>());
         }
-        hideContentAndRestartLoaders(1);
+        hideContentAndRestartLoaders(ID_LOADER_STATUS, ID_LOADER_HEAD_REF);
         super.onRefresh();
     }
 
@@ -170,7 +232,7 @@ public class PullRequestFragment extends IssueFragmentBase {
 
     private void loadStatusIfOpen() {
         if (ApiHelpers.IssueState.OPEN.equals(mPullRequest.getState())) {
-            getLoaderManager().initLoader(1, null, mStatusCallback);
+            getLoaderManager().initLoader(ID_LOADER_STATUS, null, mStatusCallback);
         }
    }
 
@@ -282,5 +344,113 @@ public class PullRequestFragment extends IssueFragmentBase {
     @Override
     public void replyToComment(long replyToId) {
         // Not used in this screen
+    }
+
+    private void showDeleteRestoreBranchConfirmDialog(final boolean restore) {
+        int message = restore ? R.string.restore_branch_question : R.string.delete_branch_question;
+        int buttonText = restore ? R.string.restore : R.string.delete;
+        new AlertDialog.Builder(getContext())
+                .setMessage(message)
+                .setIconAttribute(android.R.attr.alertDialogIcon)
+                .setPositiveButton(buttonText, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (restore) {
+                            new RestoreBranchTask().schedule();
+                        } else {
+                            new DeleteBranchTask().schedule();
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private class RestoreBranchTask extends ProgressDialogTask<Reference> {
+        public RestoreBranchTask() {
+            super(getBaseActivity(), R.string.saving_msg);
+        }
+
+        @Override
+        protected ProgressDialogTask<Reference> clone() {
+            return new RestoreBranchTask();
+        }
+
+        @Override
+        protected Reference run() throws Exception {
+            DataService dataService =
+                    (DataService) Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
+
+            PullRequestMarker head = mPullRequest.getHead();
+            if (head.getRepo() == null) {
+                return null;
+            }
+            String owner = head.getRepo().getOwner().getLogin();
+            String repo = head.getRepo().getName();
+            RepositoryId repoId = new RepositoryId(owner, repo);
+
+            Reference reference = new Reference();
+            reference.setRef("refs/heads/" + head.getRef());
+            TypedResource object = new TypedResource();
+            object.setSha(head.getSha());
+            reference.setObject(object);
+
+            return dataService.createReference(repoId, reference);
+        }
+
+        @Override
+        protected void onSuccess(Reference result) {
+            mHeadReference = result;
+            onHeadReferenceUpdated();
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getString(R.string.restore_branch_error);
+        }
+    }
+
+    private void onHeadReferenceUpdated() {
+        getActivity().invalidateOptionsMenu();
+        reloadEvents(false);
+    }
+
+    private class DeleteBranchTask extends ProgressDialogTask<Void> {
+        public DeleteBranchTask() {
+            super(getBaseActivity(), R.string.deleting_msg);
+        }
+
+        @Override
+        protected ProgressDialogTask<Void> clone() {
+            return new DeleteBranchTask();
+        }
+
+        @Override
+        protected Void run() throws Exception {
+            DataService dataService =
+                    (DataService) Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
+
+            PullRequestMarker head = mPullRequest.getHead();
+            String owner = head.getRepo().getOwner().getLogin();
+            String repo = head.getRepo().getName();
+            RepositoryId repoId = new RepositoryId(owner, repo);
+
+            Reference reference = new Reference();
+            reference.setRef("heads/" + head.getRef());
+
+            dataService.deleteReference(repoId, reference);
+            return null;
+        }
+
+        @Override
+        protected void onSuccess(Void result) {
+            mHeadReference = null;
+            onHeadReferenceUpdated();
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getString(R.string.delete_branch_error);
+        }
     }
 }
