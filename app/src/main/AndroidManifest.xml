@@ -157,12 +157,12 @@
 
         <provider
             android:name=".db.BookmarksProvider"
-            android:authorities="com.gh4a"
+            android:authorities="${applicationId}"
             android:exported="false" />
 
         <provider
             android:name=".db.SuggestionsProvider"
-            android:authorities="com.gh4a.SuggestionsProvider"
+            android:authorities="${applicationId}.SuggestionsProvider"
             android:exported="false" />
 
         <receiver

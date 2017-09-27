@@ -35,6 +35,7 @@ android {
         targetSdkVersion 26
         versionCode 56
         versionName "4.2.2"
+        applicationId "com.gh4a"
 
         buildConfigField 'String', 'CLIENT_ID', ClientId
         buildConfigField 'String', 'CLIENT_SECRET', ClientSecret
@@ -42,6 +43,7 @@ android {
 
     buildTypes {
         debug {
+            applicationIdSuffix '.debug'
             zipAlignEnabled true
         }
         release {
