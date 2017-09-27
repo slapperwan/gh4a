@@ -107,6 +107,9 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private static final String STATE_KEY_SEARCH_MODE = "search_mode";
     private static final String STATE_KEY_SEARCH_IS_EXPANDED = "search_is_expanded";
     private static final String STATE_KEY_SELECTED_MILESTONE = "selected_milestone";
+    private static final String STATE_KEY_SELECTED_LABEL = "selected_label";
+    private static final String STATE_KEY_SELECTED_ASSIGNEE = "selected_assignee";
+    private static final String STATE_KEY_PARTICIPATING_STATUS = "participating_status";
 
     private static final String LIST_QUERY = "is:%s %s repo:%s/%s %s %s %s %s";
     private static final String SEARCH_QUERY = "is:%s %s repo:%s/%s %s";
@@ -199,6 +202,9 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
             mSearchIsExpanded = savedInstanceState.getBoolean(STATE_KEY_SEARCH_IS_EXPANDED);
             mSelectedMilestone = savedInstanceState.getString(STATE_KEY_SELECTED_MILESTONE);
+            mSelectedLabel = savedInstanceState.getString(STATE_KEY_SELECTED_LABEL);
+            mSelectedAssignee = savedInstanceState.getString(STATE_KEY_SELECTED_ASSIGNEE);
+            mSelectedParticipatingStatus = savedInstanceState.getInt(STATE_KEY_PARTICIPATING_STATUS);
         }
 
         if (!mIsPullRequest && Gh4Application.get().isAuthorized()) {
@@ -248,6 +254,9 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         outState.putBoolean(STATE_KEY_SEARCH_MODE, mSearchMode);
         outState.putBoolean(STATE_KEY_SEARCH_IS_EXPANDED, mSearchIsExpanded);
         outState.putString(STATE_KEY_SELECTED_MILESTONE, mSelectedMilestone);
+        outState.putString(STATE_KEY_SELECTED_LABEL, mSelectedLabel);
+        outState.putString(STATE_KEY_SELECTED_ASSIGNEE, mSelectedAssignee);
+        outState.putInt(STATE_KEY_PARTICIPATING_STATUS, mSelectedParticipatingStatus);
     }
 
     @Override
@@ -365,15 +374,37 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         super.onPrepareRightNavigationDrawerMenu(menu);
         MenuItem milestoneFilterItem = menu.findItem(R.id.filter_by_milestone);
         if (milestoneFilterItem != null) {
-            String title = getString(R.string.issue_filter_by_milestone);
-            String subtitle = mSelectedMilestone;
-            if (subtitle == null) {
-                subtitle = getString(R.string.issue_filter_by_any_milestone);
-            } else if (subtitle.isEmpty()) {
-                subtitle = getString(R.string.issue_filter_by_no_milestone);
-            }
-
-            UiUtils.setMenuItemText(this, milestoneFilterItem, title, subtitle);
+            final String subtitle =
+                    mSelectedMilestone == null ? getString(R.string.issue_filter_by_any_milestone) :
+                    mSelectedMilestone.isEmpty() ? getString(R.string.issue_filter_by_no_milestone) :
+                    mSelectedMilestone;
+            UiUtils.setMenuItemText(this, milestoneFilterItem,
+                    getString(R.string.issue_filter_by_milestone), subtitle);
+        }
+        MenuItem labelFilterItem = menu.findItem(R.id.filter_by_label);
+        if (labelFilterItem != null) {
+            final String subtitle =
+                    mSelectedLabel == null ? getString(R.string.issue_filter_by_any_label) :
+                    mSelectedLabel.isEmpty() ? getString(R.string.issue_filter_by_no_label) :
+                    mSelectedLabel;
+            UiUtils.setMenuItemText(this, labelFilterItem,
+                    getString(R.string.issue_filter_by_labels), subtitle);
+        }
+        MenuItem assigneeFilterItem = menu.findItem(R.id.filter_by_assignee);
+        if (assigneeFilterItem != null) {
+            final String subtitle =
+                    mSelectedAssignee == null ? getString(R.string.issue_filter_by_any_assignee) :
+                    mSelectedAssignee.isEmpty() ? getString(R.string.issue_filter_by_no_assignee) :
+                    mSelectedAssignee;
+            UiUtils.setMenuItemText(this, assigneeFilterItem,
+                    getString(R.string.issue_filter_by_assignee), subtitle);
+        }
+        MenuItem participatingFilterItem = menu.findItem(R.id.filter_by_participating);
+        if (participatingFilterItem != null) {
+            String[] valueStrings = getResources().getStringArray(R.array.filter_participating);
+            UiUtils.setMenuItemText(this, participatingFilterItem,
+                    getString(R.string.issue_filter_by_participating),
+                    valueStrings[mSelectedParticipatingStatus]);
         }
     }
 
@@ -427,8 +458,8 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         searchView.setOnCloseListener(this);
         searchView.setOnQueryTextListener(this);
 
-        // TODO: More checks
-        if (mSelectedMilestone != null) {
+        if (mSelectedMilestone != null || mSelectedAssignee != null
+                || mSelectedLabel != null || mSelectedParticipatingStatus != 0) {
             menu.findItem(R.id.remove_filter).setVisible(true);
         }
 
@@ -449,8 +480,10 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void removeFilter() {
-        // TODO: Reset all filter values
         mSelectedMilestone = null;
+        mSelectedAssignee = null;
+        mSelectedLabel = null;
+        mSelectedParticipatingStatus = 0;
         onFilterUpdated();
     }
 
@@ -574,7 +607,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                         : which == 1 ? ""
                         : labels[which];
                 dialog.dismiss();
-                invalidateFragments();
+                onFilterUpdated();
             }
         };
 
@@ -647,7 +680,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                         : which == 1 ? ""
                         : mAssignees.get(which - 2).getLogin();
                 dialog.dismiss();
-                invalidateFragments();
+                onFilterUpdated();
             }
         };
 
@@ -689,7 +722,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             public void onClick(DialogInterface dialog, int which) {
                 mSelectedParticipatingStatus = which;
                 dialog.dismiss();
-                invalidateFragments();
+                onFilterUpdated();
             }
         };
 
