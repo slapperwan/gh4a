@@ -21,20 +21,20 @@
         tools:src="@drawable/commit_status_unknown" />
 
     <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_desc"
+        android:id="@+id/tv_context"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/iv_status_icon"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        tools:text="Commit status" />
+        tools:text="status/context" />
 
     <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_context"
+        android:id="@+id/tv_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_desc"
+        android:layout_below="@id/tv_context"
         android:layout_toRightOf="@id/iv_status_icon"
         android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-        tools:text="context" />
+        tools:text="Description" />
 
 </RelativeLayout>
