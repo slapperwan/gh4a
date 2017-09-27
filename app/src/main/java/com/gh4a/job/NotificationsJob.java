@@ -29,7 +29,6 @@ import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoader;
-import com.gh4a.resolver.BrowseFilter;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 
@@ -137,9 +136,9 @@ public class NotificationsJob extends Job {
         String title = owner.getLogin() + "/" + repository.getName();
         long when = notification.getUpdatedAt().getTime();
 
-        Intent markReadIntent = BrowseFilter.makeMarkNotificationAsReadActionIntent(getContext(),
-                notification.getId());
-        PendingIntent markReadPendingIntent = PendingIntent.getActivity(getContext(), id,
+        Intent markReadIntent = NotificationHandlingService.makeMarkNotificationAsReadActionIntent(
+                getContext(), notification.getId());
+        PendingIntent markReadPendingIntent = PendingIntent.getService(getContext(), id,
                 markReadIntent, 0);
         NotificationCompat.Action markReadAction = new NotificationCompat.Action(
                 R.drawable.mark_read, getContext().getString(R.string.mark_as_read),
@@ -163,11 +162,10 @@ public class NotificationsJob extends Job {
         String url = notification.getSubject().getUrl();
         if (url != null) {
             Uri uri = ApiHelpers.normalizeUri(Uri.parse(url));
-            Intent intent = BrowseFilter.makeOpenNotificationActionIntent(getContext(), uri,
-                    notification.getId());
-            PendingIntent pendingIntent =
-                    PendingIntent.getActivity(getContext(), 0, intent,
-                            PendingIntent.FLAG_UPDATE_CURRENT);
+            Intent intent = NotificationHandlingService.makeOpenNotificationActionIntent(
+                    getContext(), uri, notification.getId());
+            PendingIntent pendingIntent = PendingIntent.getService(getContext(), id, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
             builder.setContentIntent(pendingIntent);
         }
 
