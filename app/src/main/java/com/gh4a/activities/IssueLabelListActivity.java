@@ -251,7 +251,6 @@ public class IssueLabelListActivity extends BaseActivity implements
                             IssuesLabelService
                                 .deleteIssueLabel(
                                     IssueLabelListActivity.this,
-                                    getRootLayout(),
                                     mRepoOwner,
                                     mRepoName,
                                     mLabel.getName()
@@ -288,7 +287,6 @@ public class IssueLabelListActivity extends BaseActivity implements
         private void addIssue() {
             IssuesLabelService.addIssue(
                 IssueLabelListActivity.this,
-                getRootLayout(),
                 mRepoOwner,
                 mRepoName,
                 mLabel.editedName,
@@ -306,7 +304,6 @@ public class IssueLabelListActivity extends BaseActivity implements
         private void editIssueLabel() {
             IssuesLabelService.editIssueLabel(
                 IssueLabelListActivity.this,
-                getRootLayout(),
                 mRepoOwner,
                 mRepoName,
                 mLabel.getName(),
