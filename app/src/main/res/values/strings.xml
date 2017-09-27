@@ -165,6 +165,7 @@
     <string name="repo_sort_order_creation_asc">Oldest</string>
     <string name="repo_sort_order_pushed_desc">Most recently pushed</string>
     <string name="repo_sort_order_pushed_asc">Least recently pushed</string>
+    <string name="filter_and_sort">Filter and Sort</string>
 
     <string name="no_blogs_found">No blogs found.</string>
     <string name="no_comments_found">Nobody has commented so far.</string>
