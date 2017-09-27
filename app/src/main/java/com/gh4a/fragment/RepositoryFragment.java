@@ -108,7 +108,13 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     public void loadReadme(boolean refresh) {
-        Consumer consumer = result -> { // Fill-in readme
+        RepositoryService.loadReadme(
+            (BaseActivity) getActivity(),
+            mRepository.getOwner().getLogin(),
+            mRepository.getName(),
+            StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef,
+            refresh
+        ).doOnNext(result -> { // Fill-in readme
             setContentShown(true);
             TextView readmeView = (TextView) mContentView.findViewById(R.id.readme);
             View progress = mContentView.findViewById(R.id.pb_readme);
@@ -125,15 +131,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             }
             readmeView.setVisibility(View.VISIBLE);
             progress.setVisibility(View.GONE);
-        };
-
-        RepositoryService.loadReadme(
-            (BaseActivity) getActivity(),
-            mRepository.getOwner().getLogin(),
-            mRepository.getName(),
-            StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef,
-            refresh
-        ).subscribe(consumer, error -> {});
+        }).subscribe(consumer -> {}, error -> {});
     }
 
     private void loadPullRequestsCount(boolean refresh) {
