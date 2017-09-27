@@ -2,14 +2,11 @@ package com.gh4a.utils.rx;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
-import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
@@ -23,16 +20,16 @@ public class RxTools {
                 .compose(RxTools.handle(activity, loaderId, refresh));
     }
 
-    public static <T> ObservableTransformer<T, T> handle(Activity activity, int id) {
+    public static <T extends Observable<?>> ObservableTransformer<T, T> handle(BaseActivity activity, int id) {
         return observable -> {
-            final RxLoader rxLoader = new RxLoader(activity, ((AppCompatActivity)activity).getSupportLoaderManager());
+            final RxLoader rxLoader = new RxLoader(activity, activity.getSupportLoaderManager());
             return observable
-                    .compose(handleError(activity))
-                    .compose(rxLoader.makeObservableTransformer(id));
+                .compose(handleError(activity))
+                .compose(rxLoader.makeObservableTransformer(id));
         };
     }
 
-    public static <T> ObservableTransformer<T, T> handle(BaseActivity activity, int id, boolean refresh) {
+    public static <T extends Observable<?>> ObservableTransformer<T, T> handle(BaseActivity activity, int id, boolean refresh) {
         return observable -> {
             final RxLoader rxLoader = new RxLoader(activity, activity.getSupportLoaderManager());
 
@@ -47,7 +44,7 @@ public class RxTools {
     }
 
     // Error handler showing SnackBar
-    public static <T> ObservableTransformer<T, T> onErrorSnackbar(BaseActivity activity, int id, View rootLayout, String errorMessage, int messageRes) {
+    public static <T extends Observable<?>> ObservableTransformer<T, T> onErrorSnackbar(BaseActivity activity, int id, View rootLayout, String errorMessage, int messageRes) {
         return observable -> {
             final RxLoader rxLoader = new RxLoader(activity, activity.getSupportLoaderManager());
             return observable
@@ -62,7 +59,7 @@ public class RxTools {
         };
     }
 
-    public static <T> ObservableTransformer<T, T> handleError(BaseActivity activity) {
+    public static <T extends Observable<?>> ObservableTransformer<T, T> handleError(BaseActivity activity) {
         return observable -> observable
             .doOnError(error -> activity.setErrorViewVisibility(true));
     }
