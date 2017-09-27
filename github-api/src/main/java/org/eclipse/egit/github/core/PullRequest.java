@@ -25,6 +25,7 @@ public class PullRequest implements Serializable {
 	/** serialVersionUID */
 	private static final long serialVersionUID = 7858604768525096763L;
 
+	public static final String MERGEABLE_STATE_BEHIND = "behind";
 	public static final String MERGEABLE_STATE_BLOCKED = "blocked";
 	public static final String MERGEABLE_STATE_CLEAN = "clean";
 	public static final String MERGEABLE_STATE_DIRTY = "dirty";

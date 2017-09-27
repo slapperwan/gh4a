@@ -69,6 +69,10 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
         final int statusIconDrawableAttrId;
         final int statusLabelResId;
         switch (mergableState) {
+            case PullRequest.MERGEABLE_STATE_BEHIND:
+                statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
+                statusLabelResId = R.string.pull_merge_status_behind;
+                break;
             case PullRequest.MERGEABLE_STATE_BLOCKED:
                 statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
                 statusLabelResId = R.string.pull_merge_status_blocked;
