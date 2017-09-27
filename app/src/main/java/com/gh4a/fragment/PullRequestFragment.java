@@ -17,7 +17,6 @@ package com.gh4a.fragment;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.support.annotation.AttrRes;
@@ -39,7 +38,6 @@ import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
-import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.loader.CommitStatusLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -106,6 +104,7 @@ public class PullRequestFragment extends IssueFragmentBase {
             mHeadReference = result;
             mHasLoadedHeadReference = true;
             getActivity().invalidateOptionsMenu();
+            bindSpecialViews(mListHeaderView);
             getLoaderManager().destroyLoader(ID_LOADER_HEAD_REF);
         }
     };
@@ -186,14 +185,19 @@ public class PullRequestFragment extends IssueFragmentBase {
 
     @Override
     protected void bindSpecialViews(View headerView) {
+        if (!mHasLoadedHeadReference) {
+            return;
+        }
+
         View branchGroup = headerView.findViewById(R.id.pr_container);
         branchGroup.setVisibility(View.VISIBLE);
 
         StyleableTextView fromBranch = branchGroup.findViewById(R.id.tv_pr_from);
-        formatMarkerText(fromBranch, R.string.pull_request_from, mPullRequest.getHead());
+        formatMarkerText(fromBranch, R.string.pull_request_from, mPullRequest.getHead(),
+                mHeadReference != null);
 
         StyleableTextView toBranch = branchGroup.findViewById(R.id.tv_pr_to);
-        formatMarkerText(toBranch, R.string.pull_request_to, mPullRequest.getBase());
+        formatMarkerText(toBranch, R.string.pull_request_to, mPullRequest.getBase(), true);
     }
 
     @Override
@@ -207,8 +211,8 @@ public class PullRequestFragment extends IssueFragmentBase {
         }
     }
 
-    private void formatMarkerText(StyleableTextView view,
-            @StringRes int formatResId, final PullRequestMarker marker) {
+    private void formatMarkerText(StyleableTextView view, @StringRes int formatResId,
+            final PullRequestMarker marker, boolean makeClickable) {
         SpannableStringBuilder builder = StringUtils.applyBoldTags(getString(formatResId),
                 view.getTypefaceValue());
         int pos = builder.toString().indexOf("[ref]");
@@ -216,7 +220,7 @@ public class PullRequestFragment extends IssueFragmentBase {
             String label = TextUtils.isEmpty(marker.getLabel()) ? marker.getRef() : marker.getLabel();
             final Repository repo = marker.getRepo();
             builder.replace(pos, pos + 5, label);
-            if (repo != null) {
+            if (repo != null && makeClickable) {
                 builder.setSpan(new IntentSpan(getActivity()) {
                     @Override
                     protected Intent getIntent() {
