@@ -425,12 +425,17 @@ public class RepositoryListContainerFragment extends Fragment implements
             return TextUtils.equals(mFilterType, "watched") ? 0 : R.menu.repo_sort;
         }
 
-        public void selectSortType(Menu menu, String order, String direction) {
+        public void selectSortType(Menu menu, String order, String direction,
+                boolean updateSingleItem) {
             int selectedId = 0;
             for (int i = 0; i < SORT_LOOKUP.size(); i++) {
                 String[] value = SORT_LOOKUP.valueAt(i);
                 if (value[0].equals(order) && value[1].equals(direction)) {
                     selectedId = SORT_LOOKUP.keyAt(i);
+                    if (updateSingleItem) {
+                        menu.findItem(selectedId).setChecked(true);
+                        return;
+                    }
                     break;
                 }
             }

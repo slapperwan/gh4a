@@ -17,6 +17,9 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
@@ -33,29 +36,63 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class StarredRepositoryListFragment extends PagedDataBaseFragment<Repository> {
-    public static StarredRepositoryListFragment newInstance(String login,
-            String sortOrder, String sortDirection) {
+    private static final String STATE_KEY_SORT_ORDER = "sort_order";
+    private static final String STATE_KEY_SORT_DIRECTION = "sort_direction";
+
+    public static StarredRepositoryListFragment newInstance(String login) {
         StarredRepositoryListFragment f = new StarredRepositoryListFragment();
 
         Bundle args = new Bundle();
         args.putString("user", login);
-        args.putString("sort_order", sortOrder);
-        args.putString("sort_direction", sortDirection);
         f.setArguments(args);
 
         return f;
     }
 
     private String mLogin;
-    private String mSortOrder;
-    private String mSortDirection;
+    private String mSortOrder = "created";
+    private String mSortDirection = "desc";
+    private RepositoryListContainerFragment.SortDrawerHelper mSortHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString("user");
-        mSortOrder = getArguments().getString("sort_order");
-        mSortDirection = getArguments().getString("sort_direction");
+
+        mSortHelper = new RepositoryListContainerFragment.SortDrawerHelper();
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_SORT_ORDER)) {
+            mSortOrder = savedInstanceState.getString(STATE_KEY_SORT_ORDER);
+            mSortDirection = savedInstanceState.getString(STATE_KEY_SORT_DIRECTION);
+        }
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_KEY_SORT_ORDER, mSortOrder);
+        outState.putString(STATE_KEY_SORT_DIRECTION, mSortDirection);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.repo_starred_list_menu, menu);
+        mSortHelper.selectSortType(menu, mSortOrder, mSortDirection, true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        String[] sortOrderAndDirection = mSortHelper.handleSelectionAndGetSortOrder(item);
+        if (sortOrderAndDirection == null) {
+            return false;
+        }
+        mSortOrder = sortOrderAndDirection[0];
+        mSortDirection = sortOrderAndDirection[1];
+        item.setChecked(true);
+        onRefresh();
+        return true;
     }
 
     @Override
