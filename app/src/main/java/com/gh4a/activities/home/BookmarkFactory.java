@@ -33,7 +33,7 @@ public class BookmarkFactory extends FragmentFactory {
     @Override
     protected Fragment makeFragment(int position) {
         if (position == 1) {
-            return StarredRepositoryListFragment.newInstance(mUserLogin, "", ""); // TODO
+            return StarredRepositoryListFragment.newInstance(mUserLogin);
         }
         return BookmarkListFragment.newInstance();
     }

@@ -105,8 +105,8 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
     protected void onPrepareRightNavigationDrawerMenu(Menu menu) {
         if (mFragment != null) {
             mFilterDrawerHelper.selectFilterType(menu, mFragment.getFilterType());
-            mSortDrawerHelper.selectSortType(menu,
-                    mFragment.getSortOrder(), mFragment.getSortDirection());
+            mSortDrawerHelper.selectSortType(menu, mFragment.getSortOrder(),
+                    mFragment.getSortDirection(), false);
         }
     }
 

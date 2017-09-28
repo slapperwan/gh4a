@@ -61,8 +61,8 @@ public class RepositoryFactory extends FragmentFactory {
         super.prepareToolDrawerMenu(menu);
         if (mFragment != null) {
             mFilterDrawerHelper.selectFilterType(menu, mFragment.getFilterType());
-            mSortDrawerHelper.selectSortType(menu,
-                    mFragment.getSortOrder(), mFragment.getSortDirection());
+            mSortDrawerHelper.selectSortType(menu, mFragment.getSortOrder(),
+                    mFragment.getSortDirection(), false);
         }
     }
 

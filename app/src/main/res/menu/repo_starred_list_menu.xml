@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="@string/repo_sort">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/sort_order"
+        android:icon="@drawable/sort_order"
+        android:title="@string/repo_sort"
+        app:showAsAction="always">
+
         <menu>
             <group android:checkableBehavior="single">
                 <item
@@ -17,5 +24,7 @@
                     android:title="@string/repo_sort_order_pushed_desc" />
             </group>
         </menu>
+
     </item>
+
 </menu>
