@@ -124,14 +124,12 @@ public class NotificationsJob extends Job {
                     }
                 }
 
-                int color = ContextCompat.getColor(getContext(), R.color.octodroid);
-
                 if ((lastIds != null && !lastIds.isEmpty()) || !added.isEmpty()) {
                     showSummaryNotification(notificationManager,
-                            notifications, color, lastCheck, !added.isEmpty());
+                            notifications, lastCheck, !added.isEmpty());
                 }
                 for (int i = 0; i < added.size(); i++) {
-                    showSingleNotification(notificationManager, color, added.get(i), lastCheck);
+                    showSingleNotification(notificationManager, added.get(i), lastCheck);
                 }
                 newPostedIds = new HashSet<>();
                 for (NotificationHolder n : notifications) {
@@ -151,7 +149,7 @@ public class NotificationsJob extends Job {
     }
 
     private void showSingleNotification(NotificationManagerCompat notificationManager,
-            int color, Notification notification, long lastCheck) {
+            Notification notification, long lastCheck) {
         int id = notification.getId().hashCode();
         Repository repository = notification.getRepository();
         User owner = repository.getOwner();
@@ -166,15 +164,12 @@ public class NotificationsJob extends Job {
                 R.drawable.mark_read, getContext().getString(R.string.mark_as_read),
                 markReadPendingIntent);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext(),
-                CHANNEL_GITHUB_NOTIFICATIONS)
-                .setSmallIcon(R.drawable.octodroid_bg)
+        NotificationCompat.Builder builder = makeBaseBuilder()
                 .setLargeIcon(loadRoundUserAvatar(owner))
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
                 .setWhen(when)
                 .setShowWhen(true)
-                .setColor(color)
                 .setContentTitle(title)
                 .setAutoCancel(true)
                 .addAction(markReadAction)
@@ -194,24 +189,28 @@ public class NotificationsJob extends Job {
     }
 
     private void showSummaryNotification(NotificationManagerCompat notificationManager,
-            List<NotificationHolder> notifications, int color, long lastCheck,
-            boolean hasNewNotification) {
+            List<NotificationHolder> notifications, long lastCheck, boolean hasNewNotification) {
         String title = getContext().getString(R.string.unread_notifications_summary_title);
         String text = getContext().getResources()
                 .getQuantityString(R.plurals.unread_notifications_summary_text,
                         notifications.size(), notifications.size());
+
+        android.app.Notification publicVersion = makeBaseBuilder()
+                .setContentTitle(title)
+                .setContentText(text)
+                .setNumber(notifications.size())
+                .build();
+
         PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
                 HomeActivity.makeIntent(getContext(), R.id.notifications), 0);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(
-                getContext(), CHANNEL_GITHUB_NOTIFICATIONS)
-                .setSmallIcon(R.drawable.octodroid_bg)
+        NotificationCompat.Builder builder = makeBaseBuilder()
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupSummary(true)
                 .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
-                .setColor(color)
                 .setContentIntent(contentIntent)
                 .setContentTitle(title)
                 .setContentText(text)
+                .setPublicVersion(publicVersion)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setNumber(notifications.size());
 
@@ -228,6 +227,12 @@ public class NotificationsJob extends Job {
         }
 
         notificationManager.notify(0, builder.build());
+    }
+
+    private NotificationCompat.Builder makeBaseBuilder() {
+        return new NotificationCompat.Builder(getContext(), CHANNEL_GITHUB_NOTIFICATIONS)
+                .setSmallIcon(R.drawable.octodroid_bg)
+                .setColor(ContextCompat.getColor(getContext(), R.color.octodroid));
     }
 
     private Bitmap loadRoundUserAvatar(User user) {
