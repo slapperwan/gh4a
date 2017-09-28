@@ -30,6 +30,10 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="TextAppearance.NotificationEmphasized" parent="TextAppearance.AppCompat.Notification">
+        <item name="android:textColor">#cccccc</item>
+    </style>
+
     <style name="default_text_small_url" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">?android:attr/textColorLink</item>
     </style>
