@@ -3,4 +3,7 @@
     <style name="SelectableBorderlessItem">
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
     </style>
+
+    <style name="TextAppearance.NotificationEmphasized" parent="android:TextAppearance.Material.Notification.Emphasis">
+    </style>
 </resources>
