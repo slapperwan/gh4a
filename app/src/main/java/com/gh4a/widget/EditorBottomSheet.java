@@ -75,7 +75,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private int mLatestOffset;
     private int mTopShadowHeight;
 
-    private BottomSheetBehavior.BottomSheetCallback mBehaviorCallback =
+    private final BottomSheetBehavior.BottomSheetCallback mBehaviorCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
         @Override
         public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -442,7 +442,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             R.string.edit, R.string.preview
         };
 
-        private Context mContext;
+        private final Context mContext;
 
         public AdvancedEditorPagerAdapter(Context context) {
             mContext = context;

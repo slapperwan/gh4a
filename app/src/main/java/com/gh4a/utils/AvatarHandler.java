@@ -414,7 +414,7 @@ public class AvatarHandler {
     }
 
     private static class ImageViewDelegate implements ViewDelegate {
-        private ImageView mView;
+        private final ImageView mView;
         public ImageViewDelegate(ImageView view) {
             mView = view;
         }
@@ -437,8 +437,8 @@ public class AvatarHandler {
     }
 
     private static class MenuItemDelegate implements ViewDelegate {
-        private Context mContext;
-        private MenuItem mItem;
+        private final Context mContext;
+        private final MenuItem mItem;
         public MenuItemDelegate(Context context, MenuItem item) {
             mContext = context;
             mItem = item;

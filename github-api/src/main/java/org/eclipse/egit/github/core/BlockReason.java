@@ -14,7 +14,6 @@ import org.eclipse.egit.github.core.util.ObjectUtils;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 /**
  * GitHub request error class

@@ -11,8 +11,6 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.os.ParcelableCompat;
-import android.support.v4.os.ParcelableCompatCreatorCallbacks;
 import android.widget.Toast;
 
 import com.gh4a.R;
@@ -168,9 +166,14 @@ public class IntentUtils {
         }
 
         public static final Parcelable.Creator<InitialCommentMarker> CREATOR =
-                ParcelableCompat.newCreator(new ParcelableCompatCreatorCallbacks<InitialCommentMarker>() {
+                new Parcelable.ClassLoaderCreator<InitialCommentMarker>() {
             @Override
             public InitialCommentMarker createFromParcel(Parcel in, ClassLoader loader) {
+                return createFromParcel(in, null);
+            }
+
+            @Override
+            public InitialCommentMarker createFromParcel(Parcel in) {
                 long commentId = in.readLong();
                 long timeMillis = in.readLong();
                 return new InitialCommentMarker(commentId,
@@ -180,6 +183,6 @@ public class IntentUtils {
             public InitialCommentMarker[] newArray(int size) {
                 return new InitialCommentMarker[size];
             }
-        });
+        };
     }
 }

@@ -324,7 +324,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         LinearLayout ll = mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
 
-        LayoutInflater inflater = getLayoutInflater(null);
+        LayoutInflater inflater = getLayoutInflater();
 
         if (topRepos != null) {
             for (Repository repo : topRepos) {
@@ -371,7 +371,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         ViewGroup llOrgs = mContentView.findViewById(R.id.ll_orgs);
         LinearLayout llOrg = mContentView.findViewById(R.id.ll_org);
         int count = organizations != null ? organizations.size() : 0;
-        LayoutInflater inflater = getLayoutInflater(null);
+        LayoutInflater inflater = getLayoutInflater();
 
         llOrg.removeAllViews();
         llOrgs.setVisibility(count > 0 ? View.VISIBLE : View.GONE);

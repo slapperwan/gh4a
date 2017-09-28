@@ -88,10 +88,6 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView
         UiUtils.showImeForView(this);
     }
 
-    public boolean isEmpty() {
-        return getText() == null || getText().length() == 0;
-    }
-
     private void updateLockState() {
         setEnabled(!mLocked);
         if (mLocked) {

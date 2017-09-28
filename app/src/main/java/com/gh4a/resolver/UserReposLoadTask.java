@@ -12,7 +12,7 @@ import org.eclipse.egit.github.core.User;
 
 public class UserReposLoadTask extends UserLoadTask {
     @VisibleForTesting
-    protected boolean mShowStars;
+    protected final boolean mShowStars;
 
     public UserReposLoadTask(FragmentActivity activity, String userLogin, boolean showStars) {
         super(activity, userLogin);

@@ -15,7 +15,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -184,9 +183,8 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
 
         mNotificationsMenuItem = menu.findItem(R.id.notifications);
         if (mNotificationsMenuItem != null) {
-            View actionView = MenuItemCompat.getActionView(mNotificationsMenuItem);
-            mNotificationsIndicator =
-                    actionView.findViewById(R.id.notifications_indicator);
+            View actionView = mNotificationsMenuItem.getActionView();
+            mNotificationsIndicator = actionView.findViewById(R.id.notifications_indicator);
             updateNotificationIndicator(mSelectedFactoryId);
         }
 

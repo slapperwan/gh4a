@@ -19,10 +19,6 @@ public class MilestoneListLoader extends BaseLoader<List<Milestone>> {
     private final String mRepoName;
     private final String mState;
 
-    public MilestoneListLoader(Context context, String repoOwner, String repoName) {
-        this(context, repoOwner, repoName, null);
-    }
-
     public MilestoneListLoader(Context context, String repoOwner, String repoName, String state) {
         super(context);
         mRepoOwner = repoOwner;

@@ -21,7 +21,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v4.util.LongSparseArray;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -120,7 +119,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     private int mHighlightEndLine;
     private boolean mHighlightIsRight;
     private IntentUtils.InitialCommentMarker mInitialComment;
-    private ReactionBar.ReactionDetailsCache mReactionDetailsCache =
+    private final ReactionBar.ReactionDetailsCache mReactionDetailsCache =
             new ReactionBar.ReactionDetailsCache(this);
 
     protected static class CommitCommentWrapper implements ReactionBar.Item {
@@ -219,8 +218,8 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         inflater.inflate(R.menu.file_viewer_menu, menu);
 
         String viewAtTitle = getString(R.string.object_view_file_at, mSha.substring(0, 7));
-        MenuItem item = menu.add(0, MENU_ITEM_VIEW, Menu.NONE, viewAtTitle);
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_NEVER);
+        menu.add(0, MENU_ITEM_VIEW, Menu.NONE, viewAtTitle)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
 
         return super.onCreateOptionsMenu(menu);
     }

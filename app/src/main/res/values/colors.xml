@@ -38,7 +38,6 @@
     <color name="fab_pressed_dark">#2d501e</color>
 
     <color name="tab_indicator_color">#fff</color>
-    <color name="divider_bg">#bdbdbd</color>
     <color name="drawer_scrim">#60000000</color>
 
     <color name="scrollbar_thumb_dark">#5dffffff</color>

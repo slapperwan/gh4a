@@ -9,7 +9,7 @@ import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
 
 public abstract class ProgressDialogLoaderCallbacks<T> extends LoaderCallbacks<T> {
-    private Context mContext;
+    private final Context mContext;
     private Dialog mProgressDialog;
 
     public ProgressDialogLoaderCallbacks(Context context, ParentCallback cb) {

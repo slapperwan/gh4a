@@ -3,7 +3,6 @@ package com.gh4a.utils;
 import android.app.Application;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
-import android.text.TextUtils;
 
 import com.crashlytics.android.Crashlytics;
 

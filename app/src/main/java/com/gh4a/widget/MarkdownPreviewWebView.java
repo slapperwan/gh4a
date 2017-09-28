@@ -2,7 +2,6 @@ package com.gh4a.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild2;
 import android.support.v4.view.NestedScrollingChildHelper;
 import android.support.v4.view.ViewCompat;
@@ -21,12 +20,12 @@ import com.gh4a.activities.WebViewerActivity;
 import org.eclipse.egit.github.core.util.EncodingUtils;
 
 public class MarkdownPreviewWebView extends WebView implements NestedScrollingChild2 {
-    private NestedScrollingChildHelper mChildHelper;
+    private final NestedScrollingChildHelper mChildHelper;
     private final int[] mScrollOffset = new int[2];
     private final int[] mScrollConsumed = new int[2];
     private int mNestedOffsetY;
     private int mLastY;
-    private String mCssTheme;
+    private final String mCssTheme;
 
     public MarkdownPreviewWebView(Context context) {
         this(context, null);
@@ -70,10 +69,10 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        boolean result = false;
+        boolean result;
 
         MotionEvent event = MotionEvent.obtain(ev);
-        final int action = MotionEventCompat.getActionMasked(event);
+        final int action = event.getActionMasked();
         if (action == MotionEvent.ACTION_DOWN) {
             mNestedOffsetY = 0;
         }

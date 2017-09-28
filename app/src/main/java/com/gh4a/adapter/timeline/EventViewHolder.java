@@ -213,7 +213,7 @@ class EventViewHolder
         if (textBase == null) {
             textBase = mContext.getString(textResId, ApiHelpers.getUserLogin(mContext, user));
         }
-        SpannableStringBuilder text = StringUtils.applyBoldTags(mContext, textBase, typefaceValue);
+        SpannableStringBuilder text = StringUtils.applyBoldTags(textBase, typefaceValue);
 
         int pos = text.toString().indexOf("[commit]");
         if (event.getCommitId() != null && pos >= 0) {

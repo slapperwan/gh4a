@@ -1,5 +1,6 @@
 package com.gh4a.widget;
 
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.view.MotionEvent;
@@ -13,34 +14,37 @@ public class ToggleableAppBarLayoutBehavior extends AppBarLayout.Behavior {
     }
 
     @Override
-    public boolean onStartNestedScroll(CoordinatorLayout parent, AppBarLayout child,
-            View directTargetChild, View target, int nestedScrollAxes) {
+    public boolean onStartNestedScroll(@NonNull CoordinatorLayout parent,
+            @NonNull AppBarLayout child, @NonNull View directTargetChild,
+            @NonNull View target, int nestedScrollAxes, int type) {
         return mEnabled && super.onStartNestedScroll(parent, child, directTargetChild, target,
-                nestedScrollAxes);
+                nestedScrollAxes, type);
     }
 
     @Override
-    public void onNestedPreScroll(CoordinatorLayout coordinatorLayout,
-            AppBarLayout child, View target, int dx, int dy, int[] consumed) {
+    public void onNestedPreScroll(@NonNull CoordinatorLayout coordinatorLayout,
+            @NonNull AppBarLayout child, @NonNull View target,
+            int dx, int dy, @NonNull int[] consumed, int type) {
         if (mEnabled) {
-            super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
+            super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type);
         }
     }
 
     @Override
-    public void onNestedScroll(CoordinatorLayout coordinatorLayout, AppBarLayout child, View target,
-            int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
+    public void onNestedScroll(@NonNull CoordinatorLayout coordinatorLayout,
+            @NonNull AppBarLayout child, @NonNull View target,
+            int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int type) {
         if (mEnabled) {
             super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed,
-                    dxUnconsumed, dyUnconsumed);
+                    dxUnconsumed, dyUnconsumed, type);
         }
     }
 
     @Override
-    public void onStopNestedScroll(CoordinatorLayout coordinatorLayout,
-            AppBarLayout child, View target) {
+    public void onStopNestedScroll(@NonNull CoordinatorLayout coordinatorLayout,
+            @NonNull AppBarLayout child, @NonNull View target, int type) {
         if (mEnabled) {
-            super.onStopNestedScroll(coordinatorLayout, child, target);
+            super.onStopNestedScroll(coordinatorLayout, child, target, type);
         }
     }
 

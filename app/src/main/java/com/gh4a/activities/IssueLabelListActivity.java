@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
@@ -222,14 +221,14 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MenuItem saveItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
-                .setIcon(R.drawable.content_save);
-            MenuItemCompat.setShowAsAction(saveItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+            menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
+                    .setIcon(R.drawable.content_save)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
             if (mLabel != mAddedLabel) {
-                MenuItem deleteItem = menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
-                    .setIcon(R.drawable.content_discard);
-                MenuItemCompat.setShowAsAction(deleteItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+                menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
+                        .setIcon(R.drawable.content_discard)
+                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 
             return true;

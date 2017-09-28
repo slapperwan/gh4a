@@ -313,7 +313,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
 
         menu.setHeaderTitle(R.string.go_to);
 
-        /** Common menu */
+        /* Common menu */
         menu.add(getString(R.string.menu_user, event.getActor().getLogin()))
                 .setIntent(UserActivity.makeIntent(getActivity(), event.getActor()));
         if (repoOwner != null) {

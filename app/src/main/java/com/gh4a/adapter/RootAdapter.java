@@ -19,7 +19,6 @@ import android.content.Context;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,9 +39,6 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         implements Filterable, View.OnClickListener {
     public interface OnItemClickListener<T> {
         void onItemClick(T item);
-    }
-    public interface OnContextMenuListener<T> {
-        void onCreateContextMenu(ContextMenu menu, T item);
     }
     public interface OnScrolledToFooterListener {
         void onScrolledToFooter();

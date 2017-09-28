@@ -12,7 +12,7 @@ import org.eclipse.egit.github.core.User;
 
 public class UserFollowersLoadTask extends UserLoadTask {
     @VisibleForTesting
-    protected boolean mShowFollowers;
+    protected final boolean mShowFollowers;
 
     public UserFollowersLoadTask(FragmentActivity activity, String userLogin,
             boolean showFollowers) {

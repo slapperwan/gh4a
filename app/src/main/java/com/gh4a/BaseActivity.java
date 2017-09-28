@@ -72,7 +72,6 @@ import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
 import org.eclipse.egit.github.core.BlockReason;
 import org.eclipse.egit.github.core.client.RequestException;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,7 +91,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private AppBarLayout mHeader;
     private ToggleableAppBarLayoutBehavior mHeaderBehavior;
-    private AppBarLayout.ScrollingViewBehavior mSwipeLayoutBehavior;
     private SmoothProgressBar mProgress;
     private SwipeRefreshLayout mSwipeLayout;
     private DrawerLayout mDrawerLayout;
@@ -209,10 +207,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected void setChildScrollDelegate(SwipeRefreshLayout.ChildScrollDelegate delegate) {
         mSwipeLayout.setChildScrollDelegate(delegate);
-    }
-
-    protected void setEmptyText(int resId) {
-        setEmptyText(getString(resId));
     }
 
     protected void setEmptyText(CharSequence text) {
@@ -471,7 +465,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         mDrawerLayout.closeDrawers();
         return false;
     }
@@ -643,10 +637,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
             );
         }
 
-        mSwipeLayoutBehavior = onCreateSwipeLayoutBehavior();
         CoordinatorLayout.LayoutParams lp =
                 (CoordinatorLayout.LayoutParams) mSwipeLayout.getLayoutParams();
-        lp.setBehavior(mSwipeLayoutBehavior);
+        lp.setBehavior(onCreateSwipeLayoutBehavior());
 
         updateSwipeToRefreshState();
     }

@@ -207,7 +207,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
     }
 
     private class FetchTokenTask extends BackgroundTask<Pair<User, String>> {
-        private Uri mUri;
+        private final Uri mUri;
         public FetchTokenTask(Uri uri) {
             super(Github4AndroidActivity.this);
             mUri = uri;

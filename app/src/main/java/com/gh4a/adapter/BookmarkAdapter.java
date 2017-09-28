@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -42,7 +41,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     private int mExtraColumnIndex;
     private int mUrlColumnIndex;
 
-    private List<Integer> mPositions = new ArrayList<>();
+    private final List<Integer> mPositions = new ArrayList<>();
 
     public BookmarkAdapter(Context context, OnItemInteractListener listener) {
         super();
@@ -197,7 +196,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+            if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                 mItemInteractListener.onItemDrag(this);
             }
             return false;

@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v4.print.PrintHelper;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
@@ -242,8 +241,8 @@ public class FileViewerActivity extends WebViewerActivity
             viewRawItem.setVisible(true);
         }
 
-        MenuItem item = menu.add(0, MENU_ITEM_HISTORY, Menu.NONE, R.string.history);
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_NEVER);
+        menu.add(0, MENU_ITEM_HISTORY, Menu.NONE, R.string.history)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
 
         return super.onCreateOptionsMenu(menu);
     }

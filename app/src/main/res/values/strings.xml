@@ -124,7 +124,6 @@
     <string name="undo">Undo</string>
     <string name="raw">Raw</string>
     <string name="view_in_file">View in file</string>
-    <string name="reply_to_review_comments">Reply to review comments</string>
     <string name="reviewed_files">Reviewed files:</string>
     <string name="show_details">Show details</string>
     <string name="preview">Preview</string>
@@ -320,7 +319,6 @@
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>
-    <string name="commit_in_repo">Commit %1$s in %2$s/%3$s</string>
     <string name="commit">Commit</string>
     <string name="commits">Commits</string>
     <string name="commit_changed">Files Changed</string>
@@ -332,9 +330,7 @@
     <string name="commit_comment_hint">Comment on this commit</string>
     <string name="commit_details">Committed by [b]%1$s[/b] %2$s</string>
     <string name="commit_comment_dialog_title">Comment on line -%1$d +%2$d</string>
-    <string name="error_edit_commit_comment">Saving comment on line %1$d failed.</string>
     <string name="error_delete_commit_comment">Deletion of commit comment failed.</string>
-    <string name="error_edit_comment">Saving comment failed.</string>
     <string name="error_delete_comment">Comment deletion failed.</string>
 
     <!-- Release -->
@@ -403,16 +399,13 @@
     <string name="issue_filter_by_no_milestone">No milestone set</string>
     <string name="issue_filter_by_any_assignee">Any assignee</string>
     <string name="issue_filter_by_no_assignee">Unassigned</string>
+    <string name="issue_filter_remove">Remove filter</string>
     <string name="issue_clear_milestone">No milestone</string>
     <string name="issue_clear_assignee">No assignee</string>
     <string name="issue_no_labels">No labels assigned</string>
     <string name="issue_milestone_due_date">Due Date</string>
     <string name="issue_milestone_due_unset">No date set</string>
-    <string name="issue_comment_title">Comment</string>
-    <string name="issue_comment_update_title">Update</string>
     <string name="issue_comment_hint">Comment on this issue</string>
-    <string name="issue_comment_header">[b]%1$s[/b]</string>
-    <string name="issue_commit_comment_file">Comment on [b][file][/b]</string>
     <string name="commit_comment_header">%1$s added a note %2$s</string>
     <string name="issue_no_description">No description provided.</string>
     <string name="close_issue_confirm">Do you really want to close this issue?</string>
@@ -478,8 +471,6 @@
 
     <!-- Bookmarks -->
     <string name="bookmark">Bookmark</string>
-    <string name="remove">Remove</string>
-    <string name="remove_bookmark_confirm">Do you really want to remove this bookmark?</string>
     <string name="remove_bookmark">Remove bookmark</string>
     <string name="bookmark_saved">Bookmark saved</string>
     <string name="bookmark_removed">Bookmark removed</string>

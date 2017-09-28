@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,7 +27,7 @@ import org.eclipse.egit.github.core.User;
 import java.util.List;
 
 public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSelectedListener {
-    private String mUserLogin;
+    private final String mUserLogin;
     private User mSelf;
     private User mSelectedOrganization;
     private List<User> mUserScopes;
@@ -38,7 +37,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
     };
 
     @SuppressWarnings("FieldCanBeLocal")
-    private LoaderCallbacks<List<User>> mOrganizationCallback =
+    private final LoaderCallbacks<List<User>> mOrganizationCallback =
             new LoaderCallbacks<List<User>>(mActivity) {
         @Override
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
@@ -89,7 +88,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
         mActivity.getMenuInflater().inflate(R.menu.user_selector, menu);
 
-        Spinner spinner = (Spinner) MenuItemCompat.getActionView(menu.findItem(R.id.selector));
+        Spinner spinner = (Spinner) menu.findItem(R.id.selector).getActionView();
         UserAdapter adapter = new UserAdapter(mActivity, mSelf, mUserScopes);
         spinner.setAdapter(adapter);
         spinner.setGravity(Gravity.RIGHT);

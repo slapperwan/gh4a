@@ -49,7 +49,6 @@ import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.CommitService;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -67,7 +66,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
     private final OnCommentAction mActionCallback;
     private final String mRepoOwner;
     private final String mRepoName;
-    private ReactionBar.ReactionDetailsCache mReactionDetailsCache =
+    private final ReactionBar.ReactionDetailsCache mReactionDetailsCache =
             new ReactionBar.ReactionDetailsCache(this);
 
     private final ViewHolder.Callback mHolderCallback = new ViewHolder.Callback() {
@@ -279,7 +278,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         private final PopupMenu mPopupMenu;
         private final Callback mCallback;
 
-        private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
+        private final ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
         protected CommitComment mBoundItem;
 
         @Override

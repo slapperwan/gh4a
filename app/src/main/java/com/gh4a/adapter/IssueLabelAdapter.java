@@ -24,6 +24,7 @@ import org.eclipse.egit.github.core.Label;
 public class IssueLabelAdapter extends
         RootAdapter<IssueLabelAdapter.EditableLabel, IssueLabelAdapter.ViewHolder> {
     public static class EditableLabel extends Label {
+        private static final long serialVersionUID = 2394627063964522785L;
         public String editedName;
         public String editedColor;
         public final boolean newlyAdded;

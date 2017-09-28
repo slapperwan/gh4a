@@ -1,6 +1,5 @@
 package com.gh4a.widget;
 
-import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.text.TextPaint;

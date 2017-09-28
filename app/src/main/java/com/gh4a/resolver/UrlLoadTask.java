@@ -7,7 +7,7 @@ import com.gh4a.BackgroundTask;
 import com.gh4a.utils.IntentUtils;
 
 public abstract class UrlLoadTask extends BackgroundTask<Intent> {
-    protected FragmentActivity mActivity;
+    protected final FragmentActivity mActivity;
     private final boolean mFinishCurrentActivity;
     private ProgressDialogFragment mProgressDialog;
 

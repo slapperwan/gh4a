@@ -172,7 +172,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         LinearLayout llAdded = mContentView.findViewById(R.id.ll_added);
         LinearLayout llRenamed = mContentView.findViewById(R.id.ll_renamed);
         LinearLayout llDeleted = mContentView.findViewById(R.id.ll_deleted);
-        final LayoutInflater inflater = getLayoutInflater(null);
+        final LayoutInflater inflater = getLayoutInflater();
         int added = 0, changed = 0, renamed = 0, deleted = 0;
         int additions = 0, deletions = 0;
         int count = files != null ? files.size() : 0;

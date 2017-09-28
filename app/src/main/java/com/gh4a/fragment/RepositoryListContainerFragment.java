@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -28,7 +27,7 @@ import org.eclipse.egit.github.core.Repository;
 
 public class RepositoryListContainerFragment extends Fragment implements
         LoaderCallbacks.ParentCallback, SearchView.OnCloseListener, SearchView.OnQueryTextListener,
-        MenuItemCompat.OnActionExpandListener, SwipeRefreshLayout.ChildScrollDelegate {
+        MenuItem.OnActionExpandListener, SwipeRefreshLayout.ChildScrollDelegate {
     public static RepositoryListContainerFragment newInstance(String userLogin, boolean isOrg) {
         return newInstance(userLogin, isOrg, null);
     }
@@ -46,7 +45,7 @@ public class RepositoryListContainerFragment extends Fragment implements
         return f;
     }
 
-    public static String FILTER_TYPE_STARRED = "starred";
+    public static final String FILTER_TYPE_STARRED = "starred";
 
     private String mUserLogin;
     private boolean mIsOrg;
@@ -250,11 +249,11 @@ public class RepositoryListContainerFragment extends Fragment implements
         // We can only properly search the 'all repos' list
         if ("all".equals(mFilterType)) {
             MenuItem searchItem = menu.findItem(R.id.search);
-            MenuItemCompat.setOnActionExpandListener(searchItem, this);
+            searchItem.setOnActionExpandListener(this);
 
-            final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+            final SearchView searchView = (SearchView) searchItem.getActionView();
             if (mSearchIsExpanded) {
-                MenuItemCompat.expandActionView(searchItem);
+                searchItem.expandActionView();
                 searchView.setQuery(mSearchQuery, false);
             }
             searchView.setOnCloseListener(this);

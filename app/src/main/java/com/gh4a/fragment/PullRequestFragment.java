@@ -147,8 +147,8 @@ public class PullRequestFragment extends IssueFragmentBase {
 
     private void formatMarkerText(StyleableTextView view,
             @StringRes int formatResId, final PullRequestMarker marker) {
-        SpannableStringBuilder builder = StringUtils.applyBoldTags(getActivity(),
-                getString(formatResId), view.getTypefaceValue());
+        SpannableStringBuilder builder = StringUtils.applyBoldTags(getString(formatResId),
+                view.getTypefaceValue());
         int pos = builder.toString().indexOf("[ref]");
         if (pos >= 0) {
             String label = TextUtils.isEmpty(marker.getLabel()) ? marker.getRef() : marker.getLabel();
@@ -209,7 +209,7 @@ public class PullRequestFragment extends IssueFragmentBase {
 
         ViewGroup statusContainer =
                 mListHeaderView.findViewById(R.id.merge_commit_status_container);
-        LayoutInflater inflater = getLayoutInflater(null);
+        LayoutInflater inflater = getLayoutInflater();
         statusContainer.removeAllViews();
         for (CommitStatus status : statusByContext.values()) {
             View statusRow = inflater.inflate(R.layout.row_commit_status, statusContainer, false);

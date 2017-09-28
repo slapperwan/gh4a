@@ -34,15 +34,6 @@ import java.util.regex.Pattern;
  * The Class StringUtils.
  */
 public class StringUtils {
-    private static final Pattern EMAIL_ADDRESS_PATTERN = Pattern.compile(
-            "[a-zA-Z0-9\\+\\._%\\-\\+]{1,256}" +
-            "@" +
-            "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
-            "(" +
-            "\\." +
-            "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
-            ")+");
-
     private static final Pattern HUNK_START_PATTERN =
             Pattern.compile("@@ -(\\d+),\\d+ \\+(\\d+),\\d+.*");
 
@@ -100,10 +91,6 @@ public class StringUtils {
         return userLogin + (!StringUtils.isBlank(name) ? " - " + name : "");
     }
 
-    public static boolean checkEmail(String email) {
-        return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
-    }
-
     public static CharSequence formatRelativeTime(Context context, Date date, boolean showDateIfLongAgo) {
         long now = System.currentTimeMillis();
         long time = date.getTime();
@@ -116,13 +103,11 @@ public class StringUtils {
     }
 
     public static void applyBoldTagsAndSetText(StyleableTextView view, String input) {
-        SpannableStringBuilder text = applyBoldTags(view.getContext(),
-                input, view.getTypefaceValue());
+        SpannableStringBuilder text = applyBoldTags(input, view.getTypefaceValue());
         view.setText(text);
     }
 
-    public static SpannableStringBuilder applyBoldTags(Context context,
-            String input, int baseTypefaceValue) {
+    public static SpannableStringBuilder applyBoldTags(String input, int baseTypefaceValue) {
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         int pos = 0;
 

@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.support.annotation.AttrRes;
 import android.support.annotation.DrawableRes;
 import android.support.v7.widget.PopupMenu;
-import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -244,9 +243,7 @@ class ReviewViewHolder
         CharSequence time = review.getSubmittedAt() != null
                 ? StringUtils.formatRelativeTime(mContext, review.getSubmittedAt(), true) : "";
         String rawMessage = mContext.getString(textResId, login, time);
-        SpannableStringBuilder message = StringUtils.applyBoldTags(mContext, rawMessage,
-                mMessageView.getTypefaceValue());
-        mMessageView.setText(message);
+        StringUtils.applyBoldTagsAndSetText(mMessageView, rawMessage);
     }
 
     @Override

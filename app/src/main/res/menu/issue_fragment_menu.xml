@@ -5,7 +5,7 @@
     <item
         android:id="@+id/react"
         android:title="@string/add_reaction">
-        <menu></menu>
+        <menu />
     </item>
 
 </menu>

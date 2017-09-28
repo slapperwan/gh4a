@@ -216,16 +216,16 @@ public class HtmlUtils {
             1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,
         };
 
-        private float mDividerHeight;
-        private int mBulletMargin;
-        private int mReplyMargin;
-        private int mReplyMarkerSize;
+        private final float mDividerHeight;
+        private final int mBulletMargin;
+        private final int mReplyMargin;
+        private final int mReplyMarkerSize;
 
-        private Context mContext;
-        private String mSource;
-        private XMLReader mReader;
-        private SpannableStringBuilder mSpannableStringBuilder;
-        private android.text.Html.ImageGetter mImageGetter;
+        private final Context mContext;
+        private final String mSource;
+        private final XMLReader mReader;
+        private final SpannableStringBuilder mSpannableStringBuilder;
+        private final android.text.Html.ImageGetter mImageGetter;
 
         private static Pattern sTextAlignPattern;
         private static Pattern sForegroundColorPattern;
@@ -943,7 +943,7 @@ public class HtmlUtils {
         }
 
         private static class Font {
-            public String mFace;
+            public final String mFace;
 
             public Font(String face) {
                 mFace = face;
@@ -951,7 +951,7 @@ public class HtmlUtils {
         }
 
         private static class Href {
-            public String mHref;
+            public final String mHref;
 
             public Href(String href) {
                 mHref = href;
@@ -959,7 +959,7 @@ public class HtmlUtils {
         }
 
         private static class Foreground {
-            private int mForegroundColor;
+            private final int mForegroundColor;
 
             public Foreground(int foregroundColor) {
                 mForegroundColor = foregroundColor;
@@ -967,7 +967,7 @@ public class HtmlUtils {
         }
 
         private static class Background {
-            private int mBackgroundColor;
+            private final int mBackgroundColor;
 
             public Background(int backgroundColor) {
                 mBackgroundColor = backgroundColor;
@@ -975,7 +975,7 @@ public class HtmlUtils {
         }
 
         private static class Heading {
-            private int mLevel;
+            private final int mLevel;
 
             public Heading(int level) {
                 mLevel = level;
@@ -983,7 +983,7 @@ public class HtmlUtils {
         }
 
         private static class Newline {
-            private int mNumNewlines;
+            private final int mNumNewlines;
 
             public Newline(int numNewlines) {
                 mNumNewlines = numNewlines;
@@ -991,7 +991,7 @@ public class HtmlUtils {
         }
 
         private static class Alignment {
-            private Layout.Alignment mAlignment;
+            private final Layout.Alignment mAlignment;
 
             public Alignment(Layout.Alignment alignment) {
                 mAlignment = alignment;

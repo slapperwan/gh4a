@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -121,8 +120,8 @@ public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implem
         super.onPageMoved(position, fraction);
         if (mCreateFab != null) {
             float openFraction = 1 - position - fraction;
-            ViewCompat.setScaleX(mCreateFab, openFraction);
-            ViewCompat.setScaleY(mCreateFab, openFraction);
+            mCreateFab.setScaleX(openFraction);
+            mCreateFab.setScaleY(openFraction);
             mCreateFab.setVisibility(openFraction == 0 ? View.INVISIBLE : View.VISIBLE);
         }
     }

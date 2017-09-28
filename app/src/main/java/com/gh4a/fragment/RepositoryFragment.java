@@ -21,7 +21,6 @@ import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.support.v4.os.AsyncTaskCompat;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -91,8 +90,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         }
         @Override
         protected void onResultReady(String result) {
-            AsyncTaskCompat.executeParallel(new FillReadmeTask(
-                    mRepository.getId(), mReadmeView, mLoadingView, mImageGetter), result);
+            new FillReadmeTask(mRepository.getId(), mReadmeView, mLoadingView, mImageGetter)
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, result);
         }
     };
 

@@ -12,7 +12,7 @@
     <item
         android:id="@+id/remove_filter"
         android:icon="@drawable/filter_remove"
-        android:title="Remove filter"
+        android:title="@string/issue_filter_remove"
         android:visible="false"
         app:showAsAction="always" />
 

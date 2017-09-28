@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -74,8 +73,8 @@ public class LabelBadgeView extends View {
         int desiredHeight = rows * mBadgeSize + (rows - 1) * mBadgeSpacing
                 + getPaddingTop() + getPaddingBottom();
 
-        setMeasuredDimension(ViewCompat.resolveSizeAndState(desiredWidth, widthMeasureSpec, 0),
-                ViewCompat.resolveSizeAndState(desiredHeight, heightMeasureSpec, 0));
+        setMeasuredDimension(View.resolveSizeAndState(desiredWidth, widthMeasureSpec, 0),
+                View.resolveSizeAndState(desiredHeight, heightMeasureSpec, 0));
     }
 
     @Override

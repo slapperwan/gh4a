@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -88,12 +87,12 @@ public class IssueListFactory extends FragmentFactory {
     public boolean onCreateOptionsMenu(Menu menu) {
         int resIdState = mShowingClosed ?
                 R.string.issues_menu_show_open : R.string.issues_menu_show_closed;
-        MenuItem item = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, resIdState);
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_IF_ROOM);
+        menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, resIdState)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
-        item = menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.actions)
-                .setIcon(R.drawable.overflow_horizontal);
-        MenuItemCompat.setShowAsAction(item, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.actions)
+                .setIcon(R.drawable.overflow_horizontal)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         return super.onCreateOptionsMenu(menu);
     }

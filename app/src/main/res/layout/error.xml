@@ -37,8 +37,8 @@
         android:paddingRight="16dp"
         android:paddingTop="8dp"
         android:text="@string/try_again"
+        android:textAllCaps="true"
         android:textColor="?attr/colorAccent"
-        app:allCaps="true"
         app:ghFont="medium" />
 
     <View

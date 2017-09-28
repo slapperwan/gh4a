@@ -25,8 +25,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -64,7 +62,7 @@ import java.util.Map;
 public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
-        MenuItemCompat.OnActionExpandListener {
+        MenuItem.OnActionExpandListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return makeIntent(context, repoOwner, repoName, false);
     }
@@ -232,11 +230,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public void onRefresh() {
         mAssignees = null;
         mMilestones = null;
@@ -276,8 +269,8 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         super.onPageMoved(position, fraction);
         if (!mSearchMode && mCreateFab != null) {
             float openFraction = 1 - position - fraction;
-            ViewCompat.setScaleX(mCreateFab, openFraction);
-            ViewCompat.setScaleY(mCreateFab, openFraction);
+            mCreateFab.setScaleX(openFraction);
+            mCreateFab.setScaleY(openFraction);
             mCreateFab.setVisibility(openFraction == 0 ? View.INVISIBLE : View.VISIBLE);
         }
     }
@@ -448,11 +441,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         getMenuInflater().inflate(R.menu.issue_list_menu, menu);
 
         MenuItem searchItem = menu.findItem(R.id.search);
-        MenuItemCompat.setOnActionExpandListener(searchItem, this);
+        searchItem.setOnActionExpandListener(this);
 
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
         if (mSearchIsExpanded) {
-            MenuItemCompat.expandActionView(searchItem);
+            searchItem.expandActionView();
             searchView.setQuery(mSearchQuery, false);
         }
         searchView.setOnCloseListener(this);

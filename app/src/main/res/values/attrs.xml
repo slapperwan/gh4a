@@ -117,7 +117,6 @@
             <enum name="condensed" value="4" />
             <enum name="boldCondensed" value="5" />
         </attr>
-        <attr name="allCaps" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="IssueStateTrackingFloatingActionButton">

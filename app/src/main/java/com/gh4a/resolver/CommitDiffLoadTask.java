@@ -16,7 +16,7 @@ import java.util.List;
 
 public class CommitDiffLoadTask extends DiffLoadTask {
     @VisibleForTesting
-    protected String mSha;
+    protected final String mSha;
 
     public CommitDiffLoadTask(FragmentActivity activity, String repoOwner, String repoName,
             DiffHighlightId diffId, String sha) {

@@ -60,7 +60,7 @@ public class TimelineItemAdapter
         Reaction addReactionInBackground(Comment comment, String content) throws IOException;
     }
 
-    private ReviewViewHolder.Callback mReviewCallback = new ReviewViewHolder.Callback() {
+    private final ReviewViewHolder.Callback mReviewCallback = new ReviewViewHolder.Callback() {
         @Override
         public boolean canQuote() {
             return !mLocked && mDisplayReviewDetails;
@@ -72,7 +72,7 @@ public class TimelineItemAdapter
         }
     };
 
-    private CommentViewHolder.Callback mCommentCallback = new CommentViewHolder.Callback() {
+    private final CommentViewHolder.Callback mCommentCallback = new CommentViewHolder.Callback() {
         @Override
         public boolean canQuote() {
             return !mLocked;
@@ -123,7 +123,7 @@ public class TimelineItemAdapter
         }
     };
 
-    private ReplyViewHolder.Callback mReplyCallback = new ReplyViewHolder.Callback() {
+    private final ReplyViewHolder.Callback mReplyCallback = new ReplyViewHolder.Callback() {
         @Override
         public void reply(long replyToId) {
             mActionCallback.replyToComment(replyToId);

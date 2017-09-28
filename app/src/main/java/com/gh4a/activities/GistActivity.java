@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -158,14 +157,14 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuItem starItem = menu.add(0, R.id.star, 0, R.string.repo_star_action)
-                .setIcon(R.drawable.star);
-        MenuItemCompat.setShowAsAction(starItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        menu.add(0, R.id.star, 0, R.string.repo_star_action)
+                .setIcon(R.drawable.star)
+                .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         if (mGist != null) {
-            MenuItem shareItem = menu.add(0, R.id.share, 0, R.string.share)
-                    .setIcon(R.drawable.social_share);
-            MenuItemCompat.setShowAsAction(shareItem, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+            menu.add(0, R.id.share, 0, R.string.share)
+                    .setIcon(R.drawable.social_share)
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -179,8 +178,8 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         starAction.setVisible(authorized);
         if (authorized) {
             if (mIsStarred == null) {
-                MenuItemCompat.setActionView(starAction, R.layout.ab_loading);
-                MenuItemCompat.expandActionView(starAction);
+                starAction.setActionView(R.layout.ab_loading);
+                starAction.expandActionView();
             } else if (mIsStarred) {
                 starAction.setTitle(R.string.repo_unstar_action);
                 starAction.setIcon(R.drawable.unstar);
@@ -202,8 +201,8 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
                         mGist.getHtmlUrl());
                 return true;
             case R.id.star:
-                MenuItemCompat.setActionView(item, R.layout.ab_loading);
-                MenuItemCompat.expandActionView(item);
+                item.setActionView(R.layout.ab_loading);
+                item.expandActionView();
                 new UpdateStarTask().schedule();
                 return true;
         }

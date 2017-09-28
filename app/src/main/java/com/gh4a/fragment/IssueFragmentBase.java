@@ -79,7 +79,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     private boolean mIsCollaborator;
     private boolean mListShown;
     private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
-    private ReactionBar.ReactionDetailsCache mReactionDetailsCache =
+    private final ReactionBar.ReactionDetailsCache mReactionDetailsCache =
             new ReactionBar.ReactionDetailsCache(this);
     private TimelineItemAdapter mAdapter;
     private HttpImageGetter mImageGetter;
@@ -181,7 +181,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public void onRefresh() {
         if (mListHeaderView != null) {
-            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
             fillLabels(null);
         }
         if (mImageGetter != null) {
@@ -380,7 +380,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         List<User> assignees = mIssue.getAssignees();
         if (assignees != null && !assignees.isEmpty()) {
             ViewGroup assigneeContainer = mListHeaderView.findViewById(R.id.assignee_list);
-            LayoutInflater inflater = getLayoutInflater(null);
+            LayoutInflater inflater = getLayoutInflater();
             assigneeContainer.removeAllViews();
             for (User assignee : assignees) {
                 View row = inflater.inflate(R.layout.row_assignee, assigneeContainer, false);
@@ -464,7 +464,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         }
         if (mReactionMenuHelper != null) {
             mReactionMenuHelper.update();
-            getActivity().supportInvalidateOptionsMenu();
+            getActivity().invalidateOptionsMenu();
         }
     }
 

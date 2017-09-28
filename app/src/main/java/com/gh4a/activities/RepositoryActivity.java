@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -330,8 +329,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         watchAction.setVisible(authorized);
         if (authorized) {
             if (mIsWatching == null) {
-                MenuItemCompat.setActionView(watchAction, R.layout.ab_loading);
-                MenuItemCompat.expandActionView(watchAction);
+                watchAction.setActionView(R.layout.ab_loading);
+                watchAction.expandActionView();
             } else if (mIsWatching) {
                 watchAction.setTitle(R.string.repo_unwatch_action);
             } else {
@@ -343,8 +342,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         starAction.setVisible(authorized);
         if (authorized) {
             if (mIsStarring == null) {
-                MenuItemCompat.setActionView(starAction, R.layout.ab_loading);
-                MenuItemCompat.expandActionView(starAction);
+                starAction.setActionView(R.layout.ab_loading);
+                starAction.expandActionView();
             } else if (mIsStarring) {
                 starAction.setTitle(R.string.repo_unstar_action);
                 starAction.setIcon(R.drawable.unstar);
@@ -379,13 +378,13 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         String url = "https://github.com/" + mRepoOwner + "/" + mRepoName;
         switch (item.getItemId()) {
             case R.id.watch:
-                MenuItemCompat.setActionView(item, R.layout.ab_loading);
-                MenuItemCompat.expandActionView(item);
+                item.setActionView(R.layout.ab_loading);
+                item.expandActionView();
                 new UpdateWatchTask().schedule();
                 return true;
             case R.id.star:
-                MenuItemCompat.setActionView(item, R.layout.ab_loading);
-                MenuItemCompat.expandActionView(item);
+                item.setActionView(R.layout.ab_loading);
+                item.expandActionView();
                 new UpdateStarTask().schedule();
                 return true;
             case R.id.ref:

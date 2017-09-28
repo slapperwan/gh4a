@@ -121,8 +121,8 @@ public class HttpImageGetter {
     }
 
     private static class PlaceholderDrawable extends DrawableWrapper implements Runnable {
-        private String mUrl;
-        private ObjectInfo mInfo;
+        private final String mUrl;
+        private final ObjectInfo mInfo;
         private Drawable mLoadedImage;
 
         public PlaceholderDrawable(String url, ObjectInfo info, Drawable placeholder) {
@@ -174,8 +174,8 @@ public class HttpImageGetter {
                 ImageSpan[] spans = getImageSpans();
                 if (spans != null && spans.length > 0) {
                     ArrayList<PlaceholderDrawable> imagesToLoad = new ArrayList<>();
-                    for (int i = 0; i < spans.length; i++) {
-                        Drawable d = spans[i].getDrawable();
+                    for (ImageSpan span : spans) {
+                        Drawable d = span.getDrawable();
                         if (d instanceof PlaceholderDrawable) {
                             imagesToLoad.add((PlaceholderDrawable) d);
                         }
@@ -315,7 +315,7 @@ public class HttpImageGetter {
     }
 
     private final Handler mHandler = new Handler();
-    private Map<Object, ObjectInfo> mObjectInfos = new HashMap<>();
+    private final Map<Object, ObjectInfo> mObjectInfos = new HashMap<>();
     private final Drawable mLoadingDrawable;
     private final Drawable mErrorDrawable;
 
@@ -327,7 +327,6 @@ public class HttpImageGetter {
     private final int mHeight;
 
     private boolean mDestroyed;
-    private boolean mResumed;
 
     public HttpImageGetter(Context context) {
         mContext = context;
@@ -352,14 +351,12 @@ public class HttpImageGetter {
     }
 
     public void pause() {
-        mResumed = false;
         for (ObjectInfo info : mObjectInfos.values()) {
             info.setResumed(false);
         }
     }
 
     public void resume() {
-        mResumed = true;
         for (ObjectInfo info : mObjectInfos.values()) {
             info.setResumed(true);
         }
@@ -404,7 +401,7 @@ public class HttpImageGetter {
     }
 
     private static class ImageGetterAsyncTask extends AsyncTask<PlaceholderDrawable, Void, Void> {
-        private HttpImageGetter mImageGetter;
+        private final HttpImageGetter mImageGetter;
         private final ObjectInfo mInfo;
 
         public ImageGetterAsyncTask(HttpImageGetter getter, ObjectInfo info) {
