@@ -243,7 +243,7 @@ public class NotificationsJob extends Job {
 
     private NotificationCompat.Builder makeBaseBuilder() {
         return new NotificationCompat.Builder(getContext(), CHANNEL_GITHUB_NOTIFICATIONS)
-                .setSmallIcon(R.drawable.octodroid_bg)
+                .setSmallIcon(R.drawable.notification)
                 .setColor(ContextCompat.getColor(getContext(), R.color.octodroid));
     }
 
