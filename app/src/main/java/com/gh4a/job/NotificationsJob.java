@@ -37,15 +37,20 @@ import org.eclipse.egit.github.core.Repository;
 import org.eclipse.egit.github.core.User;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class NotificationsJob extends Job {
     private static final String CHANNEL_GITHUB_NOTIFICATIONS = "channel_notifications";
     private static final String GROUP_ID_GITHUB = "github_notifications";
-    private static final int NOTIFICATION_ID_BASE = 10000;
     public static final String TAG = "job_notifications";
+
+    private static final String KEY_LAST_NOTIFICATION_CHECK = "last_notification_check";
+    private static final String KEY_LAST_NOTIFICATION_IDS = "last_notification_ids";
 
     public static void scheduleJob(int intervalMinutes) {
         new JobRequest.Builder(TAG)
@@ -93,8 +98,8 @@ public class NotificationsJob extends Job {
 
             SharedPreferences prefs = getContext().getSharedPreferences(SettingsFragment.PREF_NAME,
                     Context.MODE_PRIVATE);
-            long lastCheck = prefs.getLong(SettingsFragment.KEY_LAST_NOTIFICATION_CHECK, 0);
-            int lastCount = prefs.getInt(SettingsFragment.KEY_LAST_NOTIFICATION_COUNT, 0);
+            long lastCheck = prefs.getLong(KEY_LAST_NOTIFICATION_CHECK, 0);
+            Set<String> newPostedIds = null;
 
             NotificationManagerCompat notificationManager =
                     NotificationManagerCompat.from(getContext());
@@ -102,24 +107,40 @@ public class NotificationsJob extends Job {
             if (notifications.isEmpty()) {
                 notificationManager.cancelAll();
             } else {
-                for (int i = 0; i < lastCount; i++) {
-                    // Do not cancel summary notification
-                    notificationManager.cancel(NOTIFICATION_ID_BASE + 1 + i);
+                ArrayList<Notification> added = new ArrayList<>();
+                Set<String> lastIds = prefs.getStringSet(KEY_LAST_NOTIFICATION_IDS, null);
+
+                for (NotificationHolder n : notifications) {
+                    if (lastIds != null && lastIds.contains(n.notification.getId())) {
+                        lastIds.remove(n.notification.getId());
+                    } else {
+                        added.add(n.notification);
+                    }
+                }
+                // What's in lastIds now are the removed notifications, so cancel those
+                if (lastIds != null) {
+                    for (String id : lastIds) {
+                        notificationManager.cancel(id.hashCode());
+                    }
                 }
 
                 int color = ContextCompat.getColor(getContext(), R.color.octodroid);
 
-                showSummaryNotification(notificationManager, notifications, color, lastCheck);
-                for (int i = 0; i < notifications.size(); i++) {
-                    showSingleNotification(notificationManager, color,
-                            notifications.get(i).notification, i, lastCheck);
+                if ((lastIds != null && !lastIds.isEmpty()) || !added.isEmpty()) {
+                    showSummaryNotification(notificationManager, notifications, color, lastCheck);
+                }
+                for (int i = 0; i < added.size(); i++) {
+                    showSingleNotification(notificationManager, color, added.get(i), lastCheck);
+                }
+                newPostedIds = new HashSet<>();
+                for (NotificationHolder n : notifications) {
+                    newPostedIds.add(n.notification.getId());
                 }
             }
 
             prefs.edit()
-                    .putLong(SettingsFragment.KEY_LAST_NOTIFICATION_CHECK,
-                            System.currentTimeMillis())
-                    .putInt(SettingsFragment.KEY_LAST_NOTIFICATION_COUNT, notifications.size())
+                    .putLong(KEY_LAST_NOTIFICATION_CHECK, System.currentTimeMillis())
+                    .putStringSet(KEY_LAST_NOTIFICATION_IDS, newPostedIds)
                     .apply();
         } catch (IOException e) {
             return Result.FAILURE;
@@ -129,8 +150,8 @@ public class NotificationsJob extends Job {
     }
 
     private void showSingleNotification(NotificationManagerCompat notificationManager,
-            int color, Notification notification, int index, long lastCheck) {
-        int id = NOTIFICATION_ID_BASE + 1 + index;
+            int color, Notification notification, long lastCheck) {
+        int id = notification.getId().hashCode();
         Repository repository = notification.getRepository();
         User owner = repository.getOwner();
         String title = owner.getLogin() + "/" + repository.getName();
@@ -211,7 +232,7 @@ public class NotificationsJob extends Job {
             builder.setLocalOnly(true);
         }
 
-        notificationManager.notify(NOTIFICATION_ID_BASE, builder.build());
+        notificationManager.notify(0, builder.build());
     }
 
     private Bitmap loadRoundUserAvatar(User user) {
