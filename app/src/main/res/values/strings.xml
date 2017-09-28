@@ -534,9 +534,13 @@
     <string name="channel_notifications_description">Notifications received from GitHub.</string>
     <string name="unread_notifications_summary_title">Unread GitHub notifications</string>
     <plurals name="unread_notifications_summary_text">
-        <item quantity="zero">You have no unread notifications</item>
-        <item quantity="one">You have one unread notification</item>
-        <item quantity="other">You have %1$d unread notifications</item>
+        <item quantity="zero">No unread notifications</item>
+        <item quantity="one">One unread notification</item>
+        <item quantity="other">%1$d unread notifications</item>
+    </plurals>
+    <plurals name="notification">
+        <item quantity="one">1 notification</item>
+        <item quantity="other">%1$d notifications</item>
     </plurals>
     <string name="notification_interval">Sync interval</string>
     <string name="notification_mark_read">Auto mark read</string>

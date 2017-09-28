@@ -149,6 +149,8 @@
             </intent-filter>
         </activity>
 
+        <service android:name=".job.NotificationHandlingService" />
+
         <provider
             android:name=".db.BookmarksProvider"
             android:authorities="com.gh4a"
