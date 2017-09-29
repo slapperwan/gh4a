@@ -19,6 +19,7 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.apollographql.android'
 
 if (isPlaystore) {
     apply plugin: 'io.fabric'

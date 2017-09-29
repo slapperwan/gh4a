@@ -21,8 +21,10 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
+import com.apollographql.apollo.ApolloClient;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.CrashReportingHelper;
 
@@ -50,9 +52,15 @@ import org.eclipse.egit.github.core.service.UserService;
 import org.eclipse.egit.github.core.service.WatcherService;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * The Class Gh4Application.
@@ -85,6 +93,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     private GitHubClient mClient;
     private HashMap<String, GitHubService> mServices;
     private PrettyTime mPt;
+    private ApolloClient mApolloClient;
 
     private static final int THEME_DARK = 0;
     private static final int THEME_LIGHT = 1;
@@ -135,8 +144,27 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
         mPt = new PrettyTime();
 
+        final String authToken = getAuthToken();
+
         mClient = new DefaultClient();
-        mClient.setOAuth2Token(getAuthToken());
+        mClient.setOAuth2Token(authToken);
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(@NonNull Chain chain) throws IOException {
+                        Request request = chain.request().newBuilder()
+                                .addHeader("Authorization", "token " + authToken)
+                                .build();
+                        return chain.proceed(request);
+                    }
+                })
+                .build();
+
+        mApolloClient = ApolloClient.builder()
+                .serverUrl("https://api.github.com/graphql")
+                .okHttpClient(client)
+                .build();
 
         mServices = new HashMap<>();
         mServices.put(COLLAB_SERVICE, new CollaboratorService(mClient));
@@ -158,6 +186,10 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         mServices.put(STAR_SERVICE, new StarService(mClient));
         mServices.put(USER_SERVICE, new UserService(mClient));
         mServices.put(WATCHER_SERVICE, new WatcherService(mClient));
+    }
+
+    public ApolloClient getApolloClient() {
+        return mApolloClient;
     }
 
     public GitHubService getService(String name) {

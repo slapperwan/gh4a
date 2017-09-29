@@ -1,0 +1,16 @@
+query PullRequestPendingReviewQuery(
+  $owner: String!,
+  $repo: String!,
+  $prNumber: Int!
+) {
+  repository(owner: $owner, name: $repo) {
+    pullRequest(number: $prNumber) {
+      id
+      reviews(states: PENDING, first: 1) {
+        nodes {
+          id
+        }
+      }
+    }
+  }
+}
