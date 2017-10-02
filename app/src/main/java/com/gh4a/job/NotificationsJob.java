@@ -144,7 +144,7 @@ public class NotificationsJob extends Job {
 
         Intent markReadIntent =
                 NotificationHandlingService.makeMarkReposNotificationsAsReadActionIntent(
-                        getContext(), repository);
+                        getContext(), id, repository.getOwner().getLogin(), repository.getName());
         PendingIntent markReadPendingIntent = PendingIntent.getService(getContext(), id,
                 markReadIntent, 0);
         NotificationCompat.Action markReadAction = new NotificationCompat.Action(
@@ -166,7 +166,7 @@ public class NotificationsJob extends Job {
         Uri uri = url != null ? ApiHelpers.normalizeUri(Uri.parse(url)) : null;
 
         Intent intent = NotificationHandlingService.makeOpenNotificationActionIntent(
-                getContext(), uri, repository);
+                getContext(), uri, repository.getOwner().getLogin(), repository.getName());
         PendingIntent pendingIntent = PendingIntent.getService(getContext(), id, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
         builder.setContentIntent(pendingIntent);
