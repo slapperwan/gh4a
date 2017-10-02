@@ -59,6 +59,13 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         return intent;
     }
 
+    public static Intent makeNotificationsIntent(Context context, String repoOwner,
+            String repoName) {
+        return makeIntent(context, R.id.notifications)
+                .putExtra(NotificationListFragment.EXTRA_INITIAL_REPO_OWNER, repoOwner)
+                .putExtra(NotificationListFragment.EXTRA_INITIAL_REPO_NAME, repoName);
+    }
+
     private static final int REQUEST_SETTINGS = 10000;
 
     private FragmentFactory mFactory;
