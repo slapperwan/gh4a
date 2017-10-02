@@ -36,9 +36,13 @@ import org.eclipse.egit.github.core.service.NotificationService;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 public class NotificationListFragment extends LoadingListFragmentBase implements
         RootAdapter.OnItemClickListener<NotificationHolder>,NotificationAdapter.OnNotificationActionCallback {
+    public static final String EXTRA_INITIAL_REPO_OWNER = "initial_notification_repo_owner";
+    public static final String EXTRA_INITIAL_REPO_NAME = "initial_notification_repo_name";
+
     public static NotificationListFragment newInstance() {
         return new NotificationListFragment();
     }
@@ -62,6 +66,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             if (!mAll && !mParticipating) {
                 mCallback.setNotificationsIndicatorVisible(!result.notifications.isEmpty());
             }
+
+            scrollToInitialNotification(result.notifications);
         }
     };
 
@@ -253,6 +259,30 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             }
         }
         updateMenuItemVisibility();
+    }
+
+    private void scrollToInitialNotification(List<NotificationHolder> notifications) {
+        Bundle extras = getActivity().getIntent().getExtras();
+        String repoOwner = extras.getString(EXTRA_INITIAL_REPO_OWNER);
+        String repoName = extras.getString(EXTRA_INITIAL_REPO_NAME);
+        extras.remove(EXTRA_INITIAL_REPO_OWNER);
+        extras.remove(EXTRA_INITIAL_REPO_NAME);
+
+        if (repoOwner == null || repoName == null) {
+            return;
+        }
+
+        for (int i = 0; i < notifications.size(); i++) {
+            NotificationHolder holder = notifications.get(i);
+            if (holder.notification == null) {
+                Repository repo = holder.repository;
+                if (repoOwner.equals(repo.getOwner().getLogin())
+                        && repoName.equals(repo.getName())) {
+                    scrollToAndHighlightPosition(i);
+                    break;
+                }
+            }
+        }
     }
 
     private class MarkReadTask extends BackgroundTask<Void> {

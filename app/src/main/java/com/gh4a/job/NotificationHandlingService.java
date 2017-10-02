@@ -10,7 +10,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.gh4a.Gh4Application;
-import com.gh4a.R;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.resolver.BrowseFilter;
@@ -83,8 +82,7 @@ public class NotificationHandlingService extends IntentService {
         if (uri != null) {
             startActivity(BrowseFilter.makeRedirectionIntent(this, uri, null));
         } else {
-            // FIXME: scroll to repo - maybe create separate activity?
-            startActivity(HomeActivity.makeIntent(this, R.id.notifications));
+            startActivity(HomeActivity.makeNotificationsIntent(this, repoOwner, repoName));
         }
     }
 
