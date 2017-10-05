@@ -263,6 +263,10 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
 
     private void scrollToInitialNotification(List<NotificationHolder> notifications) {
         Bundle extras = getActivity().getIntent().getExtras();
+        if (extras == null) {
+            return;
+        }
+
         String repoOwner = extras.getString(EXTRA_INITIAL_REPO_OWNER);
         String repoName = extras.getString(EXTRA_INITIAL_REPO_NAME);
         extras.remove(EXTRA_INITIAL_REPO_OWNER);
