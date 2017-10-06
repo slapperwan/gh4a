@@ -67,16 +67,20 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
             Map<String, TimelineItem.TimelineReview> reviewsBySpecialId = new HashMap<>();
 
             for (CommitComment commitComment : commitComments) {
-                String id = TimelineItem.Diff.getDiffHunkId(commitComment);
-
-                TimelineItem.TimelineReview review = reviewsBySpecialId.get(id);
-                if (review == null) {
-                    review = reviewsById.get(commitComment.getPullRequestReviewId());
-                    reviewsBySpecialId.put(id, review);
-                }
-
                 CommitFile file = filesByName.get(commitComment.getPath());
-                review.addComment(commitComment, file, true);
+                if (commitComment.getPullRequestReviewId() == 0) {
+                    events.add(new TimelineItem.TimelineComment(commitComment, file));
+                } else {
+                    String id = TimelineItem.Diff.getDiffHunkId(commitComment);
+
+                    TimelineItem.TimelineReview review = reviewsBySpecialId.get(id);
+                    if (review == null) {
+                        review = reviewsById.get(commitComment.getPullRequestReviewId());
+                        reviewsBySpecialId.put(id, review);
+                    }
+
+                    review.addComment(commitComment, file, true);
+                }
             }
         }
 
