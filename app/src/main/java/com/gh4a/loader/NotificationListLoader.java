@@ -3,37 +3,41 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.NotificationThread;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.activity.NotificationService;
 
-import org.eclipse.egit.github.core.Notification;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.NotificationService;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NotificationListLoader extends BaseLoader<NotificationListLoadResult> {
 
-    private static final Comparator<Notification> SORTER = new Comparator<Notification>() {
+    private static final Comparator<NotificationThread> SORTER = new Comparator<NotificationThread>() {
         @Override
-        public int compare(Notification lhs, Notification rhs) {
-            Repository lhsRepository = lhs.getRepository();
-            Repository rhsRepository = rhs.getRepository();
+        public int compare(NotificationThread lhs, NotificationThread rhs) {
+            Repository lhsRepository = lhs.repository();
+            Repository rhsRepository = rhs.repository();
 
             if (!lhsRepository.equals(rhsRepository)) {
-                User lhsOwner = lhsRepository.getOwner();
-                User rhsOwner = rhsRepository.getOwner();
+                User lhsOwner = lhsRepository.owner();
+                User rhsOwner = rhsRepository.owner();
 
                 if (!lhsOwner.equals(rhsOwner)) {
-                    return lhsOwner.getLogin().compareTo(rhsOwner.getLogin());
+                    return lhsOwner.login().compareTo(rhsOwner.location());
                 }
 
-                return lhsRepository.getName().compareTo(rhsRepository.getName());
+                return lhsRepository.name().compareTo(rhsRepository.name());
             }
 
-            return rhs.getUpdatedAt().compareTo(lhs.getUpdatedAt());
+            return rhs.updatedAt().compareTo(lhs.updatedAt());
         }
     };
 
@@ -48,10 +52,19 @@ public class NotificationListLoader extends BaseLoader<NotificationListLoadResul
 
     @Override
     protected NotificationListLoadResult doLoadInBackground() throws Exception {
-        NotificationService notificationService = (NotificationService)
-                Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
-        List<Notification> notifications =
-                notificationService.getNotifications(mAll, mParticipating);
+        final NotificationService service =
+                Gh4Application.get().getGitHubService(NotificationService.class);
+        final Map<String, Object> options = new HashMap<>();
+        options.put("all", mAll);
+        options.put("participating", mParticipating);
+
+        List<NotificationThread> notifications = ApiHelpers.Pager.fetchAllPages(
+                new ApiHelpers.Pager.PageProvider<NotificationThread>() {
+            @Override
+            public Page<NotificationThread> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(service.getNotifications(options, page).blockingGet());
+            }
+        });
         Collections.sort(notifications, SORTER);
 
         Repository previousRepository = null;
@@ -59,8 +72,8 @@ public class NotificationListLoader extends BaseLoader<NotificationListLoadResul
         int unreadNotificationsCount = 0;
         NotificationHolder previousRepositoryHolder = null;
 
-        for (Notification notification : notifications) {
-            Repository repository = notification.getRepository();
+        for (NotificationThread notification : notifications) {
+            Repository repository = notification.repository();
 
             if (!repository.equals(previousRepository)) {
                 markHolder(result, unreadNotificationsCount, previousRepositoryHolder);
@@ -71,7 +84,7 @@ public class NotificationListLoader extends BaseLoader<NotificationListLoadResul
                 unreadNotificationsCount = 0;
             }
 
-            if (notification.isUnread()) {
+            if (notification.unread()) {
                 unreadNotificationsCount += 1;
             }
 

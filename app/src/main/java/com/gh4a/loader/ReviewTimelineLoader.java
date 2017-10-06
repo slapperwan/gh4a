@@ -3,13 +3,16 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.GitHubFile;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Review;
+import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.Review;
-import org.eclipse.egit.github.core.service.PullRequestService;
-
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,43 +36,67 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
 
     @Override
     protected List<TimelineItem> doLoadInBackground() throws Exception {
-        PullRequestService pullRequestService = (PullRequestService)
-                Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        final Gh4Application app = Gh4Application.get();
+        final PullRequestService prService = app.getGitHubService(PullRequestService.class);
+        final PullRequestReviewService reviewService =
+                app.getGitHubService(PullRequestReviewService.class);
+        final PullRequestReviewCommentService commentService =
+                app.getGitHubService(PullRequestReviewCommentService.class);
 
-        Review review = pullRequestService.getReview(repoId, mPullRequestNumber, mReviewId);
+        Review review = ApiHelpers.throwOnFailure(reviewService.getReview(
+                mRepoOwner, mRepoName, mPullRequestNumber, mReviewId).blockingGet());
         TimelineItem.TimelineReview timelineReview = new TimelineItem.TimelineReview(review);
 
-        List<CommitComment> reviewComments =
-                pullRequestService.getReviewComments(repoId, mPullRequestNumber, mReviewId);
+        List<ReviewComment> reviewComments = ApiHelpers.Pager.fetchAllPages(
+                new ApiHelpers.Pager.PageProvider<ReviewComment>() {
+            @Override
+            public Page<ReviewComment> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(reviewService.getReviewComments(
+                        mRepoOwner, mRepoName, mPullRequestNumber, mReviewId).blockingGet());
+            }
+        });
 
         if (!reviewComments.isEmpty()) {
-            Collections.sort(reviewComments);
+            Collections.sort(reviewComments, ApiHelpers.COMMENT_COMPARATOR);
 
-            HashMap<String, CommitFile> filesByName = new HashMap<>();
-            for (CommitFile file : pullRequestService.getFiles(repoId, mPullRequestNumber)) {
-                filesByName.put(file.getFilename(), file);
+            List<GitHubFile> files = ApiHelpers.Pager.fetchAllPages(
+                    new ApiHelpers.Pager.PageProvider<GitHubFile>() {
+                @Override
+                public Page<GitHubFile> providePage(long page) throws IOException {
+                    return ApiHelpers.throwOnFailure(prService.getPullRequestFiles(
+                            mRepoOwner, mRepoName, mPullRequestNumber, page).blockingGet());
+                }
+            });
+            HashMap<String, GitHubFile> filesByName = new HashMap<>();
+            for (GitHubFile file : files) {
+                filesByName.put(file.filename(), file);
             }
 
             // Add all of the review comments to the review item creating necessary diff hunks
-            for (CommitComment reviewComment : reviewComments) {
-                CommitFile file = filesByName.get(reviewComment.getPath());
+            for (ReviewComment reviewComment : reviewComments) {
+                GitHubFile file = filesByName.get(reviewComment.path());
                 timelineReview.addComment(reviewComment, file, true);
             }
 
-            List<CommitComment> commitComments =
-                    pullRequestService.getComments(repoId, mPullRequestNumber);
+            List<ReviewComment> comments = ApiHelpers.Pager.fetchAllPages(
+                    new ApiHelpers.Pager.PageProvider<ReviewComment>() {
+                @Override
+                public Page<ReviewComment> providePage(long page) throws IOException {
+                    return ApiHelpers.throwOnFailure(commentService.getPullRequestComments(
+                            mRepoOwner, mRepoName, mPullRequestNumber, page).blockingGet());
+                }
+            });
 
-            Collections.sort(commitComments);
+            Collections.sort(comments, ApiHelpers.COMMENT_COMPARATOR);
 
-            for (CommitComment commitComment : commitComments) {
+            for (ReviewComment commitComment : comments) {
                 if (reviewComments.contains(commitComment)) {
                     continue;
                 }
 
                 // Rest of the comments should be added only if they are under the same diff hunks
                 // as the original review comments.
-                CommitFile file = filesByName.get(commitComment.getPath());
+                GitHubFile file = filesByName.get(commitComment.path());
                 timelineReview.addComment(commitComment, file, false);
             }
         }

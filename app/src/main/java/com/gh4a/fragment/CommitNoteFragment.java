@@ -22,33 +22,33 @@ import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.EditorBottomSheet;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.CommitService;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.git.GitComment;
+import com.meisolsson.githubsdk.model.request.repository.CreateCommitComment;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> implements
-        CommitNoteAdapter.OnCommentAction<CommitComment>,
+public class CommitNoteFragment extends ListDataBaseFragment<GitComment> implements
+        CommitNoteAdapter.OnCommentAction<GitComment>,
         EditorBottomSheet.Callback, EditorBottomSheet.Listener {
 
     public static CommitNoteFragment newInstance(String repoOwner, String repoName,
-            String commitSha, RepositoryCommit commit,
-            List<CommitComment> allComments, IntentUtils.InitialCommentMarker initialComment) {
+            String commitSha, Commit commit,
+            List<GitComment> allComments, IntentUtils.InitialCommentMarker initialComment) {
         CommitNoteFragment f = new CommitNoteFragment();
 
-        ArrayList<CommitComment> comments = new ArrayList<>();
+        ArrayList<GitComment> comments = new ArrayList<>();
         // we're only interested in unpositional comments
-        for (CommitComment comment : allComments) {
-            if (comment.getPosition() < 0) {
+        for (GitComment comment : allComments) {
+            if (comment.position() < 0) {
                 comments.add(comment);
             }
         }
@@ -57,9 +57,9 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putString("sha", commitSha);
-        args.putSerializable("commit_author", commit.getAuthor());
-        args.putSerializable("committer", commit.getCommitter());
-        args.putSerializable("comments", comments);
+        args.putParcelable("commit_author", commit.author());
+        args.putParcelable("committer", commit.committer());
+        args.putParcelableArrayList("comments", comments);
         args.putParcelable("initial_comment", initialComment);
 
         f.setArguments(args);
@@ -89,8 +89,8 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
         mRepoOwner = args.getString("owner");
         mRepoName = args.getString("repo");
         mObjectSha = args.getString("sha");
-        mCommitAuthor = (User) args.getSerializable("commit_author");
-        mCommitter = (User) args.getSerializable("committer");
+        mCommitAuthor = args.getParcelable("commit_author");
+        mCommitter = args.getParcelable("committer");
         mInitialComment = args.getParcelable("initial_comment");
         args.remove("initial_comment");
     }
@@ -190,13 +190,13 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    protected RootAdapter<CommitComment, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
+    protected RootAdapter<GitComment, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new CommitNoteAdapter(getActivity(), mRepoOwner, mRepoName, this);
         return mAdapter;
     }
 
     @Override
-    protected void onAddData(RootAdapter<CommitComment, ?> adapter, List<CommitComment> data) {
+    protected void onAddData(RootAdapter<GitComment, ?> adapter, List<GitComment> data) {
         super.onAddData(adapter, data);
         Set<User> users = mAdapter.getUsers();
         if (mCommitAuthor != null) {
@@ -209,7 +209,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
         if (mInitialComment != null) {
             for (int i = 0; i < data.size(); i++) {
-                if (mInitialComment.matches(data.get(i).getId(), data.get(i).getCreatedAt())) {
+                if (mInitialComment.matches(data.get(i).id(), data.get(i).createdAt())) {
                     scrollToAndHighlightPosition(i);
                     break;
                 }
@@ -224,10 +224,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    public Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
+    public Loader<LoaderResult<List<GitComment>>> onCreateLoader() {
         CommitCommentListLoader loader = new CommitCommentListLoader(getActivity(),
                 mRepoOwner, mRepoName, mObjectSha, true, false);
-        loader.prefillData((List<CommitComment>) getArguments().getSerializable("comments"));
+        List<GitComment> comments = getArguments().getParcelableArrayList("comments");
+        loader.prefillData(comments);
         return loader;
     }
 
@@ -243,20 +244,20 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    public void editComment(CommitComment comment) {
+    public void editComment(GitComment comment) {
         Intent intent = EditCommitCommentActivity.makeIntent(getActivity(),
-                mRepoOwner, mRepoName, mObjectSha, comment);
+                mRepoOwner, mRepoName, mObjectSha, comment.id(), comment.body());
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
     @Override
-    public void deleteComment(final CommitComment comment) {
+    public void deleteComment(final GitComment comment) {
         new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.delete_comment_message)
                 .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new DeleteCommentTask(getBaseActivity(), comment.getId()).schedule();
+                        new DeleteCommentTask(getBaseActivity(), comment.id()).schedule();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
@@ -275,11 +276,10 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void onSendCommentInBackground(String comment) throws IOException {
-        CommitService commitService = (CommitService)
-                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
-        CommitComment commitComment = new CommitComment();
-        commitComment.setBody(comment);
-        commitService.addComment(new RepositoryId(mRepoOwner, mRepoName), mObjectSha, commitComment);
+        RepositoryCommentService service =
+                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        ApiHelpers.throwOnFailure(service.createCommitComment(mRepoOwner, mRepoName, mObjectSha,
+                CreateCommitComment.builder().body(comment).build()).blockingGet());
     }
 
     @Override
@@ -308,12 +308,10 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
         @Override
         protected Void run() throws Exception {
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            Gh4Application app = Gh4Application.get();
-            CommitService commitService =
-                    (CommitService) app.getService(Gh4Application.COMMIT_SERVICE);
-
-            commitService.deleteComment(repoId, mId);
+            RepositoryCommentService service =
+                    Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+            ApiHelpers.throwOnFailure(
+                    service.deleteCommitComment(mRepoOwner, mRepoName, mId).blockingGet());
             return null;
         }
 

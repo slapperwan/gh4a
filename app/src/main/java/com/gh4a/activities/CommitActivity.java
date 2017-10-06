@@ -37,9 +37,8 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryCommit;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.git.GitComment;
 
 import java.util.List;
 
@@ -74,38 +73,38 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     private String mObjectSha;
     private int mPullRequestNumber;
 
-    private RepositoryCommit mCommit;
-    private List<CommitComment> mComments;
+    private Commit mCommit;
+    private List<GitComment> mComments;
     private IntentUtils.InitialCommentMarker mInitialComment;
 
     private static final int[] TITLES = new int[] {
         R.string.commit, R.string.issue_comments
     };
 
-    private final LoaderCallbacks<RepositoryCommit> mCommitCallback =
-            new LoaderCallbacks<RepositoryCommit>(this) {
+    private final LoaderCallbacks<Commit> mCommitCallback =
+            new LoaderCallbacks<Commit>(this) {
         @Override
-        protected Loader<LoaderResult<RepositoryCommit>> onCreateLoader() {
+        protected Loader<LoaderResult<Commit>> onCreateLoader() {
             return new CommitLoader(CommitActivity.this, mRepoOwner, mRepoName, mObjectSha);
         }
 
         @Override
-        protected void onResultReady(RepositoryCommit result) {
+        protected void onResultReady(Commit result) {
             mCommit = result;
             showContentIfReady();
         }
     };
 
-    private final LoaderCallbacks<List<CommitComment>> mCommentCallback =
-            new LoaderCallbacks<List<CommitComment>>(this) {
+    private final LoaderCallbacks<List<GitComment>> mCommentCallback =
+            new LoaderCallbacks<List<GitComment>>(this) {
         @Override
-        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
+        protected Loader<LoaderResult<List<GitComment>>> onCreateLoader() {
             return new CommitCommentListLoader(CommitActivity.this, mRepoOwner, mRepoName,
                     mObjectSha, true, true);
         }
 
         @Override
-        protected void onResultReady(List<CommitComment> result) {
+        protected void onResultReady(List<GitComment> result) {
             mComments = result;
             if (result.isEmpty()) {
                 mInitialComment = null;

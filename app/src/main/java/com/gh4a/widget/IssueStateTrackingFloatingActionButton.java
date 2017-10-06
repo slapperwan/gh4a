@@ -5,10 +5,10 @@ import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
 
 import com.gh4a.R;
-import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.IssueState;
 
 public class IssueStateTrackingFloatingActionButton extends FloatingActionButton {
-    private String mState;
+    private IssueState mState;
     private boolean mMerged;
 
     private static final int[] STATE_CLOSED = { R.attr.state_closed };
@@ -26,7 +26,7 @@ public class IssueStateTrackingFloatingActionButton extends FloatingActionButton
         super(context, attrs, defStyleAttr);
     }
 
-    public void setState(String state) {
+    public void setState(IssueState state) {
         mState = state;
         refreshDrawableState();
     }
@@ -39,7 +39,7 @@ public class IssueStateTrackingFloatingActionButton extends FloatingActionButton
     @Override
     public int[] onCreateDrawableState(int extraSpace) {
         final int[] drawableState = super.onCreateDrawableState(extraSpace + 2);
-        if (ApiHelpers.IssueState.CLOSED.equals(mState)) {
+        if (mState == IssueState.Closed) {
             mergeDrawableStates(drawableState, STATE_CLOSED);
         }
         if (mMerged) {

@@ -2,8 +2,6 @@ package com.gh4a.fragment;
 
 import java.util.List;
 
-import org.eclipse.egit.github.core.Repository;
-
 import android.os.Bundle;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +12,7 @@ import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.RepositorySearchLoader;
+import com.meisolsson.githubsdk.model.Repository;
 
 public class RepositorySearchFragment extends ListDataBaseFragment<Repository> implements
         RootAdapter.OnItemClickListener<Repository> {

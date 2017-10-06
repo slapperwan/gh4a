@@ -1,7 +1,5 @@
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.Download;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.Formatter;
@@ -12,8 +10,9 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.ReleaseAsset;
 
-public class ReleaseAssetAdapter extends RootAdapter<Download, ReleaseAssetAdapter.ViewHolder> {
+public class ReleaseAssetAdapter extends RootAdapter<ReleaseAsset, ReleaseAssetAdapter.ViewHolder> {
     public ReleaseAssetAdapter(Context context) {
         super(context);
     }
@@ -25,19 +24,19 @@ public class ReleaseAssetAdapter extends RootAdapter<Download, ReleaseAssetAdapt
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, Download download) {
-        holder.tvTitle.setText(download.getName());
-        if (!StringUtils.isBlank(download.getDescription())) {
+    public void onBindViewHolder(ViewHolder holder, ReleaseAsset asset) {
+        holder.tvTitle.setText(asset.name());
+        if (!StringUtils.isBlank(asset.label())) {
             holder.tvDesc.setVisibility(View.VISIBLE);
-            holder.tvDesc.setText(download.getDescription());
+            holder.tvDesc.setText(asset.label());
         } else {
             holder.tvDesc.setVisibility(View.GONE);
         }
 
         holder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
-                StringUtils.formatRelativeTime(mContext, download.getCreatedAt(), true)));
-        holder.tvSize.setText(Formatter.formatFileSize(mContext, download.getSize()));
-        holder.tvDownloads.setText(String.valueOf(download.getDownloadCount()));
+                StringUtils.formatRelativeTime(mContext, asset.createdAt(), true)));
+        holder.tvSize.setText(Formatter.formatFileSize(mContext, asset.size()));
+        holder.tvDownloads.setText(String.valueOf(asset.downloadCount()));
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

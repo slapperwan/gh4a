@@ -15,10 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.StarService;
-
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
@@ -27,7 +23,13 @@ import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.service.activity.StarringService;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 public class StarredRepositoryListFragment extends PagedDataBaseFragment<Repository> {
@@ -72,12 +74,17 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
     }
 
     @Override
-    protected PageIterator<Repository> onCreateIterator() {
-        StarService starService = (StarService)
-                Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
-        HashMap<String, String> filterData = new HashMap<>();
+    protected PageIteratorLoader<Repository> onCreateLoader() {
+        final StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
+        final HashMap<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortOrder);
         filterData.put("direction", mSortDirection);
-        return starService.pageStarred(mLogin, filterData);
+        return new PageIteratorLoader<Repository>(getActivity()) {
+            @Override
+            protected Page<Repository> loadPage(int page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getStarredRepositories(mLogin, filterData, page).blockingGet());
+            }
+        };
     }
 }

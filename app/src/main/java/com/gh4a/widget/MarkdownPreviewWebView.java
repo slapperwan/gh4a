@@ -16,8 +16,7 @@ import android.widget.EditText;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.WebViewerActivity;
-
-import org.eclipse.egit.github.core.util.EncodingUtils;
+import com.gh4a.utils.StringUtils;
 
 public class MarkdownPreviewWebView extends WebView implements NestedScrollingChild2 {
     private final NestedScrollingChildHelper mChildHelper;
@@ -171,7 +170,7 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
     }
 
     private void setContent(String content) {
-        String html = generateMarkdownHtml(EncodingUtils.toBase64(content), mCssTheme);
+        String html = generateMarkdownHtml(StringUtils.toBase64(content), mCssTheme);
         loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
     }
 

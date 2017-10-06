@@ -30,13 +30,12 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.git.GitUser;
 import com.vdurmont.emoji.EmojiParser;
 
-import org.eclipse.egit.github.core.CommitUser;
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.User;
-
-public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.ViewHolder> {
+public class CommitAdapter extends RootAdapter<Commit, CommitAdapter.ViewHolder> {
     public CommitAdapter(Context context) {
         super(context);
     }
@@ -50,18 +49,18 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, RepositoryCommit commit) {
-        User author = commit.getAuthor();
+    public void onBindViewHolder(ViewHolder holder, Commit commit) {
+        User author = commit.author();
         if (author != null) {
             AvatarHandler.assignAvatar(holder.ivGravatar, author);
         } else {
-            CommitUser commitAuthor = commit.getCommit().getAuthor();
-            String email = commitAuthor != null ? commitAuthor.getEmail() : null;
+            GitUser commitAuthor = commit.commit().author();
+            String email = commitAuthor != null ? commitAuthor.email() : null;
             holder.ivGravatar.setImageDrawable(new AvatarHandler.DefaultAvatarDrawable(null, email));
         }
         holder.ivGravatar.setTag(commit);
 
-        String message = commit.getCommit().getMessage();
+        String message = commit.commit().message();
         int pos = message.indexOf('\n');
         if (pos > 0) {
             message = message.substring(0, pos);
@@ -69,10 +68,10 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
         message = EmojiParser.parseToUnicode(message);
 
         holder.tvDesc.setText(message);
-        holder.tvSha.setText(commit.getSha().substring(0, 10));
+        holder.tvSha.setText(commit.sha().substring(0, 10));
         holder.ivDescriptionIndicator.setVisibility(pos > 0 ? View.VISIBLE : View.GONE);
 
-        int comments = commit.getCommit().getCommentCount();
+        int comments = commit.commit().commentCount();
         if (comments > 0) {
             holder.tvComments.setText(String.valueOf(comments));
             holder.tvComments.setVisibility(View.VISIBLE);
@@ -82,13 +81,13 @@ public class CommitAdapter extends RootAdapter<RepositoryCommit, CommitAdapter.V
 
         holder.tvExtra.setText(ApiHelpers.getAuthorName(mContext, commit));
         holder.tvTimestamp.setText(
-                StringUtils.formatRelativeTime(mContext, commit.getCommit().getAuthor().getDate(), false));
+                StringUtils.formatRelativeTime(mContext, commit.commit().author().date(), false));
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
-            RepositoryCommit commit = (RepositoryCommit) v.getTag();
+            Commit commit = (Commit) v.getTag();
             Intent intent = UserActivity.makeIntent(mContext, ApiHelpers.getAuthorLogin(commit));
             if (intent != null) {
                 mContext.startActivity(intent);

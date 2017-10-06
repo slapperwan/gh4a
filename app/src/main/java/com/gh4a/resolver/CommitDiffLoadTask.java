@@ -7,14 +7,13 @@ import android.support.v4.app.FragmentActivity;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.CommitLoader;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.RepositoryCommit;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.GitHubFile;
+import com.meisolsson.githubsdk.model.git.GitComment;
 
 import java.util.List;
 
-public class CommitDiffLoadTask extends DiffLoadTask {
+public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
     @VisibleForTesting
     protected final String mSha;
 
@@ -25,10 +24,10 @@ public class CommitDiffLoadTask extends DiffLoadTask {
     }
 
     @Override
-    protected Intent getLaunchIntent(String sha, CommitFile file, List<CommitComment> comments,
-            DiffHighlightId diffId) {
+    protected Intent getLaunchIntent(String sha, GitHubFile file,
+            List<GitComment> comments, DiffHighlightId diffId) {
         return CommitDiffViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                sha, file.getFilename(), file.getPatch(), comments, diffId.startLine,
+                sha, file.filename(), file.patch(), comments, diffId.startLine,
                 diffId.endLine, diffId.right, null);
     }
 
@@ -38,13 +37,13 @@ public class CommitDiffLoadTask extends DiffLoadTask {
     }
 
     @Override
-    protected List<CommitFile> getFiles() throws Exception {
-        RepositoryCommit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mSha);
-        return commit.getFiles();
+    protected List<GitHubFile> getFiles() throws Exception {
+        Commit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mSha);
+        return commit.files();
     }
 
     @Override
-    protected List<CommitComment> getComments() throws Exception {
+    protected List<GitComment> getComments() throws Exception {
         return CommitCommentListLoader.loadComments(mRepoOwner, mRepoName, mSha);
     }
 }

@@ -268,7 +268,7 @@ public class LinkParserTest {
         assertThat("Extras are missing", extras, is(notNullValue()));
         assertThat("User name is incorrect", extras.getString("owner"), is("slapperwan"));
         assertThat("Repo name is incorrect", extras.getString("repo"), is("gh4a"));
-        assertThat("Issue to edit is set", extras.getSerializable("issue"), is(nullValue()));
+        assertThat("Issue to edit is set", extras.getParcelable("issue"), is(nullValue()));
     }
 
     @Test

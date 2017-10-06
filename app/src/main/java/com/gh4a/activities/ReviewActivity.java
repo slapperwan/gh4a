@@ -12,8 +12,7 @@ import android.view.MenuItem;
 import com.gh4a.R;
 import com.gh4a.fragment.ReviewFragment;
 import com.gh4a.utils.IntentUtils;
-
-import org.eclipse.egit.github.core.Review;
+import com.meisolsson.githubsdk.model.Review;
 
 public class ReviewActivity extends FragmentContainerActivity {
 
@@ -52,7 +51,7 @@ public class ReviewActivity extends FragmentContainerActivity {
         mRepoOwner = extras.getString("repo_owner");
         mRepoName = extras.getString("repo_name");
         mIssueNumber = extras.getInt("issue_number");
-        mReview = (Review) extras.getSerializable("review");
+        mReview = extras.getParcelable("review");
         mInitialComment = extras.getParcelable("initial_comment");
         extras.remove("initial_comment");
     }
@@ -67,11 +66,11 @@ public class ReviewActivity extends FragmentContainerActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share:
-                IntentUtils.share(this, mTitle, mReview.getHtmlUrl());
+                IntentUtils.share(this, mTitle, mReview.htmlUrl());
                 return true;
 
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(mReview.getHtmlUrl()));
+                IntentUtils.launchBrowser(this, Uri.parse(mReview.htmlUrl()));
                 return true;
         }
 
@@ -88,6 +87,6 @@ public class ReviewActivity extends FragmentContainerActivity {
     protected Intent navigateUp() {
         return PullRequestActivity.makeIntent(this, mRepoOwner, mRepoName, mIssueNumber,
                 PullRequestActivity.PAGE_CONVERSATION,
-                new IntentUtils.InitialCommentMarker(mReview.getId()));
+                new IntentUtils.InitialCommentMarker(mReview.id()));
     }
 }

@@ -47,15 +47,17 @@ import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.UserService;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.UserType;
+import com.meisolsson.githubsdk.service.users.UserFollowerService;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import retrofit2.Response;
 
 public class UserFragment extends LoadingFragmentBase implements View.OnClickListener {
     public static UserFragment newInstance(String login) {
@@ -96,7 +98,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             filterData.put("sort", "pushed");
             filterData.put("affiliation", "owner,collaborator");
             return new RepositoryListLoader(getActivity(), mUserLogin,
-                    mUser.getType(), filterData, 5);
+                    mUser.type(), filterData, 5);
         }
         @Override
         protected void onResultReady(Collection<Repository> result) {
@@ -178,8 +180,8 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         MenuItem followAction = menu.findItem(R.id.follow);
         if (followAction != null) {
-            if (!mIsSelf && Gh4Application.get().isAuthorized() && mUser != null
-                    && !ApiHelpers.UserType.ORG.equals(mUser.getType())) {
+            if (!mIsSelf && Gh4Application.get().isAuthorized()
+                    && mUser != null && mUser.type() == UserType.Organization) {
                 followAction.setVisible(true);
                 if (mIsFollowing == null) {
                     followAction.setActionView(R.layout.ab_loading);
@@ -211,12 +213,12 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         AvatarHandler.assignAvatar(gravatar, mUser);
 
         TextView tvFollowersCount = mContentView.findViewById(R.id.tv_followers_count);
-        tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
+        tvFollowersCount.setText(String.valueOf(mUser.followers()));
 
         View llOrgMembers = mContentView.findViewById(R.id.cell_org_members);
         View llFollowers = mContentView.findViewById(R.id.cell_followers);
 
-        if (ApiHelpers.UserType.USER.equals(mUser.getType())) {
+        if (mUser.type() == UserType.User) {
             llFollowers.setOnClickListener(this);
             llOrgMembers.setVisibility(View.GONE);
         } else {
@@ -227,42 +229,45 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         mContentView.findViewById(R.id.cell_repos).setOnClickListener(this);
 
         TextView tvReposCount = mContentView.findViewById(R.id.tv_repos_count);
+        final int gistCount;
         if (ApiHelpers.loginEquals(mUserLogin, Gh4Application.get().getAuthLogin())) {
-            tvReposCount.setText(String.valueOf(mUser.getTotalPrivateRepos() + mUser.getPublicRepos()));
+            tvReposCount.setText(String.valueOf(mUser.totalPrivateRepos() + mUser.publicRepos()));
+            gistCount = mUser.publicGists() + mUser.privateGists();
         } else {
-            tvReposCount.setText(String.valueOf(mUser.getPublicRepos()));
+            tvReposCount.setText(String.valueOf(mUser.publicRepos()));
+            gistCount = mUser.publicGists();
         }
 
         //hide gists repos if organization
-        fillCountIfUser(R.id.cell_gists, R.id.tv_gists_count,
-                mUser.getPublicGists() + mUser.getPrivateGists());
+
+        fillCountIfUser(R.id.cell_gists, R.id.tv_gists_count, gistCount);
         //hide following if organization
-        fillCountIfUser(R.id.cell_following, R.id.tv_following_count, mUser.getFollowing());
+        fillCountIfUser(R.id.cell_following, R.id.tv_following_count, mUser.following());
 
         TextView tvName = mContentView.findViewById(R.id.tv_name);
-        String name = StringUtils.isBlank(mUser.getName()) ? mUser.getLogin() : mUser.getName();
-        if (ApiHelpers.UserType.ORG.equals(mUser.getType())) {
+        String name = StringUtils.isBlank(mUser.name()) ? mUser.login() : mUser.name();
+        if (mUser.type() == UserType.Organization) {
             tvName.setText(getString(R.string.org_user_template, name));
         } else {
             tvName.setText(name);
         }
 
         TextView tvCreated = mContentView.findViewById(R.id.tv_created_at);
-        if (mUser.getCreatedAt() != null) {
+        if (mUser.createdAt() != null) {
             tvCreated.setText(getString(R.string.user_created_at,
-                    DateFormat.getMediumDateFormat(getActivity()).format(mUser.getCreatedAt())));
+                    DateFormat.getMediumDateFormat(getActivity()).format(mUser.createdAt())));
             tvCreated.setVisibility(View.VISIBLE);
         } else {
             tvCreated.setVisibility(View.GONE);
         }
 
-        fillTextView(R.id.tv_email, mUser.getEmail());
-        fillTextView(R.id.tv_website, mUser.getBlog());
-        fillTextView(R.id.tv_company, mUser.getCompany());
-        fillTextView(R.id.tv_location, mUser.getLocation());
+        fillTextView(R.id.tv_email, mUser.email());
+        fillTextView(R.id.tv_website, mUser.blog());
+        fillTextView(R.id.tv_company, mUser.company());
+        fillTextView(R.id.tv_location, mUser.location());
 
         getLoaderManager().initLoader(1, null, mRepoListCallback);
-        if (User.TYPE_USER.equals(mUser.getType())) {
+        if (mUser.type() == UserType.User) {
             getLoaderManager().initLoader(2, null, mOrganizationCallback);
         } else {
             fillOrganizations(null);
@@ -271,7 +276,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
     private void fillCountIfUser(int layoutId, int countId, int count) {
         View layout = mContentView.findViewById(layoutId);
-        if (ApiHelpers.UserType.USER.equals(mUser.getType())) {
+        if (mUser.type() == UserType.User) {
             TextView countView = mContentView.findViewById(countId);
             countView.setText(String.valueOf(count));
             layout.setOnClickListener(this);
@@ -296,7 +301,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         Intent intent = null;
 
         if (id == R.id.cell_followers) {
-            if (ApiHelpers.UserType.ORG.equals(mUser.getType())) {
+            if (mUser.type() == UserType.Organization) {
                 intent = OrganizationMemberListActivity.makeIntent(getActivity(), mUserLogin);
             } else {
                 intent = FollowerFollowingListActivity.makeIntent(getActivity(), mUserLogin, true);
@@ -305,7 +310,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             intent = FollowerFollowingListActivity.makeIntent(getActivity(), mUserLogin, false);
         } else if (id == R.id.cell_repos || id == R.id.btn_repos) {
             intent = RepositoryListActivity.makeIntent(getActivity(), mUserLogin,
-                    ApiHelpers.UserType.ORG.equals(mUser.getType()));
+                    mUser.type() == UserType.Organization);
         } else if (id == R.id.cell_gists) {
             intent = GistListActivity.makeIntent(getActivity(), mUserLogin);
         } else if (id == R.id.cell_org_members) {
@@ -333,21 +338,21 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                 rowView.setTag(repo);
 
                 TextView tvTitle = rowView.findViewById(R.id.tv_title);
-                tvTitle.setText(repo.getOwner().getLogin() + "/" + repo.getName());
+                tvTitle.setText(repo.owner().login() + "/" + repo.name());
 
                 TextView tvDesc = rowView.findViewById(R.id.tv_desc);
-                if (!StringUtils.isBlank(repo.getDescription())) {
+                if (!StringUtils.isBlank(repo.description())) {
                     tvDesc.setVisibility(View.VISIBLE);
-                    tvDesc.setText(repo.getDescription());
+                    tvDesc.setText(repo.description());
                 } else {
                     tvDesc.setVisibility(View.GONE);
                 }
 
                 TextView tvForks = rowView.findViewById(R.id.tv_forks);
-                tvForks.setText(String.valueOf(repo.getForks()));
+                tvForks.setText(String.valueOf(repo.forksCount()));
 
                 TextView tvStars = rowView.findViewById(R.id.tv_stars);
-                tvStars.setText(String.valueOf(repo.getWatchers()));
+                tvStars.setText(String.valueOf(repo.watchersCount()));
 
                 ll.addView(rowView);
             }
@@ -387,7 +392,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             AvatarHandler.assignAvatar(avatar, org);
 
             TextView nameView = rowView.findViewById(R.id.tv_title);
-            nameView.setText(org.getLogin());
+            nameView.setText(org.login());
 
             llOrg.addView(rowView);
         }
@@ -398,13 +403,11 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             return;
         }
 
-        if (mIsFollowing) {
-            mUser.setFollowers(mUser.getFollowers() + 1);
-        } else {
-            mUser.setFollowers(mUser.getFollowers() - 1);
-        }
+        mUser = mUser.toBuilder()
+                .followers(mUser.followers() + (mIsFollowing ? 1 : -1))
+                .build();
         TextView tvFollowersCount = mContentView.findViewById(R.id.tv_followers_count);
-        tvFollowersCount.setText(String.valueOf(mUser.getFollowers()));
+        tvFollowersCount.setText(String.valueOf(mUser.followers()));
     }
 
     private class UpdateFollowTask extends BackgroundTask<Void> {
@@ -414,13 +417,12 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         @Override
         protected Void run() throws Exception {
-            UserService userService = (UserService)
-                    Gh4Application.get().getService(Gh4Application.USER_SERVICE);
-            if (mIsFollowing) {
-                userService.unfollow(mUserLogin);
-            } else {
-                userService.follow(mUserLogin);
-            }
+            UserFollowerService service =
+                    Gh4Application.get().getGitHubService(UserFollowerService.class);
+            Response<Boolean> response = mIsFollowing
+                    ? service.unfollowUser(mUserLogin).blockingGet()
+                    : service.followUser(mUserLogin).blockingGet();
+            ApiHelpers.throwOnFailure(response);
             return null;
         }
 

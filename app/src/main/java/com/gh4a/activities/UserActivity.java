@@ -17,8 +17,7 @@ import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.UserFragment;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
 
 public class UserActivity extends BaseFragmentPagerActivity {
     public static Intent makeIntent(Context context, String login) {
@@ -29,7 +28,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
         if (user == null) {
             return null;
         }
-        return makeIntent(context, user.getLogin(), user.getName());
+        return makeIntent(context, user.login(), user.name());
     }
 
     public static Intent makeIntent(Context context, String login, String name) {

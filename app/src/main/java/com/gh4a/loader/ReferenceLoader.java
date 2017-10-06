@@ -3,16 +3,15 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.PullRequestMarker;
-import org.eclipse.egit.github.core.Reference;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.DataService;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.PullRequest;
+import com.meisolsson.githubsdk.model.PullRequestMarker;
+import com.meisolsson.githubsdk.model.git.GitReference;
+import com.meisolsson.githubsdk.service.git.GitService;
 
 import java.io.IOException;
 
-public class ReferenceLoader extends BaseLoader<Reference> {
+public class ReferenceLoader extends BaseLoader<GitReference> {
     private final PullRequest mPullRequest;
 
     public ReferenceLoader(Context context, PullRequest pullRequest) {
@@ -21,18 +20,17 @@ public class ReferenceLoader extends BaseLoader<Reference> {
     }
 
     @Override
-    public Reference doLoadInBackground() throws IOException {
-        DataService dataService = (DataService)
-                Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
+    public GitReference doLoadInBackground() throws IOException {
+        GitService service = Gh4Application.get().getGitHubService(GitService.class);
 
-        PullRequestMarker head = mPullRequest.getHead();
-        if (head.getRepo() == null) {
+        PullRequestMarker head = mPullRequest.head();
+        if (head.repo() == null) {
             return null;
         }
-        String owner = head.getRepo().getOwner().getLogin();
-        String repo = head.getRepo().getName();
-        String ref = "heads/" + head.getRef();
+        String owner = head.repo().owner().login();
+        String repo = head.repo().name();
+        String ref = head.ref();
 
-        return dataService.getReference(new RepositoryId(owner, repo), ref);
+        return ApiHelpers.throwOnFailure(service.getGitReference(owner, repo, ref).blockingGet());
     }
 }

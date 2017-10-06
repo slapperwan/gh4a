@@ -26,10 +26,9 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.Review;
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.Review;
+import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.model.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -107,17 +106,17 @@ class ReviewViewHolder
 
     @Override
     public void bind(TimelineItem.TimelineReview item) {
-        Review review = item.review;
+        Review review = item.review();
         mShowDetailsButton.setTag(review);
 
-        AvatarHandler.assignAvatar(mAvatarView, review.getUser());
-        mAvatarContainer.setTag(review.getUser());
+        AvatarHandler.assignAvatar(mAvatarView, review.user());
+        mAvatarContainer.setTag(review.user());
 
         formatTitle(review);
 
-        boolean hasBody = !TextUtils.isEmpty(review.getBody());
+        boolean hasBody = !TextUtils.isEmpty(review.body());
         if (hasBody) {
-            mImageGetter.bind(mBodyView, review.getBodyHtml(), review.getId());
+            mImageGetter.bind(mBodyView, review.bodyHtml(), review.id());
             mBodyView.setVisibility(View.VISIBLE);
         } else {
             mBodyView.setVisibility(View.GONE);
@@ -136,10 +135,10 @@ class ReviewViewHolder
 
             int viewIndex = 0;
             for (TimelineItem.Diff diffHunk : item.getDiffHunks()) {
-                CommitComment commitComment = diffHunk.getInitialComment();
-                String filename = commitComment.getPath();
+                ReviewComment commitComment = diffHunk.getInitialComment();
+                String filename = commitComment.path();
                 int commentCount = diffHunk.comments.size();
-                boolean isOutdated = commitComment.getPosition() == -1;
+                boolean isOutdated = commitComment.position() == -1;
 
                 if (files.containsKey(filename)) {
                     FileDetails details = files.get(filename);
@@ -156,7 +155,7 @@ class ReviewViewHolder
                     row.setOnClickListener(this);
                 }
                 row.setTag(review);
-                row.setTag(R.id.review_comment_id, commitComment.getId());
+                row.setTag(R.id.review_comment_id, commitComment.id());
 
                 files.put(filename, new FileDetails(row, isOutdated, commentCount));
 
@@ -209,11 +208,11 @@ class ReviewViewHolder
     @DrawableRes
     private int getEventIconResId(Review review) {
         @AttrRes int iconResAttr = R.attr.timelineEventReviewed;
-        switch (review.getState()) {
-            case Review.STATE_APPROVED:
+        switch (review.state()) {
+            case Approved:
                 iconResAttr = R.attr.timelineEventApproved;
                 break;
-            case Review.STATE_CHANGES_REQUESTED:
+            case ChangesRequested:
                 iconResAttr = R.attr.timelineEventRequestedChanges;
                 break;
         }
@@ -222,26 +221,26 @@ class ReviewViewHolder
 
     private void formatTitle(Review review) {
         int textResId;
-        switch (review.getState()) {
-            case Review.STATE_APPROVED:
+        switch (review.state()) {
+            case Approved:
                 textResId = R.string.pull_request_event_review_approved;
                 break;
-            case Review.STATE_CHANGES_REQUESTED:
+            case ChangesRequested:
                 textResId = R.string.pull_request_event_review_requested_changes;
                 break;
-            case Review.STATE_DISMISSED:
-            case Review.STATE_COMMENTED:
+            case Dismissed:
+            case Commented:
             default:
                 textResId = R.string.pull_request_event_review_reviewed;
                 break;
-            case Review.STATE_PENDING:
+            case Pending:
                 textResId = R.string.pull_request_event_review_started_review;
                 break;
         }
 
-        String login = review.getUser().getLogin();
-        CharSequence time = review.getSubmittedAt() != null
-                ? StringUtils.formatRelativeTime(mContext, review.getSubmittedAt(), true) : "";
+        String login = review.user().login();
+        CharSequence time = review.submittedAt() != null
+                ? StringUtils.formatRelativeTime(mContext, review.submittedAt(), true) : "";
         String rawMessage = mContext.getString(textResId, login, time);
         StringUtils.applyBoldTagsAndSetText(mMessageView, rawMessage);
     }
@@ -283,11 +282,11 @@ class ReviewViewHolder
         switch (item.getItemId()) {
             case R.id.share:
                 IntentUtils.share(mContext, "Pull Request #" + mIssueNumber + " - Review",
-                        review.getHtmlUrl());
+                        review.htmlUrl());
                 return true;
 
             case R.id.browser:
-                IntentUtils.launchBrowser(mContext, Uri.parse(review.getHtmlUrl()));
+                IntentUtils.launchBrowser(mContext, Uri.parse(review.htmlUrl()));
                 return true;
         }
         return false;

@@ -27,12 +27,12 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.RepositoryContents;
+import com.meisolsson.githubsdk.model.Content;
+import com.meisolsson.githubsdk.model.ContentType;
 
 import java.util.Set;
 
-public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.ViewHolder> {
+public class FileAdapter extends RootAdapter<Content, FileAdapter.ViewHolder> {
     private Set<String> mSubModuleNames;
 
     public FileAdapter(Context context) {
@@ -51,28 +51,28 @@ public class FileAdapter extends RootAdapter<RepositoryContents, FileAdapter.Vie
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, RepositoryContents content) {
-        String name = content.getName();
+    public void onBindViewHolder(ViewHolder holder, Content content) {
+        String name = content.name();
         boolean isSubModule = mSubModuleNames != null && mSubModuleNames.contains(name);
 
-        holder.icon.setBackgroundResource(getIconId(content.getType(), name));
+        holder.icon.setBackgroundResource(getIconId(content.type(), name));
         holder.fileName.setText(name);
 
-        if (!isSubModule && RepositoryContents.TYPE_FILE.equals(content.getType())) {
-            holder.fileSize.setText(Formatter.formatShortFileSize(mContext, content.getSize()));
+        if (!isSubModule && content.type() == ContentType.File) {
+            holder.fileSize.setText(Formatter.formatShortFileSize(mContext, content.size()));
             holder.fileSize.setVisibility(View.VISIBLE);
         } else {
             holder.fileSize.setVisibility(View.GONE);
         }
     }
 
-    private int getIconId(String type, String fileName) {
+    private int getIconId(ContentType type, String fileName) {
         int iconId;
         if (mSubModuleNames != null && mSubModuleNames.contains(fileName)) {
             iconId = R.attr.submoduleIcon;
-        } else if (RepositoryContents.TYPE_DIR.equals(type)) {
+        } else if (type == ContentType.Directory) {
             iconId = R.attr.dirIcon;
-        } else if (RepositoryContents.TYPE_FILE.equals(type) && FileUtils.isImage(fileName)) {
+        } else if (type == ContentType.File && FileUtils.isImage(fileName)) {
             iconId = R.attr.contentPictureIcon;
         } else {
             iconId = R.attr.fileIcon;

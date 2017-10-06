@@ -3,12 +3,13 @@ package com.gh4a.loader;
 import java.io.IOException;
 import java.util.List;
 
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.OrganizationService;
-
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.organizations.OrganizationMemberService;
 
 public class OrganizationMemberListLoader extends BaseLoader<List<User>> {
 
@@ -21,8 +22,13 @@ public class OrganizationMemberListLoader extends BaseLoader<List<User>> {
 
     @Override
     public List<User> doLoadInBackground() throws IOException {
-        OrganizationService orgService = (OrganizationService)
-                Gh4Application.get().getService(Gh4Application.ORG_SERVICE);
-        return orgService.getMembers(mUserLogin);
+        final OrganizationMemberService service =
+                Gh4Application.get().getGitHubService(OrganizationMemberService.class);
+        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<User>() {
+            @Override
+            public Page<User> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(service.getMembers(mUserLogin, page).blockingGet());
+            }
+        });
     }
 }

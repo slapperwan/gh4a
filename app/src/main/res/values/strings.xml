@@ -230,7 +230,6 @@
     <string name="event_release_title">Created a release in [b]%1$s[/b]</string>
     <string name="event_issue_comment">Commented on issue [b]%1$d[/b] in [b]%2$s[/b]</string>
     <string name="event_pull_request_comment">Commented on pull request [b]%1$d[/b] in [b]%2$s[/b]</string>
-    <string name="event_team_user_add">Added [b]%1$s[/b] to the team [b]%2$s[/b]</string>
     <string name="event_team_repo_add">Added the repository [b]%1$s[/b] to the team [b]%2$s[/b]</string>
     <plurals name="page">
         <item quantity="one">a page</item>

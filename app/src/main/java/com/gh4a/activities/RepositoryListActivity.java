@@ -18,6 +18,7 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
@@ -103,7 +104,7 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         super.onNavigationItemSelected(item);
         String type = mFilterDrawerHelper.handleSelectionAndGetFilterType(item);
         if (type != null) {

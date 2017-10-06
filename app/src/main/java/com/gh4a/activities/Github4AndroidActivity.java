@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.util.Pair;
 import android.view.Menu;
@@ -30,13 +31,14 @@ import android.widget.FrameLayout;
 import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
 import com.gh4a.BuildConfig;
-import com.gh4a.DefaultClient;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.users.UserService;
 
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.UserService;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
@@ -133,7 +135,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         super.onNavigationItemSelected(item);
         switch (item.getItemId()) {
             case R.id.settings:
@@ -242,10 +244,9 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                 String token = response.getString("access_token");
 
                 // fetch user information to get user name
-                DefaultClient client = new DefaultClient();
-                client.setOAuth2Token(token);
-                UserService userService = new UserService(client);
-                User user = userService.getUser();
+                UserService service = ServiceFactory.createService(
+                        UserService.class, null, token, null);
+                User user = ApiHelpers.throwOnFailure(service.getUser().blockingGet());
 
                 return Pair.create(user, token);
             } finally {

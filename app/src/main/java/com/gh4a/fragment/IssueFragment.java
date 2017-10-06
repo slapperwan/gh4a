@@ -15,11 +15,10 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.IssueService;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class IssueFragment extends IssueFragmentBase {
     }
 
     public void updateState(Issue issue) {
-        mIssue.setState(issue.getState());
+        mIssue = mIssue.toBuilder().state(issue.state()).build();
         assignHighlightColor();
         reloadEvents(false);
     }
@@ -40,7 +39,7 @@ public class IssueFragment extends IssueFragmentBase {
     @Override
     protected void bindSpecialViews(View headerView) {
         TextView tvPull = headerView.findViewById(R.id.tv_pull);
-        if (mIssue.getPullRequest() != null && mIssue.getPullRequest().getDiffUrl() != null) {
+        if (mIssue.pullRequest() != null && mIssue.pullRequest().diffUrl() != null) {
             tvPull.setVisibility(View.VISIBLE);
             tvPull.setOnClickListener(this);
         } else {
@@ -50,7 +49,7 @@ public class IssueFragment extends IssueFragmentBase {
 
     @Override
     protected void assignHighlightColor() {
-        if (ApiHelpers.IssueState.CLOSED.equals(mIssue.getState())) {
+        if (mIssue.state() == IssueState.Closed) {
             setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
         } else {
             setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
@@ -61,7 +60,7 @@ public class IssueFragment extends IssueFragmentBase {
     public void onClick(View v) {
         if (v.getId() == R.id.tv_pull) {
             startActivity(PullRequestActivity.makeIntent(getActivity(),
-                    mRepoOwner, mRepoName, mIssue.getNumber()));
+                    mRepoOwner, mRepoName, mIssue.number()));
         } else {
             super.onClick(v);
         }
@@ -69,24 +68,24 @@ public class IssueFragment extends IssueFragmentBase {
 
     @Override
     public Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
-        return new IssueCommentListLoader(getActivity(), mRepoOwner, mRepoName, mIssue.getNumber());
+        return new IssueCommentListLoader(getActivity(), mRepoOwner, mRepoName, mIssue.number());
     }
 
     @Override
-    public void editComment(Comment comment) {
-        @AttrRes int highlightColorAttr = ApiHelpers.IssueState.CLOSED.equals(mIssue.getState())
+    public void editComment(GitHubCommentBase comment) {
+        @AttrRes int highlightColorAttr = mIssue.state() == IssueState.Closed
                 ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
-        Intent intent = EditIssueCommentActivity.makeIntent(getActivity(),
-                mRepoOwner, mRepoName, mIssue.getNumber(), comment, highlightColorAttr);
+        Intent intent = EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
+                mIssue.number(), comment.id(), comment.body(), highlightColorAttr);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
     @Override
-    protected void deleteCommentInBackground(RepositoryId repoId, Comment comment) throws Exception {
-        Gh4Application app = Gh4Application.get();
-        IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
-
-        issueService.deleteComment(repoId, comment.getId());
+    protected void deleteCommentInBackground(GitHubCommentBase comment) throws Exception {
+        IssueCommentService service =
+                Gh4Application.get().getGitHubService(IssueCommentService.class);
+        ApiHelpers.throwOnFailure(
+                service.deleteIssueComment(mRepoOwner, mRepoName, comment.id()).blockingGet());
     }
 
     @Override

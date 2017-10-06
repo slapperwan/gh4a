@@ -34,11 +34,10 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.Reaction;
-import org.eclipse.egit.github.core.Reactions;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.ReactionService;
+import com.meisolsson.githubsdk.model.Reaction;
+import com.meisolsson.githubsdk.model.Reactions;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.reactions.ReactionService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -121,13 +120,13 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         if (mAddHelper != null) {
             mAddHelper.update();
         }
-        if (reactions != null && reactions.getTotalCount() > 0) {
-            updateView(mPlusOneView, reactions.getPlusOne());
-            updateView(mMinusOneView, reactions.getMinusOne());
-            updateView(mLaughView, reactions.getLaugh());
-            updateView(mHoorayView, reactions.getHooray());
-            updateView(mConfusedView, reactions.getConfused());
-            updateView(mHeartView, reactions.getHeart());
+        if (reactions != null && reactions.totalCount() > 0) {
+            updateView(mPlusOneView, reactions.plusOne());
+            updateView(mMinusOneView, reactions.minusOne());
+            updateView(mLaughView, reactions.laugh());
+            updateView(mHoorayView, reactions.hooray());
+            updateView(mConfusedView, reactions.confused());
+            updateView(mHeartView, reactions.heart());
             setVisibility(View.VISIBLE);
         } else {
             setVisibility(View.GONE);
@@ -256,7 +255,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
 
         public void toggleOwnReaction(Reaction currentReaction) {
-            final int id = currentReaction != null ? currentReaction.getId() : 0;
+            final int id = currentReaction != null ? currentReaction.id() : 0;
             new ToggleReactionTask(mContent, id, mLastKnownDetails, mCallback, mItem, mDetailsCache)
                     .execute();
         }
@@ -265,7 +264,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             if (details != null) {
                 List<Reaction> reactions = new ArrayList<>();
                 for (Reaction reaction : details) {
-                    if (TextUtils.equals(mContent, reaction.getContent())) {
+                    if (TextUtils.equals(mContent, reaction.content())) {
                         reactions.add(reaction);
                     }
                 }
@@ -294,14 +293,14 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             mOwnReaction = null;
             if (reactions != null) {
                 User ownUser = Gh4Application.get().getCurrentAccountInfoForAvatar();
-                String ownLogin = ownUser != null ? ownUser.getLogin() : null;
+                String ownLogin = ownUser != null ? ownUser.login() : null;
 
                 mUsers = new ArrayList<>();
                 for (Reaction reaction : reactions) {
-                    if (ApiHelpers.loginEquals(reaction.getUser(), ownLogin)) {
+                    if (ApiHelpers.loginEquals(reaction.user(), ownLogin)) {
                         mOwnReaction = reaction;
                     } else {
-                        mUsers.add(reaction.getUser());
+                        mUsers.add(reaction.user());
                     }
                 }
                 if (ownUser != null) {
@@ -407,14 +406,13 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         @Override
         protected List<Reaction> doInBackground(Void... voids) {
             try {
-                List<Reaction> reactions =
-                        mCallback.loadReactionDetailsInBackground(mItem);
+                List<Reaction> reactions = mCallback.loadReactionDetailsInBackground(mItem);
                 Collections.sort(reactions, new Comparator<Reaction>() {
                     @Override
                     public int compare(Reaction lhs, Reaction rhs) {
-                        int result = lhs.getContent().compareTo(rhs.getContent());
+                        int result = lhs.content().compareTo(rhs.content());
                         if (result == 0) {
-                            result = rhs.getCreatedAt().compareTo(lhs.getCreatedAt());
+                            result = rhs.createdAt().compareTo(lhs.createdAt());
                         }
                         return result;
                     }
@@ -459,8 +457,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                     Reaction result = mCallback.addReactionInBackground(mItem, mContent);
                     return Pair.create(true, result);
                 } else {
-                    ReactionService service = (ReactionService)
-                            Gh4Application.get().getService(Gh4Application.REACTION_SERVICE);
+                    ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
                     service.deleteReaction(mId);
                     return Pair.create(true, null);
                 }
@@ -481,7 +478,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             } else {
                 for (int i = 0; i < mExistingDetails.size(); i++) {
                     Reaction reaction = mExistingDetails.get(i);
-                    if (reaction.getId() == mId) {
+                    if (reaction.id() == mId) {
                         mExistingDetails.remove(i);
                         break;
                     }
@@ -545,12 +542,12 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
                 String ownLogin = Gh4Application.get().getAuthLogin();
                 for (Reaction reaction : reactions) {
-                    if (!ApiHelpers.loginEquals(reaction.getUser(), ownLogin)) {
+                    if (!ApiHelpers.loginEquals(reaction.user(), ownLogin)) {
                         continue;
                     }
                     for (int i = 0; i < CONTENTS.length; i++) {
-                        if (TextUtils.equals(CONTENTS[i], reaction.getContent())) {
-                            mOldReactionIds[i] = reaction.getId();
+                        if (TextUtils.equals(CONTENTS[i], reaction.content())) {
+                            mOldReactionIds[i] = reaction.id();
                             break;
                         }
                     }
@@ -612,7 +609,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                         for (int i = 0; i < CONTENTS.length; i++) {
                             if (TextUtils.equals(CONTENTS[i], content)) {
                                 mOldReactionIds[i] =
-                                        result.second != null ? result.second.getId() : 0;
+                                        result.second != null ? result.second.id() : 0;
                                 break;
                             }
                         }
@@ -663,18 +660,25 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
 
         private Reactions buildReactions(List<Reaction> reactions) {
-            Reactions result = new Reactions();
+            int plusOne = 0, minusOne = 0, confused = 0, heart = 0, hooray = 0, laugh = 0;
             for (Reaction reaction : reactions) {
-                switch (reaction.getContent()) {
-                    case Reaction.CONTENT_PLUS_ONE: result.setPlusOne(result.getPlusOne() + 1); break;
-                    case Reaction.CONTENT_MINUS_ONE: result.setMinusOne(result.getMinusOne() + 1); break;
-                    case Reaction.CONTENT_CONFUSED: result.setConfused(result.getConfused() + 1); break;
-                    case Reaction.CONTENT_HEART: result.setHeart(result.getHeart() + 1); break;
-                    case Reaction.CONTENT_HOORAY: result.setHooray(result.getHooray() + 1); break;
-                    case Reaction.CONTENT_LAUGH: result.setLaugh(result.getLaugh() + 1); break;
+                switch (reaction.content()) {
+                    case Reaction.CONTENT_PLUS_ONE: ++plusOne; break;
+                    case Reaction.CONTENT_MINUS_ONE: ++minusOne; break;
+                    case Reaction.CONTENT_CONFUSED: ++confused; break;
+                    case Reaction.CONTENT_HEART: ++heart; break;
+                    case Reaction.CONTENT_HOORAY: ++hooray; break;
+                    case Reaction.CONTENT_LAUGH: ++laugh; break;
                 }
             }
-            return result;
+            return Reactions.builder()
+                    .plusOne(plusOne)
+                    .minusOne(minusOne)
+                    .confused(confused)
+                    .heart(heart)
+                    .hooray(hooray)
+                    .laugh(laugh)
+                    .build();
         }
     }
 }

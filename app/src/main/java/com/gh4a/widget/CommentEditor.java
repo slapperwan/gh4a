@@ -11,8 +11,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
 
 import java.util.Set;
 

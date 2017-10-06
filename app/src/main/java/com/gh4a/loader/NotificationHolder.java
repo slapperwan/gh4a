@@ -3,12 +3,12 @@ package com.gh4a.loader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import org.eclipse.egit.github.core.Notification;
-import org.eclipse.egit.github.core.Repository;
+import com.meisolsson.githubsdk.model.NotificationThread;
+import com.meisolsson.githubsdk.model.Repository;
 
 public class NotificationHolder {
     @Nullable
-    public final Notification notification;
+    public final NotificationThread notification;
 
     @NonNull
     public final Repository repository;
@@ -21,10 +21,10 @@ public class NotificationHolder {
         this.repository = repository;
     }
 
-    public NotificationHolder(@NonNull Notification notification) {
+    public NotificationHolder(@NonNull NotificationThread notification) {
         this.notification = notification;
-        repository = notification.getRepository();
-        mRead = !notification.isUnread();
+        repository = notification.repository();
+        mRead = !notification.unread();
     }
 
     public boolean isLastRepositoryNotification() {

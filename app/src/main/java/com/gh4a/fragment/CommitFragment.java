@@ -25,29 +25,29 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.GitHubFile;
+import com.meisolsson.githubsdk.model.PositionalCommentBase;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.git.GitComment;
+import com.meisolsson.githubsdk.model.git.GitCommit;
+import com.meisolsson.githubsdk.model.git.GitUser;
 import com.vdurmont.emoji.EmojiParser;
-
-import org.eclipse.egit.github.core.Commit;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.CommitUser;
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommitFragment extends LoadingFragmentBase implements OnClickListener {
     public static CommitFragment newInstance(String repoOwner, String repoName, String commitSha,
-            RepositoryCommit commit, List<CommitComment> comments) {
+            Commit commit, List<GitComment> comments) {
         CommitFragment f = new CommitFragment();
 
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putString("sha", commitSha);
-        args.putSerializable("commit", commit);
-        args.putSerializable("comments", new ArrayList<>(comments));
+        args.putParcelable("commit", commit);
+        args.putParcelableArrayList("comments", new ArrayList<>(comments));
         f.setArguments(args);
         return f;
     }
@@ -61,8 +61,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
-    private RepositoryCommit mCommit;
-    private List<CommitComment> mComments;
+    private Commit mCommit;
+    private List<GitComment> mComments;
     protected View mContentView;
 
     @Override
@@ -71,8 +71,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         mRepoOwner = getArguments().getString("owner");
         mRepoName = getArguments().getString("repo");
         mObjectSha = getArguments().getString("sha");
-        mCommit = (RepositoryCommit) getArguments().getSerializable("commit");
-        mComments = (List<CommitComment>) getArguments().getSerializable("comments");
+        mCommit = getArguments().getParcelable("commit");
+        mComments = getArguments().getParcelableArrayList("comments");
     }
 
     @Override
@@ -94,7 +94,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
     protected void populateViewIfReady() {
         fillHeader();
-        fillStats(mCommit.getFiles(), mComments);
+        fillStats(mCommit.files(), mComments);
     }
 
     private void fillHeader() {
@@ -102,12 +102,12 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         final Gh4Application app = Gh4Application.get();
 
         ImageView ivGravatar = mContentView.findViewById(R.id.iv_gravatar);
-        User author = mCommit.getAuthor();
+        User author = mCommit.author();
         if (author != null) {
             AvatarHandler.assignAvatar(ivGravatar, author);
         } else {
-            CommitUser commitAuthor = mCommit.getCommit().getAuthor();
-            String email = commitAuthor != null ? commitAuthor.getEmail() : null;
+            GitUser commitAuthor = mCommit.commit().author();
+            String email = commitAuthor != null ? commitAuthor.email() : null;
             ivGravatar.setImageDrawable(new AvatarHandler.DefaultAvatarDrawable(null, email));
         }
 
@@ -120,7 +120,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         TextView tvMessage = mContentView.findViewById(R.id.tv_message);
         TextView tvTitle = mContentView.findViewById(R.id.tv_title);
 
-        String message = mCommit.getCommit().getMessage();
+        String message = mCommit.commit().message();
         int pos = message.indexOf('\n');
         String title = pos > 0 ? message.substring(0, pos) : message;
         title = EmojiParser.parseToUnicode(title);
@@ -139,14 +139,14 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         tvMessage.setVisibility(StringUtils.isBlank(message) ? View.GONE : View.VISIBLE);
         tvMessage.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
-        Commit commit = mCommit.getCommit();
+        GitCommit commit = mCommit.commit();
 
         TextView tvAuthor = mContentView.findViewById(R.id.tv_author);
         tvAuthor.setText(ApiHelpers.getAuthorName(app, mCommit));
 
         TextView tvTimestamp = mContentView.findViewById(R.id.tv_timestamp);
         tvTimestamp.setText(StringUtils.formatRelativeTime(
-                activity, commit.getAuthor().getDate(), true));
+                activity, commit.author().date(), true));
 
         View committerContainer = mContentView.findViewById(R.id.committer);
 
@@ -155,10 +155,10 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
             StyleableTextView commitExtra =
                     mContentView.findViewById(R.id.tv_commit_extra);
 
-            AvatarHandler.assignAvatar(commitGravatar, mCommit.getCommitter());
+            AvatarHandler.assignAvatar(commitGravatar, mCommit.committer());
             String committerText = getString(R.string.commit_details,
                     ApiHelpers.getCommitterName(app, mCommit),
-                    StringUtils.formatRelativeTime(activity, commit.getCommitter().getDate(), true));
+                    StringUtils.formatRelativeTime(activity, commit.committer().date(), true));
             StringUtils.applyBoldTagsAndSetText(commitExtra, committerText);
 
             committerContainer.setVisibility(View.VISIBLE);
@@ -167,7 +167,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         }
     }
 
-    protected void fillStats(List<CommitFile> files, List<CommitComment> comments) {
+    protected void fillStats(List<GitHubFile> files, List<? extends PositionalCommentBase> comments) {
         LinearLayout llChanged = mContentView.findViewById(R.id.ll_changed);
         LinearLayout llAdded = mContentView.findViewById(R.id.ll_added);
         LinearLayout llRenamed = mContentView.findViewById(R.id.ll_renamed);
@@ -188,10 +188,10 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         llDeleted.removeAllViews();
 
         for (int i = 0; i < count; i++) {
-            CommitFile file = files.get(i);
+            GitHubFile file = files.get(i);
             final LinearLayout parent;
 
-            switch (file.getStatus()) {
+            switch (file.status()) {
                 case "added":
                     parent = llAdded;
                     added++;
@@ -212,27 +212,27 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
                     continue;
             }
 
-            additions += file.getAdditions();
-            deletions += file.getDeletions();
+            additions += file.additions();
+            deletions += file.deletions();
 
             int commentCount = 0;
-            for (CommitComment comment : comments) {
-                if (TextUtils.equals(file.getFilename(), comment.getPath())) {
+            for (PositionalCommentBase comment : comments) {
+                if (TextUtils.equals(file.filename(), comment.path())) {
                     commentCount++;
                 }
             }
 
             ViewGroup fileView = (ViewGroup) inflater.inflate(R.layout.commit_filename, parent, false);
             TextView fileNameView = fileView.findViewById(R.id.filename);
-            fileNameView.setText(file.getFilename());
+            fileNameView.setText(file.filename());
 
             TextView statsView = fileView.findViewById(R.id.stats);
-            if (file.getPatch() != null) {
+            if (file.patch() != null) {
                 SpannableStringBuilder stats = new SpannableStringBuilder();
-                stats.append("+").append(String.valueOf(file.getAdditions()));
+                stats.append("+").append(String.valueOf(file.additions()));
                 int addLength = stats.length();
                 stats.setSpan(addSpan, 0, addLength, 0);
-                stats.append("\u00a0\u00a0\u00a0-").append(String.valueOf(file.getDeletions()));
+                stats.append("\u00a0\u00a0\u00a0-").append(String.valueOf(file.deletions()));
                 stats.setSpan(deleteSpan, addLength, stats.length(), 0);
                 statsView.setText(stats);
                 statsView.setVisibility(View.VISIBLE);
@@ -240,8 +240,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
                 statsView.setVisibility(View.GONE);
             }
 
-            if (file.getPatch() != null ||
-                    (parent != llDeleted && FileUtils.isImage(file.getFilename()))) {
+            if (file.patch() != null ||
+                    (parent != llDeleted && FileUtils.isImage(file.filename()))) {
                 fileNameView.setTextColor(highlightColor);
                 fileView.setOnClickListener(this);
                 fileView.setTag(file);
@@ -278,19 +278,19 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
                 startActivity(intent);
             }
         } else {
-            CommitFile file = (CommitFile) v.getTag();
+            GitHubFile file = (GitHubFile) v.getTag();
             handleFileClick(file);
         }
     }
 
-    protected void handleFileClick(CommitFile file) {
+    protected void handleFileClick(GitHubFile file) {
         final Intent intent;
-        if (FileUtils.isImage(file.getFilename())) {
+        if (FileUtils.isImage(file.filename())) {
             intent = FileViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mObjectSha, file.getFilename());
+                    mObjectSha, file.filename());
         } else {
             intent = CommitDiffViewerActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mObjectSha, file.getFilename(), file.getPatch(),
+                    mObjectSha, file.filename(), file.patch(),
                     commentsForFile(file), -1, -1, false, null);
         }
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);
@@ -310,14 +310,14 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         }
     }
 
-    private ArrayList<CommitComment> commentsForFile(CommitFile file) {
+    private ArrayList<GitComment> commentsForFile(GitHubFile file) {
         if (mComments == null) {
             return null;
         }
-        String path = file.getFilename();
-        ArrayList<CommitComment> result = null;
-        for (CommitComment comment : mComments) {
-            if (!TextUtils.equals(comment.getPath(), path)) {
+        String path = file.filename();
+        ArrayList<GitComment> result = null;
+        for (GitComment comment : mComments) {
+            if (!TextUtils.equals(comment.path(), path)) {
                 continue;
             }
             if (result == null) {

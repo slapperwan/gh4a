@@ -22,8 +22,7 @@ import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.widget.SwipeRefreshLayout;
-
-import org.eclipse.egit.github.core.Repository;
+import com.meisolsson.githubsdk.model.Repository;
 
 public class RepositoryListContainerFragment extends Fragment implements
         LoaderCallbacks.ParentCallback, SearchView.OnCloseListener, SearchView.OnQueryTextListener,

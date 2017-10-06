@@ -64,7 +64,6 @@ android {
 }
 
 dependencies {
-    compile project(':github-api')
     compile 'com.android.support:support-v4:26.0.1'
     compile 'com.android.support:appcompat-v7:26.0.1'
     compile 'com.android.support:cardview-v7:26.0.1'
@@ -72,6 +71,7 @@ dependencies {
     compile 'com.android.support:preference-v14:26.0.1'
     compile 'com.android.support:customtabs:26.0.1'
     compile 'com.android.support:design:26.0.1'
+    compile 'com.github.maniac103:githubsdk:gh4a-SNAPSHOT'
     compile 'com.larswerkman:HoloColorPicker:1.5@aar'
     compile 'com.caverock:androidsvg:1.2.2-beta-1@aar'
     compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'

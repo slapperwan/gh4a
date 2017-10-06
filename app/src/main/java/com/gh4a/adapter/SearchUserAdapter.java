@@ -27,10 +27,9 @@ import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.User;
 
-import org.eclipse.egit.github.core.SearchUser;
-
-public class SearchUserAdapter extends RootAdapter<SearchUser, SearchUserAdapter.ViewHolder> {
+public class SearchUserAdapter extends RootAdapter<User, SearchUserAdapter.ViewHolder> {
     public SearchUserAdapter(Context context) {
         super(context);
     }
@@ -44,22 +43,21 @@ public class SearchUserAdapter extends RootAdapter<SearchUser, SearchUserAdapter
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, SearchUser user) {
-        AvatarHandler.assignAvatar(holder.ivGravatar, user.getLogin(),
-                determineUserId(user.getId()), null);
+    public void onBindViewHolder(ViewHolder holder, User user) {
+        AvatarHandler.assignAvatar(holder.ivGravatar, user);
         holder.ivGravatar.setTag(user);
 
-        holder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
+        holder.tvTitle.setText(StringUtils.formatName(user.login(), user.name()));
         holder.tvExtra.setText(mContext.getString(R.string.user_extra_data,
-                user.getFollowers(), user.getPublicRepos()));
+                user.followers(), user.publicRepos()));
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
-            SearchUser user = (SearchUser) v.getTag();
+            User user = (User) v.getTag();
             mContext.startActivity(UserActivity.makeIntent(mContext,
-                    user.getLogin(), user.getName()));
+                    user.login(), user.name()));
         } else {
             super.onClick(v);
         }

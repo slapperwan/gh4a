@@ -7,8 +7,7 @@ import android.text.TextUtils;
 
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.loader.ReleaseListLoader;
-
-import org.eclipse.egit.github.core.Release;
+import com.meisolsson.githubsdk.model.Release;
 
 import java.util.List;
 
@@ -34,7 +33,7 @@ public class ReleaseLoadTask extends UrlLoadTask {
 
         if (releases != null) {
             for (Release release : releases) {
-                if (TextUtils.equals(release.getTagName(), mTagName)) {
+                if (TextUtils.equals(release.tagName(), mTagName)) {
                     return ReleaseInfoActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                             release);
                 }

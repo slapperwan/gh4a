@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
+import android.util.Base64;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.widget.CustomTypefaceSpan;
@@ -156,5 +157,13 @@ public class StringUtils {
         }
 
         return null;
+    }
+
+    public static String toBase64(String data) {
+        return Base64.encodeToString(data.getBytes(), Base64.DEFAULT);
+    }
+
+    public static String fromBase64(String encoded) {
+        return new String(Base64.decode(encoded, Base64.DEFAULT));
     }
 }

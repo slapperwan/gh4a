@@ -45,8 +45,7 @@ import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.widget.IssueLabelSpan;
-
-import org.eclipse.egit.github.core.Label;
+import com.meisolsson.githubsdk.model.Label;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -454,8 +453,8 @@ public class UiUtils {
         for (Label label : labels) {
             int pos = builder.length();
             IssueLabelSpan span = new IssueLabelSpan(context, label, true);
-            builder.append(label.getName());
-            builder.setSpan(span, pos, pos + label.getName().length(), 0);
+            builder.append(label.name());
+            builder.setSpan(span, pos, pos + label.name().length(), 0);
         }
         return builder;
     }

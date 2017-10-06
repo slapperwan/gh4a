@@ -21,8 +21,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationListLoader;
 import com.gh4a.utils.AvatarHandler;
-
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
 
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
     @Override
     protected Fragment makeFragment(int position) {
         return PrivateEventListFragment.newInstance(mUserLogin,
-                mSelectedOrganization != null ? mSelectedOrganization.getLogin() : null);
+                mSelectedOrganization != null ? mSelectedOrganization.login() : null);
     }
 
     @Override
@@ -179,7 +178,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
             AvatarHandler.assignAvatar(avatar, user);
 
             TextView nameView = convertView.findViewById(R.id.tv_title);
-            nameView.setText(user.getLogin());
+            nameView.setText(user.login());
 
             return convertView;
         }

@@ -1,17 +1,15 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.ContentsService;
-
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Content;
+import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
-public class ContentLoader extends BaseLoader<List<RepositoryContents>> {
+import java.io.IOException;
+
+public class ContentLoader extends BaseLoader<Content> {
     private final String mRepoOwner;
     private final String mRepoName;
     private final String mPath;
@@ -26,9 +24,10 @@ public class ContentLoader extends BaseLoader<List<RepositoryContents>> {
     }
 
     @Override
-    public List<RepositoryContents> doLoadInBackground() throws IOException {
-        ContentsService contentService = (ContentsService)
-                Gh4Application.get().getService(Gh4Application.CONTENTS_SERVICE);
-        return contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
+    public Content doLoadInBackground() throws IOException {
+        final RepositoryContentService service =
+                Gh4Application.get().getGitHubService(RepositoryContentService.class);
+        return ApiHelpers.throwOnFailure(
+                service.getContents(mRepoOwner, mRepoName, mPath, mRef).blockingGet());
     }
 }

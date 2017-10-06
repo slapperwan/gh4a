@@ -15,8 +15,6 @@
  */
 package com.gh4a.activities;
 
-import org.eclipse.egit.github.core.GollumPage;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,11 +23,12 @@ import android.support.v7.app.ActionBar;
 
 import com.gh4a.R;
 import com.gh4a.fragment.WikiListFragment;
+import com.meisolsson.githubsdk.model.GitHubWikiPage;
 
 public class WikiListActivity extends FragmentContainerActivity {
     public static Intent makeIntent(Context context, String repoOwner,
-            String repoName, GollumPage initialPage) {
-        String initialPageId = initialPage != null ? initialPage.getSha() : null;
+            String repoName, GitHubWikiPage initialPage) {
+        String initialPageId = initialPage != null ? initialPage.sha() : null;
         return new Intent(context, WikiListActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)

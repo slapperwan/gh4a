@@ -57,17 +57,18 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
-
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.MergeStatus;
-import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.PullRequestMarker;
-import org.eclipse.egit.github.core.Reference;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.TypedResource;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.DataService;
-import org.eclipse.egit.github.core.service.PullRequestService;
+import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.model.MergeResponse;
+import com.meisolsson.githubsdk.model.PullRequest;
+import com.meisolsson.githubsdk.model.PullRequestMarker;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.git.GitReference;
+import com.meisolsson.githubsdk.model.request.git.CreateGitReference;
+import com.meisolsson.githubsdk.model.request.pull_request.EditPullRequest;
+import com.meisolsson.githubsdk.model.request.pull_request.MergeRequest;
+import com.meisolsson.githubsdk.service.git.GitService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -104,7 +105,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private PullRequest mPullRequest;
     private PullRequestFragment mPullRequestFragment;
     private IssueStateTrackingFloatingActionButton mEditFab;
-    private Reference mHeadReference;
+    private GitReference mHeadReference;
     private boolean mHasLoadedHeadReference;
 
     private ViewGroup mHeader;
@@ -116,9 +117,9 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private class MergeMethodDesc {
         final @StringRes int textResId;
-        final String action;
+        final MergeRequest.Method action;
 
-        public MergeMethodDesc(@StringRes int textResId, String action) {
+        public MergeMethodDesc(@StringRes int textResId, MergeRequest.Method action) {
             this.textResId = textResId;
             this.action = action;
         }
@@ -174,14 +175,14 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
     };
 
-    private final LoaderCallbacks<Reference> mHeadReferenceCallback = new LoaderCallbacks<Reference>(this) {
+    private final LoaderCallbacks<GitReference> mHeadReferenceCallback = new LoaderCallbacks<GitReference>(this) {
         @Override
-        protected Loader<LoaderResult<Reference>> onCreateLoader() {
+        protected Loader<LoaderResult<GitReference>> onCreateLoader() {
             return new ReferenceLoader(PullRequestActivity.this, mPullRequest);
         }
 
         @Override
-        protected void onResultReady(Reference result) {
+        protected void onResultReady(GitReference result) {
             mHeadReference = result;
             mHasLoadedHeadReference = true;
             supportInvalidateOptionsMenu();
@@ -224,12 +225,11 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         boolean authorized = app.isAuthorized();
 
         boolean isCreator = mPullRequest != null
-                && ApiHelpers.loginEquals(mPullRequest.getUser(), app.getAuthLogin());
-        boolean isClosed = mPullRequest != null
-                && ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState());
+                && ApiHelpers.loginEquals(mPullRequest.user(), app.getAuthLogin());
+        boolean isClosed = mPullRequest != null && mPullRequest.state() == IssueState.Closed;
         boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
         boolean closerIsCreator = mIssue != null
-                && ApiHelpers.userEquals(mIssue.getUser(), mIssue.getClosedBy());
+                && ApiHelpers.userEquals(mIssue.user(), mIssue.closedBy());
         boolean canClose = mPullRequest != null && authorized && (isCreator || isCollaborator);
         boolean canOpen = canClose && (isCollaborator || closerIsCreator);
         boolean canMerge = canClose && isCollaborator;
@@ -239,12 +239,12 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
         if (!canOpen || !isClosed) {
             menu.removeItem(R.id.pull_reopen);
-        } else if (isClosed && mPullRequest.isMerged()) {
+        } else if (isClosed && mPullRequest.merged()) {
             menu.findItem(R.id.pull_reopen).setEnabled(false);
         }
         if (!canMerge) {
             menu.removeItem(R.id.pull_merge);
-        } else if (mPullRequest.isMerged() || !mPullRequest.isMergeable()) {
+        } else if (mPullRequest.merged() || !mPullRequest.mergable()) {
             MenuItem mergeItem = menu.findItem(R.id.pull_merge);
             mergeItem.setEnabled(false);
         }
@@ -255,7 +255,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             menu.removeItem(R.id.copy_number);
         }
 
-        if (mPullRequest == null || mPullRequest.getHead().getRepo() == null) {
+        if (mPullRequest == null || mPullRequest.head().repo() == null) {
             menu.removeItem(R.id.delete_branch);
         } else {
             MenuItem deleteBranchItem = menu.findItem(R.id.delete_branch);
@@ -280,15 +280,15 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 break;
             case R.id.share:
                 IntentUtils.share(this, getString(R.string.share_pull_subject,
-                        mPullRequest.getNumber(), mPullRequest.getTitle(),
-                        mRepoOwner + "/" + mRepoName), mPullRequest.getHtmlUrl());
+                        mPullRequest.number(), mPullRequest.title(),
+                        mRepoOwner + "/" + mRepoName), mPullRequest.htmlUrl());
                 break;
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(mPullRequest.getHtmlUrl()));
+                IntentUtils.launchBrowser(this, Uri.parse(mPullRequest.htmlUrl()));
                 break;
             case R.id.copy_number:
-                IntentUtils.copyToClipboard(this, "Pull Request #" + mPullRequest.getNumber(),
-                        String.valueOf(mPullRequest.getNumber()));
+                IntentUtils.copyToClipboard(this, "Pull Request #" + mPullRequest.number(),
+                        String.valueOf(mPullRequest.number()));
                 return true;
             case R.id.delete_branch:
                 showDeleteRestoreBranchConfirmDialog(mHeadReference == null);
@@ -357,13 +357,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     @Override
     protected Fragment makeFragment(int position) {
         if (position == 1) {
-            PullRequestMarker base = mPullRequest.getBase();
-            PullRequestMarker head = mPullRequest.getHead();
+            PullRequestMarker base = mPullRequest.base();
+            PullRequestMarker head = mPullRequest.head();
             return CommitCompareFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber,
-                    base.getLabel(), base.getSha(), head.getLabel(), head.getSha());
+                    base.label(), base.sha(), head.label(), head.sha());
         } else if (position == 2) {
             return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
-                    mPullRequestNumber, mPullRequest.getHead().getSha());
+                    mPullRequestNumber, mPullRequest.head().sha());
         } else {
             Fragment f = PullRequestFragment.newInstance(mPullRequest,
                     mIssue, mIsCollaborator, mInitialComment);
@@ -470,21 +470,18 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private void showMergeDialog() {
         LayoutInflater inflater = LayoutInflater.from(this);
-        String title = getString(R.string.pull_message_dialog_title, mPullRequest.getNumber());
+        String title = getString(R.string.pull_message_dialog_title, mPullRequest.number());
         View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
 
         final View editorNotice = view.findViewById(R.id.notice);
         final EditText editor = view.findViewById(R.id.et_commit_message);
-        editor.setText(mPullRequest.getTitle());
+        editor.setText(mPullRequest.title());
 
         final ArrayAdapter<MergeMethodDesc> adapter = new ArrayAdapter<>(this,
                 R.layout.pull_merge_method_item);
-        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_merge,
-                PullRequestService.MERGE_METHOD_MERGE));
-        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_squash,
-                PullRequestService.MERGE_METHOD_SQUASH));
-        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_rebase,
-                PullRequestService.MERGE_METHOD_REBASE));
+        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_merge, MergeRequest.Method.Merge));
+        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_squash, MergeRequest.Method.Squash));
+        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_rebase, MergeRequest.Method.Rebase));
 
         final Spinner mergeMethod = view.findViewById(R.id.merge_method);
         mergeMethod.setAdapter(adapter);
@@ -509,7 +506,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     public void onClick(DialogInterface dialog, int which) {
                         String text = editor.getText() == null ? null : editor.getText().toString();
                         int methodIndex = mergeMethod.getSelectedItemPosition();
-                        String method = adapter.getItem(methodIndex).action;
+                        MergeRequest.Method method = adapter.getItem(methodIndex).action;
                         new PullRequestMergeTask(text, method).schedule();
                     }
                 })
@@ -519,7 +516,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private void updateFabVisibility() {
         boolean isIssueOwner = mIssue != null
-                && ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
+                && ApiHelpers.loginEquals(mIssue.user(), Gh4Application.get().getAuthLogin());
         boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
         boolean shouldHaveFab = (isIssueOwner || isCollaborator)
                 && mPullRequest != null && mIssue != null;
@@ -537,20 +534,20 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             mEditFab = null;
         }
         if (mEditFab != null) {
-            mEditFab.setState(mPullRequest.getState());
-            mEditFab.setMerged(mPullRequest.isMerged());
+            mEditFab.setState(mPullRequest.state());
+            mEditFab.setMerged(mPullRequest.merged());
         }
     }
 
     private void fillHeader() {
         final int stateTextResId;
 
-        if (mPullRequest.isMerged()) {
+        if (mPullRequest.merged()) {
             stateTextResId = R.string.pull_request_merged;
             mHeaderColorAttrs = new int[] {
                 R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark
             };
-        } else if (ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())) {
+        } else if (mPullRequest.state() == IssueState.Closed) {
             stateTextResId = R.string.closed;
             mHeaderColorAttrs = new int[] {
                 R.attr.colorIssueClosed, R.attr.colorIssueClosedDark
@@ -566,7 +563,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         tvState.setText(getString(stateTextResId).toUpperCase(Locale.getDefault()));
 
         TextView tvTitle = mHeader.findViewById(R.id.tv_title);
-        tvTitle.setText(mPullRequest.getTitle());
+        tvTitle.setText(mPullRequest.title());
 
         mHeader.setVisibility(View.VISIBLE);
     }
@@ -576,12 +573,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             mPullRequestFragment.updateState(mPullRequest);
         }
         if (mIssue != null) {
-            mIssue.setState(mPullRequest.getState());
-            if (ApiHelpers.IssueState.CLOSED.equals(mIssue.getState())) {
+            Issue.Builder builder = mIssue.toBuilder().state(mPullRequest.state());
+            if (mPullRequest.state() == IssueState.Closed) {
                 // if we came here, we either closed or merged the PR ourselves,
                 // so set the 'closed by' field accordingly
-                mIssue.setClosedBy(new User().setLogin(Gh4Application.get().getAuthLogin()));
+                builder.closedBy(Gh4Application.get().getCurrentAccountInfoForAvatar());
             }
+            mIssue = builder.build();
         }
         fillHeader();
         updateFabVisibility();
@@ -589,40 +587,37 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         supportInvalidateOptionsMenu();
     }
 
-    private class RestoreBranchTask extends ProgressDialogTask<Reference> {
+    private class RestoreBranchTask extends ProgressDialogTask<GitReference> {
         public RestoreBranchTask() {
             super(getBaseActivity(), R.string.saving_msg);
         }
 
         @Override
-        protected ProgressDialogTask<Reference> clone() {
+        protected ProgressDialogTask<GitReference> clone() {
             return new RestoreBranchTask();
         }
 
         @Override
-        protected Reference run() throws Exception {
-            DataService dataService =
-                    (DataService) Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
+        protected GitReference run() throws Exception {
+            GitService service = Gh4Application.get().getGitHubService(GitService.class);
 
-            PullRequestMarker head = mPullRequest.getHead();
-            if (head.getRepo() == null) {
+            PullRequestMarker head = mPullRequest.head();
+            if (head.repo() == null) {
                 return null;
             }
-            String owner = head.getRepo().getOwner().getLogin();
-            String repo = head.getRepo().getName();
-            RepositoryId repoId = new RepositoryId(owner, repo);
+            String owner = head.repo().owner().login();
+            String repo = head.repo().name();
 
-            Reference reference = new Reference();
-            reference.setRef("refs/heads/" + head.getRef());
-            TypedResource object = new TypedResource();
-            object.setSha(head.getSha());
-            reference.setObject(object);
-
-            return dataService.createReference(repoId, reference);
+            CreateGitReference request = CreateGitReference.builder()
+                    .ref(head.ref())
+                    .sha(head.sha())
+                    .build();
+            return ApiHelpers.throwOnFailure(
+                    service.createGitReference(owner, repo, request).blockingGet());
         }
 
         @Override
-        protected void onSuccess(Reference result) {
+        protected void onSuccess(GitReference result) {
             mHeadReference = result;
             handlePullRequestUpdate();
         }
@@ -645,18 +640,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
         @Override
         protected Void run() throws Exception {
-            DataService dataService =
-                    (DataService) Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
+            GitService service = Gh4Application.get().getGitHubService(GitService.class);
 
-            PullRequestMarker head = mPullRequest.getHead();
-            String owner = head.getRepo().getOwner().getLogin();
-            String repo = head.getRepo().getName();
-            RepositoryId repoId = new RepositoryId(owner, repo);
+            PullRequestMarker head = mPullRequest.head();
+            String owner = head.repo().owner().login();
+            String repo = head.repo().name();
 
-            Reference reference = new Reference();
-            reference.setRef("heads/" + head.getRef());
-
-            dataService.deleteReference(repoId, reference);
+            ApiHelpers.throwOnFailure(service.deleteGitReference(owner, repo, head.ref()).blockingGet());
             return null;
         }
 
@@ -687,15 +677,12 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
         @Override
         protected PullRequest run() throws IOException {
-            PullRequestService pullService = (PullRequestService)
-                    Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-
-            PullRequest pullRequest = new PullRequest();
-            pullRequest.setNumber(mPullRequest.getNumber());
-            pullRequest.setState(mOpen ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED);
-
-            return pullService.editPullRequest(repoId, pullRequest);
+            PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
+            EditPullRequest request = EditPullRequest.builder()
+                    .state(mOpen ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED)
+                    .build();
+            return ApiHelpers.throwOnFailure(service.editPullRequest(
+                    mRepoOwner, mRepoName, mPullRequestNumber, request).blockingGet());
         }
 
         @Override
@@ -708,46 +695,51 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         protected String getErrorMessage() {
             int errorMessageResId =
                     mOpen ? R.string.issue_error_reopen : R.string.issue_error_close;
-            return getContext().getString(errorMessageResId, mPullRequest.getNumber());
+            return getContext().getString(errorMessageResId, mPullRequest.number());
         }
     }
 
-    private class PullRequestMergeTask extends ProgressDialogTask<MergeStatus> {
+    private class PullRequestMergeTask extends ProgressDialogTask<MergeResponse> {
         private final String mCommitMessage;
-        private final String mMergeMethod;
+        private final MergeRequest.Method mMergeMethod;
 
-        public PullRequestMergeTask(String commitMessage, String mergeMethod) {
+        public PullRequestMergeTask(String commitMessage, MergeRequest.Method mergeMethod) {
             super(getBaseActivity(), R.string.merging_msg);
             mCommitMessage = commitMessage;
             mMergeMethod = mergeMethod;
         }
 
         @Override
-        protected ProgressDialogTask<MergeStatus> clone() {
+        protected ProgressDialogTask<MergeResponse> clone() {
             return new PullRequestMergeTask(mCommitMessage, mMergeMethod);
         }
 
         @Override
-        protected MergeStatus run() throws Exception {
-            PullRequestService pullService = (PullRequestService)
-                    Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        protected MergeResponse run() throws Exception {
+            PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
+            MergeRequest request = MergeRequest.builder()
+                    .commitMessage(mCommitMessage)
+                    .method(mMergeMethod)
+                    .build();
 
-            return pullService.merge(repoId, mPullRequest.getNumber(), mCommitMessage, mMergeMethod);
+            return ApiHelpers.throwOnFailure(service.mergePullRequest(
+                    mRepoOwner, mRepoName, mPullRequestNumber, request).blockingGet());
         }
 
         @Override
-        protected void onSuccess(MergeStatus result) {
-            if (result.isMerged()) {
-                mPullRequest.setMerged(true);
-                mPullRequest.setState(ApiHelpers.IssueState.CLOSED);
+        protected void onSuccess(MergeResponse result) {
+            if (result.merged()) {
+                mPullRequest = mPullRequest.toBuilder()
+                        .merged(true)
+                        .state(IssueState.Closed)
+                        .build();
             }
             handlePullRequestUpdate();
         }
 
         @Override
         protected String getErrorMessage() {
-            return getContext().getString(R.string.pull_error_merge, mPullRequest.getNumber());
+            return getContext().getString(R.string.pull_error_merge, mPullRequest.number());
         }
     }
 }

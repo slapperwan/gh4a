@@ -44,36 +44,37 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.StyleableTextView;
-
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitStatus;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.PullRequestMarker;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.PullRequestService;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.model.PullRequest;
+import com.meisolsson.githubsdk.model.PullRequestMarker;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.model.Status;
+import com.meisolsson.githubsdk.service.issues.IssueCommentService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import retrofit2.Response;
+
 public class PullRequestFragment extends IssueFragmentBase {
     private PullRequest mPullRequest;
 
-    private final LoaderCallbacks<List<CommitStatus>> mStatusCallback =
-            new LoaderCallbacks<List<CommitStatus>>(this) {
+    private final LoaderCallbacks<List<Status>> mStatusCallback =
+            new LoaderCallbacks<List<Status>>(this) {
         @Override
-        protected Loader<LoaderResult<List<CommitStatus>>> onCreateLoader() {
+        protected Loader<LoaderResult<List<Status>>> onCreateLoader() {
             return new CommitStatusLoader(getActivity(), mRepoOwner, mRepoName,
-                    mPullRequest.getHead().getSha());
+                    mPullRequest.head().sha());
         }
 
         @Override
-        protected void onResultReady(List<CommitStatus> result) {
+        protected void onResultReady(List<Status> result) {
             fillStatus(result);
         }
     };
@@ -82,19 +83,21 @@ public class PullRequestFragment extends IssueFragmentBase {
             boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
         PullRequestFragment f = new PullRequestFragment();
 
-        Repository repo = pr.getBase().getRepo();
-        Bundle args = buildArgs(repo.getOwner().getLogin(), repo.getName(),
+        Repository repo = pr.base().repo();
+        Bundle args = buildArgs(repo.owner().login(), repo.name(),
                 issue, isCollaborator, initialComment);
-        args.putSerializable("pr", pr);
+        args.putParcelable("pr", pr);
         f.setArguments(args);
 
         return f;
     }
 
     public void updateState(PullRequest pr) {
-        mIssue.setState(pr.getState());
-        mPullRequest.setState(pr.getState());
-        mPullRequest.setMerged(pr.isMerged());
+        mIssue = mIssue.toBuilder().state(pr.state()).build();
+        mPullRequest = mPullRequest.toBuilder()
+                .state(pr.state())
+                .merged(pr.merged())
+                .build();
 
         assignHighlightColor();
         loadStatusIfOpen();
@@ -103,7 +106,7 @@ public class PullRequestFragment extends IssueFragmentBase {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mPullRequest = (PullRequest) getArguments().getSerializable("pr");
+        mPullRequest = getArguments().getParcelable("pr");
         super.onCreate(savedInstanceState);
     }
 
@@ -116,7 +119,7 @@ public class PullRequestFragment extends IssueFragmentBase {
     @Override
     public void onRefresh() {
         if (mListHeaderView != null) {
-            fillStatus(new ArrayList<CommitStatus>());
+            fillStatus(new ArrayList<Status>());
         }
         hideContentAndRestartLoaders(1);
         super.onRefresh();
@@ -128,17 +131,17 @@ public class PullRequestFragment extends IssueFragmentBase {
         branchGroup.setVisibility(View.VISIBLE);
 
         StyleableTextView fromBranch = branchGroup.findViewById(R.id.tv_pr_from);
-        formatMarkerText(fromBranch, R.string.pull_request_from, mPullRequest.getHead());
+        formatMarkerText(fromBranch, R.string.pull_request_from, mPullRequest.head());
 
         StyleableTextView toBranch = branchGroup.findViewById(R.id.tv_pr_to);
-        formatMarkerText(toBranch, R.string.pull_request_to, mPullRequest.getBase());
+        formatMarkerText(toBranch, R.string.pull_request_to, mPullRequest.base());
     }
 
     @Override
     protected void assignHighlightColor() {
-        if (mPullRequest.isMerged()) {
+        if (mPullRequest.merged()) {
             setHighlightColors(R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark);
-        } else if (ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())) {
+        } else if (mPullRequest.state() == IssueState.Closed) {
             setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
         } else {
             setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
@@ -151,14 +154,14 @@ public class PullRequestFragment extends IssueFragmentBase {
                 view.getTypefaceValue());
         int pos = builder.toString().indexOf("[ref]");
         if (pos >= 0) {
-            String label = TextUtils.isEmpty(marker.getLabel()) ? marker.getRef() : marker.getLabel();
-            final Repository repo = marker.getRepo();
+            String label = TextUtils.isEmpty(marker.label()) ? marker.ref() : marker.label();
+            final Repository repo = marker.repo();
             builder.replace(pos, pos + 5, label);
             if (repo != null) {
                 builder.setSpan(new IntentSpan(getActivity()) {
                     @Override
                     protected Intent getIntent() {
-                        return RepositoryActivity.makeIntent(getActivity(), repo, marker.getRef());
+                        return RepositoryActivity.makeIntent(getActivity(), repo, marker.ref());
                     }
                 }, pos, pos + label.length(), 0);
             }
@@ -169,109 +172,122 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     private void loadStatusIfOpen() {
-        if (ApiHelpers.IssueState.OPEN.equals(mPullRequest.getState())) {
+        if (mPullRequest.state() == IssueState.Open) {
             getLoaderManager().initLoader(1, null, mStatusCallback);
         }
    }
 
-   private void fillStatus(List<CommitStatus> statuses) {
-        Map<String, CommitStatus> statusByContext = new HashMap<>();
-        for (CommitStatus status : statuses) {
-            if (!statusByContext.containsKey(status.getContext())) {
-                statusByContext.put(status.getContext(), status);
-            }
-        }
+   private void fillStatus(List<Status> statuses) {
+       Map<String, Status> statusByContext = new HashMap<>();
+       for (Status status : statuses) {
+           if (!statusByContext.containsKey(status.context())) {
+               statusByContext.put(status.context(), status);
+           }
+       }
 
-        final int statusIconDrawableAttrId, statusLabelResId;
-        if (PullRequest.MERGEABLE_STATE_CLEAN.equals(mPullRequest.getMergeableState())) {
-            statusIconDrawableAttrId = R.attr.pullRequestMergeOkIcon;
-            statusLabelResId = R.string.pull_merge_status_clean;
-        } else if (PullRequest.MERGEABLE_STATE_UNSTABLE.equals(mPullRequest.getMergeableState())) {
-            statusIconDrawableAttrId = R.attr.pullRequestMergeUnstableIcon;
-            statusLabelResId = R.string.pull_merge_status_unstable;
-        } else if (PullRequest.MERGEABLE_STATE_DIRTY.equals(mPullRequest.getMergeableState())) {
-            statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
-            statusLabelResId = R.string.pull_merge_status_dirty;
-        } else if (statusByContext.isEmpty()) {
-            // unknwon status, no commit statuses -> nothing to display
-            return;
-        } else {
-            statusIconDrawableAttrId = R.attr.pullRequestMergeUnknownIcon;
-            statusLabelResId = R.string.pull_merge_status_unknown;
-        }
+       final int statusIconDrawableAttrId, statusLabelResId;
+       switch (mPullRequest.mergeableState()) {
+           case Clean:
+               statusIconDrawableAttrId = R.attr.pullRequestMergeOkIcon;
+               statusLabelResId = R.string.pull_merge_status_clean;
+               break;
+           case Unstable:
+               statusIconDrawableAttrId = R.attr.pullRequestMergeUnstableIcon;
+               statusLabelResId = R.string.pull_merge_status_unstable;
+               break;
+           case Dirty:
+               statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
+               statusLabelResId = R.string.pull_merge_status_dirty;
+               break;
+           default:
+               if (statusByContext.isEmpty()) {
+                   // unknwon status, no commit statuses -> nothing to display
+                   return;
+               } else {
+                   statusIconDrawableAttrId = R.attr.pullRequestMergeUnknownIcon;
+                   statusLabelResId = R.string.pull_merge_status_unknown;
+               }
+               break;
+       }
 
-        ImageView statusIcon = mListHeaderView.findViewById(R.id.iv_merge_status_icon);
-        statusIcon.setImageResource(UiUtils.resolveDrawable(getActivity(),
-                statusIconDrawableAttrId));
+       ImageView statusIcon = mListHeaderView.findViewById(R.id.iv_merge_status_icon);
+       statusIcon.setImageResource(UiUtils.resolveDrawable(getActivity(),
+               statusIconDrawableAttrId));
 
-        TextView statusLabel = mListHeaderView.findViewById(R.id.merge_status_label);
-        statusLabel.setText(statusLabelResId);
+       TextView statusLabel = mListHeaderView.findViewById(R.id.merge_status_label);
+       statusLabel.setText(statusLabelResId);
 
-        ViewGroup statusContainer =
-                mListHeaderView.findViewById(R.id.merge_commit_status_container);
-        LayoutInflater inflater = getLayoutInflater();
-        statusContainer.removeAllViews();
-        for (CommitStatus status : statusByContext.values()) {
-            View statusRow = inflater.inflate(R.layout.row_commit_status, statusContainer, false);
+       ViewGroup statusContainer =
+               mListHeaderView.findViewById(R.id.merge_commit_status_container);
+       LayoutInflater inflater = getLayoutInflater();
+       statusContainer.removeAllViews();
+       for (Status status : statusByContext.values()) {
+           View statusRow = inflater.inflate(R.layout.row_commit_status, statusContainer, false);
 
-            String state = status.getState();
-            final int iconDrawableAttrId;
-            if (CommitStatus.STATE_ERROR.equals(state) || CommitStatus.STATE_FAILURE.equals(state)) {
-                iconDrawableAttrId = R.attr.commitStatusFailIcon;
-            } else if (CommitStatus.STATE_SUCCESS.equals(state)) {
-                iconDrawableAttrId = R.attr.commitStatusOkIcon;
-            } else {
-                iconDrawableAttrId = R.attr.commitStatusUnknownIcon;
-            }
-            ImageView icon = statusRow.findViewById(R.id.iv_status_icon);
-            icon.setImageResource(UiUtils.resolveDrawable(getActivity(), iconDrawableAttrId));
+           final int iconDrawableAttrId;
+           switch (status.state()) {
+               case Error:
+               case Failure:
+                   iconDrawableAttrId = R.attr.commitStatusFailIcon;
+                   break;
+               case Success:
+                   iconDrawableAttrId = R.attr.commitStatusOkIcon;
+                   break;
+               default:
+                   iconDrawableAttrId = R.attr.commitStatusUnknownIcon;
+           }
+           ImageView icon = statusRow.findViewById(R.id.iv_status_icon);
+           icon.setImageResource(UiUtils.resolveDrawable(getActivity(), iconDrawableAttrId));
 
-            TextView context = statusRow.findViewById(R.id.tv_context);
-            context.setText(status.getContext());
+           TextView context = statusRow.findViewById(R.id.tv_context);
+           context.setText(status.context());
 
-            TextView description = statusRow.findViewById(R.id.tv_desc);
-            description.setText(status.getDescription());
+           TextView description = statusRow.findViewById(R.id.tv_desc);
+           description.setText(status.description());
 
-            statusContainer.addView(statusRow);
-        }
-        mListHeaderView.findViewById(R.id.merge_commit_no_status).setVisibility(
-                statusByContext.isEmpty() ? View.VISIBLE : View.GONE);
+           statusContainer.addView(statusRow);
+       }
+       mListHeaderView.findViewById(R.id.merge_commit_no_status).setVisibility(
+               statusByContext.isEmpty() ? View.VISIBLE : View.GONE);
 
-        mListHeaderView.findViewById(R.id.merge_status_container).setVisibility(View.VISIBLE);
-    }
+       mListHeaderView.findViewById(R.id.merge_status_container).setVisibility(View.VISIBLE);
+   }
 
     @Override
     public Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
         return new PullRequestCommentListLoader(getActivity(),
-                mRepoOwner, mRepoName, mPullRequest.getNumber());
+                mRepoOwner, mRepoName, mPullRequest.number());
     }
 
     @Override
-    public void editComment(Comment comment) {
-        final @AttrRes int highlightColorAttr = mPullRequest.isMerged()
+    public void editComment(GitHubCommentBase comment) {
+        final @AttrRes int highlightColorAttr = mPullRequest.merged()
                 ? R.attr.colorPullRequestMerged
-                : ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())
+                : mPullRequest.state() == IssueState.Closed
                         ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
-        Intent intent = comment instanceof CommitComment
+        Intent intent = comment instanceof ReviewComment
                 ? EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mPullRequest.getNumber(), 0L, (CommitComment) comment, highlightColorAttr)
+                mPullRequest.number(), comment.id(), 0L, comment.body(), highlightColorAttr)
                 : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mIssue.getNumber(), comment, highlightColorAttr);
+                        mIssue.number(), comment.id(), comment.body(), highlightColorAttr);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
-    @Override
-    protected void deleteCommentInBackground(RepositoryId repoId, Comment comment) throws Exception {
-        Gh4Application app = Gh4Application.get();
 
-        if (comment instanceof CommitComment) {
-            PullRequestService pullService =
-                    (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
-            pullService.deleteComment(repoId, comment.getId());
+    @Override
+    protected void deleteCommentInBackground(GitHubCommentBase comment) throws Exception {
+        final Response<Boolean> response;
+
+        if (comment instanceof ReviewComment) {
+            PullRequestReviewCommentService service =
+                    Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+            response = service.deleteComment(mRepoOwner, mRepoName, comment.id()).blockingGet();
         } else {
-            IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
-            issueService.deleteComment(repoId, comment.getId());
+            IssueCommentService service =
+                    Gh4Application.get().getGitHubService(IssueCommentService.class);
+            response = service.deleteIssueComment(mRepoOwner, mRepoName, comment.id()).blockingGet();
         }
+        ApiHelpers.throwOnFailure(response);
     }
 
     @Override

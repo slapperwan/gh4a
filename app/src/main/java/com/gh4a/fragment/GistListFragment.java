@@ -11,8 +11,7 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.GistListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.StarredGistListLoader;
-
-import org.eclipse.egit.github.core.Gist;
+import com.meisolsson.githubsdk.model.Gist;
 
 import java.util.List;
 
@@ -61,6 +60,6 @@ public class GistListFragment extends ListDataBaseFragment<Gist> implements
 
     @Override
     public void onItemClick(Gist gist) {
-        startActivity(GistActivity.makeIntent(getActivity(), gist.getId()));
+        startActivity(GistActivity.makeIntent(getActivity(), gist.id()));
     }
 }

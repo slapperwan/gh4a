@@ -8,14 +8,13 @@ import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.loader.PullRequestFilesLoader;
 import com.gh4a.loader.PullRequestLoader;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.PullRequest;
+import com.meisolsson.githubsdk.model.GitHubFile;
+import com.meisolsson.githubsdk.model.PullRequest;
+import com.meisolsson.githubsdk.model.ReviewComment;
 
 import java.util.List;
 
-public class PullRequestDiffLoadTask extends DiffLoadTask {
+public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
     @VisibleForTesting
     protected final int mPullRequestNumber;
 
@@ -26,10 +25,10 @@ public class PullRequestDiffLoadTask extends DiffLoadTask {
     }
 
     @Override
-    protected Intent getLaunchIntent(String sha, CommitFile file, List<CommitComment> comments,
-            DiffHighlightId diffId) {
+    protected Intent getLaunchIntent(String sha, GitHubFile file,
+            List<ReviewComment> comments, DiffHighlightId diffId) {
         return PullRequestDiffViewerActivity.makeIntent(mActivity, mRepoOwner,
-                mRepoName, mPullRequestNumber, sha, file.getFilename(), file.getPatch(),
+                mRepoName, mPullRequestNumber, sha, file.filename(), file.patch(),
                 comments, -1, diffId.startLine, diffId.endLine, diffId.right, null);
     }
 
@@ -37,17 +36,16 @@ public class PullRequestDiffLoadTask extends DiffLoadTask {
     protected String getSha() throws Exception {
         PullRequest pullRequest = PullRequestLoader.loadPullRequest(mRepoOwner, mRepoName,
                 mPullRequestNumber);
-        return pullRequest.getHead().getSha();
+        return pullRequest.head().sha();
     }
 
     @Override
-    protected List<CommitFile> getFiles() throws Exception {
+    protected List<GitHubFile> getFiles() throws Exception {
         return PullRequestFilesLoader.loadFiles(mRepoOwner, mRepoName, mPullRequestNumber);
     }
 
     @Override
-    protected List<CommitComment> getComments() throws Exception {
-        return PullRequestCommentsLoader.loadComments(mRepoOwner, mRepoName,
-                mPullRequestNumber);
+    protected List<ReviewComment> getComments() throws Exception {
+        return PullRequestCommentsLoader.loadComments(mRepoOwner, mRepoName, mPullRequestNumber);
     }
 }

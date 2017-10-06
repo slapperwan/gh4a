@@ -3,8 +3,8 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.service.GistService;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.service.gists.GistService;
 
 import java.io.IOException;
 
@@ -18,8 +18,7 @@ public class GistStarLoader extends BaseLoader<Boolean> {
 
     @Override
     public Boolean doLoadInBackground() throws IOException {
-        GistService gistService = (GistService)
-                Gh4Application.get().getService(Gh4Application.GIST_SERVICE);
-        return gistService.isStarred(mGistId);
+        GistService service = Gh4Application.get().getGitHubService(GistService.class);
+        return ApiHelpers.throwOnFailure(service.checkIfGistIsStarred(mGistId).blockingGet());
     }
 }

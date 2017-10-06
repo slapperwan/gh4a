@@ -26,18 +26,21 @@ import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.ReactionBar;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.Reaction;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.PullRequestService;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.PositionalCommentBase;
+import com.meisolsson.githubsdk.model.Reaction;
+import com.meisolsson.githubsdk.model.Reactions;
+import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.model.request.ReactionRequest;
+import com.meisolsson.githubsdk.service.reactions.ReactionService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 
 import java.io.IOException;
 import java.util.List;
 
-public class PullRequestDiffViewerActivity extends DiffViewerActivity {
+public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComment> {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number,
-            String commitSha, String path, String diff, List<CommitComment> comments,
+            String commitSha, String path, String diff, List<ReviewComment> comments,
             int initialLine, int highlightStartLine, int highlightEndLine, boolean highlightIsRight,
             IntentUtils.InitialCommentMarker initialComment) {
         Intent intent = new Intent(context, PullRequestDiffViewerActivity.class)
@@ -51,8 +54,8 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
 
     @Override
     protected void openCommentDialog(long id, long replyToId, String line, int position,
-            int leftLine, int rightLine, CommitComment commitComment) {
-        String body = commitComment == null ? "" : commitComment.getBody();
+            int leftLine, int rightLine, PositionalCommentBase commitComment) {
+        String body = commitComment == null ? "" : commitComment.body();
         Intent intent = EditPullRequestDiffCommentActivity.makeIntent(this,
                 mRepoOwner, mRepoName, mSha, mPath, line, leftLine, rightLine,
                 position, id, body, mPullRequestNumber, replyToId);
@@ -66,7 +69,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    protected Loader<LoaderResult<List<CommitComment>>> createCommentLoader() {
+    protected Loader<LoaderResult<List<ReviewComment>>> createCommentLoader() {
         return new PullRequestCommentsLoader(this, mRepoOwner, mRepoName, mPullRequestNumber);
     }
 
@@ -93,33 +96,41 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity {
     }
 
     @Override
-    protected void deleteComment(long id) throws IOException {
-        Gh4Application app = Gh4Application.get();
-        PullRequestService pullRequestService = (PullRequestService)
-                app.getService(Gh4Application.PULL_SERVICE);
+    protected PositionalCommentBase onUpdateReactions(PositionalCommentBase comment,
+            Reactions reactions) {
+        return ((ReviewComment) comment).toBuilder()
+                .reactions(reactions)
+                .build();
+    }
 
-        pullRequestService.deleteComment(new RepositoryId(mRepoOwner, mRepoName), id);
+    @Override
+    protected void deleteComment(long id) throws IOException {
+        PullRequestReviewCommentService service =
+                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+        ApiHelpers.throwOnFailure(service.deleteComment(mRepoOwner, mRepoName, id).blockingGet());
     }
 
     @Override
     public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws IOException {
-        CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        Gh4Application app = Gh4Application.get();
-        PullRequestService pullRequestService = (PullRequestService)
-                app.getService(Gh4Application.PULL_SERVICE);
+        final CommitCommentWrapper comment = (CommitCommentWrapper) item;
+        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
 
-        return pullRequestService.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName),
-                comment.comment.getId());
+        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Reaction>() {
+            @Override
+            public Page<Reaction> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(service.getPullRequestReviewCommentReactions(
+                        mRepoOwner, mRepoName, comment.comment.id(), page).blockingGet());
+            }
+        });
     }
 
     @Override
     public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws IOException {
         CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        Gh4Application app = Gh4Application.get();
-        PullRequestService pullRequestService = (PullRequestService)
-                app.getService(Gh4Application.PULL_SERVICE);
+        ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
 
-        return pullRequestService.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName),
-                comment.comment.getId(), content);
+        return ApiHelpers.throwOnFailure(service.createPullRequestReviewCommentReaction(
+                mRepoOwner, mRepoName, comment.comment.id(),
+                ReactionRequest.builder().content(content).build()).blockingGet());
     }
 }

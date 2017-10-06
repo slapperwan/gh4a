@@ -36,7 +36,7 @@ class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timelin
         if (v.getId() == R.id.btn_reply) {
             TimelineItem.TimelineComment timelineComment =
                     (TimelineItem.TimelineComment) v.getTag();
-            mCallback.reply(timelineComment.comment.getId());
+            mCallback.reply(timelineComment.comment().id());
         }
     }
 }
