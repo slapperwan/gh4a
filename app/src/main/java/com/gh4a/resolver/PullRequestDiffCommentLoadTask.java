@@ -11,10 +11,9 @@ import com.gh4a.loader.PullRequestFilesLoader;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.PullRequest;
+import com.meisolsson.githubsdk.model.GitHubFile;
+import com.meisolsson.githubsdk.model.PullRequest;
+import com.meisolsson.githubsdk.model.ReviewComment;
 
 import java.util.List;
 
@@ -49,25 +48,25 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
             return null;
         }
 
-        List<CommitComment> comments = PullRequestCommentsLoader.loadComments(mRepoOwner,
-                mRepoName, mPullRequestNumber);
+        List<ReviewComment> comments =
+                PullRequestCommentsLoader.loadComments(mRepoOwner, mRepoName, mPullRequestNumber);
         if (comments == null || mActivity.isFinishing()) {
             return null;
         }
 
-        List<CommitFile> files =
+        List<GitHubFile> files =
                 PullRequestFilesLoader.loadFiles(mRepoOwner, mRepoName, mPullRequestNumber);
         if (files == null || mActivity.isFinishing()) {
             return null;
         }
 
         boolean foundComment = false;
-        CommitFile resultFile = null;
-        for (CommitComment comment : comments) {
-            if (mMarker.matches(comment.getId(), comment.getCreatedAt())) {
+        GitHubFile resultFile = null;
+        for (ReviewComment comment : comments) {
+            if (mMarker.matches(comment.id(), comment.createdAt())) {
                 foundComment = true;
-                for (CommitFile commitFile : files) {
-                    if (commitFile.getFilename().equals(comment.getPath())) {
+                for (GitHubFile commitFile : files) {
+                    if (commitFile.filename().equals(comment.path())) {
                         resultFile = commitFile;
                         break;
                     }
@@ -82,10 +81,10 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
 
         Intent intent = null;
         if (resultFile != null) {
-            if (!FileUtils.isImage(resultFile.getFilename())) {
+            if (!FileUtils.isImage(resultFile.filename())) {
                 intent = PullRequestDiffViewerActivity.makeIntent(mActivity, mRepoOwner,
-                        mRepoName, mPullRequestNumber, pullRequest.getHead().getSha(),
-                        resultFile.getFilename(), resultFile.getPatch(), comments, -1, -1, -1,
+                        mRepoName, mPullRequestNumber, pullRequest.head().sha(),
+                        resultFile.filename(), resultFile.patch(), comments, -1, -1, -1,
                         false, mMarker);
             }
         } else {

@@ -11,16 +11,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.gh4a.R;
-
-import org.eclipse.egit.github.core.CodeSearchResult;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.TextMatch;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.SearchCode;
+import com.meisolsson.githubsdk.model.TextMatch;
 
 import java.util.List;
 
-public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchAdapter.ViewHolder> {
+public class CodeSearchAdapter extends RootAdapter<SearchCode, CodeSearchAdapter.ViewHolder> {
     public interface Callback {
-        void onSearchFragmentClick(CodeSearchResult result, int matchIndex);
+        void onSearchFragmentClick(SearchCode result, int matchIndex);
     }
 
     private final Callback mCallback;
@@ -37,20 +36,20 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
     }
 
     @Override
-    protected void onBindViewHolder(ViewHolder holder, CodeSearchResult result) {
-        Repository repo = result.getRepository();
-        holder.tvTitle.setText(result.getName());
-        holder.tvRepo.setText(repo.getOwner().getLogin() + "/" + repo.getName());
+    protected void onBindViewHolder(ViewHolder holder, SearchCode result) {
+        Repository repo = result.repository();
+        holder.tvTitle.setText(result.name());
+        holder.tvRepo.setText(repo.owner().login() + "/" + repo.name());
 
-        List<TextMatch> matches = result.getTextMatches();
+        List<TextMatch> matches = result.textMatches();
         if (matches != null && !matches.isEmpty()) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
 
             for (int i = 0; i < matches.size(); i++) {
                 TextMatch match = matches.get(i);
-                SpannableStringBuilder builder = new SpannableStringBuilder(match.getFragment());
+                SpannableStringBuilder builder = new SpannableStringBuilder(match.fragment());
 
-                List<TextMatch.MatchItem> items = match.getMatches();
+                List<TextMatch.MatchItem> items = match.matches();
                 if (items != null) {
                     for (TextMatch.MatchItem item : items) {
                         int start = item.getStartPos();
@@ -87,7 +86,7 @@ public class CodeSearchAdapter extends RootAdapter<CodeSearchResult, CodeSearchA
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.tv_match) {
-            CodeSearchResult searchResult = (CodeSearchResult) view.getTag();
+            SearchCode searchResult = (SearchCode) view.getTag();
             mCallback.onSearchFragmentClick(searchResult, (int) view.getTag(R.id.search_match_index));
             return;
         }

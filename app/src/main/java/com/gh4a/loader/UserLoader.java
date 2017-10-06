@@ -3,19 +3,18 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.UserService;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.users.UserService;
 
 import java.io.IOException;
 
 public class UserLoader extends BaseLoader<User> {
-
     private final String mLogin;
 
     public UserLoader(Context context, String login) {
         super(context);
-        this.mLogin = login;
+        mLogin = login;
     }
 
     @Override
@@ -24,8 +23,7 @@ public class UserLoader extends BaseLoader<User> {
     }
 
     public static User loadUser(String login) throws IOException {
-        UserService userService = (UserService)
-                Gh4Application.get().getService(Gh4Application.USER_SERVICE);
-        return userService.getUser(login);
+        UserService userService = Gh4Application.get().getGitHubService(UserService.class);
+        return ApiHelpers.throwOnFailure(userService.getUser(login).blockingGet());
     }
 }

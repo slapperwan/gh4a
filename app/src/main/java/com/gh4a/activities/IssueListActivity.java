@@ -21,6 +21,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -48,11 +49,11 @@ import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.model.Label;
+import com.meisolsson.githubsdk.model.Milestone;
+import com.meisolsson.githubsdk.model.User;
 
 import java.util.HashMap;
 import java.util.List;
@@ -146,7 +147,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         @Override
         protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
             return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName,
-                    ApiHelpers.IssueState.OPEN);
+                    IssueState.Open);
         }
 
         @Override
@@ -339,9 +340,9 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ISSUE_CREATE) {
             if (resultCode == Activity.RESULT_OK && data.hasExtra("issue")) {
-                Issue issue = (Issue) data.getSerializableExtra("issue");
+                Issue issue = data.getParcelableExtra("issue");
                 Intent intent = IssueActivity.makeIntent(this, mRepoOwner, mRepoName,
-                        issue.getNumber());
+                        issue.number());
                 startActivityForResult(intent, REQUEST_ISSUE_AFTER_CREATE);
             }
         } else if (requestCode == REQUEST_ISSUE_AFTER_CREATE) {
@@ -409,7 +410,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         super.onNavigationItemSelected(item);
 
         if (mSortHelper.handleItemSelection(item)) {
@@ -594,7 +595,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         labels[1] = getResources().getString(R.string.issue_filter_by_no_label);
 
         for (int i = 0; i < mLabels.size(); i++) {
-            labels[i + 2] = mLabels.get(i).getName();
+            labels[i + 2] = mLabels.get(i).name();
             if (TextUtils.equals(mSelectedLabel, labels[i + 2])) {
                 selected = i + 2;
             }
@@ -627,7 +628,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         milestones[1] = getResources().getString(R.string.issue_filter_by_no_milestone);
 
         for (int i = 0; i < mMilestones.size(); i++) {
-            milestones[i + 2] = mMilestones.get(i).getTitle();
+            milestones[i + 2] = mMilestones.get(i).title();
             if (TextUtils.equals(mSelectedMilestone, milestones[i + 2])) {
                 selected = i + 2;
             }
@@ -667,8 +668,8 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
         for (int i = 0; i < mAssignees.size(); i++) {
             User u = mAssignees.get(i);
-            assignees[i + 2] = u.getLogin();
-            if (u.getLogin().equalsIgnoreCase(mSelectedAssignee)) {
+            assignees[i + 2] = u.login();
+            if (u.login().equalsIgnoreCase(mSelectedAssignee)) {
                 selected = i + 2;
             }
         }
@@ -678,7 +679,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             public void onClick(DialogInterface dialog, int which) {
                 mSelectedAssignee = which == 0 ? null
                         : which == 1 ? ""
-                        : mAssignees.get(which - 2).getLogin();
+                        : mAssignees.get(which - 2).login();
                 dialog.dismiss();
                 onFilterUpdated();
             }

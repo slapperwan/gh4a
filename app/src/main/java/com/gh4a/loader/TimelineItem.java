@@ -7,12 +7,14 @@ import android.support.annotation.Nullable;
 
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.utils.IntentUtils;
-
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.IssueEvent;
-import org.eclipse.egit.github.core.Review;
+import com.meisolsson.githubsdk.model.GitHubComment;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.GitHubFile;
+import com.meisolsson.githubsdk.model.IssueEvent;
+import com.meisolsson.githubsdk.model.Reactions;
+import com.meisolsson.githubsdk.model.Review;
+import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,26 +31,43 @@ public abstract class TimelineItem {
                 Pattern.compile(".*github\\.com/repos/([^/]+)/([^/]+)/pulls/(\\d+)");
 
         @NonNull
-        public final Comment comment;
+        private GitHubCommentBase comment;
 
         @Nullable
-        public final CommitFile file;
+        public final GitHubFile file;
 
         Diff diff;
 
-        public TimelineComment(@NonNull Comment comment) {
+        public TimelineComment(@NonNull GitHubComment comment) {
             this.comment = comment;
             this.file = null;
         }
 
-        public TimelineComment(@NonNull CommitComment commitComment, @Nullable CommitFile file) {
-            this.comment = commitComment;
+        public TimelineComment(@NonNull ReviewComment comment, @Nullable GitHubFile file) {
+            this.comment = comment;
             this.file = file;
         }
 
+        public GitHubCommentBase comment() {
+            return comment;
+        }
+
+        public ReviewComment getReviewComment() {
+            return comment instanceof ReviewComment ? (ReviewComment) comment : null;
+        }
+
+        public void setReactions(Reactions reactions) {
+            if (comment instanceof ReviewComment) {
+                comment = ((ReviewComment) comment).toBuilder().reactions(reactions).build();
+            } else {
+                comment = ((GitHubComment) comment).toBuilder().reactions(reactions).build();
+            }
+        }
+
         @Nullable
-        public CommitComment getCommitComment() {
-            return comment instanceof CommitComment ? (CommitComment) comment : null;
+        @Override
+        public User getUser() {
+            return comment.user();
         }
 
         public Diff getParentDiff() {
@@ -57,7 +76,7 @@ public abstract class TimelineItem {
 
         @Override
         public Date getCreatedAt() {
-            return comment.getCreatedAt();
+            return comment.createdAt();
         }
 
         @Nullable
@@ -67,24 +86,23 @@ public abstract class TimelineItem {
 
         @Nullable
         public Intent makeDiffIntent(Context context, int line, boolean isRightNumber) {
-            CommitComment commitComment = getCommitComment();
-
-            if (file == null || commitComment == null) {
+            ReviewComment reviewComment = getReviewComment();
+            if (file == null || reviewComment == null) {
                 return null;
             }
 
-            Matcher matcher = PULL_REQUEST_PATTERN.matcher(commitComment.getPullRequestUrl());
+            Matcher matcher = PULL_REQUEST_PATTERN.matcher(reviewComment.pullRequestUrl());
             if (matcher.matches()) {
                 String repoOwner = matcher.group(1);
                 String repoName = matcher.group(2);
                 int pullRequestNumber = Integer.parseInt(matcher.group(3));
 
                 IntentUtils.InitialCommentMarker initialComment = line == -1
-                        ? new IntentUtils.InitialCommentMarker(commitComment.getId()) : null;
+                        ? new IntentUtils.InitialCommentMarker(reviewComment.id()) : null;
 
                 return PullRequestDiffViewerActivity.makeIntent(context, repoOwner, repoName,
-                        pullRequestNumber, commitComment.getCommitId(), commitComment.getPath(),
-                        file.getPatch(), null, -1, line, line, isRightNumber, initialComment);
+                        pullRequestNumber, reviewComment.commitId(), reviewComment.path(),
+                        file.patch(), null, -1, line, line, isRightNumber, initialComment);
             }
 
             return null;
@@ -99,15 +117,24 @@ public abstract class TimelineItem {
             this.event = event;
         }
 
+        @Nullable
+        @Override
+        public User getUser() {
+            if (event.assigner() != null) {
+                return event.assigner();
+            }
+            return event.actor();
+        }
+
         @Override
         public Date getCreatedAt() {
-            return event.getCreatedAt();
+            return event.createdAt();
         }
     }
 
     public static class TimelineReview extends TimelineItem {
         @NonNull
-        public final Review review;
+        private final Review review;
 
         @NonNull
         private final Map<String, Diff> diffHunksBySpecialId = new HashMap<>();
@@ -116,9 +143,19 @@ public abstract class TimelineItem {
             this.review = review;
         }
 
+        public Review review() {
+            return review;
+        }
+
+        @Nullable
+        @Override
+        public User getUser() {
+            return review.user();
+        }
+
         @Override
         public Date getCreatedAt() {
-            return review.getSubmittedAt();
+            return review.submittedAt();
         }
 
         public Collection<Diff> getDiffHunks() {
@@ -135,7 +172,7 @@ public abstract class TimelineItem {
          * @param file The commit file in which the comment was created.
          * @param addNewDiffHunk {@code true} if new diff hunk should be created if it's not found.
          */
-        public void addComment(@NonNull CommitComment comment, @Nullable CommitFile file,
+        public void addComment(@NonNull ReviewComment comment, @Nullable GitHubFile file,
                 boolean addNewDiffHunk) {
             // Comments are grouped by a special diff hunk id which is a combination of these 3
             // fields. By using this id we can display comments and their replies together under
@@ -159,7 +196,7 @@ public abstract class TimelineItem {
                 }
 
                 if (diffHunk.getCreatedAt() != null &&
-                        diffHunk.getCreatedAt().after(comment.getCreatedAt())) {
+                        diffHunk.getCreatedAt().after(comment.createdAt())) {
                     // Because we are adding all of the comments in order based on their creation
                     // date and also first add only comments from the initial review we know that
                     // if something comes out of order then our initial comment was a reply.
@@ -183,9 +220,9 @@ public abstract class TimelineItem {
          *
          * @param comment The comment for which to return the special id.
          */
-        public static String getDiffHunkId(CommitComment comment) {
-            return comment.getOriginalCommitId() + comment.getPath() +
-                    comment.getOriginalPosition();
+        public static String getDiffHunkId(ReviewComment comment) {
+            return comment.originalCommitId() + comment.path() +
+                    comment.originalPosition();
         }
 
         public Diff(TimelineComment timelineComment) {
@@ -224,37 +261,43 @@ public abstract class TimelineItem {
         }
 
         @NonNull
-        public CommitComment getInitialComment() {
+        public ReviewComment getInitialComment() {
             TimelineComment comment = getInitialTimelineComment();
 
-            if (comment.getCommitComment() == null) {
+            if (comment.getReviewComment() == null) {
                 throw new AssertionError("Missing required initial commit comment.");
             }
 
-            return comment.getCommitComment();
+            return comment.getReviewComment();
+        }
+
+        @Nullable
+        @Override
+        public User getUser() {
+            return null;
         }
 
         @Override
         public Date getCreatedAt() {
-            return getInitialComment().getCreatedAt();
+            return getInitialComment().createdAt();
         }
 
         @Override
         public int compareTo(@NonNull Diff other) {
-            CommitComment comment = getInitialComment();
-            CommitComment otherComment = other.getInitialComment();
+            ReviewComment comment = getInitialComment();
+            ReviewComment otherComment = other.getInitialComment();
 
             // First sort by filename
-            int byPath = comment.getPath().compareTo(otherComment.getPath());
+            int byPath = comment.path().compareTo(otherComment.path());
             if (byPath != 0) {
                 return byPath;
             }
 
             // Then by line numbers
-            if (comment.getOriginalPosition() < otherComment.getOriginalPosition()) {
+            if (comment.originalPosition() < otherComment.originalPosition()) {
                 return -1;
             }
-            if (comment.getOriginalPosition() > otherComment.getOriginalPosition()) {
+            if (comment.originalPosition() > otherComment.originalPosition()) {
                 return 1;
             }
 
@@ -286,11 +329,20 @@ public abstract class TimelineItem {
             this.timelineComment = timelineComment;
         }
 
+        @Nullable
+        @Override
+        public User getUser() {
+            return null;
+        }
+
         @Override
         public Date getCreatedAt() {
             return null;
         }
     }
+
+    @Nullable
+    public abstract User getUser();
 
     @Nullable
     public abstract Date getCreatedAt();

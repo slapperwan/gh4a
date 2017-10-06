@@ -2,13 +2,14 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
-import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.service.IssueService;
+import com.gh4a.ServiceFactory;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.SearchPage;
+import com.meisolsson.githubsdk.service.search.SearchService;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Locale;
 
 public class PullRequestCountLoader extends BaseLoader<Integer> {
@@ -26,11 +27,11 @@ public class PullRequestCountLoader extends BaseLoader<Integer> {
 
     @Override
     public Integer doLoadInBackground() throws IOException {
-        IssueService issueService = (IssueService)
-                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        HashMap<String, String> filterData = new HashMap<>();
-        filterData.put("q", String.format(Locale.US, QUERY_FORMAT,
-                mRepository.getOwner().getLogin(), mRepository.getName(), mState));
-        return issueService.getSearchIssueResultCount(filterData);
+        SearchService service = ServiceFactory.createService(SearchService.class, null, null, 1);
+        String query = String.format(Locale.US, QUERY_FORMAT,
+                mRepository.owner().login(), mRepository.name(), mState);
+        SearchPage<Issue> page = ApiHelpers.throwOnFailure(
+                service.searchIssues(query, null, null, 0).blockingGet());
+        return page.totalCount();
     }
 }

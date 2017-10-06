@@ -53,10 +53,10 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
-
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.IssueService;
+import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.model.request.issue.IssueRequest;
+import com.meisolsson.githubsdk.service.issues.IssueService;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -189,7 +189,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
     private void updateHeader() {
         TextView tvState = mHeader.findViewById(R.id.tv_state);
-        boolean closed = ApiHelpers.IssueState.CLOSED.equals(mIssue.getState());
+        boolean closed = mIssue.state() == IssueState.Closed;
         int stateTextResId = closed ? R.string.closed : R.string.open;
         int stateColorAttributeId = closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
 
@@ -198,7 +198,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                 closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
 
         TextView tvTitle = mHeader.findViewById(R.id.tv_title);
-        tvTitle.setText(mIssue.getTitle());
+        tvTitle.setText(mIssue.title());
 
         mHeader.setVisibility(View.VISIBLE);
     }
@@ -210,11 +210,11 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
         boolean authorized = Gh4Application.get().isAuthorized();
         boolean isCreator = mIssue != null && authorized &&
-                ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
-        boolean isClosed = mIssue != null && ApiHelpers.IssueState.CLOSED.equals(mIssue.getState());
+                ApiHelpers.loginEquals(mIssue.user(), Gh4Application.get().getAuthLogin());
+        boolean isClosed = mIssue != null && mIssue.state() == IssueState.Closed;
         boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
         boolean closerIsCreator = mIssue != null
-                && ApiHelpers.userEquals(mIssue.getUser(), mIssue.getClosedBy());
+                && ApiHelpers.userEquals(mIssue.user(), mIssue.closedBy());
         boolean canClose = mIssue != null && authorized && (isCreator || isCollaborator);
         boolean canOpen = canClose && (isCollaborator || closerIsCreator);
 
@@ -256,11 +256,11 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                 return true;
             case R.id.share:
                 IntentUtils.share(this, getString(R.string.share_issue_subject,
-                        mIssueNumber, mIssue.getTitle(), mRepoOwner + "/" + mRepoName),
-                        mIssue.getHtmlUrl());
+                        mIssueNumber, mIssue.title(), mRepoOwner + "/" + mRepoName),
+                        mIssue.htmlUrl());
                 return true;
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(mIssue.getHtmlUrl()));
+                IntentUtils.launchBrowser(this, Uri.parse(mIssue.htmlUrl()));
                 return true;
             case R.id.copy_number:
                 IntentUtils.copyToClipboard(this, "Issue #" + mIssueNumber,
@@ -329,7 +329,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
     private void updateFabVisibility() {
         boolean isIssueOwner = mIssue != null
-                && ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
+                && ApiHelpers.loginEquals(mIssue.user(), Gh4Application.get().getAuthLogin());
         boolean isCollaborator = mIsCollaborator != null && mIsCollaborator;
         boolean shouldHaveFab = (isIssueOwner || isCollaborator) && mIssue != null;
         CoordinatorLayout rootLayout = getRootLayout();
@@ -344,7 +344,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             mEditFab = null;
         }
         if (mEditFab != null) {
-            mEditFab.setState(mIssue.getState());
+            mEditFab.setState(mIssue.state());
         }
     }
 
@@ -394,14 +394,10 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
         @Override
         protected Issue run() throws IOException {
-            IssueService issueService = (IssueService)
-                    Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-
-            Issue issue = issueService.getIssue(repoId, mIssueNumber);
-            issue.setState(mOpen ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED);
-
-            return issueService.editIssue(repoId, issue);
+            IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
+            IssueState targetState = mOpen ? IssueState.Open : IssueState.Closed;
+            return ApiHelpers.throwOnFailure(service.editIssue(mRepoOwner, mRepoName, mIssueNumber,
+                    IssueRequest.builder().state(targetState).build()).blockingGet());
         }
 
         @Override
@@ -410,7 +406,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
             updateHeader();
             if (mEditFab != null) {
-                mEditFab.setState(mIssue.getState());
+                mEditFab.setState(mIssue.state());
             }
             if (mFragment != null) {
                 mFragment.updateState(mIssue);

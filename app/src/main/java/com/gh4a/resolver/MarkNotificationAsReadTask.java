@@ -4,8 +4,7 @@ import android.content.Context;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.service.NotificationService;
+import com.meisolsson.githubsdk.service.activity.NotificationService;
 
 import java.io.IOException;
 
@@ -19,9 +18,9 @@ public class MarkNotificationAsReadTask extends BackgroundTask<Void> {
 
     @Override
     protected Void run() throws IOException {
-        NotificationService notificationService = (NotificationService)
-                Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
-        notificationService.markThreadAsRead(mNotificationId);
+        NotificationService service =
+                Gh4Application.get().getGitHubService(NotificationService.class);
+        service.markNotificationRead(mNotificationId).blockingGet();
         return null;
     }
 

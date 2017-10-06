@@ -6,8 +6,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 
-import org.eclipse.egit.github.core.User;
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -30,6 +28,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v4.util.LongSparseArray;
 import android.support.v4.util.LruCache;
 import android.support.v4.util.SparseArrayCompat;
 import android.text.TextUtils;
@@ -37,20 +36,22 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import com.meisolsson.githubsdk.model.User;
+
 public class AvatarHandler {
     private static final String TAG = "GravatarHandler";
 
     private static final int MAX_CACHED_IMAGE_SIZE = 60; /* dp - maximum gravatar view size used */
 
-    private static LruCache<Integer, Bitmap> sCache;
+    private static LruCache<Long, Bitmap> sCache;
     private static int sNextRequestId = 1;
 
     private static class Request {
-        int id;
+        long id;
         String url;
         ArrayList<ViewDelegate> views;
     }
-    private static final SparseArrayCompat<Request> sRequests = new SparseArrayCompat<>();
+    private static final LongSparseArray<Request> sRequests = new LongSparseArray<>();
     private static int sMaxImageSizePx = -1;
 
     private static final int MSG_LOAD = 1;
@@ -76,7 +77,7 @@ public class AvatarHandler {
             }
         }
 
-        private void processResult(int requestId, Bitmap bitmap) {
+        private void processResult(long requestId, Bitmap bitmap) {
             final Request request = sRequests.get(requestId);
             if (request != null && bitmap != null) {
                 synchronized (AvatarHandler.class) {
@@ -97,15 +98,15 @@ public class AvatarHandler {
             return;
         }
 
-        assignAvatar(view, user.getLogin(), user.getId(), user.getAvatarUrl());
+        assignAvatar(view, user.login(), user.id(), user.avatarUrl());
     }
 
-    public static void assignAvatar(ImageView view, String userName, int userId, String url) {
+    public static void assignAvatar(ImageView view, String userName, long userId, String url) {
         assignAvatarInternal(new ImageViewDelegate(view), userName, userId, url);
     }
 
     public static void assignAvatar(Context context, MenuItem item,
-            String userName, int userId, String url) {
+            String userName, long userId, String url) {
         assignAvatarInternal(new MenuItemDelegate(context, item), userName, userId, url);
     }
 
@@ -113,15 +114,15 @@ public class AvatarHandler {
         if (user == null) {
             return null;
         }
-        Bitmap cachedBitmap = loadBitmapFromCache(context, user.getId());
+        Bitmap cachedBitmap = loadBitmapFromCache(context, user.id());
         if (cachedBitmap != null) {
             return cachedBitmap;
         }
         try {
-            Bitmap bitmap = fetchBitmap(makeUrl(user.getAvatarUrl(), user.getId()));
+            Bitmap bitmap = fetchBitmap(makeUrl(user.avatarUrl(), user.id()));
             if (bitmap != null) {
                 synchronized (AvatarHandler.class) {
-                    sCache.put(user.getId(), bitmap);
+                    sCache.put(user.id(), bitmap);
                 }
             }
             return bitmap;
@@ -130,7 +131,7 @@ public class AvatarHandler {
         }
     }
 
-    private static Bitmap loadBitmapFromCache(Context context, int id) {
+    private static Bitmap loadBitmapFromCache(Context context, long id) {
         synchronized (AvatarHandler.class) {
             if (sCache == null) {
                 initialize(context);
@@ -140,7 +141,7 @@ public class AvatarHandler {
     }
 
     private static void assignAvatarInternal(ViewDelegate view,
-            String userName, int userId, String url) {
+            String userName, long userId, String url) {
         removeOldRequest(view);
 
         Bitmap bitmap = loadBitmapFromCache(view.getContext(), userId);
@@ -183,15 +184,15 @@ public class AvatarHandler {
         // Use 10% of the available memory or 1MB for the cache, whatever is larger
         final int limit = Math.max(maxMemory / 10, 1024);
 
-        sCache = new LruCache<Integer, Bitmap>(limit) {
+        sCache = new LruCache<Long, Bitmap>(limit) {
             @Override
-            protected void entryRemoved(boolean evicted, Integer key, Bitmap oldValue, Bitmap newValue) {
+            protected void entryRemoved(boolean evicted, Long key, Bitmap oldValue, Bitmap newValue) {
                 super.entryRemoved(evicted, key, oldValue, newValue);
                 oldValue.recycle();
             }
 
             @Override
-            protected int sizeOf(Integer key, Bitmap value) {
+            protected int sizeOf(Long key, Bitmap value) {
                 final long sizeInBytes;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     sizeInBytes = value.getAllocationByteCount();
@@ -206,7 +207,7 @@ public class AvatarHandler {
         sMaxImageSizePx = Math.round(res.getDisplayMetrics().density * MAX_CACHED_IMAGE_SIZE);
     }
 
-    private static String makeUrl(String url, int userId) {
+    private static String makeUrl(String url, long userId) {
         if (url == null) {
             url = "https://avatars.githubusercontent.com/u/" + userId;
         }
@@ -232,7 +233,7 @@ public class AvatarHandler {
         }
     }
 
-    private static Request getRequestForId(int id) {
+    private static Request getRequestForId(long id) {
         int count = sRequests.size();
         for (int i = 0; i < count; i++) {
             Request request = sRequests.valueAt(i);

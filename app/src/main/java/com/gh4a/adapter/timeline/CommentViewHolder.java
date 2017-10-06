@@ -26,11 +26,10 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
-
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Reaction;
-import org.eclipse.egit.github.core.Reactions;
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.AuthorAssociation;
+import com.meisolsson.githubsdk.model.Reaction;
+import com.meisolsson.githubsdk.model.Reactions;
+import com.meisolsson.githubsdk.model.User;
 
 import java.io.IOException;
 import java.util.Date;
@@ -115,9 +114,9 @@ class CommentViewHolder
     public void bind(TimelineItem.TimelineComment item) {
         mBoundItem = item;
 
-        User user = item.comment.getUser();
-        Date createdAt = item.comment.getCreatedAt();
-        Date updatedAt = item.comment.getUpdatedAt();
+        User user = item.getUser();
+        Date createdAt = item.getCreatedAt();
+        Date updatedAt = item.comment().updatedAt();
 
         tvExtra.setTag(user);
 
@@ -125,7 +124,7 @@ class CommentViewHolder
         ivGravatar.setTag(user);
 
         tvTimestamp.setText(StringUtils.formatRelativeTime(mContext, createdAt, true));
-        if (createdAt.equals(updatedAt) || item.getCommitComment() != null) {
+        if (createdAt.equals(updatedAt) || item.getReviewComment() != null) {
             // Unlike issue comments, the update timestamp for commit comments also changes
             // when e.g. the line number changes due to the diff the comment was made on
             // becoming outdated. As we can't distinguish those updates from comment body
@@ -137,10 +136,10 @@ class CommentViewHolder
         }
 
         // Body
-        mImageGetter.bind(tvDesc, item.comment.getBodyHtml(), item.comment.getId());
+        mImageGetter.bind(tvDesc, item.comment().bodyHtml(), item.comment().id());
 
         // Extra view
-        String login = ApiHelpers.getUserLogin(mContext, item.comment.getUser());
+        String login = ApiHelpers.getUserLogin(mContext, user);
         SpannableStringBuilder userName = new SpannableStringBuilder(login);
         userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
 
@@ -164,7 +163,7 @@ class CommentViewHolder
         ivMenu.setTag(item);
 
         // Reactions
-        reactions.setReactions(item.comment.getReactions());
+        reactions.setReactions(item.comment().reactions());
 
         String ourLogin = Gh4Application.get().getAuthLogin();
         boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
@@ -174,27 +173,27 @@ class CommentViewHolder
         menu.findItem(R.id.edit).setVisible(canEdit);
         menu.findItem(R.id.delete).setVisible(canEdit);
         menu.findItem(R.id.view_in_file).setVisible(item.file != null
-                && item.getCommitComment() != null && item.getCommitComment().getPosition() != -1);
+                && item.getReviewComment() != null && item.getReviewComment().position() != -1);
     }
 
     @Nullable
     private String getAuthorAssociation(TimelineItem.TimelineComment item) {
-        String authorAssociation = item.comment.getAuthorAssociation();
+        AuthorAssociation authorAssociation = item.comment().authorAssociation();
         if (authorAssociation == null) {
             return null;
         }
         switch (authorAssociation) {
-            case Comment.ASSOCIATION_COLLABORATOR:
+            case Collaborator:
                 return mContext.getString(R.string.collaborator);
-            case Comment.ASSOCIATION_CONTRIBUTOR:
+            case Contributor:
                 return mContext.getString(R.string.contributor);
-            case Comment.ASSOCIATION_FIRST_TIME_CONTRIBUTOR:
+            case FirstTimeContributor:
                 return mContext.getString(R.string.first_time_contributor);
-            case Comment.ASSOCIATION_FIRST_TIMER:
+            case FirstTimer:
                 return mContext.getString(R.string.first_timer);
-            case Comment.ASSOCIATION_MEMBER:
+            case Member:
                 return mContext.getString(R.string.member);
-            case Comment.ASSOCIATION_OWNER:
+            case Owner:
                 return mContext.getString(R.string.owner);
             default:
                 return null;
@@ -235,20 +234,21 @@ class CommentViewHolder
 
     @Override
     public Object getCacheKey() {
-        return mBoundItem.comment;
+        return mBoundItem.comment().id();
     }
 
     public void updateReactions(Reactions reactions) {
         if (mBoundItem != null) {
-            mBoundItem.comment.setReactions(reactions);
+            mBoundItem.setReactions(reactions);
         }
         this.reactions.setReactions(reactions);
         mReactionMenuHelper.update();
     }
 
+
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws
-            IOException {
+    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item)
+            throws IOException {
         return mCallback.loadReactionDetailsInBackground(mBoundItem);
     }
 

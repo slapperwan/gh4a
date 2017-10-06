@@ -40,15 +40,13 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
-
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.LabelService;
+import com.meisolsson.githubsdk.model.Label;
+import com.meisolsson.githubsdk.service.issues.IssueLabelService;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.List;
 
 public class IssueLabelListActivity extends BaseActivity implements
@@ -116,17 +114,16 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(STATE_KEY_ADDED_LABEL)) {
-                mAddedLabel = (IssueLabelAdapter.EditableLabel)
-                        savedInstanceState.getSerializable(STATE_KEY_EDITING_LABEL);
+                mAddedLabel = savedInstanceState.getParcelable(STATE_KEY_EDITING_LABEL);
                 mAdapter.add(mAddedLabel);
                 startEditing(mAddedLabel);
             } else if (savedInstanceState.containsKey(STATE_KEY_EDITING_LABEL)) {
-                IssueLabelAdapter.EditableLabel label = (IssueLabelAdapter.EditableLabel)
-                        savedInstanceState.getSerializable(STATE_KEY_EDITING_LABEL);
+                IssueLabelAdapter.EditableLabel label =
+                        savedInstanceState.getParcelable(STATE_KEY_EDITING_LABEL);
                 int count = mAdapter.getCount();
                 for (int i = 0; i < count; i++) {
                     IssueLabelAdapter.EditableLabel item = mAdapter.getItem(i);
-                    if (item.getName().equals(label.getName())) {
+                    if (item.name().equals(label.name())) {
                         item.editedName = label.editedName;
                         item.editedColor = label.editedColor;
                         startEditing(item);
@@ -177,9 +174,9 @@ public class IssueLabelListActivity extends BaseActivity implements
         super.onSaveInstanceState(outState);
         if (mActionMode != null) {
             if (mAddedLabel != null) {
-                outState.putSerializable(STATE_KEY_ADDED_LABEL, mAddedLabel);
+                outState.putParcelable(STATE_KEY_ADDED_LABEL, mAddedLabel);
             } else {
-                outState.putSerializable(STATE_KEY_EDITING_LABEL, mActionMode.mLabel);
+                outState.putParcelable(STATE_KEY_EDITING_LABEL, mActionMode.mLabel);
             }
         }
     }
@@ -253,17 +250,17 @@ public class IssueLabelListActivity extends BaseActivity implements
                 if (mLabel == mAddedLabel) {
                     new AddIssueLabelTask(mLabel.editedName, mLabel.editedColor).schedule();
                 } else {
-                    new EditIssueLabelTask(mLabel.getName(), mLabel.editedName, mLabel.editedColor)
+                    new EditIssueLabelTask(mLabel.name(), mLabel.editedName, mLabel.editedColor)
                             .schedule();
                 }
                 break;
             case Menu.FIRST + 1:
                 new AlertDialog.Builder(IssueLabelListActivity.this)
-                        .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.getName()))
+                        .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.name()))
                         .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteIssueLabelTask(mLabel.getName()).schedule();
+                                new DeleteIssueLabelTask(mLabel.name()).schedule();
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
@@ -307,9 +304,8 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         protected Void run() throws IOException {
-            LabelService labelService = (LabelService)
-                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
-            labelService.deleteLabel(mRepoOwner, mRepoName, URLEncoder.encode(mLabelName, "UTF-8"));
+            IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+            ApiHelpers.throwOnFailure(service.deleteLabel(mRepoOwner, mRepoName, mLabelName).blockingGet());
             return null;
         }
 
@@ -344,15 +340,10 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         protected Void run() throws IOException {
-            LabelService labelService = (LabelService)
-                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
+            IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+            Label label = Label.builder().name(mNewLabelName).color(mColor).build();
 
-            Label label = new Label();
-            label.setName(mNewLabelName);
-            label.setColor(mColor);
-
-            labelService.editLabel(new RepositoryId(mRepoOwner, mRepoName),
-                    URLEncoder.encode(mOldLabelName, "UTF-8"), label);
+            ApiHelpers.throwOnFailure(service.editLabel(mRepoOwner, mRepoName, mOldLabelName, label).blockingGet());
             return null;
         }
 
@@ -385,14 +376,15 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         @Override
         protected Void run() throws IOException {
-            LabelService labelService = (LabelService)
-                    Gh4Application.get().getService(Gh4Application.LABEL_SERVICE);
+            IssueLabelService service =
+                    Gh4Application.get().getGitHubService(IssueLabelService.class);
 
-            Label label = new Label();
-            label.setName(mLabelName);
-            label.setColor(mColor);
+            Label label = Label.builder()
+                    .name(mLabelName)
+                    .color(mColor)
+                    .build();
 
-            labelService.createLabel(mRepoOwner, mRepoName, label);
+            ApiHelpers.throwOnFailure(service.createLabel(mRepoOwner, mRepoName, label).blockingGet());
             return null;
         }
 

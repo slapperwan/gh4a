@@ -21,9 +21,9 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.widget.PathBreadcrumbs;
 import com.gh4a.widget.SwipeRefreshLayout;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryContents;
+import com.meisolsson.githubsdk.model.Content;
+import com.meisolsson.githubsdk.model.ContentType;
+import com.meisolsson.githubsdk.model.Repository;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,13 +50,13 @@ public class ContentListContainerFragment extends Fragment implements
     private final Stack<String> mDirStack = new Stack<>();
     private ArrayList<String> mInitialPathToLoad;
     private boolean mStateSaved;
-    private final Map<String, ArrayList<RepositoryContents>> mContentCache =
-            new LinkedHashMap<String, ArrayList<RepositoryContents>>() {
+    private final Map<String, ArrayList<Content>> mContentCache =
+            new LinkedHashMap<String, ArrayList<Content>>() {
         private static final long serialVersionUID = -2379579224736389357L;
         private static final int MAX_CACHE_ENTRIES = 100;
 
         @Override
-        protected boolean removeEldestEntry(Entry<String, ArrayList<RepositoryContents>> eldest) {
+        protected boolean removeEldestEntry(Entry<String, ArrayList<Content>> eldest) {
             return size() > MAX_CACHE_ENTRIES;
         }
     };
@@ -65,8 +65,8 @@ public class ContentListContainerFragment extends Fragment implements
             new LoaderCallbacks<Map<String, String>>(this) {
         @Override
         protected Loader<LoaderResult<Map<String, String>>> onCreateLoader() {
-            return new GitModuleParserLoader(getActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), mSelectedRef);
+            return new GitModuleParserLoader(getActivity(), mRepository.owner().login(),
+                    mRepository.name(), mSelectedRef);
         }
         @Override
         protected void onResultReady(Map<String, String> result) {
@@ -82,7 +82,7 @@ public class ContentListContainerFragment extends Fragment implements
         ContentListContainerFragment f = new ContentListContainerFragment();
 
         Bundle args = new Bundle();
-        args.putSerializable("repository", repository);
+        args.putParcelable("repository", repository);
         args.putString("ref", ref);
         args.putString("initialpath", initialPath);
         f.setArguments(args);
@@ -93,7 +93,7 @@ public class ContentListContainerFragment extends Fragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mRepository = (Repository) getArguments().getSerializable("repository");
+        mRepository = getArguments().getParcelable("repository");
         mSelectedRef = getArguments().getString("ref");
         mStateSaved = false;
 
@@ -109,8 +109,8 @@ public class ContentListContainerFragment extends Fragment implements
                     if (cacheKey.equals("/")) {
                         cacheKey = null;
                     }
-                    mContentCache.put(cacheKey,
-                            (ArrayList<RepositoryContents>) savedInstanceState.getSerializable(key));
+                    ArrayList<Content> content = savedInstanceState.getParcelableArrayList(key);
+                    mContentCache.put(cacheKey, content);
                 }
             }
             mInitialPathToLoad = savedInstanceState.getStringArrayList(STATE_KEY_INITIAL_PATH);
@@ -201,36 +201,34 @@ public class ContentListContainerFragment extends Fragment implements
         super.onSaveInstanceState(outState);
         outState.putStringArrayList(STATE_KEY_DIR_STACK, new ArrayList<>(mDirStack));
         outState.putStringArrayList(STATE_KEY_INITIAL_PATH, mInitialPathToLoad);
-        for (Map.Entry<String, ArrayList<RepositoryContents>> entry : mContentCache.entrySet()) {
+        for (Map.Entry<String, ArrayList<Content>> entry : mContentCache.entrySet()) {
             String key = entry.getKey();
-            outState.putSerializable(STATE_KEY_CONTENT_CACHE_PREFIX + key, entry.getValue());
+            outState.putParcelableArrayList(STATE_KEY_CONTENT_CACHE_PREFIX + key, entry.getValue());
         }
         mStateSaved = true;
     }
 
     @Override
-    public void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents) {
+    public void onContentsLoaded(ContentListFragment fragment, List<Content> contents) {
         if (contents == null) {
             return;
         }
         mContentCache.put(fragment.getPath(), new ArrayList<>(contents));
         if (fragment.getPath() == null) {
-            for (RepositoryContents content : contents) {
-                if (RepositoryContents.TYPE_FILE.equals(content.getType())) {
-                    if (content.getName().equals(".gitmodules")) {
-                        LoaderManager lm = getActivity().getSupportLoaderManager();
-                        lm.restartLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
-                        break;
-                    }
+            for (Content content : contents) {
+                if (content.type() == ContentType.File && content.name().equals(".gitmodules")) {
+                    LoaderManager lm = getActivity().getSupportLoaderManager();
+                    lm.restartLoader(LOADER_MODULEMAP, null, mGitModuleCallback);
+                    break;
                 }
             }
         }
         if (mInitialPathToLoad != null && !mInitialPathToLoad.isEmpty() && !mStateSaved) {
             String itemToLoad = mInitialPathToLoad.get(0);
             boolean found = false;
-            for (RepositoryContents content : contents) {
-                if (RepositoryContents.TYPE_DIR.equals(content.getType())) {
-                    if (content.getPath().equals(itemToLoad)) {
+            for (Content content : contents) {
+                if (content.type() == ContentType.Directory) {
+                    if (content.path().equals(itemToLoad)) {
                         onTreeSelected(content);
                         found = true;
                         break;
@@ -246,9 +244,9 @@ public class ContentListContainerFragment extends Fragment implements
     }
 
     @Override
-    public void onTreeSelected(RepositoryContents content) {
-        String path = content.getPath();
-        if (RepositoryContents.TYPE_DIR.equals(content.getType())) {
+    public void onTreeSelected(Content content) {
+        String path = content.path();
+        if (content.type() == ContentType.Directory) {
             mDirStack.push(path);
             updateBreadcrumbs();
             addFragmentForTopOfStack();
@@ -257,8 +255,8 @@ public class ContentListContainerFragment extends Fragment implements
             startActivity(RepositoryActivity.makeIntent(getActivity(), userRepo[0], userRepo[1]));
         } else {
             startActivity(FileViewerActivity.makeIntent(getActivity(),
-                    mRepository.getOwner().getLogin(), mRepository.getName(),
-                    getCurrentRef(), content.getPath()));
+                    mRepository.owner().login(), mRepository.name(),
+                    getCurrentRef(), content.path()));
         }
     }
 
@@ -318,6 +316,6 @@ public class ContentListContainerFragment extends Fragment implements
         if (!TextUtils.isEmpty(mSelectedRef)) {
             return mSelectedRef;
         }
-        return mRepository.getDefaultBranch();
+        return mRepository.defaultBranch();
     }
 }

@@ -28,29 +28,10 @@ import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.job.Gh4JobCreator;
 import com.gh4a.job.NotificationsJob;
 import com.gh4a.utils.CrashReportingHelper;
+import com.meisolsson.githubsdk.model.User;
 
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.CollaboratorService;
-import org.eclipse.egit.github.core.service.CommitService;
-import org.eclipse.egit.github.core.service.ContentsService;
-import org.eclipse.egit.github.core.service.DataService;
-import org.eclipse.egit.github.core.service.DownloadService;
-import org.eclipse.egit.github.core.service.EventService;
-import org.eclipse.egit.github.core.service.GistService;
-import org.eclipse.egit.github.core.service.GitHubService;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.LabelService;
-import org.eclipse.egit.github.core.service.MarkdownService;
-import org.eclipse.egit.github.core.service.MilestoneService;
-import org.eclipse.egit.github.core.service.NotificationService;
-import org.eclipse.egit.github.core.service.OrganizationService;
-import org.eclipse.egit.github.core.service.PullRequestService;
-import org.eclipse.egit.github.core.service.ReactionService;
-import org.eclipse.egit.github.core.service.RepositoryService;
-import org.eclipse.egit.github.core.service.StarService;
-import org.eclipse.egit.github.core.service.UserService;
-import org.eclipse.egit.github.core.service.WatcherService;
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.HashMap;
@@ -64,29 +45,8 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public static final String LOG_TAG = "Gh4a";
     public static int THEME = R.style.LightTheme;
 
-    public static final String COLLAB_SERVICE = "github.collaborator";
-    public static final String COMMIT_SERVICE = "github.commit";
-    public static final String CONTENTS_SERVICE = "github.contents";
-    public static final String DATA_SERVICE = "github.data";
-    public static final String DOWNLOAD_SERVICE = "github.download";
-    public static final String EVENT_SERVICE = "github.event";
-    public static final String GIST_SERVICE = "github.gist";
-    public static final String ISSUE_SERVICE = "github.issue";
-    public static final String LABEL_SERVICE = "github.label";
-    public static final String MARKDOWN_SERVICE = "github.markdown";
-    public static final String MILESTONE_SERVICE = "github.milestone";
-    public static final String NOTIFICATION_SERVICE = "github.notification";
-    public static final String ORG_SERVICE = "github.organization";
-    public static final String PULL_SERVICE = "github.pullrequest";
-    public static final String REACTION_SERVICE = "github.reaction";
-    public static final String REPO_SERVICE = "github.repository";
-    public static final String STAR_SERVICE = "github.star";
-    public static final String USER_SERVICE = "github.user";
-    public static final String WATCHER_SERVICE = "github.watcher";
-
     private static Gh4Application sInstance;
-    private GitHubClient mClient;
-    private HashMap<String, GitHubService> mServices;
+    private HashMap<Class<?>, Object> mServiceCache = new HashMap<>();
     private PrettyTime mPt;
 
     private static final int THEME_DARK = 0;
@@ -137,30 +97,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         CrashReportingHelper.onCreate(this);
 
         mPt = new PrettyTime();
-
-        mClient = new DefaultClient();
-        mClient.setOAuth2Token(getAuthToken());
-
-        mServices = new HashMap<>();
-        mServices.put(COLLAB_SERVICE, new CollaboratorService(mClient));
-        mServices.put(COMMIT_SERVICE, new CommitService(mClient));
-        mServices.put(CONTENTS_SERVICE, new ContentsService(mClient));
-        mServices.put(DATA_SERVICE, new DataService(mClient));
-        mServices.put(DOWNLOAD_SERVICE, new DownloadService(mClient));
-        mServices.put(EVENT_SERVICE, new EventService(mClient));
-        mServices.put(GIST_SERVICE, new GistService(mClient));
-        mServices.put(ISSUE_SERVICE, new IssueService(mClient));
-        mServices.put(LABEL_SERVICE, new LabelService(mClient));
-        mServices.put(MARKDOWN_SERVICE, new MarkdownService(mClient));
-        mServices.put(MILESTONE_SERVICE, new MilestoneService(mClient));
-        mServices.put(NOTIFICATION_SERVICE, new NotificationService(mClient));
-        mServices.put(ORG_SERVICE, new OrganizationService(mClient));
-        mServices.put(PULL_SERVICE, new PullRequestService(mClient));
-        mServices.put(REACTION_SERVICE, new ReactionService(mClient));
-        mServices.put(REPO_SERVICE, new RepositoryService(mClient));
-        mServices.put(STAR_SERVICE, new StarService(mClient));
-        mServices.put(USER_SERVICE, new UserService(mClient));
-        mServices.put(WATCHER_SERVICE, new WatcherService(mClient));
+        JodaTimeAndroid.init(this);
 
         JobManager.create(this).addJobCreator(new Gh4JobCreator());
         updateNotificationJob(prefs);
@@ -175,8 +112,13 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         }
     }
 
-    public GitHubService getService(String name) {
-        return mServices.get(name);
+    public <S> S getGitHubService(Class<S> serviceClass) {
+        S service = (S) mServiceCache.get(serviceClass);
+        if (service == null) {
+            service = ServiceFactory.createService(serviceClass, null, null, null);
+            mServiceCache.put(serviceClass, service);
+        }
+        return service;
     }
 
     private void selectTheme(int theme) {
@@ -242,7 +184,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     public void addAccount(User user, String token) {
         SharedPreferences prefs = getPrefs();
-        String login = user.getLogin();
+        String login = user.login();
         Set<String> logins = prefs.getStringSet(KEY_ALL_LOGINS, null);
         logins.add(login);
 
@@ -250,7 +192,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 .putString(KEY_ACTIVE_LOGIN, login)
                 .putStringSet(KEY_ALL_LOGINS, logins)
                 .putString(KEY_PREFIX_TOKEN + login, token)
-                .putInt(KEY_PREFIX_USER_ID + login, user.getId())
+                .putLong(KEY_PREFIX_USER_ID + login, user.id())
                 .apply();
 
         updateNotificationJob(prefs);
@@ -259,9 +201,9 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public User getCurrentAccountInfoForAvatar() {
         String login = getAuthLogin();
         if (login != null) {
-            int userId = getPrefs().getInt(KEY_PREFIX_USER_ID + login, -1);
+            long userId = getPrefs().getLong(KEY_PREFIX_USER_ID + login, -1);
             if (userId >= 0) {
-                return new User().setLogin(login).setId(userId);
+                return User.builder().login(login).id(userId).build();
             }
         }
         return null;
@@ -269,7 +211,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     public void setCurrentAccountInfo(User user) {
         getPrefs().edit()
-                .putInt(KEY_PREFIX_USER_ID + user.getLogin(), user.getId())
+                .putLong(KEY_PREFIX_USER_ID + user.login(), user.id())
                 .apply();
     }
 
@@ -306,9 +248,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(KEY_ACTIVE_LOGIN)) {
-            mClient.setOAuth2Token(getAuthToken());
-        } else if (key.equals(SettingsFragment.KEY_THEME)) {
+        if (key.equals(SettingsFragment.KEY_THEME)) {
             selectTheme(sharedPreferences.getInt(key, THEME_LIGHT));
         }
     }

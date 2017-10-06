@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.User;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -29,6 +27,7 @@ import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.User;
 
 public class UserAdapter extends RootAdapter<User, UserAdapter.ViewHolder> {
     public UserAdapter(Context context) {
@@ -48,7 +47,7 @@ public class UserAdapter extends RootAdapter<User, UserAdapter.ViewHolder> {
         AvatarHandler.assignAvatar(holder.ivGravatar, user);
         holder.ivGravatar.setTag(user);
 
-        holder.tvTitle.setText(StringUtils.formatName(user.getLogin(), user.getName()));
+        holder.tvTitle.setText(StringUtils.formatName(user.login(), user.name()));
     }
 
     @Override

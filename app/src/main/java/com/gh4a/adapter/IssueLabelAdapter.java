@@ -3,6 +3,9 @@ package com.gh4a.adapter;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,36 +21,77 @@ import com.gh4a.R;
 import com.gh4a.utils.TypefaceCache;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
-
-import org.eclipse.egit.github.core.Label;
+import com.meisolsson.githubsdk.model.Label;
 
 public class IssueLabelAdapter extends
         RootAdapter<IssueLabelAdapter.EditableLabel, IssueLabelAdapter.ViewHolder> {
-    public static class EditableLabel extends Label {
-        private static final long serialVersionUID = 2394627063964522785L;
+    public static class EditableLabel implements Parcelable {
         public String editedName;
         public String editedColor;
         public final boolean newlyAdded;
         public boolean isEditing;
+        private final Label mLabel;
 
         public EditableLabel(String color) {
             super();
             newlyAdded = true;
             isEditing = true;
             editedColor = color;
+            mLabel = null;
         }
         public EditableLabel(Label label) {
             newlyAdded = false;
             isEditing = false;
-            setColor(label.getColor());
-            setName(label.getName());
-            setUrl(label.getUrl());
+            mLabel = label;
+        }
+        private EditableLabel(Parcel in) {
+            editedName = in.readString();
+            editedColor = in.readString();
+            newlyAdded = in.readInt() != 0;
+            isEditing = in.readInt() != 0;
+            mLabel = in.readParcelable(ClassLoader.getSystemClassLoader());
+        }
+
+        @Nullable
+        public String name() {
+            return editedName != null ? editedName : mLabel != null ? mLabel.name() : null;
+        }
+
+        @Nullable
+        public String color() {
+            return editedColor != null ? editedColor : mLabel != null ? mLabel.color() : null;
         }
 
         public void restoreOriginalProperties() {
-            editedColor = getColor();
-            editedName = getName();
+            editedColor = null;
+            editedName = null;
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel parcel, int flags) {
+            parcel.writeString(editedName);
+            parcel.writeString(editedColor);
+            parcel.writeInt(newlyAdded ? 1 : 0);
+            parcel.writeInt(isEditing ? 1 : 0);
+            parcel.writeParcelable(mLabel, flags);
+        }
+
+        public static Parcelable.Creator<EditableLabel> CREATOR = new Parcelable.Creator<EditableLabel>() {
+            @Override
+            public EditableLabel createFromParcel(Parcel parcel) {
+                return new EditableLabel(parcel);
+            }
+
+            @Override
+            public EditableLabel[] newArray(int size) {
+                return new EditableLabel[size];
+            }
+        };
     }
 
     public IssueLabelAdapter(Context context) {
@@ -104,9 +148,9 @@ public class IssueLabelAdapter extends
             holder.editor.setHint(null);
         }
 
-        assignColor(holder, label.editedColor != null ? label.editedColor : label.getColor());
-        holder.label.setText(label.getName());
-        holder.editor.setText(label.editedName != null ? label.editedName : label.getName());
+        assignColor(holder, label.editedColor != null ? label.editedColor : label.color());
+        holder.label.setText(label.name());
+        holder.editor.setText(label.editedName != null ? label.editedName : label.name());
     }
 
     private void assignColor(ViewHolder holder, String colorString) {

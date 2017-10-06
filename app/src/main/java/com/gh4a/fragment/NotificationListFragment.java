@@ -29,11 +29,12 @@ import com.gh4a.loader.NotificationListLoader;
 import com.gh4a.resolver.BrowseFilter;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-
-import org.eclipse.egit.github.core.Notification;
-import org.eclipse.egit.github.core.NotificationSubject;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.service.NotificationService;
+import com.meisolsson.githubsdk.model.NotificationSubject;
+import com.meisolsson.githubsdk.model.NotificationThread;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.request.NotificationReadRequest;
+import com.meisolsson.githubsdk.model.request.activity.SubscriptionRequest;
+import com.meisolsson.githubsdk.service.activity.NotificationService;
 
 import java.io.IOException;
 import java.util.Date;
@@ -150,12 +151,12 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         } else {
             new MarkReadTask(null, item.notification).schedule();
 
-            NotificationSubject subject = item.notification.getSubject();
-            String url = subject.getUrl();
+            NotificationSubject subject = item.notification.subject();
+            String url = subject.url();
             if (url != null) {
                 Uri uri = ApiHelpers.normalizeUri(Uri.parse(url));
                 intent = BrowseFilter.makeRedirectionIntent(getActivity(), uri,
-                        new IntentUtils.InitialCommentMarker(item.notification.getLastReadAt()));
+                        new IntentUtils.InitialCommentMarker(item.notification.lastReadAt()));
             } else {
                 intent = null;
             }
@@ -221,9 +222,9 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         if (notificationHolder.notification == null) {
             final Repository repository = notificationHolder.repository;
 
-            String login = ApiHelpers.getUserLogin(getActivity(), repository.getOwner());
+            String login = ApiHelpers.getUserLogin(getActivity(), repository.owner());
             String title = getString(R.string.mark_repository_as_read_question,
-                    login + "/" + repository.getName());
+                    login + "/" + repository.name());
 
             new AlertDialog.Builder(getActivity())
                     .setMessage(title)
@@ -254,7 +255,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         mMarkAllAsReadMenuItem.setVisible(isContentShown() && mAdapter.hasUnreadNotifications());
     }
 
-    private void markAsRead(Repository repository, Notification notification) {
+    private void markAsRead(Repository repository, NotificationThread notification) {
         if (mAdapter.markAsRead(repository, notification)) {
             if (!mAll && !mParticipating) {
                 mCallback.setNotificationsIndicatorVisible(false);
@@ -282,8 +283,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             NotificationHolder holder = notifications.get(i);
             if (holder.notification == null) {
                 Repository repo = holder.repository;
-                if (repoOwner.equals(repo.getOwner().getLogin())
-                        && repoName.equals(repo.getName())) {
+                if (repoOwner.equals(repo.owner().login())
+                        && repoName.equals(repo.name())) {
                     scrollToAndHighlightPosition(i);
                     break;
                 }
@@ -295,9 +296,9 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         @Nullable
         private final Repository mRepository;
         @Nullable
-        private final Notification mNotification;
+        private final NotificationThread mNotification;
 
-        public MarkReadTask(@Nullable Repository repository, @Nullable Notification notification) {
+        public MarkReadTask(@Nullable Repository repository, @Nullable NotificationThread notification) {
             super(getActivity());
             mRepository = repository;
             mNotification = notification;
@@ -305,15 +306,19 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
 
         @Override
         protected Void run() throws IOException {
-            NotificationService notificationService = (NotificationService)
-                    Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
+            NotificationService service =
+                    Gh4Application.get().getGitHubService(NotificationService.class);
 
             if (mNotification != null) {
-                notificationService.markThreadAsRead(mNotification.getId());
+                ApiHelpers.throwOnFailure(
+                        service.markNotificationRead(mNotification.id()).blockingGet());
             } else if (mRepository != null) {
-                notificationService.markNotificationsAsRead(mRepository, mNotificationsLoadTime);
+                ApiHelpers.throwOnFailure(service.markAllRepositoryNotificationsRead(
+                        mRepository.owner().login(), mRepository.name(),
+                        NotificationReadRequest.builder().lastReadAt(mNotificationsLoadTime).build()).blockingGet());
             } else {
-                notificationService.markNotificationsAsRead(mNotificationsLoadTime);
+                ApiHelpers.throwOnFailure(service.markAllNotificationsRead(
+                        NotificationReadRequest.builder().lastReadAt(mNotificationsLoadTime).build()).blockingGet());
             }
 
             return null;
@@ -326,19 +331,24 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     }
 
     private class UnsubscribeTask extends BackgroundTask<Void> {
-        private final Notification mNotification;
+        private final NotificationThread mNotification;
 
-        public UnsubscribeTask(Notification notification) {
+        public UnsubscribeTask(NotificationThread notification) {
             super(getActivity());
             mNotification = notification;
         }
 
         @Override
         protected Void run() throws IOException {
-            NotificationService notificationService = (NotificationService)
-                    Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
+            NotificationService service =
+                    Gh4Application.get().getGitHubService(NotificationService.class);
+            SubscriptionRequest request = SubscriptionRequest.builder()
+                    .subscribed(false)
+                    .ignored(true)
+                    .build();
 
-            notificationService.setThreadSubscription(mNotification.getId(), false, true);
+            ApiHelpers.throwOnFailure(
+                    service.setNotificationThreadSubscription(mNotification.id(), request).blockingGet());
             return null;
         }
 

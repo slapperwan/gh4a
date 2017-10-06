@@ -41,20 +41,19 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.ReactionBar;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.Reactions;
+import com.meisolsson.githubsdk.model.PositionalCommentBase;
+import com.meisolsson.githubsdk.model.Reactions;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class DiffViewerActivity extends WebViewerActivity implements
-        ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
-    protected static Intent fillInIntent(Intent baseIntent, String repoOwner, String repoName,
-            String commitSha, String path, String diff, List<CommitComment> comments,
-            int initialLine, int highlightStartLine, int highlightEndLine,
+public abstract class DiffViewerActivity<C extends PositionalCommentBase> extends WebViewerActivity
+        implements ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
+    protected static <C extends PositionalCommentBase> Intent fillInIntent(Intent baseIntent,
+            String repoOwner, String repoName, String commitSha, String path, String diff,
+            List<C> comments, int initialLine, int highlightStartLine, int highlightEndLine,
             boolean highlightisRight, IntentUtils.InitialCommentMarker initialComment) {
         return baseIntent.putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
@@ -123,33 +122,32 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             new ReactionBar.ReactionDetailsCache(this);
 
     protected static class CommitCommentWrapper implements ReactionBar.Item {
-        public final CommitComment comment;
-        public CommitCommentWrapper(CommitComment comment) {
+        public PositionalCommentBase comment;
+        public CommitCommentWrapper(PositionalCommentBase comment) {
             this.comment = comment;
         }
         @Override
         public Object getCacheKey() {
-            return comment;
+            return comment.id();
         }
     }
 
     private String mDiff;
     private String[] mDiffLines;
-    private final SparseArray<List<CommitComment>> mCommitCommentsByPos = new SparseArray<>();
+    private final SparseArray<List<PositionalCommentBase>> mCommitCommentsByPos = new SparseArray<>();
     private final LongSparseArray<CommitCommentWrapper> mCommitComments = new LongSparseArray<>();
 
     private static final int MENU_ITEM_VIEW = 10;
 
-    private final LoaderCallbacks<List<CommitComment>> mCommentCallback =
-            new LoaderCallbacks<List<CommitComment>>(this) {
+    private final LoaderCallbacks<List<C>> mCommentCallback = new LoaderCallbacks<List<C>>(this) {
         @Override
-        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
+        protected Loader<LoaderResult<List<C>>> onCreateLoader() {
             return createCommentLoader();
         }
 
         @Override
-        protected void onResultReady(List<CommitComment> result) {
-            addCommentsToMap(result);
+        protected void onResultReady(List<C> result) {
+            addCommentsToMap(new ArrayList<>(result));
             onDataReady();
         }
     };
@@ -159,8 +157,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        List<CommitComment> comments = (ArrayList<CommitComment>)
-                getIntent().getSerializableExtra("comments");
+        List<C> comments = getIntent().getParcelableArrayListExtra("comments");
 
         if (comments != null) {
             addCommentsToMap(comments);
@@ -234,7 +231,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
     @Override
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        comment.comment.setReactions(reactions);
+        comment.comment = onUpdateReactions(comment.comment, reactions);
         onDataReady();
     }
 
@@ -306,10 +303,10 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             }
             content.append(">").append(TextUtils.htmlEncode(line)).append("</div>");
 
-            List<CommitComment> comments = mCommitCommentsByPos.get(i);
+            List<PositionalCommentBase> comments = mCommitCommentsByPos.get(i);
             if (comments != null) {
-                for (CommitComment comment : comments) {
-                    long id = comment.getId();
+                for (PositionalCommentBase comment : comments) {
+                    long id = comment.id();
                     mCommitComments.put(id, new CommitCommentWrapper(comment));
                     content.append("<div ").append("id=\"comment").append(id).append("\"");
                     content.append(" class=\"comment");
@@ -325,19 +322,19 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     }
                     content.append("><div class=\"change\">");
                     content.append(getString(R.string.commit_comment_header,
-                            "<b>" + ApiHelpers.getUserLogin(this, comment.getUser()) + "</b>",
-                            StringUtils.formatRelativeTime(DiffViewerActivity.this, comment.getCreatedAt(), true)));
-                    content.append("</div>").append(comment.getBodyHtml());
+                            "<b>" + ApiHelpers.getUserLogin(this, comment.user()) + "</b>",
+                            StringUtils.formatRelativeTime(DiffViewerActivity.this, comment.createdAt(), true)));
+                    content.append("</div>").append(comment.bodyHtml());
 
-                    Reactions reactions = comment.getReactions();
-                    if (reactions.getTotalCount() > 0) {
+                    Reactions reactions = comment.reactions();
+                    if (reactions.totalCount() > 0) {
                         content.append("<div>");
-                        appendReactionSpan(content, reactions.getPlusOne(), REACTION_PLUS_ONE_PATH);
-                        appendReactionSpan(content, reactions.getMinusOne(), REACTION_MINUS_ONE_PATH);
-                        appendReactionSpan(content, reactions.getConfused(), REACTION_CONFUSED_PATH);
-                        appendReactionSpan(content, reactions.getHeart(), REACTION_HEART_PATH);
-                        appendReactionSpan(content, reactions.getLaugh(), REACTION_LAUGH_PATH);
-                        appendReactionSpan(content, reactions.getHooray(), REACTION_HOORAY_PATH);
+                        appendReactionSpan(content, reactions.plusOne(), REACTION_PLUS_ONE_PATH);
+                        appendReactionSpan(content, reactions.minusOne(), REACTION_MINUS_ONE_PATH);
+                        appendReactionSpan(content, reactions.confused(), REACTION_CONFUSED_PATH);
+                        appendReactionSpan(content, reactions.heart(), REACTION_HEART_PATH);
+                        appendReactionSpan(content, reactions.laugh(), REACTION_LAUGH_PATH);
+                        appendReactionSpan(content, reactions.hooray(), REACTION_HOORAY_PATH);
                         content.append("</div>");
                     }
                     content.append("</div>");
@@ -407,13 +404,13 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
     }
 
-    private void addCommentsToMap(List<CommitComment> comments) {
-        for (CommitComment comment : comments) {
-            if (!TextUtils.equals(comment.getPath(), mPath)) {
+    private void addCommentsToMap(List<C> comments) {
+        for (PositionalCommentBase comment : comments) {
+            if (!TextUtils.equals(comment.path(), mPath)) {
                 continue;
             }
-            int position = comment.getPosition();
-            List<CommitComment> commentsByPos = mCommitCommentsByPos.get(position);
+            int position = comment.position();
+            List<PositionalCommentBase> commentsByPos = mCommitCommentsByPos.get(position);
             if (commentsByPos == null) {
                 commentsByPos = new ArrayList<>();
                 mCommitCommentsByPos.put(position, commentsByPos);
@@ -449,12 +446,14 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         setContentShown(false);
     }
 
-    protected abstract Loader<LoaderResult<List<CommitComment>>> createCommentLoader();
+    protected abstract Loader<LoaderResult<List<C>>> createCommentLoader();
     protected abstract void openCommentDialog(long id, long replyToId, String line,
-            int position, int leftLine, int rightLine, CommitComment commitComment);
+            int position, int leftLine, int rightLine, PositionalCommentBase commitComment);
     protected abstract void deleteComment(long id) throws IOException;
     protected abstract boolean canReply();
     protected abstract String createUrl(String lineId, long replyId);
+    protected abstract PositionalCommentBase onUpdateReactions(PositionalCommentBase comment,
+            Reactions reactions);
 
     private String createLineLinkId(int line, boolean isRight) {
         return (isRight ? "R" : "L") + line;
@@ -489,7 +488,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
             if (id == 0 || !canReply()) {
                 menu.removeItem(R.id.reply);
             }
-            if (id == 0|| !ApiHelpers.loginEquals(comment.comment.getUser(), ownLogin)) {
+            if (id == 0|| !ApiHelpers.loginEquals(comment.comment.user(), ownLogin)) {
                 menu.removeItem(R.id.edit);
                 menu.removeItem(R.id.delete);
             }
@@ -535,7 +534,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
                     break;
                 case R.id.edit:
                     CommitCommentWrapper wrapper = mCommitComments.get(mId);
-                    CommitComment comment = wrapper != null ? wrapper.comment : null;
+                    PositionalCommentBase comment = wrapper != null ? wrapper.comment : null;
                     openCommentDialog(mId, 0L, mLineText, mPosition, mLeftLine, mRightLine, comment);
                     break;
                 case R.id.add_comment:

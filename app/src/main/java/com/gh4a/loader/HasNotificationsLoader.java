@@ -2,13 +2,14 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
-import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.Notification;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.NotificationService;
+import com.gh4a.ServiceFactory;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.NotificationThread;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.service.activity.NotificationService;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class HasNotificationsLoader extends BaseLoader<Boolean> {
 
@@ -18,9 +19,13 @@ public class HasNotificationsLoader extends BaseLoader<Boolean> {
 
     @Override
     public Boolean doLoadInBackground() throws IOException {
-        NotificationService notificationService = (NotificationService)
-                Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
-        PageIterator<Notification> notifications = notificationService.pageNotifications(1, false, false);
-        return notifications.hasNext() && !notifications.next().isEmpty();
+        NotificationService service = ServiceFactory.createService(
+                NotificationService.class, null, null, 1);
+        HashMap<String, Object> options = new HashMap<>();
+        options.put("all", false);
+        options.put("participating", false);
+        Page<NotificationThread> page = ApiHelpers.throwOnFailure(
+                service.getNotifications(options, 0).blockingGet());
+        return !page.items().isEmpty();
     }
 }

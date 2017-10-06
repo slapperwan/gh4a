@@ -2,12 +2,12 @@ package com.gh4a.loader;
 
 import java.io.IOException;
 
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.WatcherService;
-
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Subscription;
+import com.meisolsson.githubsdk.service.activity.WatchingService;
 
 public class IsWatchingLoader extends BaseLoader<Boolean> {
 
@@ -22,8 +22,9 @@ public class IsWatchingLoader extends BaseLoader<Boolean> {
 
     @Override
     public Boolean doLoadInBackground() throws IOException {
-        WatcherService watcherService = (WatcherService)
-                Gh4Application.get().getService(Gh4Application.WATCHER_SERVICE);
-        return watcherService.isWatching(new RepositoryId(mRepoOwner, mRepoName));
+        WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
+        Subscription subscription = ApiHelpers.throwOnFailure(
+                service.getRepositorySubscription(mRepoOwner, mRepoName).blockingGet());
+        return subscription.subscribed();
     }
 }

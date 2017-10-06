@@ -15,11 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.RepositoryService;
-
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
@@ -28,6 +23,13 @@ import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.service.repositories.RepositoryForkService;
+
+import java.io.IOException;
 
 public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     private String mRepoOwner;
@@ -67,9 +69,15 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected PageIterator<Repository> onCreateIterator() {
-        RepositoryService repoService = (RepositoryService)
-                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-        return repoService.pageForks(new RepositoryId(mRepoOwner, mRepoName));
+    protected PageIteratorLoader<Repository> onCreateLoader() {
+        final RepositoryForkService service =
+                Gh4Application.get().getGitHubService(RepositoryForkService.class);
+        return new PageIteratorLoader<Repository>(getActivity()) {
+            @Override
+            protected Page<Repository> loadPage(int page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getForks(mRepoOwner, mRepoName, page).blockingGet());
+            }
+        };
     }
 }

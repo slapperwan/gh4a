@@ -27,9 +27,8 @@ import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.MilestoneListLoader;
-import com.gh4a.utils.ApiHelpers;
-
-import org.eclipse.egit.github.core.Milestone;
+import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.model.Milestone;
 
 import java.util.List;
 
@@ -90,7 +89,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     @Override
     public Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
         return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName,
-                mShowClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN);
+                mShowClosed ? IssueState.Closed : IssueState.Open);
     }
 
     @Override

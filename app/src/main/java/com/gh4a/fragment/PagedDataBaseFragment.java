@@ -21,14 +21,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.gh4a.PageIteratorWithSaveableState;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PageIteratorLoader;
-
-import org.eclipse.egit.github.core.client.PageIterator;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +33,7 @@ import java.util.Collection;
 public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase implements
         RootAdapter.OnItemClickListener<T>, RootAdapter.OnScrolledToFooterListener {
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
-    private PageIteratorWithSaveableState<T> mIterator;
+    // private PageIteratorWithSaveableState<T> mIterator;
     private boolean mIsLoadCompleted;
     private View mLoadingView;
 
@@ -46,7 +43,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
             new LoaderCallbacks<PageIteratorLoader<T>.LoadedPage>(this) {
         @Override
         protected Loader<LoaderResult<PageIteratorLoader<T>.LoadedPage>> onCreateLoader() {
-            return new PageIteratorLoader<>(getActivity(), mIterator);
+            return PagedDataBaseFragment.this.onCreateLoader();
         }
 
         @Override
@@ -65,10 +62,11 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
         setContentShown(false);
 
-        mIterator = (PageIteratorWithSaveableState<T>) onCreateIterator();
+        /*
+        mIterator = onCreateIterator();
         if (savedInstanceState != null) {
             mIterator.restoreState(savedInstanceState.getBundle(STATE_KEY_ITERATOR_STATE));
-        }
+        }*/
 
         getLoaderManager().initLoader(0, null, mLoaderCallback);
     }
@@ -76,9 +74,10 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        /*
         if (mIterator != null) {
             outState.putBundle(STATE_KEY_ITERATOR_STATE, mIterator.saveState());
-        }
+        }*/
     }
 
     @Override
@@ -146,6 +145,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
-    protected abstract PageIterator<T> onCreateIterator();
+    protected abstract PageIteratorLoader<T> onCreateLoader();
     public abstract void onItemClick(T item);
 }

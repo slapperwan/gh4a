@@ -2,13 +2,12 @@ package com.gh4a.loader;
 
 import java.io.IOException;
 
-import org.eclipse.egit.github.core.Release;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.RepositoryService;
-
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Release;
+import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
 public class ReleaseLoader extends BaseLoader<Release> {
 
@@ -25,8 +24,8 @@ public class ReleaseLoader extends BaseLoader<Release> {
 
     @Override
     public Release doLoadInBackground() throws IOException {
-        RepositoryService repoService = (RepositoryService)
-                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-        return repoService.getRelease(new RepositoryId(mRepoOwner, mRepoName), mReleaseId);
+        RepositoryReleaseService service =
+                Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
+       return ApiHelpers.throwOnFailure(service.getRelease(mRepoOwner, mRepoName, mReleaseId).blockingGet());
     }
 }

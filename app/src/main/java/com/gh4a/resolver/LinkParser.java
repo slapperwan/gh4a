@@ -24,8 +24,6 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
-import org.eclipse.egit.github.core.client.IGitHubConstants;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -53,7 +51,7 @@ public class LinkParser {
             IntentUtils.InitialCommentMarker initialCommentFallback) {
         List<String> parts = new ArrayList<>(uri.getPathSegments());
 
-        if (IGitHubConstants.HOST_GISTS.equals(uri.getHost())) {
+        if ("gist.github.com".equals(uri.getHost())) {
             return parseGistLink(activity, parts);
         }
 

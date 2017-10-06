@@ -4,17 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryCommitCompare;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.RequestException;
-import org.eclipse.egit.github.core.service.CommitService;
-
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
-public class CommitCompareLoader extends BaseLoader<List<RepositoryCommit>> {
+public class CommitCompareLoader extends BaseLoader<List<Commit>> {
     private final String mRepoOwner;
     private final String mRepoName;
     private final String mBase;
@@ -34,15 +32,14 @@ public class CommitCompareLoader extends BaseLoader<List<RepositoryCommit>> {
     }
 
     @Override
-    public List<RepositoryCommit> doLoadInBackground() throws IOException {
-        CommitService commitService = (CommitService)
-                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
-        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+    public List<Commit> doLoadInBackground() throws IOException {
+        RepositoryCommitService service =
+                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
         // first try using the actual SHA1s
-        List<RepositoryCommit> commits = getCommitsOrNullOn404(commitService, repoId, mBase, mHead);
+        List<Commit> commits = getCommitsOrNullOn404(service, mBase, mHead);
         if (commits == null && mBaseLabel != null && mHeadLabel != null) {
             // We got a 404; likely the history of the base branch was rewritten. Try the labels.
-            commits = getCommitsOrNullOn404(commitService, repoId, mBaseLabel, mHeadLabel);
+            commits = getCommitsOrNullOn404(service, mBaseLabel, mHeadLabel);
         }
         if (commits == null) {
             // Bummer, at least one branch was deleted.
@@ -52,12 +49,12 @@ public class CommitCompareLoader extends BaseLoader<List<RepositoryCommit>> {
         return commits;
     }
 
-    private List<RepositoryCommit> getCommitsOrNullOn404(CommitService service,
-            RepositoryId repoId, String base, String head) throws IOException {
+    private List<Commit> getCommitsOrNullOn404(RepositoryCommitService service,
+            String base, String head) throws IOException {
         try {
-            RepositoryCommitCompare compare = service.compare(repoId, base, head);
-            return compare.getCommits();
-        } catch (RequestException e) {
+            return ApiHelpers.throwOnFailure(
+                    service.compareCommits(mRepoOwner, mRepoName, base, head).blockingGet()).commits();
+        } catch (ApiRequestException e) {
             // Ignore error 404
             if (e.getStatus() != 404) {
                 throw e;

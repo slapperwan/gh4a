@@ -46,13 +46,12 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.SwipeRefreshLayout;
-
-import org.eclipse.egit.github.core.Download;
-import org.eclipse.egit.github.core.Release;
+import com.meisolsson.githubsdk.model.Release;
+import com.meisolsson.githubsdk.model.ReleaseAsset;
 
 public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
-        RootAdapter.OnItemClickListener<Download> {
+        RootAdapter.OnItemClickListener<ReleaseAsset> {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, long id) {
         return new Intent(context, ReleaseInfoActivity.class)
                 .putExtra("owner", repoOwner)
@@ -93,7 +92,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         @Override
         protected Loader<LoaderResult<String>> onCreateLoader() {
             return new MarkdownLoader(ReleaseInfoActivity.this,
-                    mRepoOwner, mRepoName, mRelease.getBody());
+                    mRepoOwner, mRepoName, mRelease.body());
         }
 
         @Override
@@ -137,7 +136,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
-        mRelease = (Release) extras.getSerializable("release");
+        mRelease = extras.getParcelable("release");
         mReleaseId = extras.getLong("id");
     }
 
@@ -150,7 +149,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.browser) {
-            IntentUtils.launchBrowser(this, Uri.parse(mRelease.getHtmlUrl()));
+            IntentUtils.launchBrowser(this, Uri.parse(mRelease.htmlUrl()));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -196,9 +195,9 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     private void handleReleaseReady() {
-        String name = mRelease.getName();
+        String name = mRelease.name();
         if (TextUtils.isEmpty(name)) {
-            name = mRelease.getTagName();
+            name = mRelease.tagName();
         }
         getSupportActionBar().setTitle(name);
         getSupportLoaderManager().initLoader(1, null, mBodyCallback);
@@ -207,32 +206,32 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     private void fillData() {
         ImageView gravatar = findViewById(R.id.iv_gravatar);
-        AvatarHandler.assignAvatar(gravatar, mRelease.getAuthor());
+        AvatarHandler.assignAvatar(gravatar, mRelease.author());
         gravatar.setOnClickListener(this);
 
         StyleableTextView details = findViewById(R.id.tv_releaseinfo);
         String detailsText = getString(R.string.release_details,
-                ApiHelpers.getUserLogin(this, mRelease.getAuthor()),
-                StringUtils.formatRelativeTime(this, mRelease.getCreatedAt(), true));
+                ApiHelpers.getUserLogin(this, mRelease.author()),
+                StringUtils.formatRelativeTime(this, mRelease.createdAt(), true));
         StringUtils.applyBoldTagsAndSetText(details, detailsText);
 
         TextView releaseType = findViewById(R.id.tv_releasetype);
-        if (mRelease.isDraft()) {
+        if (mRelease.draft()) {
             releaseType.setText(R.string.release_type_draft);
-        } else if (mRelease.isPrerelease()) {
+        } else if (mRelease.prerelease()) {
             releaseType.setText(R.string.release_type_prerelease);
         } else {
             releaseType.setText(R.string.release_type_final);
         }
 
         TextView tag = findViewById(R.id.tv_releasetag);
-        tag.setText(getString(R.string.release_tag, mRelease.getTagName()));
+        tag.setText(getString(R.string.release_tag, mRelease.tagName()));
         tag.setOnClickListener(this);
 
-        if (mRelease.getAssets() != null && !mRelease.getAssets().isEmpty()) {
+        if (mRelease.assets() != null && !mRelease.assets().isEmpty()) {
             RecyclerView downloadsList = findViewById(R.id.download_list);
             ReleaseAssetAdapter adapter = new ReleaseAssetAdapter(this);
-            adapter.addAll(mRelease.getAssets());
+            adapter.addAll(mRelease.assets());
             adapter.setOnItemClickListener(this);
             downloadsList.setLayoutManager(new LinearLayoutManager(this));
             downloadsList.setNestedScrollingEnabled(false);
@@ -242,18 +241,11 @@ public class ReleaseInfoActivity extends BaseActivity implements
         }
     }
 
-    @Override
-    public void onItemClick(Download download) {
-        UiUtils.enqueueDownloadWithPermissionCheck(this, download.getUrl(),
-                download.getContentType(), download.getName(),
-                download.getDescription(), "application/octet-stream");
-    }
-
     private void fillNotes(String bodyHtml) {
         TextView body = findViewById(R.id.tv_release_notes);
 
         if (!StringUtils.isBlank(bodyHtml)) {
-            mImageGetter.bind(body, bodyHtml, mRelease.getId());
+            mImageGetter.bind(body, bodyHtml, mRelease.id());
             body.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         } else {
             body.setText(R.string.release_no_releasenotes);
@@ -264,16 +256,22 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     @Override
+    public void onItemClick(ReleaseAsset item) {
+        UiUtils.enqueueDownloadWithPermissionCheck(this, item.url(),
+                item.contentType(), item.name(), item.label(), "application/octet-stream");
+    }
+
+    @Override
     public void onClick(View v) {
         Intent intent = null;
 
         switch (v.getId()) {
             case R.id.tv_releasetag:
                 intent = RepositoryActivity.makeIntent(this,
-                        mRepoOwner, mRepoName, mRelease.getTagName());
+                        mRepoOwner, mRepoName, mRelease.tagName());
                 break;
             case R.id.iv_gravatar:
-                intent = UserActivity.makeIntent(this, mRelease.getAuthor());
+                intent = UserActivity.makeIntent(this, mRelease.author());
                 break;
         }
 

@@ -1,7 +1,5 @@
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.Contributor;
-
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -15,8 +13,9 @@ import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.User;
 
-public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdapter.ViewHolder> {
+public class ContributorAdapter extends RootAdapter<User, ContributorAdapter.ViewHolder> {
     public ContributorAdapter(Context context) {
         super(context);
     }
@@ -30,22 +29,20 @@ public class ContributorAdapter extends RootAdapter<Contributor, ContributorAdap
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, Contributor contributor) {
-        AvatarHandler.assignAvatar(holder.ivGravatar, contributor.getLogin(),
-                contributor.getId(), contributor.getAvatarUrl());
+    public void onBindViewHolder(ViewHolder holder, User contributor) {
+        AvatarHandler.assignAvatar(holder.ivGravatar, contributor);
         holder.ivGravatar.setTag(contributor);
 
-        holder.tvTitle.setText(StringUtils.formatName(contributor.getLogin(), contributor.getName()));
+        holder.tvTitle.setText(StringUtils.formatName(contributor.login(), contributor.name()));
         holder.tvExtra.setText(mContext.getResources().getQuantityString(R.plurals.contributor_extra_data,
-                contributor.getContributions(), contributor.getContributions()));
+                contributor.contributions(), contributor.contributions()));
     }
 
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
-            Contributor contributor = (Contributor) v.getTag();
-            Intent intent = UserActivity.makeIntent(mContext,
-                    contributor.getLogin(), contributor.getName());
+            User contributor = (User) v.getTag();
+            Intent intent = UserActivity.makeIntent(mContext, contributor);
             if (intent != null) {
                 mContext.startActivity(intent);
             }

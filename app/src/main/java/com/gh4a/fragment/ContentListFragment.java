@@ -34,16 +34,15 @@ import com.gh4a.loader.ContentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryContents;
+import com.meisolsson.githubsdk.model.Content;
+import com.meisolsson.githubsdk.model.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class ContentListFragment extends ListDataBaseFragment<RepositoryContents> implements
-        RootAdapter.OnItemClickListener<RepositoryContents> {
+public class ContentListFragment extends ListDataBaseFragment<Content> implements
+        RootAdapter.OnItemClickListener<Content> {
     private static final int MENU_HISTORY = Menu.FIRST + 1;
 
     private Repository mRepository;
@@ -54,20 +53,20 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     private FileAdapter mAdapter;
 
     public interface ParentCallback {
-        void onContentsLoaded(ContentListFragment fragment, List<RepositoryContents> contents);
-        void onTreeSelected(RepositoryContents content);
+        void onContentsLoaded(ContentListFragment fragment, List<Content> contents);
+        void onTreeSelected(Content content);
         Set<String> getSubModuleNames(ContentListFragment fragment);
     }
 
     public static ContentListFragment newInstance(Repository repository,
-            String path, ArrayList<RepositoryContents> contents, String ref) {
+            String path, ArrayList<Content> contents, String ref) {
         ContentListFragment f = new ContentListFragment();
 
         Bundle args = new Bundle();
         args.putString("path", path);
         args.putString("ref", ref);
-        args.putSerializable("repo", repository);
-        args.putSerializable("contents", contents);
+        args.putParcelable("repo", repository);
+        args.putParcelableArrayList("contents", contents);
         f.setArguments(args);
 
         return f;
@@ -76,11 +75,11 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepository = (Repository) getArguments().getSerializable("repo");
+        mRepository = getArguments().getParcelable("repo");
         mPath = getArguments().getString("path");
         mRef = getArguments().getString("ref");
         if (StringUtils.isBlank(mRef)) {
-            mRef = mRepository.getDefaultBranch();
+            mRef = mRepository.defaultBranch();
         }
     }
 
@@ -97,7 +96,7 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     }
 
     @Override
-    protected RootAdapter<RepositoryContents, ?> onCreateAdapter() {
+    protected RootAdapter<Content, ?> onCreateAdapter() {
         mAdapter = new FileAdapter(getActivity());
         mAdapter.setSubModuleNames(mCallback.getSubModuleNames(this));
         mAdapter.setContextMenuSupported(true);
@@ -122,10 +121,10 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
         ContextMenuAwareRecyclerView.RecyclerContextMenuInfo info =
                 (ContextMenuAwareRecyclerView.RecyclerContextMenuInfo) menuInfo;
-        RepositoryContents contents = mAdapter.getItemFromAdapterPosition(info.position);
+        Content contents = mAdapter.getItemFromAdapterPosition(info.position);
         Set<String> subModules = mCallback.getSubModuleNames(this);
 
-        if (subModules == null || !subModules.contains(contents.getName())) {
+        if (subModules == null || !subModules.contains(contents.name())) {
             menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history);
         }
     }
@@ -140,10 +139,10 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
 
         int id = item.getItemId();
         if (id == MENU_HISTORY) {
-            RepositoryContents contents = mAdapter.getItemFromAdapterPosition(info.position);
+            Content contents = mAdapter.getItemFromAdapterPosition(info.position);
             Intent intent = CommitHistoryActivity.makeIntent(getActivity(),
-                    mRepository.getOwner().getLogin(), mRepository.getName(),
-                    mRef, contents.getPath());
+                    mRepository.owner().login(), mRepository.name(),
+                    mRef, contents.path());
             startActivity(intent);
             return true;
         }
@@ -162,23 +161,21 @@ public class ContentListFragment extends ListDataBaseFragment<RepositoryContents
     }
 
     @Override
-    protected void onAddData(RootAdapter<RepositoryContents, ?> adapter, List<RepositoryContents> data) {
+    protected void onAddData(RootAdapter<Content, ?> adapter, List<Content> data) {
         super.onAddData(adapter, data);
         mCallback.onContentsLoaded(this, data);
     }
 
     @Override
-    public void onItemClick(RepositoryContents content) {
+    public void onItemClick(Content content) {
         mCallback.onTreeSelected(content);
     }
 
     @Override
-    public Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader() {
+    public Loader<LoaderResult<List<Content>>> onCreateLoader() {
         ContentListLoader loader = new ContentListLoader(getActivity(),
-                mRepository.getOwner().getLogin(), mRepository.getName(), mPath, mRef);
-        @SuppressWarnings("unchecked")
-        ArrayList<RepositoryContents> contents =
-                (ArrayList<RepositoryContents>) getArguments().getSerializable("contents");
+                mRepository.owner().login(), mRepository.name(), mPath, mRef);
+        ArrayList<Content> contents = getArguments().getParcelableArrayList("contents");
         if (contents != null) {
             loader.prefillData(contents);
         }

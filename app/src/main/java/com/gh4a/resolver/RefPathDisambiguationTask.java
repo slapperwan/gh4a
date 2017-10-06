@@ -9,12 +9,13 @@ import android.util.Pair;
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Branch;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.service.repositories.RepositoryBranchService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
-import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.RepositoryTag;
-import org.eclipse.egit.github.core.service.RepositoryService;
-
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -102,22 +103,27 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
             return Pair.create("HEAD", null);
         }
 
-        RepositoryService repoService = (RepositoryService)
-                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-        RepositoryId repo = new RepositoryId(mRepoOwner, mRepoName);
+        final Gh4Application app = Gh4Application.get();
+        final RepositoryBranchService branchService =
+                app.getGitHubService(RepositoryBranchService.class);
+        final RepositoryService repoService = app.getGitHubService(RepositoryService.class);
 
         // then look for matching branches
-        List<RepositoryBranch> branches = repoService.getBranches(repo);
-        if (branches != null) {
-            for (RepositoryBranch branch : branches) {
-                if (TextUtils.equals(mRefAndPath, branch.getName())) {
-                    return Pair.create(branch.getName(), null);
-                } else {
-                    String nameWithSlash = branch.getName() + "/";
-                    if (mRefAndPath.startsWith(nameWithSlash)) {
-                        return Pair.create(branch.getName(),
-                                mRefAndPath.substring(nameWithSlash.length()));
-                    }
+        List<Branch> branches = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Branch>() {
+            @Override
+            public Page<Branch> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        branchService.getBranches(mRepoOwner, mRepoName, page).blockingGet());
+            }
+        });
+        for (Branch branch : branches) {
+            if (TextUtils.equals(mRefAndPath, branch.name())) {
+                return Pair.create(branch.name(), null);
+            } else {
+                String nameWithSlash = branch.name() + "/";
+                if (mRefAndPath.startsWith(nameWithSlash)) {
+                    return Pair.create(branch.name(),
+                            mRefAndPath.substring(nameWithSlash.length()));
                 }
             }
         }
@@ -127,17 +133,21 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
         }
 
         // and for tags after that
-        List<RepositoryTag> tags = repoService.getTags(repo);
-        if (tags != null) {
-            for (RepositoryTag tag : tags) {
-                if (TextUtils.equals(mRefAndPath, tag.getName())) {
-                    return Pair.create(tag.getName(), null);
-                } else {
-                    String nameWithSlash = tag.getName() + "/";
-                    if (mRefAndPath.startsWith(nameWithSlash)) {
-                        return Pair.create(tag.getName(),
-                                mRefAndPath.substring(nameWithSlash.length()));
-                    }
+        List<Branch> tags = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Branch>() {
+            @Override
+            public Page<Branch> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        repoService.getTags(mRepoOwner, mRepoName, page).blockingGet());
+            }
+        });
+        for (Branch tag : tags) {
+            if (TextUtils.equals(mRefAndPath, tag.name())) {
+                return Pair.create(tag.name(), null);
+            } else {
+                String nameWithSlash = tag.name() + "/";
+                if (mRefAndPath.startsWith(nameWithSlash)) {
+                    return Pair.create(tag.name(),
+                            mRefAndPath.substring(nameWithSlash.length()));
                 }
             }
         }

@@ -17,8 +17,6 @@ package com.gh4a.fragment;
 
 import java.util.List;
 
-import org.eclipse.egit.github.core.RepositoryCommit;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,9 +29,10 @@ import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.CommitCompareLoader;
 import com.gh4a.loader.LoaderResult;
+import com.meisolsson.githubsdk.model.Commit;
 
-public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit> implements
-        RootAdapter.OnItemClickListener<RepositoryCommit> {
+public class CommitCompareFragment extends ListDataBaseFragment<Commit> implements
+        RootAdapter.OnItemClickListener<Commit> {
     public static CommitCompareFragment newInstance(String repoOwner, String repoName,
             String baseRef, String headRef) {
         return newInstance(repoOwner, repoName, -1, null, baseRef, null, headRef);
@@ -86,16 +85,16 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     }
 
     @Override
-    protected RootAdapter<RepositoryCommit, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
+    protected RootAdapter<Commit, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         CommitAdapter adapter = new CommitAdapter(getActivity());
         adapter.setOnItemClickListener(this);
         return adapter;
     }
 
     @Override
-    public void onItemClick(RepositoryCommit commit) {
+    public void onItemClick(Commit commit) {
         Intent intent = CommitActivity.makeIntent(getActivity(),
-                mRepoOwner, mRepoName, mPullRequestNumber, commit.getSha());
+                mRepoOwner, mRepoName, mPullRequestNumber, commit.sha());
         startActivityForResult(intent, REQUEST_COMMIT);
     }
 
@@ -112,7 +111,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<RepositoryCommit
     }
 
     @Override
-    public Loader<LoaderResult<List<RepositoryCommit>>> onCreateLoader() {
+    public Loader<LoaderResult<List<Commit>>> onCreateLoader() {
         return new CommitCompareLoader(getActivity(), mRepoOwner, mRepoName,
                 mBaseLabel, mBase, mHeadLabel, mHead);
     }

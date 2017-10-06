@@ -8,10 +8,10 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.PullRequestService;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.request.CommentRequest;
+import com.meisolsson.githubsdk.model.request.pull_request.CreateReviewComment;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 
 import java.io.IOException;
 
@@ -48,31 +48,31 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
     }
 
     @Override
-    protected void createComment(RepositoryId repoId, CommitComment comment,
+    protected void createComment(String repoOwner, String repoName, String body,
             long replyToCommentId) throws IOException {
-        int prNumber = getIntent().getIntExtra("pull_request_number", 0);
-        Gh4Application app = Gh4Application.get();
-        PullRequestService pullRequestService = (PullRequestService)
-                app.getService(Gh4Application.PULL_SERVICE);
+        Bundle extras = getIntent().getExtras();
+        int prNumber = extras.getInt("pull_request_number", 0);
+        PullRequestReviewCommentService service =
+                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+        CreateReviewComment.Builder builder = CreateReviewComment.builder()
+                .body(body)
+                .commitId(extras.getString("commit_id"))
+                .path(extras.getString("path"))
+                .position(extras.getInt("position"));
 
-        if (replyToCommentId != 0L) {
-            pullRequestService.replyToComment(repoId, prNumber,
-                    (int) replyToCommentId, comment.getBody());
-        } else {
-            Bundle extras = getIntent().getExtras();
-            comment.setPosition(extras.getInt("position"));
-            comment.setCommitId(extras.getString("commit_id"));
-            comment.setPath(extras.getString("path"));
-
-            pullRequestService.createComment(repoId, prNumber, comment);
+        if (replyToCommentId != 0) {
+            builder.inReplyTo(replyToCommentId);
         }
+        ApiHelpers.throwOnFailure(service.createReviewComment(
+                repoOwner, repoName, prNumber, builder.build()).blockingGet());
     }
 
     @Override
-    protected void editComment(RepositoryId repoId, CommitComment comment) throws IOException {
-        Gh4Application app = Gh4Application.get();
-        PullRequestService pullRequestService = (PullRequestService)
-                app.getService(Gh4Application.PULL_SERVICE);
-        pullRequestService.editComment(repoId, comment);
+    protected void editComment(String repoOwner, String repoName, long commentId,
+            String body) throws IOException {
+        PullRequestReviewCommentService service =
+                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+        ApiHelpers.throwOnFailure(service.editReviewComment(repoOwner, repoName, commentId,
+                CommentRequest.builder().body(body).build()).blockingGet());
     }
 }

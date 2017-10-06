@@ -32,8 +32,7 @@ import android.widget.LinearLayout;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
 
 import java.io.IOException;
 import java.util.Set;

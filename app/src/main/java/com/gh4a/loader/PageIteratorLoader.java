@@ -1,19 +1,18 @@
 package com.gh4a.loader;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.eclipse.egit.github.core.client.NoSuchPageException;
-import org.eclipse.egit.github.core.client.PageIterator;
 
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.gh4a.Gh4Application;
+import com.meisolsson.githubsdk.model.Page;
 
-public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIteratorLoader<T>.LoadedPage>> {
-    private final PageIterator<T> mPageIterator;
+public abstract class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIteratorLoader<T>.LoadedPage>> {
+    private int mNextPage;
     private ArrayList<T> mPreviouslyLoadedData;
 
     public class LoadedPage {
@@ -25,9 +24,9 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIter
         }
     }
 
-    public PageIteratorLoader(Context context, PageIterator<T> pageIterator) {
+    public PageIteratorLoader(Context context) {
         super(context);
-        mPageIterator = pageIterator;
+        mNextPage = 0;
         mPreviouslyLoadedData = new ArrayList<>();
         onContentChanged();
     }
@@ -35,34 +34,34 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIter
     @Override
     public void onContentChanged() {
         super.onContentChanged();
-        mPageIterator.reset();
+        mNextPage = 0;
         mPreviouslyLoadedData.clear();
     }
 
     @Override
     protected void onReset() {
         super.onReset();
-        mPageIterator.reset();
+        mNextPage = 0;
         mPreviouslyLoadedData.clear();
     }
 
     @Override
     public LoaderResult<LoadedPage> loadInBackground() {
-        if (mPageIterator.hasNext()) {
+        if (mNextPage >= 0) {
             try {
-                Collection<T> newData = mPageIterator.next();
+                Page<T> page = loadPage(mNextPage);
                 mPreviouslyLoadedData = new ArrayList<>(mPreviouslyLoadedData);
-                mPreviouslyLoadedData.addAll(newData);
-            } catch (NoSuchPageException e) {
-                // should only happen in case of an empty repo
-                return new LoaderResult<>(new LoadedPage(mPreviouslyLoadedData, false));
+                mPreviouslyLoadedData.addAll(page.items());
+
+                Integer next = page.next();
+                mNextPage = next != null ? next : -1;
             } catch (Exception e) {
                 Log.e(Gh4Application.LOG_TAG, e.getMessage(), e);
                 return new LoaderResult<>(e);
             }
         }
 
-        return new LoaderResult<>(new LoadedPage(mPreviouslyLoadedData, mPageIterator.hasNext()));
+        return new LoaderResult<>(new LoadedPage(mPreviouslyLoadedData, mNextPage >= 0));
     }
 
     @Override
@@ -76,4 +75,6 @@ public class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult<PageIter
     protected void onStopLoading() {
         cancelLoad();
     }
+
+    protected abstract Page<T> loadPage(int page) throws IOException;
 }

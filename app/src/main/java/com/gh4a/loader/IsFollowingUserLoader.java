@@ -1,12 +1,14 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-
-import org.eclipse.egit.github.core.service.UserService;
+import java.net.HttpURLConnection;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.service.users.UserFollowerService;
 
 public class IsFollowingUserLoader extends BaseLoader<Boolean> {
 
@@ -19,8 +21,16 @@ public class IsFollowingUserLoader extends BaseLoader<Boolean> {
 
     @Override
     public Boolean doLoadInBackground() throws IOException {
-        UserService userService = (UserService)
-                Gh4Application.get().getService(Gh4Application.USER_SERVICE);
-        return userService.isFollowing(mLogin);
+        UserFollowerService service = Gh4Application.get().getGitHubService(UserFollowerService.class);
+        try {
+            ApiHelpers.throwOnFailure(service.isFollowing(mLogin).blockingGet());
+            return true;
+        } catch (ApiRequestException e) {
+            if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND) {
+                // 404 means 'not following'
+                return false;
+            }
+            throw e;
+        }
     }
 }

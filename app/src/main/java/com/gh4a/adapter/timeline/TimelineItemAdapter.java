@@ -14,12 +14,10 @@ import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.ReactionBar;
-
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.IssueEvent;
-import org.eclipse.egit.github.core.Reaction;
-import org.eclipse.egit.github.core.Reactions;
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.Reaction;
+import com.meisolsson.githubsdk.model.Reactions;
+import com.meisolsson.githubsdk.model.User;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -51,15 +49,15 @@ public class TimelineItemAdapter
     private boolean mLocked;
 
     public interface OnCommentAction {
-        void editComment(Comment comment);
-        void deleteComment(Comment comment);
+        void editComment(GitHubCommentBase comment);
+        void deleteComment(GitHubCommentBase comment);
         void quoteText(CharSequence text);
         void addText(CharSequence text);
         void onReplyCommentSelected(long replyToId);
         long getSelectedReplyCommentId();
-        String getShareSubject(Comment comment);
-        List<Reaction> loadReactionDetailsInBackground(Comment comment) throws IOException;
-        Reaction addReactionInBackground(Comment comment, String content) throws IOException;
+        String getShareSubject(GitHubCommentBase comment);
+        List<Reaction> loadReactionDetailsInBackground(GitHubCommentBase comment) throws IOException;
+        Reaction addReactionInBackground(GitHubCommentBase comment, String content) throws IOException;
     }
 
     private final ReviewViewHolder.Callback mReviewCallback = new ReviewViewHolder.Callback() {
@@ -94,16 +92,16 @@ public class TimelineItemAdapter
         public boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem) {
             switch (menuItem.getItemId()) {
                 case R.id.edit:
-                    mActionCallback.editComment(comment.comment);
+                    mActionCallback.editComment(comment.comment());
                     return true;
 
                 case R.id.delete:
-                    mActionCallback.deleteComment(comment.comment);
+                    mActionCallback.deleteComment(comment.comment());
                     return true;
 
                 case R.id.share:
-                    IntentUtils.share(mContext, mActionCallback.getShareSubject(comment.comment),
-                            comment.comment.getHtmlUrl());
+                    IntentUtils.share(mContext, mActionCallback.getShareSubject(comment.comment()),
+                            comment.comment().htmlUrl());
                     return true;
 
                 case R.id.view_in_file:
@@ -119,14 +117,14 @@ public class TimelineItemAdapter
 
         @Override
         public List<Reaction> loadReactionDetailsInBackground(TimelineItem.TimelineComment item)
-                throws  IOException {
-            return mActionCallback.loadReactionDetailsInBackground(item.comment);
+                throws IOException {
+            return mActionCallback.loadReactionDetailsInBackground(item.comment());
         }
 
         @Override
         public Reaction addReactionInBackground(TimelineItem.TimelineComment item,
                 String content) throws IOException {
-            return mActionCallback.addReactionInBackground(item.comment, content);
+            return mActionCallback.addReactionInBackground(item.comment(), content);
         }
     };
 
@@ -180,21 +178,7 @@ public class TimelineItemAdapter
     public Set<User> getUsers() {
         final HashSet<User> users = new HashSet<>();
         for (int i = 0; i < getCount(); i++) {
-            User user = null;
-            TimelineItem item = getItem(i);
-
-            if (item instanceof TimelineItem.TimelineComment) {
-                user = ((TimelineItem.TimelineComment) item).comment.getUser();
-            } else if (item instanceof TimelineItem.TimelineReview) {
-                user = ((TimelineItem.TimelineReview) item).review.getUser();
-            } else if (item instanceof TimelineItem.TimelineEvent) {
-                IssueEvent event = ((TimelineItem.TimelineEvent) item).event;
-                user = event.getAssigner();
-                if (user == null) {
-                    user = event.getActor();
-                }
-            }
-
+            User user = getItem(i).getUser();
             if (user != null) {
                 users.add(user);
             }
@@ -297,14 +281,14 @@ public class TimelineItemAdapter
             return false;
         }
         if (item instanceof TimelineItem.Diff) {
-            return ((TimelineItem.Diff) item).getInitialComment().getId() != replyCommentId;
+            return ((TimelineItem.Diff) item).getInitialComment().id() != replyCommentId;
         }
         if (item instanceof TimelineItem.TimelineComment) {
             TimelineItem.TimelineComment tc = (TimelineItem.TimelineComment) item;
             if (tc.getParentDiff() != null) {
-                return tc.getParentDiff().getInitialComment().getId() != replyCommentId;
+                return tc.getParentDiff().getInitialComment().id() != replyCommentId;
             }
-            return tc.comment.getId() != replyCommentId;
+            return tc.comment().id() != replyCommentId;
         }
         return false;
     }

@@ -27,9 +27,8 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.Repository;
 import com.vdurmont.emoji.EmojiParser;
-
-import org.eclipse.egit.github.core.Repository;
 
 import java.util.Locale;
 
@@ -47,21 +46,21 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
 
     @Override
     public void onBindViewHolder(ViewHolder holder, Repository repository) {
-        holder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
+        holder.tvTitle.setText(repository.owner().login() + "/" + repository.name());
 
-        if (!StringUtils.isBlank(repository.getDescription())) {
+        if (!StringUtils.isBlank(repository.description())) {
             holder.tvDesc.setVisibility(View.VISIBLE);
             holder.tvDesc.setText(
-                    EmojiParser.parseToUnicode(StringUtils.doTeaser(repository.getDescription())));
+                    EmojiParser.parseToUnicode(StringUtils.doTeaser(repository.description())));
         } else {
             holder.tvDesc.setVisibility(View.GONE);
         }
 
-        holder.tvLanguage.setText(repository.getLanguage() != null
-                ? repository.getLanguage() : mContext.getString(R.string.unknown));
-        holder.tvForks.setText(String.valueOf(repository.getForks()));
-        holder.tvStars.setText(String.valueOf(repository.getWatchers()));
-        holder.tvSize.setText(Formatter.formatFileSize(mContext, 1024L * repository.getSize()));
+        holder.tvLanguage.setText(repository.language() != null
+                ? repository.language() : mContext.getString(R.string.unknown));
+        holder.tvForks.setText(String.valueOf(repository.forksCount()));
+        holder.tvStars.setText(String.valueOf(repository.watchersCount()));
+        holder.tvSize.setText(Formatter.formatFileSize(mContext, 1024L * repository.size()));
         holder.tvPrivate.setVisibility(repository.isPrivate() ? View.VISIBLE : View.GONE);
         holder.tvFork.setVisibility(repository.isFork() ? View.VISIBLE : View.GONE);
     }
@@ -69,7 +68,7 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
     @Override
     protected boolean isFiltered(CharSequence filter, Repository repo) {
         String lcFilter = filter.toString().toLowerCase(Locale.getDefault());
-        String name = repo.getName().toLowerCase(Locale.getDefault());
+        String name = repo.name().toLowerCase(Locale.getDefault());
         return name.contains(lcFilter);
     }
 

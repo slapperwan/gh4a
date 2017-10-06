@@ -3,7 +3,6 @@ package com.gh4a.adapter.timeline;
 import android.content.Context;
 import android.content.Intent;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.style.TypefaceSpan;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,10 +20,11 @@ import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.TimestampToastSpan;
 
-import org.eclipse.egit.github.core.IssueEvent;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Rename;
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.IssueEvent;
+import com.meisolsson.githubsdk.model.IssueEventType;
+import com.meisolsson.githubsdk.model.Label;
+import com.meisolsson.githubsdk.model.Rename;
+import com.meisolsson.githubsdk.model.User;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -36,24 +36,24 @@ class EventViewHolder
 
     private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
             Pattern.compile(".*github\\.com/repos/([^/]+)/([^/]+)/commits");
-    private static final HashMap<String, Integer> EVENT_ICONS = new HashMap<>();
+    private static final HashMap<IssueEventType, Integer> EVENT_ICONS = new HashMap<>();
 
     static {
-        EVENT_ICONS.put(IssueEvent.TYPE_CLOSED, R.attr.issueEventClosedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_REOPENED, R.attr.issueEventReopenedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_MERGED, R.attr.issueEventMergedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_REFERENCED, R.attr.issueEventReferencedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_ASSIGNED, R.attr.issueEventAssignedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_UNASSIGNED, R.attr.issueEventUnassignedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_LABELED, R.attr.issueEventLabeledIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_UNLABELED, R.attr.issueEventUnlabeledIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_LOCKED, R.attr.issueEventLockedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_UNLOCKED, R.attr.issueEventUnlockedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_MILESTONED, R.attr.issueEventMilestonedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_DEMILESTONED, R.attr.issueEventDemilestonedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_RENAMED, R.attr.issueEventRenamedIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_HEAD_REF_DELETED, R.attr.timelineEventBranchIcon);
-        EVENT_ICONS.put(IssueEvent.TYPE_HEAD_REF_RESTORED, R.attr.timelineEventBranchIcon);
+        EVENT_ICONS.put(IssueEventType.Closed, R.attr.issueEventClosedIcon);
+        EVENT_ICONS.put(IssueEventType.Reopened, R.attr.issueEventReopenedIcon);
+        EVENT_ICONS.put(IssueEventType.Merged, R.attr.issueEventMergedIcon);
+        EVENT_ICONS.put(IssueEventType.Referenced, R.attr.issueEventReferencedIcon);
+        EVENT_ICONS.put(IssueEventType.Assigned, R.attr.issueEventAssignedIcon);
+        EVENT_ICONS.put(IssueEventType.Unassigned, R.attr.issueEventUnassignedIcon);
+        EVENT_ICONS.put(IssueEventType.Labeled, R.attr.issueEventLabeledIcon);
+        EVENT_ICONS.put(IssueEventType.Unlabeled, R.attr.issueEventUnlabeledIcon);
+        EVENT_ICONS.put(IssueEventType.Locked, R.attr.issueEventLockedIcon);
+        EVENT_ICONS.put(IssueEventType.Unlocked, R.attr.issueEventUnlockedIcon);
+        EVENT_ICONS.put(IssueEventType.Milestoned, R.attr.issueEventMilestonedIcon);
+        EVENT_ICONS.put(IssueEventType.Demilestoned, R.attr.issueEventDemilestonedIcon);
+        EVENT_ICONS.put(IssueEventType.Renamed, R.attr.issueEventRenamedIcon);
+        EVENT_ICONS.put(IssueEventType.HeadRefDeleted, R.attr.timelineEventBranchIcon);
+        EVENT_ICONS.put(IssueEventType.HeadRefRestored, R.attr.timelineEventBranchIcon);
     }
 
     private final Context mContext;
@@ -85,12 +85,12 @@ class EventViewHolder
 
     @Override
     public void bind(TimelineItem.TimelineEvent item) {
-        User user = item.event.getAssigner() != null
-                ? item.event.getAssigner() : item.event.getActor();
+        User user = item.event.assigner() != null
+                ? item.event.assigner() : item.event.actor();
         AvatarHandler.assignAvatar(mAvatarView, user);
         mAvatarContainer.setTag(user);
 
-        Integer eventIconAttr = EVENT_ICONS.get(item.event.getEvent());
+        Integer eventIconAttr = EVENT_ICONS.get(item.event.event());
         if (eventIconAttr != null) {
             mEventIconView.setImageResource(UiUtils.resolveDrawable(mContext, eventIconAttr));
             mEventIconView.setVisibility(View.VISIBLE);
@@ -107,45 +107,44 @@ class EventViewHolder
         String textBase = null;
         int textResId = 0;
 
-        switch (event.getEvent()) {
-            case IssueEvent.TYPE_CLOSED:
+        switch (event.event()) {
+            case Closed:
                 if (isPullRequestEvent) {
-                    textResId = event.getCommitId() != null
+                    textResId = event.commitId() != null
                             ? R.string.pull_request_event_closed_with_commit
                             : R.string.pull_request_event_closed;
                 } else {
-                    textResId = event.getCommitId() != null
+                    textResId = event.commitId() != null
                             ? R.string.issue_event_closed_with_commit
                             : R.string.issue_event_closed;
                 }
                 break;
-            case IssueEvent.TYPE_REOPENED:
+            case Reopened:
                 textResId = isPullRequestEvent
                         ? R.string.pull_request_event_reopened
                         : R.string.issue_event_reopened;
                 break;
-            case IssueEvent.TYPE_MERGED:
-                textResId = event.getCommitId() != null
+            case Merged:
+                textResId = event.commitId() != null
                         ? R.string.pull_request_event_merged_with_commit
                         : R.string.pull_request_event_merged;
                 break;
-            case IssueEvent.TYPE_REFERENCED:
+            case Referenced:
                 if (isPullRequestEvent) {
-                    textResId = event.getCommitId() != null
+                    textResId = event.commitId() != null
                             ? R.string.pull_request_event_referenced_with_commit
                             : R.string.pull_request_event_referenced;
                 } else {
-                    textResId = event.getCommitId() != null
+                    textResId = event.commitId() != null
                             ? R.string.issue_event_referenced_with_commit
                             : R.string.issue_event_referenced;
                 }
                 break;
-            case IssueEvent.TYPE_ASSIGNED:
-            case IssueEvent.TYPE_UNASSIGNED: {
-                boolean isAssign = TextUtils.equals(event.getEvent(), IssueEvent.TYPE_ASSIGNED);
-                String actorLogin = user != null ? user.getLogin() : null;
-                String assigneeLogin = event.getAssignee() != null
-                        ? event.getAssignee().getLogin() : null;
+            case Assigned:
+            case Unassigned: {
+                boolean isAssign = event.event() == IssueEventType.Assigned;
+                String actorLogin = user != null ? user.login() : null;
+                String assigneeLogin = event.assignee() != null ? event.assignee().login() : null;
                 if (assigneeLogin != null && assigneeLogin.equals(actorLogin)) {
                     if (isAssign) {
                         textResId = isPullRequestEvent
@@ -160,40 +159,40 @@ class EventViewHolder
                             : R.string.issue_event_unassigned;
                     textBase = mContext.getString(textResId,
                             ApiHelpers.getUserLogin(mContext, user),
-                            ApiHelpers.getUserLogin(mContext, event.getAssignee()));
+                            ApiHelpers.getUserLogin(mContext, event.assignee()));
                 }
                 break;
             }
-            case IssueEvent.TYPE_LABELED:
+            case Labeled:
                 textResId = R.string.issue_event_labeled;
                 break;
-            case IssueEvent.TYPE_UNLABELED:
+            case Unlabeled:
                 textResId = R.string.issue_event_unlabeled;
                 break;
-            case IssueEvent.TYPE_LOCKED:
+            case Locked:
                 textResId = R.string.issue_event_locked;
                 break;
-            case IssueEvent.TYPE_UNLOCKED:
+            case Unlocked:
                 textResId = R.string.issue_event_unlocked;
                 break;
-            case IssueEvent.TYPE_MILESTONED:
-            case IssueEvent.TYPE_DEMILESTONED:
-                textResId = TextUtils.equals(event.getEvent(), IssueEvent.TYPE_MILESTONED)
+            case Milestoned:
+            case Demilestoned:
+                textResId = event.event() == IssueEventType.Milestoned
                         ? R.string.issue_event_milestoned
                         : R.string.issue_event_demilestoned;
                 textBase = mContext.getString(textResId, ApiHelpers.getUserLogin(mContext, user),
-                        event.getMilestone().getTitle());
+                        event.milestone().title());
                 break;
-            case IssueEvent.TYPE_RENAMED: {
-                Rename rename = event.getRename();
+            case Renamed: {
+                Rename rename = event.rename();
                 textBase = mContext.getString(R.string.issue_event_renamed,
-                        ApiHelpers.getUserLogin(mContext, user), rename.getFrom(), rename.getTo());
+                        ApiHelpers.getUserLogin(mContext, user), rename.from(), rename.to());
                 break;
             }
-            case IssueEvent.TYPE_HEAD_REF_DELETED:
+            case HeadRefDeleted:
                 textResId = R.string.pull_request_event_ref_deleted;
                 break;
-            case IssueEvent.TYPE_HEAD_REF_RESTORED:
+            case HeadRefRestored:
                 textResId = R.string.pull_request_event_ref_restored;
                 break;
             default:
@@ -206,8 +205,8 @@ class EventViewHolder
         SpannableStringBuilder text = StringUtils.applyBoldTags(textBase, typefaceValue);
 
         int pos = text.toString().indexOf("[commit]");
-        if (event.getCommitId() != null && pos >= 0) {
-            text.replace(pos, pos + 8, event.getCommitId().substring(0, 7));
+        if (event.commitId() != null && pos >= 0) {
+            text.replace(pos, pos + 8, event.commitId().substring(0, 7));
             text.setSpan(new IntentSpan(mContext) {
                 @Override
                 protected Intent getIntent() {
@@ -215,7 +214,7 @@ class EventViewHolder
                     // that information directly, so get it indirectly by parsing the URL
                     String repoOwner = mRepoOwner;
                     String repoName = mRepoName;
-                    String url = event.getCommitUrl();
+                    String url = event.commitUrl();
                     if (url != null) {
                         Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
                         if (matcher.find()) {
@@ -225,28 +224,28 @@ class EventViewHolder
                     }
 
                     return CommitActivity.makeIntent(mContext, repoOwner, repoName,
-                            event.getCommitId());
+                            event.commitId());
                 }
             }, pos, pos + 7, 0);
             text.setSpan(new TypefaceSpan("monospace"), pos, pos + 7, 0);
         }
 
         pos = text.toString().indexOf("[label]");
-        Label label = event.getLabel();
+        Label label = event.label();
         if (label != null && pos >= 0) {
-            int length = label.getName().length();
-            text.replace(pos, pos + 7, label.getName());
+            int length = label.name().length();
+            text.replace(pos, pos + 7, label.name());
             text.setSpan(new IssueLabelSpan(mContext, label, false), pos, pos + length, 0);
         }
 
-        CharSequence time = event.getCreatedAt() != null
-                ? StringUtils.formatRelativeTime(mContext, event.getCreatedAt(), true) : "";
+        CharSequence time = event.createdAt() != null
+                ? StringUtils.formatRelativeTime(mContext, event.createdAt(), true) : "";
 
         pos = text.toString().indexOf("[time]");
         if (pos >= 0) {
             text.replace(pos, pos + 6, time);
-            if (event.getCreatedAt() != null) {
-                text.setSpan(new TimestampToastSpan(event.getCreatedAt()), pos,
+            if (event.createdAt() != null) {
+                text.setSpan(new TimestampToastSpan(event.createdAt()), pos,
                         pos + time.length(), 0);
             }
         }

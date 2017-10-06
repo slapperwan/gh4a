@@ -18,11 +18,10 @@ import com.gh4a.loader.NotificationHolder;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.Notification;
-import org.eclipse.egit.github.core.NotificationSubject;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.NotificationSubject;
+import com.meisolsson.githubsdk.model.NotificationThread;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.User;
 
 public class NotificationAdapter extends
         RootAdapter<NotificationHolder, NotificationAdapter.ViewHolder> {
@@ -63,7 +62,7 @@ public class NotificationAdapter extends
     }
 
     public boolean markAsRead(@Nullable Repository repository,
-            @Nullable Notification notification) {
+            @Nullable NotificationThread notification) {
         NotificationHolder previousRepoItem = null;
         int unreadNotificationsInSameRepoCount = 0;
         boolean hasReadEverything = true;
@@ -85,7 +84,7 @@ public class NotificationAdapter extends
             if (isMarkingSingleNotification) {
                 if (item.notification == null) {
                     if (previousRepoItem != null && unreadNotificationsInSameRepoCount == 0
-                            && previousRepoItem.repository.equals(notification.getRepository())) {
+                            && previousRepoItem.repository.equals(notification.repository())) {
                         previousRepoItem.setIsRead(true);
                     }
                     previousRepoItem = item;
@@ -103,7 +102,7 @@ public class NotificationAdapter extends
         // Additional check for the very last notification
         if (isMarkingSingleNotification && previousRepoItem != null
                 && unreadNotificationsInSameRepoCount == 0
-                && previousRepoItem.repository.equals(notification.getRepository())) {
+                && previousRepoItem.repository.equals(notification.repository())) {
             previousRepoItem.setIsRead(true);
         }
 
@@ -140,9 +139,9 @@ public class NotificationAdapter extends
             holder.ivAction.setVisibility(item.isRead() ? View.GONE : View.VISIBLE);
 
             Repository repository = item.repository;
-            holder.tvTitle.setText(repository.getOwner().getLogin() + "/" + repository.getName());
+            holder.tvTitle.setText(repository.owner().login() + "/" + repository.name());
 
-            User owner = item.repository.getOwner();
+            User owner = item.repository.owner();
             AvatarHandler.assignAvatar(holder.ivAvatar, owner);
             holder.ivAvatar.setTag(owner);
             holder.ivAvatar.setAlpha(alpha);
@@ -153,8 +152,8 @@ public class NotificationAdapter extends
         holder.tvTimestamp.setAlpha(alpha);
         holder.mPopupMenu.getMenu().findItem(R.id.mark_as_read).setVisible(!item.isRead());
 
-        NotificationSubject subject = item.notification.getSubject();
-        int iconResId = getIconResId(subject.getType());
+        NotificationSubject subject = item.notification.subject();
+        int iconResId = getIconResId(subject.type());
         if (iconResId > 0) {
             holder.ivIcon.setImageResource(iconResId);
             holder.ivIcon.setVisibility(View.VISIBLE);
@@ -162,9 +161,9 @@ public class NotificationAdapter extends
             holder.ivIcon.setVisibility(View.INVISIBLE);
         }
 
-        holder.tvTitle.setText(subject.getTitle());
+        holder.tvTitle.setText(subject.title());
         holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                item.notification.getUpdatedAt(), true));
+                item.notification.updatedAt(), true));
 
         ViewGroup.MarginLayoutParams layoutParams =
                 (ViewGroup.MarginLayoutParams) holder.vNotificationContent.getLayoutParams();

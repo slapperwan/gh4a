@@ -15,11 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.WatcherService;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +24,13 @@ import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
+import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.activity.WatchingService;
+
+import java.io.IOException;
 
 public class WatcherListFragment extends PagedDataBaseFragment<User> {
     public static WatcherListFragment newInstance(String repoOwner, String repoName) {
@@ -71,9 +73,14 @@ public class WatcherListFragment extends PagedDataBaseFragment<User> {
     }
 
     @Override
-    protected PageIterator<User> onCreateIterator() {
-        WatcherService watcherService = (WatcherService)
-                Gh4Application.get().getService(Gh4Application.WATCHER_SERVICE);
-        return watcherService.pageWatchers(new RepositoryId(mRepoOwner, mRepoName));
+    protected PageIteratorLoader<User> onCreateLoader() {
+        final WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
+        return new PageIteratorLoader<User>(getActivity()) {
+            @Override
+            protected Page<User> loadPage(int page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getRepositoryWatchers(mRepoOwner, mRepoName, page).blockingGet());
+            }
+        };
     }
 }

@@ -1,13 +1,14 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.StarService;
+import java.net.HttpURLConnection;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.service.activity.StarringService;
 
 public class IsStarringLoader extends BaseLoader<Boolean> {
 
@@ -22,8 +23,17 @@ public class IsStarringLoader extends BaseLoader<Boolean> {
 
     @Override
     public Boolean doLoadInBackground() throws IOException {
-        StarService starService = (StarService)
-                Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
-        return starService.isStarring(new RepositoryId(mRepoOwner, mRepoName));
+        StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
+        try {
+            ApiHelpers.throwOnFailure(
+                    service.checkIfRepositoryIsStarred(mRepoOwner, mRepoName).blockingGet());
+            return true;
+        } catch (ApiRequestException e) {
+            if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND) {
+                // 404 means 'not starred'
+                return false;
+            }
+            throw e;
+        }
     }
 }

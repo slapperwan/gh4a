@@ -2,12 +2,12 @@ package com.gh4a.loader;
 
 import java.io.IOException;
 
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.MarkdownService;
-
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.request.RequestMarkdown;
+import com.meisolsson.githubsdk.service.misc.MarkdownService;
 
 public class MarkdownLoader extends BaseLoader<String> {
     private final String mText;
@@ -23,11 +23,12 @@ public class MarkdownLoader extends BaseLoader<String> {
 
     @Override
     public String doLoadInBackground() throws IOException {
-        MarkdownService markdownService = (MarkdownService)
-                Gh4Application.get().getService(Gh4Application.MARKDOWN_SERVICE);
-        if (mRepoOwner != null && mRepoName != null) {
-            return markdownService.getRepositoryHtml(new RepositoryId(mRepoOwner, mRepoName), mText);
-        }
-        return markdownService.getHtml(mText, null);
+        MarkdownService service = Gh4Application.get().getGitHubService(MarkdownService.class);
+        RequestMarkdown request = RequestMarkdown.builder()
+                .context(mRepoName != null && mRepoOwner != null ? mRepoOwner + "/" + mRepoName : null)
+                .mode("gfm")
+                .text(mText)
+                .build();
+        return ApiHelpers.throwOnFailure(service.renderMarkdown(request).blockingGet());
     }
 }

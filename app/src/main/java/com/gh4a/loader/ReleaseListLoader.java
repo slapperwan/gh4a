@@ -3,10 +3,10 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.Release;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.RepositoryService;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Release;
+import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -30,15 +30,22 @@ public class ReleaseListLoader extends BaseLoader<List<Release>> {
         Collections.sort(releases, new Comparator<Release>() {
             @Override
             public int compare(Release lhs, Release rhs) {
-                return rhs.getCreatedAt().compareTo(lhs.getCreatedAt());
+                return rhs.createdAt().compareTo(lhs.createdAt());
             }
         });
         return releases;
     }
 
-    public static List<Release> loadReleases(String repoOwner, String repoName) throws IOException {
-        RepositoryService repoService = (RepositoryService)
-                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-        return repoService.getReleases(new RepositoryId(repoOwner, repoName));
+    public static List<Release> loadReleases(final String repoOwner, final String repoName)
+            throws IOException {
+        final RepositoryReleaseService service =
+                Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
+        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Release>() {
+            @Override
+            public Page<Release> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getReleases(repoOwner, repoName, page).blockingGet());
+            }
+        });
     }
 }

@@ -42,53 +42,55 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.PullRequestBranchInfoView;
 import com.gh4a.widget.CommitStatusBox;
 
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitStatus;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.PullRequestMarker;
-import org.eclipse.egit.github.core.Reference;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.TypedResource;
-import org.eclipse.egit.github.core.service.DataService;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.PullRequestService;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.model.PullRequest;
+import com.meisolsson.githubsdk.model.PullRequestMarker;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.model.Status;
+import com.meisolsson.githubsdk.model.git.GitReference;
+import com.meisolsson.githubsdk.model.request.git.CreateGitReference;
+import com.meisolsson.githubsdk.service.git.GitService;
+import com.meisolsson.githubsdk.service.issues.IssueCommentService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Response;
 
 public class PullRequestFragment extends IssueFragmentBase {
     private static final int ID_LOADER_STATUS = 1;
     private static final int ID_LOADER_HEAD_REF = 2;
 
     private PullRequest mPullRequest;
-    private Reference mHeadReference;
+    private GitReference mHeadReference;
     private boolean mHasLoadedHeadReference;
 
-    private final LoaderCallbacks<List<CommitStatus>> mStatusCallback =
-            new LoaderCallbacks<List<CommitStatus>>(this) {
+    private final LoaderCallbacks<List<Status>> mStatusCallback =
+            new LoaderCallbacks<List<Status>>(this) {
         @Override
-        protected Loader<LoaderResult<List<CommitStatus>>> onCreateLoader() {
+        protected Loader<LoaderResult<List<Status>>> onCreateLoader() {
             return new CommitStatusLoader(getActivity(), mRepoOwner, mRepoName,
-                    mPullRequest.getHead().getSha());
+                    mPullRequest.head().sha());
         }
 
         @Override
-        protected void onResultReady(List<CommitStatus> result) {
+        protected void onResultReady(List<Status> result) {
             fillStatus(result);
         }
     };
 
-    private final LoaderCallbacks<Reference> mHeadReferenceCallback = new LoaderCallbacks<Reference>(this) {
+    private final LoaderCallbacks<GitReference> mHeadReferenceCallback = new LoaderCallbacks<GitReference>(this) {
         @Override
-        protected Loader<LoaderResult<Reference>> onCreateLoader() {
+        protected Loader<LoaderResult<GitReference>> onCreateLoader() {
             return new ReferenceLoader(getActivity(), mPullRequest);
         }
 
         @Override
-        protected void onResultReady(Reference result) {
+        protected void onResultReady(GitReference result) {
             mHeadReference = result;
             mHasLoadedHeadReference = true;
             getActivity().invalidateOptionsMenu();
@@ -101,19 +103,21 @@ public class PullRequestFragment extends IssueFragmentBase {
             boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
         PullRequestFragment f = new PullRequestFragment();
 
-        Repository repo = pr.getBase().getRepo();
-        Bundle args = buildArgs(repo.getOwner().getLogin(), repo.getName(),
+        Repository repo = pr.base().repo();
+        Bundle args = buildArgs(repo.owner().login(), repo.name(),
                 issue, isCollaborator, initialComment);
-        args.putSerializable("pr", pr);
+        args.putParcelable("pr", pr);
         f.setArguments(args);
 
         return f;
     }
 
     public void updateState(PullRequest pr) {
-        mIssue.setState(pr.getState());
-        mPullRequest.setState(pr.getState());
-        mPullRequest.setMerged(pr.isMerged());
+        mIssue = mIssue.toBuilder().state(pr.state()).build();
+        mPullRequest = mPullRequest.toBuilder()
+                .state(pr.state())
+                .merged(pr.merged())
+                .build();
 
         assignHighlightColor();
         loadStatusIfOpen();
@@ -122,7 +126,7 @@ public class PullRequestFragment extends IssueFragmentBase {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mPullRequest = (PullRequest) getArguments().getSerializable("pr");
+        mPullRequest = getArguments().getParcelable("pr");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         getLoaderManager().initLoader(ID_LOADER_HEAD_REF, null, mHeadReferenceCallback);
@@ -139,8 +143,8 @@ public class PullRequestFragment extends IssueFragmentBase {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.pull_request_fragment_menu, menu);
 
-        if (mPullRequest == null || mPullRequest.getHead().getRepo() == null
-                || ApiHelpers.IssueState.OPEN.equals(mPullRequest.getState())) {
+        if (mPullRequest == null || mPullRequest.head().repo() == null
+                || mPullRequest.state() == IssueState.Open) {
             menu.removeItem(R.id.delete_branch);
         } else {
             MenuItem deleteBranchItem = menu.findItem(R.id.delete_branch);
@@ -166,7 +170,7 @@ public class PullRequestFragment extends IssueFragmentBase {
         mHeadReference = null;
         mHasLoadedHeadReference = false;
         if (mListHeaderView != null) {
-            fillStatus(new ArrayList<CommitStatus>());
+            fillStatus(new ArrayList<Status>());
         }
         hideContentAndRestartLoaders(ID_LOADER_STATUS, ID_LOADER_HEAD_REF);
         super.onRefresh();
@@ -179,15 +183,15 @@ public class PullRequestFragment extends IssueFragmentBase {
         }
 
         PullRequestBranchInfoView branchContainer = headerView.findViewById(R.id.branch_container);
-        branchContainer.bind(mPullRequest.getHead(), mPullRequest.getBase(), mHeadReference);
+        branchContainer.bind(mPullRequest.head(), mPullRequest.base(), mHeadReference);
         branchContainer.setVisibility(View.VISIBLE);
     }
 
     @Override
     protected void assignHighlightColor() {
-        if (mPullRequest.isMerged()) {
+        if (mPullRequest.merged()) {
             setHighlightColors(R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark);
-        } else if (ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())) {
+        } else if (mPullRequest.state() == IssueState.Closed) {
             setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
         } else {
             setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
@@ -195,48 +199,51 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     private void loadStatusIfOpen() {
-        if (ApiHelpers.IssueState.OPEN.equals(mPullRequest.getState())) {
+        if (mPullRequest.state() == IssueState.Open) {
             getLoaderManager().initLoader(ID_LOADER_STATUS, null, mStatusCallback);
         }
    }
 
-   private void fillStatus(List<CommitStatus> statuses) {
+   private void fillStatus(List<Status> statuses) {
        CommitStatusBox commitStatusBox = mListHeaderView.findViewById(R.id.commit_status_box);
-       commitStatusBox.fillStatus(statuses, mPullRequest.getMergeableState());
+       commitStatusBox.fillStatus(statuses, mPullRequest.mergeableState());
    }
 
     @Override
     public Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
         return new PullRequestCommentListLoader(getActivity(),
-                mRepoOwner, mRepoName, mPullRequest.getNumber());
+                mRepoOwner, mRepoName, mPullRequest.number());
     }
 
     @Override
-    public void editComment(Comment comment) {
-        final @AttrRes int highlightColorAttr = mPullRequest.isMerged()
+    public void editComment(GitHubCommentBase comment) {
+        final @AttrRes int highlightColorAttr = mPullRequest.merged()
                 ? R.attr.colorPullRequestMerged
-                : ApiHelpers.IssueState.CLOSED.equals(mPullRequest.getState())
+                : mPullRequest.state() == IssueState.Closed
                         ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
-        Intent intent = comment instanceof CommitComment
+        Intent intent = comment instanceof ReviewComment
                 ? EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mPullRequest.getNumber(), 0L, (CommitComment) comment, highlightColorAttr)
+                mPullRequest.number(), comment.id(), 0L, comment.body(), highlightColorAttr)
                 : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                        mIssue.getNumber(), comment, highlightColorAttr);
+                        mIssue.number(), comment.id(), comment.body(), highlightColorAttr);
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
-    @Override
-    protected void deleteCommentInBackground(RepositoryId repoId, Comment comment) throws Exception {
-        Gh4Application app = Gh4Application.get();
 
-        if (comment instanceof CommitComment) {
-            PullRequestService pullService =
-                    (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
-            pullService.deleteComment(repoId, comment.getId());
+    @Override
+    protected void deleteCommentInBackground(GitHubCommentBase comment) throws Exception {
+        final Response<Void> response;
+
+        if (comment instanceof ReviewComment) {
+            PullRequestReviewCommentService service =
+                    Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+            response = service.deleteComment(mRepoOwner, mRepoName, comment.id()).blockingGet();
         } else {
-            IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
-            issueService.deleteComment(repoId, comment.getId());
+            IssueCommentService service =
+                    Gh4Application.get().getGitHubService(IssueCommentService.class);
+            response = service.deleteIssueComment(mRepoOwner, mRepoName, comment.id()).blockingGet();
         }
+        ApiHelpers.throwOnFailure(response);
     }
 
     @Override
@@ -264,40 +271,38 @@ public class PullRequestFragment extends IssueFragmentBase {
                 .show();
     }
 
-    private class RestoreBranchTask extends ProgressDialogTask<Reference> {
+    private class RestoreBranchTask extends ProgressDialogTask<GitReference> {
         public RestoreBranchTask() {
             super(getBaseActivity(), R.string.saving_msg);
         }
 
         @Override
-        protected ProgressDialogTask<Reference> clone() {
+        protected ProgressDialogTask<GitReference> clone() {
             return new RestoreBranchTask();
         }
 
         @Override
-        protected Reference run() throws Exception {
-            DataService dataService =
-                    (DataService) Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
+        protected GitReference run() throws Exception {
+            GitService service = Gh4Application.get().getGitHubService(GitService.class);
 
-            PullRequestMarker head = mPullRequest.getHead();
-            if (head.getRepo() == null) {
+            PullRequestMarker head = mPullRequest.head();
+            if (head.repo() == null) {
                 return null;
             }
-            String owner = head.getRepo().getOwner().getLogin();
-            String repo = head.getRepo().getName();
-            RepositoryId repoId = new RepositoryId(owner, repo);
+            String owner = head.repo().owner().login();
+            String repo = head.repo().name();
 
-            Reference reference = new Reference();
-            reference.setRef("refs/heads/" + head.getRef());
-            TypedResource object = new TypedResource();
-            object.setSha(head.getSha());
-            reference.setObject(object);
+            CreateGitReference request = CreateGitReference.builder()
+                    .ref(head.ref())
+                    .sha(head.sha())
+                    .build();
 
-            return dataService.createReference(repoId, reference);
+            return ApiHelpers.throwOnFailure(
+                    service.createGitReference(owner, repo, request).blockingGet());
         }
 
         @Override
-        protected void onSuccess(Reference result) {
+        protected void onSuccess(GitReference result) {
             mHeadReference = result;
             onHeadReferenceUpdated();
         }
@@ -325,18 +330,14 @@ public class PullRequestFragment extends IssueFragmentBase {
 
         @Override
         protected Void run() throws Exception {
-            DataService dataService =
-                    (DataService) Gh4Application.get().getService(Gh4Application.DATA_SERVICE);
+            GitService service = Gh4Application.get().getGitHubService(GitService.class);
 
-            PullRequestMarker head = mPullRequest.getHead();
-            String owner = head.getRepo().getOwner().getLogin();
-            String repo = head.getRepo().getName();
-            RepositoryId repoId = new RepositoryId(owner, repo);
+            PullRequestMarker head = mPullRequest.head();
+            String owner = head.repo().owner().login();
+            String repo = head.repo().name();
 
-            Reference reference = new Reference();
-            reference.setRef("heads/" + head.getRef());
-
-            dataService.deleteReference(repoId, reference);
+            ApiHelpers.throwOnFailure(
+                    service.deleteGitReference(owner, repo, head.ref()).blockingGet());
             return null;
         }
 

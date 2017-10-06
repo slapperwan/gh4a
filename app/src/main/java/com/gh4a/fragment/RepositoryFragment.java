@@ -48,17 +48,16 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
+import com.meisolsson.githubsdk.model.Permissions;
+import com.meisolsson.githubsdk.model.Repository;
 import com.vdurmont.emoji.EmojiParser;
-
-import org.eclipse.egit.github.core.Permissions;
-import org.eclipse.egit.github.core.Repository;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
         RepositoryFragment f = new RepositoryFragment();
 
         Bundle args = new Bundle();
-        args.putSerializable("repo", repository);
+        args.putParcelable("repo", repository);
         args.putString("ref", ref);
         f.setArguments(args);
 
@@ -84,12 +83,12 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         @Override
         protected Loader<LoaderResult<String>> onCreateLoader() {
             mIsReadmeLoaded = false;
-            return new ReadmeLoader(getActivity(), mRepository.getOwner().getLogin(),
-                    mRepository.getName(), StringUtils.isBlank(mRef) ? mRepository.getDefaultBranch() : mRef);
+            return new ReadmeLoader(getActivity(), mRepository.owner().login(),
+                    mRepository.name(), StringUtils.isBlank(mRef) ? mRepository.defaultBranch() : mRef);
         }
         @Override
         protected void onResultReady(String result) {
-            new FillReadmeTask(mRepository.getId(), mReadmeView, mLoadingView, mImageGetter)
+            new FillReadmeTask(mRepository.id(), mReadmeView, mLoadingView, mImageGetter)
                     .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, result);
         }
     };
@@ -107,7 +106,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
 
             TextView tvIssuesCount = mContentView.findViewById(R.id.tv_issues_count);
-            tvIssuesCount.setText(String.valueOf(mRepository.getOpenIssues() - result));
+            tvIssuesCount.setText(String.valueOf(mRepository.openIssuesCount() - result));
 
             TextView tvPullRequestsCountView = v.findViewById(R.id.tv_pull_requests_count);
             tvPullRequestsCountView.setText(String.valueOf(result));
@@ -117,7 +116,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepository = (Repository) getArguments().getSerializable("repo");
+        mRepository = getArguments().getParcelable("repo");
         mRef = getArguments().getString("ref");
     }
 
@@ -212,34 +211,34 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private void fillData() {
         TextView tvRepoName = mContentView.findViewById(R.id.tv_repo_name);
         SpannableStringBuilder repoName = new SpannableStringBuilder();
-        repoName.append(mRepository.getOwner().getLogin());
+        repoName.append(mRepository.owner().login());
         repoName.append("/");
-        repoName.append(mRepository.getName());
+        repoName.append(mRepository.name());
         repoName.setSpan(new IntentSpan(tvRepoName.getContext()) {
             @Override
             protected Intent getIntent() {
-                return UserActivity.makeIntent(getActivity(), mRepository.getOwner());
+                return UserActivity.makeIntent(getActivity(), mRepository.owner());
             }
-        }, 0, mRepository.getOwner().getLogin().length(), 0);
+        }, 0, mRepository.owner().login().length(), 0);
         tvRepoName.setText(repoName);
         tvRepoName.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
         TextView tvParentRepo = mContentView.findViewById(R.id.tv_parent);
-        if (mRepository.isFork() && mRepository.getParent() != null) {
-            Repository parent = mRepository.getParent();
+        if (mRepository.isFork() && mRepository.parent() != null) {
+            Repository parent = mRepository.parent();
             tvParentRepo.setVisibility(View.VISIBLE);
             tvParentRepo.setText(getString(R.string.forked_from,
-                    parent.getOwner().getLogin() + "/" + parent.getName()));
+                    parent.owner().login() + "/" + parent.name()));
             tvParentRepo.setOnClickListener(this);
             tvParentRepo.setTag(parent);
         } else {
             tvParentRepo.setVisibility(View.GONE);
         }
 
-        fillTextView(R.id.tv_desc, 0, mRepository.getDescription());
-        fillTextView(R.id.tv_language,R.string.repo_language, mRepository.getLanguage());
-        fillTextView(R.id.tv_url, 0, !StringUtils.isBlank(mRepository.getHomepage())
-                ? mRepository.getHomepage() : mRepository.getHtmlUrl());
+        fillTextView(R.id.tv_desc, 0, mRepository.description());
+        fillTextView(R.id.tv_language,R.string.repo_language, mRepository.language());
+        fillTextView(R.id.tv_url, 0, !StringUtils.isBlank(mRepository.homepage())
+                ? mRepository.homepage() : mRepository.htmlUrl());
 
         mContentView.findViewById(R.id.cell_stargazers).setOnClickListener(this);
         mContentView.findViewById(R.id.cell_forks).setOnClickListener(this);
@@ -249,20 +248,20 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
         mReadmeTitleView.setOnClickListener(this);
 
-        Permissions permissions = mRepository.getPermissions();
+        Permissions permissions = mRepository.permissions();
         updateClickableLabel(R.id.tv_collaborators_label,
-                permissions != null && permissions.hasPushAccess());
-        updateClickableLabel(R.id.tv_wiki_label, mRepository.isHasWiki());
+                permissions != null && permissions.push());
+        updateClickableLabel(R.id.tv_wiki_label, mRepository.hasWiki());
 
         TextView tvStargazersCount = mContentView.findViewById(R.id.tv_stargazers_count);
-        tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
+        tvStargazersCount.setText(String.valueOf(mRepository.watchersCount()));
 
         TextView tvForksCount = mContentView.findViewById(R.id.tv_forks_count);
-        tvForksCount.setText(String.valueOf(mRepository.getForks()));
+        tvForksCount.setText(String.valueOf(mRepository.forksCount()));
 
         LinearLayout llIssues = mContentView.findViewById(R.id.cell_issues);
 
-        if (mRepository.isHasIssues()) {
+        if (mRepository.hasIssues()) {
             llIssues.setVisibility(View.VISIBLE);
             llIssues.setOnClickListener(this);
             // value will be filled when PR count arrives
@@ -301,14 +300,12 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     public void updateStargazerCount(boolean starring) {
-        if (starring) {
-            mRepository.setWatchers(mRepository.getWatchers() + 1);
-        } else {
-            mRepository.setWatchers(mRepository.getWatchers() - 1);
-        }
+        mRepository = mRepository.toBuilder()
+                .watchersCount(mRepository.watchersCount() + (starring ? 1 : -1))
+                .build();
 
         TextView tvStargazersCount = mContentView.findViewById(R.id.tv_stargazers_count);
-        tvStargazersCount.setText(String.valueOf(mRepository.getWatchers()));
+        tvStargazersCount.setText(String.valueOf(mRepository.watchersCount()));
     }
 
     @Override
@@ -320,8 +317,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             return;
         }
 
-        String owner = mRepository.getOwner().getLogin();
-        String name = mRepository.getName();
+        String owner = mRepository.owner().login();
+        String name = mRepository.name();
         Intent intent = null;
 
         if (id == R.id.cell_pull_requests) {

@@ -3,14 +3,13 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.CommitService;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
 import java.io.IOException;
 
-public class CommitLoader extends BaseLoader<RepositoryCommit> {
+public class CommitLoader extends BaseLoader<Commit> {
     private final String mRepoOwner;
     private final String mRepoName;
     private final String mObjectSha;
@@ -23,14 +22,15 @@ public class CommitLoader extends BaseLoader<RepositoryCommit> {
     }
 
     @Override
-    public RepositoryCommit doLoadInBackground() throws IOException {
+    public Commit doLoadInBackground() throws IOException {
         return loadCommit(mRepoOwner, mRepoName, mObjectSha);
     }
 
-    public static RepositoryCommit loadCommit(String repoOwner, String repoName, String objectSha)
+    public static Commit loadCommit(String repoOwner, String repoName, String objectSha)
             throws IOException {
-        CommitService commitService = (CommitService)
-                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
-        return commitService.getCommit(new RepositoryId(repoOwner, repoName), objectSha);
+        RepositoryCommitService service =
+                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+        return ApiHelpers.throwOnFailure(
+                service.getCommit(repoOwner, repoName, objectSha).blockingGet());
     }
 }

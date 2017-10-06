@@ -18,8 +18,7 @@ package com.gh4a.adapter;
 import android.content.Context;
 
 import com.gh4a.R;
-
-import org.eclipse.egit.github.core.Issue;
+import com.meisolsson.githubsdk.model.Issue;
 
 public class RepositoryIssueAdapter extends IssueAdapter {
     public RepositoryIssueAdapter(Context context) {
@@ -31,8 +30,8 @@ public class RepositoryIssueAdapter extends IssueAdapter {
         super.onBindViewHolder(holder, issue);
 
         // https://api.github.com/repos/batterseapower/pinyin-toolkit/issues/132
-        String[] urlPart = issue.getUrl().split("/");
+        String[] urlPart = issue.url().split("/");
         holder.tvNumber.setText(mContext.getString(R.string.repo_issue_on,
-                issue.getNumber(), urlPart[4], urlPart[5]));
+                issue.number(), urlPart[4], urlPart[5]));
     }
 }

@@ -14,14 +14,11 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.CommitStatus;
-import org.eclipse.egit.github.core.PullRequest;
+import com.meisolsson.githubsdk.model.PullRequest;
+import com.meisolsson.githubsdk.model.Status;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickListener {
     private final ImageView mStatusIcon;
@@ -58,29 +55,29 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
         mHeader.setOnClickListener(this);
     }
 
-    public void fillStatus(List<CommitStatus> statuses, String mergableState) {
+    public void fillStatus(List<Status> statuses, PullRequest.MergeableState mergableState) {
         final int statusIconDrawableAttrId;
         final int statusLabelResId;
         switch (mergableState) {
-            case PullRequest.MERGEABLE_STATE_BEHIND:
+            case Behind:
                 statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
                 statusLabelResId = R.string.pull_merge_status_behind;
                 break;
-            case PullRequest.MERGEABLE_STATE_BLOCKED:
+            case Blocked:
                 statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
                 statusLabelResId = R.string.pull_merge_status_blocked;
                 break;
-            case PullRequest.MERGEABLE_STATE_CLEAN:
+            case Clean:
                 statusIconDrawableAttrId = R.attr.pullRequestMergeOkIcon;
                 statusLabelResId = statuses.isEmpty()
                         ? R.string.pull_merge_status_mergable
                         : R.string.pull_merge_status_clean;
                 break;
-            case PullRequest.MERGEABLE_STATE_UNSTABLE:
+            case Unstable:
                 statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
                 statusLabelResId = R.string.pull_merge_status_unstable;
                 break;
-            case PullRequest.MERGEABLE_STATE_DIRTY:
+            case Dirty:
                 statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
                 statusLabelResId = R.string.pull_merge_status_dirty;
                 break;
@@ -119,20 +116,19 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
         int pendingCount = 0;
         int successCount = 0;
 
-        for (CommitStatus status : statuses) {
+        for (Status status : statuses) {
             View statusRow = mInflater.inflate(R.layout.row_commit_status, mStatusContainer, false);
             statusRow.setTag(status);
             statusRow.setOnClickListener(this);
 
-            String state = status.getState();
             final int iconDrawableAttrId;
-            switch (state) {
-                case CommitStatus.STATE_ERROR:
-                case CommitStatus.STATE_FAILURE:
+            switch (status.state()) {
+                case Error:
+                case Failure:
                     iconDrawableAttrId = R.attr.commitStatusFailIcon;
                     failingCount += 1;
                     break;
-                case CommitStatus.STATE_SUCCESS:
+                case Success:
                     iconDrawableAttrId = R.attr.commitStatusOkIcon;
                     successCount += 1;
                     break;
@@ -146,15 +142,15 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
             icon.setImageResource(UiUtils.resolveDrawable(getContext(), iconDrawableAttrId));
 
             TextView context = statusRow.findViewById(R.id.tv_context);
-            context.setText(status.getContext());
+            context.setText(status.context());
 
             TextView description = statusRow.findViewById(R.id.tv_desc);
-            description.setText(status.getDescription());
+            description.setText(status.description());
 
             mStatusContainer.addView(statusRow);
         }
 
-        if (PullRequest.MERGEABLE_STATE_UNSTABLE.equals(mergableState) && pendingCount > 0) {
+        if (mergableState == PullRequest.MergeableState.Unstable && pendingCount > 0) {
             int resId = UiUtils.resolveDrawable(getContext(), R.attr.pullRequestMergeUnknownIcon);
             mStatusIcon.setImageResource(resId);
             mStatusLabel.setText(R.string.pull_merge_status_pending);
@@ -168,8 +164,8 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.row_commit_status:
-                CommitStatus status = (CommitStatus) v.getTag();
-                IntentUtils.launchBrowser(getContext(), Uri.parse(status.getTargetUrl()));
+                Status status = (Status) v.getTag();
+                IntentUtils.launchBrowser(getContext(), Uri.parse(status.targetUrl()));
                 break;
             case R.id.commit_status_header:
                 setStatusesExpanded(mStatusContainer.getVisibility() != View.VISIBLE);

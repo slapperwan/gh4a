@@ -29,6 +29,7 @@ import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.BackgroundTask;
 import com.gh4a.R;
 import com.gh4a.activities.FileViewerActivity;
@@ -46,13 +47,11 @@ import com.gh4a.loader.RepositorySearchLoader;
 import com.gh4a.loader.UserSearchLoader;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.CodeSearchResult;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RequestError;
-import org.eclipse.egit.github.core.SearchUser;
-import org.eclipse.egit.github.core.TextMatch;
-import org.eclipse.egit.github.core.client.RequestException;
+import com.meisolsson.githubsdk.model.ClientErrorResponse;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.SearchCode;
+import com.meisolsson.githubsdk.model.TextMatch;
+import com.meisolsson.githubsdk.model.User;
 
 import java.io.IOException;
 import java.util.List;
@@ -110,30 +109,30 @@ public class SearchFragment extends LoadingListFragmentBase implements
         }
     };
 
-    private final LoaderCallbacks<List<SearchUser>> mUserCallback =
-            new LoaderCallbacks<List<SearchUser>>(this) {
+    private final LoaderCallbacks<List<User>> mUserCallback =
+            new LoaderCallbacks<List<User>>(this) {
         @Override
-        protected Loader<LoaderResult<List<SearchUser>>> onCreateLoader() {
+        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new UserSearchLoader(getActivity(), mQuery);
         }
 
         @Override
-        protected void onResultReady(List<SearchUser> result) {
+        protected void onResultReady(List<User> result) {
             SearchUserAdapter adapter = new SearchUserAdapter(getActivity());
             adapter.addAll(result);
             setAdapter(adapter);
         }
     };
 
-    private final LoaderCallbacks<List<CodeSearchResult>> mCodeCallback =
-            new LoaderCallbacks<List<CodeSearchResult>>(this) {
+    private final LoaderCallbacks<List<SearchCode>> mCodeCallback =
+            new LoaderCallbacks<List<SearchCode>>(this) {
         @Override
-        protected Loader<LoaderResult<List<CodeSearchResult>>> onCreateLoader() {
+        protected Loader<LoaderResult<List<SearchCode>>> onCreateLoader() {
             return new CodeSearchLoader(getActivity(), mQuery);
         }
 
         @Override
-        protected void onResultReady(List<CodeSearchResult> result) {
+        protected void onResultReady(List<SearchCode> result) {
             CodeSearchAdapter adapter = new CodeSearchAdapter(getActivity(), SearchFragment.this);
             adapter.addAll(result);
             setAdapter(adapter);
@@ -141,9 +140,9 @@ public class SearchFragment extends LoadingListFragmentBase implements
 
         @Override
         protected boolean onError(Exception e) {
-            if (e instanceof RequestException) {
-                RequestError error = ((RequestException) e).getError();
-                if (error != null && error.getErrors() != null && !error.getErrors().isEmpty()) {
+            if (e instanceof ApiRequestException) {
+                ClientErrorResponse response = ((ApiRequestException) e).getResponse();
+                if (response!= null && response.errors() != null && !response.errors().isEmpty()) {
                     updateEmptyText(R.string.code_search_too_broad);
                     if (mAdapter != null) {
                         mAdapter.clear();
@@ -255,11 +254,11 @@ public class SearchFragment extends LoadingListFragmentBase implements
         if (item instanceof Repository) {
             Repository repository = (Repository) item;
             startActivity(RepositoryActivity.makeIntent(getActivity(), repository));
-        } else if (item instanceof CodeSearchResult) {
-            openFileViewer((CodeSearchResult) item, -1);
+        } else if (item instanceof SearchCode) {
+            openFileViewer((SearchCode) item, -1);
         } else {
-            SearchUser user = (SearchUser) item;
-            startActivity(UserActivity.makeIntent(getActivity(), user.getLogin(), user.getName()));
+            User user = (User) item;
+            startActivity(UserActivity.makeIntent(getActivity(), user));
         }
     }
 
@@ -322,7 +321,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     @Override
-    public void onSearchFragmentClick(CodeSearchResult result, int matchIndex) {
+    public void onSearchFragmentClick(SearchCode result, int matchIndex) {
         openFileViewer(result, matchIndex);
     }
 
@@ -337,13 +336,13 @@ public class SearchFragment extends LoadingListFragmentBase implements
                 new String[] { String.valueOf(type), query + "%" }, SUGGESTION_ORDER);
     }
 
-    private void openFileViewer(CodeSearchResult result, int matchIndex) {
-        Repository repo = result.getRepository();
-        Uri uri = Uri.parse(result.getUrl());
+    private void openFileViewer(SearchCode result, int matchIndex) {
+        Repository repo = result.repository();
+        Uri uri = Uri.parse(result.url());
         String ref = uri.getQueryParameter("ref");
-        TextMatch textMatch = matchIndex >= 0 ? result.getTextMatches().get(matchIndex) : null;
+        TextMatch textMatch = matchIndex >= 0 ? result.textMatches().get(matchIndex) : null;
         startActivity(FileViewerActivity.makeIntentWithSearchMatch(getActivity(),
-                repo.getOwner().getLogin(), repo.getName(), ref, result.getPath(),
+                repo.owner().login(), repo.name(), ref, result.path(),
                 textMatch));
     }
 

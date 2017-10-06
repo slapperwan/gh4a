@@ -5,18 +5,19 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.RequestException;
-import org.eclipse.egit.github.core.service.ContentsService;
-import org.eclipse.egit.github.core.service.RepositoryService;
-
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Content;
+import com.meisolsson.githubsdk.model.ContentType;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
-public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
+public class ContentListLoader extends BaseLoader<List<Content>> {
     private final String mRepoOwner;
     private final String mRepoName;
     private final String mPath;
@@ -27,25 +28,32 @@ public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
         super(context);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
-        mPath = path;
+        mPath = path != null ? path : "";
         mRef = ref;
     }
 
     @Override
-    public List<RepositoryContents> doLoadInBackground() throws IOException {
+    public List<Content> doLoadInBackground() throws IOException {
         Gh4Application app = Gh4Application.get();
-        ContentsService contentService = (ContentsService) app.getService(Gh4Application.CONTENTS_SERVICE);
-        RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
+        RepositoryService repoService = app.getGitHubService(RepositoryService.class);
+        final RepositoryContentService contentService = app.getGitHubService(RepositoryContentService.class);
 
         if (mRef == null) {
-            Repository repo = repoService.getRepository(mRepoOwner, mRepoName);
-            mRef = repo.getDefaultBranch();
+            Repository repo = ApiHelpers.throwOnFailure(
+                    repoService.getRepository(mRepoOwner, mRepoName).blockingGet());
+            mRef = repo.defaultBranch();
         }
 
-        List<RepositoryContents> contents;
+        List<Content> contents;
         try {
-            contents = contentService.getContents(new RepositoryId(mRepoOwner, mRepoName), mPath, mRef);
-        } catch (RequestException e) {
+            contents = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Content>() {
+                @Override
+                public Page<Content> providePage(long page) throws IOException {
+                    return ApiHelpers.throwOnFailure(contentService.getDirectoryContents(
+                            mRepoOwner, mRepoName, mPath, mRef, page).blockingGet());
+                }
+            });
+        } catch (ApiRequestException e) {
             if (e.getStatus() == 404) {
                 contents = null;
             } else {
@@ -54,10 +62,11 @@ public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
         }
 
         if (contents != null && !contents.isEmpty()) {
-            Comparator<RepositoryContents> comp = new Comparator<RepositoryContents>() {
-                public int compare(RepositoryContents c1, RepositoryContents c2) {
-                    boolean c1IsDir = RepositoryContents.TYPE_DIR.equals(c1.getType());
-                    boolean c2IsDir = RepositoryContents.TYPE_DIR.equals(c2.getType());
+            Comparator<Content> comp = new Comparator<Content>() {
+                @Override
+                public int compare(Content c1, Content c2) {
+                    boolean c1IsDir = c1.type() == ContentType.Directory;
+                    boolean c2IsDir = c2.type() == ContentType.Directory;
                     if (c1IsDir && !c2IsDir) {
                         // Directory before non-directory
                         return -1;
@@ -67,7 +76,7 @@ public class ContentListLoader extends BaseLoader<List<RepositoryContents>> {
                     } else {
                         // Alphabetic order otherwise
                         // return o1.compareTo(o2);
-                        return c1.getName().compareTo(c2.getName());
+                        return c1.name().compareTo(c2.name());
                     }
                 }
             };

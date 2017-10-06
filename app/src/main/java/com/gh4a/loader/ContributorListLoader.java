@@ -3,15 +3,15 @@ package com.gh4a.loader;
 import java.io.IOException;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Contributor;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.RepositoryService;
-
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
-public class ContributorListLoader extends BaseLoader<List<Contributor>> {
+public class ContributorListLoader extends BaseLoader<List<User>> {
     private final String mRepoOwner;
     private final String mRepoName;
 
@@ -22,9 +22,15 @@ public class ContributorListLoader extends BaseLoader<List<Contributor>> {
     }
 
     @Override
-    public List<Contributor> doLoadInBackground() throws IOException {
-        RepositoryService repoService = (RepositoryService)
-                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-        return repoService.getContributors(new RepositoryId(mRepoOwner, mRepoName), true);
+    public List<User> doLoadInBackground() throws IOException {
+        final RepositoryService service =
+                Gh4Application.get().getGitHubService(RepositoryService.class);
+        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<User>() {
+            @Override
+            public Page<User> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getContributors(mRepoOwner, mRepoName, page).blockingGet());
+            }
+        });
     }
 }

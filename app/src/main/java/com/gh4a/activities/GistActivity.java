@@ -40,13 +40,14 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.Gist;
-import org.eclipse.egit.github.core.GistFile;
-import org.eclipse.egit.github.core.service.GistService;
+import com.meisolsson.githubsdk.model.Gist;
+import com.meisolsson.githubsdk.model.GistFile;
+import com.meisolsson.githubsdk.service.gists.GistService;
 
 import java.io.IOException;
 import java.util.Map;
+
+import retrofit2.Response;
 
 public class GistActivity extends BaseActivity implements View.OnClickListener {
     public static Intent makeIntent(Context context, String gistId) {
@@ -118,18 +119,18 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     private void fillData(final Gist gist) {
         mGist = gist;
 
-        if (gist.getOwner() != null) {
-            getSupportActionBar().setSubtitle(gist.getOwner().getLogin());
+        if (gist.owner() != null) {
+            getSupportActionBar().setSubtitle(gist.owner().login());
         }
 
         TextView tvDesc = findViewById(R.id.tv_desc);
-        tvDesc.setText(TextUtils.isEmpty(gist.getDescription())
-                ? getString(R.string.gist_no_description) : gist.getDescription());
+        tvDesc.setText(TextUtils.isEmpty(gist.description())
+                ? getString(R.string.gist_no_description) : gist.description());
 
         TextView tvCreatedAt = findViewById(R.id.tv_created_at);
-        tvCreatedAt.setText(StringUtils.formatRelativeTime(this, gist.getCreatedAt(), true));
+        tvCreatedAt.setText(StringUtils.formatRelativeTime(this, gist.createdAt(), true));
 
-        Map<String, GistFile> files = gist.getFiles();
+        Map<String, GistFile> files = gist.files();
         if (files != null && !files.isEmpty()) {
             ViewGroup container = findViewById(R.id.file_container);
             LayoutInflater inflater = getLayoutInflater();
@@ -139,7 +140,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
                 TextView rowView = (TextView) inflater.inflate(R.layout.selectable_label,
                         container, false);
 
-                rowView.setText(gistFile.getFilename());
+                rowView.setText(gistFile.filename());
                 rowView.setTextColor(UiUtils.resolveColor(this, android.R.attr.textColorPrimary));
                 rowView.setOnClickListener(this);
                 rowView.setTag(gistFile);
@@ -155,7 +156,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         GistFile file = (GistFile) view.getTag();
-        startActivity(GistViewerActivity.makeIntent(this, mGistId, file.getFilename()));
+        startActivity(GistViewerActivity.makeIntent(this, mGistId, file.filename()));
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -198,9 +199,9 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share:
-                String login = ApiHelpers.getUserLogin(this, mGist.getOwner());
+                String login = ApiHelpers.getUserLogin(this, mGist.owner());
                 IntentUtils.share(this, getString(R.string.share_gist_subject, mGistId, login),
-                        mGist.getHtmlUrl());
+                        mGist.htmlUrl());
                 return true;
             case R.id.star:
                 item.setActionView(R.layout.ab_loading);
@@ -213,8 +214,8 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected Intent navigateUp() {
-        String login = mGist != null && mGist.getOwner() != null
-                ? mGist.getOwner().getLogin() : null;
+        String login = mGist != null && mGist.owner() != null
+                ? mGist.owner().login() : null;
         return login != null ? GistListActivity.makeIntent(this, login) : null;
     }
 
@@ -225,13 +226,11 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
         @Override
         protected Void run() throws IOException {
-            GistService gistService = (GistService)
-                    Gh4Application.get().getService(Gh4Application.GIST_SERVICE);
-            if (mIsStarred) {
-                gistService.unstarGist(mGistId);
-            } else {
-                gistService.starGist(mGistId);
-            }
+            GistService service = Gh4Application.get().getGitHubService(GistService.class);
+            Response<Void> response = mIsStarred
+                    ? service.unstarGist(mGistId).blockingGet()
+                    : service.starGist(mGistId).blockingGet();
+            ApiHelpers.throwOnFailure(response);
             return null;
         }
 

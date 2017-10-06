@@ -1,7 +1,5 @@
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.Release;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -12,6 +10,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.Release;
 
 public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHolder> {
     public ReleaseAdapter(Context context) {
@@ -26,21 +25,21 @@ public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, Release release) {
-        String name = release.getName();
+        String name = release.name();
         if (TextUtils.isEmpty(name)) {
-            name = release.getTagName();
+            name = release.tagName();
         }
         holder.tvTitle.setText(name);
         holder.tvType.setText(formatReleaseType(release));
         holder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
-                StringUtils.formatRelativeTime(mContext, release.getCreatedAt(), true)));
+                StringUtils.formatRelativeTime(mContext, release.createdAt(), true)));
     }
 
     private String formatReleaseType(Release release) {
-        if (release.isDraft()) {
+        if (release.draft()) {
             return mContext.getString(R.string.release_type_draft);
         }
-        if (release.isPrerelease()) {
+        if (release.prerelease()) {
             return mContext.getString(R.string.release_type_prerelease);
         }
         return mContext.getString(R.string.release_type_final);

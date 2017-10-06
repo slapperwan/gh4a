@@ -2,12 +2,12 @@ package com.gh4a.loader;
 
 import java.io.IOException;
 
-import org.eclipse.egit.github.core.Gist;
-import org.eclipse.egit.github.core.service.GistService;
-
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Gist;
+import com.meisolsson.githubsdk.service.gists.GistService;
 
 public class GistLoader extends BaseLoader<Gist> {
     private final String mGistId;
@@ -19,8 +19,7 @@ public class GistLoader extends BaseLoader<Gist> {
 
     @Override
     public Gist doLoadInBackground() throws IOException {
-        GistService gistService = (GistService)
-                Gh4Application.get().getService(Gh4Application.GIST_SERVICE);
-        return gistService.getGist(mGistId);
+        GistService service = Gh4Application.get().getGitHubService(GistService.class);
+        return ApiHelpers.throwOnFailure(service.getGist(mGistId).blockingGet());
     }
 }

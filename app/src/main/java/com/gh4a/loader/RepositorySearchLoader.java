@@ -1,17 +1,17 @@
 package com.gh4a.loader;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.RequestException;
-import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.SearchPage;
+import com.meisolsson.githubsdk.service.search.SearchService;
 
 public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
     private final String mUserLogin;
@@ -33,19 +33,24 @@ public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
             return new ArrayList<>();
         }
 
-        RepositoryService repoService = (RepositoryService)
-                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-        HashMap<String, String> params = new HashMap<>();
-        params.put("fork", "true");
+        SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
+        StringBuilder params = new StringBuilder(mQuery);
+        params.append(" fork:true");
         if (mUserLogin != null) {
-            params.put("user", mUserLogin);
+            params.append(" user:").append(mUserLogin);
         }
 
-        List<Repository> result;
+        List<Repository> result = new ArrayList<>();
 
         try {
-            result = repoService.searchRepositories(mQuery, params);
-        } catch (RequestException e) {
+            int nextPage = 1;
+            do {
+                SearchPage<Repository> page = ApiHelpers.throwOnFailure(
+                        service.searchRepositories(params.toString(), null, null, nextPage).blockingGet());
+                result.addAll(page.items());
+                nextPage = page.next() != null ? page.next() : 0;
+            } while (nextPage > 0);
+        } catch (ApiRequestException e) {
             if (e.getStatus() == 422) {
                 // With that status code, Github wants to tell us there are no
                 // repositories to search in. Just pretend no error and return

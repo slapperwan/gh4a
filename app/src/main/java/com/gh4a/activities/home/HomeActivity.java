@@ -45,8 +45,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
 
 public class HomeActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, RepositoryListContainerFragment.Callback,
@@ -252,7 +251,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         super.onNavigationItemSelected(item);
 
         updateNotificationIndicator(item.getItemId());
@@ -483,10 +482,10 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
             AvatarHandler.assignAvatar(mAvatarView, mUserInfo);
         }
         if (mUserExtraView != null) {
-            if (TextUtils.isEmpty(mUserInfo.getName())) {
+            if (TextUtils.isEmpty(mUserInfo.name())) {
                 mUserExtraView.setVisibility(View.GONE);
             } else {
-                mUserExtraView.setText(mUserInfo.getName());
+                mUserExtraView.setText(mUserInfo.name());
                 mUserExtraView.setVisibility(View.VISIBLE);
             }
         }
