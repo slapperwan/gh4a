@@ -6,9 +6,8 @@ import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.activities.FollowerFollowingListActivity;
 import com.gh4a.activities.UserActivity;
-import com.gh4a.utils.ApiHelpers;
-
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.UserType;
 
 public class UserFollowersLoadTask extends UserLoadTask {
     @VisibleForTesting
@@ -22,10 +21,9 @@ public class UserFollowersLoadTask extends UserLoadTask {
 
     @Override
     protected Intent getIntent(User user) {
-        if (ApiHelpers.UserType.ORG.equals(user.getType())) {
+        if (user.type() == UserType.Organization) {
             return UserActivity.makeIntent(mActivity, user);
         }
-        return FollowerFollowingListActivity.makeIntent(mActivity, user.getLogin(),
-                mShowFollowers);
+        return FollowerFollowingListActivity.makeIntent(mActivity, user.login(), mShowFollowers);
     }
 }

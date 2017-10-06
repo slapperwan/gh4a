@@ -29,19 +29,20 @@ import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.service.issues.IssueService;
 
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.IssueService;
-
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     private static final int REQUEST_ISSUE = 1000;
 
-    private Map<String, String> mFilterData;
+    private Map<String, Object> mFilterData;
     private int mEmptyTextResId;
     private boolean mShowRepository;
     private String mIssueState;
@@ -101,10 +102,10 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
 
     @Override
     public void onItemClick(Issue issue) {
-        String[] urlPart = issue.getUrl().split("/");
-        Intent intent = issue.getPullRequest() != null
-                ? PullRequestActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.getNumber())
-                : IssueActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.getNumber());
+        String[] urlPart = issue.url().split("/");
+        Intent intent = issue.pullRequest() != null
+                ? PullRequestActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.number())
+                : IssueActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.number());
         startActivityForResult(intent, REQUEST_ISSUE);
     }
 
@@ -133,10 +134,15 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     }
 
     @Override
-    protected PageIterator<Issue> onCreateIterator() {
-        IssueService issueService = (IssueService)
-                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        return issueService.pageSearchIssues(mFilterData);
+    protected PageIteratorLoader<Issue> onCreateLoader() {
+        final IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
+        return new PageIteratorLoader<Issue>(getActivity()) {
+            @Override
+            protected Page<Issue> loadPage(int page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getIssues(mFilterData, page).blockingGet());
+            }
+        };
     }
 
     public static class SortDrawerHelper {

@@ -10,8 +10,7 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.OrganizationMemberListLoader;
-
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
 
 import java.util.List;
 

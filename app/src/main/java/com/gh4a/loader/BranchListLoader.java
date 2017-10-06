@@ -1,18 +1,17 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.RepositoryService;
-
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Branch;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.service.repositories.RepositoryBranchService;
 
-public class BranchListLoader extends BaseLoader<List<RepositoryBranch>> {
+import java.io.IOException;
+import java.util.List;
+
+public class BranchListLoader extends BaseLoader<List<Branch>> {
     private final String mRepoOwner;
     private final String mRepoName;
 
@@ -23,19 +22,15 @@ public class BranchListLoader extends BaseLoader<List<RepositoryBranch>> {
     }
 
     @Override
-    public List<RepositoryBranch> doLoadInBackground() throws IOException {
-        RepositoryService repoService = (RepositoryService)
-                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-        List<RepositoryBranch> branches = repoService.getBranches(new RepositoryId(mRepoOwner, mRepoName));
-        ArrayList<RepositoryBranch> result = new ArrayList<>();
-
-        if (branches != null) {
-            for (RepositoryBranch branch : branches) {
-                if (branch != null) {
-                    result.add(branch);
-                }
+    public List<Branch> doLoadInBackground() throws Exception {
+        final RepositoryBranchService service =
+                Gh4Application.get().getGitHubService(RepositoryBranchService.class);
+        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Branch>() {
+            @Override
+            public Page<Branch> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getBranches(mRepoOwner, mRepoName, page).blockingGet());
             }
-        }
-        return result;
+        });
     }
 }

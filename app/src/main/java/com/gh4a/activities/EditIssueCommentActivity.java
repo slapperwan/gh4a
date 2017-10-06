@@ -5,37 +5,38 @@ import android.content.Intent;
 import android.support.annotation.AttrRes;
 
 import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.IssueService;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.request.CommentRequest;
+import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 
 import java.io.IOException;
 
 public class EditIssueCommentActivity extends EditCommentActivity {
     public static Intent makeIntent(Context context, String repoOwner,
-            String repoName, int issueNumber, Comment comment,
+            String repoName, int issueNumber, long id, String body,
             @AttrRes int highlightColorAttr) {
         Intent intent = new Intent(context, EditIssueCommentActivity.class)
                 .putExtra("issue", issueNumber);
         return EditCommentActivity.fillInIntent(intent,
-                repoOwner, repoName, comment.getId(), 0L, comment.getBody(), highlightColorAttr);
+                repoOwner, repoName, id, 0L, body, highlightColorAttr);
     }
 
     @Override
-    protected void createComment(RepositoryId repoId, CommitComment comment,
+    protected void createComment(String repoOwner, String repoName, String body,
             long replyToCommentId) throws IOException {
         int issueNumber = getIntent().getIntExtra("issue", 0);
-        Gh4Application app = Gh4Application.get();
-        IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
-        issueService.createComment(repoId, issueNumber, comment.getBody());
+        IssueCommentService service =
+                Gh4Application.get().getGitHubService(IssueCommentService.class);
+        ApiHelpers.throwOnFailure(service.createIssueComment(repoOwner, repoName, issueNumber,
+                CommentRequest.builder().body(body).build()).blockingGet());
     }
 
     @Override
-    protected void editComment(RepositoryId repoId, CommitComment comment) throws IOException {
-        Gh4Application app = Gh4Application.get();
-        IssueService issueService = (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
-        issueService.editComment(repoId, comment);
+    protected void editComment(String repoOwner, String repoName, long commentId,
+            String body) throws IOException {
+        IssueCommentService service =
+                Gh4Application.get().getGitHubService(IssueCommentService.class);
+        ApiHelpers.throwOnFailure(service.editIssueComment(repoOwner, repoName, commentId,
+                CommentRequest.builder().body(body).build()).blockingGet());
     }
 }

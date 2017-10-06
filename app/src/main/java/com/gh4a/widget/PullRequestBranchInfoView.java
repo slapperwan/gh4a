@@ -14,9 +14,8 @@ import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.PullRequestMarker;
-import org.eclipse.egit.github.core.Reference;
+import com.meisolsson.githubsdk.model.PullRequestMarker;
+import com.meisolsson.githubsdk.model.git.GitReference;
 
 public class PullRequestBranchInfoView extends RelativeLayout implements View.OnClickListener {
     private final StyleableTextView mSourceBranchView;
@@ -47,7 +46,7 @@ public class PullRequestBranchInfoView extends RelativeLayout implements View.On
     }
 
     public void bind(PullRequestMarker sourceMarker, PullRequestMarker targetMarker,
-            Reference sourceReference) {
+            GitReference sourceReference) {
         mSourceMarker = sourceMarker;
         mTargetMarker = targetMarker;
         formatMarkerText(mSourceBranchView, R.string.pull_request_from, sourceMarker,
@@ -61,12 +60,11 @@ public class PullRequestBranchInfoView extends RelativeLayout implements View.On
                 getContext().getString(formatResId), view.getTypefaceValue());
         int pos = builder.toString().indexOf("[ref]");
         if (pos >= 0) {
-            String label = TextUtils.isEmpty(marker.getLabel())
-                    ? marker.getRef() : marker.getLabel();
+            String label = TextUtils.isEmpty(marker.label()) ? marker.ref() : marker.label();
             builder.replace(pos, pos + 5, label);
-            if (marker.getRepo() != null && makeClickable) {
-                builder.setSpan(new ForegroundColorSpan(mAccentColor), pos, pos + label.length(),
-                        0);
+            if (marker.repo() != null && makeClickable) {
+                builder.setSpan(
+                        new ForegroundColorSpan(mAccentColor), pos, pos + label.length(), 0);
                 view.setClickable(true);
             } else {
                 view.setClickable(false);
@@ -79,9 +77,9 @@ public class PullRequestBranchInfoView extends RelativeLayout implements View.On
     @Override
     public void onClick(View v) {
         PullRequestMarker marker = v.getId() == R.id.tv_pr_from ? mSourceMarker : mTargetMarker;
-        if (marker.getRepo() != null) {
-            Intent intent = RepositoryActivity.makeIntent(getContext(), marker.getRepo(),
-                    marker.getRef());
+        if (marker.repo() != null) {
+            Intent intent = RepositoryActivity.makeIntent(getContext(), marker.repo(),
+                    marker.ref());
             getContext().startActivity(intent);
         }
     }

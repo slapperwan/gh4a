@@ -13,9 +13,6 @@ import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.EditorBottomSheet;
 
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryId;
-
 import java.io.IOException;
 
 public abstract class EditCommentActivity extends AppCompatActivity implements
@@ -72,16 +69,14 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
     @Override
     public void onEditorSendInBackground(String body) throws IOException {
         Bundle extras = getIntent().getExtras();
-        RepositoryId repoId = new RepositoryId(extras.getString("owner"), extras.getString("repo"));
+        String repoOwner = extras.getString("owner");
+        String repoName = extras.getString("repo");
         long id = extras.getLong("id", 0L);
 
-        CommitComment comment = new CommitComment();
-        comment.setId(id);
-        comment.setBody(body);
         if (id == 0L) {
-            createComment(repoId, comment, extras.getLong("reply_to"));
+            createComment(repoOwner, repoName, body, extras.getLong("reply_to"));
         } else {
-            editComment(repoId, comment);
+            editComment(repoOwner, repoName, id, body);
         }
     }
 
@@ -106,7 +101,8 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
         return mRootLayout;
     }
 
-    protected abstract void createComment(RepositoryId repoId,
-            CommitComment comment, long replyToCommentId) throws IOException;
-    protected abstract void editComment(RepositoryId repoId, CommitComment comment) throws IOException;
+    protected abstract void createComment(String repoOwner, String repoName,
+            String body, long replyToCommentId) throws IOException;
+    protected abstract void editComment(String repoOwner, String repoName,
+            long commentId, String body) throws IOException;
 }

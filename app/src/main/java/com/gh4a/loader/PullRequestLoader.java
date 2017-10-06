@@ -3,10 +3,9 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.PullRequestService;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.PullRequest;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
 import java.io.IOException;
 
@@ -30,9 +29,9 @@ public class PullRequestLoader extends BaseLoader<PullRequest> {
 
     public static PullRequest loadPullRequest(String repoOwner, String repoName,
             int pullRequestNumber) throws IOException {
-        PullRequestService pullRequestService = (PullRequestService)
-                Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        return pullRequestService.getPullRequest(new RepositoryId(repoOwner, repoName),
-                pullRequestNumber);
+        PullRequestService service =
+                Gh4Application.get().getGitHubService(PullRequestService.class);
+        return ApiHelpers.throwOnFailure(
+                service.getPullRequest(repoOwner, repoName, pullRequestNumber).blockingGet());
     }
 }

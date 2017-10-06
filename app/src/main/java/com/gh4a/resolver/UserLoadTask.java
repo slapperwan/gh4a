@@ -5,8 +5,7 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.loader.UserLoader;
-
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
 
 public abstract class UserLoadTask extends UrlLoadTask {
     @VisibleForTesting

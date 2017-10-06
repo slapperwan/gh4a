@@ -15,12 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.CommitService;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,9 +25,17 @@ import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.PageIteratorLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
-public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> {
+import java.io.IOException;
+
+public class CommitListFragment extends PagedDataBaseFragment<Commit> {
     private static final int REQUEST_COMMIT = 2000;
 
     private String mRepoOwner;
@@ -42,8 +44,8 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     private String mFilePath;
 
     public static CommitListFragment newInstance(Repository repo, String ref) {
-        return newInstance(repo.getOwner().getLogin(), repo.getName(),
-                StringUtils.isBlank(ref) ? repo.getDefaultBranch() : ref, null);
+        return newInstance(repo.owner().login(), repo.name(),
+                StringUtils.isBlank(ref) ? repo.defaultBranch() : ref, null);
     }
 
     public static CommitListFragment newInstance(String repoOwner, String repoName,
@@ -70,7 +72,7 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     }
 
     @Override
-    protected RootAdapter<RepositoryCommit, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
+    protected RootAdapter<Commit, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         return new CommitAdapter(getActivity());
     }
 
@@ -80,10 +82,10 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     }
 
     @Override
-    public void onItemClick(RepositoryCommit commit) {
-        String[] urlPart = commit.getUrl().split("/");
+    public void onItemClick(Commit commit) {
+        String[] urlPart = commit.url().split("/");
         Intent intent = CommitActivity.makeIntent(getActivity(),
-                urlPart[4], urlPart[5], commit.getSha());
+                urlPart[4], urlPart[5], commit.sha());
         startActivityForResult(intent, REQUEST_COMMIT);
     }
 
@@ -100,10 +102,15 @@ public class CommitListFragment extends PagedDataBaseFragment<RepositoryCommit> 
     }
 
     @Override
-    protected PageIterator<RepositoryCommit> onCreateIterator() {
-        CommitService commitService = (CommitService)
-                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
-        return commitService.pageCommits(
-                new RepositoryId(mRepoOwner, mRepoName), mRef, mFilePath);
+    protected PageIteratorLoader<Commit> onCreateLoader() {
+        final RepositoryCommitService service =
+                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+        return new PageIteratorLoader<Commit>(getActivity()) {
+            @Override
+            protected Page<Commit> loadPage(int page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getCommits(mRepoOwner, mRepoName, mRef, mFilePath, page).blockingGet());
+            }
+        };
     }
 }

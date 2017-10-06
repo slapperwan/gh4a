@@ -23,8 +23,8 @@ public abstract class BaseLoader<T> extends AsyncTaskLoader<LoaderResult<T>> {
     @Override
     public LoaderResult<T> loadInBackground() {
         try {
-            T data = doLoadInBackground();
-            return new LoaderResult<>(data);
+            T result = doLoadInBackground();
+            return new LoaderResult<>(result);
         } catch (Exception e) {
             Log.e(Gh4Application.LOG_TAG, e.getMessage(), e);
             return new LoaderResult<>(e);

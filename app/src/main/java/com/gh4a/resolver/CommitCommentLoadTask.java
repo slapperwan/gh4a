@@ -10,10 +10,10 @@ import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.CommitLoader;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
-import org.eclipse.egit.github.core.RepositoryCommit;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.GitHubFile;
+import com.meisolsson.githubsdk.model.PositionalCommentBase;
+import com.meisolsson.githubsdk.model.git.GitComment;
 
 import java.util.List;
 
@@ -39,15 +39,15 @@ public class CommitCommentLoadTask extends UrlLoadTask {
 
     @Override
     protected Intent run() throws Exception {
-        List<CommitComment> comments =
+        List<GitComment> comments =
                 CommitCommentListLoader.loadComments(mRepoOwner, mRepoName, mCommitSha);
-        RepositoryCommit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mCommitSha);
+        Commit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mCommitSha);
 
-        CommitFile resultFile = null;
-        for (CommitComment comment : comments) {
-            if (mMarker.matches(comment.getId(), comment.getCreatedAt())) {
-                for (CommitFile commitFile : commit.getFiles()) {
-                    if (commitFile.getFilename().equals(comment.getPath())) {
+        GitHubFile resultFile = null;
+        for (PositionalCommentBase comment : comments) {
+            if (mMarker.matches(comment.id(), comment.createdAt())) {
+                for (GitHubFile commitFile : commit.files()) {
+                    if (commitFile.filename().equals(comment.path())) {
                         resultFile = commitFile;
                         break;
                     }
@@ -62,9 +62,9 @@ public class CommitCommentLoadTask extends UrlLoadTask {
 
         Intent intent = null;
         if (resultFile != null) {
-            if (!FileUtils.isImage(resultFile.getFilename())) {
+            if (!FileUtils.isImage(resultFile.filename())) {
                 intent = CommitDiffViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                        mCommitSha, resultFile.getFilename(), resultFile.getPatch(), comments, -1,
+                        mCommitSha, resultFile.filename(), resultFile.patch(), comments, -1,
                         -1, false, mMarker);
             }
         } else {

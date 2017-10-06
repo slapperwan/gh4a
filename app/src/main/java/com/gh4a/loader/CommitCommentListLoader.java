@@ -3,16 +3,16 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.CommitService;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.git.GitComment;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommitCommentListLoader extends BaseLoader<List<CommitComment>> {
+public class CommitCommentListLoader extends BaseLoader<List<GitComment>> {
     private final String mRepoOwner;
     private final String mRepoName;
     private final String mSha;
@@ -30,15 +30,15 @@ public class CommitCommentListLoader extends BaseLoader<List<CommitComment>> {
     }
 
     @Override
-    public List<CommitComment> doLoadInBackground() throws IOException {
-        List<CommitComment> comments = loadComments(mRepoOwner, mRepoName, mSha);
+    public List<GitComment> doLoadInBackground() throws IOException {
+        List<GitComment> comments = loadComments(mRepoOwner, mRepoName, mSha);
 
         if (comments == null || (mIncludePositional && mIncludeUnpositional)) {
             return comments;
         }
-        ArrayList<CommitComment> result = new ArrayList<>();
-        for (CommitComment comment : comments) {
-            int pos = comment.getPosition();
+        ArrayList<GitComment> result = new ArrayList<>();
+        for (GitComment comment : comments) {
+            int pos = comment.position();
             if ((pos < 0 && mIncludeUnpositional) || (pos >= 0 && mIncludePositional)) {
                 result.add(comment);
             }
@@ -46,10 +46,16 @@ public class CommitCommentListLoader extends BaseLoader<List<CommitComment>> {
         return result;
     }
 
-    public static List<CommitComment> loadComments(String repoOwner, String repoName, String sha)
-            throws IOException {
-        CommitService commitService = (CommitService)
-                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
-        return commitService.getComments(new RepositoryId(repoOwner, repoName), sha);
+    public static List<GitComment> loadComments(final String repoOwner, final String repoName,
+            final String sha) throws IOException {
+        final RepositoryCommentService service =
+                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<GitComment>() {
+            @Override
+            public Page<GitComment> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getCommitComments(repoOwner, repoName, sha, page).blockingGet());
+            }
+        });
     }
 }

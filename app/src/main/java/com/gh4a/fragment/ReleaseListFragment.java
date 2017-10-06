@@ -11,8 +11,7 @@ import com.gh4a.adapter.ReleaseAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReleaseListLoader;
-
-import org.eclipse.egit.github.core.Release;
+import com.meisolsson.githubsdk.model.Release;
 
 import java.util.List;
 

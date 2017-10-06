@@ -25,8 +25,7 @@ import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.CommitComment;
+import com.meisolsson.githubsdk.model.ReviewComment;
 
 class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Diff>
         implements View.OnClickListener {
@@ -81,19 +80,19 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
     @Override
     public void bind(TimelineItem.Diff item) {
-        CommitComment comment = item.getInitialComment();
+        ReviewComment comment = item.getInitialComment();
 
         mFileTextView.setTag(item.getInitialTimelineComment());
-        mFileTextView.setText(comment.getPath());
+        mFileTextView.setText(comment.path());
 
-        boolean isOutdated = comment.getPosition() == -1;
+        boolean isOutdated = comment.position() == -1;
         mFileTextView.setPaintFlags(isOutdated
                 ? mFileTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : mFileTextView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
         mFileTextView.setClickable(!isOutdated);
         mFileTextView.setTextColor(isOutdated ? mSecondaryTextColor : mAccentColor);
 
-        String[] lines = comment.getDiffHunk().split("\n");
+        String[] lines = comment.diffChunk().split("\n");
 
         int leftLine = 0;
         int rightLine = 0;
@@ -216,9 +215,9 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
     }
 
     private String createUrl(TimelineItem.Diff diff, int line, boolean isRightLine) {
-        CommitComment comment = diff.getInitialComment();
+        ReviewComment comment = diff.getInitialComment();
         return "https://github.com/" + mRepoOwner + "/" + mRepoName + "/pull/" + mIssueNumber +
-                "#discussion-diff-" + comment.getId() + (isRightLine ? "R" : "L") + line;
+                "#discussion-diff-" + comment.id() + (isRightLine ? "R" : "L") + line;
     }
 
     private void showPopupMenu(final TimelineItem.Diff diff, final int line,
@@ -228,7 +227,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         Menu menu = popupMenu.getMenu();
         popupMenu.getMenuInflater().inflate(R.menu.review_diff_hunk_menu, menu);
 
-        menu.findItem(R.id.view_in_file).setVisible(diff.getInitialComment().getPosition() != -1);
+        menu.findItem(R.id.view_in_file).setVisible(diff.getInitialComment().position() != -1);
 
         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override

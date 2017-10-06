@@ -6,11 +6,10 @@ import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReviewActivity;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.Review;
-import org.eclipse.egit.github.core.service.PullRequestService;
+import com.meisolsson.githubsdk.model.Review;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
 public class PullRequestReviewLoadTask extends UrlLoadTask {
     @VisibleForTesting
@@ -33,11 +32,11 @@ public class PullRequestReviewLoadTask extends UrlLoadTask {
 
     @Override
     protected Intent run() throws Exception {
-        PullRequestService pullRequestService = (PullRequestService) Gh4Application.get()
-                .getService(Gh4Application.PULL_SERVICE);
+        PullRequestReviewService service =
+                Gh4Application.get().getGitHubService(PullRequestReviewService.class);
 
-        Review review = pullRequestService.getReview(new RepositoryId(mRepoOwner, mRepoName),
-                mPullRequestNumber, mMarker.commentId);
+        Review review = ApiHelpers.throwOnFailure(service.getReview(mRepoOwner, mRepoName,
+                mPullRequestNumber, mMarker.commentId).blockingGet());
 
         return ReviewActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                 mPullRequestNumber, review, mMarker);

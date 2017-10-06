@@ -3,12 +3,14 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Review;
+import com.meisolsson.githubsdk.model.ReviewState;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
-import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.Review;
-import org.eclipse.egit.github.core.service.PullRequestService;
-
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,13 +29,19 @@ public class PendingReviewLoader extends BaseLoader<List<Review>> {
 
     @Override
     protected List<Review> doLoadInBackground() throws Exception {
-        PullRequestService pullService = (PullRequestService)
-                Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        List<Review> reviews = pullService.getReviews(new RepositoryId(mRepoOwner, mRepoName),
-                mPullRequestNumber);
+        final PullRequestReviewService service =
+                Gh4Application.get().getGitHubService(PullRequestReviewService.class);
+        List<Review> reviews = ApiHelpers.Pager.fetchAllPages(
+                new ApiHelpers.Pager.PageProvider<Review>() {
+            @Override
+            public Page<Review> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(service.getReviews(
+                        mRepoOwner, mRepoName, mPullRequestNumber, page).blockingGet());
+            }
+        });
         Iterator<Review> iterator = reviews.iterator();
         while (iterator.hasNext()) {
-            if (!Review.STATE_PENDING.equals(iterator.next().getState())) {
+            if (iterator.next().state() != ReviewState.Pending) {
                 iterator.remove();
             }
         }

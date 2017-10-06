@@ -5,17 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.ContentsService;
-import org.eclipse.egit.github.core.util.EncodingUtils;
-
 import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.Content;
+import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
 public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
     private final String mRepoOwner;
@@ -31,15 +30,21 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
 
     @Override
     public Map<String, String> doLoadInBackground() throws IOException {
-        ContentsService contentService = (ContentsService)
-                Gh4Application.get().getService(Gh4Application.CONTENTS_SERVICE);
-        List<RepositoryContents> contents = contentService.getContents(
-                new RepositoryId(mRepoOwner, mRepoName), ".gitmodules", mRef);
+        final RepositoryContentService service =
+                Gh4Application.get().getGitHubService(RepositoryContentService.class);
+        Content content;
 
-        if (contents == null || contents.isEmpty()) {
-            return null;
+        try {
+            content = ApiHelpers.throwOnFailure(
+                    service.getContents(mRepoOwner, mRepoName, ".gitmodules", mRef).blockingGet());
+        } catch (ApiRequestException e) {
+            if (e.getStatus() == 404) {
+                return null;
+            }
+            throw e;
         }
-        String data = new String(EncodingUtils.fromBase64(contents.get(0).getContent()));
+
+        String data = StringUtils.fromBase64(content.content());
         if (StringUtils.isBlank(data)) {
             return null;
         }

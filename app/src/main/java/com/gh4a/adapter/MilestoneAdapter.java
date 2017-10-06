@@ -15,8 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.Milestone;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
@@ -29,6 +27,8 @@ import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.model.Milestone;
 
 public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.ViewHolder> {
     private final int mTextColorPrimary;
@@ -48,25 +48,25 @@ public class MilestoneAdapter extends RootAdapter<Milestone, MilestoneAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, Milestone milestone) {
-        holder.tvTitle.setText(milestone.getTitle());
-        holder.tvTitle.setTextColor(ApiHelpers.IssueState.CLOSED.equals(milestone.getState())
+        holder.tvTitle.setText(milestone.title());
+        holder.tvTitle.setTextColor(milestone.state() == IssueState.Closed
                 ? mTextColorSecondary : mTextColorPrimary);
 
-        if (!StringUtils.isBlank(milestone.getDescription())) {
+        if (!StringUtils.isBlank(milestone.description())) {
             holder.tvDesc.setVisibility(View.VISIBLE);
-            holder.tvDesc.setText(milestone.getDescription());
+            holder.tvDesc.setText(milestone.description());
         } else {
             holder.tvDesc.setVisibility(View.GONE);
         }
 
         holder.tvOpen.setText(mContext.getString(R.string.issue_milestone_open_issues,
-                milestone.getOpenIssues()));
+                milestone.openIssues()));
         holder.tvClosed.setText(mContext.getString(R.string.issue_milestone_closed_issues,
-                milestone.getClosedIssues()));
+                milestone.closedIssues()));
 
-        if (milestone.getDueOn() != null) {
+        if (milestone.dueOn() != null) {
             holder.tvDue.setText(
-                    DateFormat.getMediumDateFormat(mContext).format(milestone.getDueOn()));
+                    DateFormat.getMediumDateFormat(mContext).format(milestone.dueOn()));
             holder.tvDue.setVisibility(View.VISIBLE);
         } else {
             holder.tvDue.setVisibility(View.GONE);

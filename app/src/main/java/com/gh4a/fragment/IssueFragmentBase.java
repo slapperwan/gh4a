@@ -51,15 +51,17 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.EditorBottomSheet;
 import com.gh4a.widget.ReactionBar;
-
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.Reaction;
-import org.eclipse.egit.github.core.Reactions;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.IssueService;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.Label;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Reaction;
+import com.meisolsson.githubsdk.model.Reactions;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.request.CommentRequest;
+import com.meisolsson.githubsdk.model.request.ReactionRequest;
+import com.meisolsson.githubsdk.service.reactions.ReactionService;
+import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 
 import java.io.IOException;
 import java.util.List;
@@ -90,8 +92,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
-        args.putSerializable("issue", issue);
-        args.putSerializable("collaborator", isCollaborator);
+        args.putParcelable("issue", issue);
+        args.putBoolean("collaborator", isCollaborator);
         args.putParcelable("initial_comment", initialComment);
         return args;
     }
@@ -103,7 +105,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         Bundle args = getArguments();
         mRepoOwner = args.getString("owner");
         mRepoName = args.getString("repo");
-        mIssue = (Issue) args.getSerializable("issue");
+        mIssue = args.getParcelable("issue");
         mIsCollaborator = args.getBoolean("collaborator");
         mInitialComment = args.getParcelable("initial_comment");
         args.remove("initial_comment");
@@ -163,7 +165,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         fillData();
-        fillLabels(mIssue.getLabels());
+        fillLabels(mIssue.labels());
         updateCommentLockState();
 
         super.onActivityCreated(savedInstanceState);
@@ -255,8 +257,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     protected RootAdapter<TimelineItem, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName, mIssue.getNumber(),
-                mIssue.getPullRequest() != null, true, this);
+        mAdapter = new TimelineItemAdapter(getActivity(), mRepoOwner, mRepoName, mIssue.number(),
+                mIssue.pullRequest() != null, true, this);
         mAdapter.setLocked(isLocked());
         return mAdapter;
     }
@@ -270,13 +272,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
                 if (item instanceof TimelineItem.TimelineComment) {
                     TimelineItem.TimelineComment comment = (TimelineItem.TimelineComment) item;
-                    if (mInitialComment.matches(comment.comment.getId(), comment.getCreatedAt())) {
+                    if (mInitialComment.matches(comment.comment().id(), comment.getCreatedAt())) {
                         scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
                         break;
                     }
                 } else if (item instanceof TimelineItem.TimelineReview) {
                     TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) item;
-                    if (mInitialComment.matches(review.review.getId(), review.getCreatedAt())) {
+                    if (mInitialComment.matches(review.review().id(), review.getCreatedAt())) {
                         scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
                         break;
                     }
@@ -316,13 +318,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     private boolean isLocked() {
-        return mIssue.isLocked() && !mIsCollaborator;
+        return mIssue.locked() && !mIsCollaborator;
     }
 
     private void updateMentionUsers() {
         Set<User> users = mAdapter.getUsers();
-        if (mIssue.getUser() != null) {
-            users.add(mIssue.getUser());
+        if (mIssue.user() != null) {
+            users.add(mIssue.user());
         }
         mBottomSheet.setMentionUsers(users);
     }
@@ -333,24 +335,24 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     private void fillData() {
         ImageView ivGravatar = mListHeaderView.findViewById(R.id.iv_gravatar);
-        AvatarHandler.assignAvatar(ivGravatar, mIssue.getUser());
-        ivGravatar.setTag(mIssue.getUser());
+        AvatarHandler.assignAvatar(ivGravatar, mIssue.user());
+        ivGravatar.setTag(mIssue.user());
         ivGravatar.setOnClickListener(this);
 
         TextView tvExtra = mListHeaderView.findViewById(R.id.tv_extra);
-        tvExtra.setText(ApiHelpers.getUserLogin(getActivity(), mIssue.getUser()));
+        tvExtra.setText(ApiHelpers.getUserLogin(getActivity(), mIssue.user()));
         tvExtra.setOnClickListener(this);
-        tvExtra.setTag(mIssue.getUser());
+        tvExtra.setTag(mIssue.user());
 
         TextView tvTimestamp = mListHeaderView.findViewById(R.id.tv_timestamp);
         tvTimestamp.setText(StringUtils.formatRelativeTime(getActivity(),
-                mIssue.getCreatedAt(), true));
+                mIssue.createdAt(), true));
 
-        String body = mIssue.getBodyHtml();
+        String body = mIssue.bodyHtml();
         TextView descriptionView = mListHeaderView.findViewById(R.id.tv_desc);
         descriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         if (!StringUtils.isBlank(body)) {
-            mImageGetter.bind(descriptionView, body, mIssue.getId());
+            mImageGetter.bind(descriptionView, body, mIssue.id());
 
             if (!isLocked()) {
                 descriptionView.setCustomSelectionActionModeCallback(
@@ -370,16 +372,16 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         }
 
         View milestoneGroup = mListHeaderView.findViewById(R.id.milestone_container);
-        if (mIssue.getMilestone() != null) {
+        if (mIssue.milestone() != null) {
             TextView tvMilestone = mListHeaderView.findViewById(R.id.tv_milestone);
-            tvMilestone.setText(mIssue.getMilestone().getTitle());
+            tvMilestone.setText(mIssue.milestone().title());
             milestoneGroup.setVisibility(View.VISIBLE);
         } else {
             milestoneGroup.setVisibility(View.GONE);
         }
 
         View assigneeGroup = mListHeaderView.findViewById(R.id.assignee_container);
-        List<User> assignees = mIssue.getAssignees();
+        List<User> assignees = mIssue.assignees();
         if (assignees != null && !assignees.isEmpty()) {
             ViewGroup assigneeContainer = mListHeaderView.findViewById(R.id.assignee_list);
             LayoutInflater inflater = getLayoutInflater();
@@ -404,7 +406,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         ReactionBar reactions = mListHeaderView.findViewById(R.id.reactions);
         reactions.setCallback(this, this);
         reactions.setDetailsCache(mReactionDetailsCache);
-        reactions.setReactions(mIssue.getReactions());
+        reactions.setReactions(mIssue.reactions());
 
         assignHighlightColor();
         bindSpecialViews(mListHeaderView);
@@ -423,43 +425,53 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public Object getCacheKey() {
-        return mIssue;
+        return mIssue.id();
     }
 
     @Override
     public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws IOException {
-        IssueService service = (IssueService)
-                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        return service.getIssueReactions(new RepositoryId(mRepoOwner, mRepoName),
-                mIssue.getNumber());
+        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Reaction>() {
+            @Override
+            public Page<Reaction> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getIssueReactions(mRepoOwner, mRepoName, mIssue.number(), page).blockingGet());
+            }
+        });
     }
 
     @Override
-    public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws IOException {
-        IssueService service = (IssueService)
-                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        return service.addIssueReaction(new RepositoryId(mRepoOwner, mRepoName),
-                mIssue.getNumber(), content);
+    public Reaction addReactionInBackground(ReactionBar.Item item, String content)
+            throws IOException {
+        ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        return ApiHelpers.throwOnFailure(service.createIssueReaction(mRepoOwner, mRepoName,
+                mIssue.number(), ReactionRequest.builder().content(content).build()).blockingGet());
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(Comment comment) throws IOException {
-        IssueService service = (IssueService)
-                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        return service.getCommentReactions(new RepositoryId(mRepoOwner, mRepoName), comment.getId());
+    public List<Reaction> loadReactionDetailsInBackground(final GitHubCommentBase comment)
+            throws IOException {
+        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Reaction>() {
+            @Override
+            public Page<Reaction> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getIssueCommentReactions(mRepoOwner, mRepoName, comment.id(), page).blockingGet());
+            }
+        });
     }
 
     @Override
-    public Reaction addReactionInBackground(Comment comment, String content) throws IOException {
-        IssueService service = (IssueService)
-                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        return service.addCommentReaction(new RepositoryId(mRepoOwner, mRepoName),
-                comment.getId(), content);
+    public Reaction addReactionInBackground(GitHubCommentBase comment, String content)
+            throws IOException {
+        ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        return ApiHelpers.throwOnFailure(service.createIssueCommentReaction(mRepoOwner, mRepoName,
+                comment.id(), ReactionRequest.builder().content(content).build()).blockingGet());
     }
 
     @Override
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
-        mIssue.setReactions(reactions);
+        mIssue = mIssue.toBuilder().reactions(reactions).build();
         if (mListHeaderView != null) {
             ReactionBar bar = mListHeaderView.findViewById(R.id.reactions);
             bar.setReactions(reactions);
@@ -507,9 +519,9 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public void onEditorSendInBackground(String comment) throws IOException {
-        IssueService issueService = (IssueService)
-                Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
-        issueService.createComment(mRepoOwner, mRepoName, mIssue.getNumber(), comment);
+        IssueCommentService service = Gh4Application.get().getGitHubService(IssueCommentService.class);
+        ApiHelpers.throwOnFailure(service.createIssueComment(mRepoOwner, mRepoName, mIssue.number(),
+                CommentRequest.builder().body(comment).build()).blockingGet());
     }
 
     @Override
@@ -526,7 +538,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public void deleteComment(final Comment comment) {
+    public void deleteComment(final GitHubCommentBase comment) {
         new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.delete_comment_message)
                 .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
@@ -540,8 +552,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public String getShareSubject(Comment comment) {
-        return getString(R.string.share_comment_subject, comment.getId(), mIssue.getNumber(),
+    public String getShareSubject(GitHubCommentBase comment) {
+        return getString(R.string.share_comment_subject, comment.id(), mIssue.number(),
                 mRepoOwner + "/" + mRepoName);
     }
 
@@ -570,13 +582,12 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     protected abstract void bindSpecialViews(View headerView);
     protected abstract void assignHighlightColor();
-    protected abstract void deleteCommentInBackground(RepositoryId repoId, Comment comment)
-            throws Exception;
+    protected abstract void deleteCommentInBackground(GitHubCommentBase comment) throws Exception;
 
     private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private final Comment mComment;
+        private final GitHubCommentBase mComment;
 
-        public DeleteCommentTask(BaseActivity activity, Comment comment) {
+        public DeleteCommentTask(BaseActivity activity, GitHubCommentBase comment) {
             super(activity, R.string.deleting_msg);
             mComment = comment;
         }
@@ -588,8 +599,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
         @Override
         protected Void run() throws Exception {
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            deleteCommentInBackground(repoId, mComment);
+            deleteCommentInBackground(mComment);
             return null;
         }
 

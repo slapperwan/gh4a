@@ -30,8 +30,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.LabelBadgeView;
-
-import org.eclipse.egit.github.core.Issue;
+import com.meisolsson.githubsdk.model.Issue;
 
 public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
     public IssueAdapter(Context context) {
@@ -48,26 +47,26 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
 
     @Override
     protected void onBindViewHolder(ViewHolder holder, Issue issue) {
-        AvatarHandler.assignAvatar(holder.ivGravatar, issue.getUser());
+        AvatarHandler.assignAvatar(holder.ivGravatar, issue.user());
         holder.ivGravatar.setTag(issue);
 
-        holder.lvLabels.setLabels(issue.getLabels());
-        holder.tvNumber.setText("#" + issue.getNumber());
-        holder.tvDesc.setText(issue.getTitle());
-        holder.tvCreator.setText(ApiHelpers.getUserLogin(mContext, issue.getUser()));
+        holder.lvLabels.setLabels(issue.labels());
+        holder.tvNumber.setText("#" + issue.number());
+        holder.tvDesc.setText(issue.title());
+        holder.tvCreator.setText(ApiHelpers.getUserLogin(mContext, issue.user()));
         holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
-                issue.getCreatedAt(), true));
+                issue.createdAt(), true));
 
-        if (issue.getComments() > 0) {
+        if (issue.comments() > 0) {
             holder.tvComments.setVisibility(View.VISIBLE);
-            holder.tvComments.setText(String.valueOf(issue.getComments()));
+            holder.tvComments.setText(String.valueOf(issue.comments()));
         } else {
             holder.tvComments.setVisibility(View.GONE);
         }
 
-        if (issue.getMilestone() != null) {
+        if (issue.milestone() != null) {
             holder.tvMilestone.setVisibility(View.VISIBLE);
-            holder.tvMilestone.setText(issue.getMilestone().getTitle());
+            holder.tvMilestone.setText(issue.milestone().title());
         } else {
             holder.tvMilestone.setVisibility(View.GONE);
         }
@@ -77,7 +76,7 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
     public void onClick(View v) {
         if (v.getId() == R.id.iv_gravatar) {
             Issue issue = (Issue) v.getTag();
-            Intent intent = UserActivity.makeIntent(mContext, issue.getUser());
+            Intent intent = UserActivity.makeIntent(mContext, issue.user());
             if (intent != null) {
                 mContext.startActivity(intent);
             }

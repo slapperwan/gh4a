@@ -13,12 +13,13 @@ import android.widget.Spinner;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.widget.EditorBottomSheet;
 import com.gh4a.widget.StyleableTextView;
-
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.Review;
-import org.eclipse.egit.github.core.service.PullRequestService;
+import com.meisolsson.githubsdk.model.Review;
+import com.meisolsson.githubsdk.model.request.pull_request.CreateReview;
+import com.meisolsson.githubsdk.model.request.pull_request.SubmitReview;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
 import java.io.IOException;
 
@@ -70,11 +71,11 @@ public class CreateReviewActivity extends AppCompatActivity implements
 
         mReviewEventAdapter = new ArrayAdapter<>(this, R.layout.spinner_item);
         mReviewEventAdapter.add(new ReviewEventDesc(R.string.pull_request_review_event_comment,
-                PullRequestService.REVIEW_EVENT_COMMENT));
+                CreateReview.Event.Comment, SubmitReview.Event.Comment));
         mReviewEventAdapter.add(new ReviewEventDesc(R.string.pull_request_review_event_approve,
-                PullRequestService.REVIEW_EVENT_APPROVE));
+                CreateReview.Event.Approve, SubmitReview.Event.Approve));
         mReviewEventAdapter.add(new ReviewEventDesc(R.string.pull_request_review_event_request_changes,
-                PullRequestService.REVIEW_EVENT_REQUEST_CHANGES));
+                CreateReview.Event.RequestChanges, SubmitReview.Event.RequestChanges));
 
         mReviewEventSpinner = header.findViewById(R.id.pull_request_review_event);
         mReviewEventSpinner.setAdapter(mReviewEventAdapter);
@@ -84,7 +85,7 @@ public class CreateReviewActivity extends AppCompatActivity implements
 
         mEditorSheet.setCallback(this);
         if (mPendingReview != null && savedInstanceState == null) {
-            mEditorSheet.setCommentText(mPendingReview.getBody(), false);
+            mEditorSheet.setCommentText(mPendingReview.body(), false);
         }
 
         setResult(RESULT_CANCELED);
@@ -99,16 +100,24 @@ public class CreateReviewActivity extends AppCompatActivity implements
     public void onEditorSendInBackground(String body) throws IOException {
         int position = mReviewEventSpinner.getSelectedItemPosition();
         @SuppressWarnings("ConstantConditions")
-        String eventType = mReviewEventAdapter.getItem(position).mEventType;
+        ReviewEventDesc desc = mReviewEventAdapter.getItem(position);
 
-        PullRequestService pullService = (PullRequestService)
-                Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        PullRequestReviewService service =
+                Gh4Application.get().getGitHubService(PullRequestReviewService.class);
         if (mPendingReview == null) {
-            pullService.createReview(repoId, mPullRequestNumber, eventType, body);
+            CreateReview request = CreateReview.builder()
+                    .body(body)
+                    .event(desc.mCreateEvent)
+                    .build();
+            ApiHelpers.throwOnFailure(service.createReview(mRepoOwner, mRepoName,
+                    mPullRequestNumber, request).blockingGet());
         } else {
-            pullService.submitReview(repoId, mPullRequestNumber,
-                    mPendingReview.getId(), eventType, body);
+            SubmitReview request = SubmitReview.builder()
+                    .body(body)
+                    .event(desc.mSubmitEvent)
+                    .build();
+            ApiHelpers.throwOnFailure(service.submitReview(mRepoOwner, mRepoName,
+                    mPullRequestNumber, mPendingReview.id(), request).blockingGet());
         }
     }
 
@@ -136,11 +145,14 @@ public class CreateReviewActivity extends AppCompatActivity implements
     private class ReviewEventDesc {
         @StringRes
         public final int mTextResId;
-        public final String mEventType;
+        public final CreateReview.Event mCreateEvent;
+        public final SubmitReview.Event mSubmitEvent;
 
-        public ReviewEventDesc(@StringRes int textResId, String eventType) {
+        public ReviewEventDesc(@StringRes int textResId, CreateReview.Event createEvent,
+                SubmitReview.Event submitEvent) {
             mTextResId = textResId;
-            mEventType = eventType;
+            mCreateEvent = createEvent;
+            mSubmitEvent = submitEvent;
         }
 
         @Override

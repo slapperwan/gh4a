@@ -9,8 +9,7 @@ import android.view.View;
 
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
-
-import org.eclipse.egit.github.core.Label;
+import com.meisolsson.githubsdk.model.Label;
 
 import java.util.List;
 

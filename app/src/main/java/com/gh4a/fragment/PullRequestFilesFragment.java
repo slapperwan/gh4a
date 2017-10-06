@@ -15,9 +15,8 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.loader.PullRequestFilesLoader;
 import com.gh4a.utils.FileUtils;
-
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.CommitFile;
+import com.meisolsson.githubsdk.model.GitHubFile;
+import com.meisolsson.githubsdk.model.ReviewComment;
 
 import java.util.List;
 
@@ -45,32 +44,32 @@ public class PullRequestFilesFragment extends CommitFragment {
     private String mRepoName;
     private int mPullRequestNumber;
     private String mHeadSha;
-    private List<CommitFile> mFiles;
-    private List<CommitComment> mComments;
+    private List<GitHubFile> mFiles;
+    private List<ReviewComment> mComments;
 
-    private final LoaderCallbacks<List<CommitFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<CommitFile>>(this) {
+    private final LoaderCallbacks<List<GitHubFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<GitHubFile>>(this) {
         @Override
-        protected Loader<LoaderResult<List<CommitFile>>> onCreateLoader() {
+        protected Loader<LoaderResult<List<GitHubFile>>> onCreateLoader() {
             return new PullRequestFilesLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
         }
 
         @Override
-        protected void onResultReady(List<CommitFile> result) {
+        protected void onResultReady(List<GitHubFile> result) {
             mFiles = result;
             populateViewIfReady();
         }
     };
 
-    private final LoaderCallbacks<List<CommitComment>> mPullRequestCommentsCallback =
-            new LoaderCallbacks<List<CommitComment>>(this) {
+    private final LoaderCallbacks<List<ReviewComment>> mPullRequestCommentsCallback =
+            new LoaderCallbacks<List<ReviewComment>>(this) {
         @Override
-        protected Loader<LoaderResult<List<CommitComment>>> onCreateLoader() {
+        protected Loader<LoaderResult<List<ReviewComment>>> onCreateLoader() {
             return new PullRequestCommentsLoader(getActivity(),
                     mRepoOwner, mRepoName, mPullRequestNumber);
         }
 
         @Override
-        protected void onResultReady(List<CommitComment> result) {
+        protected void onResultReady(List<ReviewComment> result) {
             mComments = result;
             populateViewIfReady();
         }
@@ -122,15 +121,15 @@ public class PullRequestFilesFragment extends CommitFragment {
     }
 
     @Override
-    protected void handleFileClick(CommitFile file) {
+    protected void handleFileClick(GitHubFile file) {
         final Intent intent;
-        if (FileUtils.isImage(file.getFilename())) {
+        if (FileUtils.isImage(file.filename())) {
             intent = FileViewerActivity.makeIntent(getActivity(),
-                    mRepoOwner, mRepoName, mHeadSha, file.getFilename());
+                    mRepoOwner, mRepoName, mHeadSha, file.filename());
         } else {
             intent = PullRequestDiffViewerActivity.makeIntent(getActivity(),
-                    mRepoOwner, mRepoName, mPullRequestNumber, mHeadSha, file.getFilename(),
-                    file.getPatch(), mComments, -1, -1, -1, false, null);
+                    mRepoOwner, mRepoName, mPullRequestNumber, mHeadSha, file.filename(),
+                    file.patch(), mComments, -1, -1, -1, false, null);
         }
 
         startActivityForResult(intent, REQUEST_DIFF_VIEWER);

@@ -8,43 +8,44 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.egit.github.core.CommitStatus;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.CommitService;
-
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Status;
+import com.meisolsson.githubsdk.model.StatusState;
+import com.meisolsson.githubsdk.service.repositories.RepositoryStatusService;
 
-public class CommitStatusLoader extends BaseLoader<List<CommitStatus>> {
+public class CommitStatusLoader extends BaseLoader<List<Status>> {
     private final String mRepoOwner;
     private final String mRepoName;
     private final String mSha;
 
-    private static final Comparator<CommitStatus> TIMESTAMP_COMPARATOR = new Comparator<CommitStatus>() {
+    private static final Comparator<Status> TIMESTAMP_COMPARATOR = new Comparator<Status>() {
         @Override
-        public int compare(CommitStatus lhs, CommitStatus rhs) {
-            return rhs.getUpdatedAt().compareTo(lhs.getUpdatedAt());
+        public int compare(Status lhs, Status rhs) {
+            return rhs.updatedAt().compareTo(lhs.updatedAt());
         }
     };
 
-    private static final Comparator<CommitStatus> STATUS_AND_CONTEXT_COMPARATOR = new Comparator<CommitStatus>() {
+    private static final Comparator<Status> STATUS_AND_CONTEXT_COMPARATOR = new Comparator<Status>() {
         @Override
-        public int compare(CommitStatus lhs, CommitStatus rhs) {
+        public int compare(Status lhs, Status rhs) {
             int lhsSeverity = getStateSeverity(lhs);
             int rhsSeverity = getStateSeverity(rhs);
             if (lhsSeverity != rhsSeverity) {
                 return lhsSeverity < rhsSeverity ? 1 : -1;
             } else {
-                return lhs.getContext().compareTo(rhs.getContext());
+                return lhs.context().compareTo(rhs.context());
             }
         }
 
-        private int getStateSeverity(CommitStatus status) {
-            switch (status.getState()) {
-                case CommitStatus.STATE_SUCCESS: return 0;
-                case CommitStatus.STATE_ERROR:
-                case CommitStatus.STATE_FAILURE: return 2;
+        private int getStateSeverity(Status status) {
+            switch (status.state()) {
+                case Success: return 0;
+                case Error:
+                case Failure: return 2;
                 default: return 1;
             }
         }
@@ -58,24 +59,29 @@ public class CommitStatusLoader extends BaseLoader<List<CommitStatus>> {
     }
 
     @Override
-    public List<CommitStatus> doLoadInBackground() throws IOException {
-        CommitService commitService = (CommitService)
-                Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
-        List<CommitStatus> statuses =
-                commitService.getStatuses(new RepositoryId(mRepoOwner, mRepoName), mSha);
+    public List<Status> doLoadInBackground() throws IOException {
+        final RepositoryStatusService service =
+                Gh4Application.get().getGitHubService(RepositoryStatusService.class);
+        List<Status> statuses = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Status>() {
+            @Override
+            public Page<Status> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getStatuses(mRepoOwner, mRepoName, mSha, page).blockingGet());
+            }
+        });
 
         // Sort by timestamps first, so the removal logic below keeps the newest status
         Collections.sort(statuses, TIMESTAMP_COMPARATOR);
 
         // Filter out outdated statuses, only keep the newest status per context
         Set<String> seenContexts = new HashSet<>();
-        Iterator<CommitStatus> iter = statuses.iterator();
+        Iterator<Status> iter = statuses.iterator();
         while (iter.hasNext()) {
-            CommitStatus status = iter.next();
-            if (seenContexts.contains(status.getContext())) {
+            Status status = iter.next();
+            if (seenContexts.contains(status.context())) {
                 iter.remove();
             } else {
-                seenContexts.add(status.getContext());
+                seenContexts.add(status.context());
             }
         }
 

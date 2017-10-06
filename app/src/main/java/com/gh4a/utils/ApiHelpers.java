@@ -5,15 +5,25 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.gh4a.ApiRequestException;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.Label;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.git.GitUser;
 
-import org.eclipse.egit.github.core.CommitUser;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.User;
-
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import retrofit2.Response;
 
 public class ApiHelpers {
     public interface IssueState {
@@ -23,80 +33,83 @@ public class ApiHelpers {
         String UNMERGED = "unmerged";
     }
 
-    public interface UserType {
-        String USER = "User";
-        String ORG = "Organization";
-    }
-
-    public interface MilestoneState {
-        String OPEN = "open";
-        String CLOSED = "closed";
-    }
+    public static final Comparator<GitHubCommentBase> COMMENT_COMPARATOR = new Comparator<GitHubCommentBase>() {
+        @Override
+        public int compare(GitHubCommentBase lhs, GitHubCommentBase rhs) {
+            if (lhs.createdAt() == null) {
+                return 1;
+            }
+            if (rhs.createdAt() == null) {
+                return -1;
+            }
+            return lhs.createdAt().compareTo(rhs.createdAt());
+        }
+    };
 
     //RepositoryCommit
-    public static String getAuthorName(Context context, RepositoryCommit commit) {
-        if (commit.getAuthor() != null) {
-            return commit.getAuthor().getLogin();
+    public static String getAuthorName(Context context, Commit commit) {
+        if (commit.author() != null) {
+            return commit.author().login();
         }
-        if (commit.getCommit().getAuthor() != null) {
-            return commit.getCommit().getAuthor().getName();
+        if (commit.commit().author() != null) {
+            return commit.commit().author().name();
         }
         return context.getString(R.string.unknown);
     }
 
-    public static String getAuthorLogin(RepositoryCommit commit) {
-        if (commit.getAuthor() != null) {
-            return commit.getAuthor().getLogin();
+    public static String getAuthorLogin(Commit commit) {
+        if (commit.author() != null) {
+            return commit.author().login();
         }
         return null;
     }
 
-    public static String getCommitterName(Context context, RepositoryCommit commit) {
-        if (commit.getCommitter() != null) {
-            return commit.getCommitter().getLogin();
+    public static String getCommitterName(Context context, Commit commit) {
+        if (commit.committer() != null) {
+            return commit.committer().login();
         }
-        if (commit.getCommit().getCommitter() != null) {
-            return commit.getCommit().getCommitter().getName();
+        if (commit.commit().committer() != null) {
+            return commit.commit().committer().name();
         }
         return context.getString(R.string.unknown);
     }
 
-    public static boolean authorEqualsCommitter(RepositoryCommit commit) {
-        if (commit.getCommitter() != null && commit.getAuthor() != null) {
-            return TextUtils.equals(commit.getCommitter().getLogin(), commit.getAuthor().getLogin());
+    public static boolean authorEqualsCommitter(Commit commit) {
+        if (commit.committer() != null && commit.author() != null) {
+            return TextUtils.equals(commit.committer().login(), commit.author().login());
         }
 
-        CommitUser author = commit.getCommit().getAuthor();
-        CommitUser committer = commit.getCommit().getCommitter();
-        if (author.getEmail() != null && committer.getEmail() != null) {
-            return TextUtils.equals(author.getEmail(), committer.getEmail());
+        GitUser author = commit.commit().author();
+        GitUser committer = commit.commit().committer();
+        if (author.email() != null && committer.email() != null) {
+            return TextUtils.equals(author.email(), committer.email());
         }
-        return TextUtils.equals(author.getName(), committer.getName());
+        return TextUtils.equals(author.name(), committer.name());
     }
 
     public static String getUserLogin(Context context, User user) {
-        if (user != null && user.getLogin() != null) {
-            return user.getLogin();
+        if (user != null && user.login() != null) {
+            return user.login();
         }
         return context.getString(R.string.unknown);
     }
 
     public static int colorForLabel(Label label) {
-        return Color.parseColor("#" + label.getColor());
+        return Color.parseColor("#" + label.color());
     }
 
     public static boolean userEquals(User lhs, User rhs) {
         if (lhs == null || rhs == null) {
             return false;
         }
-        return loginEquals(lhs.getLogin(), rhs.getLogin());
+        return loginEquals(lhs.login(), rhs.login());
     }
 
     public static boolean loginEquals(User user, String login) {
         if (user == null) {
             return false;
         }
-        return loginEquals(user.getLogin(), login);
+        return loginEquals(user.login(), login);
     }
 
     public static boolean loginEquals(String user, String login) {
@@ -147,5 +160,32 @@ public class ApiHelpers {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static <T> T throwOnFailure(Response<T> response) throws IOException {
+        if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            Gh4Application.get().logout();
+        }
+        if (!response.isSuccessful()) {
+            throw new ApiRequestException(response);
+        }
+        return response.body();
+    }
+
+    public static class Pager<T> {
+        public interface PageProvider<T> {
+            Page<T> providePage(long page) throws IOException;
+        }
+
+        public static <T> List<T> fetchAllPages(PageProvider<T> provider) throws IOException {
+            List<T> result = new ArrayList<>();
+            int nextPage = 1;
+            do {
+                Page<T> page = provider.providePage(nextPage);
+                result.addAll(page.items());
+                nextPage = page.next() != null ? page.next() : 0;
+            } while (nextPage > 0);
+            return result;
+        }
     }
 }

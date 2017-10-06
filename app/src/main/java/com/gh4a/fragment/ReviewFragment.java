@@ -26,19 +26,25 @@ import com.gh4a.adapter.timeline.TimelineItemAdapter;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ReviewTimelineLoader;
 import com.gh4a.loader.TimelineItem;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.EditorBottomSheet;
 
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.Reaction;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.Review;
-import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.PullRequestService;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Reaction;
+import com.meisolsson.githubsdk.model.Review;
+import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.model.request.ReactionRequest;
+import com.meisolsson.githubsdk.model.request.pull_request.CreateReviewComment;
+import com.meisolsson.githubsdk.service.reactions.ReactionService;
+import com.meisolsson.githubsdk.service.issues.IssueCommentService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 
 import java.io.IOException;
 import java.util.List;
+
+import retrofit2.Response;
 
 public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         implements TimelineItemAdapter.OnCommentAction,
@@ -58,7 +64,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         args.putString("repo_owner", repoOwner);
         args.putString("repo_name", repoName);
         args.putInt("issue_number", issueNumber);
-        args.putSerializable("review", review);
+        args.putParcelable("review", review);
         args.putParcelable("initial_comment", mInitialComment);
         f.setArguments(args);
         return f;
@@ -79,7 +85,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         mRepoOwner = args.getString("repo_owner");
         mRepoName = args.getString("repo_name");
         mIssueNumber = args.getInt("issue_number");
-        mReview = (Review) args.getSerializable("review");
+        mReview = args.getParcelable("review");
         mInitialComment = args.getParcelable("initial_comment");
         args.remove("initial_comment");
 
@@ -146,7 +152,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     @Override
     protected Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
         return new ReviewTimelineLoader(getActivity(), mRepoOwner, mRepoName, mIssueNumber,
-                mReview.getId());
+                mReview.id());
     }
 
     @Override
@@ -202,7 +208,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         }
 
         if (firstReplyItem != null) {
-            mSelectedReplyCommentId = firstReplyItem.timelineComment.comment.getId();
+            mSelectedReplyCommentId = firstReplyItem.timelineComment.comment().id();
             // When there is only one reply item we don't need to display it
             data.remove(firstReplyItem);
         }
@@ -214,7 +220,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
             if (item instanceof TimelineItem.TimelineComment) {
                 TimelineItem.TimelineComment comment = (TimelineItem.TimelineComment) item;
-                if (mInitialComment.matches(comment.comment.getId(), comment.getCreatedAt())) {
+                if (mInitialComment.matches(comment.comment().id(), comment.getCreatedAt())) {
                     scrollToAndHighlightPosition(i);
                     break;
                 }
@@ -249,21 +255,21 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    public void editComment(Comment comment) {
+    public void editComment(GitHubCommentBase comment) {
         Intent intent;
-        if (comment instanceof CommitComment) {
+        if (comment instanceof ReviewComment) {
             intent = EditPullRequestCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mIssueNumber, 0L, (CommitComment) comment, 0);
+                    mIssueNumber, comment.id(), 0L, comment.body(), 0);
         } else {
             intent = EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
-                    mIssueNumber, comment, 0);
+                    mIssueNumber, comment.id(), comment.body(), 0);
         }
 
         startActivityForResult(intent, REQUEST_EDIT);
     }
 
     @Override
-    public void deleteComment(final Comment comment) {
+    public void deleteComment(final GitHubCommentBase comment) {
         new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.delete_comment_message)
                 .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
@@ -305,7 +311,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    public String getShareSubject(Comment comment) {
+    public String getShareSubject(GitHubCommentBase comment) {
         return null;
     }
 
@@ -314,33 +320,44 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(Comment comment) throws IOException {
-        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-        Gh4Application app = Gh4Application.get();
-        if (comment instanceof CommitComment) {
-            PullRequestService pullService =
-                    (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
-            return pullService.getCommentReactions(repoId, comment.getId());
+    public List<Reaction> loadReactionDetailsInBackground(final GitHubCommentBase comment)
+            throws IOException {
+        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        final ApiHelpers.Pager.PageProvider<Reaction> pageProvider;
+        if (comment instanceof ReviewComment) {
+            pageProvider = new ApiHelpers.Pager.PageProvider<Reaction>() {
+                @Override
+                public Page<Reaction> providePage(long page) throws IOException {
+                    return ApiHelpers.throwOnFailure(service.getPullRequestReviewCommentReactions(
+                            mRepoOwner, mRepoName, comment.id(), page).blockingGet());
+                }
+            };
         } else {
-            IssueService issueService =
-                    (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
-            return issueService.getCommentReactions(repoId, comment.getId());
+            pageProvider = new ApiHelpers.Pager.PageProvider<Reaction>() {
+                @Override
+                public Page<Reaction> providePage(long page) throws IOException {
+                    return ApiHelpers.throwOnFailure(service.getIssueCommentReactions(
+                            mRepoOwner, mRepoName, comment.id(), page).blockingGet());
+                }
+            };
         }
+        return ApiHelpers.Pager.fetchAllPages(pageProvider);
     }
 
     @Override
-    public Reaction addReactionInBackground(Comment comment, String content) throws IOException {
-        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-        Gh4Application app = Gh4Application.get();
-        if (comment instanceof CommitComment) {
-            PullRequestService pullService =
-                    (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
-            return pullService.addCommentReaction(repoId, comment.getId(), content);
+    public Reaction addReactionInBackground(GitHubCommentBase comment, String content)
+            throws IOException {
+        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        final ReactionRequest request = ReactionRequest.builder().content(content).build();
+        final Response<Reaction> response;
+        if (comment instanceof ReviewComment) {
+            response = service.createPullRequestReviewCommentReaction(
+                    mRepoOwner, mRepoName, comment.id(), request).blockingGet();
         } else {
-            IssueService issueService =
-                    (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
-            return issueService.addCommentReaction(repoId, comment.getId(), content);
+            response = service.createIssueCommentReaction(
+                    mRepoOwner, mRepoName, comment.id(), request).blockingGet();
         }
+        return ApiHelpers.throwOnFailure(response);
     }
 
     @Override
@@ -355,11 +372,14 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
     @Override
     public void onEditorSendInBackground(String comment) throws IOException {
-        Gh4Application app = Gh4Application.get();
-        PullRequestService pullService =
-                (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
-        RepositoryId repositoryId = new RepositoryId(mRepoOwner, mRepoName);
-        pullService.replyToComment(repositoryId, mIssueNumber, mSelectedReplyCommentId, comment);
+        PullRequestReviewCommentService service =
+                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+        CreateReviewComment request = CreateReviewComment.builder()
+                .body(comment)
+                .inReplyTo(mSelectedReplyCommentId)
+                .build();
+        ApiHelpers.throwOnFailure(service.createReviewComment(
+                mRepoOwner, mRepoName, mIssueNumber, request).blockingGet());
     }
 
     @Override
@@ -373,9 +393,9 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private final Comment mComment;
+        private final GitHubCommentBase mComment;
 
-        public DeleteCommentTask(BaseActivity activity, Comment comment) {
+        public DeleteCommentTask(BaseActivity activity, GitHubCommentBase comment) {
             super(activity, R.string.deleting_msg);
             mComment = comment;
         }
@@ -387,18 +407,17 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
         @Override
         protected Void run() throws Exception {
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            Gh4Application app = Gh4Application.get();
-
-            if (mComment instanceof CommitComment) {
-                PullRequestService pullService =
-                        (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
-                pullService.deleteComment(repoId, mComment.getId());
+            final Response<Void> response;
+            if (mComment instanceof ReviewComment) {
+                PullRequestReviewCommentService service =
+                        Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                response = service.deleteComment(mRepoOwner, mRepoName, mComment.id()).blockingGet();
             } else {
-                IssueService issueService =
-                        (IssueService) app.getService(Gh4Application.ISSUE_SERVICE);
-                issueService.deleteComment(repoId, mComment.getId());
+                IssueCommentService service =
+                        Gh4Application.get().getGitHubService(IssueCommentService.class);
+                response = service.deleteIssueComment(mRepoOwner, mRepoName, mComment.id()).blockingGet();
             }
+            ApiHelpers.throwOnFailure(response);
             return null;
         }
 

@@ -17,8 +17,7 @@ import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
-
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +48,7 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
             String ourLogin = Gh4Application.get().getAuthLogin();
             mOriginalUsers.clear();
             for (User user : newUsers) {
-                if (!TextUtils.equals(ourLogin, user.getLogin())) {
+                if (!TextUtils.equals(ourLogin, user.login())) {
                     mOriginalUsers.add(user);
                 }
             }

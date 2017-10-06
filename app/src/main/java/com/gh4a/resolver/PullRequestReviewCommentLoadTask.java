@@ -7,13 +7,15 @@ import android.support.v4.app.FragmentActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.loader.TimelineItem;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Review;
+import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
-import org.eclipse.egit.github.core.CommitComment;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.Review;
-import org.eclipse.egit.github.core.service.PullRequestService;
-
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -41,18 +43,26 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
 
     @Override
     protected Intent run() throws Exception {
-        PullRequestService pullRequestService = (PullRequestService) Gh4Application.get()
-                .getService(Gh4Application.PULL_SERVICE);
-        RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+        final Gh4Application app = Gh4Application.get();
+        final PullRequestReviewService reviewService =
+                app.getGitHubService(PullRequestReviewService.class);
+        final PullRequestReviewCommentService commentService =
+                app.getGitHubService(PullRequestReviewCommentService.class);
 
-        List<CommitComment> comments = pullRequestService.getComments(repoId,
-                mPullRequestNumber);
+        List<ReviewComment> comments = ApiHelpers.Pager.fetchAllPages(
+                new ApiHelpers.Pager.PageProvider<ReviewComment>() {
+            @Override
+            public Page<ReviewComment> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(commentService.getPullRequestComments(
+                        mRepoOwner, mRepoName, mPullRequestNumber, page).blockingGet());
+            }
+        });
 
         // Required to have comments sorted so we can find correct review
-        Collections.sort(comments);
+        Collections.sort(comments, ApiHelpers.COMMENT_COMPARATOR);
 
-        Map<String, CommitComment> commentsByDiffHunkId = new HashMap<>();
-        for (CommitComment comment : comments) {
+        Map<String, ReviewComment> commentsByDiffHunkId = new HashMap<>();
+        for (ReviewComment comment : comments) {
             String id = TimelineItem.Diff.getDiffHunkId(comment);
 
             if (!commentsByDiffHunkId.containsKey(id)) {
@@ -61,14 +71,14 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
                 commentsByDiffHunkId.put(id, comment);
             }
 
-            if (mMarker.matches(comment.getId(), null)) {
+            if (mMarker.matches(comment.id(), null)) {
                 // Once found the comment we are looking for get a correct review id from
                 // the initial diff hunk comment
-                CommitComment initialComment = commentsByDiffHunkId.get(id);
-                long reviewId = initialComment.getPullRequestReviewId();
+                ReviewComment initialComment = commentsByDiffHunkId.get(id);
+                long reviewId = initialComment.pullRequestReviewId();
 
-                Review review = pullRequestService.getReview(repoId, mPullRequestNumber,
-                        reviewId);
+                Review review = ApiHelpers.throwOnFailure(reviewService.getReview(
+                        mRepoOwner, mRepoName, mPullRequestNumber, reviewId).blockingGet());
                 return ReviewActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                         mPullRequestNumber, review, mMarker);
             }

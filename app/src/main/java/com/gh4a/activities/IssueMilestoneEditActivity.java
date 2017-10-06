@@ -52,14 +52,16 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 import com.gh4a.widget.MarkdownButtonsBar;
 import com.gh4a.widget.MarkdownPreviewWebView;
-
-import org.eclipse.egit.github.core.Milestone;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.service.MilestoneService;
+import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.model.Milestone;
+import com.meisolsson.githubsdk.model.request.issue.CreateMilestone;
+import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+
+import retrofit2.Response;
 
 public class IssueMilestoneEditActivity extends BasePagerActivity implements
         View.OnClickListener, View.OnFocusChangeListener, AppBarLayout.OnOffsetChangedListener {
@@ -135,8 +137,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         actionBar.setDisplayShowTitleEnabled(true);
 
         if (mMilestone == null) {
-            mMilestone = new Milestone();
-            mMilestone.setState(ApiHelpers.IssueState.OPEN);
+            mMilestone = Milestone.builder().state(IssueState.Open).build();
         }
 
         mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, mSaveFab));
@@ -151,8 +152,8 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             }
         });
 
-        mTitleView.setText(mMilestone.getTitle());
-        mDescriptionView.setText(mMilestone.getDescription());
+        mTitleView.setText(mMilestone.title());
+        mDescriptionView.setText(mMilestone.description());
         updateHighlightColor();
         updateLabels();
         setToolbarScrollable(false);
@@ -186,7 +187,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
         mFromPullRequest = extras.getBoolean("from_pr", false);
-        mMilestone = (Milestone) extras.getSerializable("milestone");
+        mMilestone = extras.getParcelable("milestone");
     }
 
     private boolean isInEditMode() {
@@ -206,9 +207,9 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.edit_milestone_menu, menu);
 
-            if (mMilestone.getState().equals(ApiHelpers.MilestoneState.OPEN)) {
+            if (mMilestone.state() == IssueState.Open) {
                 menu.removeItem(R.id.milestone_reopen);
-            } else if (mMilestone.getState().equals(ApiHelpers.MilestoneState.CLOSED)) {
+            } else {
                 menu.removeItem(R.id.milestone_close);
             }
         }
@@ -230,8 +231,10 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             String desc = mDescriptionView.getText() != null ?
                     mDescriptionView.getText().toString() : null;
 
-            mMilestone.setTitle(title);
-            mMilestone.setDescription(desc);
+            mMilestone = mMilestone.toBuilder()
+                    .title(title)
+                    .description(desc)
+                    .build();
             new SaveIssueMilestoneTask(mMilestone).schedule();
         }
     }
@@ -261,11 +264,11 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             case R.id.delete:
                 new AlertDialog.Builder(this)
                         .setMessage(getString(R.string.issue_dialog_delete_message,
-                                mMilestone.getTitle()))
+                                mMilestone.title()))
                         .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteIssueMilestoneTask(mMilestone.getNumber()).schedule();
+                                new DeleteIssueMilestoneTask(mMilestone.number()).schedule();
                             }
                         })
                         .setNegativeButton(R.string.cancel, null)
@@ -286,9 +289,6 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 .setPositiveButton(buttonResId, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        mMilestone.setState(reopen
-                                ? ApiHelpers.MilestoneState.OPEN
-                                : ApiHelpers.MilestoneState.CLOSED);
                         new OpenCloseIssueMilestoneTask(mMilestone, reopen).schedule();
                     }
                 })
@@ -297,10 +297,10 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
     }
 
     private void updateHighlightColor() {
-        boolean closed = ApiHelpers.IssueState.CLOSED.equals(mMilestone.getState());
+        boolean closed = mMilestone.state() == IssueState.Closed;
         transitionHeaderToColor(closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
                 closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
-        mSaveFab.setState(mMilestone.getState());
+        mSaveFab.setState(mMilestone.state());
     }
 
     private void setDueOn(int year, int month, int day) {
@@ -312,17 +312,21 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
 
-        mMilestone.setDueOn(cal.getTime());
+        mMilestone = mMilestone.toBuilder()
+                .dueOn(cal.getTime())
+                .build();
         updateLabels();
     }
 
     private void resetDueOn() {
-        mMilestone.setDueOn(null);
+        mMilestone = mMilestone.toBuilder()
+                .dueOn(null)
+                .build();
         updateLabels();
     }
 
     private void updateLabels() {
-        Date dueOn = mMilestone.getDueOn();
+        Date dueOn = mMilestone.dueOn();
 
         if (dueOn != null) {
             mDueView.setText(DateFormat.getMediumDateFormat(this).format(dueOn));
@@ -346,15 +350,18 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
 
         @Override
         protected Void run() throws IOException {
-            MilestoneService milestoneService = (MilestoneService)
-                    Gh4Application.get().getService(Gh4Application.MILESTONE_SERVICE);
-
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            if (isInEditMode()) {
-                milestoneService.editMilestone(repoId, mMilestone);
-            } else {
-                milestoneService.createMilestone(repoId, mMilestone);
-            }
+            IssueMilestoneService service =
+                    Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+            CreateMilestone request = CreateMilestone.builder()
+                    .title(mMilestone.title())
+                    .description(mMilestone.description())
+                    .state(mMilestone.state())
+                    .dueOn(mMilestone.dueOn())
+                    .build();
+            Response<Milestone> response = isInEditMode()
+                    ? service.editMilestone(mRepoOwner, mRepoName, mMilestone.id(), request).blockingGet()
+                    : service.createMilestone(mRepoOwner, mRepoName, request).blockingGet();
+            ApiHelpers.throwOnFailure(response);
 
             return null;
         }
@@ -368,7 +375,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         @Override
         protected String getErrorMessage() {
             return getContext().getString(R.string.issue_error_create_milestone,
-                    mMilestone.getTitle());
+                    mMilestone.title());
         }
     }
 
@@ -387,9 +394,9 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
 
         @Override
         protected Void run() throws IOException {
-            MilestoneService milestoneService = (MilestoneService)
-                    Gh4Application.get().getService(Gh4Application.MILESTONE_SERVICE);
-            milestoneService.deleteMilestone(mRepoOwner, mRepoName, mNumber);
+            IssueMilestoneService service =
+                    Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+            ApiHelpers.throwOnFailure(service.deleteMilestone(mRepoOwner, mRepoName, mNumber).blockingGet());
             return null;
         }
 
@@ -405,7 +412,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         }
     }
 
-    private class OpenCloseIssueMilestoneTask extends ProgressDialogTask<Void> {
+    private class OpenCloseIssueMilestoneTask extends ProgressDialogTask<Milestone> {
         private final Milestone mMilestone;
         private final boolean mOpen;
 
@@ -416,23 +423,25 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         }
 
         @Override
-        protected ProgressDialogTask<Void> clone() {
+        protected ProgressDialogTask<Milestone> clone() {
             return new OpenCloseIssueMilestoneTask(mMilestone, mOpen);
         }
 
         @Override
-        protected Void run() throws IOException {
-            MilestoneService milestoneService = (MilestoneService)
-                    Gh4Application.get().getService(Gh4Application.MILESTONE_SERVICE);
+        protected Milestone run() throws IOException {
+            IssueMilestoneService service =
+                    Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+            CreateMilestone request = CreateMilestone.builder()
+                    .state(mOpen ? IssueState.Open : IssueState.Closed)
+                    .build();
 
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            milestoneService.editMilestone(repoId, mMilestone);
-
-            return null;
+            return ApiHelpers.throwOnFailure(service.editMilestone(mRepoOwner, mRepoName,
+                    mMilestone.id(), request).blockingGet());
         }
 
         @Override
-        protected void onSuccess(Void result) {
+        protected void onSuccess(Milestone result) {
+            IssueMilestoneEditActivity.this.mMilestone = result;
             updateHighlightColor();
             supportInvalidateOptionsMenu();
             setResult(RESULT_OK);
@@ -443,7 +452,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             return getContext().getString(mOpen
                             ? R.string.issue_milestone_reopen_error
                             : R.string.issue_milestone_close_error,
-                    mMilestone.getTitle());
+                    mMilestone.title());
         }
     }
 
@@ -460,7 +469,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
 
-            Date dueOn = activity.mMilestone.getDueOn();
+            Date dueOn = activity.mMilestone.dueOn();
             if (dueOn != null) {
                 c.setTime(dueOn);
                 year = c.get(Calendar.YEAR);

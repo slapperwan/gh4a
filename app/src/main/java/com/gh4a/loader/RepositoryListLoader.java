@@ -3,22 +3,27 @@ package com.gh4a.loader;
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.service.RepositoryService;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.UserType;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
+import io.reactivex.Single;
+import retrofit2.Response;
+
 public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
     private final String mLogin;
     private final Map<String, String> mFilterData;
     private final int mSize;
-    private final String mUserType;
+    private final UserType mUserType;
 
-    public RepositoryListLoader(Context context, String login, String userType,
+    public RepositoryListLoader(Context context, String login, UserType userType,
             Map<String, String> filterData, int size) {
         super(context);
         this.mLogin = login;
@@ -29,26 +34,18 @@ public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
 
     @Override
     public Collection<Repository> doLoadInBackground() throws IOException {
-        Gh4Application app = Gh4Application.get();
-        RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
-        if (ApiHelpers.loginEquals(mLogin, app.getAuthLogin())) {
-            if (mSize > 0) {
-                return repoService.pageRepositories(mFilterData, mSize).next();
-            } else {
-                return repoService.getRepositories(mFilterData);
-            }
-        } else if (ApiHelpers.UserType.ORG.equals(mUserType)) {
-            if (mSize > 0) {
-                return repoService.pageOrgRepositories(mLogin, mFilterData, mSize).next();
-            } else {
-                return repoService.getOrgRepositories(mLogin, mFilterData);
-            }
+        RepositoryService service = ServiceFactory.createService(
+                RepositoryService.class, null, null, mSize);
+        final Single<Response<Page<Repository>>> observable;
+
+        if (ApiHelpers.loginEquals(mLogin, Gh4Application.get().getAuthLogin())) {
+            observable = service.getUserRepositories(mFilterData, 0);
+        } else if (mUserType == UserType.Organization) {
+            observable = service.getOrganizationRepositories(mLogin, mFilterData, 0);
         } else {
-            if (mSize > 0) {
-                return repoService.pageRepositories(mLogin, mFilterData, mSize).next();
-            } else {
-                return repoService.getRepositories(mLogin, mFilterData);
-            }
+            observable = service.getUserRepositories(mLogin, mFilterData, 0);
         }
+
+        return ApiHelpers.throwOnFailure(observable.blockingGet()).items();
     }
 }

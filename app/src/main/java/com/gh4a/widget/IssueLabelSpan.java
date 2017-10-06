@@ -11,8 +11,7 @@ import android.text.style.ReplacementSpan;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.Label;
+import com.meisolsson.githubsdk.model.Label;
 
 public class IssueLabelSpan extends ReplacementSpan {
     private final RectF mTmpRect = new RectF();

@@ -39,19 +39,20 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.RepositoryTag;
-import org.eclipse.egit.github.core.service.StarService;
-import org.eclipse.egit.github.core.service.WatcherService;
+import com.meisolsson.githubsdk.model.Branch;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.request.activity.SubscriptionRequest;
+import com.meisolsson.githubsdk.service.activity.StarringService;
+import com.meisolsson.githubsdk.service.activity.WatchingService;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Response;
 
 public class RepositoryActivity extends BaseFragmentPagerActivity {
     public static Intent makeIntent(Context context, Repository repo) {
@@ -59,7 +60,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     public static Intent makeIntent(Context context, Repository repo, String ref) {
-        return makeIntent(context, repo.getOwner().getLogin(), repo.getName(), ref);
+        return makeIntent(context, repo.owner().login(), repo.name(), ref);
     }
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
@@ -118,20 +119,20 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         }
     };
 
-    private final LoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>> mBranchesAndTagsCallback =
-            new ProgressDialogLoaderCallbacks<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(this, this) {
+    private final LoaderCallbacks<Pair<List<Branch>, List<Branch>>> mBranchesAndTagsCallback =
+            new ProgressDialogLoaderCallbacks<Pair<List<Branch>, List<Branch>>>(this, this) {
         @Override
-        protected Loader<LoaderResult<Pair<List<RepositoryBranch>, List<RepositoryTag>>>> onCreateLoader() {
-            return new BaseLoader<Pair<List<RepositoryBranch>, List<RepositoryTag>>>(RepositoryActivity.this) {
+        protected Loader<LoaderResult<Pair<List<Branch>, List<Branch>>>> onCreateLoader() {
+            return new BaseLoader<Pair<List<Branch>, List<Branch>>>(RepositoryActivity.this) {
                 @Override
-                protected Pair<List<RepositoryBranch>, List<RepositoryTag>> doLoadInBackground() throws Exception {
+                protected Pair<List<Branch>, List<Branch>> doLoadInBackground() throws Exception {
                     return Pair.create(new BranchListLoader(getContext(), mRepoOwner, mRepoName).doLoadInBackground(),
                             new TagListLoader(getContext(), mRepoOwner, mRepoName).doLoadInBackground());
                 }
             };
         }
         @Override
-        protected void onResultReady(Pair<List<RepositoryBranch>, List<RepositoryTag>> result) {
+        protected void onResultReady(Pair<List<Branch>, List<Branch>> result) {
             mBranches = result.first;
             mTags = result.second;
             showRefSelectionDialog();
@@ -170,8 +171,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     private String mInitialPath;
 
     private Repository mRepository;
-    private List<RepositoryBranch> mBranches;
-    private List<RepositoryTag> mTags;
+    private List<Branch> mBranches;
+    private List<Branch> mTags;
     private String mSelectedRef;
 
     private Boolean mIsWatching;
@@ -218,13 +219,13 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         if (!TextUtils.isEmpty(mSelectedRef)) {
             return mSelectedRef;
         }
-        return mRepository.getDefaultBranch();
+        return mRepository.defaultBranch();
     }
 
     private String getBookmarkUrl() {
         String url = "https://github.com/" + mRepoOwner + "/" + mRepoName;
         String ref = getCurrentRef();
-        return ref.equals(mRepository.getDefaultBranch()) ? url : url + "/tree/" + ref;
+        return ref.equals(mRepository.defaultBranch()) ? url : url + "/tree/" + ref;
     }
 
     @Override
@@ -429,11 +430,11 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         int current = -1, master = -1, count = adapter.getCount();
 
         for (int i = 0; i < count; i++) {
-            String name = adapter.getName(i);
-            if (name.equals(mSelectedRef) || adapter.getSha(i).equals(mSelectedRef)) {
+            Branch item = adapter.getItem(i);
+            if (item.name().equals(mSelectedRef) || item.commit().sha().equals(mSelectedRef)) {
                 current = i;
             }
-            if (name.equals(mRepository.getDefaultBranch())) {
+            if (item.name().equals(mRepository.defaultBranch())) {
                 master = i;
             }
         }
@@ -447,7 +448,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                 .setSingleChoiceItems(adapter, current, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        setSelectedRef(adapter.getName(which));
+                        setSelectedRef(adapter.getItem(which).name());
                         dialog.dismiss();
                     }
                 })
@@ -472,36 +473,20 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     private class BranchAndTagAdapter extends BaseAdapter {
-        private final ArrayList<Object> mItems;
+        private final ArrayList<Branch> mItems;
         private final LayoutInflater mInflater;
         private final int mBranchDrawableResId;
         private final int mTagDrawableResId;
+        private final int mFirstTagIndex;
 
         public BranchAndTagAdapter() {
             mItems = new ArrayList<>();
             mItems.addAll(mBranches);
             mItems.addAll(mTags);
+            mFirstTagIndex = mBranches.size();
             mInflater = LayoutInflater.from(RepositoryActivity.this);
             mBranchDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.branchIcon);
             mTagDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.tagIcon);
-        }
-
-        private String getName(int position) {
-            Object item = mItems.get(position);
-            if (item instanceof RepositoryBranch) {
-                return ((RepositoryBranch) item).getName();
-            } else {
-                return ((RepositoryTag) item).getName();
-            }
-        }
-
-        private String getSha(int position) {
-            Object item = mItems.get(position);
-            if (item instanceof RepositoryBranch) {
-                return ((RepositoryBranch) item).getCommit().getSha();
-            } else {
-                return ((RepositoryTag) item).getCommit().getSha();
-            }
         }
 
         @Override
@@ -510,8 +495,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         }
 
         @Override
-        public Object getItem(int position) {
-            return getName(position);
+        public Branch getItem(int position) {
+            return mItems.get(position);
         }
 
         @Override
@@ -527,9 +512,9 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
             ImageView icon = convertView.findViewById(R.id.icon);
             TextView title = convertView.findViewById(R.id.title);
 
-            icon.setImageResource(mItems.get(position) instanceof RepositoryTag
+            icon.setImageResource(position >= mFirstTagIndex
                     ? mTagDrawableResId : mBranchDrawableResId);
-            title.setText(getName(position));
+            title.setText(mItems.get(position).name());
 
             return convertView;
         }
@@ -542,14 +527,11 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
 
         @Override
         protected Void run() throws IOException {
-            StarService starService = (StarService)
-                    Gh4Application.get().getService(Gh4Application.STAR_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            if (mIsStarring) {
-                starService.unstar(repoId);
-            } else {
-                starService.star(repoId);
-            }
+            StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
+            Response<Void> response = mIsStarring
+                    ? service.unstarRepository(mRepoOwner, mRepoName).blockingGet()
+                    : service.starRepository(mRepoOwner, mRepoName).blockingGet();
+            ApiHelpers.throwOnFailure(response);
             return null;
         }
 
@@ -574,14 +556,19 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
 
         @Override
         protected Void run() throws IOException {
-            WatcherService watcherService = (WatcherService)
-                    Gh4Application.get().getService(Gh4Application.WATCHER_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            if (mIsWatching) {
-                watcherService.unwatch(repoId);
+            WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
+            final Response<?> response;
+            if (mIsStarring) {
+                response = service.deleteRepositorySubscription(mRepoOwner, mRepoName).blockingGet();
             } else {
-                watcherService.watch(repoId);
+                SubscriptionRequest request = SubscriptionRequest.builder()
+                        .subscribed(true)
+                        .ignored(false)
+                        .build();
+                response = service.setRepositorySubscription(mRepoOwner, mRepoName, request)
+                        .blockingGet();
             }
+            ApiHelpers.throwOnFailure(response);
             return null;
         }
 

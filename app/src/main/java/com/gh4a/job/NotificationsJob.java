@@ -33,10 +33,9 @@ import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoader;
 import com.gh4a.utils.AvatarHandler;
-
-import org.eclipse.egit.github.core.Notification;
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.NotificationThread;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -124,15 +123,15 @@ public class NotificationsJob extends Job {
     @NonNull
     @Override
     protected Result onRunJob(Params params) {
-        List<List<Notification>> notifsGroupedByRepo = new ArrayList<>();
+        List<List<NotificationThread>> notifsGroupedByRepo = new ArrayList<>();
         try {
             List<NotificationHolder> notifications =
                     NotificationListLoader.loadNotifications(false, false);
             for (NotificationHolder holder : notifications) {
                 if (holder.notification == null) {
-                    notifsGroupedByRepo.add(new ArrayList<Notification>());
+                    notifsGroupedByRepo.add(new ArrayList<NotificationThread>());
                 } else {
-                    List<Notification> list =
+                    List<NotificationThread> list =
                             notifsGroupedByRepo.get(notifsGroupedByRepo.size() - 1);
                     list.add(holder.notification);
                 }
@@ -150,9 +149,9 @@ public class NotificationsJob extends Job {
             Set<String> newShownRepoIds = new HashSet<>();
             boolean hasUnseenNotification = false, hasNewNotification = false;
 
-            for (List<Notification> list : notifsGroupedByRepo) {
-                for (Notification n : list) {
-                    long timestamp = n.getUpdatedAt().getTime();
+            for (List<NotificationThread> list : notifsGroupedByRepo) {
+                for (NotificationThread n : list) {
+                    long timestamp = n.updatedAt().getTime();
                     hasNewNotification |= timestamp > lastCheck;
                     hasUnseenNotification |= timestamp > lastSeen;
                 }
@@ -168,9 +167,9 @@ public class NotificationsJob extends Job {
                     NotificationManagerCompat.from(getContext());
 
             showSummaryNotification(nm, notifsGroupedByRepo, hasNewNotification);
-            for (List<Notification> list : notifsGroupedByRepo) {
+            for (List<NotificationThread> list : notifsGroupedByRepo) {
                 showRepoNotification(nm, list, lastCheck);
-                String repoId = String.valueOf(list.get(0).getRepository().getId());
+                String repoId = String.valueOf(list.get(0).repository().id());
                 if (lastShownRepoIds != null) {
                     lastShownRepoIds.remove(repoId);
                 }
@@ -194,18 +193,18 @@ public class NotificationsJob extends Job {
     }
 
     private void showRepoNotification(NotificationManagerCompat nm,
-            List<Notification> notifications, long lastCheck) {
-        Repository repository = notifications.get(0).getRepository();
-        final int id = (int) repository.getId();
-        String title = repository.getOwner().getLogin() + "/" + repository.getName();
+            List<NotificationThread> notifications, long lastCheck) {
+        Repository repository = notifications.get(0).repository();
+        final int id = repository.id().intValue();
+        String title = repository.owner().login() + "/" + repository.name();
         // notifications are sorted by time descending
-        long when = notifications.get(0).getUpdatedAt().getTime();
+        long when = notifications.get(0).updatedAt().getTime();
         String text = getContext().getResources()
                 .getQuantityString(R.plurals.unread_notifications_summary_text,
                         notifications.size(), notifications.size());
 
         Intent intent = NotificationHandlingService.makeOpenNotificationActionIntent(
-                getContext(), repository.getOwner().getLogin(), repository.getName());
+                getContext(), repository.owner().login(), repository.name());
         PendingIntent contentIntent = PendingIntent.getService(getContext(), id, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -215,7 +214,7 @@ public class NotificationsJob extends Job {
 
         Intent markReadIntent =
                 NotificationHandlingService.makeMarkReposNotificationsAsReadActionIntent(
-                        getContext(), id, repository.getOwner().getLogin(), repository.getName());
+                        getContext(), id, repository.owner().login(), repository.name());
         PendingIntent markReadPendingIntent = PendingIntent.getService(getContext(), id,
                 markReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Action markReadAction = new NotificationCompat.Action(
@@ -230,7 +229,7 @@ public class NotificationsJob extends Job {
                 .build();
 
         NotificationCompat.Builder builder = makeBaseBuilder()
-                .setLargeIcon(loadRoundUserAvatar(repository.getOwner()))
+                .setLargeIcon(loadRoundUserAvatar(repository.owner()))
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
                 .setWhen(when)
@@ -250,11 +249,11 @@ public class NotificationsJob extends Job {
         NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle("")
                 .setConversationTitle(title);
         for (int i = notifications.size() - 1; i >= 0; i--) {
-            Notification n = notifications.get(i);
-            style.addMessage(n.getSubject().getTitle(),
-                    n.getUpdatedAt().getTime(), determineNotificationTypeLabel(n));
+            NotificationThread n = notifications.get(i);
+            style.addMessage(n.subject().title(),
+                    n.updatedAt().getTime(), determineNotificationTypeLabel(n));
             hasNewNotification = hasNewNotification ||
-                    n.getUpdatedAt().getTime() > lastCheck;
+                    n.updatedAt().getTime() > lastCheck;
         }
         builder.setStyle(style);
 
@@ -266,9 +265,9 @@ public class NotificationsJob extends Job {
     }
 
     private void showSummaryNotification(NotificationManagerCompat nm,
-            List<List<Notification>> notificationsPerRepo, boolean hasNewNotification) {
+            List<List<NotificationThread>> notificationsPerRepo, boolean hasNewNotification) {
         int totalCount = 0;
-        for (List<Notification> list : notificationsPerRepo) {
+        for (List<NotificationThread> list : notificationsPerRepo) {
             totalCount += list.size();
         }
 
@@ -303,9 +302,9 @@ public class NotificationsJob extends Job {
 
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle(builder)
                 .setBigContentTitle(text);
-        for (List<Notification> list : notificationsPerRepo) {
-            Repository repository = list.get(0).getRepository();
-            String repoName = repository.getOwner().getLogin() + "/" + repository.getName();
+        for (List<NotificationThread> list : notificationsPerRepo) {
+            Repository repository = list.get(0).repository();
+            String repoName = repository.owner().login() + "/" + repository.name();
             final TextAppearanceSpan notificationPrimarySpan =
                     new TextAppearanceSpan(getContext(),
                             R.style.TextAppearance_NotificationEmphasized);
@@ -313,10 +312,10 @@ public class NotificationsJob extends Job {
 
             SpannableStringBuilder line = new SpannableStringBuilder(repoName).append(" ");
             if (list.size() == 1) {
-                Notification n = list.get(0);
+                NotificationThread n = list.get(0);
                 line.append(determineNotificationTypeLabel(n));
                 emphasisEnd = line.length();
-                line.append(" ").append(n.getSubject().getTitle());
+                line.append(" ").append(n.subject().title());
             } else {
                 emphasisEnd = line.length();
                 line.append(getContext().getResources().getQuantityString(R.plurals.notification,
@@ -336,9 +335,9 @@ public class NotificationsJob extends Job {
         nm.notify(0, builder.build());
     }
 
-    private String determineNotificationTypeLabel(Notification n) {
+    private String determineNotificationTypeLabel(NotificationThread n) {
         final Resources res = getContext().getResources();
-        switch (n.getSubject().getType()) {
+        switch (n.subject().type()) {
             case NotificationAdapter.SUBJECT_COMMIT:
                 return res.getString(R.string.notification_subject_commit);
             case NotificationAdapter.SUBJECT_ISSUE:
@@ -348,7 +347,7 @@ public class NotificationsJob extends Job {
             case NotificationAdapter.SUBJECT_RELEASE:
                 return res.getString(R.string.notification_subject_release);
         }
-        return n.getSubject().getType();
+        return n.subject().type();
     }
 
     private NotificationCompat.Builder makeBaseBuilder() {

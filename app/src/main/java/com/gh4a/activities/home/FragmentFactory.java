@@ -7,7 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import org.eclipse.egit.github.core.User;
+import com.meisolsson.githubsdk.model.User;
 
 public abstract class FragmentFactory {
     protected final HomeActivity mActivity;

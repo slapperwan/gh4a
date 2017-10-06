@@ -15,9 +15,6 @@
  */
 package com.gh4a.adapter;
 
-import org.eclipse.egit.github.core.Gist;
-import org.eclipse.egit.github.core.User;
-
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -29,6 +26,8 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.Gist;
+import com.meisolsson.githubsdk.model.User;
 
 public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
     private final String mOwnerLogin;
@@ -46,8 +45,8 @@ public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, Gist gist) {
-        User user = gist.getOwner();
-        boolean isSelf = user != null && TextUtils.equals(user.getLogin(), mOwnerLogin);
+        User user = gist.owner();
+        boolean isSelf = user != null && TextUtils.equals(user.login(), mOwnerLogin);
 
         if (isSelf) {
             holder.tvCreator.setVisibility(View.GONE);
@@ -57,11 +56,11 @@ public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
         }
 
         holder.tvTimestamp.setText(
-                StringUtils.formatRelativeTime(mContext, gist.getCreatedAt(), false));
-        holder.tvTitle.setText(TextUtils.isEmpty(gist.getDescription())
-                ? mContext.getString(R.string.gist_no_description) : gist.getDescription());
-        holder.tvSha.setText(gist.getId());
-        holder.tvFiles.setText(String.valueOf(gist.getFiles().size()));
+                StringUtils.formatRelativeTime(mContext, gist.createdAt(), false));
+        holder.tvTitle.setText(TextUtils.isEmpty(gist.description())
+                ? mContext.getString(R.string.gist_no_description) : gist.description());
+        holder.tvSha.setText(gist.id());
+        holder.tvFiles.setText(String.valueOf(gist.files().size()));
         holder.tvPrivate.setVisibility(gist.isPublic() ? View.GONE : View.VISIBLE);
     }
 

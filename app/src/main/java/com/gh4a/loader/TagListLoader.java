@@ -1,18 +1,17 @@
 package com.gh4a.loader;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-
-import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.RepositoryTag;
-import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.content.Context;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Branch;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
-public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
+public class TagListLoader extends BaseLoader<List<Branch>> {
     private final String mRepoOwner;
     private final String mRepoName;
 
@@ -23,19 +22,15 @@ public class TagListLoader extends BaseLoader<List<RepositoryTag>> {
     }
 
     @Override
-    public List<RepositoryTag> doLoadInBackground() throws IOException {
-        RepositoryService repoService = (RepositoryService)
-                Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
-        List<RepositoryTag> tags = repoService.getTags(new RepositoryId(mRepoOwner, mRepoName));
-        ArrayList<RepositoryTag> result = new ArrayList<>();
-
-        if (tags != null) {
-            for (RepositoryTag tag : tags) {
-                if (tag != null) {
-                    result.add(tag);
-                }
+    public List<Branch> doLoadInBackground() throws IOException {
+        final RepositoryService service =
+                Gh4Application.get().getGitHubService(RepositoryService.class);
+        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Branch>() {
+            @Override
+            public Page<Branch> providePage(long page) throws IOException {
+                return ApiHelpers.throwOnFailure(
+                        service.getTags(mRepoOwner, mRepoName, page).blockingGet());
             }
-        }
-        return result;
+        });
     }
 }

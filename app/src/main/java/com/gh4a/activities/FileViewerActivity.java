@@ -26,11 +26,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v4.print.PrintHelper;
 import android.support.v7.widget.PopupMenu;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.R;
 import com.gh4a.loader.ContentLoader;
 import com.gh4a.loader.LoaderCallbacks;
@@ -38,13 +40,9 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-
-import org.eclipse.egit.github.core.FieldError;
-import org.eclipse.egit.github.core.RepositoryContents;
-import org.eclipse.egit.github.core.RequestError;
-import org.eclipse.egit.github.core.TextMatch;
-import org.eclipse.egit.github.core.client.RequestException;
-import org.eclipse.egit.github.core.util.EncodingUtils;
+import com.meisolsson.githubsdk.model.ClientErrorResponse;
+import com.meisolsson.githubsdk.model.Content;
+import com.meisolsson.githubsdk.model.TextMatch;
 
 import java.util.List;
 import java.util.Locale;
@@ -86,24 +84,23 @@ public class FileViewerActivity extends WebViewerActivity
     private int mHighlightStart;
     private int mHighlightEnd;
     private TextMatch mTextMatch;
-    private RepositoryContents mContent;
+    private Content mContent;
     private int mLastTouchedLine = 0;
     private boolean mViewRawText;
 
     private static final int MENU_ITEM_HISTORY = 10;
     private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
 
-    private final LoaderCallbacks<List<RepositoryContents>> mFileCallback =
-            new LoaderCallbacks<List<RepositoryContents>>(this) {
+    private final LoaderCallbacks<Content> mFileCallback = new LoaderCallbacks<Content>(this) {
         @Override
-        protected Loader<LoaderResult<List<RepositoryContents>>> onCreateLoader() {
+        protected Loader<LoaderResult<Content>> onCreateLoader() {
             return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
         }
 
         @Override
-        protected void onResultReady(List<RepositoryContents> result) {
-            if (result != null && !result.isEmpty()) {
-                mContent = result.get(0);
+        protected void onResultReady(Content result) {
+            if (result != null) {
+                mContent = result;
                 onDataReady();
                 setContentEmpty(false);
             } else {
@@ -114,12 +111,13 @@ public class FileViewerActivity extends WebViewerActivity
 
         @Override
         protected boolean onError(Exception e) {
-            if (e instanceof RequestException) {
-                RequestError error = ((RequestException) e).getError();
-                List<FieldError> errors = error != null ? error.getErrors() : null;
+            if (e instanceof ApiRequestException) {
+                ClientErrorResponse response = ((ApiRequestException) e).getResponse();
+                List<ClientErrorResponse.FieldError> errors =
+                        response != null ? response.errors() : null;
                 if (errors != null) {
-                    for (FieldError fe : errors) {
-                        if ("too_large".equals(fe.getCode())) {
+                    for (ClientErrorResponse.FieldError fe : errors) {
+                        if (fe.reason() == ClientErrorResponse.FieldError.Reason.TooLarge) {
                             openUnsuitableFileAndFinish();
                             return true;
                         }
@@ -163,7 +161,7 @@ public class FileViewerActivity extends WebViewerActivity
         mRef = extras.getString("ref");
         mHighlightStart = extras.getInt("highlight_start", -1);
         mHighlightEnd = extras.getInt("highlight_end", -1);
-        mTextMatch = (TextMatch) extras.getSerializable("text_match");
+        mTextMatch = extras.getParcelable("text_match");
     }
 
     @Override
@@ -180,7 +178,7 @@ public class FileViewerActivity extends WebViewerActivity
 
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
-        String base64Data = mContent.getContent();
+        String base64Data = mContent.content();
         if (base64Data != null && FileUtils.isImage(mPath)) {
             String title = addTitleHeader ? getDocumentTitle() : null;
             String imageUrl = "data:" + FileUtils.getMimeTypeFor(mPath) +
@@ -190,7 +188,7 @@ public class FileViewerActivity extends WebViewerActivity
             return generateMarkdownHtml(base64Data,
                     mRepoOwner, mRepoName, mRef, cssTheme, addTitleHeader);
         } else {
-            String data = base64Data != null ? new String(EncodingUtils.fromBase64(base64Data)) : "";
+            String data = base64Data != null ? StringUtils.fromBase64(base64Data) : "";
             findMatchingLines(data);
             return generateCodeHtml(data, mPath,
                     mHighlightStart, mHighlightEnd, cssTheme, addTitleHeader);
@@ -202,7 +200,7 @@ public class FileViewerActivity extends WebViewerActivity
             return;
         }
 
-        int[] matchingLines = StringUtils.findMatchingLines(data, mTextMatch.getFragment());
+        int[] matchingLines = StringUtils.findMatchingLines(data, mTextMatch.fragment());
         if (matchingLines != null) {
             mHighlightStart = matchingLines[0];
             mHighlightEnd = matchingLines[1];
@@ -220,11 +218,11 @@ public class FileViewerActivity extends WebViewerActivity
         if (!FileUtils.isImage(mPath)) {
             return false;
         }
-        String base64Data = mContent != null ? mContent.getContent() : null;
+        String base64Data = mContent != null ? mContent.content() : null;
         if (base64Data == null) {
             return false;
         }
-        byte[] decodedData = EncodingUtils.fromBase64(base64Data);
+        byte[] decodedData = Base64.decode(base64Data, Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(decodedData, 0, decodedData.length);
 
         PrintHelper printHelper = new PrintHelper(this);

@@ -15,13 +15,10 @@
  */
 package com.gh4a.fragment;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.eclipse.egit.github.core.Repository;
-import org.eclipse.egit.github.core.client.PageIterator;
-import org.eclipse.egit.github.core.service.RepositoryService;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -32,7 +29,13 @@ import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
+
+import retrofit2.Response;
 
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
@@ -99,12 +102,9 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected PageIterator<Repository> onCreateIterator() {
-        Gh4Application app = Gh4Application.get();
-        boolean isSelf = ApiHelpers.loginEquals(mLogin, app.getAuthLogin());
-        RepositoryService repoService = (RepositoryService) app.getService(Gh4Application.REPO_SERVICE);
-
-        Map<String, String> filterData = new HashMap<>();
+    protected PageIteratorLoader<Repository> onCreateLoader() {
+        final boolean isSelf = ApiHelpers.loginEquals(mLogin, Gh4Application.get().getAuthLogin());
+        final Map<String, String> filterData = new HashMap<>();
 
         // We're operating on the limit of what Github's repo API supports. Specifically,
         // it doesn't support sorting for the organization repo list endpoint, so we're using
@@ -131,9 +131,16 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
             filterData.put("direction", mSortDirection);
         }
 
-        if (isSelf) {
-            return repoService.pageRepositories(filterData);
-        }
-        return repoService.pageRepositories(mLogin, filterData);
+        return new PageIteratorLoader<Repository>(getActivity()) {
+            final RepositoryService service =
+                    Gh4Application.get().getGitHubService(RepositoryService.class);
+            @Override
+            protected Page<Repository> loadPage(int page) throws IOException {
+                Response<Page<Repository>> response = isSelf
+                        ? service.getUserRepositories(filterData, page).blockingGet()
+                        : service.getUserRepositories(mLogin, filterData, page).blockingGet();
+                return ApiHelpers.throwOnFailure(response);
+            }
+        };
     }
 }

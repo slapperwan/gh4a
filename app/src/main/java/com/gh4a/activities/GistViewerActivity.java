@@ -32,10 +32,9 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
-
-import org.eclipse.egit.github.core.Gist;
-import org.eclipse.egit.github.core.GistFile;
-import org.eclipse.egit.github.core.util.EncodingUtils;
+import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.Gist;
+import com.meisolsson.githubsdk.model.GistFile;
 
 public class GistViewerActivity extends WebViewerActivity {
     public static Intent makeIntent(Context context, String id, String fileName) {
@@ -56,8 +55,8 @@ public class GistViewerActivity extends WebViewerActivity {
         }
         @Override
         protected void onResultReady(Gist result) {
-            mGistOwner = ApiHelpers.getUserLogin(GistViewerActivity.this, result.getOwner());
-            mGistFile = result.getFiles().get(mFileName);
+            mGistOwner = ApiHelpers.getUserLogin(GistViewerActivity.this, result.owner());
+            mGistFile = result.files().get(mFileName);
             onDataReady();
         }
     };
@@ -97,11 +96,11 @@ public class GistViewerActivity extends WebViewerActivity {
 
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
-        if (FileUtils.isMarkdown(mGistFile.getFilename())) {
-            String base64Data = EncodingUtils.toBase64(mGistFile.getContent());
+        if (FileUtils.isMarkdown(mGistFile.filename())) {
+            String base64Data = StringUtils.toBase64(mGistFile.content());
             return generateMarkdownHtml(base64Data, null, null, null, cssTheme, addTitleHeader);
         } else {
-            return generateCodeHtml(mGistFile.getContent(), mFileName,
+            return generateCodeHtml(mGistFile.content(), mFileName,
                     -1, -1, cssTheme, addTitleHeader);
         }
     }
@@ -117,7 +116,7 @@ public class GistViewerActivity extends WebViewerActivity {
         inflater.inflate(R.menu.file_viewer_menu, menu);
 
         menu.removeItem(R.id.share);
-        if (mGistFile == null || FileUtils.isMarkdown(mGistFile.getFilename())) {
+        if (mGistFile == null || FileUtils.isMarkdown(mGistFile.filename())) {
             menu.removeItem(R.id.wrap);
         }
 
@@ -133,7 +132,7 @@ public class GistViewerActivity extends WebViewerActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(mGistFile.getRawUrl()));
+                IntentUtils.launchBrowser(this, Uri.parse(mGistFile.rawUrl()));
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -29,7 +29,7 @@ class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timelin
 
     @Override
     public void bind(TimelineItem.Reply item) {
-        boolean selected = item.timelineComment.comment.getId() == mCallback.getSelectedCommentId();
+        boolean selected = item.timelineComment.comment().id() == mCallback.getSelectedCommentId();
         mReplyButton.setTag(item.timelineComment);
         mReplyButton.setText(selected ? R.string.reply_selected : R.string.reply);
     }
@@ -39,7 +39,7 @@ class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timelin
         if (v.getId() == R.id.btn_reply) {
             TimelineItem.TimelineComment timelineComment =
                     (TimelineItem.TimelineComment) v.getTag();
-            mCallback.reply(timelineComment.comment.getId());
+            mCallback.reply(timelineComment.comment().id());
         }
     }
 }

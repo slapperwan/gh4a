@@ -71,9 +71,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
-
-import org.eclipse.egit.github.core.BlockReason;
-import org.eclipse.egit.github.core.client.RequestException;
+import com.meisolsson.githubsdk.model.ClientErrorResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -608,13 +606,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
             View retryButton = error.findViewById(R.id.retry_button);
             TextView messageView = error.findViewById(R.id.error_message);
 
-            RequestException re = e instanceof RequestException ? (RequestException) e : null;
-            BlockReason blockReason = re != null && re.getError() != null
-                    ? re.getError().getBlockReason() : null;
+            ApiRequestException re = e instanceof ApiRequestException ? (ApiRequestException) e : null;
+            ClientErrorResponse.BlockReason blockReason = re != null && re.getResponse() != null
+                    ? re.getResponse().blockReason() : null;
 
             if (blockReason != null) {
                 messageView.setText(
-                        getString(R.string.load_failure_explanation_dmca, blockReason.getHtmlUrl()));
+                        getString(R.string.load_failure_explanation_dmca, blockReason.htmlUrl()));
                 retryButton.setVisibility(View.GONE);
             } else if (re != null && re.getMessage() != null) {
                 messageView.setText(
