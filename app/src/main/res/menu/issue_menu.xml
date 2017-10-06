@@ -22,4 +22,10 @@
         android:icon="@drawable/web_site"
         android:title="@string/open_in_browser"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/copy_number"
+        android:title="@string/copy_number"
+        app:showAsAction="never" />
+
 </menu>

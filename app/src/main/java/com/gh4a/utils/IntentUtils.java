@@ -2,6 +2,8 @@ package com.gh4a.utils;
 
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -85,6 +87,13 @@ public class IntentUtils {
         shareIntent.putExtra(Intent.EXTRA_TEXT, url);
         context.startActivity(
                 Intent.createChooser(shareIntent, context.getString(R.string.share_title)));
+    }
+
+    public static void copyToClipboard(Context context, CharSequence label, CharSequence text) {
+        ClipboardManager clipboardManager =
+                (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clipData = ClipData.newPlainText(label, text);
+        clipboardManager.setPrimaryClip(clipData);
     }
 
     private static Intent createActivityChooserIntent(Context context, Intent intent, Uri uri) {

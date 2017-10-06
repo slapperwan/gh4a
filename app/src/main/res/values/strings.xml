@@ -516,4 +516,5 @@
     <string name="first_timer">First-timer</string>
     <string name="member">Member</string>
     <string name="owner">Owner</string>
+    <string name="copy_number">Copy number</string>
 </resources>

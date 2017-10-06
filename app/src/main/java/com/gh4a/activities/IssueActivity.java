@@ -221,6 +221,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         if (mIssue == null) {
             menu.removeItem(R.id.browser);
             menu.removeItem(R.id.share);
+            menu.removeItem(R.id.copy_number);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -248,6 +249,10 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                 return true;
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(mIssue.getHtmlUrl()));
+                return true;
+            case R.id.copy_number:
+                IntentUtils.copyToClipboard(this, "Issue #" + mIssueNumber,
+                        String.valueOf(mIssueNumber));
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -252,6 +252,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         if (mPullRequest == null) {
             menu.removeItem(R.id.share);
             menu.removeItem(R.id.browser);
+            menu.removeItem(R.id.copy_number);
         }
 
         if (mPullRequest == null || mPullRequest.getHead().getRepo() == null) {
@@ -285,6 +286,10 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(mPullRequest.getHtmlUrl()));
                 break;
+            case R.id.copy_number:
+                IntentUtils.copyToClipboard(this, "Pull Request #" + mPullRequest.getNumber(),
+                        String.valueOf(mPullRequest.getNumber()));
+                return true;
             case R.id.delete_branch:
                 showDeleteRestoreBranchConfirmDialog(mHeadReference == null);
                 break;
