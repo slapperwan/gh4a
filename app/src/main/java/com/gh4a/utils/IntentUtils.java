@@ -169,7 +169,7 @@ public class IntentUtils {
                 new Parcelable.ClassLoaderCreator<InitialCommentMarker>() {
             @Override
             public InitialCommentMarker createFromParcel(Parcel in, ClassLoader loader) {
-                return createFromParcel(in, null);
+                return createFromParcel(in);
             }
 
             @Override
