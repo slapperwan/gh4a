@@ -9,7 +9,6 @@ import android.text.TextUtils;
 
 import com.gh4a.activities.BlogListActivity;
 import com.gh4a.activities.CommitActivity;
-import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
@@ -88,8 +87,6 @@ public class LinkParser {
         }
 
         switch (action) {
-            case "downloads":
-                return new ParseResult(DownloadsActivity.makeIntent(activity, user, repo));
             case "releases":
                 return parseReleaseLink(activity, parts, user, repo, id);
             case "tree":
