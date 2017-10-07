@@ -304,15 +304,6 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/releases" />
 
-                <com.gh4a.widget.StyleableTextView
-                    android:id="@+id/tv_downloads_label"
-                    style="@style/SelectableLabel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="@dimen/content_padding"
-                    android:paddingRight="@dimen/content_padding"
-                    android:text="@string/downloads" />
-
             </LinearLayout>
 
         </android.support.v7.widget.CardView>

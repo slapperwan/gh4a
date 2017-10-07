@@ -32,7 +32,6 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
-import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.ForkListActivity;
 import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.ReleaseListActivity;
@@ -253,7 +252,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         Permissions permissions = mRepository.getPermissions();
         updateClickableLabel(R.id.tv_collaborators_label,
                 permissions != null && permissions.hasPushAccess());
-        updateClickableLabel(R.id.tv_downloads_label, mRepository.isHasDownloads());
         updateClickableLabel(R.id.tv_wiki_label, mRepository.isHasWiki());
 
         TextView tvStargazersCount = mContentView.findViewById(R.id.tv_stargazers_count);
@@ -340,8 +338,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             intent = ForkListActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.tv_wiki_label) {
             intent = WikiListActivity.makeIntent(getActivity(), owner, name, null);
-        } else if (id == R.id.tv_downloads_label) {
-            intent = DownloadsActivity.makeIntent(getActivity(), owner, name);
         } else if (id == R.id.tv_releases_label) {
             intent = ReleaseListActivity.makeIntent(getActivity(), owner, name);
         } else if (view.getTag() instanceof Repository) {

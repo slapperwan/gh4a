@@ -32,7 +32,7 @@ import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
-import com.gh4a.adapter.DownloadAdapter;
+import com.gh4a.adapter.ReleaseAssetAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
@@ -231,7 +231,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
         if (mRelease.getAssets() != null && !mRelease.getAssets().isEmpty()) {
             RecyclerView downloadsList = findViewById(R.id.download_list);
-            DownloadAdapter adapter = new DownloadAdapter(this);
+            ReleaseAssetAdapter adapter = new ReleaseAssetAdapter(this);
             adapter.addAll(mRelease.getAssets());
             adapter.setOnItemClickListener(this);
             downloadsList.setLayoutManager(new LinearLayoutManager(this));
