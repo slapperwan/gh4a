@@ -8,7 +8,6 @@ import com.gh4a.BuildConfig;
 import com.gh4a.activities.BlogListActivity;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CompareActivity;
-import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
@@ -190,16 +189,6 @@ public class LinkParserTest {
         assertThat("Initial path is set", extras.getString("initial_path"), is(nullValue()));
         assertThat("Initial page did not lead to overview", extras.getInt("initial_page"),
                 is(RepositoryActivity.PAGE_REPO_OVERVIEW));
-    }
-
-    @Test
-    public void downloadsLink__opensDownloadsActivity() throws Exception {
-        LinkParser.ParseResult result = parseLink("https://github.com/slapperwan/gh4a/downloads");
-        assertRedirectsTo(result, DownloadsActivity.class);
-        Bundle extras = result.intent.getExtras();
-        assertThat("Extras are missing", extras, is(notNullValue()));
-        assertThat("User name is incorrect", extras.getString("owner"), is("slapperwan"));
-        assertThat("Repo name is incorrect", extras.getString("repo"), is("gh4a"));
     }
 
     @Test

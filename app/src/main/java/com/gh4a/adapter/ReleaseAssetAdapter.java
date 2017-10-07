@@ -13,8 +13,8 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 
-public class DownloadAdapter extends RootAdapter<Download, DownloadAdapter.ViewHolder> {
-    public DownloadAdapter(Context context) {
+public class ReleaseAssetAdapter extends RootAdapter<Download, ReleaseAssetAdapter.ViewHolder> {
+    public ReleaseAssetAdapter(Context context) {
         super(context);
     }
 

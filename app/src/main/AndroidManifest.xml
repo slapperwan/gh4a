@@ -56,7 +56,6 @@
         <activity android:name=".activities.CommitHistoryActivity" android:exported="false" />
         <activity android:name=".activities.CompareActivity" android:exported="false" />
         <activity android:name=".activities.ContributorListActivity" android:exported="false" />
-        <activity android:name=".activities.DownloadsActivity" android:exported="false" />
         <activity
             android:name=".activities.EditCommitCommentActivity"
             android:exported="false"
