@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.Single;
 import retrofit2.Response;
 
 public class ApiHelpers {
@@ -186,6 +188,52 @@ public class ApiHelpers {
                 nextPage = page.next() != null ? page.next() : 0;
             } while (nextPage > 0);
             return result;
+        }
+    }
+
+    public static class PageIterator<T> {
+        public interface PageProducer<T> {
+            Single<Response<Page<T>>> getPage(long page);
+        }
+
+        public static <T> Observable<List<T>> toObservable(PageProducer<T> producer) {
+            return pageToObservable(producer, 1);
+        }
+
+        public static <T> Single<List<T>> toSingle(PageProducer<T> producer) {
+            return toObservable(producer)
+                    .toList()
+                    .map(lists -> {
+                        List<T> result = new ArrayList<T>();
+                        for (List<T> l : lists) {
+                            result.addAll(l);
+                        }
+                        return result;
+                    });
+        }
+
+        private static <T> Observable<List<T>> pageToObservable(PageProducer<T> producer, int page) {
+            return producer.getPage(page)
+                    .toObservable()
+                    .compose(result -> evaluateError(result))
+                    .compose(result -> chain(producer, result));
+        }
+
+        private static <T> Observable<Page<T>> evaluateError(Observable<Response<Page<T>>> input) {
+            return input.map(response -> {
+                throwOnFailure(response);
+                return response.body();
+            });
+        }
+
+        private static <T> Observable<List<T>> chain(PageProducer<T> producer, Observable<Page<T>> input) {
+            return input.concatMap(page -> {
+                if (page.next() == null) {
+                    return Observable.empty();
+                }
+                return Observable.just(page.items())
+                        .concatWith(pageToObservable(producer, page.next()));
+            });
         }
     }
 }
