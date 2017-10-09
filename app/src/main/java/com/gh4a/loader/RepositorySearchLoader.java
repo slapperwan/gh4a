@@ -28,7 +28,7 @@ public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
     }
 
     @Override
-    public List<Repository> doLoadInBackground() throws Exception {
+    public List<Repository> doLoadInBackground() throws ApiRequestException {
         if (TextUtils.isEmpty(mQuery)) {
             return new ArrayList<>();
         }

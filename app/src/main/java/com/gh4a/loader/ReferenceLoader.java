@@ -2,14 +2,13 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.model.PullRequestMarker;
 import com.meisolsson.githubsdk.model.git.GitReference;
 import com.meisolsson.githubsdk.service.git.GitService;
-
-import java.io.IOException;
 
 public class ReferenceLoader extends BaseLoader<GitReference> {
     private final PullRequest mPullRequest;
@@ -20,7 +19,7 @@ public class ReferenceLoader extends BaseLoader<GitReference> {
     }
 
     @Override
-    public GitReference doLoadInBackground() throws IOException {
+    public GitReference doLoadInBackground() throws ApiRequestException {
         GitService service = Gh4Application.get().getGitHubService(GitService.class);
 
         PullRequestMarker head = mPullRequest.head();

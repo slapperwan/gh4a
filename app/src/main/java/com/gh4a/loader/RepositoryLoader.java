@@ -1,9 +1,8 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Repository;
@@ -21,8 +20,10 @@ public class RepositoryLoader extends BaseLoader<Repository> {
     }
 
     @Override
-    public Repository doLoadInBackground() throws IOException {
+    public Repository doLoadInBackground() throws ApiRequestException {
         RepositoryService service = Gh4Application.get().getGitHubService(RepositoryService.class);
-        return ApiHelpers.throwOnFailure(service.getRepository(mRepoOwner, mRepoName).blockingGet());
+        return service.getRepository(mRepoOwner, mRepoName)
+                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .blockingGet();
     }
 }

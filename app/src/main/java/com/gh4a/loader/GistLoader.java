@@ -1,9 +1,8 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Gist;
@@ -18,7 +17,7 @@ public class GistLoader extends BaseLoader<Gist> {
     }
 
     @Override
-    public Gist doLoadInBackground() throws IOException {
+    public Gist doLoadInBackground() throws ApiRequestException {
         GistService service = Gh4Application.get().getGitHubService(GistService.class);
         return ApiHelpers.throwOnFailure(service.getGist(mGistId).blockingGet());
     }

@@ -1,6 +1,5 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -12,7 +11,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.ContentType;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
@@ -33,7 +31,7 @@ public class ContentListLoader extends BaseLoader<List<Content>> {
     }
 
     @Override
-    public List<Content> doLoadInBackground() throws IOException {
+    public List<Content> doLoadInBackground() throws ApiRequestException {
         Gh4Application app = Gh4Application.get();
         RepositoryService repoService = app.getGitHubService(RepositoryService.class);
         final RepositoryContentService contentService = app.getGitHubService(RepositoryContentService.class);
@@ -46,15 +44,12 @@ public class ContentListLoader extends BaseLoader<List<Content>> {
 
         List<Content> contents;
         try {
-            contents = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Content>() {
-                @Override
-                public Page<Content> providePage(long page) throws IOException {
-                    return ApiHelpers.throwOnFailure(contentService.getDirectoryContents(
-                            mRepoOwner, mRepoName, mPath, mRef, page).blockingGet());
-                }
-            });
-        } catch (ApiRequestException e) {
-            if (e.getStatus() == 404) {
+            contents = ApiHelpers.PageIterator
+                    .toSingle(page -> contentService.getDirectoryContents(
+                            mRepoOwner, mRepoName, mPath, mRef, page))
+                    .blockingGet();
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof ApiRequestException && ((ApiRequestException) e.getCause()).getStatus() == 404) {
                 contents = null;
             } else {
                 throw e;

@@ -9,10 +9,11 @@ import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.loader.PullRequestFilesLoader;
 import com.gh4a.loader.PullRequestLoader;
 import com.meisolsson.githubsdk.model.GitHubFile;
-import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.model.ReviewComment;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
     @VisibleForTesting
@@ -33,19 +34,18 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
     }
 
     @Override
-    protected String getSha() throws Exception {
-        PullRequest pullRequest = PullRequestLoader.loadPullRequest(mRepoOwner, mRepoName,
-                mPullRequestNumber);
-        return pullRequest.head().sha();
+    protected Single<String> getSha() {
+        return PullRequestLoader.loadPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
+                .map(pr -> pr.head().sha());
     }
 
     @Override
-    protected List<GitHubFile> getFiles() throws Exception {
+    protected Single<List<GitHubFile>> getFiles() {
         return PullRequestFilesLoader.loadFiles(mRepoOwner, mRepoName, mPullRequestNumber);
     }
 
     @Override
-    protected List<ReviewComment> getComments() throws Exception {
+    protected Single<List<ReviewComment>> getComments() {
         return PullRequestCommentsLoader.loadComments(mRepoOwner, mRepoName, mPullRequestNumber);
     }
 }

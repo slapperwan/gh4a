@@ -2,16 +2,15 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.GitHubComment;
 import com.meisolsson.githubsdk.model.IssueEvent;
 import com.meisolsson.githubsdk.model.IssueEventType;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 import com.meisolsson.githubsdk.service.issues.IssueEventService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,24 +53,16 @@ public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
     }
 
     @Override
-    protected List<TimelineItem> doLoadInBackground() throws IOException {
+    protected List<TimelineItem> doLoadInBackground() throws ApiRequestException {
         final Gh4Application app = Gh4Application.get();
         final IssueEventService eventService = app.getGitHubService(IssueEventService.class);
         final IssueCommentService commentService = app.getGitHubService(IssueCommentService.class);
-        List<GitHubComment> comments = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<GitHubComment>() {
-            @Override
-            public Page<GitHubComment> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(
-                        commentService.getIssueComments(mRepoOwner, mRepoName, mIssueNumber, page).blockingGet());
-            }
-        });
-        List<IssueEvent> events = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<IssueEvent>() {
-            @Override
-            public Page<IssueEvent> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(
-                        eventService.getIssueEvents(mRepoOwner, mRepoName, mIssueNumber, page).blockingGet());
-            }
-        });
+        List<GitHubComment> comments = ApiHelpers.PageIterator
+                .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, mIssueNumber, page))
+                .blockingGet();
+        List<IssueEvent> events = ApiHelpers.PageIterator
+                .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, mIssueNumber, page))
+                .blockingGet();
         List<TimelineItem> result = new ArrayList<>();
 
         for (GitHubComment comment : comments) {

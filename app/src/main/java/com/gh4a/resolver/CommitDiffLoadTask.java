@@ -4,14 +4,16 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.CommitLoader;
-import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.git.GitComment;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
     @VisibleForTesting
@@ -32,18 +34,18 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
     }
 
     @Override
-    public String getSha() throws Exception {
-        return mSha;
+    public Single<String> getSha() {
+        return Single.just(mSha);
     }
 
     @Override
-    protected List<GitHubFile> getFiles() throws Exception {
-        Commit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mSha);
-        return commit.files();
+    protected Single<List<GitHubFile>> getFiles() throws ApiRequestException {
+        return CommitLoader.loadCommit(mRepoOwner, mRepoName, mSha)
+                .map(commit -> commit.files());
     }
 
     @Override
-    protected List<GitComment> getComments() throws Exception {
+    protected Single<List<GitComment>> getComments() throws ApiRequestException {
         return CommitCommentListLoader.loadComments(mRepoOwner, mRepoName, mSha);
     }
 }

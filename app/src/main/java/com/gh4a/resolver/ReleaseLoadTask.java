@@ -5,6 +5,7 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.loader.ReleaseListLoader;
 import com.meisolsson.githubsdk.model.Release;
@@ -28,7 +29,7 @@ public class ReleaseLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws Exception {
+    protected Intent run() throws ApiRequestException {
         List<Release> releases = ReleaseListLoader.loadReleases(mRepoOwner, mRepoName);
 
         if (releases != null) {

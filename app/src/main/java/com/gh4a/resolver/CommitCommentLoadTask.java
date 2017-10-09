@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.loader.CommitCommentListLoader;
@@ -38,10 +39,10 @@ public class CommitCommentLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws Exception {
-        List<GitComment> comments =
-                CommitCommentListLoader.loadComments(mRepoOwner, mRepoName, mCommitSha);
-        Commit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mCommitSha);
+    protected Intent run() throws ApiRequestException {
+        List<GitComment> comments = CommitCommentListLoader.loadComments(
+                mRepoOwner, mRepoName, mCommitSha).blockingGet();
+        Commit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mCommitSha).blockingGet();
 
         GitHubFile resultFile = null;
         for (PositionalCommentBase comment : comments) {

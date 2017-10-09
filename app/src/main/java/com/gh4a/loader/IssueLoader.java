@@ -1,9 +1,8 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Issue;
@@ -23,7 +22,7 @@ public class IssueLoader extends BaseLoader<Issue> {
     }
 
     @Override
-    public Issue doLoadInBackground() throws IOException {
+    public Issue doLoadInBackground() throws ApiRequestException {
         IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
         return ApiHelpers.throwOnFailure(service.getIssue(mRepoOwner, mRepoName, mIssueNumber).blockingGet());
     }

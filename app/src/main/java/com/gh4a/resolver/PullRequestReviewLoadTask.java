@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.utils.ApiHelpers;
@@ -31,7 +32,7 @@ public class PullRequestReviewLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws Exception {
+    protected Intent run() throws ApiRequestException {
         PullRequestReviewService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewService.class);
 

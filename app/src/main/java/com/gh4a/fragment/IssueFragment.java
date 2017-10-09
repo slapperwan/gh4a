@@ -22,6 +22,9 @@ import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 
 import java.util.List;
 
+import io.reactivex.Single;
+import retrofit2.Response;
+
 public class IssueFragment extends IssueFragmentBase {
     public static IssueFragment newInstance(String repoOwner, String repoName, Issue issue,
             boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
@@ -81,11 +84,10 @@ public class IssueFragment extends IssueFragmentBase {
     }
 
     @Override
-    protected void deleteCommentInBackground(GitHubCommentBase comment) throws Exception {
+    protected Single<Response<Void>> doDeleteComment(GitHubCommentBase comment) {
         IssueCommentService service =
                 Gh4Application.get().getGitHubService(IssueCommentService.class);
-        ApiHelpers.throwOnFailure(
-                service.deleteIssueComment(mRepoOwner, mRepoName, comment.id()).blockingGet());
+        return service.deleteIssueComment(mRepoOwner, mRepoName, comment.id());
     }
 
     @Override

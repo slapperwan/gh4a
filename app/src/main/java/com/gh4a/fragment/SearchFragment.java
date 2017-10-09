@@ -53,7 +53,6 @@ import com.meisolsson.githubsdk.model.SearchCode;
 import com.meisolsson.githubsdk.model.TextMatch;
 import com.meisolsson.githubsdk.model.User;
 
-import java.io.IOException;
 import java.util.List;
 
 public class SearchFragment extends LoadingListFragmentBase implements
@@ -390,7 +389,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
         }
 
         @Override
-        protected Void run() throws IOException {
+        protected Void run() throws ApiRequestException {
             ContentValues cv = new ContentValues();
             cv.put(SuggestionsProvider.Columns.TYPE, mType);
             cv.put(SuggestionsProvider.Columns.SUGGESTION, mSuggestion);
@@ -413,7 +412,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
         }
 
         @Override
-        protected Void run() throws Exception {
+        protected Void run() {
             getContext().getContentResolver().delete(SuggestionsProvider.Columns.CONTENT_URI,
                     SuggestionsProvider.Columns.TYPE + " = ?",
                     new String[] { String.valueOf(mType) });

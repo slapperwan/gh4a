@@ -3,6 +3,7 @@ package com.gh4a.resolver;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
@@ -10,6 +11,8 @@ import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlLoadTask {
     protected final String mRepoOwner;
@@ -25,8 +28,8 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
     }
 
     @Override
-    protected Intent run() throws Exception {
-        List<GitHubFile> files = getFiles();
+    protected Intent run() throws ApiRequestException {
+        List<GitHubFile> files = getFiles().blockingGet();
         GitHubFile file = null;
         for (GitHubFile commitFile : files) {
             if (ApiHelpers.md5(commitFile.filename()).equalsIgnoreCase(mDiffId.fileHash)) {
@@ -39,7 +42,7 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
             return null;
         }
 
-        String sha = getSha();
+        String sha = getSha().blockingGet();
         if (sha == null || mActivity.isFinishing()) {
             return null;
         }
@@ -49,12 +52,12 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
                     sha, file.filename());
         }
 
-        return getLaunchIntent(sha, file, getComments(), mDiffId);
+        return getLaunchIntent(sha, file, getComments().blockingGet(), mDiffId);
     }
 
-    protected abstract List<GitHubFile> getFiles() throws Exception;
-    protected abstract String getSha() throws Exception;
-    protected abstract List<C> getComments() throws Exception;
+    protected abstract Single<List<GitHubFile>> getFiles();
+    protected abstract Single<String> getSha();
+    protected abstract Single<List<C>> getComments();
     protected abstract Intent getLaunchIntent(String sha, GitHubFile file,
             List<C> comments, DiffHighlightId diffId);
 }

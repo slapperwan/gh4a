@@ -9,13 +9,11 @@ import com.gh4a.activities.ReviewActivity;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -49,14 +47,10 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
         final PullRequestReviewCommentService commentService =
                 app.getGitHubService(PullRequestReviewCommentService.class);
 
-        List<ReviewComment> comments = ApiHelpers.Pager.fetchAllPages(
-                new ApiHelpers.Pager.PageProvider<ReviewComment>() {
-            @Override
-            public Page<ReviewComment> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(commentService.getPullRequestComments(
-                        mRepoOwner, mRepoName, mPullRequestNumber, page).blockingGet());
-            }
-        });
+        List<ReviewComment> comments = ApiHelpers.PageIterator
+                .toSingle(page -> commentService.getPullRequestComments(
+                        mRepoOwner, mRepoName, mPullRequestNumber, page))
+                .blockingGet();
 
         // Required to have comments sorted so we can find correct review
         Collections.sort(comments, ApiHelpers.COMMENT_COMPARATOR);

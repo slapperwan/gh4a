@@ -40,6 +40,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
@@ -70,7 +71,6 @@ import com.meisolsson.githubsdk.model.request.pull_request.EditPullRequest;
 import com.meisolsson.githubsdk.model.request.pull_request.MergeRequest;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -610,7 +610,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
 
         @Override
-        protected PullRequest run() throws IOException {
+        protected PullRequest run() throws ApiRequestException {
             PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
             EditPullRequest request = EditPullRequest.builder()
                     .state(mOpen ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED)
@@ -649,7 +649,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
 
         @Override
-        protected MergeResponse run() throws Exception {
+        protected MergeResponse run() throws ApiRequestException {
             PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
             MergeRequest request = MergeRequest.builder()
                     .commitMessage(mCommitMessage)

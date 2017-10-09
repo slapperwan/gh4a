@@ -31,9 +31,10 @@ import com.meisolsson.githubsdk.model.Reaction;
 import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.User;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
+import io.reactivex.Single;
 
 class CommentViewHolder
         extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.TimelineComment>
@@ -64,10 +65,8 @@ class CommentViewHolder
         void quoteText(CharSequence text);
         void addText(CharSequence text);
         boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem);
-        List<Reaction> loadReactionDetailsInBackground(TimelineItem.TimelineComment item)
-                throws IOException;
-        Reaction addReactionInBackground(TimelineItem.TimelineComment item, String content)
-                throws IOException;
+        Single<List<Reaction>> loadReactionDetailsInBackground(TimelineItem.TimelineComment item);
+        Single<Reaction> addReactionInBackground(TimelineItem.TimelineComment item, String content);
     }
 
     public CommentViewHolder(View view, HttpImageGetter imageGetter, String repoOwner,
@@ -247,14 +246,12 @@ class CommentViewHolder
 
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item)
-            throws IOException {
+    public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
         return mCallback.loadReactionDetailsInBackground(mBoundItem);
     }
 
     @Override
-    public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws
-            IOException {
+    public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
         return mCallback.addReactionInBackground(mBoundItem, content);
     }
 }

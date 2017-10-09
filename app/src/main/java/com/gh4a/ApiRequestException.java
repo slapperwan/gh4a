@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import retrofit2.Response;
 
-public class ApiRequestException extends IOException {
+public class ApiRequestException extends RuntimeException {
     private static final long serialVersionUID = -4331443972707730572L;
 
     private final ClientErrorResponse mResponse;

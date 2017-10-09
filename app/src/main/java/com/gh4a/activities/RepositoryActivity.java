@@ -21,6 +21,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.BackgroundTask;
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
@@ -48,7 +49,6 @@ import com.meisolsson.githubsdk.model.request.activity.SubscriptionRequest;
 import com.meisolsson.githubsdk.service.activity.StarringService;
 import com.meisolsson.githubsdk.service.activity.WatchingService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,7 +125,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         protected Loader<LoaderResult<Pair<List<Branch>, List<Branch>>>> onCreateLoader() {
             return new BaseLoader<Pair<List<Branch>, List<Branch>>>(RepositoryActivity.this) {
                 @Override
-                protected Pair<List<Branch>, List<Branch>> doLoadInBackground() throws Exception {
+                protected Pair<List<Branch>, List<Branch>> doLoadInBackground() throws ApiRequestException {
                     return Pair.create(new BranchListLoader(getContext(), mRepoOwner, mRepoName).doLoadInBackground(),
                             new TagListLoader(getContext(), mRepoOwner, mRepoName).doLoadInBackground());
                 }
@@ -526,7 +526,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         }
 
         @Override
-        protected Void run() throws IOException {
+        protected Void run() throws ApiRequestException {
             StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
             Response<Void> response = mIsStarring
                     ? service.unstarRepository(mRepoOwner, mRepoName).blockingGet()
@@ -555,7 +555,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         }
 
         @Override
-        protected Void run() throws IOException {
+        protected Void run() throws ApiRequestException {
             WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
             final Response<?> response;
             if (mIsStarring) {

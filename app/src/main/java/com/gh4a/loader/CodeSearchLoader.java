@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.SearchCode;
@@ -21,7 +22,7 @@ public class CodeSearchLoader extends BaseLoader<List<SearchCode>> {
     }
 
     @Override
-    public List<SearchCode> doLoadInBackground() throws Exception {
+    public List<SearchCode> doLoadInBackground() throws ApiRequestException {
         SearchService service = ServiceFactory.createService(SearchService.class,
                 "application/vnd.github.v3.text-match+json", null, null);
 

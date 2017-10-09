@@ -1,7 +1,5 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-
 import android.content.Context;
 
 import com.gh4a.ApiRequestException;
@@ -24,7 +22,7 @@ public class ReadmeLoader extends BaseLoader<String> {
     }
 
     @Override
-    public String doLoadInBackground() throws IOException {
+    public String doLoadInBackground() throws ApiRequestException {
         RepositoryContentService service = ServiceFactory.createService(
                 RepositoryContentService.class, "application/vnd.github.v3.html", null, null);
 

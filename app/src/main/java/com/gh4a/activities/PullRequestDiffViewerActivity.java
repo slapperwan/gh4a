@@ -26,7 +26,6 @@ import com.gh4a.loader.PullRequestCommentsLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.ReactionBar;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
 import com.meisolsson.githubsdk.model.Reaction;
 import com.meisolsson.githubsdk.model.Reactions;
@@ -35,8 +34,10 @@ import com.meisolsson.githubsdk.model.request.ReactionRequest;
 import com.meisolsson.githubsdk.service.reactions.ReactionService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 
-import java.io.IOException;
 import java.util.List;
+
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComment> {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number,
@@ -104,33 +105,28 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     }
 
     @Override
-    protected void deleteComment(long id) throws IOException {
+    protected Single<Response<Void>> deleteComment(long id) {
         PullRequestReviewCommentService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
-        ApiHelpers.throwOnFailure(service.deleteComment(mRepoOwner, mRepoName, id).blockingGet());
+        return service.deleteComment(mRepoOwner, mRepoName, id);
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws IOException {
+    public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
         final CommitCommentWrapper comment = (CommitCommentWrapper) item;
         final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
-
-        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Reaction>() {
-            @Override
-            public Page<Reaction> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(service.getPullRequestReviewCommentReactions(
-                        mRepoOwner, mRepoName, comment.comment.id(), page).blockingGet());
-            }
-        });
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getPullRequestReviewCommentReactions(
+                        mRepoOwner, mRepoName, comment.comment.id(), page));
     }
 
     @Override
-    public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws IOException {
+    public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
         CommitCommentWrapper comment = (CommitCommentWrapper) item;
         ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        ReactionRequest request = ReactionRequest.builder().content(content).build();
 
-        return ApiHelpers.throwOnFailure(service.createPullRequestReviewCommentReaction(
-                mRepoOwner, mRepoName, comment.comment.id(),
-                ReactionRequest.builder().content(content).build()).blockingGet());
+        return service.createPullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)
+                .compose(response -> ApiHelpers.throwOnFailure(response));
     }
 }

@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.BackgroundTask;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -417,7 +418,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         }
 
         @Override
-        protected Void run() throws Exception {
+        protected Void run() throws ApiRequestException {
             UserFollowerService service =
                     Gh4Application.get().getGitHubService(UserFollowerService.class);
             Response<Void> response = mIsFollowing

@@ -8,13 +8,11 @@ import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
-import java.io.IOException;
 import java.util.List;
 
 public class PullRequestReviewDiffLoadTask extends UrlLoadTask {
@@ -44,14 +42,10 @@ public class PullRequestReviewDiffLoadTask extends UrlLoadTask {
         final PullRequestReviewService reviewService =
                 app.getGitHubService(PullRequestReviewService.class);
 
-        List<ReviewComment> comments = ApiHelpers.Pager.fetchAllPages(
-                new ApiHelpers.Pager.PageProvider<ReviewComment>() {
-            @Override
-            public Page<ReviewComment> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(service.getPullRequestComments(
-                        mRepoOwner, mRepoName, mPullRequestNumber, page).blockingGet());
-            }
-        });
+        List<ReviewComment> comments = ApiHelpers.PageIterator
+                .toSingle(page -> service.getPullRequestComments(
+                        mRepoOwner, mRepoName, mPullRequestNumber, page))
+                .blockingGet();
 
         long diffCommentId = Long.parseLong(mDiffId.fileHash);
 

@@ -1,13 +1,12 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
 import java.util.List;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
@@ -22,15 +21,11 @@ public class ContributorListLoader extends BaseLoader<List<User>> {
     }
 
     @Override
-    public List<User> doLoadInBackground() throws IOException {
+    public List<User> doLoadInBackground() throws ApiRequestException {
         final RepositoryService service =
                 Gh4Application.get().getGitHubService(RepositoryService.class);
-        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<User>() {
-            @Override
-            public Page<User> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(
-                        service.getContributors(mRepoOwner, mRepoName, page).blockingGet());
-            }
-        });
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getContributors(mRepoOwner, mRepoName, page))
+                .blockingGet();
     }
 }

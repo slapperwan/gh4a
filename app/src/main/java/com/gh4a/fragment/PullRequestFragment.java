@@ -59,6 +59,7 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentSer
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Single;
 import retrofit2.Response;
 
 public class PullRequestFragment extends IssueFragmentBase {
@@ -231,19 +232,16 @@ public class PullRequestFragment extends IssueFragmentBase {
 
 
     @Override
-    protected void deleteCommentInBackground(GitHubCommentBase comment) throws Exception {
-        final Response<Void> response;
-
+    protected Single<Response<Void>> doDeleteComment(GitHubCommentBase comment) {
         if (comment instanceof ReviewComment) {
             PullRequestReviewCommentService service =
                     Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
-            response = service.deleteComment(mRepoOwner, mRepoName, comment.id()).blockingGet();
+            return service.deleteComment(mRepoOwner, mRepoName, comment.id());
         } else {
             IssueCommentService service =
                     Gh4Application.get().getGitHubService(IssueCommentService.class);
-            response = service.deleteIssueComment(mRepoOwner, mRepoName, comment.id()).blockingGet();
+            return service.deleteIssueComment(mRepoOwner, mRepoName, comment.id());
         }
-        ApiHelpers.throwOnFailure(response);
     }
 
     @Override

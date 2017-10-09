@@ -35,6 +35,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
@@ -54,7 +55,6 @@ import com.gh4a.widget.ReactionBar;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.Label;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Reaction;
 import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.User;
@@ -63,9 +63,11 @@ import com.meisolsson.githubsdk.model.request.ReactionRequest;
 import com.meisolsson.githubsdk.service.reactions.ReactionService;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
         View.OnClickListener, TimelineItemAdapter.OnCommentAction,
@@ -429,44 +431,33 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws IOException {
+    public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
         final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
-        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Reaction>() {
-            @Override
-            public Page<Reaction> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(
-                        service.getIssueReactions(mRepoOwner, mRepoName, mIssue.number(), page).blockingGet());
-            }
-        });
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getIssueReactions(mRepoOwner, mRepoName, mIssue.number(), page));
     }
 
     @Override
-    public Reaction addReactionInBackground(ReactionBar.Item item, String content)
-            throws IOException {
+    public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
         ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
-        return ApiHelpers.throwOnFailure(service.createIssueReaction(mRepoOwner, mRepoName,
-                mIssue.number(), ReactionRequest.builder().content(content).build()).blockingGet());
+        ReactionRequest request = ReactionRequest.builder().content(content).build();
+        return service.createIssueReaction(mRepoOwner, mRepoName, mIssue.number(), request)
+                .compose(response -> ApiHelpers.throwOnFailure(response));
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(final GitHubCommentBase comment)
-            throws IOException {
+    public Single<List<Reaction>> loadReactionDetailsInBackground(final GitHubCommentBase comment) {
         final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
-        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Reaction>() {
-            @Override
-            public Page<Reaction> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(
-                        service.getIssueCommentReactions(mRepoOwner, mRepoName, comment.id(), page).blockingGet());
-            }
-        });
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getIssueCommentReactions(mRepoOwner, mRepoName, comment.id(), page));
     }
 
     @Override
-    public Reaction addReactionInBackground(GitHubCommentBase comment, String content)
-            throws IOException {
+    public Single<Reaction> addReactionInBackground(GitHubCommentBase comment, String content) {
         ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
-        return ApiHelpers.throwOnFailure(service.createIssueCommentReaction(mRepoOwner, mRepoName,
-                comment.id(), ReactionRequest.builder().content(content).build()).blockingGet());
+        ReactionRequest request = ReactionRequest.builder().content(content).build();
+        return service.createIssueCommentReaction(mRepoOwner, mRepoName,comment.id(), request)
+                .compose(response -> ApiHelpers.throwOnFailure(response));
     }
 
     @Override
@@ -518,10 +509,12 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public void onEditorSendInBackground(String comment) throws IOException {
+    public Single<?> onEditorDoSend(String comment) {
         IssueCommentService service = Gh4Application.get().getGitHubService(IssueCommentService.class);
-        ApiHelpers.throwOnFailure(service.createIssueComment(mRepoOwner, mRepoName, mIssue.number(),
-                CommentRequest.builder().body(comment).build()).blockingGet());
+        CommentRequest request = CommentRequest.builder().body(comment).build();
+        return service.createIssueComment(mRepoOwner, mRepoName, mIssue.number(), request)
+                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .map(response -> response);
     }
 
     @Override
@@ -582,7 +575,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     protected abstract void bindSpecialViews(View headerView);
     protected abstract void assignHighlightColor();
-    protected abstract void deleteCommentInBackground(GitHubCommentBase comment) throws Exception;
+    protected abstract Single<Response<Void>> doDeleteComment(GitHubCommentBase comment);
 
     private class DeleteCommentTask extends ProgressDialogTask<Void> {
         private final GitHubCommentBase mComment;
@@ -598,8 +591,10 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         }
 
         @Override
-        protected Void run() throws Exception {
-            deleteCommentInBackground(mComment);
+        protected Void run() throws ApiRequestException {
+            doDeleteComment(mComment)
+                    .compose(ApiHelpers::throwOnFailure)
+                    .blockingGet();
             return null;
         }
 

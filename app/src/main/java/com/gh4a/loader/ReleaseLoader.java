@@ -1,9 +1,8 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Release;
@@ -23,7 +22,7 @@ public class ReleaseLoader extends BaseLoader<Release> {
     }
 
     @Override
-    public Release doLoadInBackground() throws IOException {
+    public Release doLoadInBackground() throws ApiRequestException {
         RepositoryReleaseService service =
                 Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
        return ApiHelpers.throwOnFailure(service.getRelease(mRepoOwner, mRepoName, mReleaseId).blockingGet());

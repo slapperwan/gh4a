@@ -12,8 +12,9 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.EditorBottomSheet;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
 
-import java.io.IOException;
+import io.reactivex.Single;
 
 public abstract class EditCommentActivity extends AppCompatActivity implements
         EditorBottomSheet.Callback {
@@ -67,16 +68,16 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onEditorSendInBackground(String body) throws IOException {
+    public Single<?> onEditorDoSend(String body) {
         Bundle extras = getIntent().getExtras();
         String repoOwner = extras.getString("owner");
         String repoName = extras.getString("repo");
         long id = extras.getLong("id", 0L);
 
         if (id == 0L) {
-            createComment(repoOwner, repoName, body, extras.getLong("reply_to"));
+            return createComment(repoOwner, repoName, body, extras.getLong("reply_to"));
         } else {
-            editComment(repoOwner, repoName, id, body);
+            return editComment(repoOwner, repoName, id, body);
         }
     }
 
@@ -101,8 +102,8 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
         return mRootLayout;
     }
 
-    protected abstract void createComment(String repoOwner, String repoName,
-            String body, long replyToCommentId) throws IOException;
-    protected abstract void editComment(String repoOwner, String repoName,
-            long commentId, String body) throws IOException;
+    protected abstract Single<GitHubCommentBase> createComment(
+            String repoOwner, String repoName, String body, long replyToCommentId);
+    protected abstract Single<GitHubCommentBase> editComment(
+            String repoOwner, String repoName, long commentId, String body);
 }

@@ -2,12 +2,13 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
-import java.io.IOException;
+import io.reactivex.Single;
 
 public class PullRequestLoader extends BaseLoader<PullRequest> {
 
@@ -23,15 +24,15 @@ public class PullRequestLoader extends BaseLoader<PullRequest> {
     }
 
     @Override
-    public PullRequest doLoadInBackground() throws IOException {
-        return loadPullRequest(mRepoOwner, mRepoName, mPullRequestNumber);
+    public PullRequest doLoadInBackground() throws ApiRequestException {
+        return loadPullRequest(mRepoOwner, mRepoName, mPullRequestNumber).blockingGet();
     }
 
-    public static PullRequest loadPullRequest(String repoOwner, String repoName,
-            int pullRequestNumber) throws IOException {
+    public static Single<PullRequest> loadPullRequest(String repoOwner, String repoName,
+            int pullRequestNumber) {
         PullRequestService service =
                 Gh4Application.get().getGitHubService(PullRequestService.class);
         return ApiHelpers.throwOnFailure(
-                service.getPullRequest(repoOwner, repoName, pullRequestNumber).blockingGet());
+                service.getPullRequest(repoOwner, repoName, pullRequestNumber));
     }
 }

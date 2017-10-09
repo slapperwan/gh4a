@@ -1,6 +1,5 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 
 import android.content.Context;
@@ -20,7 +19,7 @@ public class IsFollowingUserLoader extends BaseLoader<Boolean> {
     }
 
     @Override
-    public Boolean doLoadInBackground() throws IOException {
+    public Boolean doLoadInBackground() throws ApiRequestException {
         UserFollowerService service = Gh4Application.get().getGitHubService(UserFollowerService.class);
         try {
             ApiHelpers.throwOnFailure(service.isFollowing(mLogin).blockingGet());

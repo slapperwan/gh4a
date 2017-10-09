@@ -1,6 +1,5 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,7 @@ public class GitModuleParserLoader extends BaseLoader<Map<String, String>> {
     }
 
     @Override
-    public Map<String, String> doLoadInBackground() throws IOException {
+    public Map<String, String> doLoadInBackground() throws ApiRequestException {
         final RepositoryContentService service =
                 Gh4Application.get().getGitHubService(RepositoryContentService.class);
         Content content;

@@ -6,11 +6,12 @@ import android.support.annotation.AttrRes;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.request.CommentRequest;
 import com.meisolsson.githubsdk.model.request.pull_request.CreateReviewComment;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 
-import java.io.IOException;
+import io.reactivex.Single;
 
 public class EditPullRequestCommentActivity extends EditCommentActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
@@ -23,8 +24,8 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
     }
 
     @Override
-    protected void createComment(String repoOwner, String repoName, String body,
-            long replyToCommentId) throws IOException {
+    protected Single<GitHubCommentBase> createComment(String repoOwner, String repoName,
+            String body, long replyToCommentId) {
         int prNumber = getIntent().getIntExtra("pr", 0);
         PullRequestReviewCommentService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
@@ -32,16 +33,19 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
         if (replyToCommentId != 0) {
             requestBuilder.inReplyTo(replyToCommentId);
         }
-        ApiHelpers.throwOnFailure(service.createReviewComment(
-                repoOwner, repoName, prNumber, requestBuilder.build()).blockingGet());
+        return service.createReviewComment(repoOwner, repoName, prNumber, requestBuilder.build())
+                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .map(response -> response);
     }
 
     @Override
-    protected void editComment(String repoOwner, String repoName, long commentId,
-            String body) throws IOException {
+    protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
+            long commentId, String body) {
         PullRequestReviewCommentService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
-        ApiHelpers.throwOnFailure(service.editReviewComment(repoOwner, repoName, commentId,
-                CommentRequest.builder().body(body).build()).blockingGet());
+        CommentRequest request = CommentRequest.builder().body(body).build();
+        return service.editReviewComment(repoOwner, repoName, commentId, request)
+                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .map(response -> response);
     }
 }

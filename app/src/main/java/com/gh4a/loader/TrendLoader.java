@@ -5,10 +5,12 @@ import android.content.Context;
 import com.gh4a.holder.Trend;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.CharArrayWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -29,7 +31,7 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
     }
 
     @Override
-    public List<Trend> doLoadInBackground() throws Exception {
+    public List<Trend> doLoadInBackground() throws IOException, JSONException {
         URL url = new URL(String.format(Locale.US, URL_TEMPLATE, mType));
         List<Trend> trends = new ArrayList<>();
 

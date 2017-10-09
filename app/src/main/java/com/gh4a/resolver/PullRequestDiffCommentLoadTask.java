@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.loader.PullRequestCommentsLoader;
@@ -41,21 +42,21 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws Exception {
-        PullRequest pullRequest =
-                PullRequestLoader.loadPullRequest(mRepoOwner, mRepoName, mPullRequestNumber);
+    protected Intent run() throws ApiRequestException {
+        PullRequest pullRequest = PullRequestLoader.loadPullRequest(
+                mRepoOwner, mRepoName, mPullRequestNumber).blockingGet();
         if (pullRequest == null || mActivity.isFinishing()) {
             return null;
         }
 
-        List<ReviewComment> comments =
-                PullRequestCommentsLoader.loadComments(mRepoOwner, mRepoName, mPullRequestNumber);
+        List<ReviewComment> comments = PullRequestCommentsLoader.loadComments(
+                mRepoOwner, mRepoName, mPullRequestNumber).blockingGet();
         if (comments == null || mActivity.isFinishing()) {
             return null;
         }
 
-        List<GitHubFile> files =
-                PullRequestFilesLoader.loadFiles(mRepoOwner, mRepoName, mPullRequestNumber);
+        List<GitHubFile> files = PullRequestFilesLoader.loadFiles(
+                mRepoOwner, mRepoName, mPullRequestNumber).blockingGet();
         if (files == null || mActivity.isFinishing()) {
             return null;
         }

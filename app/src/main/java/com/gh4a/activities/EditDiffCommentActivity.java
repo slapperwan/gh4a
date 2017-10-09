@@ -9,11 +9,12 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.request.CommentRequest;
 import com.meisolsson.githubsdk.model.request.repository.CreateCommitComment;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
 
-import java.io.IOException;
+import io.reactivex.Single;
 
 public class EditDiffCommentActivity extends EditCommentActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
@@ -47,8 +48,8 @@ public class EditDiffCommentActivity extends EditCommentActivity {
     }
 
     @Override
-    protected void createComment(String repoOwner, String repoName, String body,
-            long replyToCommentId) throws IOException {
+    protected Single<GitHubCommentBase> createComment(String repoOwner, String repoName,
+            String body, long replyToCommentId) {
         Bundle extras = getIntent().getExtras();
         String commitId = extras.getString("commit_id");
         RepositoryCommentService service =
@@ -58,16 +59,19 @@ public class EditDiffCommentActivity extends EditCommentActivity {
                 .path(extras.getString("path"))
                 .position(extras.getInt("position"))
                 .build();
-        ApiHelpers.throwOnFailure(service.createCommitComment(repoOwner, repoName, commitId, request)
-                .blockingGet());
+        return service.createCommitComment(repoOwner, repoName, commitId, request)
+                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .map(response -> response);
     }
 
     @Override
-    protected void editComment(String repoOwner, String repoName, long commentId,
-            String body) throws IOException {
+    protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
+            long commentId, String body) {
         RepositoryCommentService service =
                 Gh4Application.get().getGitHubService(RepositoryCommentService.class);
-        ApiHelpers.throwOnFailure(service.editCommitComment(repoOwner, repoName, commentId,
-                CommentRequest.builder().body(body).build()).blockingGet());
+        CommentRequest request = CommentRequest.builder().body(body).build();
+        return service.editCommitComment(repoOwner, repoName, commentId, request)
+                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .map(response -> response);
     }
 }

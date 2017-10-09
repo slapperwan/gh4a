@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +23,7 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
@@ -135,7 +135,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
             final RepositoryService service =
                     Gh4Application.get().getGitHubService(RepositoryService.class);
             @Override
-            protected Page<Repository> loadPage(int page) throws IOException {
+            protected Page<Repository> loadPage(int page) throws ApiRequestException {
                 Response<Page<Repository>> response = isSelf
                         ? service.getUserRepositories(filterData, page).blockingGet()
                         : service.getUserRepositories(mLogin, filterData, page).blockingGet();

@@ -1,9 +1,8 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Subscription;
@@ -21,7 +20,7 @@ public class IsWatchingLoader extends BaseLoader<Boolean> {
     }
 
     @Override
-    public Boolean doLoadInBackground() throws IOException {
+    public Boolean doLoadInBackground() throws ApiRequestException {
         WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
         Subscription subscription = ApiHelpers.throwOnFailure(
                 service.getRepositorySubscription(mRepoOwner, mRepoName).blockingGet());

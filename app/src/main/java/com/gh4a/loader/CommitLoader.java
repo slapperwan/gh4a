@@ -2,12 +2,13 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
-import java.io.IOException;
+import io.reactivex.Single;
 
 public class CommitLoader extends BaseLoader<Commit> {
     private final String mRepoOwner;
@@ -22,15 +23,14 @@ public class CommitLoader extends BaseLoader<Commit> {
     }
 
     @Override
-    public Commit doLoadInBackground() throws IOException {
-        return loadCommit(mRepoOwner, mRepoName, mObjectSha);
+    public Commit doLoadInBackground() throws ApiRequestException {
+        return loadCommit(mRepoOwner, mRepoName, mObjectSha).blockingGet();
     }
 
-    public static Commit loadCommit(String repoOwner, String repoName, String objectSha)
-            throws IOException {
+    public static Single<Commit> loadCommit(String repoOwner, String repoName, String objectSha)
+            throws ApiRequestException {
         RepositoryCommitService service =
                 Gh4Application.get().getGitHubService(RepositoryCommitService.class);
-        return ApiHelpers.throwOnFailure(
-                service.getCommit(repoOwner, repoName, objectSha).blockingGet());
+        return ApiHelpers.throwOnFailure(service.getCommit(repoOwner, repoName, objectSha));
     }
 }

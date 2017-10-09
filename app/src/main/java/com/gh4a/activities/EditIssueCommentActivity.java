@@ -6,10 +6,11 @@ import android.support.annotation.AttrRes;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.request.CommentRequest;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 
-import java.io.IOException;
+import io.reactivex.Single;
 
 public class EditIssueCommentActivity extends EditCommentActivity {
     public static Intent makeIntent(Context context, String repoOwner,
@@ -22,21 +23,25 @@ public class EditIssueCommentActivity extends EditCommentActivity {
     }
 
     @Override
-    protected void createComment(String repoOwner, String repoName, String body,
-            long replyToCommentId) throws IOException {
+    protected Single<GitHubCommentBase> createComment(String repoOwner, String repoName,
+            String body, long replyToCommentId) {
         int issueNumber = getIntent().getIntExtra("issue", 0);
         IssueCommentService service =
                 Gh4Application.get().getGitHubService(IssueCommentService.class);
-        ApiHelpers.throwOnFailure(service.createIssueComment(repoOwner, repoName, issueNumber,
-                CommentRequest.builder().body(body).build()).blockingGet());
+        CommentRequest request = CommentRequest.builder().body(body).build();
+        return service.createIssueComment(repoOwner, repoName, issueNumber, request)
+                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .map(response -> response);
     }
 
     @Override
-    protected void editComment(String repoOwner, String repoName, long commentId,
-            String body) throws IOException {
+    protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
+            long commentId, String body) {
         IssueCommentService service =
                 Gh4Application.get().getGitHubService(IssueCommentService.class);
-        ApiHelpers.throwOnFailure(service.editIssueComment(repoOwner, repoName, commentId,
-                CommentRequest.builder().body(body).build()).blockingGet());
+        CommentRequest request = CommentRequest.builder().body(body).build();
+        return service.editIssueComment(repoOwner, repoName, commentId, request)
+                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .map(response -> response);
     }
 }

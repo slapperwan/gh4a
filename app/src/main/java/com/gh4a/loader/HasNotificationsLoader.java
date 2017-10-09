@@ -2,13 +2,13 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.NotificationThread;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.service.activity.NotificationService;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 public class HasNotificationsLoader extends BaseLoader<Boolean> {
@@ -18,7 +18,7 @@ public class HasNotificationsLoader extends BaseLoader<Boolean> {
     }
 
     @Override
-    public Boolean doLoadInBackground() throws IOException {
+    public Boolean doLoadInBackground() throws ApiRequestException {
         NotificationService service = ServiceFactory.createService(
                 NotificationService.class, null, null, 1);
         HashMap<String, Object> options = new HashMap<>();

@@ -4,10 +4,10 @@ import android.content.Context;
 import android.support.v4.util.LongSparseArray;
 import android.text.TextUtils;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.GitHubFile;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.model.ReviewState;
@@ -15,7 +15,6 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentSer
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +29,7 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
     }
 
     @Override
-    public List<TimelineItem> doLoadInBackground() throws IOException {
+    public List<TimelineItem> doLoadInBackground() throws ApiRequestException {
         // Combine issue comments and pull request comments (to get comments on diff)
         List<TimelineItem> events = super.doLoadInBackground();
 
@@ -40,26 +39,20 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
                 app.getGitHubService(PullRequestReviewService.class);
         final PullRequestReviewCommentService commentService =
                 app.getGitHubService(PullRequestReviewCommentService.class);
-        List<GitHubFile> files = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<GitHubFile>() {
-            @Override
-            public Page<GitHubFile> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(prService.getPullRequestFiles(
-                        mRepoOwner, mRepoName, mIssueNumber, page).blockingGet());
-            }
-        });
+        List<GitHubFile> files = ApiHelpers.PageIterator
+                .toSingle(page -> prService.getPullRequestFiles(
+                        mRepoOwner, mRepoName, mIssueNumber, page))
+                .blockingGet();
 
         HashMap<String, GitHubFile> filesByName = new HashMap<>();
         for (GitHubFile file : files) {
             filesByName.put(file.filename(), file);
         }
 
-        List<Review> prReviews = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Review>() {
-            @Override
-            public Page<Review> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(reviewService.getReviews(
-                        mRepoOwner, mRepoName, mIssueNumber, page).blockingGet());
-            }
-        });
+        List<Review> prReviews = ApiHelpers.PageIterator
+                .toSingle(page -> reviewService.getReviews(
+                        mRepoOwner, mRepoName, mIssueNumber, page))
+                .blockingGet();
         LongSparseArray<TimelineItem.TimelineReview> reviewsById = new LongSparseArray<>();
         List<TimelineItem.TimelineReview> reviews = new ArrayList<>();
         for (final Review review : prReviews) {
@@ -69,14 +62,10 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
 
             if (review.state() == ReviewState.Pending) {
                 // For reviews with pending state we have to manually load the comments
-                List<ReviewComment> pendingComments = ApiHelpers.Pager.fetchAllPages(
-                        new ApiHelpers.Pager.PageProvider<ReviewComment>() {
-                    @Override
-                    public Page<ReviewComment> providePage(long page) throws IOException {
-                        return ApiHelpers.throwOnFailure(reviewService.getReviewComments(
-                                mRepoOwner, mRepoName, mIssueNumber, review.id()).blockingGet());
-                    }
-                });
+                List<ReviewComment> pendingComments = ApiHelpers.PageIterator
+                        .toSingle(page -> reviewService.getReviewComments(
+                                mRepoOwner, mRepoName, mIssueNumber, review.id()))
+                        .blockingGet();
 
                 for (ReviewComment pendingComment : pendingComments) {
                     GitHubFile commitFile = filesByName.get(pendingComment.path());
@@ -85,14 +74,10 @@ public class PullRequestCommentListLoader extends IssueCommentListLoader {
             }
         }
 
-        List<ReviewComment> commitComments = ApiHelpers.Pager.fetchAllPages(
-                new ApiHelpers.Pager.PageProvider<ReviewComment>() {
-            @Override
-            public Page<ReviewComment> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(commentService.getPullRequestComments(
-                        mRepoOwner, mRepoName, mIssueNumber, page).blockingGet());
-            }
-        });
+        List<ReviewComment> commitComments = ApiHelpers.PageIterator
+                .toSingle(page -> commentService.getPullRequestComments(
+                        mRepoOwner, mRepoName, mIssueNumber, page))
+                .blockingGet();
 
         if (!commitComments.isEmpty()) {
             Collections.sort(commitComments, ApiHelpers.COMMENT_COMPARATOR);

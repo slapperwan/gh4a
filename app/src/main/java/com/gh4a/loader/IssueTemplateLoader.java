@@ -1,6 +1,5 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
 import java.util.List;
 
 import android.content.Context;
@@ -11,7 +10,6 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.ContentType;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
 public class IssueTemplateLoader extends BaseLoader<String> {
@@ -27,7 +25,7 @@ public class IssueTemplateLoader extends BaseLoader<String> {
     }
 
     @Override
-    public String doLoadInBackground() throws IOException {
+    public String doLoadInBackground() throws ApiRequestException {
         RepositoryContentService service =
                 Gh4Application.get().getGitHubService(RepositoryContentService.class);
 
@@ -45,16 +43,12 @@ public class IssueTemplateLoader extends BaseLoader<String> {
     }
 
     private Content fetchIssueTemplateContent(final RepositoryContentService service,
-            final String path) throws IOException {
+            final String path) throws ApiRequestException {
         List<Content> contents;
         try {
-            contents = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Content>() {
-                @Override
-                public Page<Content> providePage(long page) throws IOException {
-                    return ApiHelpers.throwOnFailure(service.getDirectoryContents(
-                            mRepoOwner, mRepoName, path, null, page).blockingGet());
-                }
-            });
+            contents = ApiHelpers.PageIterator
+                    .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page))
+                    .blockingGet();
         } catch (ApiRequestException e) {
             if (e.getStatus() == 404) {
                 return null;

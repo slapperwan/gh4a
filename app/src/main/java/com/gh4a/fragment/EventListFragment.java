@@ -17,7 +17,6 @@ package com.gh4a.fragment;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
