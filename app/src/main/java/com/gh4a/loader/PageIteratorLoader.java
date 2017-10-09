@@ -1,6 +1,5 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -8,6 +7,7 @@ import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.meisolsson.githubsdk.model.Page;
 
@@ -76,5 +76,5 @@ public abstract class PageIteratorLoader<T> extends AsyncTaskLoader<LoaderResult
         cancelLoad();
     }
 
-    protected abstract Page<T> loadPage(int page) throws IOException;
+    protected abstract Page<T> loadPage(int page) throws ApiRequestException;
 }

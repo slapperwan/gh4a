@@ -17,14 +17,13 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.GitHubEvent;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.service.activity.EventService;
-
-import java.io.IOException;
 
 public class PublicTimelineFragment extends EventListFragment {
     public static PublicTimelineFragment newInstance() {
@@ -44,7 +43,7 @@ public class PublicTimelineFragment extends EventListFragment {
         final EventService service = Gh4Application.get().getGitHubService(EventService.class);
         return new PageIteratorLoader<GitHubEvent>(getActivity()) {
             @Override
-            protected Page<GitHubEvent> loadPage(int page) throws IOException {
+            protected Page<GitHubEvent> loadPage(int page) throws ApiRequestException {
                 return ApiHelpers.throwOnFailure(service.getPublicEvents(page).blockingGet());
             }
         };

@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
@@ -29,7 +30,6 @@ import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.activity.StarringService;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 public class StarredRepositoryListFragment extends PagedDataBaseFragment<Repository> {
@@ -81,7 +81,7 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
         filterData.put("direction", mSortDirection);
         return new PageIteratorLoader<Repository>(getActivity()) {
             @Override
-            protected Page<Repository> loadPage(int page) throws IOException {
+            protected Page<Repository> loadPage(int page) throws ApiRequestException {
                 return ApiHelpers.throwOnFailure(
                         service.getStarredRepositories(mLogin, filterData, page).blockingGet());
             }

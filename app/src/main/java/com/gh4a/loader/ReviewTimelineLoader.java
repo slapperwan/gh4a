@@ -2,17 +2,16 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.GitHubFile;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
     }
 
     @Override
-    protected List<TimelineItem> doLoadInBackground() throws Exception {
+    protected List<TimelineItem> doLoadInBackground() throws ApiRequestException {
         final Gh4Application app = Gh4Application.get();
         final PullRequestService prService = app.getGitHubService(PullRequestService.class);
         final PullRequestReviewService reviewService =
@@ -47,26 +46,18 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
                 mRepoOwner, mRepoName, mPullRequestNumber, mReviewId).blockingGet());
         TimelineItem.TimelineReview timelineReview = new TimelineItem.TimelineReview(review);
 
-        List<ReviewComment> reviewComments = ApiHelpers.Pager.fetchAllPages(
-                new ApiHelpers.Pager.PageProvider<ReviewComment>() {
-            @Override
-            public Page<ReviewComment> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(reviewService.getReviewComments(
-                        mRepoOwner, mRepoName, mPullRequestNumber, mReviewId).blockingGet());
-            }
-        });
+        List<ReviewComment> reviewComments = ApiHelpers.PageIterator
+                .toSingle(page -> reviewService.getReviewComments(
+                        mRepoOwner, mRepoName, mPullRequestNumber, mReviewId))
+                .blockingGet();
 
         if (!reviewComments.isEmpty()) {
             Collections.sort(reviewComments, ApiHelpers.COMMENT_COMPARATOR);
 
-            List<GitHubFile> files = ApiHelpers.Pager.fetchAllPages(
-                    new ApiHelpers.Pager.PageProvider<GitHubFile>() {
-                @Override
-                public Page<GitHubFile> providePage(long page) throws IOException {
-                    return ApiHelpers.throwOnFailure(prService.getPullRequestFiles(
-                            mRepoOwner, mRepoName, mPullRequestNumber, page).blockingGet());
-                }
-            });
+            List<GitHubFile> files = ApiHelpers.PageIterator
+                    .toSingle(page -> prService.getPullRequestFiles(
+                            mRepoOwner, mRepoName, mPullRequestNumber, page))
+                    .blockingGet();
             HashMap<String, GitHubFile> filesByName = new HashMap<>();
             for (GitHubFile file : files) {
                 filesByName.put(file.filename(), file);
@@ -78,14 +69,10 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
                 timelineReview.addComment(reviewComment, file, true);
             }
 
-            List<ReviewComment> comments = ApiHelpers.Pager.fetchAllPages(
-                    new ApiHelpers.Pager.PageProvider<ReviewComment>() {
-                @Override
-                public Page<ReviewComment> providePage(long page) throws IOException {
-                    return ApiHelpers.throwOnFailure(commentService.getPullRequestComments(
-                            mRepoOwner, mRepoName, mPullRequestNumber, page).blockingGet());
-                }
-            });
+            List<ReviewComment> comments = ApiHelpers.PageIterator
+                    .toSingle(page -> commentService.getPullRequestComments(
+                            mRepoOwner, mRepoName, mPullRequestNumber, page))
+                    .blockingGet();
 
             Collections.sort(comments, ApiHelpers.COMMENT_COMPARATOR);
 

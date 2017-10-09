@@ -2,6 +2,7 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
@@ -10,7 +11,6 @@ import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.UserType;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
     }
 
     @Override
-    public Collection<Repository> doLoadInBackground() throws IOException {
+    public Collection<Repository> doLoadInBackground() throws ApiRequestException {
         RepositoryService service = ServiceFactory.createService(
                 RepositoryService.class, null, null, mSize);
         final Single<Response<Page<Repository>>> observable;

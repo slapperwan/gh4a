@@ -43,6 +43,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
@@ -57,7 +58,6 @@ import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.model.request.issue.CreateMilestone;
 import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -349,7 +349,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         }
 
         @Override
-        protected Void run() throws IOException {
+        protected Void run() throws ApiRequestException {
             IssueMilestoneService service =
                     Gh4Application.get().getGitHubService(IssueMilestoneService.class);
             CreateMilestone request = CreateMilestone.builder()
@@ -393,7 +393,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         }
 
         @Override
-        protected Void run() throws IOException {
+        protected Void run() throws ApiRequestException {
             IssueMilestoneService service =
                     Gh4Application.get().getGitHubService(IssueMilestoneService.class);
             ApiHelpers.throwOnFailure(service.deleteMilestone(mRepoOwner, mRepoName, mNumber).blockingGet());
@@ -428,7 +428,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         }
 
         @Override
-        protected Milestone run() throws IOException {
+        protected Milestone run() throws ApiRequestException {
             IssueMilestoneService service =
                     Gh4Application.get().getGitHubService(IssueMilestoneService.class);
             CreateMilestone request = CreateMilestone.builder()

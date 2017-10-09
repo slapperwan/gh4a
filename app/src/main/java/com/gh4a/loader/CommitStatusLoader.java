@@ -1,6 +1,5 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -10,11 +9,10 @@ import java.util.Set;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Status;
-import com.meisolsson.githubsdk.model.StatusState;
 import com.meisolsson.githubsdk.service.repositories.RepositoryStatusService;
 
 public class CommitStatusLoader extends BaseLoader<List<Status>> {
@@ -59,35 +57,35 @@ public class CommitStatusLoader extends BaseLoader<List<Status>> {
     }
 
     @Override
-    public List<Status> doLoadInBackground() throws IOException {
+    public List<Status> doLoadInBackground() throws ApiRequestException {
         final RepositoryStatusService service =
                 Gh4Application.get().getGitHubService(RepositoryStatusService.class);
-        List<Status> statuses = ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Status>() {
-            @Override
-            public Page<Status> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(
-                        service.getStatuses(mRepoOwner, mRepoName, mSha, page).blockingGet());
-            }
-        });
-
-        // Sort by timestamps first, so the removal logic below keeps the newest status
-        Collections.sort(statuses, TIMESTAMP_COMPARATOR);
-
-        // Filter out outdated statuses, only keep the newest status per context
-        Set<String> seenContexts = new HashSet<>();
-        Iterator<Status> iter = statuses.iterator();
-        while (iter.hasNext()) {
-            Status status = iter.next();
-            if (seenContexts.contains(status.context())) {
-                iter.remove();
-            } else {
-                seenContexts.add(status.context());
-            }
-        }
-
-        // sort by status, then context
-        Collections.sort(statuses, STATUS_AND_CONTEXT_COMPARATOR);
-
-        return statuses;
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getStatuses(mRepoOwner, mRepoName, mSha, page))
+                // Sort by timestamps first, so the removal logic below keeps the newest status
+                .map(statuses -> {
+                    Collections.sort(statuses, TIMESTAMP_COMPARATOR);
+                    return statuses;
+                })
+                // Filter out outdated statuses, only keep the newest status per context
+                .map(statuses -> {
+                    Set<String> seenContexts = new HashSet<>();
+                    Iterator<Status> iter = statuses.iterator();
+                    while (iter.hasNext()) {
+                        Status status = iter.next();
+                        if (seenContexts.contains(status.context())) {
+                            iter.remove();
+                        } else {
+                            seenContexts.add(status.context());
+                        }
+                    }
+                    return statuses;
+                })
+                // sort by status, then context
+                .map(statuses -> {
+                    Collections.sort(statuses, STATUS_AND_CONTEXT_COMPARATOR);
+                    return statuses;
+                })
+                .blockingGet();
     }
 }

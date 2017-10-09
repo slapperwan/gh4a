@@ -1,6 +1,5 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class CommitCompareLoader extends BaseLoader<List<Commit>> {
     }
 
     @Override
-    public List<Commit> doLoadInBackground() throws IOException {
+    public List<Commit> doLoadInBackground() throws ApiRequestException {
         RepositoryCommitService service =
                 Gh4Application.get().getGitHubService(RepositoryCommitService.class);
         // first try using the actual SHA1s
@@ -50,7 +49,7 @@ public class CommitCompareLoader extends BaseLoader<List<Commit>> {
     }
 
     private List<Commit> getCommitsOrNullOn404(RepositoryCommitService service,
-            String base, String head) throws IOException {
+            String base, String head) throws ApiRequestException {
         try {
             return ApiHelpers.throwOnFailure(
                     service.compareCommits(mRepoOwner, mRepoName, base, head).blockingGet()).commits();

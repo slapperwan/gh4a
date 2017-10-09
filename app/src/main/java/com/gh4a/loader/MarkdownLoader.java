@@ -1,9 +1,8 @@
 package com.gh4a.loader;
 
-import java.io.IOException;
-
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.request.RequestMarkdown;
@@ -22,7 +21,7 @@ public class MarkdownLoader extends BaseLoader<String> {
     }
 
     @Override
-    public String doLoadInBackground() throws IOException {
+    public String doLoadInBackground() throws ApiRequestException {
         MarkdownService service = Gh4Application.get().getGitHubService(MarkdownService.class);
         RequestMarkdown request = RequestMarkdown.builder()
                 .context(mRepoName != null && mRepoOwner != null ? mRepoOwner + "/" + mRepoName : null)

@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.SearchPage;
@@ -21,7 +22,7 @@ public class UserSearchLoader extends BaseLoader<List<User>> {
     }
 
     @Override
-    public List<User> doLoadInBackground() throws Exception {
+    public List<User> doLoadInBackground() throws ApiRequestException {
         if (TextUtils.isEmpty(mQuery)) {
             return new ArrayList<>();
         }

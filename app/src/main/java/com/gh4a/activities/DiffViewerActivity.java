@@ -31,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
@@ -44,10 +45,12 @@ import com.gh4a.widget.ReactionBar;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
 import com.meisolsson.githubsdk.model.Reactions;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public abstract class DiffViewerActivity<C extends PositionalCommentBase> extends WebViewerActivity
         implements ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
@@ -449,7 +452,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     protected abstract Loader<LoaderResult<List<C>>> createCommentLoader();
     protected abstract void openCommentDialog(long id, long replyToId, String line,
             int position, int leftLine, int rightLine, PositionalCommentBase commitComment);
-    protected abstract void deleteComment(long id) throws IOException;
+    protected abstract Single<Response<Void>> deleteComment(long id);
     protected abstract boolean canReply();
     protected abstract String createUrl(String lineId, long replyId);
     protected abstract PositionalCommentBase onUpdateReactions(PositionalCommentBase comment,
@@ -566,8 +569,10 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         }
 
         @Override
-        protected Void run() throws IOException {
-            deleteComment(mId);
+        protected Void run() throws ApiRequestException {
+            deleteComment(mId)
+                    .compose(ApiHelpers::throwOnFailure)
+                    .blockingGet();
             return null;
         }
 

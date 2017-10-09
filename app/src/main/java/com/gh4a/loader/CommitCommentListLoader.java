@@ -2,15 +2,16 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.git.GitComment;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class CommitCommentListLoader extends BaseLoader<List<GitComment>> {
     private final String mRepoOwner;
@@ -30,8 +31,8 @@ public class CommitCommentListLoader extends BaseLoader<List<GitComment>> {
     }
 
     @Override
-    public List<GitComment> doLoadInBackground() throws IOException {
-        List<GitComment> comments = loadComments(mRepoOwner, mRepoName, mSha);
+    public List<GitComment> doLoadInBackground() throws ApiRequestException {
+        List<GitComment> comments = loadComments(mRepoOwner, mRepoName, mSha).blockingGet();
 
         if (comments == null || (mIncludePositional && mIncludeUnpositional)) {
             return comments;
@@ -46,16 +47,11 @@ public class CommitCommentListLoader extends BaseLoader<List<GitComment>> {
         return result;
     }
 
-    public static List<GitComment> loadComments(final String repoOwner, final String repoName,
-            final String sha) throws IOException {
+    public static Single<List<GitComment>> loadComments(final String repoOwner,
+            final String repoName, final String sha) throws ApiRequestException {
         final RepositoryCommentService service =
                 Gh4Application.get().getGitHubService(RepositoryCommentService.class);
-        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<GitComment>() {
-            @Override
-            public Page<GitComment> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(
-                        service.getCommitComments(repoOwner, repoName, sha, page).blockingGet());
-            }
-        });
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getCommitComments(repoOwner, repoName, sha, page));
     }
 }

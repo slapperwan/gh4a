@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
@@ -44,7 +45,6 @@ import com.meisolsson.githubsdk.model.Gist;
 import com.meisolsson.githubsdk.model.GistFile;
 import com.meisolsson.githubsdk.service.gists.GistService;
 
-import java.io.IOException;
 import java.util.Map;
 
 import retrofit2.Response;
@@ -225,7 +225,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         }
 
         @Override
-        protected Void run() throws IOException {
+        protected Void run() throws ApiRequestException {
             GistService service = Gh4Application.get().getGitHubService(GistService.class);
             Response<Void> response = mIsStarred
                     ? service.unstarGist(mGistId).blockingGet()

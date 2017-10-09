@@ -15,16 +15,17 @@ import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.git.GitUser;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.functions.Predicate;
 import retrofit2.Response;
 
 public class ApiHelpers {
@@ -164,7 +165,7 @@ public class ApiHelpers {
         return "";
     }
 
-    public static <T> T throwOnFailure(Response<T> response) throws IOException {
+    public static <T> T throwOnFailure(Response<T> response) throws ApiRequestException {
         if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
             Gh4Application.get().logout();
         }
@@ -174,21 +175,8 @@ public class ApiHelpers {
         return response.body();
     }
 
-    public static class Pager<T> {
-        public interface PageProvider<T> {
-            Page<T> providePage(long page) throws IOException;
-        }
-
-        public static <T> List<T> fetchAllPages(PageProvider<T> provider) throws IOException {
-            List<T> result = new ArrayList<>();
-            int nextPage = 1;
-            do {
-                Page<T> page = provider.providePage(nextPage);
-                result.addAll(page.items());
-                nextPage = page.next() != null ? page.next() : 0;
-            } while (nextPage > 0);
-            return result;
-        }
+    public static <T> Single<T> throwOnFailure(Single<Response<T>> input) {
+        return input.map(response -> throwOnFailure(response));
     }
 
     public static class PageIterator<T> {
@@ -210,6 +198,18 @@ public class ApiHelpers {
                         }
                         return result;
                     });
+        }
+
+        public static <T> Single<List<T>> filter(Single<List<T>> input, Predicate<T> predicate) {
+            return input.map(list -> {
+                Iterator<T> iter = list.iterator();
+                while (iter.hasNext()) {
+                    if (!predicate.test(iter.next())) {
+                        iter.remove();
+                    }
+                }
+                return list;
+            });
         }
 
         private static <T> Observable<List<T>> pageToObservable(PageProducer<T> producer, int page) {

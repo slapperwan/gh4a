@@ -26,6 +26,7 @@ import android.text.style.TextAppearanceSpan;
 import com.evernote.android.job.Job;
 import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
+import com.gh4a.ApiRequestException;
 import com.gh4a.R;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.adapter.NotificationAdapter;
@@ -136,7 +137,7 @@ public class NotificationsJob extends Job {
                     list.add(holder.notification);
                 }
             }
-        } catch (IOException e) {
+        } catch (ApiRequestException e) {
             return Result.FAILURE;
         }
 

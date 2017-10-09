@@ -31,20 +31,9 @@ public class PendingReviewLoader extends BaseLoader<List<Review>> {
     protected List<Review> doLoadInBackground() throws Exception {
         final PullRequestReviewService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewService.class);
-        List<Review> reviews = ApiHelpers.Pager.fetchAllPages(
-                new ApiHelpers.Pager.PageProvider<Review>() {
-            @Override
-            public Page<Review> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(service.getReviews(
-                        mRepoOwner, mRepoName, mPullRequestNumber, page).blockingGet());
-            }
-        });
-        Iterator<Review> iterator = reviews.iterator();
-        while (iterator.hasNext()) {
-            if (iterator.next().state() != ReviewState.Pending) {
-                iterator.remove();
-            }
-        }
-        return reviews;
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page))
+                .compose(result -> ApiHelpers.PageIterator.filter(result, r -> r.state() == ReviewState.Pending))
+                .blockingGet();
     }
 }

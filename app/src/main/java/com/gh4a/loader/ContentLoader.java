@@ -2,12 +2,11 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
-
-import java.io.IOException;
 
 public class ContentLoader extends BaseLoader<Content> {
     private final String mRepoOwner;
@@ -24,7 +23,7 @@ public class ContentLoader extends BaseLoader<Content> {
     }
 
     @Override
-    public Content doLoadInBackground() throws IOException {
+    public Content doLoadInBackground() throws ApiRequestException {
         final RepositoryContentService service =
                 Gh4Application.get().getGitHubService(RepositoryContentService.class);
         return ApiHelpers.throwOnFailure(

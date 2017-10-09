@@ -2,6 +2,7 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Issue;
@@ -9,7 +10,6 @@ import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.SearchPage;
 import com.meisolsson.githubsdk.service.search.SearchService;
 
-import java.io.IOException;
 import java.util.Locale;
 
 public class PullRequestCountLoader extends BaseLoader<Integer> {
@@ -26,7 +26,7 @@ public class PullRequestCountLoader extends BaseLoader<Integer> {
     }
 
     @Override
-    public Integer doLoadInBackground() throws IOException {
+    public Integer doLoadInBackground() throws ApiRequestException {
         SearchService service = ServiceFactory.createService(SearchService.class, null, null, 1);
         String query = String.format(Locale.US, QUERY_FORMAT,
                 mRepository.owner().login(), mRepository.name(), mState);

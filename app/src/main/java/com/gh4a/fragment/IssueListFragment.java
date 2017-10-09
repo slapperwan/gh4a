@@ -22,6 +22,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueActivity;
@@ -35,7 +36,6 @@ import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.service.issues.IssueService;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -138,7 +138,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
         final IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
         return new PageIteratorLoader<Issue>(getActivity()) {
             @Override
-            protected Page<Issue> loadPage(int page) throws IOException {
+            protected Page<Issue> loadPage(int page) throws ApiRequestException {
                 return ApiHelpers.throwOnFailure(
                         service.getIssues(mFilterData, page).blockingGet());
             }

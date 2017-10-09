@@ -2,14 +2,13 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.NotificationThread;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.activity.NotificationService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,21 +29,16 @@ public class NotificationListLoader extends BaseLoader<NotificationListLoadResul
     private final boolean mParticipating;
 
     public static List<NotificationHolder> loadNotifications(boolean all,
-            boolean participating) throws IOException {
+            boolean participating) throws ApiRequestException {
         final NotificationService service =
                 Gh4Application.get().getGitHubService(NotificationService.class);
         final Map<String, Object> options = new HashMap<>();
         options.put("all", all);
         options.put("participating", participating);
 
-        List<NotificationThread> notifications = ApiHelpers.Pager.fetchAllPages(
-                new ApiHelpers.Pager.PageProvider<NotificationThread>() {
-                    @Override
-                    public Page<NotificationThread> providePage(long page) throws IOException {
-                        return ApiHelpers.throwOnFailure(
-                                service.getNotifications(options, page).blockingGet());
-                    }
-                });
+        List<NotificationThread> notifications = ApiHelpers.PageIterator
+                .toSingle(page -> service.getNotifications(options, page))
+                .blockingGet();
 
         // group notifications by repo
         final HashMap<Repository, ArrayList<NotificationThread>> notificationsByRepo = new HashMap<>();

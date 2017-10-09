@@ -19,11 +19,12 @@ import com.meisolsson.githubsdk.model.Reaction;
 import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.User;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import io.reactivex.Single;
 
 public class TimelineItemAdapter
         extends RootAdapter<TimelineItem, TimelineItemAdapter.TimelineItemViewHolder>
@@ -56,8 +57,8 @@ public class TimelineItemAdapter
         void onReplyCommentSelected(long replyToId);
         long getSelectedReplyCommentId();
         String getShareSubject(GitHubCommentBase comment);
-        List<Reaction> loadReactionDetailsInBackground(GitHubCommentBase comment) throws IOException;
-        Reaction addReactionInBackground(GitHubCommentBase comment, String content) throws IOException;
+        Single<List<Reaction>> loadReactionDetailsInBackground(GitHubCommentBase comment);
+        Single<Reaction> addReactionInBackground(GitHubCommentBase comment, String content);
     }
 
     private final ReviewViewHolder.Callback mReviewCallback = new ReviewViewHolder.Callback() {
@@ -116,14 +117,12 @@ public class TimelineItemAdapter
         }
 
         @Override
-        public List<Reaction> loadReactionDetailsInBackground(TimelineItem.TimelineComment item)
-                throws IOException {
+        public Single<List<Reaction>> loadReactionDetailsInBackground(TimelineItem.TimelineComment item) {
             return mActionCallback.loadReactionDetailsInBackground(item.comment());
         }
 
         @Override
-        public Reaction addReactionInBackground(TimelineItem.TimelineComment item,
-                String content) throws IOException {
+        public Single<Reaction> addReactionInBackground(TimelineItem.TimelineComment item, String content) {
             return mActionCallback.addReactionInBackground(item.comment(), content);
         }
     };

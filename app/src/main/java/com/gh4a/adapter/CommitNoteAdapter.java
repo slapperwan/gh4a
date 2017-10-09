@@ -40,7 +40,6 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.StyleableTextView;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Reaction;
 import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.User;
@@ -48,11 +47,12 @@ import com.meisolsson.githubsdk.model.git.GitComment;
 import com.meisolsson.githubsdk.model.request.ReactionRequest;
 import com.meisolsson.githubsdk.service.reactions.ReactionService;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import io.reactivex.Single;
 
 public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter.ViewHolder>
         implements ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
@@ -205,24 +205,20 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     }
 
     @Override
-    public List<Reaction> loadReactionDetailsInBackground(ReactionBar.Item item) throws IOException {
+    public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
         final GitComment comment = ((ViewHolder) item).mBoundItem;
         final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
-        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<Reaction>() {
-            @Override
-            public Page<Reaction> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(
-                        service.getCommitCommentReactions(mRepoOwner, mRepoName, comment.id(), page).blockingGet());
-            }
-        });
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getCommitCommentReactions(mRepoOwner, mRepoName, comment.id(), page));
     }
 
     @Override
-    public Reaction addReactionInBackground(ReactionBar.Item item, String content) throws IOException {
+    public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
         GitComment comment = ((ViewHolder) item).mBoundItem;
         ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
-        return ApiHelpers.throwOnFailure(service.createCommitCommentReaction(mRepoOwner, mRepoName,
-                comment.id(), ReactionRequest.builder().content(content).build()).blockingGet());
+        ReactionRequest request = ReactionRequest.builder().content(content).build();
+        return service.createCommitCommentReaction(mRepoOwner, mRepoName, comment.id(), request)
+                .compose(response -> ApiHelpers.throwOnFailure(response));
     }
 
     @Override

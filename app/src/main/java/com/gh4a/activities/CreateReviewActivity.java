@@ -23,6 +23,9 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
 import java.io.IOException;
 
+import io.reactivex.Single;
+import retrofit2.Response;
+
 public class CreateReviewActivity extends AppCompatActivity implements
         EditorBottomSheet.Callback {
     private static final String EXTRA_OWNER = "owner";
@@ -97,28 +100,30 @@ public class CreateReviewActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onEditorSendInBackground(String body) throws IOException {
+    public Single<?> onEditorDoSend(String body) {
         int position = mReviewEventSpinner.getSelectedItemPosition();
         @SuppressWarnings("ConstantConditions")
         ReviewEventDesc desc = mReviewEventAdapter.getItem(position);
 
         PullRequestReviewService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewService.class);
+        final Single<Response<Review>> resultSingle;
+
         if (mPendingReview == null) {
             CreateReview request = CreateReview.builder()
                     .body(body)
                     .event(desc.mCreateEvent)
                     .build();
-            ApiHelpers.throwOnFailure(service.createReview(mRepoOwner, mRepoName,
-                    mPullRequestNumber, request).blockingGet());
+            resultSingle = service.createReview(mRepoOwner, mRepoName, mPullRequestNumber, request);
         } else {
             SubmitReview request = SubmitReview.builder()
                     .body(body)
                     .event(desc.mSubmitEvent)
                     .build();
-            ApiHelpers.throwOnFailure(service.submitReview(mRepoOwner, mRepoName,
-                    mPullRequestNumber, mPendingReview.id(), request).blockingGet());
+            resultSingle = service.submitReview(mRepoOwner, mRepoName,
+                    mPullRequestNumber, mPendingReview.id(), request);
         }
+        return resultSingle.map(ApiHelpers::throwOnFailure);
     }
 
     @Override

@@ -38,6 +38,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.BaseActivity;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
@@ -64,7 +65,6 @@ import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.request.issue.IssueRequest;
 import com.meisolsson.githubsdk.service.issues.IssueService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -691,7 +691,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         }
 
         @Override
-        protected Issue run() throws IOException {
+        protected Issue run() throws ApiRequestException {
             IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
             Response<Issue> response = mIssueNumber != 0
                     ? service.editIssue(mRepoOwner, mRepoName, mIssueNumber, mRequest).blockingGet()

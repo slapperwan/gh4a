@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
@@ -32,8 +33,6 @@ import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
-
-import java.io.IOException;
 
 public class CommitListFragment extends PagedDataBaseFragment<Commit> {
     private static final int REQUEST_COMMIT = 2000;
@@ -107,7 +106,7 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
                 Gh4Application.get().getGitHubService(RepositoryCommitService.class);
         return new PageIteratorLoader<Commit>(getActivity()) {
             @Override
-            protected Page<Commit> loadPage(int page) throws IOException {
+            protected Page<Commit> loadPage(int page) throws ApiRequestException {
                 return ApiHelpers.throwOnFailure(
                         service.getCommits(mRepoOwner, mRepoName, mRef, mFilePath, page).blockingGet());
             }

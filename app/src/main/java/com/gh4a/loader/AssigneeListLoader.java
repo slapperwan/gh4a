@@ -2,13 +2,12 @@ package com.gh4a.loader;
 
 import android.content.Context;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
-import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.issues.IssueAssigneeService;
 
-import java.io.IOException;
 import java.util.List;
 
 public class AssigneeListLoader extends BaseLoader<List<User>> {
@@ -22,15 +21,11 @@ public class AssigneeListLoader extends BaseLoader<List<User>> {
     }
 
     @Override
-    protected List<User> doLoadInBackground() throws Exception {
+    protected List<User> doLoadInBackground() throws ApiRequestException {
         final IssueAssigneeService service =
                 Gh4Application.get().getGitHubService(IssueAssigneeService.class);
-        return ApiHelpers.Pager.fetchAllPages(new ApiHelpers.Pager.PageProvider<User>() {
-            @Override
-            public Page<User> providePage(long page) throws IOException {
-                return ApiHelpers.throwOnFailure(
-                        service.getAssignees(mRepoOwner, mRepoName, page).blockingGet());
-            }
-        });
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getAssignees(mRepoOwner, mRepoName, page))
+                .blockingGet();
     }
 }

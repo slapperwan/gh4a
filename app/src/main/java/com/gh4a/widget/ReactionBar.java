@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
@@ -39,20 +40,21 @@ import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.reactions.ReactionService;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.Single;
+
 public class ReactionBar extends LinearLayout implements View.OnClickListener {
     public interface Item {
         Object getCacheKey();
     }
     public interface Callback {
-        List<Reaction> loadReactionDetailsInBackground(Item item) throws IOException;
-        Reaction addReactionInBackground(Item item, String content) throws IOException;
+        Single<List<Reaction>> loadReactionDetailsInBackground(Item item);
+        Single<Reaction> addReactionInBackground(Item item, String content);
     }
 
     private static final @IdRes int[] VIEW_IDS = {
@@ -409,7 +411,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         @Override
         protected List<Reaction> doInBackground(Void... voids) {
             try {
-                List<Reaction> reactions = mCallback.loadReactionDetailsInBackground(mItem);
+                List<Reaction> reactions = mCallback.loadReactionDetailsInBackground(mItem)
+                        .blockingGet();
                 Collections.sort(reactions, new Comparator<Reaction>() {
                     @Override
                     public int compare(Reaction lhs, Reaction rhs) {
@@ -421,7 +424,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                     }
                 });
                 return reactions;
-            } catch (IOException e) {
+            } catch (RuntimeException e) {
                 return null;
             }
         }
@@ -457,14 +460,15 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         protected Pair<Boolean, Reaction> doInBackground(Void... voids) {
             try {
                 if (mId == 0) {
-                    Reaction result = mCallback.addReactionInBackground(mItem, mContent);
+                    Reaction result = mCallback.addReactionInBackground(mItem, mContent)
+                            .blockingGet();
                     return Pair.create(true, result);
                 } else {
                     ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
                     service.deleteReaction(mId);
                     return Pair.create(true, null);
                 }
-            } catch (IOException e) {
+            } catch (ApiRequestException e) {
                 android.util.Log.d("foo", "save fail", e);
                 return Pair.create(false, null);
             }
