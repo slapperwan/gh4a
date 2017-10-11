@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -28,6 +29,7 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.gh4a.R;
 import com.gh4a.activities.home.HomeActivity;
+import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoader;
@@ -257,7 +259,17 @@ public class NotificationsJob extends Job {
     }
 
     private String determineNotificationTypeLabel(Notification n) {
-        // FIXME
+        final Resources res = getContext().getResources();
+        switch (n.getSubject().getType()) {
+            case NotificationAdapter.SUBJECT_COMMIT:
+                return res.getString(R.string.notification_subject_commit);
+            case NotificationAdapter.SUBJECT_ISSUE:
+                return res.getString(R.string.notification_subject_issue);
+            case NotificationAdapter.SUBJECT_PULL_REQUEST:
+                return res.getString(R.string.notification_subject_pr);
+            case NotificationAdapter.SUBJECT_RELEASE:
+                return res.getString(R.string.notification_subject_release);
+        }
         return n.getSubject().getType();
     }
 
