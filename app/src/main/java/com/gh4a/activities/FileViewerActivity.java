@@ -176,7 +176,7 @@ public class FileViewerActivity extends WebViewerActivity
         String base64Data = mContent.getContent();
         if (base64Data != null && FileUtils.isImage(mPath)) {
             String title = addTitleHeader ? getDocumentTitle() : null;
-            String imageUrl = "data:image/" + FileUtils.getFileExtension(mPath) +
+            String imageUrl = "data:" + FileUtils.getMimeTypeFor(mPath) +
                     ";base64," + base64Data;
             return highlightImage(imageUrl, cssTheme, title);
         } else if (base64Data != null && FileUtils.isMarkdown(mPath) && !mViewRawText) {
