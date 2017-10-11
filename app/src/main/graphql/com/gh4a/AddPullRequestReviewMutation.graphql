@@ -1,0 +1,13 @@
+mutation AddPullRequestReviewMutation(
+  $pullRequestId: ID!,
+  $comments: [DraftPullRequestReviewComment]!
+) {
+  addPullRequestReview(input: {
+    pullRequestId: $pullRequestId,
+    comments: $comments
+  }) {
+    pullRequestReview {
+      id
+    }
+  }
+}

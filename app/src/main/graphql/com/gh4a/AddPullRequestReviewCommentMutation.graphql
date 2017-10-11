@@ -1,0 +1,21 @@
+mutation AddPullRequestReviewCommentMutation(
+  $pullRequestReviewId: ID!,
+  $commitOID: GitObjectID,
+  $body: String!,
+  $path: String,
+  $position: Int,
+  $inReplyTo: ID
+) {
+  addPullRequestReviewComment(input: {
+    pullRequestReviewId: $pullRequestReviewId,
+    commitOID: $commitOID,
+    body: $body,
+    path: $path,
+    position: $position,
+    inReplyTo: $inReplyTo
+  }) {
+    comment {
+      body
+    }
+  }
+}

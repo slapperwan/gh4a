@@ -12,6 +12,11 @@
         app:showAsAction="ifRoom|withText" />
 
     <item
+        android:id="@+id/review_changes"
+        android:title="@string/review_changes"
+        app:showAsAction="ifRoom" />
+
+    <item
         android:id="@+id/pull_close"
         android:title="@string/pull_request_close"
         app:showAsAction="ifRoom|withText" />

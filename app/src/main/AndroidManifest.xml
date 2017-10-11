@@ -82,6 +82,11 @@
             android:exported="false"
             android:theme="@style/BottomSheetLightTheme"
             android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.ReviewChangesActivity"
+            android:exported="false"
+            android:theme="@style/BottomSheetLightTheme"
+            android:windowSoftInputMode="stateHidden" />
         <activity android:name=".activities.FileViewerActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize" />

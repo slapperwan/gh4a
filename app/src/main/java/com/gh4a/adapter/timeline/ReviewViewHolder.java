@@ -190,7 +190,9 @@ class ReviewViewHolder
             mDetailsHeader.setVisibility(View.VISIBLE);
         } else {
             mDetailsContainer.setVisibility(View.GONE);
-            mShowDetailsButton.setVisibility(View.GONE);
+            boolean isPending = Review.STATE_PENDING.equals(review.getState());
+            mShowDetailsButton.setVisibility(mDisplayReviewDetails && isPending
+                    ? View.VISIBLE : View.GONE);
             mDetailsHeader.setVisibility(View.GONE);
         }
 
