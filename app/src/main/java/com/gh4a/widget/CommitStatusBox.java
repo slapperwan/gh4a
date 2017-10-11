@@ -59,13 +59,6 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
     }
 
     public void fillStatus(List<CommitStatus> statuses, String mergableState) {
-        Map<String, CommitStatus> statusByContext = new HashMap<>();
-        for (CommitStatus status : statuses) {
-            if (!statusByContext.containsKey(status.getContext())) {
-                statusByContext.put(status.getContext(), status);
-            }
-        }
-
         final int statusIconDrawableAttrId;
         final int statusLabelResId;
         switch (mergableState) {
@@ -79,7 +72,7 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
                 break;
             case PullRequest.MERGEABLE_STATE_CLEAN:
                 statusIconDrawableAttrId = R.attr.pullRequestMergeOkIcon;
-                statusLabelResId = statusByContext.isEmpty()
+                statusLabelResId = statuses.isEmpty()
                         ? R.string.pull_merge_status_mergable
                         : R.string.pull_merge_status_clean;
                 break;
@@ -92,7 +85,7 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
                 statusLabelResId = R.string.pull_merge_status_dirty;
                 break;
             default:
-                if (statusByContext.isEmpty()) {
+                if (statuses.isEmpty()) {
                     // Unknown status, no commit statuses -> nothing to display
                     setVisibility(View.GONE);
                     return;
@@ -110,7 +103,7 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
 
         mStatusContainer.removeAllViews();
 
-        if (statusByContext.isEmpty()) {
+        if (statuses.isEmpty()) {
             mStatusContainer.setVisibility(View.GONE);
             mDropDownIcon.setVisibility(View.GONE);
             mHeader.setClickable(false);
@@ -126,7 +119,7 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
         int pendingCount = 0;
         int successCount = 0;
 
-        for (CommitStatus status : statusByContext.values()) {
+        for (CommitStatus status : statuses) {
             View statusRow = mInflater.inflate(R.layout.row_commit_status, mStatusContainer, false);
             statusRow.setTag(status);
             statusRow.setOnClickListener(this);
