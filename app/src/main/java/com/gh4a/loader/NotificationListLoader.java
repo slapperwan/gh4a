@@ -12,31 +12,16 @@ import org.eclipse.egit.github.core.service.NotificationService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 public class NotificationListLoader extends BaseLoader<NotificationListLoadResult> {
-
-    private static final Comparator<Notification> SORTER = new Comparator<Notification>() {
+    private static final Comparator<Notification> TIMESTAMP_SORTER = new Comparator<Notification>() {
         @Override
         public int compare(Notification lhs, Notification rhs) {
-            Repository lhsRepository = lhs.getRepository();
-            Repository rhsRepository = rhs.getRepository();
-
-            if (!lhsRepository.equals(rhsRepository)) {
-                User lhsOwner = lhsRepository.getOwner();
-                User rhsOwner = rhsRepository.getOwner();
-
-                if (!lhsOwner.equals(rhsOwner)) {
-                    return lhsOwner.getLogin().compareTo(rhsOwner.getLogin());
-                }
-
-                return lhsRepository.getName().compareTo(rhsRepository.getName());
-            }
-
             return rhs.getUpdatedAt().compareTo(lhs.getUpdatedAt());
         }
     };
-
     private final boolean mAll;
     private final boolean mParticipating;
 
@@ -52,47 +37,54 @@ public class NotificationListLoader extends BaseLoader<NotificationListLoadResul
                 Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
         List<Notification> notifications =
                 notificationService.getNotifications(mAll, mParticipating);
-        Collections.sort(notifications, SORTER);
 
-        Repository previousRepository = null;
-        List<NotificationHolder> result = new ArrayList<>();
-        int unreadNotificationsCount = 0;
-        NotificationHolder previousRepositoryHolder = null;
-
-        for (Notification notification : notifications) {
-            Repository repository = notification.getRepository();
-
-            if (!repository.equals(previousRepository)) {
-                markHolder(result, unreadNotificationsCount, previousRepositoryHolder);
-
-                previousRepositoryHolder = new NotificationHolder(repository);
-                result.add(previousRepositoryHolder);
-
-                unreadNotificationsCount = 0;
+        // group notifications by repo
+        final HashMap<Repository, ArrayList<Notification>> notificationsByRepo = new HashMap<>();
+        for (Notification n : notifications) {
+            ArrayList<Notification> list = notificationsByRepo.get(n.getRepository());
+            if (list == null) {
+                list = new ArrayList<>();
+                notificationsByRepo.put(n.getRepository(), list);
             }
-
-            if (notification.isUnread()) {
-                unreadNotificationsCount += 1;
-            }
-
-            result.add(new NotificationHolder(notification));
-            previousRepository = repository;
+            list.add(n);
         }
 
-        markHolder(result, unreadNotificationsCount, previousRepositoryHolder);
+        // sort each group by updatedAt
+        for (ArrayList<Notification> list : notificationsByRepo.values()) {
+            Collections.sort(list, TIMESTAMP_SORTER);
+        }
+
+        // sort groups by updatedAt of top notification
+        ArrayList<Repository> reposByTimestamp = new ArrayList<>(notificationsByRepo.keySet());
+        Collections.sort(reposByTimestamp, new Comparator<Repository>() {
+            @Override
+            public int compare(Repository lhs, Repository rhs) {
+                Notification lhsNotification = notificationsByRepo.get(lhs).get(0);
+                Notification rhsNotification = notificationsByRepo.get(rhs).get(0);
+                return rhsNotification.getUpdatedAt().compareTo(lhsNotification.getUpdatedAt());
+            }
+        });
+
+        // add to list
+        List<NotificationHolder> result = new ArrayList<>();
+        for (Repository repo : reposByTimestamp) {
+            ArrayList<Notification> notifsForRepo = notificationsByRepo.get(repo);
+            boolean hasUnread = false;
+            int count = notifsForRepo.size();
+
+            NotificationHolder repoItem = new NotificationHolder(repo);
+            result.add(repoItem);
+
+            for (int i = 0; i < count; i++) {
+                NotificationHolder item = new NotificationHolder(notifsForRepo.get(i));
+                hasUnread |= item.notification.isUnread();
+                item.setIsLastRepositoryNotification(i == count - 1);
+                result.add(item);
+            }
+
+            repoItem.setIsRead(!hasUnread);
+        }
 
         return new NotificationListLoadResult(result);
-    }
-
-    private void markHolder(List<NotificationHolder> result, int unreadNotificationsCount,
-            NotificationHolder previousRepositoryHolder) {
-        if (previousRepositoryHolder != null && unreadNotificationsCount == 0) {
-            previousRepositoryHolder.setIsRead(true);
-        }
-
-        int size = result.size();
-        if (size > 0) {
-            result.get(size - 1).setIsLastRepositoryNotification(true);
-        }
     }
 }
