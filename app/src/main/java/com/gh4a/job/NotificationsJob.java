@@ -42,7 +42,9 @@ import org.eclipse.egit.github.core.User;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class NotificationsJob extends Job {
@@ -51,6 +53,8 @@ public class NotificationsJob extends Job {
     public static final String TAG = "job_notifications";
 
     private static final String KEY_LAST_NOTIFICATION_CHECK = "last_notification_check";
+    private static final String KEY_LAST_NOTIFICATION_SEEN = "last_notification_seen";
+    private static final String KEY_LAST_SHOWN_REPO_IDS = "last_notification_repo_ids";
 
     public static void scheduleJob(int intervalMinutes) {
         new JobRequest.Builder(TAG)
@@ -82,13 +86,25 @@ public class NotificationsJob extends Job {
         notificationManager.createNotificationChannel(channel);
     }
 
+    public static void markNotificationsAsSeen(Context context) {
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
+
+        context.getSharedPreferences(SettingsFragment.PREF_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putLong(KEY_LAST_NOTIFICATION_SEEN, System.currentTimeMillis())
+                .putStringSet(KEY_LAST_SHOWN_REPO_IDS, null)
+                .apply();
+    }
+
     @NonNull
     @Override
     protected Result onRunJob(Params params) {
+        List<List<Notification>> notifsGroupedByRepo = new ArrayList<>();
         try {
             List<NotificationHolder> notifications =
                     NotificationListLoader.loadNotifications(false, false);
-            List<List<Notification>> notifsGroupedByRepo = new ArrayList<>();
             for (NotificationHolder holder : notifications) {
                 if (holder.notification == null) {
                     notifsGroupedByRepo.add(new ArrayList<Notification>());
@@ -98,45 +114,64 @@ public class NotificationsJob extends Job {
                     list.add(holder.notification);
                 }
             }
-
-            SharedPreferences prefs = getContext().getSharedPreferences(SettingsFragment.PREF_NAME,
-                    Context.MODE_PRIVATE);
-            long lastCheck = prefs.getLong(KEY_LAST_NOTIFICATION_CHECK, 0);
-
-            NotificationManagerCompat notificationManager =
-                    NotificationManagerCompat.from(getContext());
-
-            if (notifications.isEmpty()) {
-                notificationManager.cancelAll();
-            } else {
-                boolean hasNewNotification = false;
-                for (List<Notification> list : notifsGroupedByRepo) {
-                    for (Notification n : list) {
-                        hasNewNotification |= n.getUpdatedAt().getTime() > lastCheck;
-                    }
-                }
-
-                showSummaryNotification(notificationManager,
-                        notifsGroupedByRepo, hasNewNotification);
-                for (List<Notification> list : notifsGroupedByRepo) {
-                    showRepoNotification(notificationManager, list, lastCheck);
-                }
-            }
-
-            prefs.edit()
-                    .putLong(KEY_LAST_NOTIFICATION_CHECK, System.currentTimeMillis())
-                    .apply();
         } catch (IOException e) {
             return Result.FAILURE;
         }
 
+        SharedPreferences prefs = getContext().getSharedPreferences(SettingsFragment.PREF_NAME,
+                Context.MODE_PRIVATE);
+        long lastCheck = prefs.getLong(KEY_LAST_NOTIFICATION_CHECK, 0);
+        long lastSeen = prefs.getLong(KEY_LAST_NOTIFICATION_SEEN, 0);
+        Set<String> lastShownRepoIds = prefs.getStringSet(KEY_LAST_SHOWN_REPO_IDS, null);
+        Set<String> newShownRepoIds = new HashSet<>();
+        boolean hasUnseenNotification = false, hasNewNotification = false;
+
+        for (List<Notification> list : notifsGroupedByRepo) {
+            for (Notification n : list) {
+                long timestamp = n.getUpdatedAt().getTime();
+                hasNewNotification |= timestamp > lastCheck;
+                hasUnseenNotification |= timestamp > lastSeen;
+            }
+        }
+
+        if (!hasUnseenNotification) {
+            // seen timestamp is only updated when notifications are canceled by us,
+            // so everything is canceled at this point and we have nothing to notify of
+            return Result.SUCCESS;
+        }
+
+        NotificationManagerCompat nm =
+                NotificationManagerCompat.from(getContext());
+
+        showSummaryNotification(nm, notifsGroupedByRepo, hasNewNotification);
+        for (List<Notification> list : notifsGroupedByRepo) {
+            showRepoNotification(nm, list, lastCheck);
+            String repoId = String.valueOf(list.get(0).getRepository().getId());
+            if (lastShownRepoIds != null) {
+                lastShownRepoIds.remove(repoId);
+            }
+            newShownRepoIds.add(repoId);
+        }
+
+        // cancel sub-notifications for repos that no longer have notifications
+        if (lastShownRepoIds != null) {
+            for (String repoId : lastShownRepoIds) {
+                nm.cancel(Integer.parseInt(repoId));
+            }
+        }
+
+        prefs.edit()
+                .putLong(KEY_LAST_NOTIFICATION_CHECK, System.currentTimeMillis())
+                .putStringSet(KEY_LAST_SHOWN_REPO_IDS, newShownRepoIds)
+                .apply();
+
         return Result.SUCCESS;
     }
 
-    private void showRepoNotification(NotificationManagerCompat notificationManager,
+    private void showRepoNotification(NotificationManagerCompat nm,
             List<Notification> notifications, long lastCheck) {
         Repository repository = notifications.get(0).getRepository();
-        final int id = repository.hashCode();
+        final int id = (int) repository.getId();
         String title = repository.getOwner().getLogin() + "/" + repository.getName();
         // notifications are sorted by time descending
         long when = notifications.get(0).getUpdatedAt().getTime();
@@ -189,10 +224,10 @@ public class NotificationsJob extends Job {
             builder.setOnlyAlertOnce(true);
         }
 
-        notificationManager.notify(id, builder.build());
+        nm.notify(id, builder.build());
     }
 
-    private void showSummaryNotification(NotificationManagerCompat notificationManager,
+    private void showSummaryNotification(NotificationManagerCompat nm,
             List<List<Notification>> notificationsPerRepo, boolean hasNewNotification) {
         int totalCount = 0;
         for (List<Notification> list : notificationsPerRepo) {
@@ -212,11 +247,14 @@ public class NotificationsJob extends Job {
 
         PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
                 HomeActivity.makeIntent(getContext(), R.id.notifications), 0);
+        PendingIntent deleteIntent = PendingIntent.getService(getContext(), 0,
+                NotificationHandlingService.makeMarkNotificationsSeenIntent(getContext()), 0);
         NotificationCompat.Builder builder = makeBaseBuilder()
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupSummary(true)
                 .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
                 .setContentIntent(contentIntent)
+                .setDeleteIntent(deleteIntent)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setPublicVersion(publicVersion)
@@ -255,7 +293,7 @@ public class NotificationsJob extends Job {
             builder.setOnlyAlertOnce(true);
         }
 
-        notificationManager.notify(0, builder.build());
+        nm.notify(0, builder.build());
     }
 
     private String determineNotificationTypeLabel(Notification n) {

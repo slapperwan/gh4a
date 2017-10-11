@@ -23,8 +23,14 @@ public class NotificationHandlingService extends IntentService {
     private static final String EXTRA_REPO_NAME = "repo";
     private static final String EXTRA_NOTIFICATION_ID = "notification_id";
 
+    private static final String ACTION_MARK_SEEN = "com.gh4a.action.MARK_AS_SEEN";
     private static final String ACTION_MARK_READ = "com.gh4a.action.MARK_AS_READ";
     private static final String ACTION_OPEN_NOTIFICATION = "com.gh4a.action.OPEN_NOTIFICATION";
+
+    public static Intent makeMarkNotificationsSeenIntent(Context context) {
+        return new Intent(context, NotificationHandlingService.class)
+                .setAction(ACTION_MARK_SEEN);
+    }
 
     public static Intent makeMarkReposNotificationsAsReadActionIntent(Context context,
             int notificationId, String repoOwner, String repoName) {
@@ -61,6 +67,9 @@ public class NotificationHandlingService extends IntentService {
         }
 
         switch (intent.getAction()) {
+            case ACTION_MARK_SEEN:
+                NotificationsJob.markNotificationsAsSeen(this);
+                break;
             case ACTION_MARK_READ: {
                 markNotificationAsRead(repoOwner, repoName);
                 cancelNotification(intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1));

@@ -20,6 +20,7 @@ import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.job.NotificationsJob;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.NotificationHolder;
@@ -104,6 +105,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         super.onActivityCreated(savedInstanceState);
         setContentShown(false);
         getLoaderManager().initLoader(0, null, mNotificationsCallback);
+        NotificationsJob.markNotificationsAsSeen(getActivity());
     }
 
     @Override
