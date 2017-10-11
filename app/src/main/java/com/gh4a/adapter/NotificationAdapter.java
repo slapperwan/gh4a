@@ -27,10 +27,10 @@ import org.eclipse.egit.github.core.User;
 public class NotificationAdapter extends
         RootAdapter<NotificationHolder, NotificationAdapter.ViewHolder> {
     private static final int VIEW_TYPE_NOTIFICATION_HEADER = RootAdapter.CUSTOM_VIEW_TYPE_START + 1;
-    private static final String SUBJECT_ISSUE = "Issue";
-    private static final String SUBJECT_PULL_REQUEST = "PullRequest";
-    private static final String SUBJECT_COMMIT = "Commit";
-    private static final String SUBJECT_RELEASE = "Release";
+    public static final String SUBJECT_ISSUE = "Issue";
+    public static final String SUBJECT_PULL_REQUEST = "PullRequest";
+    public static final String SUBJECT_COMMIT = "Commit";
+    public static final String SUBJECT_RELEASE = "Release";
 
     public interface OnNotificationActionCallback {
         void markAsRead(NotificationHolder notificationHolder);
