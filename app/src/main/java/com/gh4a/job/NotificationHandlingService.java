@@ -26,10 +26,18 @@ public class NotificationHandlingService extends IntentService {
     private static final String ACTION_MARK_SEEN = "com.gh4a.action.MARK_AS_SEEN";
     private static final String ACTION_MARK_READ = "com.gh4a.action.MARK_AS_READ";
     private static final String ACTION_OPEN_NOTIFICATION = "com.gh4a.action.OPEN_NOTIFICATION";
+    private static final String ACTION_HANDLE_NOTIFICATION_DISMISS =
+            "com.gh4a.action.HANDLE_NOTIFICATION_DISMISS";
 
     public static Intent makeMarkNotificationsSeenIntent(Context context) {
         return new Intent(context, NotificationHandlingService.class)
                 .setAction(ACTION_MARK_SEEN);
+    }
+
+    public static Intent makeHandleDismissIntent(Context context, int notificationId) {
+        return new Intent(context, NotificationHandlingService.class)
+                .setAction(ACTION_HANDLE_NOTIFICATION_DISMISS)
+                .putExtra(EXTRA_NOTIFICATION_ID, notificationId);
     }
 
     public static Intent makeMarkReposNotificationsAsReadActionIntent(Context context,
@@ -62,23 +70,36 @@ public class NotificationHandlingService extends IntentService {
 
         String repoOwner = intent.getStringExtra(EXTRA_REPO_OWNER);
         String repoName = intent.getStringExtra(EXTRA_REPO_NAME);
-        if (repoOwner == null || repoName == null) {
-            return;
-        }
+        int notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1);
 
         switch (intent.getAction()) {
             case ACTION_MARK_SEEN:
                 NotificationsJob.markNotificationsAsSeen(this);
                 break;
-            case ACTION_MARK_READ: {
-                markNotificationAsRead(repoOwner, repoName);
-                cancelNotification(intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1));
+            case ACTION_HANDLE_NOTIFICATION_DISMISS:
+                if (notificationId > 0) {
+                    NotificationsJob.handleNotificationDismiss(this, notificationId);
+                }
                 break;
-            }
-            case ACTION_OPEN_NOTIFICATION: {
-                openNotification(intent.getData(), repoOwner, repoName);
+            case ACTION_MARK_READ:
+                if (repoOwner != null && repoName != null) {
+                    markNotificationAsRead(repoOwner, repoName);
+                }
+                if (notificationId > 0) {
+                    NotificationManager notificationManager =
+                            (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    NotificationsJob.handleNotificationDismiss(this, notificationId);
+                    notificationManager.cancel(notificationId);
+                }
                 break;
-            }
+            case ACTION_OPEN_NOTIFICATION:
+                if (repoOwner != null && repoName != null) {
+                    openNotification(intent.getData(), repoOwner, repoName);
+                }
+                if (notificationId > 0) {
+                    NotificationsJob.handleNotificationDismiss(this, notificationId);
+                }
+                break;
         }
     }
 
@@ -92,14 +113,6 @@ public class NotificationHandlingService extends IntentService {
             startActivity(BrowseFilter.makeRedirectionIntent(this, uri, null));
         } else {
             startActivity(HomeActivity.makeNotificationsIntent(this, repoOwner, repoName));
-        }
-    }
-
-    private void cancelNotification(int notificationId) {
-        if (notificationId >= 0) {
-            NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.cancel(notificationId);
         }
     }
 
