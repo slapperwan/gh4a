@@ -49,11 +49,10 @@ public class NotificationHandlingService extends IntentService {
                 .putExtra(EXTRA_REPO_NAME, repoName);
     }
 
-    public static Intent makeOpenNotificationActionIntent(Context context, Uri uri,
+    public static Intent makeOpenNotificationActionIntent(Context context,
             String repoOwner, String repoName) {
         return new Intent(context, NotificationHandlingService.class)
                 .setAction(ACTION_OPEN_NOTIFICATION)
-                .setData(uri)
                 .putExtra(EXTRA_REPO_OWNER, repoOwner)
                 .putExtra(EXTRA_REPO_NAME, repoName);
     }
@@ -94,25 +93,9 @@ public class NotificationHandlingService extends IntentService {
                 break;
             case ACTION_OPEN_NOTIFICATION:
                 if (repoOwner != null && repoName != null) {
-                    openNotification(intent.getData(), repoOwner, repoName);
-                }
-                if (notificationId > 0) {
-                    NotificationsJob.handleNotificationDismiss(this, notificationId);
+                    startActivity(HomeActivity.makeNotificationsIntent(this, repoOwner, repoName));
                 }
                 break;
-        }
-    }
-
-    private void openNotification(@Nullable Uri uri, String repoOwner, String repoName) {
-        SharedPreferences prefs = getSharedPreferences(SettingsFragment.PREF_NAME,
-                Context.MODE_PRIVATE);
-        if (prefs.getBoolean(SettingsFragment.KEY_NOTIFICATION_MARK_READ, false)) {
-            markNotificationAsRead(repoOwner, repoName);
-        }
-        if (uri != null) {
-            startActivity(BrowseFilter.makeRedirectionIntent(this, uri, null));
-        } else {
-            startActivity(HomeActivity.makeNotificationsIntent(this, repoOwner, repoName));
         }
     }
 

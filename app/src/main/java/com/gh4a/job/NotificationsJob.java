@@ -199,11 +199,8 @@ public class NotificationsJob extends Job {
                 .getQuantityString(R.plurals.unread_notifications_summary_text,
                         notifications.size(), notifications.size());
 
-        String url = notifications.size() == 1 ? notifications.get(0).getSubject().getUrl() : null;
-        Uri uri = url != null ? ApiHelpers.normalizeUri(Uri.parse(url)) : null;
-
         Intent intent = NotificationHandlingService.makeOpenNotificationActionIntent(
-                getContext(), uri, repository.getOwner().getLogin(), repository.getName());
+                getContext(), repository.getOwner().getLogin(), repository.getName());
         PendingIntent contentIntent = PendingIntent.getService(getContext(), id, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 

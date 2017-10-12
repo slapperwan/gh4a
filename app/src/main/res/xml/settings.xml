@@ -47,13 +47,6 @@
         android:summary="%s"
         android:title="@string/notification_interval" />
 
-    <SwitchPreference
-        android:defaultValue="false"
-        android:dependency="notifications"
-        android:summary="@string/notification_mark_read_summary"
-        android:key="notification_mark_read"
-        android:title="@string/notification_mark_read" />
-
     <Preference
         android:key="about"
         android:title="@string/about" />

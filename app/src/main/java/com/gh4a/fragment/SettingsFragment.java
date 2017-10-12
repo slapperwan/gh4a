@@ -38,7 +38,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     public static final String KEY_GIF_LOADING = "http_gif_load_mode";
     public static final String KEY_NOTIFICATIONS = "notifications";
     public static final String KEY_NOTIFICATION_INTERVAL = "notification_interval";
-    public static final String KEY_NOTIFICATION_MARK_READ = "notification_mark_read";
     private static final String KEY_ABOUT = "about";
     private static final String KEY_OPEN_SOURCE_COMPONENTS = "open_source_components";
 
