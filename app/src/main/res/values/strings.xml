@@ -547,6 +547,4 @@
     <string name="notification_subject_pr">PR</string>
     <string name="notification_subject_release">Release</string>
     <string name="notification_interval">Sync interval</string>
-    <string name="notification_mark_read">Auto mark read</string>
-    <string name="notification_mark_read_summary">Mark notifications as read when opening them</string>
 </resources>
