@@ -56,6 +56,8 @@ public class NotificationsJob extends Job {
     private static final String KEY_LAST_NOTIFICATION_SEEN = "last_notification_seen";
     private static final String KEY_LAST_SHOWN_REPO_IDS = "last_notification_repo_ids";
 
+    private static final Object sPrefsLock = new Object();
+
     public static void scheduleJob(int intervalMinutes) {
         new JobRequest.Builder(TAG)
                 .setPeriodic(TimeUnit.MINUTES.toMillis(intervalMinutes),
@@ -102,19 +104,22 @@ public class NotificationsJob extends Job {
         SharedPreferences prefs =
                 context.getSharedPreferences(SettingsFragment.PREF_NAME, Context.MODE_PRIVATE);
         String idString = String.valueOf(id);
-        Set<String> lastShownRepoIds = prefs.getStringSet(KEY_LAST_SHOWN_REPO_IDS, null);
-        if (lastShownRepoIds != null && lastShownRepoIds.contains(idString)) {
-            lastShownRepoIds.remove(idString);
-            if (lastShownRepoIds.isEmpty()) {
-                // last notification was cleared, so cancel summary notification
-                NotificationManagerCompat nm =
-                        NotificationManagerCompat.from(context);
-                nm.cancel(0);
-                lastShownRepoIds = null;
+
+        synchronized (sPrefsLock) {
+            Set<String> lastShownRepoIds = prefs.getStringSet(KEY_LAST_SHOWN_REPO_IDS, null);
+            if (lastShownRepoIds != null && lastShownRepoIds.contains(idString)) {
+                lastShownRepoIds.remove(idString);
+                if (lastShownRepoIds.isEmpty()) {
+                    // last notification was cleared, so cancel summary notification
+                    NotificationManagerCompat nm =
+                            NotificationManagerCompat.from(context);
+                    nm.cancel(0);
+                    lastShownRepoIds = null;
+                }
+                prefs.edit()
+                        .putStringSet(KEY_LAST_SHOWN_REPO_IDS, lastShownRepoIds)
+                        .apply();
             }
-            prefs.edit()
-                    .putStringSet(KEY_LAST_SHOWN_REPO_IDS, lastShownRepoIds)
-                    .apply();
         }
     }
 
@@ -138,52 +143,54 @@ public class NotificationsJob extends Job {
             return Result.FAILURE;
         }
 
-        SharedPreferences prefs = getContext().getSharedPreferences(SettingsFragment.PREF_NAME,
-                Context.MODE_PRIVATE);
-        long lastCheck = prefs.getLong(KEY_LAST_NOTIFICATION_CHECK, 0);
-        long lastSeen = prefs.getLong(KEY_LAST_NOTIFICATION_SEEN, 0);
-        Set<String> lastShownRepoIds = prefs.getStringSet(KEY_LAST_SHOWN_REPO_IDS, null);
-        Set<String> newShownRepoIds = new HashSet<>();
-        boolean hasUnseenNotification = false, hasNewNotification = false;
+        synchronized (sPrefsLock) {
+            SharedPreferences prefs = getContext().getSharedPreferences(SettingsFragment.PREF_NAME,
+                    Context.MODE_PRIVATE);
+            long lastCheck = prefs.getLong(KEY_LAST_NOTIFICATION_CHECK, 0);
+            long lastSeen = prefs.getLong(KEY_LAST_NOTIFICATION_SEEN, 0);
+            Set<String> lastShownRepoIds = prefs.getStringSet(KEY_LAST_SHOWN_REPO_IDS, null);
+            Set<String> newShownRepoIds = new HashSet<>();
+            boolean hasUnseenNotification = false, hasNewNotification = false;
 
-        for (List<Notification> list : notifsGroupedByRepo) {
-            for (Notification n : list) {
-                long timestamp = n.getUpdatedAt().getTime();
-                hasNewNotification |= timestamp > lastCheck;
-                hasUnseenNotification |= timestamp > lastSeen;
+            for (List<Notification> list : notifsGroupedByRepo) {
+                for (Notification n : list) {
+                    long timestamp = n.getUpdatedAt().getTime();
+                    hasNewNotification |= timestamp > lastCheck;
+                    hasUnseenNotification |= timestamp > lastSeen;
+                }
             }
-        }
 
-        if (!hasUnseenNotification) {
-            // seen timestamp is only updated when notifications are canceled by us,
-            // so everything is canceled at this point and we have nothing to notify of
-            return Result.SUCCESS;
-        }
+            if (!hasUnseenNotification) {
+                // seen timestamp is only updated when notifications are canceled by us,
+                // so everything is canceled at this point and we have nothing to notify of
+                return Result.SUCCESS;
+            }
 
-        NotificationManagerCompat nm =
-                NotificationManagerCompat.from(getContext());
+            NotificationManagerCompat nm =
+                    NotificationManagerCompat.from(getContext());
 
-        showSummaryNotification(nm, notifsGroupedByRepo, hasNewNotification);
-        for (List<Notification> list : notifsGroupedByRepo) {
-            showRepoNotification(nm, list, lastCheck);
-            String repoId = String.valueOf(list.get(0).getRepository().getId());
+            showSummaryNotification(nm, notifsGroupedByRepo, hasNewNotification);
+            for (List<Notification> list : notifsGroupedByRepo) {
+                showRepoNotification(nm, list, lastCheck);
+                String repoId = String.valueOf(list.get(0).getRepository().getId());
+                if (lastShownRepoIds != null) {
+                    lastShownRepoIds.remove(repoId);
+                }
+                newShownRepoIds.add(repoId);
+            }
+
+            // cancel sub-notifications for repos that no longer have notifications
             if (lastShownRepoIds != null) {
-                lastShownRepoIds.remove(repoId);
+                for (String repoId : lastShownRepoIds) {
+                    nm.cancel(Integer.parseInt(repoId));
+                }
             }
-            newShownRepoIds.add(repoId);
-        }
 
-        // cancel sub-notifications for repos that no longer have notifications
-        if (lastShownRepoIds != null) {
-            for (String repoId : lastShownRepoIds) {
-                nm.cancel(Integer.parseInt(repoId));
-            }
+            prefs.edit()
+                    .putLong(KEY_LAST_NOTIFICATION_CHECK, System.currentTimeMillis())
+                    .putStringSet(KEY_LAST_SHOWN_REPO_IDS, newShownRepoIds)
+                    .apply();
         }
-
-        prefs.edit()
-                .putLong(KEY_LAST_NOTIFICATION_CHECK, System.currentTimeMillis())
-                .putStringSet(KEY_LAST_SHOWN_REPO_IDS, newShownRepoIds)
-                .apply();
 
         return Result.SUCCESS;
     }
