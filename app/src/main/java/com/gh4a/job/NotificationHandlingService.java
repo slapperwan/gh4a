@@ -17,11 +17,13 @@ import com.gh4a.resolver.BrowseFilter;
 import org.eclipse.egit.github.core.service.NotificationService;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class NotificationHandlingService extends IntentService {
     private static final String EXTRA_REPO_OWNER = "owner";
     private static final String EXTRA_REPO_NAME = "repo";
     private static final String EXTRA_NOTIFICATION_ID = "notification_id";
+    private static final String EXTRA_TIMESTAMP = "timestamp";
 
     private static final String ACTION_MARK_SEEN = "com.gh4a.action.MARK_AS_SEEN";
     private static final String ACTION_MARK_READ = "com.gh4a.action.MARK_AS_READ";
@@ -46,7 +48,8 @@ public class NotificationHandlingService extends IntentService {
                 .setAction(ACTION_MARK_READ)
                 .putExtra(EXTRA_NOTIFICATION_ID, notificationId)
                 .putExtra(EXTRA_REPO_OWNER, repoOwner)
-                .putExtra(EXTRA_REPO_NAME, repoName);
+                .putExtra(EXTRA_REPO_NAME, repoName)
+                .putExtra(EXTRA_TIMESTAMP, System.currentTimeMillis());
     }
 
     public static Intent makeOpenNotificationActionIntent(Context context,
@@ -82,7 +85,8 @@ public class NotificationHandlingService extends IntentService {
                 break;
             case ACTION_MARK_READ:
                 if (repoOwner != null && repoName != null) {
-                    markNotificationAsRead(repoOwner, repoName);
+                    long timestamp = intent.getLongExtra(EXTRA_TIMESTAMP, 0);
+                    markNotificationAsRead(repoOwner, repoName, timestamp);
                 }
                 if (notificationId > 0) {
                     NotificationManager notificationManager =
@@ -99,11 +103,11 @@ public class NotificationHandlingService extends IntentService {
         }
     }
 
-    private void markNotificationAsRead(String repoOwner, String repoName) {
+    private void markNotificationAsRead(String repoOwner, String repoName, long timestamp) {
         NotificationService notificationService = (NotificationService)
                 Gh4Application.get().getService(Gh4Application.NOTIFICATION_SERVICE);
         try {
-            notificationService.markNotificationsAsRead(repoOwner, repoName);
+            notificationService.markNotificationsAsRead(repoOwner, repoName, new Date(timestamp));
         } catch (IOException e) {
             Log.w(Gh4Application.LOG_TAG,
                     "Could not mark repo \"" + repoOwner + "/" + repoName + "\" as read", e);
