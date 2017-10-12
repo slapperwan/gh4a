@@ -98,6 +98,26 @@ public class NotificationsJob extends Job {
                 .apply();
     }
 
+    public static void handleNotificationDismiss(Context context, int id) {
+        SharedPreferences prefs =
+                context.getSharedPreferences(SettingsFragment.PREF_NAME, Context.MODE_PRIVATE);
+        String idString = String.valueOf(id);
+        Set<String> lastShownRepoIds = prefs.getStringSet(KEY_LAST_SHOWN_REPO_IDS, null);
+        if (lastShownRepoIds != null && lastShownRepoIds.contains(idString)) {
+            lastShownRepoIds.remove(idString);
+            if (lastShownRepoIds.isEmpty()) {
+                // last notification was cleared, so cancel summary notification
+                NotificationManagerCompat nm =
+                        NotificationManagerCompat.from(context);
+                nm.cancel(0);
+                lastShownRepoIds = null;
+            }
+            prefs.edit()
+                    .putStringSet(KEY_LAST_SHOWN_REPO_IDS, lastShownRepoIds)
+                    .apply();
+        }
+    }
+
     @NonNull
     @Override
     protected Result onRunJob(Params params) {
@@ -179,6 +199,18 @@ public class NotificationsJob extends Job {
                 .getQuantityString(R.plurals.unread_notifications_summary_text,
                         notifications.size(), notifications.size());
 
+        String url = notifications.size() == 1 ? notifications.get(0).getSubject().getUrl() : null;
+        Uri uri = url != null ? ApiHelpers.normalizeUri(Uri.parse(url)) : null;
+
+        Intent intent = NotificationHandlingService.makeOpenNotificationActionIntent(
+                getContext(), uri, repository.getOwner().getLogin(), repository.getName());
+        PendingIntent contentIntent = PendingIntent.getService(getContext(), id, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        PendingIntent deleteIntent = PendingIntent.getService(getContext(), id,
+                NotificationHandlingService.makeHandleDismissIntent(getContext(), id),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
         Intent markReadIntent =
                 NotificationHandlingService.makeMarkReposNotificationsAsReadActionIntent(
                         getContext(), id, repository.getOwner().getLogin(), repository.getName());
@@ -195,18 +227,11 @@ public class NotificationsJob extends Job {
                 .setWhen(when)
                 .setShowWhen(true)
                 .setContentTitle(title)
+                .setContentIntent(contentIntent)
+                .setDeleteIntent(deleteIntent)
                 .setAutoCancel(true)
                 .addAction(markReadAction)
                 .setContentText(text);
-
-        String url = notifications.size() == 1 ? notifications.get(0).getSubject().getUrl() : null;
-        Uri uri = url != null ? ApiHelpers.normalizeUri(Uri.parse(url)) : null;
-
-        Intent intent = NotificationHandlingService.makeOpenNotificationActionIntent(
-                getContext(), uri, repository.getOwner().getLogin(), repository.getName());
-        PendingIntent pendingIntent = PendingIntent.getService(getContext(), id, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-        builder.setContentIntent(pendingIntent);
 
         boolean hasNewNotification = false;
 
