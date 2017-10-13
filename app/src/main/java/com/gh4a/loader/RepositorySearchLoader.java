@@ -10,7 +10,6 @@ import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Repository;
-import com.meisolsson.githubsdk.model.SearchPage;
 import com.meisolsson.githubsdk.service.search.SearchService;
 
 public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
@@ -40,27 +39,20 @@ public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
             params.append(" user:").append(mUserLogin);
         }
 
-        List<Repository> result = new ArrayList<>();
-
         try {
-            int nextPage = 1;
-            do {
-                SearchPage<Repository> page = ApiHelpers.throwOnFailure(
-                        service.searchRepositories(params.toString(), null, null, nextPage).blockingGet());
-                result.addAll(page.items());
-                nextPage = page.next() != null ? page.next() : 0;
-            } while (nextPage > 0);
+            return ApiHelpers.PageIterator
+                    .toSingle(page -> service.searchRepositories(params.toString(), null, null, page)
+                            .compose(ApiHelpers.searchPageAdapter()))
+                    .blockingGet();
         } catch (ApiRequestException e) {
             if (e.getStatus() == 422) {
                 // With that status code, Github wants to tell us there are no
                 // repositories to search in. Just pretend no error and return
                 // an empty list in that case.
-                result = new ArrayList<>();
+                return new ArrayList<>();
             } else {
                 throw e;
             }
         }
-
-        return result;
     }
 }

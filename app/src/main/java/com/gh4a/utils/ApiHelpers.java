@@ -3,6 +3,8 @@ package com.gh4a.utils;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.gh4a.ApiRequestException;
@@ -12,6 +14,7 @@ import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.SearchPage;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.git.GitUser;
 
@@ -25,6 +28,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.SingleTransformer;
 import io.reactivex.functions.Predicate;
 import retrofit2.Response;
 
@@ -177,6 +181,53 @@ public class ApiHelpers {
 
     public static <T> Single<T> throwOnFailure(Single<Response<T>> input) {
         return input.map(response -> throwOnFailure(response));
+    }
+
+    public static <T> SingleTransformer<Response<SearchPage<T>>, Response<Page<T>>> searchPageAdapter() {
+        return upstream -> upstream.map(response -> {
+            if (response.isSuccessful()) {
+                return Response.success(new SearchPageAdapter<>(response.body()));
+            }
+            return Response.error(response.errorBody(), response.raw());
+        });
+    };
+
+    private static class SearchPageAdapter<T> extends Page<T> {
+        private final SearchPage<T> mPage;
+
+        public SearchPageAdapter(SearchPage<T> page) {
+            mPage = page;
+        }
+
+        @Nullable
+        @Override
+        public Integer next() {
+            return mPage.next();
+        }
+
+        @Nullable
+        @Override
+        public Integer last() {
+            return mPage.last();
+        }
+
+        @Nullable
+        @Override
+        public Integer first() {
+            return mPage.first();
+        }
+
+        @Nullable
+        @Override
+        public Integer prev() {
+            return mPage.prev();
+        }
+
+        @NonNull
+        @Override
+        public List<T> items() {
+            return mPage.items();
+        }
     }
 
     public static class PageIterator<T> {
