@@ -10,7 +10,6 @@ import com.gh4a.ApiRequestException;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.SearchCode;
-import com.meisolsson.githubsdk.model.SearchPage;
 import com.meisolsson.githubsdk.service.search.SearchService;
 
 public class CodeSearchLoader extends BaseLoader<List<SearchCode>> {
@@ -30,14 +29,9 @@ public class CodeSearchLoader extends BaseLoader<List<SearchCode>> {
             return new ArrayList<>();
         }
 
-        List<SearchCode> result = new ArrayList<>();
-        int nextPage = 1;
-        do {
-            SearchPage<SearchCode> page = ApiHelpers.throwOnFailure(
-                    service.searchCode(mQuery, null, null, nextPage).blockingGet());
-            result.addAll(page.items());
-            nextPage = page.next() != null ? page.next() : 0;
-        } while (nextPage > 0);
-        return result;
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.searchCode(mQuery, null, null, page)
+                        .compose(ApiHelpers.searchPageAdapter()))
+                .blockingGet();
     }
 }
