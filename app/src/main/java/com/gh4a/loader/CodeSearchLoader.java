@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.gh4a.ApiRequestException;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.SearchCode;
 import com.meisolsson.githubsdk.service.search.SearchService;
 
@@ -31,7 +32,7 @@ public class CodeSearchLoader extends BaseLoader<List<SearchCode>> {
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.searchCode(mQuery, null, null, page)
-                        .compose(ApiHelpers::searchPageAdapter))
+                        .compose(RxUtils::searchPageAdapter))
                 .blockingGet();
     }
 }

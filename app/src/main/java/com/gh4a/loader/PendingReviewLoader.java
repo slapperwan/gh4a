@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewState;
@@ -33,7 +34,7 @@ public class PendingReviewLoader extends BaseLoader<List<Review>> {
                 Gh4Application.get().getGitHubService(PullRequestReviewService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(ApiHelpers.PageIterator.filter(r -> r.state() == ReviewState.Pending))
+                .compose(RxUtils.filter(r -> r.state() == ReviewState.Pending))
                 .blockingGet();
     }
 }

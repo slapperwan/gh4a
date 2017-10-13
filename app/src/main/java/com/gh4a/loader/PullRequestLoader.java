@@ -33,6 +33,6 @@ public class PullRequestLoader extends BaseLoader<PullRequest> {
         PullRequestService service =
                 Gh4Application.get().getGitHubService(PullRequestService.class);
         return service.getPullRequest(repoOwner, repoName, pullRequestNumber)
-                .compose(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::throwOnFailure);
     }
 }

@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.search.SearchService;
 
@@ -42,7 +43,7 @@ public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
         try {
             return ApiHelpers.PageIterator
                     .toSingle(page -> service.searchRepositories(params.toString(), null, null, page)
-                            .compose(ApiHelpers::searchPageAdapter))
+                            .compose(RxUtils::searchPageAdapter))
                     .blockingGet();
         } catch (ApiRequestException e) {
             if (e.getStatus() == 422) {

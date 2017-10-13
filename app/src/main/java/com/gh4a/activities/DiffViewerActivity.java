@@ -571,7 +571,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         @Override
         protected Void run() throws ApiRequestException {
             deleteComment(mId)
-                    .compose(ApiHelpers::throwOnFailure)
+                    .map(ApiHelpers::throwOnFailure)
                     .blockingGet();
             return null;
         }

@@ -23,14 +23,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.Single;
-import io.reactivex.SingleTransformer;
-import io.reactivex.functions.Predicate;
 import retrofit2.Response;
 
 public class ApiHelpers {
@@ -180,20 +177,7 @@ public class ApiHelpers {
         return response.body();
     }
 
-    public static <T> Single<T> throwOnFailure(Single<Response<T>> upstream) {
-        return upstream.map(response -> throwOnFailure(response));
-    }
-
-    public static <T> Single<Response<Page<T>>> searchPageAdapter(Single<Response<SearchPage<T>>> upstream) {
-        return upstream.map(response -> {
-            if (response.isSuccessful()) {
-                return Response.success(new SearchPageAdapter<>(response.body()));
-            }
-            return Response.error(response.errorBody(), response.raw());
-        });
-    };
-
-    private static class SearchPageAdapter<T> extends Page<T> {
+    public static class SearchPageAdapter<T> extends Page<T> {
         private final SearchPage<T> mPage;
 
         public SearchPageAdapter(SearchPage<T> page) {
@@ -250,18 +234,6 @@ public class ApiHelpers {
                         }
                         return result;
                     });
-        }
-
-        public static <T> SingleTransformer<List<T>, List<T>> filter(Predicate<T> predicate) {
-            return upstream -> upstream.map(list -> {
-                Iterator<T> iter = list.iterator();
-                while (iter.hasNext()) {
-                    if (!predicate.test(iter.next())) {
-                        iter.remove();
-                    }
-                }
-                return list;
-            });
         }
 
         private static <T> Observable<List<T>> pageToObservable(PageProducer<T> producer, int page) {

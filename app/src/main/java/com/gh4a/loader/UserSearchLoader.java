@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.search.SearchService;
 
@@ -29,7 +30,7 @@ public class UserSearchLoader extends BaseLoader<List<User>> {
         final SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.searchUsers(mQuery, null, null, page)
-                        .compose(ApiHelpers::searchPageAdapter))
+                        .compose(RxUtils::searchPageAdapter))
                 .blockingGet();
     }
 }

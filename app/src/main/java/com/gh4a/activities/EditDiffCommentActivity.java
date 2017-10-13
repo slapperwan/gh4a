@@ -60,7 +60,7 @@ public class EditDiffCommentActivity extends EditCommentActivity {
                 .position(extras.getInt("position"))
                 .build();
         return service.createCommitComment(repoOwner, repoName, commitId, request)
-                .compose(ApiHelpers::throwOnFailure)
+                .map(ApiHelpers::throwOnFailure)
                 .map(response -> response);
     }
 
@@ -71,7 +71,7 @@ public class EditDiffCommentActivity extends EditCommentActivity {
                 Gh4Application.get().getGitHubService(RepositoryCommentService.class);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editCommitComment(repoOwner, repoName, commentId, request)
-                .compose(ApiHelpers::throwOnFailure)
+                .map(ApiHelpers::throwOnFailure)
                 .map(response -> response);
     }
 }

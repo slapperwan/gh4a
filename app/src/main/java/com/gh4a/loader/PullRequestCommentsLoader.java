@@ -5,6 +5,7 @@ import android.content.Context;
 import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 
@@ -37,6 +38,6 @@ public class PullRequestCommentsLoader extends BaseLoader<List<ReviewComment>> {
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         repoOwner, repoName, pullRequestNumber, page))
-                .compose(ApiHelpers.PageIterator.filter(c -> c.position() >= 0));
+                .compose(RxUtils.filter(c -> c.position() >= 0));
     }
 }
