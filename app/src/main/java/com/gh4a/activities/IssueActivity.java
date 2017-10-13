@@ -39,10 +39,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueFragment;
 import com.gh4a.loader.IsCollaboratorLoader;
@@ -51,6 +49,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
@@ -320,11 +319,38 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                 .setPositiveButton(buttonResId, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new IssueOpenCloseTask(reopen).schedule();
+                        updateIssueState(reopen);
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    private void updateIssueState(boolean reopen) {
+        IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
+        IssueRequest request = IssueRequest.builder()
+                .state(reopen ? IssueState.Open : IssueState.Closed)
+                .build();
+        @StringRes int dialogResId = reopen ? R.string.opening_msg : R.string.closing_msg;
+        @StringRes int errorMessageResId =
+                reopen ? R.string.issue_error_reopen : R.string.issue_error_close;
+
+        service.editIssue(mRepoOwner, mRepoName, mIssueNumber, request)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, dialogResId, getString(errorMessageResId, mIssueNumber)))
+                .subscribe(result -> {
+                    mIssue = result;
+
+                    updateHeader();
+                    if (mEditFab != null) {
+                        mEditFab.setState(mIssue.state());
+                    }
+                    if (mFragment != null) {
+                        mFragment.updateState(mIssue);
+                    }
+                    setResult(RESULT_OK);
+                    supportInvalidateOptionsMenu();
+                }, error -> {});
     }
 
     private void updateFabVisibility() {
@@ -376,50 +402,6 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    private class IssueOpenCloseTask extends ProgressDialogTask<Issue> {
-        private final boolean mOpen;
-
-        public IssueOpenCloseTask(boolean open) {
-            super(IssueActivity.this, open ? R.string.opening_msg : R.string.closing_msg);
-            mOpen = open;
-        }
-
-        @Override
-        protected ProgressDialogTask<Issue> clone() {
-            return new IssueOpenCloseTask(mOpen);
-        }
-
-        @Override
-        protected Issue run() throws ApiRequestException {
-            IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
-            IssueState targetState = mOpen ? IssueState.Open : IssueState.Closed;
-            return ApiHelpers.throwOnFailure(service.editIssue(mRepoOwner, mRepoName, mIssueNumber,
-                    IssueRequest.builder().state(targetState).build()).blockingGet());
-        }
-
-        @Override
-        protected void onSuccess(Issue result) {
-            mIssue = result;
-
-            updateHeader();
-            if (mEditFab != null) {
-                mEditFab.setState(mIssue.state());
-            }
-            if (mFragment != null) {
-                mFragment.updateState(mIssue);
-            }
-            setResult(RESULT_OK);
-            supportInvalidateOptionsMenu();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            @StringRes int messageResId = mOpen
-                    ? R.string.issue_error_reopen : R.string.issue_error_close;
-            return getContext().getString(messageResId, mIssueNumber);
         }
     }
 }
