@@ -1,5 +1,6 @@
 package com.gh4a.fragment;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -30,7 +31,6 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.gh4a.ApiRequestException;
-import com.gh4a.BackgroundTask;
 import com.gh4a.R;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
@@ -265,8 +265,18 @@ public class SearchFragment extends LoadingListFragmentBase implements
     public boolean onQueryTextSubmit(String query) {
         mQuery = query;
         if (!StringUtils.isBlank(query)) {
-            int type = mSearchType.getSelectedItemPosition();
-            new SaveSearchSuggestionTask(query, type).schedule();
+            final ContentResolver cr = getActivity().getContentResolver();
+            final ContentValues cv = new ContentValues();
+            cv.put(SuggestionsProvider.Columns.TYPE, mSearchType.getSelectedItemPosition());
+            cv.put(SuggestionsProvider.Columns.SUGGESTION, query);
+            cv.put(SuggestionsProvider.Columns.DATE, System.currentTimeMillis());
+
+            new Thread() {
+                @Override
+                public void run() {
+                    cr.insert(SuggestionsProvider.Columns.CONTENT_URI, cv);
+                }
+            }.start();
         }
         loadResults();
         return true;
@@ -297,7 +307,16 @@ public class SearchFragment extends LoadingListFragmentBase implements
         Cursor cursor = mSearch.getSuggestionsAdapter().getCursor();
         if (cursor.moveToPosition(position)) {
             if (position == cursor.getCount() - 1) {
-                new SuggestionDeletionTask(mSearchType.getSelectedItemPosition()).schedule();
+                final int type = mSearchType.getSelectedItemPosition();
+                final ContentResolver cr = getActivity().getContentResolver();
+                new Thread() {
+                    @Override
+                    public void run() {
+                        cr.delete(SuggestionsProvider.Columns.CONTENT_URI,
+                                SuggestionsProvider.Columns.TYPE + " = ?",
+                                new String[] { String.valueOf(type) });
+                    }
+                }.start();
             } else {
                 mQuery = cursor.getString(1);
                 mSearch.setQuery(mQuery, false);
@@ -376,52 +395,6 @@ public class SearchFragment extends LoadingListFragmentBase implements
     private void updateEmptyText(@StringRes int emptyTextResId) {
         TextView emptyView = getView().findViewById(android.R.id.empty);
         emptyView.setText(emptyTextResId);
-    }
-
-    private class SaveSearchSuggestionTask extends BackgroundTask<Void> {
-        private final String mSuggestion;
-        private final int mType;
-
-        public SaveSearchSuggestionTask(String suggestion, int type) {
-            super(getBaseActivity());
-            mSuggestion = suggestion;
-            mType = type;
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            ContentValues cv = new ContentValues();
-            cv.put(SuggestionsProvider.Columns.TYPE, mType);
-            cv.put(SuggestionsProvider.Columns.SUGGESTION, mSuggestion);
-            cv.put(SuggestionsProvider.Columns.DATE, System.currentTimeMillis());
-            getContext().getContentResolver().insert(SuggestionsProvider.Columns.CONTENT_URI, cv);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-        }
-    }
-
-    private class SuggestionDeletionTask extends BackgroundTask<Void> {
-        private final int mType;
-
-        public SuggestionDeletionTask(int type) {
-            super(getBaseActivity());
-            mType = type;
-        }
-
-        @Override
-        protected Void run() {
-            getContext().getContentResolver().delete(SuggestionsProvider.Columns.CONTENT_URI,
-                    SuggestionsProvider.Columns.TYPE + " = ?",
-                    new String[] { String.valueOf(mType) });
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-        }
     }
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {

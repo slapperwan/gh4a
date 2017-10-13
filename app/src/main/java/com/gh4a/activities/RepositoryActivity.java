@@ -22,7 +22,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.ApiRequestException;
-import com.gh4a.BackgroundTask;
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -42,6 +41,7 @@ import com.gh4a.loader.RepositoryLoader;
 import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Branch;
 import com.meisolsson.githubsdk.model.Repository;
@@ -52,6 +52,7 @@ import com.meisolsson.githubsdk.service.activity.WatchingService;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Single;
 import retrofit2.Response;
 
 public class RepositoryActivity extends BaseFragmentPagerActivity {
@@ -381,12 +382,12 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
             case R.id.watch:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                new UpdateWatchTask().schedule();
+                toggleStarringState();
                 return true;
             case R.id.star:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                new UpdateStarTask().schedule();
+                toggleWatchingState();
                 return true;
             case R.id.ref:
                 if (mBranches == null) {
@@ -520,66 +521,46 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         }
     }
 
-    private class UpdateStarTask extends BackgroundTask<Void> {
-        public UpdateStarTask() {
-            super(RepositoryActivity.this);
-        }
+    private void toggleStarringState() {
+        StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
+        Single<Response<Void>> responseSingle = mIsStarring
+                ? service.unstarRepository(mRepoOwner, mRepoName)
+                : service.starRepository(mRepoOwner, mRepoName);
+        responseSingle.map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .compose(RxUtils::doInBackground)
+                .subscribe(result -> {
+                    if (mIsStarring != null) {
+                        mIsStarring = !mIsStarring;
+                        if (mRepositoryFragment != null) {
+                            mRepositoryFragment.updateStargazerCount(mIsStarring);
+                        }
+                        supportInvalidateOptionsMenu();
+                    }
+                }, error -> supportInvalidateOptionsMenu());
 
-        @Override
-        protected Void run() throws ApiRequestException {
-            StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
-            Response<Void> response = mIsStarring
-                    ? service.unstarRepository(mRepoOwner, mRepoName).blockingGet()
-                    : service.starRepository(mRepoOwner, mRepoName).blockingGet();
-            ApiHelpers.throwOnFailure(response);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            if (mIsStarring == null) {
-                // user refreshed while the action was in progress
-                return;
-            }
-            mIsStarring = !mIsStarring;
-            if (mRepositoryFragment != null) {
-                mRepositoryFragment.updateStargazerCount(mIsStarring);
-            }
-            supportInvalidateOptionsMenu();
-        }
     }
 
-    private class UpdateWatchTask extends BackgroundTask<Void> {
-        public UpdateWatchTask() {
-            super(RepositoryActivity.this);
+    private void toggleWatchingState() {
+        WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
+        final Single<?> responseSingle;
+
+        if (mIsWatching) {
+            responseSingle = service.deleteRepositorySubscription(mRepoOwner, mRepoName)
+                    .map(ApiHelpers::throwOnFailure);
+        } else {
+            SubscriptionRequest request = SubscriptionRequest.builder()
+                    .subscribed(true)
+                    .build();
+            responseSingle = service.setRepositorySubscription(mRepoOwner, mRepoName, request)
+                    .map(ApiHelpers::throwOnFailure);
         }
 
-        @Override
-        protected Void run() throws ApiRequestException {
-            WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
-            final Response<?> response;
-            if (mIsStarring) {
-                response = service.deleteRepositorySubscription(mRepoOwner, mRepoName).blockingGet();
-            } else {
-                SubscriptionRequest request = SubscriptionRequest.builder()
-                        .subscribed(true)
-                        .ignored(false)
-                        .build();
-                response = service.setRepositorySubscription(mRepoOwner, mRepoName, request)
-                        .blockingGet();
-            }
-            ApiHelpers.throwOnFailure(response);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            if (mIsWatching == null) {
-                // user refreshed while the action was in progress
-                return;
-            }
-            mIsWatching = !mIsWatching;
-            supportInvalidateOptionsMenu();
-        }
+        responseSingle.compose(RxUtils::doInBackground)
+                .subscribe(result -> {
+                    if (mIsWatching == null) {
+                        mIsWatching = !mIsWatching;
+                    }
+                    supportInvalidateOptionsMenu();
+                }, error -> supportInvalidateOptionsMenu());
     }
 }

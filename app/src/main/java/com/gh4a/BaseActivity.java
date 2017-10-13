@@ -576,7 +576,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return reloadedAny;
     }
 
-    protected void setErrorViewVisibility(boolean visible, Exception e) {
+    protected void setErrorViewVisibility(boolean visible, Throwable e) {
         View content = findViewById(R.id.content);
         View error = findViewById(R.id.error);
 

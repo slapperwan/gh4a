@@ -38,6 +38,11 @@ public class RxUtils {
         });
     }
 
+    public static <T> Single<T> doInBackground(Single<T> upstream) {
+        return upstream.subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     public static <T> SingleTransformer<T, T> wrapForBackgroundTask(final BaseActivity activity,
             final @StringRes int dialogMessageResId, final @StringRes int errorMessageResId) {
         return wrapForBackgroundTask(activity, activity.getRootLayout(), dialogMessageResId,
@@ -61,8 +66,7 @@ public class RxUtils {
             final CoordinatorLayout rootLayout, final @StringRes int dialogMessageResId,
             final String errorMessage) {
         return upstream -> upstream
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxUtils::doInBackground)
                 .compose(wrapWithProgressDialog(activity, dialogMessageResId))
                 .compose(wrapWithRetrySnackbar(rootLayout, errorMessage));
     }

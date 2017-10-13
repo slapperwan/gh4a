@@ -22,13 +22,12 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
-import android.support.v4.util.Pair;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.gh4a.BackgroundTask;
 import com.gh4a.BaseActivity;
 import com.gh4a.BuildConfig;
 import com.gh4a.Gh4Application;
@@ -36,18 +35,15 @@ import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
+import com.meisolsson.githubsdk.core.ServiceGenerator;
+import com.meisolsson.githubsdk.model.GitHubToken;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.request.RequestToken;
+import com.meisolsson.githubsdk.service.OAuthService;
 import com.meisolsson.githubsdk.service.users.UserService;
 
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import io.reactivex.Single;
 
 /**
  * The Github4Android activity.
@@ -108,13 +104,32 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         if (data != null
                 && data.getScheme().equals(CALLBACK_URI.getScheme())
                 && data.getHost().equals(CALLBACK_URI.getHost())) {
-            Uri uri = Uri.parse(TOKEN_URL)
-                    .buildUpon()
-                    .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
-                    .appendQueryParameter(PARAM_CLIENT_SECRET, BuildConfig.CLIENT_SECRET)
-                    .appendQueryParameter(PARAM_CODE, data.getQueryParameter(PARAM_CODE))
+            OAuthService service = ServiceGenerator.createAuthService();
+            RequestToken request = RequestToken.builder()
+                    .clientId(BuildConfig.CLIENT_ID)
+                    .clientSecret(BuildConfig.CLIENT_SECRET)
+                    .code(data.getQueryParameter(PARAM_CODE))
                     .build();
-            new FetchTokenTask(uri).schedule();
+
+            Single<GitHubToken> tokenSingle = service.getToken(request)
+                    .map(ApiHelpers::throwOnFailure)
+                    .compose(RxUtils::doInBackground);
+
+            Single<User> userSingle = tokenSingle
+                    .flatMap(token -> {
+                        UserService userService = ServiceFactory.createService(
+                                UserService.class, null, token.accessToken(), null);
+                        return userService.getUser();
+                    })
+                    .map(ApiHelpers::throwOnFailure)
+                    .compose(RxUtils::doInBackground);
+
+            Single.zip(tokenSingle, userSingle, (token, user) -> Pair.create(token, user))
+                    .subscribe(pair -> {
+                        Gh4Application.get().addAccount(pair.second, pair.first.accessToken());
+                        goToToplevelActivity();
+                        finish();
+                    }, error -> setErrorViewVisibility(true, error));
             return true;
         }
 
@@ -208,70 +223,5 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
         launchLogin(this);
         mContent.setVisibility(View.GONE);
         mProgress.setVisibility(View.VISIBLE);
-    }
-
-    private class FetchTokenTask extends BackgroundTask<Pair<User, String>> {
-        private final Uri mUri;
-        public FetchTokenTask(Uri uri) {
-            super(Github4AndroidActivity.this);
-            mUri = uri;
-        }
-
-        @Override
-        protected Pair<User, String> run() throws Exception {
-            HttpURLConnection connection = null;
-            CharArrayWriter writer = null;
-
-            try {
-                URL url = new URL(mUri.toString());
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.addRequestProperty("Accept", "application/json");
-
-                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    throw new IOException("HTTP failure");
-                }
-
-                InputStream in = new BufferedInputStream(connection.getInputStream());
-                InputStreamReader reader = new InputStreamReader(in, "UTF-8");
-                int length = connection.getContentLength();
-                writer = new CharArrayWriter(Math.max(0, length));
-                char[] tmp = new char[4096];
-
-                int l;
-                while ((l = reader.read(tmp)) != -1) {
-                    writer.write(tmp, 0, l);
-                }
-                JSONObject response = new JSONObject(writer.toString());
-                String token = response.getString("access_token");
-
-                // fetch user information to get user name
-                UserService service = ServiceFactory.createService(
-                        UserService.class, null, token, null);
-                User user = ApiHelpers.throwOnFailure(service.getUser().blockingGet());
-
-                return Pair.create(user, token);
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-                if (writer != null) {
-                    writer.close();
-                }
-            }
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            super.onError(e);
-            setErrorViewVisibility(true, e);
-        }
-
-        @Override
-        protected void onSuccess(Pair<User, String> result) {
-            Gh4Application.get().addAccount(result.first, result.second);
-            goToToplevelActivity();
-            finish();
-        }
     }
 }
