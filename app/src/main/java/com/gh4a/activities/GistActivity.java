@@ -39,6 +39,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Gist;
@@ -47,6 +48,7 @@ import com.meisolsson.githubsdk.service.gists.GistService;
 
 import java.util.Map;
 
+import io.reactivex.Single;
 import retrofit2.Response;
 
 public class GistActivity extends BaseActivity implements View.OnClickListener {
@@ -206,7 +208,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
             case R.id.star:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                new UpdateStarTask().schedule();
+                updateStarringState();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -219,25 +221,15 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         return login != null ? GistListActivity.makeIntent(this, login) : null;
     }
 
-    private class UpdateStarTask extends BackgroundTask<Void> {
-        public UpdateStarTask() {
-            super(GistActivity.this);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            GistService service = Gh4Application.get().getGitHubService(GistService.class);
-            Response<Void> response = mIsStarred
-                    ? service.unstarGist(mGistId).blockingGet()
-                    : service.starGist(mGistId).blockingGet();
-            ApiHelpers.throwOnFailure(response);
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            mIsStarred = !mIsStarred;
-            supportInvalidateOptionsMenu();
-        }
+    private void updateStarringState() {
+        GistService service = Gh4Application.get().getGitHubService(GistService.class);
+        Single<Response<Void>> responseSingle = mIsStarred
+                ? service.unstarGist(mGistId) : service.starGist(mGistId);
+        responseSingle.map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .compose(RxUtils::doInBackground)
+                .subscribe(result -> {
+                    mIsStarred = !mIsStarred;
+                    supportInvalidateOptionsMenu();
+                }, error -> supportInvalidateOptionsMenu());
     }
 }
