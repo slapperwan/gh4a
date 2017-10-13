@@ -65,7 +65,7 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
             builder.inReplyTo(replyToCommentId);
         }
         return service.createReviewComment(repoOwner, repoName, prNumber, builder.build())
-                .compose(ApiHelpers::throwOnFailure)
+                .map(ApiHelpers::throwOnFailure)
                 .map(response -> response);
     }
 
@@ -76,7 +76,7 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
                 Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editReviewComment(repoOwner, repoName, commentId, request)
-                .compose(ApiHelpers::throwOnFailure)
+                .map(ApiHelpers::throwOnFailure)
                 .map(response -> response);
     }
 }

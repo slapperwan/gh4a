@@ -339,7 +339,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         final Single<Response<Reaction>> responseSingle = comment instanceof ReviewComment
                 ? service.createPullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.id(), request)
                 : service.createIssueCommentReaction(mRepoOwner, mRepoName, comment.id(), request);
-        return responseSingle.compose(ApiHelpers::throwOnFailure);
+        return responseSingle.map(ApiHelpers::throwOnFailure);
     }
 
     @Override
@@ -399,7 +399,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
                         Gh4Application.get().getGitHubService(IssueCommentService.class);
                 response = service.deleteIssueComment(mRepoOwner, mRepoName, mComment.id());
             }
-            response.compose(ApiHelpers::throwOnFailure).blockingGet();
+            response.map(ApiHelpers::throwOnFailure).blockingGet();
             return null;
         }
 

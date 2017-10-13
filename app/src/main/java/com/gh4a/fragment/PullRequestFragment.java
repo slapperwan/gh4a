@@ -295,8 +295,9 @@ public class PullRequestFragment extends IssueFragmentBase {
                     .sha(head.sha())
                     .build();
 
-            return ApiHelpers.throwOnFailure(
-                    service.createGitReference(owner, repo, request).blockingGet());
+            return service.createGitReference(owner, repo, request)
+                    .map(ApiHelpers::throwOnFailure)
+                    .blockingGet();
         }
 
         @Override
@@ -334,8 +335,9 @@ public class PullRequestFragment extends IssueFragmentBase {
             String owner = head.repo().owner().login();
             String repo = head.repo().name();
 
-            ApiHelpers.throwOnFailure(
-                    service.deleteGitReference(owner, repo, head.ref()).blockingGet());
+            service.deleteGitReference(owner, repo, head.ref())
+                    .map(ApiHelpers::throwOnFailure)
+                    .blockingGet();
             return null;
         }
 

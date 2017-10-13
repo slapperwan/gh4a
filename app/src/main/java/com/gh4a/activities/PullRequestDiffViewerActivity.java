@@ -127,6 +127,6 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
         ReactionRequest request = ReactionRequest.builder().content(content).build();
 
         return service.createPullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)
-                .compose(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::throwOnFailure);
     }
 }

@@ -32,6 +32,6 @@ public class CommitLoader extends BaseLoader<Commit> {
         RepositoryCommitService service =
                 Gh4Application.get().getGitHubService(RepositoryCommitService.class);
         return service.getCommit(repoOwner, repoName, objectSha)
-                .compose(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::throwOnFailure);
     }
 }

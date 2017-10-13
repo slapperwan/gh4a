@@ -32,6 +32,7 @@ import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.service.search.SearchService;
@@ -133,8 +134,8 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
             @Override
             protected Page<Issue> loadPage(int page) throws ApiRequestException {
                 return service.searchIssues(mQuery, mSortMode, mOrder, page)
-                        .compose(ApiHelpers::searchPageAdapter)
-                        .compose(ApiHelpers::throwOnFailure)
+                        .compose(RxUtils::searchPageAdapter)
+                        .map(ApiHelpers::throwOnFailure)
                         .blockingGet();
             }
         };

@@ -13,7 +13,6 @@ import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TimelineItem;
-import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.Issue;
