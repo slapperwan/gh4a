@@ -8,6 +8,8 @@ import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Subscription;
 import com.meisolsson.githubsdk.service.activity.WatchingService;
 
+import java.net.HttpURLConnection;
+
 public class IsWatchingLoader extends BaseLoader<Boolean> {
 
     private final String mRepoOwner;
@@ -22,8 +24,16 @@ public class IsWatchingLoader extends BaseLoader<Boolean> {
     @Override
     public Boolean doLoadInBackground() throws ApiRequestException {
         WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
-        Subscription subscription = ApiHelpers.throwOnFailure(
-                service.getRepositorySubscription(mRepoOwner, mRepoName).blockingGet());
-        return subscription.subscribed();
+        try {
+            Subscription subscription = ApiHelpers.throwOnFailure(
+                    service.getRepositorySubscription(mRepoOwner, mRepoName).blockingGet());
+            return subscription.subscribed();
+        } catch (ApiRequestException e) {
+            if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND) {
+                // 404 means 'not subscribed'
+                return false;
+            }
+            throw e;
+        }
     }
 }
