@@ -27,7 +27,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
@@ -39,6 +38,7 @@ import com.gh4a.loader.ReferenceLoader;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.PullRequestBranchInfoView;
 import com.gh4a.widget.CommitStatusBox;
 
@@ -255,61 +255,15 @@ public class PullRequestFragment extends IssueFragmentBase {
         new AlertDialog.Builder(getContext())
                 .setMessage(message)
                 .setIconAttribute(android.R.attr.alertDialogIcon)
-                .setPositiveButton(buttonText, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (restore) {
-                            new RestoreBranchTask().schedule();
-                        } else {
-                            new DeleteBranchTask().schedule();
-                        }
+                .setPositiveButton(buttonText, (dialog, which) -> {
+                    if (restore) {
+                        restorePullRequestBranch();
+                    } else {
+                        deletePullRequestBranch();
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
-    }
-
-    private class RestoreBranchTask extends ProgressDialogTask<GitReference> {
-        public RestoreBranchTask() {
-            super(getBaseActivity(), R.string.saving_msg);
-        }
-
-        @Override
-        protected ProgressDialogTask<GitReference> clone() {
-            return new RestoreBranchTask();
-        }
-
-        @Override
-        protected GitReference run() throws Exception {
-            GitService service = Gh4Application.get().getGitHubService(GitService.class);
-
-            PullRequestMarker head = mPullRequest.head();
-            if (head.repo() == null) {
-                return null;
-            }
-            String owner = head.repo().owner().login();
-            String repo = head.repo().name();
-
-            CreateGitReference request = CreateGitReference.builder()
-                    .ref(head.ref())
-                    .sha(head.sha())
-                    .build();
-
-            return service.createGitReference(owner, repo, request)
-                    .map(ApiHelpers::throwOnFailure)
-                    .blockingGet();
-        }
-
-        @Override
-        protected void onSuccess(GitReference result) {
-            mHeadReference = result;
-            onHeadReferenceUpdated();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getString(R.string.restore_branch_error);
-        }
     }
 
     private void onHeadReferenceUpdated() {
@@ -317,39 +271,44 @@ public class PullRequestFragment extends IssueFragmentBase {
         reloadEvents(false);
     }
 
-    private class DeleteBranchTask extends ProgressDialogTask<Void> {
-        public DeleteBranchTask() {
-            super(getBaseActivity(), R.string.deleting_msg);
+    private void restorePullRequestBranch() {
+        PullRequestMarker head = mPullRequest.head();
+        if (head.repo() == null) {
+            return;
         }
+        String owner = head.repo().owner().login();
+        String repo = head.repo().name();
 
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteBranchTask();
-        }
+        GitService service = Gh4Application.get().getGitHubService(GitService.class);
+        CreateGitReference request = CreateGitReference.builder()
+                .ref(head.ref())
+                .sha(head.sha())
+                .build();
 
-        @Override
-        protected Void run() throws Exception {
-            GitService service = Gh4Application.get().getGitHubService(GitService.class);
+        service.createGitReference(owner, repo, request)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
+                        R.string.saving_msg, R.string.restore_branch_error))
+                .subscribe(result -> {
+                    mHeadReference = result;
+                    onHeadReferenceUpdated();
+                }, error -> {});
+    }
 
-            PullRequestMarker head = mPullRequest.head();
-            String owner = head.repo().owner().login();
-            String repo = head.repo().name();
+    private void deletePullRequestBranch() {
+        GitService service = Gh4Application.get().getGitHubService(GitService.class);
 
-            service.deleteGitReference(owner, repo, head.ref())
-                    .map(ApiHelpers::throwOnFailure)
-                    .blockingGet();
-            return null;
-        }
+        PullRequestMarker head = mPullRequest.head();
+        String owner = head.repo().owner().login();
+        String repo = head.repo().name();
 
-        @Override
-        protected void onSuccess(Void result) {
-            mHeadReference = null;
-            onHeadReferenceUpdated();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getString(R.string.delete_branch_error);
-        }
+        service.deleteGitReference(owner, repo, head.ref())
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
+                        R.string.deleting_msg, R.string.delete_branch_error))
+                .subscribe(result -> {
+                    mHeadReference = null;
+                    onHeadReferenceUpdated();
+                }, error -> {});
     }
 }

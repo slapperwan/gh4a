@@ -39,15 +39,35 @@ public class RxUtils {
     }
 
     public static <T> SingleTransformer<T, T> wrapForBackgroundTask(final BaseActivity activity,
+            final @StringRes int dialogMessageResId, final @StringRes int errorMessageResId) {
+        return wrapForBackgroundTask(activity, activity.getRootLayout(), dialogMessageResId,
+                activity.getString(errorMessageResId));
+    }
+
+    public static <T> SingleTransformer<T, T> wrapForBackgroundTask(final BaseActivity activity,
             final @StringRes int dialogMessageResId, final String errorMessage) {
+        return wrapForBackgroundTask(activity, activity.getRootLayout(),
+                dialogMessageResId, errorMessage);
+    }
+
+    public static <T> SingleTransformer<T, T> wrapForBackgroundTask(final FragmentActivity activity,
+            final CoordinatorLayout rootLayout, final @StringRes int dialogMessageResId,
+            final @StringRes int errorMessageResId) {
+        return wrapForBackgroundTask(activity, rootLayout, dialogMessageResId,
+                activity.getString(errorMessageResId));
+    }
+
+    public static <T> SingleTransformer<T, T> wrapForBackgroundTask(final FragmentActivity activity,
+            final CoordinatorLayout rootLayout, final @StringRes int dialogMessageResId,
+            final String errorMessage) {
         return upstream -> upstream
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(wrapWithProgressDialog(activity, dialogMessageResId))
-                .compose(wrapWithRetrySnackbar(activity, errorMessage));
+                .compose(wrapWithRetrySnackbar(rootLayout, errorMessage));
     }
 
-    public static <T> SingleTransformer<T, T> wrapWithProgressDialog(final BaseActivity activity,
+    public static <T> SingleTransformer<T, T> wrapWithProgressDialog(final FragmentActivity activity,
             final @StringRes int messageResId) {
         return new SingleTransformer<T, T>() {
             private ProgressDialogFragment mFragment;
@@ -75,11 +95,6 @@ public class RxUtils {
                 mFragment = null;
             }
         };
-    }
-
-    public static <T> SingleTransformer<T, T> wrapWithRetrySnackbar(final BaseActivity activity,
-            final String errorMessage) {
-        return wrapWithRetrySnackbar(activity.getRootLayout(), errorMessage);
     }
 
     public static <T> SingleTransformer<T, T> wrapWithRetrySnackbar(

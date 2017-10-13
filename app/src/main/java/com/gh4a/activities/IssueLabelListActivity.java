@@ -16,7 +16,6 @@
 package com.gh4a.activities;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -31,10 +30,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueLabelAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -42,6 +39,7 @@ import com.gh4a.loader.LabelListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.meisolsson.githubsdk.model.Label;
@@ -248,21 +246,15 @@ public class IssueLabelListActivity extends BaseActivity implements
             switch (item.getItemId()) {
             case Menu.FIRST:
                 if (mLabel == mAddedLabel) {
-                    new AddIssueLabelTask(mLabel.editedName, mLabel.editedColor).schedule();
+                    addLabel(mLabel);
                 } else {
-                    new EditIssueLabelTask(mLabel.name(), mLabel.editedName, mLabel.editedColor)
-                            .schedule();
+                    editLabel(mLabel);
                 }
                 break;
             case Menu.FIRST + 1:
                 new AlertDialog.Builder(IssueLabelListActivity.this)
                         .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.name()))
-                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteIssueLabelTask(mLabel.name()).schedule();
-                            }
-                        })
+                        .setPositiveButton(R.string.delete, (dialog, which) -> deleteLabel(mLabel))
                         .setNegativeButton(R.string.cancel, null)
                         .show();
                 break;
@@ -289,122 +281,51 @@ public class IssueLabelListActivity extends BaseActivity implements
         }
     }
 
-    private class DeleteIssueLabelTask extends ProgressDialogTask<Void> {
-        private final String mLabelName;
-
-        public DeleteIssueLabelTask(String labelName) {
-            super(IssueLabelListActivity.this, R.string.deleting_msg);
-            mLabelName = labelName;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteIssueLabelTask(mLabelName);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
-            ApiHelpers.throwOnFailure(service.deleteLabel(mRepoOwner, mRepoName, mLabelName).blockingGet());
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            forceLoaderReload(0);
-            setResult(RESULT_OK);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_delete_label, mLabelName);
-        }
+    private void deleteLabel(IssueLabelAdapter.EditableLabel label) {
+        String errorMessage = getString(R.string.issue_error_delete_label, label.base().name());
+        IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+        service.deleteLabel(mRepoOwner, mRepoName, label.base().name())
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg, errorMessage))
+                .subscribe(result -> {
+                    forceLoaderReload(0);
+                    setResult(RESULT_OK);
+                }, error -> {});
     }
 
-    private class EditIssueLabelTask extends ProgressDialogTask<Void> {
-        private final String mOldLabelName;
-        private final String mNewLabelName;
-        private final String mColor;
+    private void editLabel(IssueLabelAdapter.EditableLabel label) {
+        Label oldLabel = label.base();
+        String errorMessage = getString(R.string.issue_error_edit_label, oldLabel.name());
+        IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+        Label newLabel = Label.builder()
+                .name(label.editedName)
+                .color(label.editedColor)
+                .build();
 
-        public EditIssueLabelTask(String oldLabelName, String newLabelName, String color) {
-            super(IssueLabelListActivity.this, R.string.saving_msg);
-            mOldLabelName = oldLabelName;
-            mNewLabelName = newLabelName;
-            mColor = color;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new EditIssueLabelTask(mOldLabelName, mNewLabelName, mColor);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
-            Label label = Label.builder().name(mNewLabelName).color(mColor).build();
-
-            ApiHelpers.throwOnFailure(service.editLabel(mRepoOwner, mRepoName, mOldLabelName, label).blockingGet());
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            forceLoaderReload(0);
-            setResult(RESULT_OK);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_edit_label, mOldLabelName);
-        }
+        service.editLabel(mRepoOwner, mRepoName, oldLabel.name(), newLabel)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.saving_msg, errorMessage))
+                .subscribe(result -> {
+                    forceLoaderReload(0);
+                    setResult(RESULT_OK);
+                }, error -> {});
     }
 
-    private class AddIssueLabelTask extends ProgressDialogTask<Void> {
-        private final String mLabelName;
-        private final String mColor;
+    private void addLabel(IssueLabelAdapter.EditableLabel label) {
+        String errorMessage = getString(R.string.issue_error_create_label, label.name());
+        IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+        Label newLabel = Label.builder()
+                .name(label.name())
+                .color(label.color())
+                .build();
 
-        public AddIssueLabelTask(String labelName, String color) {
-            super(IssueLabelListActivity.this, R.string.saving_msg);
-            mLabelName = labelName;
-            mColor = color;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new AddIssueLabelTask(mLabelName, mColor);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            IssueLabelService service =
-                    Gh4Application.get().getGitHubService(IssueLabelService.class);
-
-            Label label = Label.builder()
-                    .name(mLabelName)
-                    .color(mColor)
-                    .build();
-
-            ApiHelpers.throwOnFailure(service.createLabel(mRepoOwner, mRepoName, label).blockingGet());
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            forceLoaderReload(0);
-            mAddedLabel = null;
-            setResult(RESULT_OK);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_create_label, mLabelName);
-        }
-
-        @Override
-        protected void onError(Exception e) {
-            super.onError(e);
-            mAdapter.remove(mAddedLabel);
-            mAddedLabel = null;
-        }
+        service.createLabel(mRepoOwner, mRepoName, newLabel)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.saving_msg, errorMessage))
+                .subscribe(result -> {
+                    mAddedLabel = null;
+                    forceLoaderReload(0);
+                    setResult(RESULT_OK);
+                }, error -> {});
     }
 }

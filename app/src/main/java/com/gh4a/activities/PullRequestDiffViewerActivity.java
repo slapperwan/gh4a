@@ -105,7 +105,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     }
 
     @Override
-    protected Single<Response<Void>> deleteComment(long id) {
+    protected Single<Response<Void>> doDeleteComment(long id) {
         PullRequestReviewCommentService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
         return service.deleteComment(mRepoOwner, mRepoName, id);

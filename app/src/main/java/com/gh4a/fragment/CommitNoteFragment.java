@@ -1,7 +1,6 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -13,10 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.gh4a.ApiRequestException;
-import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditCommitCommentActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
@@ -25,6 +21,7 @@ import com.gh4a.loader.CommitCommentListLoader;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.EditorBottomSheet;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
@@ -38,6 +35,7 @@ import java.util.List;
 import java.util.Set;
 
 import io.reactivex.Single;
+import retrofit2.Response;
 
 public class CommitNoteFragment extends ListDataBaseFragment<GitComment> implements
         CommitNoteAdapter.OnCommentAction<GitComment>,
@@ -263,12 +261,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
     public void deleteComment(final GitComment comment) {
         new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.delete_comment_message)
-                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new DeleteCommentTask(getBaseActivity(), comment.id()).schedule();
-                    }
-                })
+                .setPositiveButton(R.string.delete, (dialog, which) -> deleteComment(comment.id()))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
@@ -314,36 +307,13 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
         }
     }
 
-    private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private final long mId;
-
-        public DeleteCommentTask(BaseActivity activity, long id) {
-            super(activity, R.string.deleting_msg);
-            mId = id;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteCommentTask(getBaseActivity(), mId);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            RepositoryCommentService service =
-                    Gh4Application.get().getGitHubService(RepositoryCommentService.class);
-            ApiHelpers.throwOnFailure(
-                    service.deleteCommitComment(mRepoOwner, mRepoName, mId).blockingGet());
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            refreshComments();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.error_delete_comment);
-        }
+    private void deleteComment(long id) {
+        RepositoryCommentService service =
+                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        service.deleteCommitComment(mRepoOwner, mRepoName, id)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
+                        R.string.deleting_msg, R.string.error_delete_comment))
+                .subscribe(result -> refreshComments(), error -> {});
     }
 }

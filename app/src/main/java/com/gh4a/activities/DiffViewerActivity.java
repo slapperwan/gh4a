@@ -15,7 +15,6 @@
  */
 package com.gh4a.activities;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,15 +30,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.ReactionBar;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
@@ -452,7 +450,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     protected abstract Loader<LoaderResult<List<C>>> createCommentLoader();
     protected abstract void openCommentDialog(long id, long replyToId, String line,
             int position, int leftLine, int rightLine, PositionalCommentBase commitComment);
-    protected abstract Single<Response<Void>> deleteComment(long id);
+    protected abstract Single<Response<Void>> doDeleteComment(long id);
     protected abstract boolean canReply();
     protected abstract String createUrl(String lineId, long replyId);
     protected abstract PositionalCommentBase onUpdateReactions(PositionalCommentBase comment,
@@ -523,12 +521,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
                 case R.id.delete:
                     new AlertDialog.Builder(DiffViewerActivity.this)
                             .setMessage(R.string.delete_comment_message)
-                            .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                    new DeleteCommentTask(mId).schedule();
-                                }
-                            })
+                            .setPositiveButton(R.string.delete, (dialog, which) -> deleteComment(mId))
                             .setNegativeButton(R.string.cancel, null)
                             .show();
                     break;
@@ -555,36 +548,14 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         }
     }
 
-    private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private final long mId;
-
-        public DeleteCommentTask(long id) {
-            super(DiffViewerActivity.this, R.string.deleting_msg);
-            mId = id;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteCommentTask(mId);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            deleteComment(mId)
-                    .map(ApiHelpers::throwOnFailure)
-                    .blockingGet();
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            refresh();
-            setResult(RESULT_OK);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.error_delete_commit_comment);
-        }
+    private void deleteComment(long id) {
+        doDeleteComment(id)
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg,
+                        getString(R.string.error_delete_commit_comment)))
+                .subscribe(result -> {
+                    refresh();
+                    setResult(RESULT_OK);
+                }, error -> {});
     }
 }

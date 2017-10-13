@@ -17,7 +17,6 @@ package com.gh4a.activities;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -40,10 +39,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
@@ -56,13 +53,13 @@ import com.gh4a.loader.PendingReviewLoader;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
-import com.meisolsson.githubsdk.model.MergeResponse;
 import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.model.PullRequestMarker;
 import com.meisolsson.githubsdk.model.Review;
@@ -461,12 +458,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 .setMessage(messageResId)
                 .setIconAttribute(android.R.attr.alertDialogIcon)
                 .setCancelable(false)
-                .setPositiveButton(buttonResId, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new PullRequestOpenCloseTask(reopen).schedule();
-                    }
-                })
+                .setPositiveButton(buttonResId, (dialog, which) -> updatePullRequestState(reopen))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
@@ -504,14 +496,10 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         new AlertDialog.Builder(this)
                 .setTitle(title)
                 .setView(view)
-                .setPositiveButton(R.string.pull_request_merge, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String text = editor.getText() == null ? null : editor.getText().toString();
-                        int methodIndex = mergeMethod.getSelectedItemPosition();
-                        MergeRequest.Method method = adapter.getItem(methodIndex).action;
-                        new PullRequestMergeTask(text, method).schedule();
-                    }
+                .setPositiveButton(R.string.pull_request_merge, (dialog, which) -> {
+                    String text = editor.getText() == null ? null : editor.getText().toString();
+                    int methodIndex = mergeMethod.getSelectedItemPosition();
+                    mergePullRequest(text, adapter.getItem(methodIndex).action);
                 })
                 .setNegativeButton(getString(R.string.cancel), null)
                 .show();
@@ -596,84 +584,44 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         supportInvalidateOptionsMenu();
     }
 
-    private class PullRequestOpenCloseTask extends ProgressDialogTask<PullRequest> {
-        private final boolean mOpen;
+    private void updatePullRequestState(boolean open) {
+        @StringRes int dialogMessageResId = open ? R.string.opening_msg : R.string.closing_msg;
+        @StringRes int errorMessageResId = open ? R.string.issue_error_reopen : R.string.issue_error_close;
+        String errorMessage = getString(errorMessageResId, mPullRequest.number());
 
-        public PullRequestOpenCloseTask(boolean open) {
-            super(getBaseActivity(), open ? R.string.opening_msg : R.string.closing_msg);
-            mOpen = open;
-        }
+        PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
+        EditPullRequest request = EditPullRequest.builder()
+                .state(open ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED)
+                .build();
 
-        @Override
-        protected ProgressDialogTask<PullRequest> clone() {
-            return new PullRequestOpenCloseTask(mOpen);
-        }
-
-        @Override
-        protected PullRequest run() throws ApiRequestException {
-            PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
-            EditPullRequest request = EditPullRequest.builder()
-                    .state(mOpen ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED)
-                    .build();
-            return ApiHelpers.throwOnFailure(service.editPullRequest(
-                    mRepoOwner, mRepoName, mPullRequestNumber, request).blockingGet());
-        }
-
-        @Override
-        protected void onSuccess(PullRequest result) {
-            mPullRequest = result;
-            handlePullRequestUpdate();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            int errorMessageResId =
-                    mOpen ? R.string.issue_error_reopen : R.string.issue_error_close;
-            return getContext().getString(errorMessageResId, mPullRequest.number());
-        }
+        service.editPullRequest(mRepoOwner, mRepoName, mPullRequestNumber, request)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, dialogMessageResId, errorMessage))
+                .subscribe(result -> {
+                    mPullRequest = result;
+                    handlePullRequestUpdate();
+                }, error -> {});
     }
 
-    private class PullRequestMergeTask extends ProgressDialogTask<MergeResponse> {
-        private final String mCommitMessage;
-        private final MergeRequest.Method mMergeMethod;
+    private void mergePullRequest(String commitMessage, MergeRequest.Method mergeMethod) {
+        String errorMessage = getString(R.string.pull_error_merge, mPullRequest.number());
+        PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
+        MergeRequest request = MergeRequest.builder()
+                .commitMessage(commitMessage)
+                .method(mergeMethod)
+                .build();
 
-        public PullRequestMergeTask(String commitMessage, MergeRequest.Method mergeMethod) {
-            super(getBaseActivity(), R.string.merging_msg);
-            mCommitMessage = commitMessage;
-            mMergeMethod = mergeMethod;
-        }
-
-        @Override
-        protected ProgressDialogTask<MergeResponse> clone() {
-            return new PullRequestMergeTask(mCommitMessage, mMergeMethod);
-        }
-
-        @Override
-        protected MergeResponse run() throws ApiRequestException {
-            PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
-            MergeRequest request = MergeRequest.builder()
-                    .commitMessage(mCommitMessage)
-                    .method(mMergeMethod)
-                    .build();
-
-            return ApiHelpers.throwOnFailure(service.mergePullRequest(
-                    mRepoOwner, mRepoName, mPullRequestNumber, request).blockingGet());
-        }
-
-        @Override
-        protected void onSuccess(MergeResponse result) {
-            if (result.merged()) {
-                mPullRequest = mPullRequest.toBuilder()
-                        .merged(true)
-                        .state(IssueState.Closed)
-                        .build();
-            }
-            handlePullRequestUpdate();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.pull_error_merge, mPullRequest.number());
-        }
+        service.mergePullRequest(mRepoOwner, mRepoName, mPullRequestNumber, request)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.merging_msg, errorMessage))
+                .subscribe(result -> {
+                    if (result.merged()) {
+                        mPullRequest = mPullRequest.toBuilder()
+                                .merged(true)
+                                .state(IssueState.Closed)
+                                .build();
+                    }
+                    handlePullRequestUpdate();
+                }, error -> {});
     }
 }

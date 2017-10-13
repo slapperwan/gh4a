@@ -38,11 +38,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.ApiRequestException;
-import com.gh4a.BaseActivity;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.loader.CollaboratorListLoader;
 import com.gh4a.loader.IsCollaboratorLoader;
@@ -54,6 +51,7 @@ import com.gh4a.loader.MilestoneListLoader;
 import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.MarkdownButtonsBar;
 import com.gh4a.widget.MarkdownPreviewWebView;
@@ -68,6 +66,7 @@ import com.meisolsson.githubsdk.service.issues.IssueService;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Single;
 import retrofit2.Response;
 
 public class IssueEditActivity extends BasePagerActivity implements
@@ -125,6 +124,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
             return new LabelListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
+
         @Override
         protected void onResultReady(List<Label> result) {
             mAllLabels = result;
@@ -140,6 +140,7 @@ public class IssueEditActivity extends BasePagerActivity implements
             return new MilestoneListLoader(IssueEditActivity.this,
                     mRepoOwner, mRepoName, IssueState.Open);
         }
+
         @Override
         protected void onResultReady(List<Milestone> result) {
             mAllMilestone = result;
@@ -154,6 +155,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         protected Loader<LoaderResult<List<User>>> onCreateLoader() {
             return new CollaboratorListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
+
         @Override
         protected void onResultReady(List<User> result) {
             mAllAssignee = result;
@@ -171,6 +173,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         protected Loader<LoaderResult<Boolean>> onCreateLoader() {
             return new IsCollaboratorLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
         }
+
         @Override
         protected void onResultReady(Boolean result) {
             mIsCollaborator = result;
@@ -366,7 +369,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                     .title(mTitleView.getText().toString())
                     .body(mDescView.getText().toString())
                     .build();
-            SaveIssueTask.create(this, mRepoOwner, mRepoName, mEditIssue, mOriginalIssue).schedule();
+            saveIssue();
         }
     }
 
@@ -483,9 +486,11 @@ public class IssueEditActivity extends BasePagerActivity implements
                 selection[i] = assigneeLogins.contains(login);
             }
 
-            DialogInterface.OnMultiChoiceClickListener selectCb = new DialogInterface.OnMultiChoiceClickListener() {
+            DialogInterface.OnMultiChoiceClickListener selectCb =
+                    new DialogInterface.OnMultiChoiceClickListener() {
                 @Override
-                public void onClick(DialogInterface dialogInterface, int which, boolean isChecked) {
+                public void onClick(DialogInterface dialogInterface, int which,
+                        boolean isChecked) {
                     selection[which] = isChecked;
                 }
             };
@@ -635,89 +640,54 @@ public class IssueEditActivity extends BasePagerActivity implements
         }
     }
 
-    private static class SaveIssueTask extends ProgressDialogTask<Issue> {
-        private final IssueRequest mRequest;
-        private final String mRepoOwner;
-        private final String mRepoName;
-        private final int mIssueNumber;
-        private final BaseActivity mActivity;
+    private void saveIssue() {
+        Milestone milestone = mEditIssue.milestone();
+        IssueRequest.Builder builder = IssueRequest.builder();
 
-        public static SaveIssueTask create(BaseActivity activity,
-                String repoOwner, String repoName, Issue issue, Issue originalIssue) {
-            Milestone milestone = issue.milestone();
-            IssueRequest.Builder builder = IssueRequest.builder();
-
-            if (!ObjectsCompat.equals(issue.title(), originalIssue.title())) {
-                builder.title(issue.title());
+        if (!ObjectsCompat.equals(mEditIssue.title(), mOriginalIssue.title())) {
+            builder.title(mEditIssue.title());
+        }
+        if (!ObjectsCompat.equals(mEditIssue.body(), mOriginalIssue.body())) {
+            builder.body(mEditIssue.body());
+        }
+        if (!ObjectsCompat.equals(mEditIssue.milestone(), mOriginalIssue.milestone())) {
+            builder.milestone(milestone != null ? milestone.id() : null);
+        }
+        if (!ObjectsCompat.equals(mEditIssue.assignees(), mOriginalIssue.assignees())) {
+            List<String> assignees = new ArrayList<>();
+            for (User assignee : mEditIssue.assignees()) {
+                assignees.add(assignee.login());
             }
-            if (!ObjectsCompat.equals(issue.body(), originalIssue.body())) {
-                builder.body(issue.body());
+            builder.assignees(assignees);
+        }
+        if (!ObjectsCompat.equals(mEditIssue.labels(), mOriginalIssue.labels())) {
+            List<String> labels = new ArrayList<>();
+            for (Label label : mEditIssue.labels()) {
+                labels.add(label.name());
             }
-            if (!ObjectsCompat.equals(issue.milestone(), originalIssue.milestone())) {
-                builder.milestone(milestone != null ? milestone.id() : null);
-            }
-            if (!ObjectsCompat.equals(issue.assignees(), originalIssue.assignees())) {
-                List<String> assignees = new ArrayList<>();
-                for (User assignee : issue.assignees()) {
-                    assignees.add(assignee.login());
-                }
-                builder.assignees(assignees);
-            }
-            if (!ObjectsCompat.equals(issue.labels(), originalIssue.labels())) {
-                List<String> labels = new ArrayList<>();
-                for (Label label : issue.labels()) {
-                    labels.add(label.name());
-                }
-                builder.labels(labels);
-            }
-
-            return new SaveIssueTask(activity, repoOwner, repoName,
-                    issue.number(), builder.build());
+            builder.labels(labels);
         }
 
-        private SaveIssueTask(BaseActivity activity, String repoOwner, String repoName,
-                int issueNumber, IssueRequest request) {
-            super(activity, R.string.saving_msg);
-            mActivity = activity;
-            mRepoOwner = repoOwner;
-            mRepoName = repoName;
-            mIssueNumber = issueNumber;
-            mRequest = request;
-        }
+        int issueNumber = mEditIssue.number();
+        String errorMessage = issueNumber != 0
+                ? getString(R.string.issue_error_edit, issueNumber)
+                : getString(R.string.issue_error_create);
 
-        @Override
-        protected ProgressDialogTask<Issue> clone() {
-            return new SaveIssueTask(mActivity, mRepoOwner, mRepoName, mIssueNumber, mRequest);
-        }
+        IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
+        Single<Response<Issue>> single = isInEditMode()
+                ? service.editIssue(mRepoOwner, mRepoName, issueNumber, builder.build())
+                : service.createIssue(mRepoOwner, mRepoName, builder.build());
 
-        @Override
-        protected Issue run() throws ApiRequestException {
-            IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
-            Response<Issue> response = mIssueNumber != 0
-                    ? service.editIssue(mRepoOwner, mRepoName, mIssueNumber, mRequest).blockingGet()
-                    : service.createIssue(mRepoOwner, mRepoName, mRequest).blockingGet();
-
-            return ApiHelpers.throwOnFailure(response);
-        }
-
-        @Override
-        protected void onSuccess(Issue result) {
-            Intent data = new Intent();
-            Bundle extras = new Bundle();
-            extras.putParcelable("issue", result);
-            data.putExtras(extras);
-            mActivity.setResult(RESULT_OK, data);
-            mActivity.finish();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            if (mIssueNumber != 0) {
-                return getContext().getString(R.string.issue_error_edit, mIssueNumber);
-            } else {
-                return getContext().getString(R.string.issue_error_create);
-            }
-        }
+        single.map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.saving_msg, errorMessage))
+                .subscribe(result -> {
+                    Intent data = new Intent();
+                    Bundle extras = new Bundle();
+                    extras.putParcelable("issue", result);
+                    data.putExtras(extras);
+                    setResult(RESULT_OK, data);
+                    finish();
+                }, error -> {});
     }
 
     private class EditPagerAdapter extends PagerAdapter {

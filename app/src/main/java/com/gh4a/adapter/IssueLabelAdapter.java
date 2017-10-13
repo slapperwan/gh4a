@@ -62,6 +62,10 @@ public class IssueLabelAdapter extends
             return editedColor != null ? editedColor : mLabel != null ? mLabel.color() : null;
         }
 
+        public Label base() {
+            return mLabel;
+        }
+
         public void restoreOriginalProperties() {
             editedColor = null;
             editedName = null;
