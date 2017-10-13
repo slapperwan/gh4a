@@ -58,10 +58,6 @@ public class IssueListFactory extends FragmentFactory {
 
     @Override
     protected Fragment makeFragment(int position) {
-        Map<String, String> filterData = new HashMap<>();
-        filterData.put("sort", mDrawerHelper.getSortMode());
-        filterData.put("order", mDrawerHelper.getSortOrder());
-
         final String action;
         if (position == 1) {
             action = "assignee";
@@ -73,11 +69,12 @@ public class IssueListFactory extends FragmentFactory {
             action = "author";
         }
 
-        filterData.put("q", String.format(QUERY, mIsPullRequest ? "pr" : "issue",
+        final String query = String.format(QUERY, mIsPullRequest ? "pr" : "issue",
                 mShowingClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
-                action, mLogin));
+                action, mLogin);
 
-        return IssueListFragment.newInstance(filterData,
+        return IssueListFragment.newInstance(query,
+                mDrawerHelper.getSortMode(), mDrawerHelper.getSortMode(),
                 mShowingClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
                 true);
