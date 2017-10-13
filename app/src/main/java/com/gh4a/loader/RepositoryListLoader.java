@@ -46,6 +46,9 @@ public class RepositoryListLoader extends BaseLoader<Collection<Repository>> {
             observable = service.getUserRepositories(mLogin, mFilterData, 0);
         }
 
-        return ApiHelpers.throwOnFailure(observable.blockingGet()).items();
+        return observable
+                .compose(ApiHelpers::throwOnFailure)
+                .blockingGet()
+                .items();
     }
 }

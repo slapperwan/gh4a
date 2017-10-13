@@ -31,6 +31,7 @@ public class CommitLoader extends BaseLoader<Commit> {
             throws ApiRequestException {
         RepositoryCommitService service =
                 Gh4Application.get().getGitHubService(RepositoryCommitService.class);
-        return ApiHelpers.throwOnFailure(service.getCommit(repoOwner, repoName, objectSha));
+        return service.getCommit(repoOwner, repoName, objectSha)
+                .compose(ApiHelpers::throwOnFailure);
     }
 }

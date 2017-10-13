@@ -37,6 +37,6 @@ public class PullRequestCommentsLoader extends BaseLoader<List<ReviewComment>> {
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         repoOwner, repoName, pullRequestNumber, page))
-                .compose(result -> ApiHelpers.PageIterator.filter(result, c -> c.position() >= 0));
+                .compose(ApiHelpers.PageIterator.filter(c -> c.position() >= 0));
     }
 }

@@ -33,7 +33,7 @@ public class PendingReviewLoader extends BaseLoader<List<Review>> {
                 Gh4Application.get().getGitHubService(PullRequestReviewService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(result -> ApiHelpers.PageIterator.filter(result, r -> r.state() == ReviewState.Pending))
+                .compose(ApiHelpers.PageIterator.filter(r -> r.state() == ReviewState.Pending))
                 .blockingGet();
     }
 }

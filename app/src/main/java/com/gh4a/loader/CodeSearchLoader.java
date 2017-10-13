@@ -31,7 +31,7 @@ public class CodeSearchLoader extends BaseLoader<List<SearchCode>> {
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.searchCode(mQuery, null, null, page)
-                        .compose(ApiHelpers.searchPageAdapter()))
+                        .compose(ApiHelpers::searchPageAdapter))
                 .blockingGet();
     }
 }

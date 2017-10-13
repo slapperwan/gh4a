@@ -28,7 +28,7 @@ public class EditCommitCommentActivity extends EditCommentActivity {
         CreateCommitComment request = CreateCommitComment.builder().body(body).build();
         String sha = getIntent().getStringExtra("commit");
         return service.createCommitComment(repoOwner, repoName, sha, request)
-                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .compose(ApiHelpers::throwOnFailure)
                 .map(response -> response);
     }
 
@@ -39,7 +39,7 @@ public class EditCommitCommentActivity extends EditCommentActivity {
                 Gh4Application.get().getGitHubService(RepositoryCommentService.class);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editCommitComment(repoOwner, repoName, commentId, request)
-                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .compose(ApiHelpers::throwOnFailure)
                 .map(response -> response);
     }
 }

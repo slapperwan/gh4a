@@ -23,7 +23,7 @@ public class RepositoryLoader extends BaseLoader<Repository> {
     public Repository doLoadInBackground() throws ApiRequestException {
         RepositoryService service = Gh4Application.get().getGitHubService(RepositoryService.class);
         return service.getRepository(mRepoOwner, mRepoName)
-                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .compose(ApiHelpers::throwOnFailure)
                 .blockingGet();
     }
 }

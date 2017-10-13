@@ -114,6 +114,6 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
         ReactionRequest request = ReactionRequest.builder().content(content).build();
 
         return service.createCommitCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)
-                .compose(response -> ApiHelpers.throwOnFailure(response));
+                .compose(ApiHelpers::throwOnFailure);
     }
 }

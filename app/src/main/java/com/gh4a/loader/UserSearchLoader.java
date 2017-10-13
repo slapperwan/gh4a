@@ -29,7 +29,7 @@ public class UserSearchLoader extends BaseLoader<List<User>> {
         final SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.searchUsers(mQuery, null, null, page)
-                        .compose(ApiHelpers.searchPageAdapter()))
+                        .compose(ApiHelpers::searchPageAdapter))
                 .blockingGet();
     }
 }
