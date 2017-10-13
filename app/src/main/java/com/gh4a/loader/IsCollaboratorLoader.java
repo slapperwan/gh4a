@@ -31,9 +31,9 @@ public class IsCollaboratorLoader extends BaseLoader<Boolean> {
         RepositoryCollaboratorService service =
                 app.getGitHubService(RepositoryCollaboratorService.class);
         try {
-            ApiHelpers.throwOnFailure(
-                    service.isUserCollaborator(mRepoOwner, mRepoName, login).blockingGet());
-            return true;
+            return ApiHelpers.throwOnFailure(service.isUserCollaborator(mRepoOwner, mRepoName, login))
+                    .map(result -> true) // there's no actual content, result is always null
+                    .blockingGet();
         } catch (ApiRequestException e) {
             if (e.getStatus() == HttpURLConnection.HTTP_NOT_FOUND
                     || e.getStatus() == HttpURLConnection.HTTP_FORBIDDEN) {
