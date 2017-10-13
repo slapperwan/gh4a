@@ -1,7 +1,6 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,10 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.gh4a.ApiRequestException;
-import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
@@ -29,6 +25,7 @@ import com.gh4a.loader.ReviewTimelineLoader;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.EditorBottomSheet;
 
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
@@ -272,12 +269,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     public void deleteComment(final GitHubCommentBase comment) {
         new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.delete_comment_message)
-                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new DeleteCommentTask(getBaseActivity(), comment).schedule();
-                    }
-                })
+                .setPositiveButton(R.string.delete, (dialog, which) -> handleDeleteComment(comment))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
@@ -374,43 +366,22 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         return getBaseActivity().getRootLayout();
     }
 
-    private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private final GitHubCommentBase mComment;
-
-        public DeleteCommentTask(BaseActivity activity, GitHubCommentBase comment) {
-            super(activity, R.string.deleting_msg);
-            mComment = comment;
+    private void handleDeleteComment(GitHubCommentBase comment) {
+        final Single<Response<Void>> responseSingle;
+        if (comment instanceof ReviewComment) {
+            PullRequestReviewCommentService service =
+                    Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+            responseSingle = service.deleteComment(mRepoOwner, mRepoName, comment.id());
+        } else {
+            IssueCommentService service =
+                    Gh4Application.get().getGitHubService(IssueCommentService.class);
+            responseSingle = service.deleteIssueComment(mRepoOwner, mRepoName, comment.id());
         }
 
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteCommentTask(getBaseActivity(), mComment);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            final Single<Response<Void>> response;
-            if (mComment instanceof ReviewComment) {
-                PullRequestReviewCommentService service =
-                        Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
-                response = service.deleteComment(mRepoOwner, mRepoName, mComment.id());
-            } else {
-                IssueCommentService service =
-                        Gh4Application.get().getGitHubService(IssueCommentService.class);
-                response = service.deleteIssueComment(mRepoOwner, mRepoName, mComment.id());
-            }
-            response.map(ApiHelpers::throwOnFailure).blockingGet();
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            reloadComments(false);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.error_delete_comment);
-        }
+        responseSingle
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
+                        R.string.deleting_msg, R.string.error_delete_comment))
+                .subscribe(result -> reloadComments(false), error -> {});
     }
 }

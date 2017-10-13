@@ -87,7 +87,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     }
 
     @Override
-    public Single<Response<Void>> deleteComment(long id) {
+    public Single<Response<Void>> doDeleteComment(long id) {
         RepositoryCommentService service =
                 Gh4Application.get().getGitHubService(RepositoryCommentService.class);
 

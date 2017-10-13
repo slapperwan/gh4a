@@ -35,10 +35,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.ApiRequestException;
-import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
@@ -48,6 +45,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.EditorBottomSheet;
@@ -534,12 +532,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     public void deleteComment(final GitHubCommentBase comment) {
         new AlertDialog.Builder(getActivity())
                 .setMessage(R.string.delete_comment_message)
-                .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new DeleteCommentTask(getBaseActivity(), comment).schedule();
-                    }
-                })
+                .setPositiveButton(R.string.delete, (dialog, which) -> handleDeleteComment(comment))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
@@ -577,36 +570,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     protected abstract void assignHighlightColor();
     protected abstract Single<Response<Void>> doDeleteComment(GitHubCommentBase comment);
 
-    private class DeleteCommentTask extends ProgressDialogTask<Void> {
-        private final GitHubCommentBase mComment;
-
-        public DeleteCommentTask(BaseActivity activity, GitHubCommentBase comment) {
-            super(activity, R.string.deleting_msg);
-            mComment = comment;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteCommentTask(getBaseActivity(), mComment);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            doDeleteComment(mComment)
-                    .map(ApiHelpers::throwOnFailure)
-                    .blockingGet();
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            reloadEvents(false);
-            getActivity().setResult(Activity.RESULT_OK);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.error_delete_comment);
-        }
+    private void handleDeleteComment(GitHubCommentBase comment) {
+        doDeleteComment(comment)
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
+                        R.string.deleting_msg, R.string.error_delete_comment))
+                .subscribe(result -> {
+                    reloadEvents(false);
+                    getActivity().setResult(Activity.RESULT_OK);
+                }, error -> {});
     }
 }

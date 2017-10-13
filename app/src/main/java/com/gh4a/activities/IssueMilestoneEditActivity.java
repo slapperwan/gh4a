@@ -43,12 +43,11 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
-import com.gh4a.ProgressDialogTask;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 import com.gh4a.widget.MarkdownButtonsBar;
@@ -61,6 +60,7 @@ import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 import java.util.Calendar;
 import java.util.Date;
 
+import io.reactivex.Single;
 import retrofit2.Response;
 
 public class IssueMilestoneEditActivity extends BasePagerActivity implements
@@ -231,11 +231,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             String desc = mDescriptionView.getText() != null ?
                     mDescriptionView.getText().toString() : null;
 
-            mMilestone = mMilestone.toBuilder()
-                    .title(title)
-                    .description(desc)
-                    .build();
-            new SaveIssueMilestoneTask(mMilestone).schedule();
+            saveMilestone(title, desc);
         }
     }
 
@@ -265,12 +261,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 new AlertDialog.Builder(this)
                         .setMessage(getString(R.string.issue_dialog_delete_message,
                                 mMilestone.title()))
-                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                new DeleteIssueMilestoneTask(mMilestone.number()).schedule();
-                            }
-                        })
+                        .setPositiveButton(R.string.delete, (dialog, which) -> deleteMilestone())
                         .setNegativeButton(R.string.cancel, null)
                         .show();
                 return true;
@@ -286,12 +277,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 ? R.string.pull_request_reopen : R.string.pull_request_close;
         new AlertDialog.Builder(this)
                 .setMessage(messageResId)
-                .setPositiveButton(buttonResId, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new OpenCloseIssueMilestoneTask(mMilestone, reopen).schedule();
-                    }
-                })
+                .setPositiveButton(buttonResId, (dialog, which) -> setMilestoneState(reopen))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }
@@ -335,125 +321,63 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         }
     }
 
-    private class SaveIssueMilestoneTask extends ProgressDialogTask<Void> {
-        private final Milestone mMilestone;
+    private void saveMilestone(String title, String desc) {
+        String errorMessage = getString(R.string.issue_error_create_milestone, title);
+        IssueMilestoneService service =
+                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        CreateMilestone request = CreateMilestone.builder()
+                .title(title)
+                .description(desc)
+                .state(mMilestone.state())
+                .dueOn(mMilestone.dueOn())
+                .build();
 
-        public SaveIssueMilestoneTask(Milestone milestone) {
-            super(IssueMilestoneEditActivity.this, R.string.saving_msg);
-            mMilestone = milestone;
-        }
+        Single<Response<Milestone>> responseSingle = isInEditMode()
+                ? service.editMilestone(mRepoOwner, mRepoName, mMilestone.id(), request)
+                : service.createMilestone(mRepoOwner, mRepoName, request);
 
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new SaveIssueMilestoneTask(mMilestone);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            IssueMilestoneService service =
-                    Gh4Application.get().getGitHubService(IssueMilestoneService.class);
-            CreateMilestone request = CreateMilestone.builder()
-                    .title(mMilestone.title())
-                    .description(mMilestone.description())
-                    .state(mMilestone.state())
-                    .dueOn(mMilestone.dueOn())
-                    .build();
-            Response<Milestone> response = isInEditMode()
-                    ? service.editMilestone(mRepoOwner, mRepoName, mMilestone.id(), request).blockingGet()
-                    : service.createMilestone(mRepoOwner, mRepoName, request).blockingGet();
-            ApiHelpers.throwOnFailure(response);
-
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            setResult(RESULT_OK);
-            finish();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_create_milestone,
-                    mMilestone.title());
-        }
+        responseSingle
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.saving_msg, errorMessage))
+                .subscribe(result -> {
+                    mMilestone = result;
+                    setResult(RESULT_OK);
+                    finish();
+                }, error -> {});
     }
 
-    private class DeleteIssueMilestoneTask extends ProgressDialogTask<Void> {
-        private final int mNumber;
-
-        public DeleteIssueMilestoneTask(int number) {
-            super(IssueMilestoneEditActivity.this, R.string.deleting_msg);
-            mNumber = number;
-        }
-
-        @Override
-        protected ProgressDialogTask<Void> clone() {
-            return new DeleteIssueMilestoneTask(mNumber);
-        }
-
-        @Override
-        protected Void run() throws ApiRequestException {
-            IssueMilestoneService service =
-                    Gh4Application.get().getGitHubService(IssueMilestoneService.class);
-            ApiHelpers.throwOnFailure(service.deleteMilestone(mRepoOwner, mRepoName, mNumber).blockingGet());
-            return null;
-        }
-
-        @Override
-        protected void onSuccess(Void result) {
-            setResult(RESULT_OK);
-            finish();
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.issue_error_delete_milestone);
-        }
+    private void deleteMilestone() {
+        IssueMilestoneService service =
+                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        service.deleteMilestone(mRepoOwner, mRepoName, mMilestone.number())
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg, R.string.issue_error_delete_milestone))
+                .subscribe(result -> {
+                    setResult(RESULT_OK);
+                    finish();
+                }, error -> {});
     }
 
-    private class OpenCloseIssueMilestoneTask extends ProgressDialogTask<Milestone> {
-        private final Milestone mMilestone;
-        private final boolean mOpen;
+    private void setMilestoneState(boolean open) {
+        @StringRes int dialogMessageResId = open ? R.string.opening_msg : R.string.closing_msg;
+        String errorMessage = getString(
+                open ? R.string.issue_milestone_reopen_error : R.string.issue_milestone_close_error,
+                mMilestone.title());
+        IssueMilestoneService service =
+                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        CreateMilestone request = CreateMilestone.builder()
+                .state(open ? IssueState.Open : IssueState.Closed)
+                .build();
 
-        public OpenCloseIssueMilestoneTask(Milestone milestone, boolean open) {
-            super(IssueMilestoneEditActivity.this, open ? R.string.opening_msg : R.string.closing_msg);
-            mMilestone = milestone;
-            mOpen = open;
-        }
-
-        @Override
-        protected ProgressDialogTask<Milestone> clone() {
-            return new OpenCloseIssueMilestoneTask(mMilestone, mOpen);
-        }
-
-        @Override
-        protected Milestone run() throws ApiRequestException {
-            IssueMilestoneService service =
-                    Gh4Application.get().getGitHubService(IssueMilestoneService.class);
-            CreateMilestone request = CreateMilestone.builder()
-                    .state(mOpen ? IssueState.Open : IssueState.Closed)
-                    .build();
-
-            return ApiHelpers.throwOnFailure(service.editMilestone(mRepoOwner, mRepoName,
-                    mMilestone.id(), request).blockingGet());
-        }
-
-        @Override
-        protected void onSuccess(Milestone result) {
-            IssueMilestoneEditActivity.this.mMilestone = result;
-            updateHighlightColor();
-            supportInvalidateOptionsMenu();
-            setResult(RESULT_OK);
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(mOpen
-                            ? R.string.issue_milestone_reopen_error
-                            : R.string.issue_milestone_close_error,
-                    mMilestone.title());
-        }
+        service.editMilestone(mRepoOwner, mRepoName, mMilestone.id(), request)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, dialogMessageResId, errorMessage))
+                .subscribe(result -> {
+                    mMilestone = result;
+                    updateHighlightColor();
+                    supportInvalidateOptionsMenu();
+                    setResult(RESULT_OK);
+                }, error -> {});
     }
 
     public static class DatePickerFragment extends DialogFragment
