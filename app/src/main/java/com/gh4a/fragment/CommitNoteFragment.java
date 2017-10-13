@@ -294,7 +294,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
                 Gh4Application.get().getGitHubService(RepositoryCommentService.class);
         CreateCommitComment request = CreateCommitComment.builder().body(comment).build();
         return service.createCommitComment(mRepoOwner, mRepoName, mObjectSha, request)
-                .compose(response -> ApiHelpers.throwOnFailure(response))
+                .compose(ApiHelpers::throwOnFailure)
                 .map(response -> response);
     }
 

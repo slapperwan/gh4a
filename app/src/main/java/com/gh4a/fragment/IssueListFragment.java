@@ -133,8 +133,8 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
             @Override
             protected Page<Issue> loadPage(int page) throws ApiRequestException {
                 return service.searchIssues(mQuery, mSortMode, mOrder, page)
-                        .compose(ApiHelpers.searchPageAdapter())
-                        .compose(response -> ApiHelpers.throwOnFailure(response))
+                        .compose(ApiHelpers::searchPageAdapter)
+                        .compose(ApiHelpers::throwOnFailure)
                         .blockingGet();
             }
         };

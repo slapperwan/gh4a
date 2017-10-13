@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.Single;
 import io.reactivex.SingleTransformer;
 import io.reactivex.functions.Predicate;
@@ -179,12 +180,12 @@ public class ApiHelpers {
         return response.body();
     }
 
-    public static <T> Single<T> throwOnFailure(Single<Response<T>> input) {
-        return input.map(response -> throwOnFailure(response));
+    public static <T> Single<T> throwOnFailure(Single<Response<T>> upstream) {
+        return upstream.map(response -> throwOnFailure(response));
     }
 
-    public static <T> SingleTransformer<Response<SearchPage<T>>, Response<Page<T>>> searchPageAdapter() {
-        return upstream -> upstream.map(response -> {
+    public static <T> Single<Response<Page<T>>> searchPageAdapter(Single<Response<SearchPage<T>>> upstream) {
+        return upstream.map(response -> {
             if (response.isSuccessful()) {
                 return Response.success(new SearchPageAdapter<>(response.body()));
             }
@@ -251,8 +252,8 @@ public class ApiHelpers {
                     });
         }
 
-        public static <T> Single<List<T>> filter(Single<List<T>> input, Predicate<T> predicate) {
-            return input.map(list -> {
+        public static <T> SingleTransformer<List<T>, List<T>> filter(Predicate<T> predicate) {
+            return upstream -> upstream.map(list -> {
                 Iterator<T> iter = list.iterator();
                 while (iter.hasNext()) {
                     if (!predicate.test(iter.next())) {
@@ -266,19 +267,19 @@ public class ApiHelpers {
         private static <T> Observable<List<T>> pageToObservable(PageProducer<T> producer, int page) {
             return producer.getPage(page)
                     .toObservable()
-                    .compose(result -> evaluateError(result))
-                    .compose(result -> chain(producer, result));
+                    .compose(PageIterator::evaluateError)
+                    .compose(chain(producer));
         }
 
-        private static <T> Observable<Page<T>> evaluateError(Observable<Response<Page<T>>> input) {
-            return input.map(response -> {
+        private static <T> Observable<Page<T>> evaluateError(Observable<Response<Page<T>>> upstream) {
+            return upstream.map(response -> {
                 throwOnFailure(response);
                 return response.body();
             });
         }
 
-        private static <T> Observable<List<T>> chain(PageProducer<T> producer, Observable<Page<T>> input) {
-            return input.concatMap(page -> {
+        private static <T> ObservableTransformer<Page<T>, List<T>> chain(PageProducer<T> producer) {
+            return upstream -> upstream.concatMap(page -> {
                 if (page.next() == null) {
                     return Observable.empty();
                 }

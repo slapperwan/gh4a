@@ -42,7 +42,7 @@ public class RepositorySearchLoader extends BaseLoader<List<Repository>> {
         try {
             return ApiHelpers.PageIterator
                     .toSingle(page -> service.searchRepositories(params.toString(), null, null, page)
-                            .compose(ApiHelpers.searchPageAdapter()))
+                            .compose(ApiHelpers::searchPageAdapter))
                     .blockingGet();
         } catch (ApiRequestException e) {
             if (e.getStatus() == 422) {
