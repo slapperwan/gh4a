@@ -291,29 +291,28 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     @Override
     protected Fragment makeFragment(int position) {
         final @StringRes int emptyTextResId;
-        final Map<String, String> filterData = new HashMap<>();
+        final String query;
 
-        filterData.put("sort", mSortHelper.getSortMode());
-        filterData.put("order", mSortHelper.getSortOrder());
         if (mSearchMode) {
-            filterData.put("q", String.format(Locale.US, SEARCH_QUERY,
+            query = String.format(Locale.US, SEARCH_QUERY,
                     mIsPullRequest ? "pr" : "issue",
-                    getIssueType(position), mRepoOwner, mRepoName, mSearchQuery));
+                    getIssueType(position), mRepoOwner, mRepoName, mSearchQuery);
             emptyTextResId = mIsPullRequest
                     ? R.string.no_search_pull_requests_found : R.string.no_search_issues_found;
         } else {
-            filterData.put("q", String.format(Locale.US, LIST_QUERY,
+            query = String.format(Locale.US, LIST_QUERY,
                     mIsPullRequest ? "pr" : "issue",
                     getIssueType(position), mRepoOwner, mRepoName,
                     buildFilterItem("assignee", mSelectedAssignee),
                     buildFilterItem("label", mSelectedLabel),
                     buildFilterItem("milestone", mSelectedMilestone),
-                    buildParticipatingFilterItem()).trim());
+                    buildParticipatingFilterItem()).trim();
             emptyTextResId = mIsPullRequest
                     ? R.string.no_pull_requests_found : R.string.no_issues_found;
         }
 
-        return IssueListFragment.newInstance(filterData,
+        return IssueListFragment.newInstance(query,
+                mSortHelper.getSortMode(), mSortHelper.getSortOrder(),
                 getIssueState(position), emptyTextResId, false);
     }
 

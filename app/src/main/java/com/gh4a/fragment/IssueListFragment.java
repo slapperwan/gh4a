@@ -34,29 +34,26 @@ import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.Page;
-import com.meisolsson.githubsdk.service.issues.IssueService;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.meisolsson.githubsdk.service.search.SearchService;
 
 public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     private static final int REQUEST_ISSUE = 1000;
 
-    private Map<String, Object> mFilterData;
+    private String mQuery;
+    private String mSortMode;
+    private String mOrder;
     private int mEmptyTextResId;
     private boolean mShowRepository;
     private String mIssueState;
 
-    public static IssueListFragment newInstance(Map<String, String> filterData, String state,
-            int emptyTextResId, boolean showRepository) {
+    public static IssueListFragment newInstance(String query, String sortMode, String order,
+            String state, int emptyTextResId, boolean showRepository) {
         IssueListFragment f = new IssueListFragment();
 
         Bundle args = new Bundle();
-        if (filterData != null) {
-            for (String key : filterData.keySet()) {
-                args.putString("filter_" + key, filterData.get(key));
-            }
-        }
+        args.putString("query", query);
+        args.putString("sortmode", sortMode);
+        args.putString("order", order);
         args.putInt("emptytext", emptyTextResId);
         args.putString("state", state);
         args.putBoolean("withrepo", showRepository);
@@ -69,14 +66,10 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFilterData = new HashMap<>();
-
         Bundle args = getArguments();
-        for (String key : args.keySet()) {
-            if (key.startsWith("filter_")) {
-                mFilterData.put(key.substring(7), args.getString(key));
-            }
-        }
+        mQuery = args.getString("query");
+        mSortMode = args.getString("sortmode");
+        mOrder = args.getString("order");
         mEmptyTextResId = args.getInt("emptytext");
         mIssueState = args.getString("state");
         mShowRepository = args.getBoolean("withrepo");
@@ -135,12 +128,14 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
 
     @Override
     protected PageIteratorLoader<Issue> onCreateLoader() {
-        final IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
+        final SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
         return new PageIteratorLoader<Issue>(getActivity()) {
             @Override
             protected Page<Issue> loadPage(int page) throws ApiRequestException {
-                return ApiHelpers.throwOnFailure(
-                        service.getIssues(mFilterData, page).blockingGet());
+                return service.searchIssues(mQuery, mSortMode, mOrder, page)
+                        .compose(ApiHelpers.searchPageAdapter())
+                        .compose(response -> ApiHelpers.throwOnFailure(response))
+                        .blockingGet();
             }
         };
     }
