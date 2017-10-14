@@ -16,12 +16,16 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.gh4a.R;
+import com.gh4a.BuildConfig;
+
+import java.util.Locale;
 
 public class BookmarksProvider extends ContentProvider {
     private static final String TAG = "BookmarksProvider";
 
     public interface Columns extends BaseColumns {
-        Uri CONTENT_URI = Uri.parse("content://com.gh4a/bookmarks");
+        Uri CONTENT_URI = Uri.parse(String.format(Locale.US,
+                "content://%s/bookmarks", BuildConfig.APPLICATION_ID));
 
         String NAME = "name";
         String TYPE = "type";
@@ -40,8 +44,8 @@ public class BookmarksProvider extends ContentProvider {
             sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        sURIMatcher.addURI("com.gh4a", "bookmarks", MATCH_ALL);
-        sURIMatcher.addURI("com.gh4a", "bookmarks/#", MATCH_ID);
+        sURIMatcher.addURI(BuildConfig.APPLICATION_ID, "bookmarks", MATCH_ALL);
+        sURIMatcher.addURI(BuildConfig.APPLICATION_ID, "bookmarks/#", MATCH_ID);
     }
 
     private DbHelper mDbHelper;

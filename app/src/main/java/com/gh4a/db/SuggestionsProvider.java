@@ -12,11 +12,16 @@ import android.provider.BaseColumns;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.gh4a.BuildConfig;
+
+import java.util.Locale;
+
 public class SuggestionsProvider extends ContentProvider {
     private static final String TAG = "SuggestionsProvider";
 
     public interface Columns extends BaseColumns {
-        Uri CONTENT_URI = Uri.parse("content://com.gh4a.SuggestionsProvider/suggestions");
+        Uri CONTENT_URI = Uri.parse(String.format(Locale.US,
+                "content://%s.SuggestionsProvider/suggestions", BuildConfig.APPLICATION_ID));
 
         String TYPE = "type";
         String SUGGESTION = "suggestion";
@@ -33,7 +38,9 @@ public class SuggestionsProvider extends ContentProvider {
             sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
-        sURIMatcher.addURI("com.gh4a.SuggestionsProvider", "suggestions", MATCH_ALL);
+        sURIMatcher.addURI(
+                String.format(Locale.US, "%s.SuggestionsProvider", BuildConfig.APPLICATION_ID),
+                "suggestions", MATCH_ALL);
     }
 
     private DbHelper mDbHelper;
