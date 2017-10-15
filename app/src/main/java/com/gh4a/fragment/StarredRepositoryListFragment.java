@@ -18,19 +18,19 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.activity.StarringService;
 
 import java.util.HashMap;
+
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public class StarredRepositoryListFragment extends PagedDataBaseFragment<Repository> {
     public static StarredRepositoryListFragment newInstance(String login,
@@ -74,17 +74,12 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
     }
 
     @Override
-    protected PageIteratorLoader<Repository> onCreateLoader() {
+    protected Single<Response<Page<Repository>>> loadPage(int page) {
         final StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
         final HashMap<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortOrder);
         filterData.put("direction", mSortDirection);
-        return new PageIteratorLoader<Repository>(getActivity()) {
-            @Override
-            protected Page<Repository> loadPage(int page) throws ApiRequestException {
-                return ApiHelpers.throwOnFailure(
-                        service.getStarredRepositories(mLogin, filterData, page).blockingGet());
-            }
-        };
+
+        return service.getStarredRepositories(mLogin, filterData, page);
     }
 }

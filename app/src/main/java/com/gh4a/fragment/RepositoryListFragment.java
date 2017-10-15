@@ -23,26 +23,23 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
+import io.reactivex.Single;
 import retrofit2.Response;
 
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
     private String mRepoType;
-    private boolean mIsOrg;
-    private String mSortOrder;
-    private String mSortDirection;
+    private Map<String, String> mFilterData = new HashMap<>();
 
     public static RepositoryListFragment newInstance(String login, boolean isOrg,
             String repoType, String sortOrder, String sortDirection) {
@@ -62,11 +59,39 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString("user");
-        mRepoType = getArguments().getString("repo_type");
-        mIsOrg = getArguments().getBoolean("is_org");
-        mSortOrder = getArguments().getString("sort_order");
-        mSortDirection = getArguments().getString("sort_direction");
+
+        final Bundle args = getArguments();
+
+        mLogin = args.getString("user");
+        mRepoType = args.getString("repo_type");
+
+        final boolean isSelf = ApiHelpers.loginEquals(mLogin, Gh4Application.get().getAuthLogin());
+
+        // We're operating on the limit of what Github's repo API supports. Specifically,
+        // it doesn't support sorting for the organization repo list endpoint, so we're using
+        // the user repo list endpoint for organizations as well. Doing so has a few quirks though:
+        // - the 'all' filter returns an empty list when querying organization repos, so we
+        //   need to omit the filter in that case
+        // - 'sources' and 'forks' filter types are only supported for the org repo list endpoint,
+        //   but not for the user repo list endpoint, hence we emulate it by querying for 'all'
+        //   and filtering the result
+        // Additionally, using affiliation together with type is not supported, so omit
+        // type when adding affiliation.
+
+        String actualFilterType = "sources".equals(mRepoType) || "forks".equals(mRepoType)
+                ? "all" : mRepoType;
+
+        if (isSelf && TextUtils.equals(actualFilterType, "all")) {
+            mFilterData.put("affiliation", "owner,collaborator");
+        } else if (!TextUtils.equals(actualFilterType, "all") || !args.getBoolean("is_org")) {
+            mFilterData.put("type", actualFilterType);
+        }
+
+        final String sortOrder = args.getString("sort_order");
+        if (sortOrder != null) {
+            mFilterData.put("sort", sortOrder);
+            mFilterData.put("direction", args.getString("sort_direction"));
+        }
     }
 
     @Override
@@ -102,45 +127,11 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected PageIteratorLoader<Repository> onCreateLoader() {
-        final boolean isSelf = ApiHelpers.loginEquals(mLogin, Gh4Application.get().getAuthLogin());
-        final Map<String, String> filterData = new HashMap<>();
-
-        // We're operating on the limit of what Github's repo API supports. Specifically,
-        // it doesn't support sorting for the organization repo list endpoint, so we're using
-        // the user repo list endpoint for organizations as well. Doing so has a few quirks though:
-        // - the 'all' filter returns an empty list when querying organization repos, so we
-        //   need to omit the filter in that case
-        // - 'sources' and 'forks' filter types are only supported for the org repo list endpoint,
-        //   but not for the user repo list endpoint, hence we emulate it by querying for 'all'
-        //   and filtering the result
-        // Additionally, using affiliation together with type is not supported, so omit
-        // type when adding affiliation.
-
-        String actualFilterType = "sources".equals(mRepoType) || "forks".equals(mRepoType)
-                ? "all" : mRepoType;
-
-        if (isSelf && TextUtils.equals(actualFilterType, "all")) {
-            filterData.put("affiliation", "owner,collaborator");
-        } else if (!TextUtils.equals(actualFilterType, "all") || !mIsOrg) {
-            filterData.put("type", actualFilterType);
-        }
-
-        if (mSortOrder != null) {
-            filterData.put("sort", mSortOrder);
-            filterData.put("direction", mSortDirection);
-        }
-
-        return new PageIteratorLoader<Repository>(getActivity()) {
-            final RepositoryService service =
-                    Gh4Application.get().getGitHubService(RepositoryService.class);
-            @Override
-            protected Page<Repository> loadPage(int page) throws ApiRequestException {
-                Response<Page<Repository>> response = isSelf
-                        ? service.getUserRepositories(filterData, page).blockingGet()
-                        : service.getUserRepositories(mLogin, filterData, page).blockingGet();
-                return ApiHelpers.throwOnFailure(response);
-            }
-        };
+    protected Single<Response<Page<Repository>>> loadPage(int page) {
+        final RepositoryService service =
+                Gh4Application.get().getGitHubService(RepositoryService.class);
+        return ApiHelpers.loginEquals(mLogin, Gh4Application.get().getAuthLogin())
+                ? service.getUserRepositories(mFilterData, page)
+                : service.getUserRepositories(mLogin, mFilterData, page);
     }
 }

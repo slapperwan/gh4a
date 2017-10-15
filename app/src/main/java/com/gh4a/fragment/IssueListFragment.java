@@ -22,7 +22,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueActivity;
@@ -30,12 +29,14 @@ import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.PageIteratorLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.service.search.SearchService;
+
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     private static final int REQUEST_ISSUE = 1000;
@@ -128,17 +129,10 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     }
 
     @Override
-    protected PageIteratorLoader<Issue> onCreateLoader() {
+    protected Single<Response<Page<Issue>>> loadPage(int page) {
         final SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
-        return new PageIteratorLoader<Issue>(getActivity()) {
-            @Override
-            protected Page<Issue> loadPage(int page) throws ApiRequestException {
-                return service.searchIssues(mQuery, mSortMode, mOrder, page)
-                        .compose(RxUtils::searchPageAdapter)
-                        .map(ApiHelpers::throwOnFailure)
-                        .blockingGet();
-            }
-        };
+        return service.searchIssues(mQuery, mSortMode, mOrder, page)
+                .compose(RxUtils::searchPageAdapter);
     }
 
     public static class SortDrawerHelper {

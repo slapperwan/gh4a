@@ -2,14 +2,12 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
-import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.GitHubEvent;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.service.activity.EventService;
 
+import io.reactivex.Single;
 import retrofit2.Response;
 
 public class PrivateEventListFragment extends EventListFragment {
@@ -33,16 +31,10 @@ public class PrivateEventListFragment extends EventListFragment {
     }
 
     @Override
-    protected PageIteratorLoader<GitHubEvent> onCreateLoader() {
+    protected Single<Response<Page<GitHubEvent>>> loadPage(int page) {
         final EventService service = Gh4Application.get().getGitHubService(EventService.class);
-        return new PageIteratorLoader<GitHubEvent>(getActivity()) {
-            @Override
-            protected Page<GitHubEvent> loadPage(int page) throws ApiRequestException {
-                Response<Page<GitHubEvent>> response = mOrganization != null
-                        ? service.getOrganizationEvents(mLogin, mOrganization, page).blockingGet()
-                        : service.getUserReceivedEvents(mLogin, page).blockingGet();
-                return ApiHelpers.throwOnFailure(response);
-            }
-        };
+        return mOrganization != null
+                ? service.getOrganizationEvents(mLogin, mOrganization, page)
+                : service.getUserReceivedEvents(mLogin, page);
     }
 }

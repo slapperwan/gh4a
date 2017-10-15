@@ -18,17 +18,17 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.repositories.RepositoryForkService;
+
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     private String mRepoOwner;
@@ -68,15 +68,9 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected PageIteratorLoader<Repository> onCreateLoader() {
+    protected Single<Response<Page<Repository>>> loadPage(int page) {
         final RepositoryForkService service =
                 Gh4Application.get().getGitHubService(RepositoryForkService.class);
-        return new PageIteratorLoader<Repository>(getActivity()) {
-            @Override
-            protected Page<Repository> loadPage(int page) throws ApiRequestException {
-                return ApiHelpers.throwOnFailure(
-                        service.getForks(mRepoOwner, mRepoName, page).blockingGet());
-            }
-        };
+        return service.getForks(mRepoOwner, mRepoName, page);
     }
 }
