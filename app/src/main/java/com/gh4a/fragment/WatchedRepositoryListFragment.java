@@ -18,17 +18,17 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.activity.WatchingService;
+
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Repository> {
     public static WatchedRepositoryListFragment newInstance(String login) {
@@ -65,14 +65,8 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
     }
 
     @Override
-    protected PageIteratorLoader<Repository> onCreateLoader() {
+    protected Single<Response<Page<Repository>>> loadPage(int page) {
         final WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
-        return new PageIteratorLoader<Repository>(getActivity()) {
-            @Override
-            protected Page<Repository> loadPage(int page) throws ApiRequestException {
-                return ApiHelpers.throwOnFailure(
-                        service.getWatchedRepositories(mLogin, page).blockingGet());
-            }
-        };
+        return service.getWatchedRepositories(mLogin, page);
     }
 }

@@ -19,17 +19,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.loader.PageIteratorLoader;
-import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.users.UserFollowerService;
+
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> {
     public static FollowersFollowingListFragment newInstance(String login, boolean showFollowers) {
@@ -72,16 +72,11 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     }
 
     @Override
-    protected PageIteratorLoader<User> onCreateLoader() {
+    protected Single<Response<Page<User>>> loadPage(int page) {
         final UserFollowerService service =
                 Gh4Application.get().getGitHubService(UserFollowerService.class);
-        return new PageIteratorLoader<User>(getActivity()) {
-            @Override
-            protected Page<User> loadPage(int page) throws ApiRequestException {
-                return ApiHelpers.throwOnFailure(mShowFollowers
-                        ? service.getFollowers(mLogin, page).blockingGet()
-                        : service.getFollowing(mLogin, page).blockingGet());
-            }
-        };
+        return mShowFollowers
+                ? service.getFollowers(mLogin, page)
+                : service.getFollowing(mLogin, page);
     }
 }
