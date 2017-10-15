@@ -63,6 +63,7 @@ class CommentViewHolder
     public interface Callback {
         boolean canQuote();
         void quoteText(CharSequence text);
+        void addText(CharSequence text);
         boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem);
         List<Reaction> loadReactionDetailsInBackground(TimelineItem.TimelineComment item)
                 throws IOException;
@@ -84,6 +85,7 @@ class CommentViewHolder
         tvDesc = view.findViewById(R.id.tv_desc);
         tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         tvExtra = view.findViewById(R.id.tv_extra);
+        tvExtra.setOnClickListener(this);
         tvTimestamp = view.findViewById(R.id.tv_timestamp);
         tvEditTimestamp = view.findViewById(R.id.tv_edit_timestamp);
         reactions = view.findViewById(R.id.reactions);
@@ -116,6 +118,8 @@ class CommentViewHolder
         User user = item.comment.getUser();
         Date createdAt = item.comment.getCreatedAt();
         Date updatedAt = item.comment.getUpdatedAt();
+
+        tvExtra.setTag(user);
 
         AvatarHandler.assignAvatar(ivGravatar, user);
         ivGravatar.setTag(user);
@@ -199,14 +203,23 @@ class CommentViewHolder
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.iv_menu) {
-            mReactionMenuHelper.startLoadingIfNeeded();
-            mPopupMenu.show();
-        } else if (v.getId() == R.id.iv_gravatar) {
-            User user = (User) v.getTag();
-            Intent intent = UserActivity.makeIntent(mContext, user);
-            if (intent != null) {
-                mContext.startActivity(intent);
+        switch (v.getId()) {
+            case R.id.iv_menu:
+                mReactionMenuHelper.startLoadingIfNeeded();
+                mPopupMenu.show();
+                break;
+            case R.id.iv_gravatar: {
+                User user = (User) v.getTag();
+                Intent intent = UserActivity.makeIntent(mContext, user);
+                if (intent != null) {
+                    mContext.startActivity(intent);
+                }
+                break;
+            }
+            case R.id.tv_extra: {
+                User user = (User) v.getTag();
+                mCallback.addText(StringUtils.formatMention(mContext, user));
+                break;
             }
         }
     }

@@ -16,6 +16,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.StringUtils;
 
 import org.eclipse.egit.github.core.User;
 
@@ -177,7 +178,7 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
         @Override
         public CharSequence convertResultToString(Object resultValue) {
             final User user = (User) resultValue;
-            return "@" + ApiHelpers.getUserLogin(mContext, user) + " ";
+            return StringUtils.formatMention(mContext, user);
         }
     }
 

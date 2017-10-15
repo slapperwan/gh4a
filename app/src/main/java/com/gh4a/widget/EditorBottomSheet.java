@@ -203,6 +203,13 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mBasicEditor.addQuote(text);
     }
 
+    public void addText(CharSequence text) {
+        if (isInAdvancedMode()) {
+            mAdvancedEditor.addText(text);
+        }
+        mBasicEditor.addText(text);
+    }
+
     @Override
     public boolean onTouch(View view, MotionEvent event) {
         int action = event.getActionMasked();

@@ -164,6 +164,10 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
+    public void addText(CharSequence text) {
+    }
+
+    @Override
     public void replyToComment(long replyToId) {
         Intent intent = EditPullRequestCommentActivity.makeIntent(getActivity(),
                 mRepoOwner, mRepoName, mIssueNumber, replyToId, new CommitComment(), 0);

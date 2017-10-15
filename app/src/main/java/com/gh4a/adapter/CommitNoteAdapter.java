@@ -60,6 +60,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         void editComment(T comment);
         void deleteComment(T comment);
         void quoteText(CharSequence text);
+        void addText(CharSequence text);
     }
 
     private final HttpImageGetter mImageGetter;
@@ -144,6 +145,9 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
             if (intent != null) {
                 mContext.startActivity(intent);
             }
+        } else if (v.getId() == R.id.tv_extra) {
+            User user = (User) v.getTag();
+            mActionCallback.addText(StringUtils.formatMention(mContext, user));
         } else {
             super.onClick(v);
         }
@@ -154,6 +158,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         View v = inflater.inflate(R.layout.row_timeline_comment, parent, false);
         ViewHolder holder = new ViewHolder(v, mHolderCallback, this, mReactionDetailsCache);
         holder.ivGravatar.setOnClickListener(this);
+        holder.tvExtra.setOnClickListener(this);
         return holder;
     }
 
@@ -182,6 +187,7 @@ public class CommitNoteAdapter extends RootAdapter<CommitComment, CommitNoteAdap
         SpannableString userName = new SpannableString(login);
         userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
         holder.tvExtra.setText(userName);
+        holder.tvExtra.setTag(user);
 
         holder.reactions.setReactions(item.getReactions());
         holder.mReactionMenuHelper.update();

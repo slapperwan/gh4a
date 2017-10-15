@@ -26,6 +26,8 @@ import com.gh4a.Gh4Application;
 import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.StyleableTextView;
 
+import org.eclipse.egit.github.core.User;
+
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -156,5 +158,10 @@ public class StringUtils {
         }
 
         return null;
+    }
+
+    public static CharSequence formatMention(Context context, User user) {
+        String userLogin = ApiHelpers.getUserLogin(context, user);
+        return "@" + userLogin + " ";
     }
 }

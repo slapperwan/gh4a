@@ -269,6 +269,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
+    public void addText(CharSequence text) {
+        mBottomSheet.addText(text);
+    }
+
+    @Override
     public int getCommentEditorHintResId() {
         return R.string.commit_comment_hint;
     }

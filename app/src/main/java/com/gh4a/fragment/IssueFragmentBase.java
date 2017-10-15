@@ -339,6 +339,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
         TextView tvExtra = mListHeaderView.findViewById(R.id.tv_extra);
         tvExtra.setText(ApiHelpers.getUserLogin(getActivity(), mIssue.getUser()));
+        tvExtra.setOnClickListener(this);
+        tvExtra.setTag(mIssue.getUser());
 
         TextView tvTimestamp = mListHeaderView.findViewById(R.id.tv_timestamp);
         tvTimestamp.setText(StringUtils.formatRelativeTime(getActivity(),
@@ -470,6 +472,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public void onClick(View v) {
+        if (v.getId() == R.id.tv_extra) {
+            User user = (User) v.getTag();
+            addText(StringUtils.formatMention(getContext(), user));
+            return;
+        }
         Intent intent = UserActivity.makeIntent(getActivity(), (User) v.getTag());
         if (intent != null) {
             startActivity(intent);
@@ -491,6 +498,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public void quoteText(CharSequence text) {
         mBottomSheet.addQuote(text);
+    }
+
+    @Override
+    public void addText(CharSequence text) {
+        mBottomSheet.addText(text);
     }
 
     @Override

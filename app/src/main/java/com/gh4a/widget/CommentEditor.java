@@ -17,12 +17,14 @@ import org.eclipse.egit.github.core.User;
 import java.util.Set;
 
 import me.thanel.markdownedit.MarkdownEdit;
+import me.thanel.markdownedit.SelectionUtils;
 
 public class CommentEditor extends AppCompatMultiAutoCompleteTextView
         implements TextView.OnEditorActionListener {
     private DropDownUserAdapter mMentionAdapter;
     private boolean mLocked;
-    private @StringRes int mCommentEditorHintResId;
+    @StringRes
+    private int mCommentEditorHintResId;
 
     public CommentEditor(Context context) {
         super(context);
@@ -82,7 +84,19 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView
         }
 
         MarkdownEdit.addQuote(this, text);
+        focusEnd();
+    }
 
+    public void addText(CharSequence text) {
+        if (mLocked) {
+            return;
+        }
+
+        SelectionUtils.replaceSelectedText(getText(), text);
+        focusEnd();
+    }
+
+    private void focusEnd() {
         requestFocus();
         setSelection(length());
         UiUtils.showImeForView(this);

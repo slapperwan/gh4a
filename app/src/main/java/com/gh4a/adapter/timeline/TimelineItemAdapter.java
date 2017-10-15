@@ -54,6 +54,7 @@ public class TimelineItemAdapter
         void editComment(Comment comment);
         void deleteComment(Comment comment);
         void quoteText(CharSequence text);
+        void addText(CharSequence text);
         void replyToComment(long replyToId);
         String getShareSubject(Comment comment);
         List<Reaction> loadReactionDetailsInBackground(Comment comment) throws IOException;
@@ -81,6 +82,11 @@ public class TimelineItemAdapter
         @Override
         public void quoteText(CharSequence text) {
             mActionCallback.quoteText(text);
+        }
+
+        @Override
+        public void addText(CharSequence text) {
+            mActionCallback.addText(text);
         }
 
         @Override
