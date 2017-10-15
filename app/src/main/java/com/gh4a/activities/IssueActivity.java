@@ -37,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
@@ -52,6 +53,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
+import com.gordonwong.materialsheetfab.MaterialSheetFab;
 
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
@@ -85,6 +87,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     private IssueStateTrackingFloatingActionButton mEditFab;
     private final Handler mHandler = new Handler();
     private IssueFragment mFragment;
+    private MaterialSheetFab<IssueStateTrackingFloatingActionButton> mSheetFab;
 
     private final LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
         @Override
@@ -290,6 +293,10 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
     @Override
     public void onBackPressed() {
+        if (mSheetFab != null && mSheetFab.isSheetVisible()) {
+            mSheetFab.hideSheet();
+            return;
+        }
         if (mFragment != null && mFragment.onBackPressed()) {
             return;
         }
@@ -326,6 +333,19 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             mEditFab = (IssueStateTrackingFloatingActionButton)
                     getLayoutInflater().inflate(R.layout.issue_edit_fab, rootLayout, false);
             mEditFab.setOnClickListener(this);
+
+            ViewGroup v = (ViewGroup) View.inflate(this, R.layout.issue_edit_menu, rootLayout);
+            v.findViewById(R.id.edit_all).setOnClickListener(this);
+            v.findViewById(R.id.edit_labels).setOnClickListener(this);
+            v.findViewById(R.id.edit_assignees).setOnClickListener(this);
+            v.findViewById(R.id.edit_milestone).setOnClickListener(this);
+
+            mSheetFab = new MaterialSheetFab<>(mEditFab,
+                    v.findViewById(R.id.fab_sheet),
+                    v.findViewById(R.id.overlay),
+                    UiUtils.resolveColor(this, R.attr.cardBackground),
+                    UiUtils.resolveColor(this, R.attr.colorIssueEditFab));
+
             rootLayout.addView(mEditFab);
         } else if (!shouldHaveFab && mEditFab != null) {
             rootLayout.removeView(mEditFab);
@@ -348,10 +368,23 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.edit_fab && checkForAuthOrExit()) {
-            Intent editIntent = IssueEditActivity.makeEditIntent(this,
-                    mRepoOwner, mRepoName, mIssue);
-            startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
+        switch (v.getId()) {
+            case R.id.edit_all:
+            case R.id.edit_labels:
+            case R.id.edit_assignees:
+            case R.id.edit_milestone:
+                mSheetFab.hideSheet();
+                // TODO
+                Toast.makeText(this, "Clicked item", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.edit_fab:
+                if (checkForAuthOrExit()) {
+                    Intent editIntent = IssueEditActivity.makeEditIntent(this,
+                            mRepoOwner, mRepoName, mIssue);
+                    startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
+                }
+                break;
         }
     }
 

@@ -6,8 +6,10 @@ import android.util.AttributeSet;
 
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
+import com.gordonwong.materialsheetfab.AnimatedFab;
 
-public class IssueStateTrackingFloatingActionButton extends FloatingActionButton {
+public class IssueStateTrackingFloatingActionButton extends FloatingActionButton
+        implements AnimatedFab {
     private String mState;
     private boolean mMerged;
 
@@ -46,5 +48,10 @@ public class IssueStateTrackingFloatingActionButton extends FloatingActionButton
             mergeDrawableStates(drawableState, STATE_MERGED);
         }
         return drawableState;
+    }
+
+    @Override
+    public void show(float translationX, float translationY) {
+        show();
     }
 }

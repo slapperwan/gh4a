@@ -89,6 +89,7 @@ Open Source Libraries
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
 * [Material Design Icons](https://github.com/google/material-design-icons)
 * [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar)
+* [MaterialSheetFab](https://github.com/gowong/material-sheet-fab)
 
 Contributions
 -------------

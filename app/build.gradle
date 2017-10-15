@@ -83,6 +83,7 @@ dependencies {
         exclude group: 'org.json', module : 'json'
     }
     compile 'com.github.Tunous:MarkdownEdit:0.1.1'
+    compile 'com.gordonwong:material-sheet-fab:1.2.1'
     playstoreCompile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
