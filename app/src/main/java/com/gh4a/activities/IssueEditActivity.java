@@ -153,6 +153,10 @@ public class IssueEditActivity extends BasePagerActivity implements
         @Override
         protected void onResultReady(List<User> result) {
             mAllAssignee = result;
+            User creator = mEditIssue.getUser();
+            if (creator != null) {
+                mAllAssignee.add(creator);
+            }
             showAssigneesDialog();
             getSupportLoaderManager().destroyLoader(2);
         }
