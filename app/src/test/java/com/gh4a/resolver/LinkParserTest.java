@@ -75,43 +75,15 @@ public class LinkParserTest {
     }
 
     @Test
-    public void appsLink__opensBrowser() {
-        assertRedirectsToBrowser(parseLink("https://github.com/apps"));
-    }
-
-    @Test
-    public void integrationsLink__opensBrowser() {
-        assertRedirectsToBrowser(parseLink("https://github.com/integrations"));
-    }
-
-    @Test
-    public void loginLink__opensBrowser() {
-        assertRedirectsToBrowser(parseLink("https://github.com/login"));
-    }
-
-    @Test
-    public void logoutLink__opensBrowser() {
-        assertRedirectsToBrowser(parseLink("https://github.com/logout"));
-    }
-
-    @Test
-    public void marketplaceLink__opensBrowser() {
-        assertRedirectsToBrowser(parseLink("https://github.com/marketplace"));
-    }
-
-    @Test
-    public void sessionsLink__opensBrowser() {
-        assertRedirectsToBrowser(parseLink("https://github.com/sessions"));
-    }
-
-    @Test
-    public void settingsLink__opensBrowser() {
-        assertRedirectsToBrowser(parseLink("https://github.com/settings"));
-    }
-
-    @Test
-    public void updatesLink__opensBrowser() {
-        assertRedirectsToBrowser(parseLink("https://github.com/updates"));
+    public void reservedPaths__openBrowser() {
+        String[] reservedPaths = {
+                "apps", "integrations", "login", "logout", "marketplace", "sessions", "settings",
+                "updates", "support", "contact", "about", "personal", "open-source", "business",
+                "site", "security", "features"
+        };
+        for (String reservedPath : reservedPaths) {
+            assertRedirectsToBrowser(parseLink("https://github.com/" + reservedPath));
+        }
     }
 
     @Test
@@ -130,17 +102,17 @@ public class LinkParserTest {
     }
 
     @Test
-    public void orgsLink__opensBrowser() throws Exception {
-        assertRedirectsToBrowser(parseLink("https://github.com/orgs"));
-    }
-
-    @Test
     public void organizationLink__opensUserActivity() throws Exception {
         LinkParser.ParseResult result = parseLink("https://github.com/orgs/android");
         assertRedirectsTo(result, UserActivity.class);
         Bundle extras = result.intent.getExtras();
         assertThat("Extras are missing", extras, is(notNullValue()));
         assertThat("Organization name is incorrect", extras.getString("login"), is("android"));
+    }
+
+    @Test
+    public void organizationLink_withoutName__opensBrowser() throws Exception {
+        assertRedirectsToBrowser(parseLink("https://github.com/orgs"));
     }
 
     @Test
