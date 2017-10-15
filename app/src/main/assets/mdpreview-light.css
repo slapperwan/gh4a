@@ -2,7 +2,10 @@ body {
     background-color: #fafafa;
     color: #000000;
     font-size: 14px;
-    margin: 16px 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 16px;
+    word-wrap: break-word;
 }
 
 a {
