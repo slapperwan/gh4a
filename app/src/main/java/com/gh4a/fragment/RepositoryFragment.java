@@ -18,9 +18,7 @@ package com.gh4a.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.CollaboratorListActivity;
 import com.gh4a.activities.ContributorListActivity;
 import com.gh4a.activities.ForkListActivity;
@@ -39,18 +38,23 @@ import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WatcherListActivity;
 import com.gh4a.activities.WikiListActivity;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.PullRequestCountLoader;
-import com.gh4a.loader.ReadmeLoader;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.meisolsson.githubsdk.model.Permissions;
 import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
+import com.meisolsson.githubsdk.service.search.SearchService;
+import com.philosophicalhacker.lib.RxLoader;
 import com.vdurmont.emoji.EmojiParser;
+
+import java.util.Locale;
+
+import retrofit2.Response;
 
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
@@ -66,9 +70,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
     private static final int ID_LOADER_README = 0;
     private static final int ID_LOADER_PULL_REQUEST_COUNT = 1;
+
     private static final String STATE_KEY_IS_README_EXPANDED = "is_readme_expanded";
     private static final String STATE_KEY_IS_README_LOADED = "is_readme_loaded";
 
+    private RxLoader mRxLoader;
     private Repository mRepository;
     private View mContentView;
     private String mRef;
@@ -79,45 +85,12 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private boolean mIsReadmeLoaded = false;
     private boolean mIsReadmeExpanded = false;
 
-    private final LoaderCallbacks<String> mReadmeCallback = new LoaderCallbacks<String>(this) {
-        @Override
-        protected Loader<LoaderResult<String>> onCreateLoader() {
-            mIsReadmeLoaded = false;
-            return new ReadmeLoader(getActivity(), mRepository.owner().login(),
-                    mRepository.name(), StringUtils.isBlank(mRef) ? mRepository.defaultBranch() : mRef);
-        }
-        @Override
-        protected void onResultReady(String result) {
-            new FillReadmeTask(mRepository.id(), mReadmeView, mLoadingView, mImageGetter)
-                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, result);
-        }
-    };
-
-    private final LoaderCallbacks<Integer> mPullRequestsCallback = new LoaderCallbacks<Integer>(this) {
-        @Override
-        protected Loader<LoaderResult<Integer>> onCreateLoader() {
-            return new PullRequestCountLoader(getActivity(), mRepository, ApiHelpers.IssueState.OPEN);
-        }
-
-        @Override
-        protected void onResultReady(Integer result) {
-            View v = getView();
-            v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
-            v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
-
-            TextView tvIssuesCount = mContentView.findViewById(R.id.tv_issues_count);
-            tvIssuesCount.setText(String.valueOf(mRepository.openIssuesCount() - result));
-
-            TextView tvPullRequestsCountView = v.findViewById(R.id.tv_pull_requests_count);
-            tvPullRequestsCountView.setText(String.valueOf(result));
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRepository = getArguments().getParcelable("repo");
         mRef = getArguments().getString("ref");
+        mRxLoader = new RxLoader(getActivity(), getLoaderManager());
     }
 
     @Override
@@ -150,7 +123,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         if (mImageGetter != null) {
             mImageGetter.clearHtmlCache();
         }
-        hideContentAndRestartLoaders(ID_LOADER_README, ID_LOADER_PULL_REQUEST_COUNT);
+        setContentShown(false);
+        loadReadme(true);
+        loadPullRequestCount(true);
     }
 
     @Override
@@ -166,9 +141,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             mIsReadmeLoaded = savedInstanceState.getBoolean(STATE_KEY_IS_README_LOADED, false);
         }
         if (mIsReadmeExpanded || mIsReadmeLoaded) {
-            getLoaderManager().initLoader(ID_LOADER_README, null, mReadmeCallback);
+            loadReadme(false);
         }
-        getLoaderManager().initLoader(ID_LOADER_PULL_REQUEST_COUNT, null, mPullRequestsCallback);
+        loadPullRequestCount(false);
 
         updateReadmeVisibility();
     }
@@ -197,9 +172,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         getArguments().putString("ref", ref);
 
         // Reload readme
-        if (getLoaderManager().getLoader(ID_LOADER_README) != null) {
-            getLoaderManager().restartLoader(ID_LOADER_README, null, mReadmeCallback);
-        }
+        loadReadme(true);
         if (mReadmeView != null) {
             mReadmeView.setVisibility(View.GONE);
         }
@@ -345,12 +318,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
             startActivity(intent);
         }
     }
-
     private void toggleReadmeExpanded() {
         mIsReadmeExpanded = !mIsReadmeExpanded;
 
         if (mIsReadmeExpanded && !mIsReadmeLoaded) {
-            getLoaderManager().initLoader(ID_LOADER_README, null, mReadmeCallback);
+            loadReadme(false);
         }
 
         updateReadmeVisibility();
@@ -366,43 +338,65 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         mReadmeTitleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0);
     }
 
-    private class FillReadmeTask extends AsyncTask<String, Void, String> {
-        private final Long mId;
-        private final Context mContext;
-        private final TextView mReadmeView;
-        private final View mProgressView;
-        private final HttpImageGetter mImageGetter;
 
-        public FillReadmeTask(long id, TextView readmeView, View progressView,
-                HttpImageGetter imageGetter) {
-            mId = id;
-            mContext = readmeView.getContext();
-            mReadmeView = readmeView;
-            mProgressView = progressView;
-            mImageGetter = imageGetter;
-        }
+    private void loadReadme(boolean force) {
+        Context context = getActivity();
+        Long id = mRepository.id();
+        String repoOwner = mRepository.owner().login();
+        String repoName = mRepository.name();
+        RepositoryContentService service = ServiceFactory.createService(
+                RepositoryContentService.class, "application/vnd.github.v3.html", null, null);
 
-        @Override
-        protected String doInBackground(String... params) {
-            String readme = params[0];
-            if (readme != null) {
-                mImageGetter.encode(mContext, mId, readme);
-            }
-            return readme;
-        }
+        service.getReadmeHtml(repoOwner, repoName, mRef)
+                .map(response -> response.code() == 404 ? Response.success((String) null) : response)
+                .map(ApiHelpers::throwOnFailure)
+                .map(html -> {
+                    if (html != null) {
+                        html = HtmlUtils.rewriteRelativeUrls(html, repoOwner, repoName, mRef);
+                        mImageGetter.encode(context, id, html);
+                    }
+                    return html;
+                })
+                .doOnSubscribe(disposable -> mIsReadmeLoaded = false)
+                .compose(RxUtils::doInBackground)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_README, force))
+                .subscribe(readme -> {
+                    if (readme != null) {
+                        mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
+                        mImageGetter.bind(mReadmeView, readme, id);
+                    } else {
+                        mReadmeView.setText(R.string.repo_no_readme);
+                        mReadmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
+                    }
+                    mReadmeView.setVisibility(mIsReadmeExpanded ? View.VISIBLE : View.GONE);
+                    mLoadingView.setVisibility(View.GONE);
+                    mIsReadmeLoaded = true;
 
-        @Override
-        protected void onPostExecute(String result) {
-            if (result != null) {
-                mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-                mImageGetter.bind(mReadmeView, result, mId);
-            } else {
-                mReadmeView.setText(R.string.repo_no_readme);
-                mReadmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
-            }
-            mReadmeView.setVisibility(mIsReadmeExpanded ? View.VISIBLE : View.GONE);
-            mProgressView.setVisibility(View.GONE);
-            mIsReadmeLoaded = true;
-        }
+                }, error -> {});
+    }
+
+    private void loadPullRequestCount(boolean force) {
+        SearchService service = ServiceFactory.createService(SearchService.class, null, null, 1);
+        String query = String.format(Locale.US, "type:pr repo:%s/%s state:open",
+                mRepository.owner().login(), mRepository.name());
+
+        service.searchIssues(query, null, null, 0)
+                .map(ApiHelpers::throwOnFailure)
+                .map(page -> page.totalCount())
+                .compose(RxUtils::doInBackground)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_PULL_REQUEST_COUNT, force))
+                .subscribe(count -> {
+                    View v = getView();
+                    v.findViewById(R.id.issues_progress).setVisibility(View.GONE);
+                    v.findViewById(R.id.pull_requests_progress).setVisibility(View.GONE);
+
+                    TextView tvIssuesCount = mContentView.findViewById(R.id.tv_issues_count);
+                    tvIssuesCount.setText(String.valueOf(mRepository.openIssuesCount() - count));
+
+                    TextView tvPullRequestsCountView = v.findViewById(R.id.tv_pull_requests_count);
+                    tvPullRequestsCountView.setText(String.valueOf(count));
+                }, error -> {});
     }
 }
