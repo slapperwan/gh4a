@@ -15,21 +15,28 @@
  */
 package com.gh4a.fragment;
 
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
+import com.gh4a.ApiRequestException;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.CommitCompareLoader;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.CommitCompare;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
+
+import io.reactivex.Single;
 
 public class CommitCompareFragment extends ListDataBaseFragment<Commit> implements
         RootAdapter.OnItemClickListener<Commit> {
@@ -111,8 +118,27 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
     }
 
     @Override
-    public Loader<LoaderResult<List<Commit>>> onCreateLoader() {
-        return new CommitCompareLoader(getActivity(), mRepoOwner, mRepoName,
-                mBaseLabel, mBase, mHeadLabel, mHead);
+    protected Single<List<Commit>> onCreateDataSingle() {
+        RepositoryCommitService service =
+                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+
+        Single<CommitCompare> compareSingle = service.compareCommits(mRepoOwner, mRepoName, mBase, mHead)
+                .map(ApiHelpers::throwOnFailure)
+                .onErrorResumeNext(error -> {
+                    if (error instanceof ApiRequestException) {
+                        if (((ApiRequestException) error).getStatus() == HttpURLConnection.HTTP_NOT_FOUND) {
+                            // We got a 404; likely the history of the base branch was rewritten. Try the labels.
+                            return service.compareCommits(mRepoOwner, mRepoName, mBaseLabel, mHeadLabel)
+                                    .map(ApiHelpers::throwOnFailure);
+                        }
+                    }
+                    return Single.error(error);
+                });
+
+        return compareSingle
+                .map(compare -> compare.commits())
+                // Bummer, at least one branch was deleted.
+                // Can't do anything here, so return an empty list.
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND,new ArrayList<>()));
     }
 }

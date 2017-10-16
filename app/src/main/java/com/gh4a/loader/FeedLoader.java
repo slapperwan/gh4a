@@ -17,6 +17,8 @@ import com.gh4a.holder.Feed;
 
 import org.xml.sax.SAXException;
 
+import io.reactivex.Single;
+
 public class FeedLoader extends BaseLoader<List<Feed>> {
     private final String mUrl;
 
@@ -26,28 +28,32 @@ public class FeedLoader extends BaseLoader<List<Feed>> {
     }
 
     @Override
-    public List<Feed> doLoadInBackground()
-            throws IOException, SAXException, ParserConfigurationException {
-        BufferedInputStream bis = null;
-        try {
-            URL url = new URL(mUrl);
-            URLConnection request = url.openConnection();
+    public List<Feed> doLoadInBackground() throws IOException, SAXException, ParserConfigurationException {
+        return loadFeed(mUrl).blockingGet();
+    }
 
-            bis = new BufferedInputStream(request.getInputStream());
+    public static Single<List<Feed>> loadFeed(String url) {
+        return Single.fromCallable(() -> {
+            BufferedInputStream bis = null;
+            try {
+                URLConnection request = new URL(url).openConnection();
 
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser parser = factory.newSAXParser();
-            FeedHandler handler = new FeedHandler();
-            parser.parse(bis, handler);
-            return handler.getFeeds();
-        } finally {
-            if (bis != null) {
-                try {
-                    bis.close();
-                } catch (IOException e) {
-                    // ignored
+                bis = new BufferedInputStream(request.getInputStream());
+
+                SAXParserFactory factory = SAXParserFactory.newInstance();
+                SAXParser parser = factory.newSAXParser();
+                FeedHandler handler = new FeedHandler();
+                parser.parse(bis, handler);
+                return handler.getFeeds();
+            } finally {
+                if (bis != null) {
+                    try {
+                        bis.close();
+                    } catch (IOException e) {
+                        // ignored
+                    }
                 }
             }
-        }
+        });
     }
 }

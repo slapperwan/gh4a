@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import io.reactivex.Single;
+
 public class TrendLoader extends BaseLoader<List<Trend>> {
     private static final String URL_TEMPLATE =
             "http://octodroid.s3.amazonaws.com/trends/trending_%s-all.json";
@@ -32,52 +34,59 @@ public class TrendLoader extends BaseLoader<List<Trend>> {
 
     @Override
     public List<Trend> doLoadInBackground() throws IOException, JSONException {
-        URL url = new URL(String.format(Locale.US, URL_TEMPLATE, mType));
-        List<Trend> trends = new ArrayList<>();
+        return loadTrends(mType).blockingGet();
+    }
 
-        HttpURLConnection connection = null;
-        CharArrayWriter writer = null;
+    public static Single<List<Trend>> loadTrends(String type) {
+        return Single.fromCallable(() -> {
+            URL url = new URL(String.format(Locale.US, URL_TEMPLATE, type));
+            List<Trend> trends = new ArrayList<>();
 
-        try {
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Content-Type", "application/json");
+            HttpURLConnection connection = null;
+            CharArrayWriter writer = null;
 
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                return trends;
+            try {
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("GET");
+                connection.setRequestProperty("Content-Type", "application/json");
+
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    return trends;
+                }
+
+                InputStream in = new BufferedInputStream(connection.getInputStream());
+                InputStreamReader reader = new InputStreamReader(in, "UTF-8");
+                int length = connection.getContentLength();
+                writer = new CharArrayWriter(Math.max(0, length));
+                char[] tmp = new char[4096];
+
+                int l;
+                while ((l = reader.read(tmp)) != -1) {
+                    writer.write(tmp, 0, l);
+                }
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                if (writer != null) {
+                    writer.close();
+                }
             }
 
-            InputStream in = new BufferedInputStream(connection.getInputStream());
-            InputStreamReader reader = new InputStreamReader(in, "UTF-8");
-            int length = connection.getContentLength();
-            writer = new CharArrayWriter(Math.max(0, length));
-            char[] tmp = new char[4096];
+            JSONArray resultArray = new JSONArray(writer.toString());
+            for (int i = 0; i < resultArray.length(); i++) {
+                JSONObject repoObject = resultArray.getJSONObject(i);
 
-            int l;
-            while ((l = reader.read(tmp)) != -1) {
-                writer.write(tmp, 0, l);
+                trends.add(new Trend(
+                        repoObject.getString("owner"),
+                        repoObject.getString("repo"),
+                        repoObject.isNull("description") ? null : repoObject.optString("description"),
+                        (int) repoObject.getDouble("stars"),
+                        (int) repoObject.getDouble("new_stars"),
+                        (int) repoObject.getDouble("forks")));
             }
-        } finally {
-            if (connection != null) {
-                connection.disconnect();
-            }
-            if (writer != null) {
-                writer.close();
-            }
-        }
+            return trends;
 
-        JSONArray resultArray = new JSONArray(writer.toString());
-        for (int i = 0; i < resultArray.length(); i++) {
-            JSONObject repoObject = resultArray.getJSONObject(i);
-
-            trends.add(new Trend(
-                    repoObject.getString("owner"),
-                    repoObject.getString("repo"),
-                    repoObject.isNull("description") ? null : repoObject.optString("description"),
-                    (int) repoObject.getDouble("stars"),
-                    (int) repoObject.getDouble("new_stars"),
-                    (int) repoObject.getDouble("forks")));
-        }
-        return trends;
+        });
     }
 }

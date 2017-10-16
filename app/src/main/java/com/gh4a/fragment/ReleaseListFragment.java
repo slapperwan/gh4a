@@ -2,20 +2,21 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.adapter.ReleaseAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.ReleaseListLoader;
+import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Release;
+import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
-import java.util.List;
+import io.reactivex.Single;
+import retrofit2.Response;
 
-public class ReleaseListFragment extends ListDataBaseFragment<Release> implements
+public class ReleaseListFragment extends PagedDataBaseFragment<Release> implements
         RootAdapter.OnItemClickListener<Release> {
     private String mUserLogin;
     private String mRepoName;
@@ -37,8 +38,10 @@ public class ReleaseListFragment extends ListDataBaseFragment<Release> implement
     }
 
     @Override
-    protected Loader<LoaderResult<List<Release>>> onCreateLoader() {
-        return new ReleaseListLoader(getActivity(), mUserLogin, mRepoName);
+    protected Single<Response<Page<Release>>> loadPage(int page) {
+        final RepositoryReleaseService service =
+                Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
+        return service.getReleases(mUserLogin, mRepoName, page);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.gh4a.fragment;
 
 import android.content.Intent;
 import android.support.annotation.AttrRes;
-import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.TextView;
 
@@ -11,14 +10,18 @@ import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.loader.IssueCommentListLoader;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TimelineItem;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
+import com.meisolsson.githubsdk.service.issues.IssueEventService;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Single;
@@ -69,8 +72,27 @@ public class IssueFragment extends IssueFragmentBase {
     }
 
     @Override
-    public Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
-        return new IssueCommentListLoader(getActivity(), mRepoOwner, mRepoName, mIssue.number());
+    protected Single<List<TimelineItem>> onCreateDataSingle() {
+        final Gh4Application app = Gh4Application.get();
+        final int issueNumber = mIssue.number();
+        final IssueEventService eventService = app.getGitHubService(IssueEventService.class);
+        final IssueCommentService commentService = app.getGitHubService(IssueCommentService.class);
+
+        Single<List<TimelineItem>> commentSingle = ApiHelpers.PageIterator
+                .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
+                .compose(RxUtils.mapList(comment -> new TimelineItem.TimelineComment(comment)));
+        Single<List<TimelineItem>> eventSingle = ApiHelpers.PageIterator
+                .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
+                .compose(RxUtils.filter(event -> IssueCommentListLoader.INTERESTING_EVENTS.contains(event.event())))
+                .compose((RxUtils.mapList(event -> new TimelineItem.TimelineEvent(event))));
+
+        return Single.zip(commentSingle, eventSingle, (comments, events) -> {
+            ArrayList<TimelineItem> result = new ArrayList<>();
+            result.addAll(comments);
+            result.addAll(events);
+            Collections.sort(result, IssueCommentListLoader.TIMELINE_ITEM_COMPARATOR);
+            return result;
+        });
     }
 
     @Override

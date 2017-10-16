@@ -28,6 +28,8 @@ import com.gh4a.holder.Feed;
 import com.gh4a.loader.FeedLoader;
 import com.gh4a.loader.LoaderResult;
 
+import io.reactivex.Single;
+
 public class BlogListFragment extends ListDataBaseFragment<Feed> implements
         RootAdapter.OnItemClickListener<Feed> {
     private static final String BLOG = "https://github.com/blog.atom";
@@ -54,7 +56,7 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> implements
     }
 
     @Override
-    public Loader<LoaderResult<List<Feed>>> onCreateLoader() {
-        return new FeedLoader(getActivity(), BLOG);
+    protected Single<List<Feed>> onCreateDataSingle() {
+        return FeedLoader.loadFeed(BLOG);
     }
 }

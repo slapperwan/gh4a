@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -26,24 +25,48 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitHistoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.ContentListLoader;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
 import com.meisolsson.githubsdk.model.Content;
+import com.meisolsson.githubsdk.model.ContentType;
 import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+
+import io.reactivex.Single;
 
 public class ContentListFragment extends ListDataBaseFragment<Content> implements
         RootAdapter.OnItemClickListener<Content> {
     private static final int MENU_HISTORY = Menu.FIRST + 1;
+
+    private static final Comparator<Content> COMPARATOR = (lhs, rhs) -> {
+        boolean lhsIsDir = lhs.type() == ContentType.Directory;
+        boolean rhsIsDir = rhs.type() == ContentType.Directory;
+        if (lhsIsDir && !rhsIsDir) {
+            // Directory before non-directory
+            return -1;
+        } else if (!lhsIsDir && rhsIsDir) {
+            // Non-directory after directory
+            return 1;
+        } else {
+            // Alphabetic order otherwise
+            // return o1.compareTo(o2);
+            return lhs.name().compareTo(rhs.name());
+        }
+    };
 
     private Repository mRepository;
     private String mPath;
@@ -63,7 +86,7 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
         ContentListFragment f = new ContentListFragment();
 
         Bundle args = new Bundle();
-        args.putString("path", path);
+        args.putString("path", path != null ? path : "");
         args.putString("ref", ref);
         args.putParcelable("repo", repository);
         args.putParcelableArrayList("contents", contents);
@@ -172,13 +195,21 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
     }
 
     @Override
-    public Loader<LoaderResult<List<Content>>> onCreateLoader() {
-        ContentListLoader loader = new ContentListLoader(getActivity(),
-                mRepository.owner().login(), mRepository.name(), mPath, mRef);
+    protected Single<List<Content>> onCreateDataSingle() {
         ArrayList<Content> contents = getArguments().getParcelableArrayList("contents");
-        if (contents != null) {
-            loader.prefillData(contents);
+        if (contents != null && !contents.isEmpty()) {
+            return Single.just(contents);
         }
-        return loader;
+
+        Gh4Application app = Gh4Application.get();
+        RepositoryContentService contentService = app.getGitHubService(RepositoryContentService.class);
+        String repoOwner = mRepository.owner().login();
+        String repoName = mRepository.name();
+        String ref = mRef != null ? mRef : mRepository.defaultBranch();
+
+        return ApiHelpers.PageIterator
+                .toSingle(page -> contentService.getDirectoryContents(repoOwner, repoName, mPath, ref, page))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, null))
+                .compose(RxUtils.sortList(COMPARATOR));
     }
 }

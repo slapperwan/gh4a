@@ -1,12 +1,10 @@
 package com.gh4a.activities;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.Loader;
 import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -21,7 +19,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
@@ -30,15 +27,6 @@ import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListContainerFragment;
 import com.gh4a.fragment.RepositoryEventListFragment;
 import com.gh4a.fragment.RepositoryFragment;
-import com.gh4a.loader.BaseLoader;
-import com.gh4a.loader.BranchListLoader;
-import com.gh4a.loader.IsStarringLoader;
-import com.gh4a.loader.IsWatchingLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.ProgressDialogLoaderCallbacks;
-import com.gh4a.loader.RepositoryLoader;
-import com.gh4a.loader.TagListLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -48,7 +36,11 @@ import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.request.activity.SubscriptionRequest;
 import com.meisolsson.githubsdk.service.activity.StarringService;
 import com.meisolsson.githubsdk.service.activity.WatchingService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryBranchService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
+import com.philosophicalhacker.lib.RxLoader;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,10 +77,9 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                 .putExtra("initial_page", initialPage);
     }
 
-    private static final int LOADER_REPO = 0;
-    private static final int LOADER_BRANCHES_AND_TAGS = 1;
-    private static final int LOADER_WATCHING = 2;
-    private static final int LOADER_STARRING = 3;
+    private static final int ID_LOADER_REPO = 0;
+    private static final int ID_LOADER_WATCHING = 1;
+    private static final int ID_LOADER_STARRING = 2;
 
     public static final int PAGE_REPO_OVERVIEW = 0;
     public static final int PAGE_FILES = 1;
@@ -97,72 +88,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
 
     private static final int[] TITLES = new int[] {
         R.string.about, R.string.repo_files, R.string.commits, R.string.repo_activity
-    };
-
-    private final LoaderCallbacks<Repository> mRepoCallback = new LoaderCallbacks<Repository>(this) {
-        @Override
-        protected Loader<LoaderResult<Repository>> onCreateLoader() {
-            return new RepositoryLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(Repository result) {
-            mRepository = result;
-            updateTitle();
-            invalidateTabs();
-            // Apply initial page selection first time the repo is loaded
-            if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
-                getPager().setCurrentItem(mInitialPage);
-                mInitialPage = -1;
-            }
-            setContentShown(true);
-            supportInvalidateOptionsMenu();
-        }
-    };
-
-    private final LoaderCallbacks<Pair<List<Branch>, List<Branch>>> mBranchesAndTagsCallback =
-            new ProgressDialogLoaderCallbacks<Pair<List<Branch>, List<Branch>>>(this, this) {
-        @Override
-        protected Loader<LoaderResult<Pair<List<Branch>, List<Branch>>>> onCreateLoader() {
-            return new BaseLoader<Pair<List<Branch>, List<Branch>>>(RepositoryActivity.this) {
-                @Override
-                protected Pair<List<Branch>, List<Branch>> doLoadInBackground() throws ApiRequestException {
-                    return Pair.create(new BranchListLoader(getContext(), mRepoOwner, mRepoName).doLoadInBackground(),
-                            new TagListLoader(getContext(), mRepoOwner, mRepoName).doLoadInBackground());
-                }
-            };
-        }
-        @Override
-        protected void onResultReady(Pair<List<Branch>, List<Branch>> result) {
-            mBranches = result.first;
-            mTags = result.second;
-            showRefSelectionDialog();
-            getSupportLoaderManager().destroyLoader(LOADER_BRANCHES_AND_TAGS);
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mWatchCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new IsWatchingLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
-        }
-        @Override
-        protected void onResultReady(Boolean result) {
-            mIsWatching = result;
-            supportInvalidateOptionsMenu();
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mStarCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new IsStarringLoader(RepositoryActivity.this, mRepoOwner, mRepoName);
-        }
-        @Override
-        protected void onResultReady(Boolean result) {
-            mIsStarring = result;
-            supportInvalidateOptionsMenu();
-        }
     };
 
     private String mRepoOwner;
@@ -176,6 +101,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     private List<Branch> mTags;
     private String mSelectedRef;
 
+    private RxLoader mRxLoader;
     private Boolean mIsWatching;
     private Boolean mIsStarring;
 
@@ -194,11 +120,10 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
 
         setContentShown(false);
 
-        getSupportLoaderManager().initLoader(LOADER_REPO, null, mRepoCallback);
-        if (Gh4Application.get().isAuthorized()) {
-            getSupportLoaderManager().initLoader(LOADER_WATCHING, null, mWatchCallback);
-            getSupportLoaderManager().initLoader(LOADER_STARRING, null, mStarCallback);
-        }
+        mRxLoader = new RxLoader(this, getSupportLoaderManager());
+        loadRepository(false);
+        loadStarringState(false);
+        loadWatchingState(false);
     }
 
     @Override
@@ -303,7 +228,9 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         clearRefDependentFragments();
         setContentShown(false);
         invalidateTabs();
-        forceLoaderReload(0, 1, 2, 3);
+        loadRepository(true);
+        loadStarringState(true);
+        loadWatchingState(true);
         super.onRefresh();
     }
 
@@ -390,12 +317,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                 toggleWatchingState();
                 return true;
             case R.id.ref:
-                if (mBranches == null) {
-                    getSupportLoaderManager().initLoader(LOADER_BRANCHES_AND_TAGS,
-                            null, mBranchesAndTagsCallback);
-                } else {
-                    showRefSelectionDialog();
-                }
+                loadOrShowRefSelection();
                 return true;
             case R.id.share:
                 IntentUtils.share(this, mRepoOwner + "/" + mRepoName, url);
@@ -446,12 +368,9 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         new AlertDialog.Builder(this)
                 .setCancelable(true)
                 .setTitle(R.string.repo_select_ref_dialog_title)
-                .setSingleChoiceItems(adapter, current, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        setSelectedRef(adapter.getItem(which).name());
-                        dialog.dismiss();
-                    }
+                .setSingleChoiceItems(adapter, current, (dialog, which) -> {
+                    setSelectedRef(adapter.getItem(which).name());
+                    dialog.dismiss();
                 })
                 .setNegativeButton(R.string.cancel, null)
                 .show();
@@ -562,5 +481,96 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                     }
                     supportInvalidateOptionsMenu();
                 }, error -> supportInvalidateOptionsMenu());
+    }
+
+    private void loadRepository(boolean force) {
+        RepositoryService service = Gh4Application.get().getGitHubService(RepositoryService.class);
+        service.getRepository(mRepoOwner, mRepoName)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils::doInBackground)
+                .compose(this::handleError)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_REPO, force))
+                .subscribe(result -> {
+                    mRepository = result;
+                    updateTitle();
+                    invalidateTabs();
+                    // Apply initial page selection first time the repo is loaded
+                    if (mInitialPage >= PAGE_REPO_OVERVIEW && mInitialPage <= PAGE_ACTIVITY) {
+                        getPager().setCurrentItem(mInitialPage);
+                        mInitialPage = -1;
+                    }
+                    setContentShown(true);
+                    supportInvalidateOptionsMenu();
+                }, error -> {});
+    }
+
+    private void loadStarringState(boolean force) {
+        Gh4Application app = Gh4Application.get();
+        if (!app.isAuthorized()) {
+            return;
+        }
+        StarringService service = app.getGitHubService(StarringService.class);
+        service.checkIfRepositoryIsStarred(mRepoOwner, mRepoName)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils::doInBackground)
+                // success response means 'starred'
+                .map(result -> true)
+                // 404 means 'not starred'
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, false))
+                .compose(this::handleError)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_STARRING, force))
+                .subscribe(result -> {
+                    mIsStarring = result;
+                    supportInvalidateOptionsMenu();
+                }, error -> {});
+    }
+
+    private void loadWatchingState(boolean force) {
+        Gh4Application app = Gh4Application.get();
+        if (!app.isAuthorized()) {
+            return;
+        }
+        WatchingService service = app.getGitHubService(WatchingService.class);
+        service.getRepositorySubscription(mRepoOwner, mRepoName)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils::doInBackground)
+                .compose(this::handleError)
+                .map(subscription -> subscription.subscribed())
+                // 404 means 'not subscribed'
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, false))
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_WATCHING, force))
+                .subscribe(result -> {
+                    mIsWatching = result;
+                    supportInvalidateOptionsMenu();
+                }, error -> {});
+    }
+
+    private void loadOrShowRefSelection() {
+        if (mBranches != null) {
+            showRefSelectionDialog();
+        } else {
+            Gh4Application app = Gh4Application.get();
+            final RepositoryBranchService branchService =
+                    app.getGitHubService(RepositoryBranchService.class);
+            final RepositoryService repoService = app.getGitHubService(RepositoryService.class);
+
+            Single<List<Branch>> branchSingle = ApiHelpers.PageIterator
+                    .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page))
+                    .compose(RxUtils::doInBackground);
+            Single<List<Branch>> tagSingle = ApiHelpers.PageIterator
+                    .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page))
+                    .compose(RxUtils::doInBackground);
+
+            registerTemporarySubscription(Single.zip(branchSingle, tagSingle, (branches, tags) -> Pair.create(branches, tags))
+                    .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                    .subscribe(result -> {
+                        mBranches = result.first;
+                        mTags = result.second;
+                        showRefSelectionDialog();
+                    }, error -> {}));
+        }
     }
 }

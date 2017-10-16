@@ -349,8 +349,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                 RepositoryContentService.class, "application/vnd.github.v3.html", null, null);
 
         service.getReadmeHtml(repoOwner, repoName, mRef)
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, null))
                 .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, null))
                 .map(html -> {
                     if (html != null) {
                         html = HtmlUtils.rewriteRelativeUrls(html, repoOwner, repoName, mRef);

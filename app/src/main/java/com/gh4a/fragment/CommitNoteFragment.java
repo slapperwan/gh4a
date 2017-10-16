@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,8 +16,6 @@ import com.gh4a.R;
 import com.gh4a.activities.EditCommitCommentActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -231,12 +228,18 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
     }
 
     @Override
-    public Loader<LoaderResult<List<GitComment>>> onCreateLoader() {
-        CommitCommentListLoader loader = new CommitCommentListLoader(getActivity(),
-                mRepoOwner, mRepoName, mObjectSha, true, false);
+    protected Single<List<GitComment>> onCreateDataSingle() {
         List<GitComment> comments = getArguments().getParcelableArrayList("comments");
-        loader.prefillData(comments);
-        return loader;
+        if (comments != null && !comments.isEmpty()) {
+            return Single.just(comments);
+        }
+
+        final RepositoryCommentService service =
+                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mObjectSha, page))
+                .compose(RxUtils.filter(comment -> comment.position() < 0));
     }
 
     @Override
