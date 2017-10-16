@@ -266,11 +266,10 @@ public class ApiHelpers {
 
         private static <T> ObservableTransformer<Page<T>, List<T>> chain(PageProducer<T> producer) {
             return upstream -> upstream.concatMap(page -> {
-                if (page.next() == null) {
-                    return Observable.empty();
-                }
-                return Observable.just(page.items())
-                        .concatWith(pageToObservable(producer, page.next()));
+                Observable<List<T>> result = Observable.just(page.items());
+                return page.next() != null
+                        ? result.concatWith(pageToObservable(producer, page.next()))
+                        : result;
             });
         }
     }
