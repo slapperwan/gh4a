@@ -23,7 +23,7 @@ public class IssueCommentListLoader extends BaseLoader<List<TimelineItem>> {
     protected final String mRepoName;
     protected final int mIssueNumber;
 
-    private static final List<IssueEventType> INTERESTING_EVENTS = Arrays.asList(
+    public static final List<IssueEventType> INTERESTING_EVENTS = Arrays.asList(
         IssueEventType.Closed, IssueEventType.Reopened, IssueEventType.Merged,
         IssueEventType.Referenced, IssueEventType.Assigned, IssueEventType.Unassigned,
         IssueEventType.Labeled, IssueEventType.Unlocked, IssueEventType.Locked,

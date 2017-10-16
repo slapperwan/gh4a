@@ -17,7 +17,6 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.R;
@@ -25,10 +24,11 @@ import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.TrendAdapter;
 import com.gh4a.holder.Trend;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.TrendLoader;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class TrendingFragment extends ListDataBaseFragment<Trend> implements
         RootAdapter.OnItemClickListener<Trend> {
@@ -87,7 +87,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> implements
     }
 
     @Override
-    public Loader<LoaderResult<List<Trend>>> onCreateLoader() {
-        return new TrendLoader(getActivity(), mType);
+    protected Single<List<Trend>> onCreateDataSingle() {
+        return TrendLoader.loadTrends(mType);
     }
 }

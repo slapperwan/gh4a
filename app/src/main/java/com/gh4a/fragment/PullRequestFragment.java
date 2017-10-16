@@ -15,12 +15,14 @@
  */
 package com.gh4a.fragment;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.AttrRes;
 import android.support.v4.content.Loader;
+import android.support.v4.util.LongSparseArray;
 import android.support.v7.app.AlertDialog;
+import android.text.TextUtils;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,9 +33,9 @@ import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.loader.CommitStatusLoader;
+import com.gh4a.loader.IssueCommentListLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.PullRequestCommentListLoader;
 import com.gh4a.loader.ReferenceLoader;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
@@ -43,22 +45,32 @@ import com.gh4a.widget.PullRequestBranchInfoView;
 import com.gh4a.widget.CommitStatusBox;
 
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.model.PullRequestMarker;
 import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.model.ReviewState;
 import com.meisolsson.githubsdk.model.Status;
 import com.meisolsson.githubsdk.model.git.GitReference;
 import com.meisolsson.githubsdk.model.request.git.CreateGitReference;
 import com.meisolsson.githubsdk.service.git.GitService;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
+import com.meisolsson.githubsdk.service.issues.IssueEventService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.Response;
 
@@ -211,9 +223,133 @@ public class PullRequestFragment extends IssueFragmentBase {
    }
 
     @Override
-    public Loader<LoaderResult<List<TimelineItem>>> onCreateLoader() {
-        return new PullRequestCommentListLoader(getActivity(),
-                mRepoOwner, mRepoName, mPullRequest.number());
+    protected Single<List<TimelineItem>> onCreateDataSingle() {
+        final Gh4Application app = Gh4Application.get();
+        final int issueNumber = mIssue.number();
+        final IssueEventService eventService = app.getGitHubService(IssueEventService.class);
+        final IssueCommentService commentService = app.getGitHubService(IssueCommentService.class);
+
+        final PullRequestService prService = app.getGitHubService(PullRequestService.class);
+        final PullRequestReviewService reviewService =
+                app.getGitHubService(PullRequestReviewService.class);
+        final PullRequestReviewCommentService prCommentService =
+                app.getGitHubService(PullRequestReviewCommentService.class);
+
+        Single<List<TimelineItem>> issueCommentItemSingle = ApiHelpers.PageIterator
+                .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
+                .compose(RxUtils.mapList(comment -> new TimelineItem.TimelineComment(comment)));
+        Single<List<TimelineItem>> eventItemSingle = ApiHelpers.PageIterator
+                .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
+                .compose(RxUtils.filter(event -> IssueCommentListLoader.INTERESTING_EVENTS.contains(event.event())))
+                .compose((RxUtils.mapList(event -> new TimelineItem.TimelineEvent(event))));
+        Single<Map<String, GitHubFile>> filesByNameSingle = ApiHelpers.PageIterator
+                .toSingle(page -> prService.getPullRequestFiles(mRepoOwner, mRepoName, issueNumber, page))
+                .map(files -> {
+                    HashMap<String, GitHubFile> filesByName = new HashMap<>();
+                    for (GitHubFile file : files) {
+                        filesByName.put(file.filename(), file);
+                    }
+                    return filesByName;
+                });
+        Single<List<Review>> reviewSingle = ApiHelpers.PageIterator
+                .toSingle(page -> reviewService.getReviews(mRepoOwner, mRepoName, issueNumber, page));
+        Single<List<ReviewComment>> prCommentSingle = ApiHelpers.PageIterator
+                .toSingle(page -> prCommentService.getPullRequestComments(
+                        mRepoOwner, mRepoName, issueNumber, page))
+                .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR));
+
+        Single<LongSparseArray<List<ReviewComment>>> reviewCommentsByIdSingle = reviewSingle
+                .compose(RxUtils.filter(r -> r.state() == ReviewState.Pending))
+                .toObservable()
+                .flatMap(reviews -> {
+                    List<Observable<Pair<Long, List<ReviewComment>>>> obsList = new ArrayList<>();
+                    for (Review r : reviews) {
+                        Single<List<ReviewComment>> single = ApiHelpers.PageIterator
+                                .toSingle(page -> reviewService.getReviewComments(mRepoOwner,
+                                        mRepoName, issueNumber, r.id()));
+                        obsList.add(Single.zip(Single.just(r.id()), single, (id, s) -> Pair.create(id, s))
+                                .toObservable());
+                    }
+                    return Observable.concat(obsList);
+                })
+                .toList()
+                .map(list -> {
+                    LongSparseArray<List<ReviewComment>> result = new LongSparseArray<>();
+                    for (Pair<Long, List<ReviewComment>> pair : list) {
+                        result.put(pair.first, pair.second);
+                    }
+                    return result;
+                });
+
+        Single<List<TimelineItem.TimelineReview>> reviewTimelineSingle = Single.zip(
+                reviewSingle, filesByNameSingle, prCommentSingle, reviewCommentsByIdSingle,
+                (prReviews, filesByName, commitComments, pendingCommentsById) -> {
+            LongSparseArray<TimelineItem.TimelineReview> reviewsById = new LongSparseArray<>();
+            List<TimelineItem.TimelineReview> reviews = new ArrayList<>();
+
+            for (Review review : prReviews) {
+                TimelineItem.TimelineReview timelineReview = new TimelineItem.TimelineReview(review);
+                reviewsById.put(review.id(), timelineReview);
+                reviews.add(timelineReview);
+
+                if (review.state() == ReviewState.Pending) {
+                    for (ReviewComment pendingComment : pendingCommentsById.get(review.id())) {
+                        GitHubFile commitFile = filesByName.get(pendingComment.path());
+                        timelineReview.addComment(pendingComment, commitFile, true);
+                    }
+                }
+            }
+
+            Map<String, TimelineItem.TimelineReview> reviewsBySpecialId = new HashMap<>();
+
+            for (ReviewComment commitComment : commitComments) {
+                GitHubFile file = filesByName.get(commitComment.path());
+                if (commitComment.pullRequestReviewId() != 0) {
+                    String id = TimelineItem.Diff.getDiffHunkId(commitComment);
+
+                    TimelineItem.TimelineReview review = reviewsBySpecialId.get(id);
+                    if (review == null) {
+                        review = reviewsById.get(commitComment.pullRequestReviewId());
+                        reviewsBySpecialId.put(id, review);
+                    }
+
+                    review.addComment(commitComment, file, true);
+                }
+            }
+
+            return reviews;
+        })
+        .compose(RxUtils.filter(item -> {
+            return item.review().state() != ReviewState.Commented
+                    || !TextUtils.isEmpty(item.review().body())
+                    || !item.getDiffHunks().isEmpty();
+        }));
+
+        Single<List<TimelineItem.TimelineComment>> commitCommentWithoutReviewSingle = Single.zip(
+                prCommentSingle.compose(RxUtils.filter(comment -> comment.pullRequestReviewId() == 0)),
+                filesByNameSingle,
+                (comments, files) -> {
+                    List<TimelineItem.TimelineComment> items = new ArrayList<>();
+                    for (ReviewComment comment : comments) {
+                        items.add(new TimelineItem.TimelineComment(comment, files.get(comment.path())));
+                    }
+                    return items;
+                });
+
+        return Single.zip(
+                issueCommentItemSingle,
+                eventItemSingle,
+                reviewTimelineSingle,
+                commitCommentWithoutReviewSingle,
+                (comments, events, reviewItems, commentsWithoutReview) -> {
+            ArrayList<TimelineItem> result = new ArrayList<>();
+            result.addAll(comments);
+            result.addAll(events);
+            result.addAll(reviewItems);
+            result.addAll(commentsWithoutReview);
+            Collections.sort(result, IssueCommentListLoader.TIMELINE_ITEM_COMPARATOR);
+            return result;
+        });
     }
 
     @Override

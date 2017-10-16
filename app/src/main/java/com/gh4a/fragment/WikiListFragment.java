@@ -18,6 +18,8 @@ import org.xml.sax.SAXException;
 import java.io.FileNotFoundException;
 import java.util.List;
 
+import io.reactivex.Single;
+
 public class WikiListFragment extends ListDataBaseFragment<Feed> implements
         RootAdapter.OnItemClickListener<Feed> {
     private String mUserLogin;
@@ -45,13 +47,13 @@ public class WikiListFragment extends ListDataBaseFragment<Feed> implements
     }
 
     @Override
-    protected Loader<LoaderResult<List<Feed>>> onCreateLoader() {
+    protected Single<List<Feed>> onCreateDataSingle() {
         String url = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom";
-        return new FeedLoader(getActivity(), url);
+        return FeedLoader.loadFeed(url);
     }
 
     @Override
-    protected boolean onLoaderError(Exception e) {
+    protected boolean onLoaderError(Throwable e) {
         if (e instanceof SAXException || e instanceof FileNotFoundException) {
             mAdapter.clear();
             updateEmptyState();

@@ -1,21 +1,22 @@
 package com.gh4a.fragment;
 
-import java.util.List;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.ContributorAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.ContributorListLoader;
-import com.gh4a.loader.LoaderResult;
+import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
-public class ContributorListFragment extends ListDataBaseFragment<User> implements
+import io.reactivex.Single;
+import retrofit2.Response;
+
+public class ContributorListFragment extends PagedDataBaseFragment<User> implements
         RootAdapter.OnItemClickListener<User> {
     public static ContributorListFragment newInstance(String repoOwner, String repoName) {
         ContributorListFragment f = new ContributorListFragment();
@@ -29,10 +30,11 @@ public class ContributorListFragment extends ListDataBaseFragment<User> implemen
     }
 
     @Override
-    public Loader<LoaderResult<List<User>>> onCreateLoader() {
+    protected Single<Response<Page<User>>> loadPage(int page) {
         String repoOwner = getArguments().getString("owner");
         String repoName = getArguments().getString("repo");
-        return new ContributorListLoader(getActivity(), repoOwner, repoName);
+        RepositoryService service = Gh4Application.get().getGitHubService(RepositoryService.class);
+        return service.getContributors(repoOwner, repoName, page);
     }
 
     @Override

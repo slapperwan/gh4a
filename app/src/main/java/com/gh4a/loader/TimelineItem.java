@@ -36,7 +36,7 @@ public abstract class TimelineItem {
         @Nullable
         public final GitHubFile file;
 
-        Diff diff;
+        private Diff diff;
 
         public TimelineComment(@NonNull GitHubComment comment) {
             this.comment = comment;
@@ -202,7 +202,9 @@ public abstract class TimelineItem {
                     // if something comes out of order then our initial comment was a reply.
                     diffHunk.setIsReply(true);
                 } else {
-                    diffHunk.comments.add(new TimelineComment(comment, file));
+                    TimelineComment timelineComment = new TimelineComment(comment, file);
+                    timelineComment.diff = diffHunk;
+                    diffHunk.comments.add(timelineComment);
                 }
             }
         }
@@ -226,6 +228,7 @@ public abstract class TimelineItem {
         }
 
         public Diff(TimelineComment timelineComment) {
+            timelineComment.diff = this;
             comments.add(timelineComment);
         }
 

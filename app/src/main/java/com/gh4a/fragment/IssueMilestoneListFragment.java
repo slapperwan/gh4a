@@ -18,19 +18,22 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueMilestoneEditActivity;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.MilestoneListLoader;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.Milestone;
+import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> implements
         RootAdapter.OnItemClickListener<Milestone> {
@@ -87,9 +90,13 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     }
 
     @Override
-    public Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
-        return new MilestoneListLoader(getActivity(), mRepoOwner, mRepoName,
-                mShowClosed ? IssueState.Closed : IssueState.Open);
+    protected Single<List<Milestone>> onCreateDataSingle() {
+        final IssueMilestoneService service =
+                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        String targetState = mShowClosed ? "closed" : "open";
+
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, targetState, page));
     }
 
     @Override
