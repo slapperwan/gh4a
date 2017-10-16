@@ -27,7 +27,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
 import android.support.v4.util.ObjectsCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AlertDialog;
@@ -41,31 +40,33 @@ import android.widget.TextView;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.loader.CollaboratorListLoader;
-import com.gh4a.loader.IsCollaboratorLoader;
-import com.gh4a.loader.IssueTemplateLoader;
-import com.gh4a.loader.LabelListLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.MilestoneListLoader;
-import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.RxUtils;
+import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.MarkdownButtonsBar;
 import com.gh4a.widget.MarkdownPreviewWebView;
+import com.meisolsson.githubsdk.model.Content;
+import com.meisolsson.githubsdk.model.ContentType;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.request.issue.IssueRequest;
+import com.meisolsson.githubsdk.service.issues.IssueLabelService;
+import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 import com.meisolsson.githubsdk.service.issues.IssueService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
+import com.philosophicalhacker.lib.RxLoader;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import retrofit2.Response;
 
@@ -90,6 +91,8 @@ public class IssueEditActivity extends BasePagerActivity implements
     private static final int REQUEST_MANAGE_LABELS = 1000;
     private static final int REQUEST_MANAGE_MILESTONES = 1001;
 
+    private static final int ID_LOADER_COLLABORATOR_STATUS = 0;
+
     private static final int[] TITLES = {
         R.string.issue_body, R.string.preview, R.string.settings
     };
@@ -104,6 +107,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     private Issue mEditIssue;
     private Issue mOriginalIssue;
 
+    private RxLoader mRxLoader;
     private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
     private EditText mDescView;
@@ -117,84 +121,6 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     private static final String STATE_KEY_ISSUE = "issue";
     private static final String STATE_KEY_ORIGINAL_ISSUE = "original_issue";
-
-    private final LoaderCallbacks<List<Label>> mLabelCallback =
-            new ProgressDialogLoaderCallbacks<List<Label>>(this, this) {
-        @Override
-        protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
-            return new LabelListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(List<Label> result) {
-            mAllLabels = result;
-            showLabelDialog();
-            getSupportLoaderManager().destroyLoader(0);
-        }
-    };
-
-    private final LoaderCallbacks<List<Milestone>> mMilestoneCallback =
-            new ProgressDialogLoaderCallbacks<List<Milestone>>(this, this) {
-        @Override
-        protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
-            return new MilestoneListLoader(IssueEditActivity.this,
-                    mRepoOwner, mRepoName, IssueState.Open);
-        }
-
-        @Override
-        protected void onResultReady(List<Milestone> result) {
-            mAllMilestone = result;
-            showMilestonesDialog();
-            getSupportLoaderManager().destroyLoader(1);
-        }
-    };
-
-    private final LoaderCallbacks<List<User>> mCollaboratorListCallback =
-            new ProgressDialogLoaderCallbacks<List<User>>(this, this) {
-        @Override
-        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
-            return new CollaboratorListLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(List<User> result) {
-            mAllAssignee = result;
-            User creator = mEditIssue.user();
-            if (creator != null && !mAllAssignee.contains(creator)) {
-                mAllAssignee.add(creator);
-            }
-            showAssigneesDialog();
-            getSupportLoaderManager().destroyLoader(2);
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new IsCollaboratorLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(Boolean result) {
-            mIsCollaborator = result;
-            invalidatePages();
-        }
-    };
-
-    private final LoaderCallbacks<String> mIssueTemplateCallback = new LoaderCallbacks<String>(this) {
-        @Override
-        protected Loader<LoaderResult<String>> onCreateLoader() {
-            return new IssueTemplateLoader(IssueEditActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(String result) {
-            getSupportLoaderManager().destroyLoader(4);
-            mDescView.setHint(null);
-            mDescView.setEnabled(true);
-            mDescView.setText(result);
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -245,13 +171,14 @@ public class IssueEditActivity extends BasePagerActivity implements
         mFab.setOnClickListener(this);
         rootLayout.addView(mFab);
 
-        getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
+        mRxLoader = new RxLoader(this, getSupportLoaderManager());
+        loadCollaboratorStatus(false);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_ISSUE)) {
             mEditIssue = savedInstanceState.getParcelable(STATE_KEY_ISSUE);
             mOriginalIssue = savedInstanceState.getParcelable(STATE_KEY_ORIGINAL_ISSUE);
         } else if (!isInEditMode()) {
-            getSupportLoaderManager().initLoader(4, null, mIssueTemplateCallback);
+            loadIssueTemplate();
             mDescView.setEnabled(false);
             mDescView.setHint(getString(R.string.issue_loading_template_hint));
         }
@@ -339,7 +266,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         mAllMilestone = null;
         mAllLabels = null;
         mIsCollaborator = false;
-        forceLoaderReload(0, 1, 2, 3);
+        loadCollaboratorStatus(true);
         super.onRefresh();
     }
 
@@ -422,7 +349,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     private void showMilestonesDialog() {
         if (mAllMilestone == null) {
-            getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
+            loadMilestones();
         } else {
             final String[] milestones = new String[mAllMilestone.size() + 1];
             Milestone selectedMilestone = mEditIssue.milestone();
@@ -469,7 +396,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     private void showAssigneesDialog() {
         if (mAllAssignee == null) {
-            getSupportLoaderManager().initLoader(2, null, mCollaboratorListCallback);
+            loadPotentialAssignees();
         } else {
             final String[] assigneeNames = new String[mAllAssignee.size()];
             final boolean[] selection = new boolean[mAllAssignee.size()];
@@ -523,7 +450,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     private void showLabelDialog() {
         if (mAllLabels == null) {
-            getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+            loadLabels();
         } else {
             LayoutInflater inflater = getLayoutInflater();
             final List<Label> selectedLabels = mEditIssue.labels() != null
@@ -716,5 +643,112 @@ public class IssueEditActivity extends BasePagerActivity implements
         public int getCount() {
             return mIsCollaborator ? TITLES.length : TITLES.length - 1;
         }
+    }
+
+    private void loadCollaboratorStatus(boolean force) {
+        Gh4Application app = Gh4Application.get();
+        String login = app.getAuthLogin();
+        final Observable<Boolean> observable;
+
+        if (login == null) {
+            observable = Observable.just(false);
+        } else {
+            RepositoryCollaboratorService service =
+                    app.getGitHubService(RepositoryCollaboratorService.class);
+            // TODO: consider moving to a shared place - shared with IssueListActivity
+            observable = service.isUserCollaborator(mRepoOwner, mRepoName, login)
+                    .map(ApiHelpers::throwOnFailure)
+                    .compose(RxUtils::doInBackground)
+                    // the API returns 403 if the user doesn't have push access,
+                    // which in turn means he isn't a collaborator
+                    .compose(RxUtils.mapFailureToValue(403, false))
+                    .compose(this::handleError)
+                    // there's no actual content, result is always null
+                    .map(result -> true)
+                    .toObservable()
+                    .compose(mRxLoader.makeObservableTransformer(ID_LOADER_COLLABORATOR_STATUS, force));
+        }
+
+        observable.subscribe(result -> {
+            mIsCollaborator = result;
+            invalidatePages();
+        }, error -> {});
+    }
+
+    private void loadLabels() {
+        final IssueLabelService service =
+                Gh4Application.get().getGitHubService(IssueLabelService.class);
+        registerTemporarySubscription(ApiHelpers.PageIterator
+                .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
+                .compose(RxUtils::doInBackground)
+                .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                .subscribe(result -> {
+                    mAllLabels = result;
+                    showLabelDialog();
+                }, error -> {}));
+    }
+
+    private void loadMilestones() {
+        final IssueMilestoneService service =
+                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        registerTemporarySubscription(ApiHelpers.PageIterator
+                .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
+                .compose(RxUtils::doInBackground)
+                .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                .subscribe(result -> {
+                    mAllMilestone = result;
+                    showMilestonesDialog();
+                }, error -> {}));
+    }
+
+    private void loadPotentialAssignees() {
+        final RepositoryCollaboratorService service =
+                Gh4Application.get().getGitHubService(RepositoryCollaboratorService.class);
+        registerTemporarySubscription(ApiHelpers.PageIterator
+                .toSingle(page -> service.getCollaborators(mRepoOwner, mRepoName, page))
+                .compose(RxUtils::doInBackground)
+                .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                .subscribe(result -> {
+                    mAllAssignee = result;
+                    User creator = mEditIssue.user();
+                    if (creator != null && !mAllAssignee.contains(creator)) {
+                        mAllAssignee.add(creator);
+                    }
+                    showAssigneesDialog();
+                }, error -> {}));
+    }
+
+    private void loadIssueTemplate() {
+        RepositoryContentService service =
+                Gh4Application.get().getGitHubService(RepositoryContentService.class);
+
+        registerTemporarySubscription(getIssueTemplateContentSingle("")
+                .flatMap(c -> c != null ? Single.just(c) : getIssueTemplateContentSingle("/.github"))
+                .flatMap(c -> {
+                    if (c == null) {
+                        return Single.just(null);
+                    }
+                    return service.getContents(mRepoOwner, mRepoName, c.path(), null)
+                            .map(ApiHelpers::throwOnFailure)
+                            .compose(RxUtils::doInBackground);
+                })
+                .map(c -> c != null ? StringUtils.fromBase64(c.content()) : null)
+                .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                .subscribe(result -> {
+                    mDescView.setHint(null);
+                    mDescView.setEnabled(true);
+                    mDescView.setText(result);
+                }, error -> {}));
+    }
+
+    private Single<Content> getIssueTemplateContentSingle(String path) {
+        RepositoryContentService service =
+                Gh4Application.get().getGitHubService(RepositoryContentService.class);
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page))
+                .compose(RxUtils::doInBackground)
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, null))
+                .compose(RxUtils.filter(c -> c.type() == ContentType.File && c.name().startsWith("ISSUE_TEMPLATE")))
+                .map(results -> results != null && !results.isEmpty() ? results.get(0) : null);
     }
 }
