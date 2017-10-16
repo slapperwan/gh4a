@@ -8,11 +8,15 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 
+import com.gh4a.ApiRequestException;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.SearchPage;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,6 +24,7 @@ import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
@@ -35,6 +40,39 @@ public class RxUtils {
                 }
             }
             return list;
+        });
+    }
+
+    public static <T, R> SingleTransformer<List<T>, List<R>> mapList(Function<T, R> transformer) {
+        return upstream -> upstream.map(list -> {
+            if (list == null) {
+                return null;
+            }
+            List<R> result = new ArrayList<>();
+            for (T item : list) {
+                result.add(transformer.apply(item));
+            }
+            return result;
+        });
+    }
+
+    public static <T> SingleTransformer<List<T>, List<T>> sortList(Comparator<? super T> comparator) {
+        return upstream ->  upstream.map(list -> {
+            if (list != null) {
+                Collections.sort(list, comparator);
+            }
+            return list;
+        });
+    }
+
+    public static <T> SingleTransformer<T, T> mapFailureToValue(int code, T value) {
+        return upstream -> upstream.onErrorResumeNext(error -> {
+            if (error instanceof ApiRequestException) {
+                if (((ApiRequestException) error).getStatus() == code) {
+                    return Single.just(value);
+                }
+            }
+            return Single.error(error);
         });
     }
 
