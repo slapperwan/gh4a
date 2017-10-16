@@ -26,7 +26,6 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -40,25 +39,24 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
-import com.gh4a.loader.AssigneeListLoader;
-import com.gh4a.loader.IsCollaboratorLoader;
-import com.gh4a.loader.LabelListLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.MilestoneListLoader;
-import com.gh4a.loader.ProgressDialogLoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.issues.IssueAssigneeService;
+import com.meisolsson.githubsdk.service.issues.IssueLabelService;
+import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
+import com.philosophicalhacker.lib.RxLoader;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
+
+import io.reactivex.Observable;
 
 public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
@@ -79,6 +77,8 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private static final int REQUEST_ISSUE_CREATE = 1001;
     private static final int REQUEST_ISSUE_AFTER_CREATE = 1002;
 
+    private static final int ID_LOADER_COLLABORATOR_STATUS = 0;
+
     private String mRepoOwner;
     private String mRepoName;
     private String mUserLogin;
@@ -98,6 +98,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
+    private RxLoader mRxLoader;
 
     private final IssueListFragment.SortDrawerHelper mSortHelper =
             new IssueListFragment.SortDrawerHelper();
@@ -127,69 +128,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         { R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark }
     };
 
-    private final LoaderCallbacks<List<Label>> mLabelCallback =
-            new ProgressDialogLoaderCallbacks<List<Label>>(this, this) {
-        @Override
-        protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
-            return new LabelListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(List<Label> result) {
-            mLabels = result;
-            showLabelsDialog();
-            getSupportLoaderManager().destroyLoader(0);
-        }
-    };
-
-    private final LoaderCallbacks<List<Milestone>> mMilestoneCallback =
-            new ProgressDialogLoaderCallbacks<List<Milestone>>(this, this) {
-        @Override
-        protected Loader<LoaderResult<List<Milestone>>> onCreateLoader() {
-            return new MilestoneListLoader(IssueListActivity.this, mRepoOwner, mRepoName,
-                    IssueState.Open);
-        }
-
-        @Override
-        protected void onResultReady(List<Milestone> result) {
-            mMilestones = result;
-            showMilestonesDialog();
-            getSupportLoaderManager().destroyLoader(1);
-        }
-    };
-
-    private final LoaderCallbacks<List<User>> mAssigneeListCallback =
-            new ProgressDialogLoaderCallbacks<List<User>>(this, this) {
-        @Override
-        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
-            return new AssigneeListLoader(IssueListActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(List<User> result) {
-            mAssignees = result;
-            showAssigneesDialog();
-            getSupportLoaderManager().destroyLoader(2);
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mIsCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new IsCollaboratorLoader(IssueListActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(Boolean result) {
-            if (mIsCollaborator == null) {
-                mIsCollaborator = result;
-                if (mIsCollaborator) {
-                    updateRightNavigationDrawer();
-                }
-            }
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -200,10 +138,10 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
             mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
             mSearchIsExpanded = savedInstanceState.getBoolean(STATE_KEY_SEARCH_IS_EXPANDED);
-            mSelectedMilestone = savedInstanceState.getString(STATE_KEY_SELECTED_MILESTONE);
             mSelectedLabel = savedInstanceState.getString(STATE_KEY_SELECTED_LABEL);
             mSelectedAssignee = savedInstanceState.getString(STATE_KEY_SELECTED_ASSIGNEE);
-            mSelectedParticipatingStatus = savedInstanceState.getInt(STATE_KEY_PARTICIPATING_STATUS);
+            mSelectedParticipatingStatus =
+                    savedInstanceState.getInt(STATE_KEY_PARTICIPATING_STATUS);
         }
 
         if (!mIsPullRequest && Gh4Application.get().isAuthorized()) {
@@ -214,7 +152,8 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             rootLayout.addView(mCreateFab);
         }
 
-        getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
+        mRxLoader = new RxLoader(this, getSupportLoaderManager());
+        loadCollaboratorStatus(false);
     }
 
     @Nullable
@@ -244,7 +183,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         mLabels = null;
         mIsCollaborator = null;
         updateRightNavigationDrawer();
-        forceLoaderReload(0, 1, 2, 3);
+        loadCollaboratorStatus(true);
         super.onRefresh();
     }
 
@@ -600,15 +539,10 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             }
         }
 
-        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSelectedLabel = which == 0 ? null
-                        : which == 1 ? ""
-                        : labels[which];
-                dialog.dismiss();
-                onFilterUpdated();
-            }
+        DialogInterface.OnClickListener selectCb = (dialog, which) -> {
+            mSelectedLabel = which == 0 ? null : which == 1 ? "" : labels[which];
+            dialog.dismiss();
+            onFilterUpdated();
         };
 
         new AlertDialog.Builder(this)
@@ -633,15 +567,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             }
         }
 
-        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSelectedMilestone = which == 0 ? null
-                        : which == 1 ? ""
-                        : milestones[which];
-                dialog.dismiss();
-                onFilterUpdated();
-            }
+        DialogInterface.OnClickListener selectCb = (dialog, which) -> {
+            mSelectedMilestone =
+                    which == 0 ? null : which == 1 ? "" : milestones[which];
+            dialog.dismiss();
+            onFilterUpdated();
         };
 
         new AlertDialog.Builder(this)
@@ -673,15 +603,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             }
         }
 
-        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSelectedAssignee = which == 0 ? null
-                        : which == 1 ? ""
-                        : mAssignees.get(which - 2).login();
-                dialog.dismiss();
-                onFilterUpdated();
-            }
+        DialogInterface.OnClickListener selectCb = (dialog, which) -> {
+            mSelectedAssignee =
+                    which == 0 ? null : which == 1 ? "" : mAssignees.get(which - 2).login();
+            dialog.dismiss();
+            onFilterUpdated();
         };
 
         new AlertDialog.Builder(this)
@@ -693,37 +619,61 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void filterAssignee() {
-        if (mAssignees == null) {
-            getSupportLoaderManager().initLoader(2, null, mAssigneeListCallback);
-        } else {
+        if (mAssignees != null) {
             showAssigneesDialog();
+        } else {
+            final IssueAssigneeService service =
+                    Gh4Application.get().getGitHubService(IssueAssigneeService.class);
+            registerTemporarySubscription(ApiHelpers.PageIterator
+                    .toSingle(page -> service.getAssignees(mRepoOwner, mRepoName, page))
+                    .compose(RxUtils::doInBackground)
+                    .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                    .subscribe(assignees -> {
+                        mAssignees = assignees;
+                        showAssigneesDialog();
+                    }, error -> {}));
         }
     }
 
     private void filterMilestone() {
-        if (mMilestones == null) {
-            getSupportLoaderManager().initLoader(1, null, mMilestoneCallback);
-        } else {
+        if (mMilestones != null) {
             showMilestonesDialog();
+        } else {
+            final IssueMilestoneService service =
+                    Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+            registerTemporarySubscription(ApiHelpers.PageIterator
+                    .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
+                    .compose(RxUtils::doInBackground)
+                    .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                    .subscribe(milestones -> {
+                        mMilestones = milestones;
+                        showMilestonesDialog();
+                    }, error -> {}));
         }
     }
 
     private void filterLabel() {
-        if (mLabels == null) {
-            getSupportLoaderManager().initLoader(0, null, mLabelCallback);
-        } else {
+        if (mLabels != null) {
             showLabelsDialog();
+        } else {
+            final IssueLabelService service =
+                    Gh4Application.get().getGitHubService(IssueLabelService.class);
+            registerTemporarySubscription(ApiHelpers.PageIterator
+                    .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
+                    .compose(RxUtils::doInBackground)
+                    .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                    .subscribe(labels -> {
+                        mLabels = labels;
+                        showLabelsDialog();
+                    }, error -> {}));
         }
     }
 
     private void filterParticipating() {
-        DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mSelectedParticipatingStatus = which;
-                dialog.dismiss();
-                onFilterUpdated();
-            }
+        DialogInterface.OnClickListener selectCb = (dialog, which) -> {
+            mSelectedParticipatingStatus = which;
+            dialog.dismiss();
+            onFilterUpdated();
         };
 
         new AlertDialog.Builder(this)
@@ -733,5 +683,39 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                         selectCb)
                 .setNegativeButton(R.string.cancel, null)
                 .show();
+    }
+
+    private void loadCollaboratorStatus(boolean force) {
+        Gh4Application app = Gh4Application.get();
+        String login = app.getAuthLogin();
+        final Observable<Boolean> observable;
+
+        if (login == null) {
+            observable = Observable.just(false);
+        } else {
+            RepositoryCollaboratorService service =
+                    app.getGitHubService(RepositoryCollaboratorService.class);
+            // TODO: consider moving to a shared place
+            observable = service.isUserCollaborator(mRepoOwner, mRepoName, login)
+                    .map(ApiHelpers::throwOnFailure)
+                    .compose(RxUtils::doInBackground)
+                    // the API returns 403 if the user doesn't have push access,
+                    // which in turn means he isn't a collaborator
+                    .compose(RxUtils.mapFailureToValue(403, false))
+                    .compose(this::handleError)
+                    // there's no actual content, result is always null
+                    .map(result -> true)
+                    .toObservable()
+                    .compose(mRxLoader.makeObservableTransformer(ID_LOADER_COLLABORATOR_STATUS, force));
+        }
+
+        observable.subscribe(result -> {
+            if (mIsCollaborator == null) {
+                mIsCollaborator = result;
+                if (mIsCollaborator) {
+                    updateRightNavigationDrawer();
+                }
+            }
+        }, error -> {});
     }
 }
