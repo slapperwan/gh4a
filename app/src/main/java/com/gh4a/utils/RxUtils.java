@@ -33,6 +33,9 @@ import retrofit2.Response;
 public class RxUtils {
     public static <T> SingleTransformer<List<T>, List<T>> filter(Predicate<T> predicate) {
         return upstream -> upstream.map(list -> {
+            if (list == null) {
+                return null;
+            }
             Iterator<T> iter = list.iterator();
             while (iter.hasNext()) {
                 if (!predicate.test(iter.next())) {
