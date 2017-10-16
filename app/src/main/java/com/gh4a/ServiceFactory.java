@@ -20,7 +20,7 @@ public class ServiceFactory {
             "application/vnd.github.squirrel-girl-preview,application/vnd.github.v3.full+json";
 
     private final static HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor()
-            .setLevel(HttpLoggingInterceptor.Level.BODY);
+            .setLevel(HttpLoggingInterceptor.Level.BASIC);
 
     private final static Retrofit.Builder builder = new Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
