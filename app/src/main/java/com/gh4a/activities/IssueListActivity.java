@@ -51,7 +51,6 @@ import com.meisolsson.githubsdk.service.issues.IssueAssigneeService;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
 import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
-import com.philosophicalhacker.lib.RxLoader;
 
 import java.util.List;
 import java.util.Locale;
@@ -98,7 +97,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private List<Label> mLabels;
     private List<Milestone> mMilestones;
     private List<User> mAssignees;
-    private RxLoader mRxLoader;
 
     private final IssueListFragment.SortDrawerHelper mSortHelper =
             new IssueListFragment.SortDrawerHelper();
@@ -152,7 +150,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             rootLayout.addView(mCreateFab);
         }
 
-        mRxLoader = new RxLoader(this, getSupportLoaderManager());
         loadCollaboratorStatus(false);
     }
 
@@ -698,15 +695,13 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             // TODO: consider moving to a shared place - shared with IssueEditActivity
             observable = service.isUserCollaborator(mRepoOwner, mRepoName, login)
                     .map(ApiHelpers::throwOnFailure)
-                    .compose(RxUtils::doInBackground)
                     // the API returns 403 if the user doesn't have push access,
                     // which in turn means he isn't a collaborator
                     .compose(RxUtils.mapFailureToValue(403, false))
-                    .compose(this::handleError)
                     // there's no actual content, result is always null
                     .map(result -> true)
                     .toObservable()
-                    .compose(mRxLoader.makeObservableTransformer(ID_LOADER_COLLABORATOR_STATUS, force));
+                    .compose(makeLoaderObservable(ID_LOADER_COLLABORATOR_STATUS, force));
         }
 
         observable.subscribe(result -> {

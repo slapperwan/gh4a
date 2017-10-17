@@ -40,7 +40,6 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
-import com.philosophicalhacker.lib.RxLoader;
 
 public class IssueLabelListActivity extends BaseActivity implements
         RootAdapter.OnItemClickListener<IssueLabelAdapter.EditableLabel>, View.OnClickListener {
@@ -60,7 +59,6 @@ public class IssueLabelListActivity extends BaseActivity implements
     private EditActionMode mActionMode;
     private IssueLabelAdapter.EditableLabel mAddedLabel;
 
-    private RxLoader mRxLoader;
     private FloatingActionButton mFab;
     private IssueLabelAdapter mAdapter;
 
@@ -73,8 +71,6 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         setContentView(R.layout.generic_list);
         setContentShown(false);
-
-        mRxLoader = new RxLoader(this, getSupportLoaderManager());
 
         mAdapter = new IssueLabelAdapter(this);
         mAdapter.setOnItemClickListener(this);
@@ -318,10 +314,8 @@ public class IssueLabelListActivity extends BaseActivity implements
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                 .compose(RxUtils.mapList(label -> new IssueLabelAdapter.EditableLabel(label)))
-                .compose(RxUtils::doInBackground)
-                .compose(this::handleError)
                 .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_LABELS, force))
+                .compose(makeLoaderObservable(ID_LOADER_LABELS, force))
                 .subscribe(result -> {
                     UiUtils.hideImeForView(getCurrentFocus());
                     mAdapter.clear();

@@ -1,6 +1,7 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -12,10 +13,17 @@ import android.view.animation.AnimationUtils;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.philosophicalhacker.lib.RxLoader;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+import io.reactivex.Observable;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public abstract class LoadingFragmentBase extends Fragment implements
         LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
@@ -24,6 +32,7 @@ public abstract class LoadingFragmentBase extends Fragment implements
     private SmoothProgressBar mProgress;
     private final int[] mProgressColors = new int[2];
     private boolean mContentShown = true;
+    private RxLoader mRxLoader;
 
     public LoadingFragmentBase() {
     }
@@ -31,6 +40,12 @@ public abstract class LoadingFragmentBase extends Fragment implements
     @Override
     public BaseActivity getBaseActivity() {
         return (BaseActivity) getActivity();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mRxLoader = new RxLoader(getActivity(), getLoaderManager());
     }
 
     @Override
@@ -67,6 +82,14 @@ public abstract class LoadingFragmentBase extends Fragment implements
     @Override
     public boolean canChildScrollUp() {
         return UiUtils.canViewScrollUp(mContentView);
+    }
+
+    protected <T> ObservableTransformer<T, T> makeLoaderObservable(int id, boolean force) {
+        return upstream -> upstream
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError(error -> getBaseActivity().handleLoadFailure(error))
+                .compose(mRxLoader.makeObservableTransformer(id, force));
     }
 
     protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {

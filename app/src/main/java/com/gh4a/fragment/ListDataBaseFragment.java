@@ -6,20 +6,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.utils.RxUtils;
-import com.philosophicalhacker.lib.RxLoader;
 
 import io.reactivex.Single;
 
 public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
-    private RxLoader mRxLoader;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mRxLoader = new RxLoader(getActivity(), getLoaderManager());
         setContentShown(false);
         loadData(false);
     }
@@ -58,11 +54,9 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
 
     private void loadData(boolean force) {
         onCreateDataSingle()
-                .compose(RxUtils::doInBackground)
                 .doOnError(error -> onLoaderError(error)) // FIXME consume error if result is true
-                .compose(getBaseActivity()::handleError)
                 .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(0, force))
+                .compose(makeLoaderObservable(0, force))
                 .subscribe(result -> {
                     mAdapter.clear();
                     onAddData(mAdapter, result);

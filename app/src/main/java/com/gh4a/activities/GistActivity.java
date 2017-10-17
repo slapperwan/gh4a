@@ -38,7 +38,6 @@ import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Gist;
 import com.meisolsson.githubsdk.model.GistFile;
 import com.meisolsson.githubsdk.service.gists.GistService;
-import com.philosophicalhacker.lib.RxLoader;
 
 import java.util.Map;
 
@@ -57,7 +56,6 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     private String mGistId;
     private Gist mGist;
     private Boolean mIsStarred;
-    private RxLoader mRxLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,8 +63,6 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
 
         setContentView(R.layout.gist);
         setContentShown(false);
-
-        mRxLoader = new RxLoader(this, getSupportLoaderManager());
 
         loadGist(false);
         loadStarredState(false);
@@ -213,10 +209,8 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         GistService service = Gh4Application.get().getGitHubService(GistService.class);
         service.getGist(mGistId)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils::doInBackground)
-                .compose(this::handleError)
                 .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_GIST, force))
+                .compose(makeLoaderObservable(ID_LOADER_GIST, force))
                 .subscribe(result -> {
                     fillData(result);
                     setContentShown(true);
@@ -228,10 +222,8 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         GistService service = Gh4Application.get().getGitHubService(GistService.class);
         service.checkIfGistIsStarred(mGistId)
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
-                .compose(RxUtils::doInBackground)
-                .compose(this::handleError)
                 .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_STARRED, force))
+                .compose(makeLoaderObservable(ID_LOADER_STARRED, force))
                 .subscribe(result -> {
                     mIsStarred = result;
                     supportInvalidateOptionsMenu();
