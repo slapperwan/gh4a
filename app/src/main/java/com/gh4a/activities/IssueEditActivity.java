@@ -60,7 +60,6 @@ import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 import com.meisolsson.githubsdk.service.issues.IssueService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
-import com.philosophicalhacker.lib.RxLoader;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -107,7 +106,6 @@ public class IssueEditActivity extends BasePagerActivity implements
     private Issue mEditIssue;
     private Issue mOriginalIssue;
 
-    private RxLoader mRxLoader;
     private TextInputLayout mTitleWrapper;
     private EditText mTitleView;
     private EditText mDescView;
@@ -171,7 +169,6 @@ public class IssueEditActivity extends BasePagerActivity implements
         mFab.setOnClickListener(this);
         rootLayout.addView(mFab);
 
-        mRxLoader = new RxLoader(this, getSupportLoaderManager());
         loadCollaboratorStatus(false);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_ISSUE)) {
@@ -658,15 +655,13 @@ public class IssueEditActivity extends BasePagerActivity implements
             // TODO: consider moving to a shared place - shared with IssueListActivity
             observable = service.isUserCollaborator(mRepoOwner, mRepoName, login)
                     .map(ApiHelpers::throwOnFailure)
-                    .compose(RxUtils::doInBackground)
                     // the API returns 403 if the user doesn't have push access,
                     // which in turn means he isn't a collaborator
                     .compose(RxUtils.mapFailureToValue(403, false))
-                    .compose(this::handleError)
                     // there's no actual content, result is always null
                     .map(result -> true)
                     .toObservable()
-                    .compose(mRxLoader.makeObservableTransformer(ID_LOADER_COLLABORATOR_STATUS, force));
+                    .compose(makeLoaderObservable(ID_LOADER_COLLABORATOR_STATUS, force));
         }
 
         observable.subscribe(result -> {

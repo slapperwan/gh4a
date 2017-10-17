@@ -59,7 +59,6 @@ import com.meisolsson.githubsdk.service.issues.IssueEventService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
-import com.philosophicalhacker.lib.RxLoader;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,7 +74,6 @@ public class PullRequestFragment extends IssueFragmentBase {
     private static final int ID_LOADER_STATUS = 1;
     private static final int ID_LOADER_HEAD_REF = 2;
 
-    private RxLoader mRxLoader;
     private PullRequest mPullRequest;
     private GitReference mHeadReference;
     private boolean mHasLoadedHeadReference;
@@ -110,7 +108,6 @@ public class PullRequestFragment extends IssueFragmentBase {
         mPullRequest = getArguments().getParcelable("pr");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mRxLoader = new RxLoader(getActivity(), getLoaderManager());
     }
 
     @Override
@@ -418,10 +415,8 @@ public class PullRequestFragment extends IssueFragmentBase {
         }
 
         CommitStatusLoader.load(mRepoOwner, mRepoName, mPullRequest.head().sha())
-                .compose(RxUtils::doInBackground)
-                .compose(getBaseActivity()::handleError)
                 .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_STATUS, force))
+                .compose(makeLoaderObservable(ID_LOADER_STATUS, force))
                 .subscribe(statuses -> fillStatus(statuses), error -> {});
     }
 
@@ -435,10 +430,8 @@ public class PullRequestFragment extends IssueFragmentBase {
                 : service.getGitReference(repo.owner().login(), repo.name(), head.ref())
                         .map(ApiHelpers::throwOnFailure);
 
-        refSingle.compose(RxUtils::doInBackground)
-                .compose(getBaseActivity()::handleError)
-                .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_HEAD_REF, force))
+        refSingle.toObservable()
+                .compose(makeLoaderObservable(ID_LOADER_HEAD_REF, force))
                 .subscribe(ref -> {
                     mHeadReference = ref;
                     mHasLoadedHeadReference = true;

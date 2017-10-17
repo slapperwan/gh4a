@@ -49,7 +49,6 @@ import com.meisolsson.githubsdk.model.Permissions;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 import com.meisolsson.githubsdk.service.search.SearchService;
-import com.philosophicalhacker.lib.RxLoader;
 import com.vdurmont.emoji.EmojiParser;
 
 import java.net.HttpURLConnection;
@@ -75,7 +74,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     private static final String STATE_KEY_IS_README_EXPANDED = "is_readme_expanded";
     private static final String STATE_KEY_IS_README_LOADED = "is_readme_loaded";
 
-    private RxLoader mRxLoader;
     private Repository mRepository;
     private View mContentView;
     private String mRef;
@@ -91,7 +89,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         super.onCreate(savedInstanceState);
         mRepository = getArguments().getParcelable("repo");
         mRef = getArguments().getString("ref");
-        mRxLoader = new RxLoader(getActivity(), getLoaderManager());
     }
 
     @Override
@@ -359,9 +356,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                     return html;
                 })
                 .doOnSubscribe(disposable -> mIsReadmeLoaded = false)
-                .compose(RxUtils::doInBackground)
                 .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_README, force))
+                .compose(makeLoaderObservable(ID_LOADER_README, force))
                 .subscribe(readme -> {
                     if (readme != null) {
                         mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
@@ -385,9 +381,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         service.searchIssues(query, null, null, 0)
                 .map(ApiHelpers::throwOnFailure)
                 .map(page -> page.totalCount())
-                .compose(RxUtils::doInBackground)
                 .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_PULL_REQUEST_COUNT, force))
+                .compose(makeLoaderObservable(ID_LOADER_PULL_REQUEST_COUNT, force))
                 .subscribe(count -> {
                     View v = getView();
                     v.findViewById(R.id.issues_progress).setVisibility(View.GONE);

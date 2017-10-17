@@ -38,7 +38,6 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
@@ -48,7 +47,6 @@ import com.meisolsson.githubsdk.model.ReleaseAsset;
 import com.meisolsson.githubsdk.model.request.RequestMarkdown;
 import com.meisolsson.githubsdk.service.misc.MarkdownService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
-import com.philosophicalhacker.lib.RxLoader;
 
 import io.reactivex.disposables.Disposable;
 
@@ -78,7 +76,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
     private Release mRelease;
     private long mReleaseId;
 
-    private RxLoader mRxLoader;
     private Disposable mBodySubscription;
     private View mRootView;
     private HttpImageGetter mImageGetter;
@@ -92,8 +89,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
         mRootView = findViewById(R.id.root);
         mImageGetter = new HttpImageGetter(this);
         setChildScrollDelegate(this);
-
-        mRxLoader = new RxLoader(this, getSupportLoaderManager());
 
         if (mRelease != null) {
             handleReleaseReady();
@@ -272,10 +267,8 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
         service.getRelease(mRepoOwner, mRepoName, mReleaseId)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils::doInBackground)
-                .compose(this::handleError)
                 .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_RELEASE, force))
+                .compose(makeLoaderObservable(ID_LOADER_RELEASE, force))
                 .subscribe(result -> {
                     mRelease = result;
                     handleReleaseReady();
@@ -292,10 +285,8 @@ public class ReleaseInfoActivity extends BaseActivity implements
                 .build();
         mBodySubscription = service.renderMarkdown(request)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils::doInBackground)
-                .compose(this::handleError)
                 .toObservable()
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_BODY, false))
+                .compose(makeLoaderObservable(ID_LOADER_BODY, false))
                 .subscribe(result -> fillNotes(result), error -> {});
     }
 }
