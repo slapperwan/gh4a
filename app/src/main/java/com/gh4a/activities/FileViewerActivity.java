@@ -337,8 +337,7 @@ public class FileViewerActivity extends WebViewerActivity
                     }
                     return Single.error(error);
                 })
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_FILE, force))
+                .compose(makeLoaderSingle(ID_LOADER_FILE, force))
                 .subscribe(result -> {
                     if (result != null) {
                         mContent = result;

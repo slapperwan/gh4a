@@ -397,8 +397,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         UserService service = Gh4Application.get().getGitHubService(UserService.class);
         service.getUser(mUserLogin)
                 .map(ApiHelpers::throwOnFailure)
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_USER, force))
+                .compose(makeLoaderSingle(ID_LOADER_USER, force))
                 .subscribe(result -> {
                     mUser = result;
                     fillData();
@@ -428,8 +427,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         mTopRepoSubscription = observable
                 .map(ApiHelpers::throwOnFailure)
                 .map(page -> page.items())
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_REPO_LIST, false))
+                .compose(makeLoaderSingle(ID_LOADER_REPO_LIST, false))
                 .subscribe(result -> fillTopRepos(result), error -> {});
     }
 
@@ -441,8 +439,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                         ? service.getMyOrganizations(page)
                         : service.getUserPublicOrganizations(mUserLogin, page)
                 )
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_ORG_LIST, false))
+                .compose(makeLoaderSingle(ID_LOADER_ORG_LIST, false))
                 .subscribe(result -> fillOrganizations(result), error -> {});
     }
 
@@ -451,8 +448,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                 Gh4Application.get().getGitHubService(UserFollowerService.class);
         mIsFollowingSubscription = service.isFollowing(mUserLogin)
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_IS_FOLLOWING, force))
+                .compose(makeLoaderSingle(ID_LOADER_IS_FOLLOWING, force))
                 .subscribe(result -> {
                     mIsFollowing = result;
                     getActivity().invalidateOptionsMenu();

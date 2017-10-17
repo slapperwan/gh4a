@@ -127,8 +127,7 @@ public class GistViewerActivity extends WebViewerActivity {
         GistService service = Gh4Application.get().getGitHubService(GistService.class);
         service.getGist(mGistId)
                 .map(ApiHelpers::throwOnFailure)
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_GIST, force))
+                .compose(makeLoaderSingle(ID_LOADER_GIST, force))
                 .subscribe(result -> {
                     mGistOwner = ApiHelpers.getUserLogin(GistViewerActivity.this, result.owner());
                     mGistFile = result.files().get(mFileName);

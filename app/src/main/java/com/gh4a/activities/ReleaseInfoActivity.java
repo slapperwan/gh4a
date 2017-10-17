@@ -267,8 +267,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
         service.getRelease(mRepoOwner, mRepoName, mReleaseId)
                 .map(ApiHelpers::throwOnFailure)
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_RELEASE, force))
+                .compose(makeLoaderSingle(ID_LOADER_RELEASE, force))
                 .subscribe(result -> {
                     mRelease = result;
                     handleReleaseReady();
@@ -285,8 +284,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
                 .build();
         mBodySubscription = service.renderMarkdown(request)
                 .map(ApiHelpers::throwOnFailure)
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_BODY, false))
+                .compose(makeLoaderSingle(ID_LOADER_BODY, false))
                 .subscribe(result -> fillNotes(result), error -> {});
     }
 }

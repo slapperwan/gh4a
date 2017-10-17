@@ -303,8 +303,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
                     type == SEARCH_TYPE_REPO ? makeRepoSearchSingle() :
                     makeCodeSearchSingle();
             mSubscription = single
-                    .toObservable()
-                    .compose(makeLoaderObservable(0, true))
+                    .compose(makeLoaderSingle(0, true))
                     .subscribe(result -> {
                         switch (type) {
                             case SEARCH_TYPE_USER:

@@ -55,8 +55,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
     private void loadData(boolean force) {
         onCreateDataSingle()
                 .doOnError(error -> onLoaderError(error)) // FIXME consume error if result is true
-                .toObservable()
-                .compose(makeLoaderObservable(0, force))
+                .compose(makeLoaderSingle(0, force))
                 .subscribe(result -> {
                     mAdapter.clear();
                     onAddData(mAdapter, result);
