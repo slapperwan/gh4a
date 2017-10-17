@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.AttrRes;
-import android.support.v4.content.Loader;
 import android.support.v4.util.LongSparseArray;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -34,9 +33,6 @@ import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.loader.CommitStatusLoader;
 import com.gh4a.loader.IssueCommentListLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.ReferenceLoader;
 import com.gh4a.loader.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -63,6 +59,7 @@ import com.meisolsson.githubsdk.service.issues.IssueEventService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
+import com.philosophicalhacker.lib.RxLoader;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,39 +75,10 @@ public class PullRequestFragment extends IssueFragmentBase {
     private static final int ID_LOADER_STATUS = 1;
     private static final int ID_LOADER_HEAD_REF = 2;
 
+    private RxLoader mRxLoader;
     private PullRequest mPullRequest;
     private GitReference mHeadReference;
     private boolean mHasLoadedHeadReference;
-
-    private final LoaderCallbacks<List<Status>> mStatusCallback =
-            new LoaderCallbacks<List<Status>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<Status>>> onCreateLoader() {
-            return new CommitStatusLoader(getActivity(), mRepoOwner, mRepoName,
-                    mPullRequest.head().sha());
-        }
-
-        @Override
-        protected void onResultReady(List<Status> result) {
-            fillStatus(result);
-        }
-    };
-
-    private final LoaderCallbacks<GitReference> mHeadReferenceCallback = new LoaderCallbacks<GitReference>(this) {
-        @Override
-        protected Loader<LoaderResult<GitReference>> onCreateLoader() {
-            return new ReferenceLoader(getActivity(), mPullRequest);
-        }
-
-        @Override
-        protected void onResultReady(GitReference result) {
-            mHeadReference = result;
-            mHasLoadedHeadReference = true;
-            getActivity().invalidateOptionsMenu();
-            bindSpecialViews(mListHeaderView);
-            getLoaderManager().destroyLoader(ID_LOADER_HEAD_REF);
-        }
-    };
 
     public static PullRequestFragment newInstance(PullRequest pr, Issue issue,
             boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
@@ -133,7 +101,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                 .build();
 
         assignHighlightColor();
-        loadStatusIfOpen();
+        loadCommitStatusesIfOpen(false);
         reloadEvents(false);
     }
 
@@ -142,13 +110,14 @@ public class PullRequestFragment extends IssueFragmentBase {
         mPullRequest = getArguments().getParcelable("pr");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        getLoaderManager().initLoader(ID_LOADER_HEAD_REF, null, mHeadReferenceCallback);
+        mRxLoader = new RxLoader(getActivity(), getLoaderManager());
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        loadStatusIfOpen();
+        loadHeadReference(false);
+        loadCommitStatusesIfOpen(false);
     }
 
     @Override
@@ -183,9 +152,10 @@ public class PullRequestFragment extends IssueFragmentBase {
         mHeadReference = null;
         mHasLoadedHeadReference = false;
         if (mListHeaderView != null) {
-            fillStatus(new ArrayList<Status>());
+            fillStatus(new ArrayList<>());
         }
-        hideContentAndRestartLoaders(ID_LOADER_STATUS, ID_LOADER_HEAD_REF);
+        loadHeadReference(true);
+        loadCommitStatusesIfOpen(true);
         super.onRefresh();
     }
 
@@ -210,12 +180,6 @@ public class PullRequestFragment extends IssueFragmentBase {
             setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
         }
     }
-
-    private void loadStatusIfOpen() {
-        if (mPullRequest.state() == IssueState.Open) {
-            getLoaderManager().initLoader(ID_LOADER_STATUS, null, mStatusCallback);
-        }
-   }
 
    private void fillStatus(List<Status> statuses) {
        CommitStatusBox commitStatusBox = mListHeaderView.findViewById(R.id.commit_status_box);
@@ -445,6 +409,41 @@ public class PullRequestFragment extends IssueFragmentBase {
                 .subscribe(result -> {
                     mHeadReference = null;
                     onHeadReferenceUpdated();
+                }, error -> {});
+    }
+
+    private void loadCommitStatusesIfOpen(boolean force) {
+        if (mPullRequest.state() != IssueState.Open) {
+            return;
+        }
+
+        CommitStatusLoader.load(mRepoOwner, mRepoName, mPullRequest.head().sha())
+                .compose(RxUtils::doInBackground)
+                .compose(getBaseActivity()::handleError)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_STATUS, force))
+                .subscribe(statuses -> fillStatus(statuses), error -> {});
+    }
+
+    private void loadHeadReference(boolean force) {
+        GitService service = Gh4Application.get().getGitHubService(GitService.class);
+
+        PullRequestMarker head = mPullRequest.head();
+        Repository repo = head.repo();
+        Single<GitReference> refSingle = repo == null
+                ? Single.just(null)
+                : service.getGitReference(repo.owner().login(), repo.name(), head.ref())
+                        .map(ApiHelpers::throwOnFailure);
+
+        refSingle.compose(RxUtils::doInBackground)
+                .compose(getBaseActivity()::handleError)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_HEAD_REF, force))
+                .subscribe(ref -> {
+                    mHeadReference = ref;
+                    mHasLoadedHeadReference = true;
+                    getActivity().invalidateOptionsMenu();
+                    bindSpecialViews(mListHeaderView);
                 }, error -> {});
     }
 }

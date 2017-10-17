@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,17 +34,13 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.IssueLabelAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.LabelListLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
-
-import java.util.List;
+import com.philosophicalhacker.lib.RxLoader;
 
 public class IssueLabelListActivity extends BaseActivity implements
         RootAdapter.OnItemClickListener<IssueLabelAdapter.EditableLabel>, View.OnClickListener {
@@ -57,33 +52,20 @@ public class IssueLabelListActivity extends BaseActivity implements
                 .putExtra("from_pr", fromPullRequest);
     }
 
+    private static final int ID_LOADER_LABELS = 0;
+
     private String mRepoOwner;
     private String mRepoName;
     private boolean mParentIsPullRequest;
     private EditActionMode mActionMode;
     private IssueLabelAdapter.EditableLabel mAddedLabel;
 
+    private RxLoader mRxLoader;
     private FloatingActionButton mFab;
     private IssueLabelAdapter mAdapter;
 
     private static final String STATE_KEY_ADDED_LABEL = "added_label";
     private static final String STATE_KEY_EDITING_LABEL = "editing_label";
-
-    private final LoaderCallbacks<List<Label>> mLabelCallback = new LoaderCallbacks<List<Label>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<Label>>> onCreateLoader() {
-            return new LabelListLoader(IssueLabelListActivity.this, mRepoOwner, mRepoName);
-        }
-        @Override
-        protected void onResultReady(List<Label> result) {
-            UiUtils.hideImeForView(getCurrentFocus());
-            mAdapter.clear();
-            for (Label label : result) {
-                mAdapter.add(new IssueLabelAdapter.EditableLabel(label));
-            }
-            setContentShown(true);
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,6 +73,8 @@ public class IssueLabelListActivity extends BaseActivity implements
 
         setContentView(R.layout.generic_list);
         setContentShown(false);
+
+        mRxLoader = new RxLoader(this, getSupportLoaderManager());
 
         mAdapter = new IssueLabelAdapter(this);
         mAdapter.setOnItemClickListener(this);
@@ -108,7 +92,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         rootLayout.addView(mFab);
         updateFabVisibility();
 
-        getSupportLoaderManager().initLoader(0, null, mLabelCallback);
+        loadLabels(false);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(STATE_KEY_ADDED_LABEL)) {
@@ -163,7 +147,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     public void onRefresh() {
         setContentShown(false);
         mAdapter.clear();
-        forceLoaderReload(0);
+        loadLabels(true);
         super.onRefresh();
     }
 
@@ -326,6 +310,23 @@ public class IssueLabelListActivity extends BaseActivity implements
                     mAddedLabel = null;
                     forceLoaderReload(0);
                     setResult(RESULT_OK);
+                }, error -> {});
+    }
+
+    private void loadLabels(boolean force) {
+        final IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+        ApiHelpers.PageIterator
+                .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
+                .compose(RxUtils.mapList(label -> new IssueLabelAdapter.EditableLabel(label)))
+                .compose(RxUtils::doInBackground)
+                .compose(this::handleError)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_LABELS, force))
+                .subscribe(result -> {
+                    UiUtils.hideImeForView(getCurrentFocus());
+                    mAdapter.clear();
+                    mAdapter.addAll(result);
+                    setContentShown(true);
                 }, error -> {});
     }
 }

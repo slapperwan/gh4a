@@ -20,7 +20,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -31,23 +30,27 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.adapter.ReleaseAssetAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.MarkdownLoader;
-import com.gh4a.loader.ReleaseLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.meisolsson.githubsdk.model.Release;
 import com.meisolsson.githubsdk.model.ReleaseAsset;
+import com.meisolsson.githubsdk.model.request.RequestMarkdown;
+import com.meisolsson.githubsdk.service.misc.MarkdownService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
+import com.philosophicalhacker.lib.RxLoader;
+
+import io.reactivex.disposables.Disposable;
 
 public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
@@ -67,39 +70,18 @@ public class ReleaseInfoActivity extends BaseActivity implements
                 .putExtra("release", release);
     }
 
+    private static final int ID_LOADER_RELEASE = 0;
+    private static final int ID_LOADER_BODY = 1;
+
     private String mRepoOwner;
     private String mRepoName;
     private Release mRelease;
     private long mReleaseId;
 
+    private RxLoader mRxLoader;
+    private Disposable mBodySubscription;
     private View mRootView;
     private HttpImageGetter mImageGetter;
-
-    private final LoaderCallbacks<Release> mReleaseCallback = new LoaderCallbacks<Release>(this) {
-        @Override
-        protected Loader<LoaderResult<Release>> onCreateLoader() {
-            return new ReleaseLoader(ReleaseInfoActivity.this, mRepoOwner, mRepoName, mReleaseId);
-        }
-
-        @Override
-        protected void onResultReady(Release result) {
-            mRelease = result;
-            handleReleaseReady();
-            setContentShown(true);
-        }
-    };
-    private final LoaderCallbacks<String> mBodyCallback = new LoaderCallbacks<String>(this) {
-        @Override
-        protected Loader<LoaderResult<String>> onCreateLoader() {
-            return new MarkdownLoader(ReleaseInfoActivity.this,
-                    mRepoOwner, mRepoName, mRelease.body());
-        }
-
-        @Override
-        protected void onResultReady(String result) {
-            fillNotes(result);
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -111,11 +93,13 @@ public class ReleaseInfoActivity extends BaseActivity implements
         mImageGetter = new HttpImageGetter(this);
         setChildScrollDelegate(this);
 
+        mRxLoader = new RxLoader(this, getSupportLoaderManager());
+
         if (mRelease != null) {
             handleReleaseReady();
         } else {
             setContentShown(false);
-            getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
+            loadRelease(false);
         }
     }
 
@@ -162,11 +146,13 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     public void onRefresh() {
-        if (forceLoaderReload(0)) {
+        if (!getIntent().hasExtra("release")) {
             mRelease = null;
             setContentShown(false);
             mImageGetter.clearHtmlCache();
-            getSupportLoaderManager().destroyLoader(1);
+            if (mBodySubscription != null) {
+                mBodySubscription.dispose();
+            }
         }
         super.onRefresh();
     }
@@ -200,7 +186,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
             name = mRelease.tagName();
         }
         getSupportActionBar().setTitle(name);
-        getSupportLoaderManager().initLoader(1, null, mBodyCallback);
+        loadBody();
         fillData();
     }
 
@@ -278,5 +264,38 @@ public class ReleaseInfoActivity extends BaseActivity implements
         if (intent != null) {
             startActivity(intent);
         }
+    }
+
+    private void loadRelease(boolean force) {
+        RepositoryReleaseService service =
+                Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
+
+        service.getRelease(mRepoOwner, mRepoName, mReleaseId)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils::doInBackground)
+                .compose(this::handleError)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_RELEASE, force))
+                .subscribe(result -> {
+                    mRelease = result;
+                    handleReleaseReady();
+                    setContentShown(true);
+                }, error -> {});
+    }
+
+    private void loadBody() {
+        MarkdownService service = Gh4Application.get().getGitHubService(MarkdownService.class);
+        RequestMarkdown request = RequestMarkdown.builder()
+                .context(mRepoOwner + "/" + mRepoName)
+                .mode("gfm")
+                .text(mRelease.body())
+                .build();
+        mBodySubscription = service.renderMarkdown(request)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils::doInBackground)
+                .compose(this::handleError)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_BODY, false))
+                .subscribe(result -> fillNotes(result), error -> {});
     }
 }
