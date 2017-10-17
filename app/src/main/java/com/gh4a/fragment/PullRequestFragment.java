@@ -415,8 +415,7 @@ public class PullRequestFragment extends IssueFragmentBase {
         }
 
         CommitStatusLoader.load(mRepoOwner, mRepoName, mPullRequest.head().sha())
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_STATUS, force))
+                .compose(makeLoaderSingle(ID_LOADER_STATUS, force))
                 .subscribe(statuses -> fillStatus(statuses), error -> {});
     }
 
@@ -430,8 +429,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                 : service.getGitReference(repo.owner().login(), repo.name(), head.ref())
                         .map(ApiHelpers::throwOnFailure);
 
-        refSingle.toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_HEAD_REF, force))
+        refSingle.compose(makeLoaderSingle(ID_LOADER_HEAD_REF, force))
                 .subscribe(ref -> {
                     mHeadReference = ref;
                     mHasLoadedHeadReference = true;

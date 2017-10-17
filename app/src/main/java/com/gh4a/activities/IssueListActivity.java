@@ -55,7 +55,7 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorServi
 import java.util.List;
 import java.util.Locale;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
@@ -685,10 +685,10 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private void loadCollaboratorStatus(boolean force) {
         Gh4Application app = Gh4Application.get();
         String login = app.getAuthLogin();
-        final Observable<Boolean> observable;
+        final Single<Boolean> observable;
 
         if (login == null) {
-            observable = Observable.just(false);
+            observable = Single.just(false);
         } else {
             RepositoryCollaboratorService service =
                     app.getGitHubService(RepositoryCollaboratorService.class);
@@ -700,8 +700,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                     .compose(RxUtils.mapFailureToValue(403, false))
                     // there's no actual content, result is always null
                     .map(result -> true)
-                    .toObservable()
-                    .compose(makeLoaderObservable(ID_LOADER_COLLABORATOR_STATUS, force));
+                    .compose(makeLoaderSingle(ID_LOADER_COLLABORATOR_STATUS, force));
         }
 
         observable.subscribe(result -> {

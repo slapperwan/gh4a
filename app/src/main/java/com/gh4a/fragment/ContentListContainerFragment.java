@@ -322,11 +322,10 @@ public class ContentListContainerFragment extends Fragment implements
                 .map(ApiHelpers::throwOnFailure)
                 .map(content -> content != null ? StringUtils.fromBase64(content.content()) : null)
                 .map(this::parseModuleMap)
-                .toObservable()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> getBaseActivity().handleLoadFailure(error))
-                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_MODULEMAP, true))
+                .compose(mRxLoader.makeSingleTransformer(ID_LOADER_MODULEMAP, true))
                 .subscribe(result -> {
                     mGitModuleMap = result;
                     if (mContentListFragment != null) {

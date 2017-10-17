@@ -356,8 +356,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                     return html;
                 })
                 .doOnSubscribe(disposable -> mIsReadmeLoaded = false)
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_README, force))
+                .compose(makeLoaderSingle(ID_LOADER_README, force))
                 .subscribe(readme -> {
                     if (readme != null) {
                         mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
@@ -381,8 +380,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         service.searchIssues(query, null, null, 0)
                 .map(ApiHelpers::throwOnFailure)
                 .map(page -> page.totalCount())
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_PULL_REQUEST_COUNT, force))
+                .compose(makeLoaderSingle(ID_LOADER_PULL_REQUEST_COUNT, force))
                 .subscribe(count -> {
                     View v = getView();
                     v.findViewById(R.id.issues_progress).setVisibility(View.GONE);

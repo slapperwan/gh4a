@@ -209,8 +209,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         GistService service = Gh4Application.get().getGitHubService(GistService.class);
         service.getGist(mGistId)
                 .map(ApiHelpers::throwOnFailure)
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_GIST, force))
+                .compose(makeLoaderSingle(ID_LOADER_GIST, force))
                 .subscribe(result -> {
                     fillData(result);
                     setContentShown(true);
@@ -222,8 +221,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         GistService service = Gh4Application.get().getGitHubService(GistService.class);
         service.checkIfGistIsStarred(mGistId)
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_STARRED, force))
+                .compose(makeLoaderSingle(ID_LOADER_STARRED, force))
                 .subscribe(result -> {
                     mIsStarred = result;
                     supportInvalidateOptionsMenu();

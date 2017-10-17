@@ -13,15 +13,12 @@ import android.view.animation.AnimationUtils;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.philosophicalhacker.lib.RxLoader;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
-import io.reactivex.Observable;
-import io.reactivex.ObservableTransformer;
-import io.reactivex.Single;
+import io.reactivex.SingleTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -84,12 +81,12 @@ public abstract class LoadingFragmentBase extends Fragment implements
         return UiUtils.canViewScrollUp(mContentView);
     }
 
-    protected <T> ObservableTransformer<T, T> makeLoaderObservable(int id, boolean force) {
+    protected <T> SingleTransformer<T, T> makeLoaderSingle(int id, boolean force) {
         return upstream -> upstream
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> getBaseActivity().handleLoadFailure(error))
-                .compose(mRxLoader.makeObservableTransformer(id, force));
+                .compose(mRxLoader.makeSingleTransformer(id, force));
     }
 
     protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {

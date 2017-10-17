@@ -314,8 +314,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                 .compose(RxUtils.mapList(label -> new IssueLabelAdapter.EditableLabel(label)))
-                .toObservable()
-                .compose(makeLoaderObservable(ID_LOADER_LABELS, force))
+                .compose(makeLoaderSingle(ID_LOADER_LABELS, force))
                 .subscribe(result -> {
                     UiUtils.hideImeForView(getCurrentFocus());
                     mAdapter.clear();
