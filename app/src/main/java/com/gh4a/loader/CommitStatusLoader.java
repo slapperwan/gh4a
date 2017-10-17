@@ -15,6 +15,8 @@ import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Status;
 import com.meisolsson.githubsdk.service.repositories.RepositoryStatusService;
 
+import io.reactivex.Single;
+
 public class CommitStatusLoader extends BaseLoader<List<Status>> {
     private final String mRepoOwner;
     private final String mRepoName;
@@ -58,10 +60,14 @@ public class CommitStatusLoader extends BaseLoader<List<Status>> {
 
     @Override
     public List<Status> doLoadInBackground() throws ApiRequestException {
+        return load(mRepoOwner, mRepoName, mSha).blockingGet();
+    }
+
+    public static Single<List<Status>> load(String repoOwner, String repoName, String sha) {
         final RepositoryStatusService service =
                 Gh4Application.get().getGitHubService(RepositoryStatusService.class);
         return ApiHelpers.PageIterator
-                .toSingle(page -> service.getStatuses(mRepoOwner, mRepoName, mSha, page))
+                .toSingle(page -> service.getStatuses(repoOwner, repoName, sha, page))
                 // Sort by timestamps first, so the removal logic below keeps the newest status
                 .map(statuses -> {
                     Collections.sort(statuses, TIMESTAMP_COMPARATOR);
@@ -85,7 +91,6 @@ public class CommitStatusLoader extends BaseLoader<List<Status>> {
                 .map(statuses -> {
                     Collections.sort(statuses, STATUS_AND_CONTEXT_COMPARATOR);
                     return statuses;
-                })
-                .blockingGet();
+                });
     }
 }

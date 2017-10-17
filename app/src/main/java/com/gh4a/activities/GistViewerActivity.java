@@ -20,21 +20,20 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.loader.GistLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
-import com.meisolsson.githubsdk.model.Gist;
 import com.meisolsson.githubsdk.model.GistFile;
+import com.meisolsson.githubsdk.service.gists.GistService;
+import com.philosophicalhacker.lib.RxLoader;
 
 public class GistViewerActivity extends WebViewerActivity {
     public static Intent makeIntent(Context context, String id, String fileName) {
@@ -43,29 +42,20 @@ public class GistViewerActivity extends WebViewerActivity {
                 .putExtra("file", fileName);
     }
 
+    private static final int ID_LOADER_GIST = 0;
+
     private String mFileName;
     private String mGistId;
     private GistFile mGistFile;
     private String mGistOwner;
-
-    private final LoaderCallbacks<Gist> mGistCallback = new LoaderCallbacks<Gist>(this) {
-        @Override
-        protected Loader<LoaderResult<Gist>> onCreateLoader() {
-            return new GistLoader(GistViewerActivity.this, mGistId);
-        }
-        @Override
-        protected void onResultReady(Gist result) {
-            mGistOwner = ApiHelpers.getUserLogin(GistViewerActivity.this, result.owner());
-            mGistFile = result.files().get(mFileName);
-            onDataReady();
-        }
-    };
+    private RxLoader mRxLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getSupportLoaderManager().initLoader(0, null, mGistCallback);
+        mRxLoader = new RxLoader(this, getSupportLoaderManager());
+        loadGist(false);
     }
 
     @Nullable
@@ -89,8 +79,8 @@ public class GistViewerActivity extends WebViewerActivity {
     @Override
     public void onRefresh() {
         setContentShown(false);
-        forceLoaderReload(0);
         mGistFile = null;
+        loadGist(true);
         super.onRefresh();
     }
 
@@ -136,5 +126,21 @@ public class GistViewerActivity extends WebViewerActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadGist(boolean force) {
+        GistService service = Gh4Application.get().getGitHubService(GistService.class);
+        service.getGist(mGistId)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils::doInBackground)
+                .compose(this::handleError)
+                .toObservable()
+                .compose(mRxLoader.makeObservableTransformer(ID_LOADER_GIST, force))
+                .subscribe(result -> {
+                    mGistOwner = ApiHelpers.getUserLogin(GistViewerActivity.this, result.owner());
+                    mGistFile = result.files().get(mFileName);
+                    onDataReady();
+                }, error -> {});
+
     }
 }
