@@ -12,7 +12,6 @@ import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.RepositorySearchLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Repository;
@@ -22,8 +21,6 @@ import io.reactivex.Single;
 
 public class RepositorySearchFragment extends ListDataBaseFragment<Repository> implements
         RootAdapter.OnItemClickListener<Repository> {
-    private RepositorySearchLoader mLoader;
-
     public static RepositorySearchFragment newInstance(String userLogin) {
         RepositorySearchFragment f = new RepositorySearchFragment();
 
@@ -35,9 +32,6 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> i
     }
 
     public void setQuery(String query) {
-        if (mLoader != null) {
-            mLoader.setQuery(query);
-        }
         getArguments().putString("query", query);
         onRefresh();
     }

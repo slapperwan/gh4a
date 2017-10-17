@@ -11,8 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -31,20 +29,19 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.gh4a.ApiRequestException;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.CodeSearchAdapter;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.adapter.SearchUserAdapter;
+import com.gh4a.adapter.UserAdapter;
 import com.gh4a.db.SuggestionsProvider;
-import com.gh4a.loader.CodeSearchLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.RepositorySearchLoader;
-import com.gh4a.loader.UserSearchLoader;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.ClientErrorResponse;
@@ -52,8 +49,13 @@ import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.SearchCode;
 import com.meisolsson.githubsdk.model.TextMatch;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.search.SearchService;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 
 public class SearchFragment extends LoadingListFragmentBase implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
@@ -91,77 +93,15 @@ public class SearchFragment extends LoadingListFragmentBase implements
     private static final String STATE_KEY_QUERY = "query";
     private static final String STATE_KEY_SEARCH_TYPE = "search_type";
 
-    private final LoaderCallbacks<List<Repository>> mRepoCallback =
-            new LoaderCallbacks<List<Repository>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<Repository>>> onCreateLoader() {
-            RepositorySearchLoader loader = new RepositorySearchLoader(getActivity(), null);
-            loader.setQuery(mQuery);
-            return loader;
-        }
-
-        @Override
-        protected void onResultReady(List<Repository> result) {
-            RepositoryAdapter adapter = new RepositoryAdapter(getActivity());
-            adapter.addAll(result);
-            setAdapter(adapter);
-        }
-    };
-
-    private final LoaderCallbacks<List<User>> mUserCallback =
-            new LoaderCallbacks<List<User>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
-            return new UserSearchLoader(getActivity(), mQuery);
-        }
-
-        @Override
-        protected void onResultReady(List<User> result) {
-            SearchUserAdapter adapter = new SearchUserAdapter(getActivity());
-            adapter.addAll(result);
-            setAdapter(adapter);
-        }
-    };
-
-    private final LoaderCallbacks<List<SearchCode>> mCodeCallback =
-            new LoaderCallbacks<List<SearchCode>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<SearchCode>>> onCreateLoader() {
-            return new CodeSearchLoader(getActivity(), mQuery);
-        }
-
-        @Override
-        protected void onResultReady(List<SearchCode> result) {
-            CodeSearchAdapter adapter = new CodeSearchAdapter(getActivity(), SearchFragment.this);
-            adapter.addAll(result);
-            setAdapter(adapter);
-        }
-
-        @Override
-        protected boolean onError(Exception e) {
-            if (e instanceof ApiRequestException) {
-                ClientErrorResponse response = ((ApiRequestException) e).getResponse();
-                if (response!= null && response.errors() != null && !response.errors().isEmpty()) {
-                    updateEmptyText(R.string.code_search_too_broad);
-                    if (mAdapter != null) {
-                        mAdapter.clear();
-                    }
-                    updateEmptyState();
-                    setContentShown(true);
-                    return true;
-                }
-            }
-            return super.onError(e);
-        }
-    };
-
     private RecyclerView mRecyclerView;
     private RootAdapter<?, ?> mAdapter;
 
     private Spinner mSearchType;
     private SearchView mSearch;
     private int mInitialSearchType;
+    private int mSelectedSearchType = SEARCH_TYPE_NONE;
     private String mQuery;
+    private Disposable mSubscription;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -170,13 +110,6 @@ public class SearchFragment extends LoadingListFragmentBase implements
         if (savedInstanceState != null) {
             mQuery = savedInstanceState.getString(STATE_KEY_QUERY);
             mInitialSearchType = savedInstanceState.getInt(STATE_KEY_SEARCH_TYPE, SEARCH_TYPE_NONE);
-
-            LoaderManager lm = getLoaderManager();
-            switch (mInitialSearchType) {
-                case SEARCH_TYPE_REPO: lm.initLoader(0, null, mRepoCallback); break;
-                case SEARCH_TYPE_USER: lm.initLoader(0, null, mUserCallback); break;
-                case SEARCH_TYPE_CODE: lm.initLoader(0, null, mCodeCallback); break;
-            }
         } else {
             Bundle args = getArguments();
             mInitialSearchType = args.getInt("search_type", SEARCH_TYPE_REPO);
@@ -219,13 +152,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (mAdapter instanceof RepositoryAdapter) {
-            outState.putInt(STATE_KEY_SEARCH_TYPE, SEARCH_TYPE_REPO);
-        } else if (mAdapter instanceof SearchUserAdapter) {
-            outState.putInt(STATE_KEY_SEARCH_TYPE, SEARCH_TYPE_USER);
-        } else if (mAdapter instanceof CodeSearchAdapter) {
-            outState.putInt(STATE_KEY_SEARCH_TYPE, SEARCH_TYPE_CODE);
-        }
+        outState.putInt(STATE_KEY_SEARCH_TYPE, mSelectedSearchType);
         outState.putString(STATE_KEY_QUERY, mQuery);
         super.onSaveInstanceState(outState);
     }
@@ -267,7 +194,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
         if (!StringUtils.isBlank(query)) {
             final ContentResolver cr = getActivity().getContentResolver();
             final ContentValues cv = new ContentValues();
-            cv.put(SuggestionsProvider.Columns.TYPE, mSearchType.getSelectedItemPosition());
+            cv.put(SuggestionsProvider.Columns.TYPE, mSelectedSearchType);
             cv.put(SuggestionsProvider.Columns.SUGGESTION, query);
             cv.put(SuggestionsProvider.Columns.DATE, System.currentTimeMillis());
 
@@ -307,7 +234,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
         Cursor cursor = mSearch.getSuggestionsAdapter().getCursor();
         if (cursor.moveToPosition(position)) {
             if (position == cursor.getCount() - 1) {
-                final int type = mSearchType.getSelectedItemPosition();
+                final int type = mSelectedSearchType;
                 final ContentResolver cr = getActivity().getContentResolver();
                 new Thread() {
                     @Override
@@ -328,9 +255,6 @@ public class SearchFragment extends LoadingListFragmentBase implements
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         updateSelectedSearchType();
-        if (getLoaderManager().getLoader(0) != null) {
-            loadResults();
-        }
     }
 
     @Override
@@ -348,10 +272,9 @@ public class SearchFragment extends LoadingListFragmentBase implements
         if (TextUtils.isEmpty(query)) {
             return null;
         }
-        int type = mSearchType.getSelectedItemPosition();
         return getContext().getContentResolver().query(SuggestionsProvider.Columns.CONTENT_URI,
                 SUGGESTION_PROJECTION, SUGGESTION_SELECTION,
-                new String[] { String.valueOf(type), query + "%" }, SUGGESTION_ORDER);
+                new String[] { String.valueOf(mSelectedSearchType), query + "%" }, SUGGESTION_ORDER);
     }
 
     private void openFileViewer(SearchCode result, int matchIndex) {
@@ -365,20 +288,68 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     private void loadResults() {
-        LoaderManager lm = getLoaderManager();
-        switch (mSearchType.getSelectedItemPosition()) {
-            case SEARCH_TYPE_USER: lm.restartLoader(0, null, mUserCallback); break;
-            case SEARCH_TYPE_CODE: lm.restartLoader(0, null, mCodeCallback); break;
-            default: lm.restartLoader(0, null, mRepoCallback); break;
-        }
         setContentShown(false);
         mSearch.clearFocus();
+
+        if (mSubscription != null) {
+            mSubscription.dispose();
+            mSubscription = null;
+        }
+        mAdapter.clear();
+        if (!TextUtils.isEmpty(mQuery)) {
+            int type = mSelectedSearchType;
+            Single<SearchResult> single =
+                    type == SEARCH_TYPE_USER ? makeUserSearchSingle() :
+                    type == SEARCH_TYPE_REPO ? makeRepoSearchSingle() :
+                    makeCodeSearchSingle();
+            mSubscription = single
+                    .toObservable()
+                    .compose(makeLoaderObservable(0, true))
+                    .subscribe(result -> {
+                        switch (type) {
+                            case SEARCH_TYPE_USER:
+                                ((UserAdapter) mAdapter).addAll(result.user);
+                                break;
+                            case SEARCH_TYPE_REPO:
+                                ((RepositoryAdapter) mAdapter).addAll(result.repo);
+                                break;
+                            case SEARCH_TYPE_CODE:
+                                if (result.codeSearchTooBroad) {
+                                    updateEmptyText(R.string.code_search_too_broad);
+                                } else {
+                                    ((CodeSearchAdapter) mAdapter).addAll(result.code);
+                                }
+                                break;
+                        }
+                        updateEmptyState();
+                        setContentShown(true);
+                    }, error -> {});
+        } else {
+            updateEmptyState();
+            setContentShown(true);
+        }
     }
 
     private void updateSelectedSearchType() {
-        int[] hintAndEmptyTextResIds = HINT_AND_EMPTY_TEXTS[mSearchType.getSelectedItemPosition()];
+        int newType = mSearchType.getSelectedItemPosition();
+        if (newType == mSelectedSearchType) {
+            return;
+        }
+        mSelectedSearchType = newType;
+
+        int[] hintAndEmptyTextResIds = HINT_AND_EMPTY_TEXTS[newType];
         mSearch.setQueryHint(getString(hintAndEmptyTextResIds[0]));
         updateEmptyText(hintAndEmptyTextResIds[1]);
+
+        switch (newType) {
+            case SEARCH_TYPE_USER: setAdapter(new UserAdapter(getActivity())); break;
+            case SEARCH_TYPE_REPO: setAdapter(new RepositoryAdapter(getActivity())); break;
+            case SEARCH_TYPE_CODE: setAdapter(new CodeSearchAdapter(getActivity(), this)); break;
+        }
+
+        if (mSubscription != null) {
+            loadResults();
+        }
 
         // force re-filtering of the view
         mSearch.setQuery(mQuery, false);
@@ -388,13 +359,53 @@ public class SearchFragment extends LoadingListFragmentBase implements
         adapter.setOnItemClickListener(this);
         mRecyclerView.setAdapter(adapter);
         mAdapter = adapter;
-        setContentShown(true);
         updateEmptyState();
     }
 
     private void updateEmptyText(@StringRes int emptyTextResId) {
         TextView emptyView = getView().findViewById(android.R.id.empty);
         emptyView.setText(emptyTextResId);
+    }
+
+    private Single<SearchResult> makeRepoSearchSingle() {
+        SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
+        String params = mQuery + " fork:true";
+
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.searchRepositories(params, null, null, page)
+                        .compose(RxUtils::searchPageAdapter))
+                // With that status code, Github wants to tell us there are no
+                // repositories to search in. Just pretend no error and return
+                // an empty list in that case.
+                .compose(RxUtils.mapFailureToValue(422, new ArrayList<Repository>()))
+                .map(result -> new SearchResult(result, null));
+    }
+
+    private Single<SearchResult> makeUserSearchSingle() {
+        final SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.searchUsers(mQuery, null, null, page)
+                        .compose(RxUtils::searchPageAdapter))
+                .map(result -> new SearchResult(null, result));
+    }
+
+    private Single<SearchResult> makeCodeSearchSingle() {
+        SearchService service = ServiceFactory.createService(SearchService.class,
+                "application/vnd.github.v3.text-match+json", null, null);
+
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.searchCode(mQuery, null, null, page)
+                        .compose(RxUtils::searchPageAdapter))
+                .map(result -> new SearchResult(result, false))
+                .onErrorResumeNext(error -> {
+                    if (error instanceof ApiRequestException) {
+                        ClientErrorResponse response = ((ApiRequestException) error).getResponse();
+                        if (response!= null && response.errors() != null && !response.errors().isEmpty()) {
+                            return Single.just(new SearchResult(null, true));
+                        }
+                    }
+                    return Single.error(error);
+                });
     }
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {
@@ -508,6 +519,20 @@ public class SearchFragment extends LoadingListFragmentBase implements
 
         private boolean isClearRow(int position) {
             return position == getCount() - 1;
+        }
+    }
+
+    private static class SearchResult {
+        final List<Repository> repo;
+        final List<User> user;
+        final List<SearchCode> code;
+        final boolean codeSearchTooBroad;
+
+        SearchResult(List<Repository> r, List<User> u) {
+            repo = r; user = u; code = null; codeSearchTooBroad = false;
+        }
+        SearchResult(List<SearchCode> c, boolean tooBroad) {
+            repo = null; user = null; code = c; codeSearchTooBroad = tooBroad;
         }
     }
 }

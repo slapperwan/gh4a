@@ -184,6 +184,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     public void handleLoadFailure(Throwable e) {
+        // FIXME: handle auth error by integrating handleAuthFailureDuringLoad
         setErrorViewVisibility(true, e);
     }
 
@@ -603,9 +604,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return upstream -> upstream
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> setErrorViewVisibility(true, error))
+                .doOnError(error -> handleLoadFailure(error))
                 .compose(mRxLoader.makeObservableTransformer(id, force));
-
     }
 
     protected void setErrorViewVisibility(boolean visible, Throwable e) {

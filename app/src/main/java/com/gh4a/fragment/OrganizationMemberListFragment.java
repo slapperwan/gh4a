@@ -1,7 +1,6 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.Gh4Application;
@@ -9,14 +8,9 @@ import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.OrganizationMemberListLoader;
-import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.organizations.OrganizationMemberService;
-
-import java.util.List;
 
 import io.reactivex.Single;
 import retrofit2.Response;
