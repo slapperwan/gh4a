@@ -18,7 +18,6 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,26 +31,25 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.FollowerFollowingListActivity;
 import com.gh4a.activities.GistListActivity;
 import com.gh4a.activities.OrganizationMemberListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.RepositoryListActivity;
 import com.gh4a.activities.UserActivity;
-import com.gh4a.loader.IsFollowingUserLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.OrganizationListLoader;
-import com.gh4a.loader.RepositoryListLoader;
-import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
+import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.UserType;
+import com.meisolsson.githubsdk.service.organizations.OrganizationService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 import com.meisolsson.githubsdk.service.users.UserFollowerService;
+import com.meisolsson.githubsdk.service.users.UserService;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 import retrofit2.Response;
 
 public class UserFragment extends LoadingFragmentBase implements View.OnClickListener {
@@ -72,64 +71,20 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         return f;
     }
 
+    private static final int ID_LOADER_USER = 0;
+    private static final int ID_LOADER_REPO_LIST = 1;
+    private static final int ID_LOADER_ORG_LIST = 2;
+    private static final int ID_LOADER_IS_FOLLOWING = 3;
+
     private String mUserLogin;
     private User mUser;
     private View mContentView;
     private Boolean mIsFollowing;
     private boolean mIsSelf;
 
-    private final LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
-        @Override
-        protected Loader<LoaderResult<User>> onCreateLoader() {
-            return new UserLoader(getActivity(), mUserLogin);
-        }
-        @Override
-        protected void onResultReady(User result) {
-            mUser = result;
-            fillData();
-            setContentShown(true);
-            getActivity().invalidateOptionsMenu();
-        }
-    };
-
-    private final LoaderCallbacks<Collection<Repository>> mRepoListCallback =
-            new LoaderCallbacks<Collection<Repository>>(this) {
-        @Override
-        protected Loader<LoaderResult<Collection<Repository>>> onCreateLoader() {
-            Map<String, String> filterData = new HashMap<>();
-            filterData.put("sort", "pushed");
-            filterData.put("affiliation", "owner,collaborator");
-            return new RepositoryListLoader(getActivity(), mUserLogin,
-                    mUser.type(), filterData, 5);
-        }
-        @Override
-        protected void onResultReady(Collection<Repository> result) {
-            fillTopRepos(result);
-        }
-    };
-
-    private final LoaderCallbacks<List<User>> mOrganizationCallback = new LoaderCallbacks<List<User>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
-            return new OrganizationListLoader(getActivity(), mUserLogin);
-        }
-        @Override
-        protected void onResultReady(List<User> result) {
-            fillOrganizations(result);
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mIsFollowingCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new IsFollowingUserLoader(getActivity(), mUserLogin);
-        }
-        @Override
-        protected void onResultReady(Boolean result) {
-            mIsFollowing = result;
-            getActivity().invalidateOptionsMenu();
-        }
-    };
+    private Disposable mOrgListSubscription;
+    private Disposable mIsFollowingSubscription;
+    private Disposable mTopRepoSubscription;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -153,7 +108,19 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             fillOrganizations(null);
             fillTopRepos(null);
         }
-        hideContentAndRestartLoaders(0, 3);
+        setContentShown(false);
+        loadUser(true);
+        if (mTopRepoSubscription != null) {
+            mTopRepoSubscription.dispose();
+            mTopRepoSubscription = null;
+        }
+        if (mIsFollowingSubscription != null) {
+            loadIsFollowingState(true);
+        }
+        if (mOrgListSubscription != null) {
+            mOrgListSubscription.dispose();
+            mOrgListSubscription = null;
+        }
         getActivity().invalidateOptionsMenu();
     }
 
@@ -163,10 +130,9 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         setContentShown(false);
 
-        getLoaderManager().initLoader(0, null, mUserCallback);
-
+        loadUser(false);
         if (!mIsSelf && Gh4Application.get().isAuthorized()) {
-            getLoaderManager().initLoader(3, null, mIsFollowingCallback);
+            loadIsFollowingState(false);
         }
     }
 
@@ -232,7 +198,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         TextView tvReposCount = mContentView.findViewById(R.id.tv_repos_count);
         final int gistCount;
-        if (ApiHelpers.loginEquals(mUserLogin, Gh4Application.get().getAuthLogin())) {
+        if (mIsSelf) {
             tvReposCount.setText(String.valueOf(mUser.totalPrivateRepos() + mUser.publicRepos()));
             gistCount = mUser.publicGists() + mUser.privateGists();
         } else {
@@ -268,9 +234,9 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         fillTextView(R.id.tv_company, mUser.company());
         fillTextView(R.id.tv_location, mUser.location());
 
-        getLoaderManager().initLoader(1, null, mRepoListCallback);
+        loadTopRepositories();
         if (mUser.type() == UserType.User) {
-            getLoaderManager().initLoader(2, null, mOrganizationCallback);
+            loadOrganizations();
         } else {
             fillOrganizations(null);
         }
@@ -425,5 +391,71 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                     updateFollowingAction();
                     getActivity().invalidateOptionsMenu();
                 }, error -> getActivity().invalidateOptionsMenu());
+    }
+
+    private void loadUser(boolean force) {
+        UserService service = Gh4Application.get().getGitHubService(UserService.class);
+        service.getUser(mUserLogin)
+                .map(ApiHelpers::throwOnFailure)
+                .toObservable()
+                .compose(makeLoaderObservable(ID_LOADER_USER, force))
+                .subscribe(result -> {
+                    mUser = result;
+                    fillData();
+                    setContentShown(true);
+                    getActivity().invalidateOptionsMenu();
+                }, error -> {});
+
+    }
+
+    private void loadTopRepositories() {
+        RepositoryService service = ServiceFactory.createService(
+                RepositoryService.class, null, null, 5);
+        final Single<Response<Page<Repository>>> observable;
+
+        Map<String, String> filterData = new HashMap<>();
+        filterData.put("sort", "pushed");
+        filterData.put("affiliation", "owner,collaborator");
+
+        if (mIsSelf) {
+            observable = service.getUserRepositories(filterData, 0);
+        } else if (mUser.type() == UserType.Organization) {
+            observable = service.getOrganizationRepositories(mUserLogin, filterData, 0);
+        } else {
+            observable = service.getUserRepositories(mUserLogin, filterData, 0);
+        }
+
+        mTopRepoSubscription = observable
+                .map(ApiHelpers::throwOnFailure)
+                .map(page -> page.items())
+                .toObservable()
+                .compose(makeLoaderObservable(ID_LOADER_REPO_LIST, false))
+                .subscribe(result -> fillTopRepos(result), error -> {});
+    }
+
+    private void loadOrganizations() {
+        final OrganizationService service =
+                Gh4Application.get().getGitHubService(OrganizationService.class);
+        mOrgListSubscription = ApiHelpers.PageIterator
+                .toSingle(page -> mIsSelf
+                        ? service.getMyOrganizations(page)
+                        : service.getUserPublicOrganizations(mUserLogin, page)
+                )
+                .toObservable()
+                .compose(makeLoaderObservable(ID_LOADER_ORG_LIST, false))
+                .subscribe(result -> fillOrganizations(result), error -> {});
+    }
+
+    private void loadIsFollowingState(boolean force) {
+        UserFollowerService service =
+                Gh4Application.get().getGitHubService(UserFollowerService.class);
+        mIsFollowingSubscription = service.isFollowing(mUserLogin)
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .toObservable()
+                .compose(makeLoaderObservable(ID_LOADER_IS_FOLLOWING, force))
+                .subscribe(result -> {
+                    mIsFollowing = result;
+                    getActivity().invalidateOptionsMenu();
+                }, error -> {});
     }
 }

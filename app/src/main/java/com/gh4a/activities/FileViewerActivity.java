@@ -23,7 +23,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
 import android.support.v4.print.PrintHelper;
 import android.support.v7.widget.PopupMenu;
 import android.util.Base64;
@@ -33,19 +32,21 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gh4a.ApiRequestException;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.loader.ContentLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.ClientErrorResponse;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.TextMatch;
+import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
 import java.util.List;
 import java.util.Locale;
+
+import io.reactivex.Single;
 
 public class FileViewerActivity extends WebViewerActivity
         implements PopupMenu.OnMenuItemClickListener {
@@ -88,45 +89,9 @@ public class FileViewerActivity extends WebViewerActivity
     private int mLastTouchedLine = 0;
     private boolean mViewRawText;
 
+    private static final int ID_LOADER_FILE = 0;
     private static final int MENU_ITEM_HISTORY = 10;
     private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
-
-    private final LoaderCallbacks<Content> mFileCallback = new LoaderCallbacks<Content>(this) {
-        @Override
-        protected Loader<LoaderResult<Content>> onCreateLoader() {
-            return new ContentLoader(FileViewerActivity.this, mRepoOwner, mRepoName, mPath, mRef);
-        }
-
-        @Override
-        protected void onResultReady(Content result) {
-            if (result != null) {
-                mContent = result;
-                onDataReady();
-                setContentEmpty(false);
-            } else {
-                setContentEmpty(true);
-                setContentShown(true);
-            }
-        }
-
-        @Override
-        protected boolean onError(Exception e) {
-            if (e instanceof ApiRequestException) {
-                ClientErrorResponse response = ((ApiRequestException) e).getResponse();
-                List<ClientErrorResponse.FieldError> errors =
-                        response != null ? response.errors() : null;
-                if (errors != null) {
-                    for (ClientErrorResponse.FieldError fe : errors) {
-                        if (fe.reason() == ClientErrorResponse.FieldError.Reason.TooLarge) {
-                            openUnsuitableFileAndFinish();
-                            return true;
-                        }
-                    }
-                }
-            }
-            return super.onError(e);
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -136,7 +101,7 @@ public class FileViewerActivity extends WebViewerActivity
         if (FileUtils.isBinaryFormat(filename) && !FileUtils.isImage(filename)) {
             openUnsuitableFileAndFinish();
         } else {
-            getSupportLoaderManager().initLoader(0, null, mFileCallback);
+            loadFile(false);
         }
     }
 
@@ -171,8 +136,8 @@ public class FileViewerActivity extends WebViewerActivity
 
     @Override
     public void onRefresh() {
-        forceLoaderReload(0);
         setContentShown(false);
+        loadFile(true);
         super.onRefresh();
     }
 
@@ -349,5 +314,40 @@ public class FileViewerActivity extends WebViewerActivity
         content.append("<img src='").append(imageUrl).append("' />");
         content.append("</div></body></html>");
         return content.toString();
+    }
+
+    private void loadFile(boolean force) {
+        RepositoryContentService service =
+                Gh4Application.get().getGitHubService(RepositoryContentService.class);
+        service.getContents(mRepoOwner, mRepoName, mPath, mRef)
+                .map(ApiHelpers::throwOnFailure)
+                .onErrorResumeNext(error -> {
+                    if (error instanceof ApiRequestException) {
+                        ClientErrorResponse response = ((ApiRequestException) error).getResponse();
+                        List<ClientErrorResponse.FieldError> errors =
+                                response != null ? response.errors() : null;
+                        if (errors != null) {
+                            for (ClientErrorResponse.FieldError fe : errors) {
+                                if (fe.reason() == ClientErrorResponse.FieldError.Reason.TooLarge) {
+                                    openUnsuitableFileAndFinish();
+                                    return Single.just(null);
+                                }
+                            }
+                        }
+                    }
+                    return Single.error(error);
+                })
+                .toObservable()
+                .compose(makeLoaderObservable(ID_LOADER_FILE, force))
+                .subscribe(result -> {
+                    if (result != null) {
+                        mContent = result;
+                        onDataReady();
+                        setContentEmpty(false);
+                    } else {
+                        setContentEmpty(true);
+                        setContentShown(true);
+                    }
+                }, error -> {});
     }
 }
