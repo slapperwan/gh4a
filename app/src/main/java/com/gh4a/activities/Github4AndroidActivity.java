@@ -50,9 +50,7 @@ import io.reactivex.Single;
  */
 public class Github4AndroidActivity extends BaseActivity implements View.OnClickListener {
     private static final String OAUTH_URL = "https://github.com/login/oauth/authorize";
-    private static final String TOKEN_URL = "https://github.com/login/oauth/access_token";
     private static final String PARAM_CLIENT_ID = "client_id";
-    private static final String PARAM_CLIENT_SECRET = "client_secret";
     private static final String PARAM_CODE = "code";
     private static final String PARAM_SCOPE = "scope";
     private static final String PARAM_CALLBACK_URI = "redirect_uri";
@@ -111,22 +109,19 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                     .code(data.getQueryParameter(PARAM_CODE))
                     .build();
 
-            Single<GitHubToken> tokenSingle = service.getToken(request)
+            service.getToken(request)
                     .map(ApiHelpers::throwOnFailure)
-                    .compose(RxUtils::doInBackground);
-
-            Single<User> userSingle = tokenSingle
                     .flatMap(token -> {
                         UserService userService = ServiceFactory.createService(
                                 UserService.class, null, token.accessToken(), null);
-                        return userService.getUser();
+                        Single<User> userSingle = userService.getUser()
+                                .map(ApiHelpers::throwOnFailure);
+                        return Single.zip(Single.just(token), userSingle,
+                                (t, user) -> Pair.create(t.accessToken(), user));
                     })
-                    .map(ApiHelpers::throwOnFailure)
-                    .compose(RxUtils::doInBackground);
-
-            Single.zip(tokenSingle, userSingle, (token, user) -> Pair.create(token, user))
+                    .compose(RxUtils::doInBackground)
                     .subscribe(pair -> {
-                        Gh4Application.get().addAccount(pair.second, pair.first.accessToken());
+                        Gh4Application.get().addAccount(pair.second, pair.first);
                         goToToplevelActivity();
                         finish();
                     }, error -> setErrorViewVisibility(true, error));
