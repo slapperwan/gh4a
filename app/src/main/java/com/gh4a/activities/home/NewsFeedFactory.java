@@ -42,7 +42,6 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
     public NewsFeedFactory(HomeActivity activity, String userLogin) {
         super(activity);
         mUserLogin = userLogin;
-        loadOrganizations(false);
     }
 
     @Override
@@ -65,6 +64,11 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
     protected void setUserInfo(User user) {
         mSelf = user;
         mActivity.supportInvalidateOptionsMenu();
+    }
+
+    @Override
+    protected void onStartLoadingData() {
+        loadOrganizations(false);
     }
 
     @Override
