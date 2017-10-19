@@ -1,5 +1,6 @@
 package com.gh4a.resolver;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
@@ -9,15 +10,15 @@ import com.gh4a.activities.ReviewActivity;
 import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.meisolsson.githubsdk.model.Review;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+
+import io.reactivex.Single;
 
 public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
     @VisibleForTesting
@@ -41,43 +42,52 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
 
     @Override
     protected Intent run() throws Exception {
+        return load(mActivity, mRepoOwner, mRepoName, mPullRequestNumber, mMarker).blockingGet();
+    }
+
+    public static Single<Intent> load(Context context, String repoOwner, String repoName,
+            int pullRequestNumber, IntentUtils.InitialCommentMarker marker) {
         final Gh4Application app = Gh4Application.get();
         final PullRequestReviewService reviewService =
                 app.getGitHubService(PullRequestReviewService.class);
         final PullRequestReviewCommentService commentService =
                 app.getGitHubService(PullRequestReviewCommentService.class);
 
-        List<ReviewComment> comments = ApiHelpers.PageIterator
+        return ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getPullRequestComments(
-                        mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .blockingGet();
+                        repoOwner, repoName, pullRequestNumber, page))
+                // Required to have comments sorted so we can find correct review
+                .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR))
+                .flatMap(comments -> {
+                    Map<String, ReviewComment> commentsByDiffHunkId = new HashMap<>();
+                    for (ReviewComment comment : comments) {
+                        String id = TimelineItem.Diff.getDiffHunkId(comment);
 
-        // Required to have comments sorted so we can find correct review
-        Collections.sort(comments, ApiHelpers.COMMENT_COMPARATOR);
+                        if (!commentsByDiffHunkId.containsKey(id)) {
+                            // Because the comment we are looking for could be a reply to another
+                            // review we have to keep track of initial comments for each diff hunk
+                            commentsByDiffHunkId.put(id, comment);
+                        }
 
-        Map<String, ReviewComment> commentsByDiffHunkId = new HashMap<>();
-        for (ReviewComment comment : comments) {
-            String id = TimelineItem.Diff.getDiffHunkId(comment);
+                        if (marker.matches(comment.id(), null)) {
+                            // Once found the comment we are looking for get a correct review id from
+                            // the initial diff hunk comment
+                            ReviewComment initialComment = commentsByDiffHunkId.get(id);
+                            long reviewId = initialComment.pullRequestReviewId();
 
-            if (!commentsByDiffHunkId.containsKey(id)) {
-                // Because the comment we are looking for could be a reply to another review
-                // we have to keep track of initial comments for each diff hunk
-                commentsByDiffHunkId.put(id, comment);
-            }
-
-            if (mMarker.matches(comment.id(), null)) {
-                // Once found the comment we are looking for get a correct review id from
-                // the initial diff hunk comment
-                ReviewComment initialComment = commentsByDiffHunkId.get(id);
-                long reviewId = initialComment.pullRequestReviewId();
-
-                Review review = ApiHelpers.throwOnFailure(reviewService.getReview(
-                        mRepoOwner, mRepoName, mPullRequestNumber, reviewId).blockingGet());
-                return ReviewActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                        mPullRequestNumber, review, mMarker);
-            }
-        }
-
-        return null;
+                            return reviewService
+                                    .getReview(repoOwner, repoName, pullRequestNumber, reviewId)
+                                    .map(ApiHelpers::throwOnFailure);
+                        }
+                    }
+                    return Single.just(null);
+                })
+                .map(review -> {
+                    if (review == null) {
+                        return null;
+                    }
+                    return ReviewActivity.makeIntent(context, repoOwner, repoName,
+                            pullRequestNumber, review, marker);
+                });
     }
 }
