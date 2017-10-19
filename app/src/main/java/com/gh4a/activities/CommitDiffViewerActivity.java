@@ -17,13 +17,11 @@ package com.gh4a.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.Loader;
 
 import com.gh4a.Gh4Application;
-import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.ReactionBar;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
 import com.meisolsson.githubsdk.model.Reaction;
@@ -95,8 +93,12 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     }
 
     @Override
-    protected Loader<LoaderResult<List<GitComment>>> createCommentLoader() {
-        return new CommitCommentListLoader(this, mRepoOwner, mRepoName, mSha, false, true);
+    protected Single<List<GitComment>> createCommentSingle() {
+        final RepositoryCommentService service =
+                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mSha, page))
+                .compose(RxUtils.filter(c -> c.position() >= 0));
     }
 
     @Override

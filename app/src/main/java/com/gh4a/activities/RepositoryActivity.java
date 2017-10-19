@@ -553,7 +553,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                     .compose(RxUtils::doInBackground);
 
             registerTemporarySubscription(Single.zip(branchSingle, tagSingle, (branches, tags) -> Pair.create(branches, tags))
-                    .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                    .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                     .subscribe(result -> {
                         mBranches = result.first;
                         mTags = result.second;

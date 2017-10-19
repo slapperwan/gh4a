@@ -3,7 +3,6 @@ package com.gh4a.activities.home;
 import android.content.Context;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.Loader;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,46 +14,35 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.PrivateEventListFragment;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.OrganizationListLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.organizations.OrganizationService;
 
 import java.util.List;
+
+import io.reactivex.disposables.Disposable;
 
 public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSelectedListener {
     private final String mUserLogin;
     private User mSelf;
     private User mSelectedOrganization;
     private List<User> mUserScopes;
+    private Disposable mOrganizationSubscription;
+
+    private static final int ID_LOADER_ORGS = 100;
 
     private static final int[] TAB_TITLES = new int[] {
         R.string.user_news_feed
     };
 
-    @SuppressWarnings("FieldCanBeLocal")
-    private final LoaderCallbacks<List<User>> mOrganizationCallback =
-            new LoaderCallbacks<List<User>>(mActivity) {
-        @Override
-        protected Loader<LoaderResult<List<User>>> onCreateLoader() {
-            return new OrganizationListLoader(mActivity, mUserLogin);
-        }
-
-        @Override
-        protected void onResultReady(List<User> result) {
-            mUserScopes = result != null && result.size() > 0 ? result : null;
-            mActivity.supportInvalidateOptionsMenu();
-        }
-    };
-
     public NewsFeedFactory(HomeActivity activity, String userLogin) {
         super(activity);
         mUserLogin = userLogin;
-
-        mActivity.getSupportLoaderManager().initLoader(100, null, mOrganizationCallback);
+        loadOrganizations(false);
     }
 
     @Override
@@ -98,19 +86,18 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
     @Override
     protected void onRefresh() {
-        Loader loader = mActivity.getSupportLoaderManager().getLoader(100);
-        if (loader != null) {
-            loader.onContentChanged();
-        }
         mSelf = null;
         mUserScopes = null;
+        loadOrganizations(true);
         mActivity.supportInvalidateOptionsMenu();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mActivity.getSupportLoaderManager().destroyLoader(100);
+        if (mOrganizationSubscription != null) {
+            mOrganizationSubscription.dispose();
+        }
     }
 
     @Override
@@ -182,5 +169,21 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
             return convertView;
         }
+    }
+
+    private void loadOrganizations(boolean force) {
+        final Gh4Application app = Gh4Application.get();
+        final OrganizationService service = app.getGitHubService(OrganizationService.class);
+        mOrganizationSubscription = ApiHelpers.PageIterator
+                .toSingle(page -> {
+                    return ApiHelpers.loginEquals(mUserLogin, app.getAuthLogin())
+                            ? service.getMyOrganizations(page)
+                            : service.getUserPublicOrganizations(mUserLogin, page);
+                })
+                .compose(mActivity.makeLoaderSingle(ID_LOADER_ORGS, force))
+                .subscribe(result -> {
+                    mUserScopes = result != null && result.size() > 0 ? result : null;
+                    mActivity.supportInvalidateOptionsMenu();
+                }, error -> {});
     }
 }

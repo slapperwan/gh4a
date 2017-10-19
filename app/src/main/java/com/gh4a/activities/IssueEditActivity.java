@@ -43,6 +43,7 @@ import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.RxUtils;
+import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.MarkdownButtonsBar;
@@ -632,7 +633,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return getBaseActivity().getString(TITLES[position]);
+            return getString(TITLES[position]);
         }
 
         @Override
@@ -642,30 +643,12 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadCollaboratorStatus(boolean force) {
-        Gh4Application app = Gh4Application.get();
-        String login = app.getAuthLogin();
-        final Single<Boolean> observable;
-
-        if (login == null) {
-            observable = Single.just(false);
-        } else {
-            RepositoryCollaboratorService service =
-                    app.getGitHubService(RepositoryCollaboratorService.class);
-            // TODO: consider moving to a shared place - shared with IssueListActivity
-            observable = service.isUserCollaborator(mRepoOwner, mRepoName, login)
-                    .map(ApiHelpers::throwOnFailure)
-                    // the API returns 403 if the user doesn't have push access,
-                    // which in turn means he isn't a collaborator
-                    .compose(RxUtils.mapFailureToValue(403, false))
-                    // there's no actual content, result is always null
-                    .map(result -> true)
-                    .compose(makeLoaderSingle(ID_LOADER_COLLABORATOR_STATUS, force));
-        }
-
-        observable.subscribe(result -> {
-            mIsCollaborator = result;
-            invalidatePages();
-        }, error -> {});
+        SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName)
+                .compose(makeLoaderSingle(ID_LOADER_COLLABORATOR_STATUS, force))
+                .subscribe(result -> {
+                    mIsCollaborator = result;
+                    invalidatePages();
+                }, error -> {});
     }
 
     private void loadLabels() {
@@ -674,7 +657,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         registerTemporarySubscription(ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                 .compose(RxUtils::doInBackground)
-                .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                 .subscribe(result -> {
                     mAllLabels = result;
                     showLabelDialog();
@@ -687,7 +670,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         registerTemporarySubscription(ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
                 .compose(RxUtils::doInBackground)
-                .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                 .subscribe(result -> {
                     mAllMilestone = result;
                     showMilestonesDialog();
@@ -700,7 +683,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         registerTemporarySubscription(ApiHelpers.PageIterator
                 .toSingle(page -> service.getCollaborators(mRepoOwner, mRepoName, page))
                 .compose(RxUtils::doInBackground)
-                .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                 .subscribe(result -> {
                     mAllAssignee = result;
                     User creator = mEditIssue.user();
@@ -726,7 +709,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                             .compose(RxUtils::doInBackground);
                 })
                 .map(c -> c != null ? StringUtils.fromBase64(c.content()) : null)
-                .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                 .subscribe(result -> {
                     mDescView.setHint(null);
                     mDescView.setEnabled(true);

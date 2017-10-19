@@ -4,7 +4,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.gh4a.R;
-import com.gh4a.loader.TimelineItem;
+import com.gh4a.model.TimelineItem;
 
 class ReplyViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Reply>
         implements View.OnClickListener {

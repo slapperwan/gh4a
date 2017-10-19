@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,15 +18,12 @@ import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.job.NotificationsJob;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.NotificationHolder;
-import com.gh4a.loader.NotificationListLoadResult;
-import com.gh4a.loader.NotificationListLoader;
+import com.gh4a.model.NotificationHolder;
 import com.gh4a.resolver.BrowseFilter;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
+import com.gh4a.utils.SingleFactory;
 import com.meisolsson.githubsdk.model.NotificationSubject;
 import com.meisolsson.githubsdk.model.NotificationThread;
 import com.meisolsson.githubsdk.model.Repository;
@@ -50,29 +46,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         return new NotificationListFragment();
     }
 
-    private final LoaderCallbacks<NotificationListLoadResult> mNotificationsCallback =
-            new LoaderCallbacks<NotificationListLoadResult>(this) {
-        @Override
-        protected Loader<LoaderResult<NotificationListLoadResult>> onCreateLoader() {
-            return new NotificationListLoader(getContext(), mAll, mParticipating);
-        }
-
-        @Override
-        protected void onResultReady(NotificationListLoadResult result) {
-            mNotificationsLoadTime = result.loadTime;
-            mAdapter.clear();
-            mAdapter.addAll(result.notifications);
-            setContentShown(true);
-            mAdapter.notifyDataSetChanged();
-            updateEmptyState();
-            updateMenuItemVisibility();
-            if (!mAll && !mParticipating) {
-                mCallback.setNotificationsIndicatorVisible(!result.notifications.isEmpty());
-            }
-
-            scrollToInitialNotification(result.notifications);
-        }
-    };
+    private static final int ID_LOADER_NOTIFICATIONS = 0;
 
     private NotificationAdapter mAdapter;
     private Date mNotificationsLoadTime;
@@ -106,7 +80,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setContentShown(false);
-        getLoaderManager().initLoader(0, null, mNotificationsCallback);
+        loadNotifications(false);
         NotificationsJob.markNotificationsAsSeen(getActivity());
     }
 
@@ -120,7 +94,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         if (mAdapter != null) {
             mAdapter.clear();
         }
-        hideContentAndRestartLoaders(0);
+        setContentShown(false);
+        loadNotifications(true);
         updateMenuItemVisibility();
     }
 
@@ -207,9 +182,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         }
         setContentShown(false);
         updateMenuItemVisibility();
-
-        getLoaderManager().destroyLoader(0);
-        getLoaderManager().initLoader(0, null, mNotificationsCallback);
+        loadNotifications(true);
     }
 
     @Override
@@ -311,5 +284,23 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             }
         }
         updateMenuItemVisibility();
+    }
+
+    private void loadNotifications(boolean force) {
+        SingleFactory.getNotifications(mAll, mParticipating)
+                .compose(makeLoaderSingle(ID_LOADER_NOTIFICATIONS, force))
+                .subscribe(result -> {
+                    mNotificationsLoadTime = result.loadTime;
+                    mAdapter.clear();
+                    mAdapter.addAll(result.notifications);
+                    setContentShown(true);
+                    mAdapter.notifyDataSetChanged();
+                    updateEmptyState();
+                    updateMenuItemVisibility();
+                    if (!mAll && !mParticipating) {
+                        mCallback.setNotificationsIndicatorVisible(!result.notifications.isEmpty());
+                    }
+                    scrollToInitialNotification(result.notifications);
+                }, error -> {});
     }
 }

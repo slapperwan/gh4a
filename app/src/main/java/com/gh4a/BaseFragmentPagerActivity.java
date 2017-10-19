@@ -8,7 +8,6 @@ import android.util.SparseArray;
 import android.view.ViewGroup;
 
 import com.gh4a.fragment.LoadingFragmentBase;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 public abstract class BaseFragmentPagerActivity extends BasePagerActivity implements
@@ -44,8 +43,8 @@ public abstract class BaseFragmentPagerActivity extends BasePagerActivity implem
     public void onRefresh() {
         for (int i = 0; i < mAdapter.getCount(); i++) {
             Fragment f = mAdapter.getExistingFragment(i);
-            if (f instanceof LoaderCallbacks.ParentCallback) {
-                ((LoaderCallbacks.ParentCallback) f).onRefresh();
+            if (f instanceof RefreshableChild) {
+                ((RefreshableChild) f).onRefresh();
             }
         }
         super.onRefresh();

@@ -23,8 +23,8 @@ import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.TrendAdapter;
-import com.gh4a.holder.Trend;
-import com.gh4a.loader.TrendLoader;
+import com.gh4a.model.Trend;
+import com.gh4a.utils.SingleFactory;
 
 import java.util.List;
 
@@ -88,6 +88,6 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> implements
 
     @Override
     protected Single<List<Trend>> onCreateDataSingle() {
-        return TrendLoader.loadTrends(mType);
+        return SingleFactory.loadTrends(mType);
     }
 }

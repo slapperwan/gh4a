@@ -39,9 +39,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -66,7 +64,6 @@ import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
@@ -87,8 +84,11 @@ import io.reactivex.schedulers.Schedulers;
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
-        LoaderCallbacks.ParentCallback,
         NavigationView.OnNavigationItemSelectedListener {
+    public interface RefreshableChild {
+        void onRefresh();
+    }
+
     private ViewGroup mContentContainer;
     private TextView mEmptyView;
     private boolean mContentShown;
@@ -162,11 +162,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Nullable
     protected String getActionBarSubtitle() {
         return null;
-    }
-
-    @Override
-    public BaseActivity getBaseActivity() {
-        return this;
     }
 
     public void handleAuthFailureDuringLoad() {
@@ -585,20 +580,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    protected boolean forceLoaderReload(int... ids) {
-        LoaderManager lm = getSupportLoaderManager();
-        boolean reloadedAny = false;
-        for (int id : ids) {
-            Loader loader = lm.getLoader(id);
-            if (loader != null) {
-                loader.onContentChanged();
-                reloadedAny = true;
-            }
-        }
-        return reloadedAny;
-    }
-
-    protected <T> SingleTransformer<T, T> makeLoaderSingle(int id, boolean force) {
+    public <T> SingleTransformer<T, T> makeLoaderSingle(int id, boolean force) {
         return upstream -> upstream
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -1,4 +1,4 @@
-package com.gh4a.loader;
+package com.gh4a.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

@@ -12,7 +12,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import android.net.Uri;
 
-import com.gh4a.holder.Feed;
+import com.gh4a.model.Feed;
 import com.gh4a.utils.StringUtils;
 
 public class FeedHandler extends DefaultHandler {

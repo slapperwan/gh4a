@@ -26,7 +26,6 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,15 +44,11 @@ import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
 import com.gh4a.fragment.PullRequestFragment;
-import com.gh4a.loader.IsCollaboratorLoader;
-import com.gh4a.loader.IssueLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.PendingReviewLoader;
-import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
+import com.gh4a.utils.SingleFactory;
+import com.gh4a.utils.Triplet;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
@@ -63,13 +58,17 @@ import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.model.PullRequestMarker;
 import com.meisolsson.githubsdk.model.Review;
+import com.meisolsson.githubsdk.model.ReviewState;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.request.pull_request.EditPullRequest;
 import com.meisolsson.githubsdk.model.request.pull_request.MergeRequest;
+import com.meisolsson.githubsdk.service.issues.IssueService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
-import java.util.List;
 import java.util.Locale;
+
+import io.reactivex.Single;
 
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
@@ -129,73 +128,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
     }
 
-    private final LoaderCallbacks<PullRequest> mPullRequestCallback = new LoaderCallbacks<PullRequest>(this) {
-        @Override
-        protected Loader<LoaderResult<PullRequest>> onCreateLoader() {
-            return new PullRequestLoader(PullRequestActivity.this,
-                    mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-
-        @Override
-        protected void onResultReady(PullRequest result) {
-            mPullRequest = result;
-            fillHeader();
-            showContentIfReady();
-            supportInvalidateOptionsMenu();
-        }
-    };
-
-    private final LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
-        @Override
-        protected Loader<LoaderResult<Issue>> onCreateLoader() {
-            return new IssueLoader(PullRequestActivity.this,
-                    mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-
-        @Override
-        protected void onResultReady(Issue result) {
-            mIssue = result;
-            showContentIfReady();
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new IsCollaboratorLoader(PullRequestActivity.this, mRepoOwner, mRepoName);
-        }
-
-        @Override
-        protected void onResultReady(Boolean result) {
-            mIsCollaborator = result;
-            showContentIfReady();
-            supportInvalidateOptionsMenu();
-        }
-    };
-
-    private final LoaderCallbacks<List<Review>> mPendingReviewCallback =
-            new LoaderCallbacks<List<Review>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<Review>>> onCreateLoader() {
-            return new PendingReviewLoader(PullRequestActivity.this,
-                    mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-
-        @Override
-        protected void onResultReady(List<Review> result) {
-            String ownLogin = Gh4Application.get().getAuthLogin();
-            mPendingReview = null;
-            for (Review review : result) {
-                if (ApiHelpers.loginEquals(review.user(), ownLogin)) {
-                    mPendingReview = review;
-                    break;
-                }
-            }
-            mPendingReviewLoaded = true;
-            supportInvalidateOptionsMenu();
-        }
-    };
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -207,11 +139,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         addHeaderView(mHeader, !hasTabsInToolbar());
 
         setContentShown(false);
-
-        getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
-        getSupportLoaderManager().initLoader(1, null, mIssueCallback);
-        getSupportLoaderManager().initLoader(2, null, mCollaboratorCallback);
-        getSupportLoaderManager().initLoader(3, null, mPendingReviewCallback);
+        load(false);
+        loadPendingReview(false);
     }
 
     @NonNull
@@ -320,8 +249,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 if (mPullRequestFragment != null) {
                     mPullRequestFragment.reloadEvents(false);
                 }
-                // reload pending reviews
-                getSupportLoaderManager().getLoader(3).onContentChanged();
+                loadPendingReview(true);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -346,7 +274,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         mPullRequest = null;
         mIsCollaborator = null;
         mPendingReview = null;
-        mPendingReviewLoaded = false;
         setContentShown(false);
         if (mEditFab != null) {
             mEditFab.post(new Runnable() {
@@ -358,7 +285,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
         mHeader.setVisibility(View.GONE);
         mHeaderColorAttrs = null;
-        forceLoaderReload(0, 1, 2, 3);
+        load(true);
+        loadPendingReview(true);
         invalidateTabs();
         supportInvalidateOptionsMenu();
         super.onRefresh();
@@ -432,19 +360,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             Intent intent = UserActivity.makeIntent(this, (User) v.getTag());
             if (intent != null) {
                 startActivity(intent);
-            }
-        }
-    }
-
-    private void showContentIfReady() {
-        if (mPullRequest != null && mIssue != null && mIsCollaborator != null) {
-            setContentShown(true);
-            invalidateTabs();
-            updateFabVisibility();
-
-            if (mInitialPage >= 0 && mInitialPage < TITLES.length) {
-                getPager().setCurrentItem(mInitialPage);
-                mInitialPage = -1;
             }
         }
     }
@@ -622,6 +537,58 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                                 .build();
                     }
                     handlePullRequestUpdate();
+                }, error -> {});
+    }
+
+    private void load(boolean force) {
+        Gh4Application app = Gh4Application.get();
+        PullRequestService prService = app.getGitHubService(PullRequestService.class);
+        IssueService issueService = app.getGitHubService(IssueService.class);
+
+        Single<PullRequest> prSingle = prService.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
+                .map(ApiHelpers::throwOnFailure);
+        Single<Issue> issueSingle = issueService.getIssue(mRepoOwner, mRepoName, mPullRequestNumber)
+                .map(ApiHelpers::throwOnFailure);
+        Single<Boolean> isCollaboratorSingle =
+                SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName);
+
+        Single.zip(issueSingle, prSingle, isCollaboratorSingle,
+                (issue, pr, isCollaborator) -> Triplet.create(issue, pr, isCollaborator))
+                .compose(makeLoaderSingle(0, force))
+                .subscribe(result -> {
+                    mIssue = result.first;
+                    mPullRequest = result.second;
+                    mIsCollaborator = result.third;
+                    fillHeader();
+                    setContentShown(true);
+                    invalidateTabs();
+                    updateFabVisibility();
+                    supportInvalidateOptionsMenu();
+
+                    if (mInitialPage >= 0 && mInitialPage < TITLES.length) {
+                        getPager().setCurrentItem(mInitialPage);
+                        mInitialPage = -1;
+                    }
+                }, error -> {});
+    }
+
+    private void loadPendingReview(boolean force) {
+        Gh4Application app = Gh4Application.get();
+        String ownLogin = app.getAuthLogin();
+        PullRequestReviewService service = app.getGitHubService(PullRequestReviewService.class);
+
+        ApiHelpers.PageIterator
+                .toSingle(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page))
+                .compose(RxUtils.filter(r -> r.state() == ReviewState.Pending && ApiHelpers.loginEquals(r.user(), ownLogin)))
+                .compose(makeLoaderSingle(1, force))
+                .doOnSubscribe(disposable -> {
+                    mPendingReviewLoaded = false;
+                    supportInvalidateOptionsMenu();
+                })
+                .subscribe(result -> {
+                    mPendingReview = result.isEmpty() ? null : result.get(0);
+                    mPendingReviewLoaded = true;
+                    supportInvalidateOptionsMenu();
                 }, error -> {});
     }
 }

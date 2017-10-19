@@ -5,16 +5,18 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.ApiRequestException;
+import com.gh4a.Gh4Application;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
-import com.gh4a.loader.PullRequestCommentsLoader;
-import com.gh4a.loader.PullRequestFilesLoader;
-import com.gh4a.loader.PullRequestLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
 import java.util.List;
 
@@ -43,20 +45,32 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
 
     @Override
     protected Intent run() throws ApiRequestException {
-        PullRequest pullRequest = PullRequestLoader.loadPullRequest(
-                mRepoOwner, mRepoName, mPullRequestNumber).blockingGet();
+        PullRequestService service =
+                Gh4Application.get().getGitHubService(PullRequestService.class);
+        PullRequest pullRequest = service.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
+                .map(ApiHelpers::throwOnFailure)
+                .blockingGet();
+
         if (pullRequest == null || mActivity.isFinishing()) {
             return null;
         }
 
-        List<ReviewComment> comments = PullRequestCommentsLoader.loadComments(
-                mRepoOwner, mRepoName, mPullRequestNumber).blockingGet();
+        final PullRequestReviewCommentService commentService =
+                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+
+        List<ReviewComment> comments = ApiHelpers.PageIterator
+                .toSingle(page -> commentService.getPullRequestComments(
+                        mRepoOwner, mRepoName, mPullRequestNumber, page))
+                .compose(RxUtils.filter(c -> c.position() >= 0))
+                .blockingGet();
+
         if (comments == null || mActivity.isFinishing()) {
             return null;
         }
 
-        List<GitHubFile> files = PullRequestFilesLoader.loadFiles(
-                mRepoOwner, mRepoName, mPullRequestNumber).blockingGet();
+        List<GitHubFile> files = ApiHelpers.PageIterator
+                .toSingle(page -> service.getPullRequestFiles(mRepoOwner, mRepoName, mPullRequestNumber, page))
+                .blockingGet();
         if (files == null || mActivity.isFinishing()) {
             return null;
         }

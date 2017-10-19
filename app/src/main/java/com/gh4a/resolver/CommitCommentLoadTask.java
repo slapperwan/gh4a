@@ -5,16 +5,18 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.ApiRequestException;
+import com.gh4a.Gh4Application;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CommitDiffViewerActivity;
-import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.CommitLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
 import com.meisolsson.githubsdk.model.git.GitComment;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
 import java.util.List;
 
@@ -40,9 +42,17 @@ public class CommitCommentLoadTask extends UrlLoadTask {
 
     @Override
     protected Intent run() throws ApiRequestException {
-        List<GitComment> comments = CommitCommentListLoader.loadComments(
-                mRepoOwner, mRepoName, mCommitSha).blockingGet();
-        Commit commit = CommitLoader.loadCommit(mRepoOwner, mRepoName, mCommitSha).blockingGet();
+        final RepositoryCommentService commentService =
+                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        List<GitComment> comments = ApiHelpers.PageIterator
+                .toSingle(page -> commentService.getCommitComments(mRepoOwner, mRepoName, mCommitSha, page))
+                .blockingGet();
+
+        RepositoryCommitService commitService =
+                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+        Commit commit = commitService.getCommit(mRepoOwner, mRepoName, mCommitSha)
+                .map(ApiHelpers::throwOnFailure)
+                .blockingGet();
 
         GitHubFile resultFile = null;
         for (PositionalCommentBase comment : comments) {

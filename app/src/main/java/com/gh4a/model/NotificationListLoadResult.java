@@ -1,4 +1,4 @@
-package com.gh4a.loader;
+package com.gh4a.model;
 
 import java.util.Date;
 import java.util.List;

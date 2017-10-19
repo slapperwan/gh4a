@@ -11,16 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.DividerItemDecoration;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.pluscubed.recyclerfastscroll.RecyclerFastScroller;
 
 public abstract class LoadingListFragmentBase extends LoadingFragmentBase implements
-        LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
+        BaseActivity.RefreshableChild, SwipeRefreshLayout.ChildScrollDelegate {
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private NestedScrollView mEmptyViewContainer;

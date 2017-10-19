@@ -84,7 +84,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        populateViewIfReady();
+        fillHeader();
+        fillStats(mCommit.files(), mComments);
     }
 
     @Override
@@ -92,12 +93,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         // we got all our data through arguments
     }
 
-    protected void populateViewIfReady() {
-        fillHeader();
-        fillStats(mCommit.files(), mComments);
-    }
-
-    private void fillHeader() {
+    protected void fillHeader() {
         final Activity activity = getActivity();
         final Gh4Application app = Gh4Application.get();
 

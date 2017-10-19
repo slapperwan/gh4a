@@ -40,7 +40,7 @@ import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
-import com.gh4a.loader.TimelineItem;
+import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
@@ -52,6 +52,7 @@ import com.gh4a.widget.EditorBottomSheet;
 import com.gh4a.widget.ReactionBar;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.IssueEventType;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Reaction;
 import com.meisolsson.githubsdk.model.Reactions;
@@ -61,6 +62,8 @@ import com.meisolsson.githubsdk.model.request.ReactionRequest;
 import com.meisolsson.githubsdk.service.reactions.ReactionService;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -72,6 +75,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         EditorBottomSheet.Callback, EditorBottomSheet.Listener,
         ReactionBar.Callback, ReactionBar.Item, ReactionBar.ReactionDetailsCache.Listener {
     protected static final int REQUEST_EDIT = 1000;
+
+    protected static final List<IssueEventType> INTERESTING_EVENTS = Arrays.asList(
+            IssueEventType.Closed, IssueEventType.Reopened, IssueEventType.Merged,
+            IssueEventType.Referenced, IssueEventType.Assigned, IssueEventType.Unassigned,
+            IssueEventType.Labeled, IssueEventType.Unlocked, IssueEventType.Locked,
+            IssueEventType.Unlocked, IssueEventType.Milestoned, IssueEventType.Demilestoned,
+            IssueEventType.Renamed, IssueEventType.HeadRefDeleted, IssueEventType.HeadRefRestored
+    );
 
     protected View mListHeaderView;
     protected Issue mIssue;

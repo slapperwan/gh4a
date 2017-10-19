@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.loader.TimelineItem;
+import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;

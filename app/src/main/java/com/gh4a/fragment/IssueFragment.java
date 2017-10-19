@@ -9,8 +9,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.PullRequestActivity;
-import com.gh4a.loader.IssueCommentListLoader;
-import com.gh4a.loader.TimelineItem;
+import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -83,14 +82,14 @@ public class IssueFragment extends IssueFragmentBase {
                 .compose(RxUtils.mapList(comment -> new TimelineItem.TimelineComment(comment)));
         Single<List<TimelineItem>> eventSingle = ApiHelpers.PageIterator
                 .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
-                .compose(RxUtils.filter(event -> IssueCommentListLoader.INTERESTING_EVENTS.contains(event.event())))
+                .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
                 .compose((RxUtils.mapList(event -> new TimelineItem.TimelineEvent(event))));
 
         return Single.zip(commentSingle, eventSingle, (comments, events) -> {
             ArrayList<TimelineItem> result = new ArrayList<>();
             result.addAll(comments);
             result.addAll(events);
-            Collections.sort(result, IssueCommentListLoader.TIMELINE_ITEM_COMPARATOR);
+            Collections.sort(result, TimelineItem.COMPARATOR);
             return result;
         });
     }
