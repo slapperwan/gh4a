@@ -579,14 +579,17 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(RxUtils.filter(r -> r.state() == ReviewState.Pending && ApiHelpers.loginEquals(r.user(), ownLogin)))
+                .compose(RxUtils.filterAndMapToFirstOrNull(r -> {
+                    return r.state() == ReviewState.Pending
+                            && ApiHelpers.loginEquals(r.user(), ownLogin);
+                }))
                 .compose(makeLoaderSingle(1, force))
                 .doOnSubscribe(disposable -> {
                     mPendingReviewLoaded = false;
                     supportInvalidateOptionsMenu();
                 })
                 .subscribe(result -> {
-                    mPendingReview = result.isEmpty() ? null : result.get(0);
+                    mPendingReview = result;
                     mPendingReviewLoaded = true;
                     supportInvalidateOptionsMenu();
                 }, error -> {});

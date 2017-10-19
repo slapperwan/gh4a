@@ -4,13 +4,13 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
+
+import io.reactivex.Single;
 
 public class PullRequestReviewLoadTask extends UrlLoadTask {
     @VisibleForTesting
@@ -32,14 +32,12 @@ public class PullRequestReviewLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws ApiRequestException {
+    protected Single<Intent> getSingle() {
         PullRequestReviewService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewService.class);
-
-        Review review = ApiHelpers.throwOnFailure(service.getReview(mRepoOwner, mRepoName,
-                mPullRequestNumber, mMarker.commentId).blockingGet());
-
-        return ReviewActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                mPullRequestNumber, review, mMarker);
+        return service.getReview(mRepoOwner, mRepoName, mPullRequestNumber, mMarker.commentId)
+                .map(ApiHelpers::throwOnFailure)
+                .map(review -> ReviewActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
+                        mPullRequestNumber, review, mMarker));
     }
 }

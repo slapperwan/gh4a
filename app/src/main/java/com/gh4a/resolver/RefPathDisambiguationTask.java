@@ -59,39 +59,36 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws ApiRequestException {
-        Pair<String, String> refAndPath = resolve();
-        if (refAndPath == null) {
-            return null;
-        }
-
-        if (mGoToFileViewer && refAndPath.second != null) {
-            // parse line numbers from fragment
-            int highlightStart = -1, highlightEnd = -1;
-            // Line numbers are encoded either in the form #L12 or #L12-14
-            if (mFragment != null && mFragment.startsWith("L")) {
-                try {
-                    int dashPos = mFragment.indexOf("-L");
-                    if (dashPos > 0) {
-                        highlightStart = Integer.valueOf(mFragment.substring(1, dashPos));
-                        highlightEnd = Integer.valueOf(mFragment.substring(dashPos + 2));
-                    } else {
-                        highlightStart = Integer.valueOf(mFragment.substring(1));
+    protected Single<Intent> getSingle() {
+        return resolve()
+                .map(refAndPath -> {
+                    if (mGoToFileViewer && refAndPath.second != null) {
+                        // parse line numbers from fragment
+                        int highlightStart = -1, highlightEnd = -1;
+                        // Line numbers are encoded either in the form #L12 or #L12-14
+                        if (mFragment != null && mFragment.startsWith("L")) {
+                            try {
+                                int dashPos = mFragment.indexOf("-L");
+                                if (dashPos > 0) {
+                                    highlightStart = Integer.valueOf(mFragment.substring(1, dashPos));
+                                    highlightEnd = Integer.valueOf(mFragment.substring(dashPos + 2));
+                                } else {
+                                    highlightStart = Integer.valueOf(mFragment.substring(1));
+                                }
+                            } catch (NumberFormatException e) {
+                                // ignore
+                            }
+                        }
+                        return FileViewerActivity.makeIntentWithHighlight(mActivity,
+                                mRepoOwner, mRepoName, refAndPath.first, refAndPath.second,
+                                highlightStart, highlightEnd);
+                    } else if (!mGoToFileViewer) {
+                        return RepositoryActivity.makeIntent(mActivity,
+                                mRepoOwner, mRepoName, refAndPath.first,
+                                refAndPath.second, mInitialPage);
                     }
-                } catch (NumberFormatException e) {
-                    // ignore
-                }
-            }
-
-            return FileViewerActivity.makeIntentWithHighlight(mActivity,
-                    mRepoOwner, mRepoName, refAndPath.first, refAndPath.second,
-                    highlightStart, highlightEnd);
-        } else if (!mGoToFileViewer) {
-            return RepositoryActivity.makeIntent(mActivity,
-                    mRepoOwner, mRepoName, refAndPath.first, refAndPath.second, mInitialPage);
-        }
-
-        return null;
+                    return null;
+                });
     }
 
     private Single<Pair<String, String>> matchBranch(Single<List<Branch>> input) {
@@ -112,13 +109,11 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
     }
 
     // returns ref, path
-    private Pair<String, String> resolve() throws ApiRequestException {
+    private Single<Pair<String, String>> resolve() throws ApiRequestException {
         // first check whether the path redirects to HEAD
         if (mRefAndPath.startsWith("HEAD")) {
-            if (mRefAndPath.startsWith("HEAD/")) {
-                return Pair.create("HEAD", mRefAndPath.substring(5));
-            }
-            return Pair.create("HEAD", null);
+            return Single.just(Pair.create("HEAD",
+                    mRefAndPath.startsWith("HEAD/") ? mRefAndPath.substring(5) : null));
         }
 
         final Gh4Application app = Gh4Application.get();
@@ -127,34 +122,33 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
         final RepositoryService repoService = app.getGitHubService(RepositoryService.class);
 
         // then look for matching branches
-        Pair<String, String> result = ApiHelpers.PageIterator
+        return ApiHelpers.PageIterator
                 .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page))
-                .compose(response -> matchBranch(response))
-                .blockingGet();
-        if (result != null) {
-            return result;
-        }
-        if (mActivity.isFinishing()) {
-            return null;
-        }
+                .compose(this::matchBranch)
+                .flatMap(result -> {
+                    if (result != null) {
+                        return Single.just(result);
+                    }
 
-        // and for tags after that
-        result = ApiHelpers.PageIterator
-                .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page))
-                .compose(response -> matchBranch(response))
-                .blockingGet();
-        if (result != null) {
-            return result;
-        }
+                    // and tags after that
+                    return ApiHelpers.PageIterator
+                            .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page))
+                            .compose(this::matchBranch);
+                })
+                .map(result -> {
+                    if (result != null) {
+                        return null;
+                    }
 
-        // at this point, the first item may still be a SHA1 - check with a simple regex
-        int slashPos = mRefAndPath.indexOf('/');
-        String potentialSha = slashPos > 0 ? mRefAndPath.substring(0, slashPos) : mRefAndPath;
-        if (SHA1_PATTERN.matcher(potentialSha).matches()) {
-            return Pair.create(potentialSha,
-                    slashPos > 0 ? mRefAndPath.substring(slashPos + 1) : "");
-        }
-
-        return null;
+                    // at this point, the first item may still be a SHA1 - check with a simple regex
+                    int slashPos = mRefAndPath.indexOf('/');
+                    String potentialSha = slashPos > 0
+                            ? mRefAndPath.substring(0, slashPos) : mRefAndPath;
+                    if (SHA1_PATTERN.matcher(potentialSha).matches()) {
+                        return Pair.create(potentialSha,
+                                slashPos > 0 ? mRefAndPath.substring(slashPos + 1) : "");
+                    }
+                    return null;
+                });
     }
 }

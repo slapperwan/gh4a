@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentActivity;
 import com.gh4a.BackgroundTask;
 import com.gh4a.utils.IntentUtils;
 
+import io.reactivex.Single;
+
 public abstract class UrlLoadTask extends BackgroundTask<Intent> {
     protected final FragmentActivity mActivity;
     private final boolean mFinishCurrentActivity;
@@ -26,6 +28,11 @@ public abstract class UrlLoadTask extends BackgroundTask<Intent> {
         super.onPreExecute();
         mProgressDialog = ProgressDialogFragment.newInstance(mFinishCurrentActivity);
         mProgressDialog.show(mActivity.getSupportFragmentManager(), "progress");
+    }
+
+    @Override
+    protected Intent run() throws Exception {
+        return getSingle().blockingGet();
     }
 
     @Override
@@ -57,4 +64,6 @@ public abstract class UrlLoadTask extends BackgroundTask<Intent> {
             mActivity.finish();
         }
     }
+
+    protected abstract Single<Intent> getSingle();
 }

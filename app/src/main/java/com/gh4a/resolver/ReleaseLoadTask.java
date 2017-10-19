@@ -5,14 +5,13 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
-import java.util.List;
+import io.reactivex.Single;
 
 public class ReleaseLoadTask extends UrlLoadTask {
     @VisibleForTesting
@@ -31,19 +30,17 @@ public class ReleaseLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws ApiRequestException {
-        final RepositoryReleaseService service =
+    protected Single<Intent> getSingle() {
+        RepositoryReleaseService service =
                 Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getReleases(mRepoOwner, mRepoName, page))
-                .compose(RxUtils.filter(r -> TextUtils.equals(r.tagName(), mTagName)))
-                .map(list -> list.isEmpty() ? null : list.get(0))
+                .compose(RxUtils.filterAndMapToFirstOrNull(r -> TextUtils.equals(r.tagName(), mTagName)))
                 .map(r -> {
                     if (r == null) {
                         return null;
                     }
                     return ReleaseInfoActivity.makeIntent(mActivity, mRepoOwner, mRepoName, r);
-                })
-                .blockingGet();
+                });
     }
 }

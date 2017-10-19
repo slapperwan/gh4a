@@ -7,6 +7,7 @@ import com.gh4a.ApiRequestException;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
 
@@ -28,31 +29,19 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
     }
 
     @Override
-    protected Intent run() throws ApiRequestException {
-        List<GitHubFile> files = getFiles().blockingGet();
-        GitHubFile file = null;
-        for (GitHubFile commitFile : files) {
-            if (ApiHelpers.md5(commitFile.filename()).equalsIgnoreCase(mDiffId.fileHash)) {
-                file = commitFile;
-                break;
+    protected Single<Intent> getSingle() {
+        Single<GitHubFile> fileSingle = getFiles()
+                .compose(RxUtils.filterAndMapToFirstOrNull(
+                        f -> ApiHelpers.md5(f.filename()).equalsIgnoreCase(mDiffId.fileHash)));
+
+        return Single.zip(getSha(), fileSingle, (sha, file) -> {
+            if (FileUtils.isImage(file.filename())) {
+                return FileViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
+                        sha, file.filename());
             }
-        }
 
-        if (file == null || mActivity.isFinishing()) {
-            return null;
-        }
-
-        String sha = getSha().blockingGet();
-        if (sha == null || mActivity.isFinishing()) {
-            return null;
-        }
-
-        if (FileUtils.isImage(file.filename())) {
-            return FileViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                    sha, file.filename());
-        }
-
-        return getLaunchIntent(sha, file, getComments().blockingGet(), mDiffId);
+            return getLaunchIntent(sha, file, getComments().blockingGet(), mDiffId);
+        });
     }
 
     protected abstract Single<List<GitHubFile>> getFiles();

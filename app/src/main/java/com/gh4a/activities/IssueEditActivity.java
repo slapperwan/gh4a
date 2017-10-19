@@ -724,7 +724,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page))
                 .compose(RxUtils::doInBackground)
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, null))
-                .compose(RxUtils.filter(c -> c.type() == ContentType.File && c.name().startsWith("ISSUE_TEMPLATE")))
-                .map(results -> results != null && !results.isEmpty() ? results.get(0) : null);
+                .compose(RxUtils.filterAndMapToFirstOrNull(
+                        c -> c.type() == ContentType.File && c.name().startsWith("ISSUE_TEMPLATE")));
     }
 }

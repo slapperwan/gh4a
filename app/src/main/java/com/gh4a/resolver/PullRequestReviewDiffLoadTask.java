@@ -8,12 +8,15 @@ import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class PullRequestReviewDiffLoadTask extends UrlLoadTask {
     @VisibleForTesting
@@ -35,32 +38,34 @@ public class PullRequestReviewDiffLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws Exception {
+    protected Single<Intent> getSingle() {
         final Gh4Application app = Gh4Application.get();
         final PullRequestReviewCommentService service =
                 app.getGitHubService(PullRequestReviewCommentService.class);
         final PullRequestReviewService reviewService =
                 app.getGitHubService(PullRequestReviewService.class);
-
-        List<ReviewComment> comments = ApiHelpers.PageIterator
-                .toSingle(page -> service.getPullRequestComments(
-                        mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .blockingGet();
-
         long diffCommentId = Long.parseLong(mDiffId.fileHash);
 
-        for (ReviewComment comment : comments) {
-            if (diffCommentId == comment.id()) {
-                long reviewId = comment.pullRequestReviewId();
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getPullRequestComments(
+                        mRepoOwner, mRepoName, mPullRequestNumber, page))
+                .compose(RxUtils.filterAndMapToFirstOrNull(c -> c.id() == diffCommentId))
+                .flatMap(comment -> {
+                    if (comment != null) {
+                        return Single.just(null);
+                    }
+                    long reviewId = comment.pullRequestReviewId();
+                    return reviewService.getReview(mRepoOwner, mRepoName, mPullRequestNumber, reviewId)
+                            .map(ApiHelpers::throwOnFailure);
+                })
+                .map(review -> {
+                    if (review == null) {
+                        return null;
+                    }
+                    return ReviewActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
+                            mPullRequestNumber, review,
+                            new IntentUtils.InitialCommentMarker(diffCommentId));
 
-                Review review = ApiHelpers.throwOnFailure(reviewService.getReview(
-                        mRepoOwner, mRepoName, mPullRequestNumber, reviewId).blockingGet());
-                return ReviewActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                        mPullRequestNumber, review,
-                        new IntentUtils.InitialCommentMarker(diffCommentId));
-            }
-        }
-
-        return null;
+                });
     }
 }

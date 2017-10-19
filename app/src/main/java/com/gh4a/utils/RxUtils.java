@@ -46,6 +46,12 @@ public class RxUtils {
         });
     }
 
+    public static <T> SingleTransformer<List<T>, T> filterAndMapToFirstOrNull(Predicate<T> predicate) {
+        return upstream -> upstream
+                .compose(filter(predicate))
+                .map(list -> list.isEmpty() ? null : list.get(0));
+    }
+
     public static <T, R> SingleTransformer<List<T>, List<R>> mapList(Function<T, R> transformer) {
         return upstream -> upstream.map(list -> {
             if (list == null) {
