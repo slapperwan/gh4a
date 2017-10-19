@@ -166,7 +166,8 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         Single<List<ReviewComment>> reviewCommentsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> reviewService.getReviewComments(
                         mRepoOwner, mRepoName, mIssueNumber, mReview.id()))
-                .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR));
+                .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR))
+                .cache(); // single is used multiple times -> avoid refetching data
 
         Single<Boolean> hasCommentsSingle = reviewCommentsSingle
                 .map(comments -> !comments.isEmpty());

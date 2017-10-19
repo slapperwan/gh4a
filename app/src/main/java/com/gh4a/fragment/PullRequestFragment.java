@@ -209,18 +209,22 @@ public class PullRequestFragment extends IssueFragmentBase {
         Single<Map<String, GitHubFile>> filesByNameSingle = ApiHelpers.PageIterator
                 .toSingle(page -> prService.getPullRequestFiles(mRepoOwner, mRepoName, issueNumber, page))
                 .map(files -> {
-                    HashMap<String, GitHubFile> filesByName = new HashMap<>();
+                    Map<String, GitHubFile> filesByName = new HashMap<>();
                     for (GitHubFile file : files) {
                         filesByName.put(file.filename(), file);
                     }
                     return filesByName;
-                });
+                })
+                .cache(); // single is used multiple times -> avoid refetching data
+
         Single<List<Review>> reviewSingle = ApiHelpers.PageIterator
-                .toSingle(page -> reviewService.getReviews(mRepoOwner, mRepoName, issueNumber, page));
+                .toSingle(page -> reviewService.getReviews(mRepoOwner, mRepoName, issueNumber, page))
+                .cache(); // single is used multiple times -> avoid refetching data
         Single<List<ReviewComment>> prCommentSingle = ApiHelpers.PageIterator
                 .toSingle(page -> prCommentService.getPullRequestComments(
                         mRepoOwner, mRepoName, issueNumber, page))
-                .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR));
+                .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR))
+                .cache(); // single is used multiple times -> avoid refetching data
 
         Single<LongSparseArray<List<ReviewComment>>> reviewCommentsByIdSingle = reviewSingle
                 .compose(RxUtils.filter(r -> r.state() == ReviewState.Pending))
