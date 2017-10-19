@@ -9,11 +9,11 @@ import com.gh4a.activities.WikiActivity;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.model.Feed;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.SingleFactory;
 
-import org.xml.sax.SAXException;
-
-import java.io.FileNotFoundException;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
@@ -46,19 +46,9 @@ public class WikiListFragment extends ListDataBaseFragment<Feed> implements
 
     @Override
     protected Single<List<Feed>> onCreateDataSingle() {
-        String url = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom";
-        return SingleFactory.loadFeed(url);
-    }
-
-    @Override
-    protected boolean onLoaderError(Throwable e) {
-        if (e instanceof SAXException || e instanceof FileNotFoundException) {
-            mAdapter.clear();
-            updateEmptyState();
-            setContentShown(true);
-            return true;
-        }
-        return false;
+        String relativeUrl = mUserLogin + "/" + mRepoName + "/wiki.atom";
+        return SingleFactory.loadFeed(relativeUrl)
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, new ArrayList<>()));
     }
 
     @Override
