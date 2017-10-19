@@ -44,8 +44,8 @@ public class CommitCommentLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws ApiRequestException {
-        return load(mActivity, mRepoOwner, mRepoName, mCommitSha, mMarker).blockingGet();
+    protected Single<Intent> getSingle() {
+        return load(mActivity, mRepoOwner, mRepoName, mCommitSha, mMarker);
     }
 
     public static Single<Intent> load(Context context,
@@ -62,8 +62,7 @@ public class CommitCommentLoadTask extends UrlLoadTask {
                 .toSingle(page -> commentService.getCommitComments(repoOwner, repoName, commitSha, page));
 
         Single<GitHubFile> fileSingle = commentSingle
-                .compose(RxUtils.filter(c -> marker.matches(c.id(), c.createdAt())))
-                .map(list -> list.isEmpty() ? null : list.get(0))
+                .compose(RxUtils.filterAndMapToFirstOrNull(c -> marker.matches(c.id(), c.createdAt())))
                 .zipWith(commitSingle, (comment, commit) -> {
                     if (comment != null) {
                         for (GitHubFile commitFile : commit.files()) {

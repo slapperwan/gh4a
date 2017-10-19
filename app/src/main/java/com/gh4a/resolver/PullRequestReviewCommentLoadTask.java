@@ -41,8 +41,8 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws Exception {
-        return load(mActivity, mRepoOwner, mRepoName, mPullRequestNumber, mMarker).blockingGet();
+    protected Single<Intent> getSingle() {
+        return load(mActivity, mRepoOwner, mRepoName, mPullRequestNumber, mMarker);
     }
 
     public static Single<Intent> load(Context context, String repoOwner, String repoName,

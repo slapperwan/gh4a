@@ -3,8 +3,8 @@ package com.gh4a.resolver;
 import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.util.Pair;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
@@ -19,6 +19,8 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentSer
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
     @VisibleForTesting
@@ -44,68 +46,51 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Intent run() throws ApiRequestException {
+    protected Single<Intent> getSingle() {
         PullRequestService service =
                 Gh4Application.get().getGitHubService(PullRequestService.class);
-        PullRequest pullRequest = service.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
-                .map(ApiHelpers::throwOnFailure)
-                .blockingGet();
-
-        if (pullRequest == null || mActivity.isFinishing()) {
-            return null;
-        }
+        Single<PullRequest> pullRequestSingle = service.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
+                .map(ApiHelpers::throwOnFailure);
 
         final PullRequestReviewCommentService commentService =
                 Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
 
-        List<ReviewComment> comments = ApiHelpers.PageIterator
+        Single<List<ReviewComment>> commentsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(RxUtils.filter(c -> c.position() >= 0))
-                .blockingGet();
+                .compose(RxUtils.filter(c -> c.position() >= 0));
 
-        if (comments == null || mActivity.isFinishing()) {
-            return null;
-        }
+        Single<List<GitHubFile>> filesSingle = ApiHelpers.PageIterator
+                .toSingle(page -> service.getPullRequestFiles(mRepoOwner, mRepoName, mPullRequestNumber, page));
 
-        List<GitHubFile> files = ApiHelpers.PageIterator
-                .toSingle(page -> service.getPullRequestFiles(mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .blockingGet();
-        if (files == null || mActivity.isFinishing()) {
-            return null;
-        }
-
-        boolean foundComment = false;
-        GitHubFile resultFile = null;
-        for (ReviewComment comment : comments) {
-            if (mMarker.matches(comment.id(), comment.createdAt())) {
-                foundComment = true;
-                for (GitHubFile commitFile : files) {
-                    if (commitFile.filename().equals(comment.path())) {
-                        resultFile = commitFile;
-                        break;
+        return commentsSingle
+                .compose(RxUtils.filterAndMapToFirstOrNull(c -> mMarker.matches(c.id(), c.createdAt())))
+                .zipWith(filesSingle, (comment, files) -> {
+                    if (comment != null) {
+                        for (GitHubFile commitFile : files) {
+                            if (commitFile.filename().equals(comment.path())) {
+                                return Pair.create(true, commitFile);
+                            }
+                        }
                     }
-                }
-                break;
-            }
-        }
-
-        if (!foundComment || mActivity.isFinishing()) {
-            return null;
-        }
-
-        Intent intent = null;
-        if (resultFile != null) {
-            if (!FileUtils.isImage(resultFile.filename())) {
-                intent = PullRequestDiffViewerActivity.makeIntent(mActivity, mRepoOwner,
-                        mRepoName, mPullRequestNumber, pullRequest.head().sha(),
-                        resultFile.filename(), resultFile.patch(), comments, -1, -1, -1,
-                        false, mMarker);
-            }
-        } else {
-            intent = PullRequestActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                    mPullRequestNumber, mPage, mMarker);
-        }
-        return intent;
+                    return Pair.create(comment != null, (GitHubFile) null);
+                })
+                .flatMap(result -> {
+                    boolean foundComment = result.first;
+                    GitHubFile file = result.second;
+                    if (foundComment && file != null && !FileUtils.isImage(file.filename())) {
+                        return Single.zip(pullRequestSingle, commentsSingle, (pr, comments) -> {
+                            return PullRequestDiffViewerActivity.makeIntent(mActivity, mRepoOwner,
+                                    mRepoName, mPullRequestNumber, pr.head().sha(),
+                                    file.filename(), file.patch(), comments, -1, -1, -1,
+                                    false, mMarker);
+                        });
+                    }
+                    if (foundComment && file == null) {
+                        return Single.just(PullRequestActivity.makeIntent(mActivity,
+                                mRepoOwner, mRepoName, mPullRequestNumber, mPage, mMarker));
+                    }
+                    return Single.just(null);
+                });
     }
 }
