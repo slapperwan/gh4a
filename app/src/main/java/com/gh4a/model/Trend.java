@@ -15,11 +15,16 @@
  */
 package com.gh4a.model;
 
+import com.squareup.moshi.Json;
+
 public class Trend {
+    @Json(name = "owner")
     private final String repoOwner;
+    @Json(name = "repo")
     private final String repoName;
     private final String description;
     private final int stars;
+    @Json(name = "new_stars")
     private final int newStars;
     private final int forks;
 
