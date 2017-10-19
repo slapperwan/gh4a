@@ -546,13 +546,12 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
             final RepositoryService repoService = app.getGitHubService(RepositoryService.class);
 
             Single<List<Branch>> branchSingle = ApiHelpers.PageIterator
-                    .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page))
-                    .compose(RxUtils::doInBackground);
+                    .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page));
             Single<List<Branch>> tagSingle = ApiHelpers.PageIterator
-                    .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page))
-                    .compose(RxUtils::doInBackground);
+                    .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page));
 
             registerTemporarySubscription(Single.zip(branchSingle, tagSingle, (branches, tags) -> Pair.create(branches, tags))
+                    .compose(RxUtils::doInBackground)
                     .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                     .subscribe(result -> {
                         mBranches = result.first;

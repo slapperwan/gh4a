@@ -59,7 +59,8 @@ public class CommitCommentLoadTask extends UrlLoadTask {
         Single<Commit> commitSingle = commitService.getCommit(repoOwner, repoName, commitSha)
                 .map(ApiHelpers::throwOnFailure);
         Single<List<GitComment>> commentSingle = ApiHelpers.PageIterator
-                .toSingle(page -> commentService.getCommitComments(repoOwner, repoName, commitSha, page));
+                .toSingle(page -> commentService.getCommitComments(repoOwner, repoName, commitSha, page))
+                .cache(); // single is used multiple times -> avoid refetching data
 
         Single<GitHubFile> fileSingle = commentSingle
                 .compose(RxUtils.filterAndMapToFirstOrNull(c -> marker.matches(c.id(), c.createdAt())))
