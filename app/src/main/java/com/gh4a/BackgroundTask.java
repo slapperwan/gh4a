@@ -15,10 +15,6 @@ public abstract class BackgroundTask<T> extends AsyncTask<Void, Void, T> {
         return mContext;
     }
 
-    public void schedule() {
-        executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
     @Override
     protected T doInBackground(Void... params) {
         try {

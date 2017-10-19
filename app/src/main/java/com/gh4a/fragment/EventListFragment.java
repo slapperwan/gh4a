@@ -43,6 +43,7 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.resolver.CommitCommentLoadTask;
 import com.gh4a.resolver.PullRequestReviewCommentLoadTask;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
 import com.meisolsson.githubsdk.model.Download;
@@ -75,6 +76,8 @@ import com.meisolsson.githubsdk.model.payload.ReleasePayload;
 
 import java.util.Arrays;
 import java.util.List;
+
+import io.reactivex.Single;
 
 public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEvent> {
     private static final int MENU_DOWNLOAD_START = 100;
@@ -117,6 +120,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
         String repoOwner = "";
         String repoName = "";
         Intent intent = null;
+        Single<Intent> intentSingle = null;
 
         if (eventRepo != null) {
             String[] repoNamePart = eventRepo.repoWithUserName().split("/");
@@ -136,9 +140,9 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
                 CommitCommentPayload payload = (CommitCommentPayload) event.payload();
                 GitComment comment = payload.comment();
                 if (comment != null) {
-                    new CommitCommentLoadTask(getActivity(), repoOwner, repoName,
-                            comment.commitId(),
-                            new IntentUtils.InitialCommentMarker(comment.id()), false).schedule();
+                    intentSingle = CommitCommentLoadTask.load(getActivity(),
+                            repoOwner, repoName, comment.commitId(),
+                            new IntentUtils.InitialCommentMarker(comment.id()));
                 }
                 break;
             }
@@ -253,8 +257,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
 
                 if (pr != null) {
                     if (initialComment != null) {
-                        new PullRequestReviewCommentLoadTask(getActivity(), repoOwner,
-                                repoName, pr.number(), initialComment, false).schedule();
+                        intentSingle = PullRequestReviewCommentLoadTask.load(getActivity(),
+                                repoOwner, repoName, pr.number(), initialComment);
                     } else {
                         intent = PullRequestActivity.makeIntent(getActivity(), repoOwner, repoName,
                                 pr.number(), -1, null);
@@ -303,6 +307,13 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
 
         if (intent != null) {
             startActivity(intent);
+        } else if (intentSingle != null) {
+            intentSingle
+                    .compose(RxUtils::doInBackground)
+                    .compose(RxUtils.wrapWithProgressDialog(getActivity(), R.string.loading_msg))
+                    .subscribe(result -> {
+                        startActivity(result);
+                    });
         }
     }
 
