@@ -1,8 +1,8 @@
 package com.gh4a.utils;
 
 import com.gh4a.Gh4Application;
-import com.gh4a.feeds.FeedHandler;
 import com.gh4a.model.Feed;
+import com.gh4a.model.GitHubFeedService;
 import com.gh4a.model.NotificationHolder;
 import com.gh4a.model.NotificationListLoadResult;
 import com.gh4a.model.Trend;
@@ -13,24 +13,26 @@ import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.activity.NotificationService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLConnection;
+import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.transform.RegistryMatcher;
+import org.simpleframework.xml.transform.Transform;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import io.reactivex.Single;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 public class SingleFactory {
     public static Single<Boolean> isAppUserRepoCollaborator(String repoOwner, String repoName) {
@@ -115,39 +117,53 @@ public class SingleFactory {
         return new NotificationListLoadResult(result);
     }
 
-    public static Single<List<Feed>> loadFeed(String url) {
-        return Single.fromCallable(() -> {
-            BufferedInputStream bis = null;
-            try {
-                URLConnection request = new URL(url).openConnection();
-
-                bis = new BufferedInputStream(request.getInputStream());
-
-                SAXParserFactory factory = SAXParserFactory.newInstance();
-                SAXParser parser = factory.newSAXParser();
-                FeedHandler handler = new FeedHandler();
-                parser.parse(bis, handler);
-                return handler.getFeeds();
-            } finally {
-                if (bis != null) {
-                    try {
-                        bis.close();
-                    } catch (IOException e) {
-                        // ignored
-                    }
-                }
-            }
-        });
+    public static Single<List<Feed>> loadFeed(String relativeUrl) {
+        return RetrofitHelper.FEED_BUILDER
+                .build()
+                .create(GitHubFeedService.class)
+                .getFeed(relativeUrl)
+                .map(ApiHelpers::throwOnFailure)
+                .map(feed -> feed.feed);
     }
 
     public static Single<List<Trend>> loadTrends(String type) {
-        return new Retrofit.Builder()
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .addConverterFactory(MoshiConverterFactory.create(ServiceGenerator.moshi))
-                .baseUrl("http://octodroid.s3.amazonaws.com")
+        return RetrofitHelper.TREND_BUILDER
                 .build()
                 .create(TrendService.class)
                 .getTrends(type)
                 .map(ApiHelpers::throwOnFailure);
     }
+
+    private static class RetrofitHelper {
+        private static final Retrofit.Builder FEED_BUILDER;
+        private static final Retrofit.Builder TREND_BUILDER;
+        static {
+            RegistryMatcher matcher = new RegistryMatcher();
+            matcher.bind(Date.class, new Transform<Date>() {
+                private DateFormat mFormat =
+                        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+
+                @Override
+                public Date read(String value) throws Exception {
+                    return mFormat.parse(value);
+                }
+
+                @Override
+                public String write(Date value) throws Exception {
+                    return mFormat.format(value);
+                }
+            });
+
+            FEED_BUILDER = new Retrofit.Builder()
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .addConverterFactory(SimpleXmlConverterFactory.create(new Persister(matcher)))
+                    .baseUrl("https://github.com/");
+            TREND_BUILDER = new Retrofit.Builder()
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .addConverterFactory(MoshiConverterFactory.create(ServiceGenerator.moshi))
+                    .baseUrl("http://octodroid.s3.amazonaws.com/");
+        }
+    }
+
+
 }

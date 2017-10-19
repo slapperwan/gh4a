@@ -15,44 +15,102 @@
  */
 package com.gh4a.model;
 
+import android.net.Uri;
+
+import com.gh4a.utils.StringUtils;
+
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.Path;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.core.Commit;
+
 import java.util.Date;
 
+@Root(name = "entry", strict = false)
 public class Feed {
-
+    @Element(name = "id")
     private String id;
+    @Element(name = "published")
     private Date published;
+    @Path(value = "link")
+    @Attribute(name = "href")
     private String link;
+    @Element(name = "title", required = false)
     private String title;
+    @Element(name = "content")
     private String content;
-    private String preview;
+    @Path(value = "author")
+    @Element(name = "name")
     private String author;
-    private int userId;
+    @Path(value = "thumbnail")
+    @Attribute(name = "url")
     private String avatarUrl;
+
+    private int userId;
+    private String preview;
+
+    @Commit
+    private void apply() {
+        userId = determineUserId(avatarUrl, author);
+        preview = generatePreview(content);
+        if (StringUtils.isBlank(title)) {
+            title = getTitleFromUrl(link);
+        }
+    }
+
+    private static String generatePreview(String content) {
+        if (content == null) {
+            return null;
+        }
+        String preview = content.length() > 2000 ? content.substring(0, 2000) : content;
+        preview = content.replaceAll("<(.|\n)*?>","");
+        if (preview.length() > 500) {
+            preview = preview.substring(0,  500);
+        }
+        return preview;
+    }
+
+    private static int determineUserId(String url, String userName) {
+        if (url == null) {
+            return -1;
+        }
+
+        Uri uri = Uri.parse(url);
+        String host = uri.getHost();
+
+        if (host.startsWith("avatars") && host.contains("githubusercontent.com")) {
+            if (uri.getPathSegments().size() == 2) {
+                return Integer.valueOf(uri.getLastPathSegment());
+            }
+        }
+
+        // We couldn't parse the user ID from the avatar, so construct a fake
+        // user ID for identification purposes in GravatarHandler
+        if (userName != null) {
+            return userName.hashCode();
+        }
+        return -1;
+    }
+
+    private static String getTitleFromUrl(String url) {
+        if (url == null) {
+            return null;
+        }
+        return url.substring(url.lastIndexOf("/") + 1, url.length()).replaceAll("-", " ");
+    }
 
     public String getId() {
         return id;
     }
-    public void setId(String id) {
-        this.id = id;
-    }
     public Date getPublished() {
         return published;
     }
-    public void setPublished(Date published) {
-        this.published = published;
-    }
-
     public String getLink() {
         return link;
     }
-    public void setLink(String link) {
-        this.link = link;
-    }
     public String getTitle() {
         return title;
-    }
-    public void setTitle(String title) {
-        this.title = title;
     }
     public String getContent() {
         return content;
@@ -60,34 +118,13 @@ public class Feed {
     public String getPreview() {
         return preview;
     }
-    public void setContent(String content) {
-        this.content = content;
-        if (content != null) {
-            preview = content.length() > 2000 ? content.substring(0, 2000) : content;
-            preview = content.replaceAll("<(.|\n)*?>","");
-            if (preview.length() > 500) {
-                preview = preview.substring(0,  500);
-            }
-        } else {
-            preview = null;
-        }
-    }
     public String getAuthor() {
         return author;
-    }
-    public void setAuthor(String author) {
-        this.author = author;
     }
     public int getUserId() {
         return userId;
     }
     public String getAvatarUrl() {
         return avatarUrl;
-    }
-    public void setUserId(int id) {
-        this.userId = id;
-    }
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
     }
 }

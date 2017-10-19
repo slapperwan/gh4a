@@ -30,8 +30,6 @@ import io.reactivex.Single;
 
 public class BlogListFragment extends ListDataBaseFragment<Feed> implements
         RootAdapter.OnItemClickListener<Feed> {
-    private static final String BLOG = "https://github.com/blog.atom";
-
     public static BlogListFragment newInstance() {
         return new BlogListFragment();
     }
@@ -55,6 +53,6 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> implements
 
     @Override
     protected Single<List<Feed>> onCreateDataSingle() {
-        return SingleFactory.loadFeed(BLOG);
+        return SingleFactory.loadFeed("blog.atom");
     }
 }

@@ -54,7 +54,6 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
 
     private void loadData(boolean force) {
         onCreateDataSingle()
-                .doOnError(error -> onLoaderError(error)) // FIXME consume error if result is true
                 .compose(makeLoaderSingle(0, force))
                 .subscribe(result -> {
                     mAdapter.clear();
@@ -67,8 +66,4 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
 
     protected abstract Single<List<T>> onCreateDataSingle();
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
-
-    protected boolean onLoaderError(Throwable e) {
-        return false;
-    }
 }
