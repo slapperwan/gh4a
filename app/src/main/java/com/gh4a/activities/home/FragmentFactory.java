@@ -63,4 +63,6 @@ public abstract class FragmentFactory {
     }
 
     protected void setUserInfo(User user) { }
+
+    protected void onStartLoadingData() {}
 }
