@@ -29,7 +29,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -43,13 +42,10 @@ import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.IssueFragment;
-import com.gh4a.loader.IsCollaboratorLoader;
-import com.gh4a.loader.IssueLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
+import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
@@ -73,6 +69,9 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                 .putExtra("initial_comment", initialComment);
     }
 
+    private static final int ID_LOADER_ISSUE = 0;
+    private static final int ID_LOADER_COLLABORATOR_STATUS = 1;
+
     private static final int REQUEST_EDIT_ISSUE = 1000;
 
     private Issue mIssue;
@@ -85,32 +84,6 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     private IssueStateTrackingFloatingActionButton mEditFab;
     private final Handler mHandler = new Handler();
     private IssueFragment mFragment;
-
-    private final LoaderCallbacks<Issue> mIssueCallback = new LoaderCallbacks<Issue>(this) {
-        @Override
-        protected Loader<LoaderResult<Issue>> onCreateLoader() {
-            return new IssueLoader(IssueActivity.this, mRepoOwner, mRepoName, mIssueNumber);
-        }
-        @Override
-        protected void onResultReady(Issue result) {
-            mIssue = result;
-            showUiIfDone();
-            supportInvalidateOptionsMenu();
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mCollaboratorCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new IsCollaboratorLoader(IssueActivity.this, mRepoOwner, mRepoName);
-        }
-        @Override
-        protected void onResultReady(Boolean result) {
-            mIsCollaborator = result;
-            showUiIfDone();
-            supportInvalidateOptionsMenu();
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -128,9 +101,8 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         setFragment((IssueFragment) getSupportFragmentManager().findFragmentById(R.id.details));
 
         setToolbarScrollable(true);
-
-        getSupportLoaderManager().initLoader(0, null, mIssueCallback);
-        getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
+        loadIssue(false);
+        loadCollaboratorStatus(false);
     }
 
     @NonNull
@@ -295,7 +267,8 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         });
 
         supportInvalidateOptionsMenu();
-        forceLoaderReload(0, 1);
+        loadIssue(true);
+        loadCollaboratorStatus(true);
         super.onRefresh();
     }
 
@@ -397,11 +370,33 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT_ISSUE) {
             if (resultCode == Activity.RESULT_OK) {
-                forceLoaderReload(0);
+                loadIssue(true);
                 setResult(RESULT_OK);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void loadIssue(boolean force) {
+        IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
+        service.getIssue(mRepoOwner, mRepoName, mIssueNumber)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(makeLoaderSingle(ID_LOADER_ISSUE, force))
+                .subscribe(result -> {
+                    mIssue = result;
+                    showUiIfDone();
+                    supportInvalidateOptionsMenu();
+                }, error -> {});
+    }
+
+    private void loadCollaboratorStatus(boolean force) {
+        SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName)
+                .compose(makeLoaderSingle(ID_LOADER_COLLABORATOR_STATUS, force))
+                .subscribe(result -> {
+                    mIsCollaborator = result;
+                    showUiIfDone();
+                    supportInvalidateOptionsMenu();
+                }, error -> {});
     }
 }

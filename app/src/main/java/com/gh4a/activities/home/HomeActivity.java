@@ -16,7 +16,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.Loader;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -31,21 +30,22 @@ import android.widget.TextView;
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SettingsActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.fragment.NotificationListFragment;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.loader.HasNotificationsLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.UserLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.activity.NotificationService;
+import com.meisolsson.githubsdk.service.users.UserService;
+
+import java.util.HashMap;
 
 public class HomeActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, RepositoryListContainerFragment.Callback,
@@ -83,6 +83,9 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
 
+    private static final int ID_LOADER_USER = 0;
+    private static final int ID_LOADER_NOTIFICATIONS_INDICATOR = 1;
+
     private static final int OTHER_ACCOUNTS_GROUP_BASE_ID = 1000;
 
     private static final SparseArray<String> START_PAGE_MAPPING = new SparseArray<>();
@@ -99,30 +102,6 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         START_PAGE_MAPPING.put(R.id.bookmarks, "bookmarks");
         START_PAGE_MAPPING.put(R.id.search, "search");
     }
-
-    private final LoaderCallbacks<User> mUserCallback = new LoaderCallbacks<User>(this) {
-        @Override
-        protected Loader<LoaderResult<User>> onCreateLoader() {
-            return new UserLoader(HomeActivity.this, mUserLogin);
-        }
-        @Override
-        protected void onResultReady(User result) {
-            Gh4Application.get().setCurrentAccountInfo(result);
-            mUserInfo = result;
-            updateUserInfo();
-        }
-    };
-
-    private final LoaderCallbacks<Boolean> mHasNotificationsCallback = new LoaderCallbacks<Boolean>(this) {
-        @Override
-        protected Loader<LoaderResult<Boolean>> onCreateLoader() {
-            return new HasNotificationsLoader(HomeActivity.this);
-        }
-        @Override
-        protected void onResultReady(Boolean result) {
-            setNotificationsIndicatorVisible(result);
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -143,8 +122,8 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        getSupportLoaderManager().initLoader(0, null, mUserCallback);
-        getSupportLoaderManager().initLoader(1, null, mHasNotificationsCallback);
+        loadUserInfo(false);
+        loadNotificationIndicator(false);
     }
 
     @Nullable
@@ -400,7 +379,8 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
 
     @Override
     public void onRefresh() {
-        forceLoaderReload(0, 1);
+        loadUserInfo(true);
+        loadNotificationIndicator(true);
         mFactory.onRefresh();
         super.onRefresh();
     }
@@ -546,6 +526,32 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
         invalidateTitle();
         invalidateTabs();
+    }
+
+    private void loadUserInfo(boolean force) {
+        UserService service = Gh4Application.get().getGitHubService(UserService.class);
+        service.getUser(mUserLogin)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(makeLoaderSingle(ID_LOADER_USER, force))
+                .subscribe(result -> {
+                    Gh4Application.get().setCurrentAccountInfo(result);
+                    mUserInfo = result;
+                    updateUserInfo();
+                }, error -> {});
+    }
+
+    private void loadNotificationIndicator(boolean force) {
+        NotificationService service = ServiceFactory.createService(
+                NotificationService.class, null, null, 1);
+        HashMap<String, Object> options = new HashMap<>();
+        options.put("all", false);
+        options.put("participating", false);
+
+        service.getNotifications(options, 0)
+                .map(ApiHelpers::throwOnFailure)
+                .map(result -> !result.items().isEmpty())
+                .compose(makeLoaderSingle(ID_LOADER_NOTIFICATIONS_INDICATOR, force))
+                .subscribe(result -> setNotificationsIndicatorVisible(result), error -> {});
     }
 
     public static class BrowserLogoutDialogFragment extends DialogFragment implements

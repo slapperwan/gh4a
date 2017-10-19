@@ -1,4 +1,4 @@
-package com.gh4a.loader;
+package com.gh4a.model;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +18,7 @@ import com.meisolsson.githubsdk.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class TimelineItem {
+    public static final Comparator<TimelineItem> COMPARATOR = (lhs, rhs) -> {
+        if (lhs.getCreatedAt() == null) {
+            return 1;
+        }
+        if (rhs.getCreatedAt() == null) {
+            return -1;
+        }
+        return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
+    };
+
+
     public static class TimelineComment extends TimelineItem {
         private static final Pattern PULL_REQUEST_PATTERN =
                 Pattern.compile(".*github\\.com/repos/([^/]+)/([^/]+)/pulls/(\\d+)");

@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
-import com.gh4a.holder.Feed;
+import com.gh4a.model.Feed;
 import com.gh4a.utils.AvatarHandler;
 
 public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewHolder> {

@@ -160,7 +160,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     @Override
     public void onRefresh() {
         if (mAdapter != null) {
-            hideContentAndRestartLoaders(0);
+            loadResults();
         }
     }
 

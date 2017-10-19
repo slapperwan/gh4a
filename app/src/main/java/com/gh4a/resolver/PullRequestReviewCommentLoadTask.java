@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReviewActivity;
-import com.gh4a.loader.TimelineItem;
+import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.meisolsson.githubsdk.model.Review;

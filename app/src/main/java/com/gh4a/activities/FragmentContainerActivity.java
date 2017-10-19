@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentManager;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.LoadingFragmentBase;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 public abstract class FragmentContainerActivity extends BaseActivity {
@@ -39,8 +38,8 @@ public abstract class FragmentContainerActivity extends BaseActivity {
     @Override
     public void onRefresh() {
         super.onRefresh();
-        if (mFragment instanceof LoaderCallbacks.ParentCallback) {
-            ((LoaderCallbacks.ParentCallback) mFragment).onRefresh();
+        if (mFragment instanceof RefreshableChild) {
+            ((RefreshableChild) mFragment).onRefresh();
         }
     }
 

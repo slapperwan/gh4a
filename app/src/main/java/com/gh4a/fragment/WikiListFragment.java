@@ -2,16 +2,14 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.R;
 import com.gh4a.activities.WikiActivity;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.holder.Feed;
-import com.gh4a.loader.FeedLoader;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.model.Feed;
+import com.gh4a.utils.SingleFactory;
 
 import org.xml.sax.SAXException;
 
@@ -49,7 +47,7 @@ public class WikiListFragment extends ListDataBaseFragment<Feed> implements
     @Override
     protected Single<List<Feed>> onCreateDataSingle() {
         String url = "https://github.com/" + mUserLogin + "/" + mRepoName + "/wiki.atom";
-        return FeedLoader.loadFeed(url);
+        return SingleFactory.loadFeed(url);
     }
 
     @Override

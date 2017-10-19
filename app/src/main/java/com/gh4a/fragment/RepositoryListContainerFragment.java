@@ -19,13 +19,12 @@ import android.view.ViewGroup;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.meisolsson.githubsdk.model.Repository;
 
 public class RepositoryListContainerFragment extends Fragment implements
-        LoaderCallbacks.ParentCallback, SearchView.OnCloseListener, SearchView.OnQueryTextListener,
+        BaseActivity.RefreshableChild, SearchView.OnCloseListener, SearchView.OnQueryTextListener,
         MenuItem.OnActionExpandListener, SwipeRefreshLayout.ChildScrollDelegate {
     public static RepositoryListContainerFragment newInstance(String userLogin, boolean isOrg) {
         return newInstance(userLogin, isOrg, null);
@@ -92,11 +91,6 @@ public class RepositoryListContainerFragment extends Fragment implements
 
         setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public BaseActivity getBaseActivity() {
-        return (BaseActivity) getActivity();
     }
 
     @Override

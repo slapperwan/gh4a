@@ -41,6 +41,7 @@ import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
+import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
@@ -50,12 +51,9 @@ import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.issues.IssueAssigneeService;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
 import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
-import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
 
 import java.util.List;
 import java.util.Locale;
-
-import io.reactivex.Single;
 
 public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
@@ -624,7 +622,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             registerTemporarySubscription(ApiHelpers.PageIterator
                     .toSingle(page -> service.getAssignees(mRepoOwner, mRepoName, page))
                     .compose(RxUtils::doInBackground)
-                    .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                    .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                     .subscribe(assignees -> {
                         mAssignees = assignees;
                         showAssigneesDialog();
@@ -641,7 +639,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             registerTemporarySubscription(ApiHelpers.PageIterator
                     .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
                     .compose(RxUtils::doInBackground)
-                    .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                    .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                     .subscribe(milestones -> {
                         mMilestones = milestones;
                         showMilestonesDialog();
@@ -658,7 +656,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             registerTemporarySubscription(ApiHelpers.PageIterator
                     .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                     .compose(RxUtils::doInBackground)
-                    .compose(RxUtils.wrapWithProgressDialog(getBaseActivity(), R.string.loading_msg))
+                    .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                     .subscribe(labels -> {
                         mLabels = labels;
                         showLabelsDialog();
@@ -683,33 +681,15 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void loadCollaboratorStatus(boolean force) {
-        Gh4Application app = Gh4Application.get();
-        String login = app.getAuthLogin();
-        final Single<Boolean> observable;
-
-        if (login == null) {
-            observable = Single.just(false);
-        } else {
-            RepositoryCollaboratorService service =
-                    app.getGitHubService(RepositoryCollaboratorService.class);
-            // TODO: consider moving to a shared place - shared with IssueEditActivity
-            observable = service.isUserCollaborator(mRepoOwner, mRepoName, login)
-                    .map(ApiHelpers::throwOnFailure)
-                    // the API returns 403 if the user doesn't have push access,
-                    // which in turn means he isn't a collaborator
-                    .compose(RxUtils.mapFailureToValue(403, false))
-                    // there's no actual content, result is always null
-                    .map(result -> true)
-                    .compose(makeLoaderSingle(ID_LOADER_COLLABORATOR_STATUS, force));
-        }
-
-        observable.subscribe(result -> {
-            if (mIsCollaborator == null) {
-                mIsCollaborator = result;
-                if (mIsCollaborator) {
-                    updateRightNavigationDrawer();
-                }
-            }
-        }, error -> {});
+        SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName)
+                .compose(makeLoaderSingle(ID_LOADER_COLLABORATOR_STATUS, force))
+                .subscribe(result -> {
+                    if (mIsCollaborator == null) {
+                        mIsCollaborator = result;
+                        if (mIsCollaborator) {
+                            updateRightNavigationDrawer();
+                        }
+                    }
+                }, error -> {});
     }
 }

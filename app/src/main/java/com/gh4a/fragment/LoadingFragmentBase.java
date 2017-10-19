@@ -3,8 +3,6 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +10,6 @@ import android.view.animation.AnimationUtils;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.philosophicalhacker.lib.RxLoader;
@@ -23,7 +20,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public abstract class LoadingFragmentBase extends Fragment implements
-        LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
+        BaseActivity.RefreshableChild, SwipeRefreshLayout.ChildScrollDelegate {
     private ViewGroup mContentContainer;
     private View mContentView;
     private SmoothProgressBar mProgress;
@@ -32,11 +29,6 @@ public abstract class LoadingFragmentBase extends Fragment implements
     private RxLoader mRxLoader;
 
     public LoadingFragmentBase() {
-    }
-
-    @Override
-    public BaseActivity getBaseActivity() {
-        return (BaseActivity) getActivity();
     }
 
     @Override
@@ -81,6 +73,10 @@ public abstract class LoadingFragmentBase extends Fragment implements
         return UiUtils.canViewScrollUp(mContentView);
     }
 
+    protected BaseActivity getBaseActivity() {
+        return (BaseActivity) getActivity();
+    }
+
     protected <T> SingleTransformer<T, T> makeLoaderSingle(int id, boolean force) {
         return upstream -> upstream
                 .subscribeOn(Schedulers.io())
@@ -99,17 +95,6 @@ public abstract class LoadingFragmentBase extends Fragment implements
 
     protected int getHighlightColor() {
         return mProgressColors[0];
-    }
-
-    protected void hideContentAndRestartLoaders(int... loaderIds) {
-        setContentShown(false);
-        LoaderManager lm = getLoaderManager();
-        for (int id : loaderIds) {
-            Loader loader = lm.getLoader(id);
-            if (loader != null) {
-                loader.onContentChanged();
-            }
-        }
     }
 
     protected boolean isContentShown() {

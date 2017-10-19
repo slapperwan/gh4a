@@ -6,9 +6,11 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 
 import com.gh4a.ApiRequestException;
+import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReleaseInfoActivity;
-import com.gh4a.loader.ReleaseListLoader;
-import com.meisolsson.githubsdk.model.Release;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
+import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
 import java.util.List;
 
@@ -30,17 +32,18 @@ public class ReleaseLoadTask extends UrlLoadTask {
 
     @Override
     protected Intent run() throws ApiRequestException {
-        List<Release> releases = ReleaseListLoader.loadReleases(mRepoOwner, mRepoName);
-
-        if (releases != null) {
-            for (Release release : releases) {
-                if (TextUtils.equals(release.tagName(), mTagName)) {
-                    return ReleaseInfoActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                            release);
-                }
-            }
-        }
-
-        return null;
+        final RepositoryReleaseService service =
+                Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getReleases(mRepoOwner, mRepoName, page))
+                .compose(RxUtils.filter(r -> TextUtils.equals(r.tagName(), mTagName)))
+                .map(list -> list.isEmpty() ? null : list.get(0))
+                .map(r -> {
+                    if (r == null) {
+                        return null;
+                    }
+                    return ReleaseInfoActivity.makeIntent(mActivity, mRepoOwner, mRepoName, r);
+                })
+                .blockingGet();
     }
 }

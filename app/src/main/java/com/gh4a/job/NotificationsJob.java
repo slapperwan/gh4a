@@ -31,14 +31,14 @@ import com.gh4a.R;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.loader.NotificationHolder;
-import com.gh4a.loader.NotificationListLoader;
+import com.gh4a.model.NotificationHolder;
+import com.gh4a.model.NotificationListLoadResult;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.SingleFactory;
 import com.meisolsson.githubsdk.model.NotificationThread;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.User;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -126,9 +126,9 @@ public class NotificationsJob extends Job {
     protected Result onRunJob(Params params) {
         List<List<NotificationThread>> notifsGroupedByRepo = new ArrayList<>();
         try {
-            List<NotificationHolder> notifications =
-                    NotificationListLoader.loadNotifications(false, false);
-            for (NotificationHolder holder : notifications) {
+            NotificationListLoadResult result =
+                    SingleFactory.getNotifications(false, false).blockingGet();
+            for (NotificationHolder holder : result.notifications) {
                 if (holder.notification == null) {
                     notifsGroupedByRepo.add(new ArrayList<NotificationThread>());
                 } else {

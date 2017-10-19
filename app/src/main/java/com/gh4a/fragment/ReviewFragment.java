@@ -19,7 +19,7 @@ import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
-import com.gh4a.loader.TimelineItem;
+import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;

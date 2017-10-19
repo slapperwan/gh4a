@@ -21,7 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.gh4a.R;
-import com.gh4a.holder.Feed;
+import com.gh4a.model.Feed;
 
 public class WikiActivity extends WebViewerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, Feed feed) {

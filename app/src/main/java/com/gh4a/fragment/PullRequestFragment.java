@@ -31,9 +31,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
-import com.gh4a.loader.CommitStatusLoader;
-import com.gh4a.loader.IssueCommentListLoader;
-import com.gh4a.loader.TimelineItem;
+import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -59,12 +57,17 @@ import com.meisolsson.githubsdk.service.issues.IssueEventService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryStatusService;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -201,7 +204,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                 .compose(RxUtils.mapList(comment -> new TimelineItem.TimelineComment(comment)));
         Single<List<TimelineItem>> eventItemSingle = ApiHelpers.PageIterator
                 .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
-                .compose(RxUtils.filter(event -> IssueCommentListLoader.INTERESTING_EVENTS.contains(event.event())))
+                .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
                 .compose((RxUtils.mapList(event -> new TimelineItem.TimelineEvent(event))));
         Single<Map<String, GitHubFile>> filesByNameSingle = ApiHelpers.PageIterator
                 .toSingle(page -> prService.getPullRequestFiles(mRepoOwner, mRepoName, issueNumber, page))
@@ -308,7 +311,7 @@ public class PullRequestFragment extends IssueFragmentBase {
             result.addAll(events);
             result.addAll(reviewItems);
             result.addAll(commentsWithoutReview);
-            Collections.sort(result, IssueCommentListLoader.TIMELINE_ITEM_COMPARATOR);
+            Collections.sort(result, TimelineItem.COMPARATOR);
             return result;
         });
     }
@@ -409,14 +412,61 @@ public class PullRequestFragment extends IssueFragmentBase {
                 }, error -> {});
     }
 
+    private static final Comparator<Status> STATUS_TIMESTAMP_COMPARATOR =
+            (lhs, rhs) -> rhs.updatedAt().compareTo(lhs.updatedAt());
+    private static final Comparator<Status> STATUS_AND_CONTEXT_COMPARATOR = new Comparator<Status>() {
+        @Override
+        public int compare(Status lhs, Status rhs) {
+            int lhsSeverity = getStateSeverity(lhs);
+            int rhsSeverity = getStateSeverity(rhs);
+            if (lhsSeverity != rhsSeverity) {
+                return lhsSeverity < rhsSeverity ? 1 : -1;
+            } else {
+                return lhs.context().compareTo(rhs.context());
+            }
+        }
+
+        private int getStateSeverity(Status status) {
+            switch (status.state()) {
+                case Success: return 0;
+                case Error:
+                case Failure: return 2;
+                default: return 1;
+            }
+        }
+    };
+
     private void loadCommitStatusesIfOpen(boolean force) {
         if (mPullRequest.state() != IssueState.Open) {
             return;
         }
 
-        CommitStatusLoader.load(mRepoOwner, mRepoName, mPullRequest.head().sha())
-                .compose(makeLoaderSingle(ID_LOADER_STATUS, force))
-                .subscribe(statuses -> fillStatus(statuses), error -> {});
+        RepositoryStatusService service =
+                Gh4Application.get().getGitHubService(RepositoryStatusService.class);
+        String sha = mPullRequest.head().sha();
+
+        ApiHelpers.PageIterator
+                    .toSingle(page -> service.getStatuses(mRepoOwner, mRepoName, sha, page))
+                    // Sort by timestamps first, so the removal logic below keeps the newest status
+                    .compose(RxUtils.sortList(STATUS_TIMESTAMP_COMPARATOR))
+                    // Filter out outdated statuses, only keep the newest status per context
+                    .map(statuses -> {
+                        Set<String> seenContexts = new HashSet<>();
+                        Iterator<Status> iter = statuses.iterator();
+                        while (iter.hasNext()) {
+                            Status status = iter.next();
+                            if (seenContexts.contains(status.context())) {
+                                iter.remove();
+                            } else {
+                                seenContexts.add(status.context());
+                            }
+                        }
+                        return statuses;
+                    })
+                    // sort by status, then context
+                    .compose(RxUtils.sortList(STATUS_AND_CONTEXT_COMPARATOR))
+                    .compose(makeLoaderSingle(ID_LOADER_STATUS, force))
+                    .subscribe(statuses -> fillStatus(statuses), error -> {});
     }
 
     private void loadHeadReference(boolean force) {

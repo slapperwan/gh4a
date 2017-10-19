@@ -16,7 +16,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
-import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
@@ -42,7 +41,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class ContentListContainerFragment extends Fragment implements
         ContentListFragment.ParentCallback, PathBreadcrumbs.SelectionCallback,
-        LoaderCallbacks.ParentCallback, SwipeRefreshLayout.ChildScrollDelegate {
+        BaseActivity.RefreshableChild, SwipeRefreshLayout.ChildScrollDelegate {
     private static final int ID_LOADER_MODULEMAP = 100;
 
     private static final String STATE_KEY_DIR_STACK = "dir_stack";
@@ -134,11 +133,6 @@ public class ContentListContainerFragment extends Fragment implements
     @Override
     public void onRefresh() {
         setRef(mSelectedRef);
-    }
-
-    @Override
-    public BaseActivity getBaseActivity() {
-        return (BaseActivity) getActivity();
     }
 
     public void setRef(String ref) {
@@ -324,7 +318,7 @@ public class ContentListContainerFragment extends Fragment implements
                 .map(this::parseModuleMap)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> getBaseActivity().handleLoadFailure(error))
+                .doOnError(error -> ((BaseActivity) getActivity()).handleLoadFailure(error))
                 .compose(mRxLoader.makeSingleTransformer(ID_LOADER_MODULEMAP, true))
                 .subscribe(result -> {
                     mGitModuleMap = result;

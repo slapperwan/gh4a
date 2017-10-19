@@ -4,21 +4,24 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
+import android.util.Pair;
 import android.view.View;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
-import com.gh4a.loader.PullRequestCommentsLoader;
-import com.gh4a.loader.PullRequestFilesLoader;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.ReviewComment;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
+import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
 import java.util.List;
+
+import io.reactivex.Single;
 
 public class PullRequestFilesFragment extends CommitFragment {
     public static PullRequestFilesFragment newInstance(String repoOwner, String repoName,
@@ -34,6 +37,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         return f;
     }
 
+    private static final int ID_LOADER_FILES_AND_COMMENTS = 0;
     private static final int REQUEST_DIFF_VIEWER = 1000;
 
     public interface CommentUpdateListener {
@@ -44,36 +48,7 @@ public class PullRequestFilesFragment extends CommitFragment {
     private String mRepoName;
     private int mPullRequestNumber;
     private String mHeadSha;
-    private List<GitHubFile> mFiles;
     private List<ReviewComment> mComments;
-
-    private final LoaderCallbacks<List<GitHubFile>> mPullRequestFilesCallback = new LoaderCallbacks<List<GitHubFile>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<GitHubFile>>> onCreateLoader() {
-            return new PullRequestFilesLoader(getActivity(), mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-
-        @Override
-        protected void onResultReady(List<GitHubFile> result) {
-            mFiles = result;
-            populateViewIfReady();
-        }
-    };
-
-    private final LoaderCallbacks<List<ReviewComment>> mPullRequestCommentsCallback =
-            new LoaderCallbacks<List<ReviewComment>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<ReviewComment>>> onCreateLoader() {
-            return new PullRequestCommentsLoader(getActivity(),
-                    mRepoOwner, mRepoName, mPullRequestNumber);
-        }
-
-        @Override
-        protected void onResultReady(List<ReviewComment> result) {
-            mComments = result;
-            populateViewIfReady();
-        }
-    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,23 +76,14 @@ public class PullRequestFilesFragment extends CommitFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setContentShown(false);
-        getLoaderManager().initLoader(0, null, mPullRequestFilesCallback);
-        getLoaderManager().initLoader(1, null, mPullRequestCommentsCallback);
+        load(false);
     }
 
     @Override
     public void onRefresh() {
-        mFiles = null;
         mComments = null;
-        hideContentAndRestartLoaders(0, 1);
-    }
-
-    @Override
-    protected void populateViewIfReady() {
-        if (mComments != null && mFiles != null) {
-            fillStats(mFiles, mComments);
-            setContentShown(true);
-        }
+        setContentShown(false);
+        load(true);
     }
 
     @Override
@@ -150,5 +116,30 @@ public class PullRequestFilesFragment extends CommitFragment {
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private void load(boolean force) {
+        final PullRequestService service =
+                Gh4Application.get().getGitHubService(PullRequestService.class);
+        final PullRequestReviewCommentService commentService =
+                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+
+        Single<List<GitHubFile>> fileSingle = ApiHelpers.PageIterator
+                .toSingle(page -> service.getPullRequestFiles(
+                        mRepoOwner, mRepoName, mPullRequestNumber, page));
+        Single<List<ReviewComment>> commentSingle = ApiHelpers.PageIterator
+                .toSingle(page -> commentService.getPullRequestComments(
+                        mRepoOwner, mRepoName, mPullRequestNumber, page))
+                .compose(RxUtils.filter(c -> c.position() >= 0));
+
+        Single.zip(fileSingle, commentSingle, (files, comments) -> Pair.create(files, comments))
+                .compose(makeLoaderSingle(ID_LOADER_FILES_AND_COMMENTS, force))
+                .subscribe(result -> {
+                    mComments = result.second;
+                    fillHeader();
+                    fillStats(result.first, result.second);
+                    setContentShown(true);
+                }, error -> {
+                });
     }
 }

@@ -22,23 +22,22 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.Loader;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.gh4a.BaseFragmentPagerActivity;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
-import com.gh4a.loader.CommitCommentListLoader;
-import com.gh4a.loader.CommitLoader;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.git.GitComment;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
+import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
 import java.util.List;
 
@@ -68,6 +67,9 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
                 .putExtra("initial_comment", initialComment);
     }
 
+    private static final int ID_LOADER_COMMIT = 0;
+    private static final int ID_LOADER_COMMENTS = 1;
+
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
@@ -81,47 +83,13 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
         R.string.commit, R.string.issue_comments
     };
 
-    private final LoaderCallbacks<Commit> mCommitCallback =
-            new LoaderCallbacks<Commit>(this) {
-        @Override
-        protected Loader<LoaderResult<Commit>> onCreateLoader() {
-            return new CommitLoader(CommitActivity.this, mRepoOwner, mRepoName, mObjectSha);
-        }
-
-        @Override
-        protected void onResultReady(Commit result) {
-            mCommit = result;
-            showContentIfReady();
-        }
-    };
-
-    private final LoaderCallbacks<List<GitComment>> mCommentCallback =
-            new LoaderCallbacks<List<GitComment>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<GitComment>>> onCreateLoader() {
-            return new CommitCommentListLoader(CommitActivity.this, mRepoOwner, mRepoName,
-                    mObjectSha, true, true);
-        }
-
-        @Override
-        protected void onResultReady(List<GitComment> result) {
-            mComments = result;
-            if (result.isEmpty()) {
-                mInitialComment = null;
-            }
-            showContentIfReady();
-        }
-    };
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentShown(false);
-
-        getSupportLoaderManager().initLoader(0, null, mCommitCallback);
-        getSupportLoaderManager().initLoader(1, null, mCommentCallback);
+        loadCommit(false);
+        loadComments(false);
     }
 
     @Nullable
@@ -162,7 +130,8 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
         mCommit = null;
         mComments = null;
         setContentShown(false);
-        forceLoaderReload(0, 1);
+        loadCommit(true);
+        loadComments(true);
         super.onRefresh();
     }
 
@@ -225,7 +194,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
         mComments = null;
         setResult(RESULT_OK);
         setContentShown(false);
-        forceLoaderReload(1);
+        loadComments(true);
     }
 
     private void showContentIfReady() {
@@ -236,5 +205,33 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
                 getPager().setCurrentItem(1);
             }
         }
+    }
+
+    private void loadCommit(boolean force) {
+        RepositoryCommitService service =
+                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+
+        service.getCommit(mRepoOwner, mRepoName, mObjectSha)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(makeLoaderSingle(ID_LOADER_COMMIT, force))
+                .subscribe(result -> {
+                    mCommit = result;
+                    showContentIfReady();
+                }, error -> {});
+    }
+
+    private void loadComments(boolean force) {
+        final RepositoryCommentService service =
+                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        ApiHelpers.PageIterator
+                .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mObjectSha, page))
+                .compose(makeLoaderSingle(ID_LOADER_COMMENTS, force))
+                .subscribe(result -> {
+                    mComments = result;
+                    if (result.isEmpty()) {
+                        mInitialComment = null;
+                    }
+                    showContentIfReady();
+                }, error -> {});
     }
 }

@@ -17,16 +17,14 @@ package com.gh4a.fragment;
 
 import java.util.List;
 
-import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.R;
 import com.gh4a.activities.BlogActivity;
 import com.gh4a.adapter.CommonFeedAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.holder.Feed;
-import com.gh4a.loader.FeedLoader;
-import com.gh4a.loader.LoaderResult;
+import com.gh4a.model.Feed;
+import com.gh4a.utils.SingleFactory;
 
 import io.reactivex.Single;
 
@@ -57,6 +55,6 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> implements
 
     @Override
     protected Single<List<Feed>> onCreateDataSingle() {
-        return FeedLoader.loadFeed(BLOG);
+        return SingleFactory.loadFeed(BLOG);
     }
 }

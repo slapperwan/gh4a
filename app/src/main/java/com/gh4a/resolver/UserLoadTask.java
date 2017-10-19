@@ -5,8 +5,10 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.ApiRequestException;
-import com.gh4a.loader.UserLoader;
+import com.gh4a.Gh4Application;
+import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.users.UserService;
 
 public abstract class UserLoadTask extends UrlLoadTask {
     @VisibleForTesting
@@ -19,7 +21,8 @@ public abstract class UserLoadTask extends UrlLoadTask {
 
     @Override
     protected Intent run() throws ApiRequestException {
-        User user = UserLoader.loadUser(mUserLogin);
+        UserService userService = Gh4Application.get().getGitHubService(UserService.class);
+        User user = ApiHelpers.throwOnFailure(userService.getUser(mUserLogin).blockingGet());
         if (user == null) {
             return null;
         }

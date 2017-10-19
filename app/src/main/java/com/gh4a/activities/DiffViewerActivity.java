@@ -19,7 +19,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.Loader;
 import android.support.v4.util.LongSparseArray;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -32,8 +31,6 @@ import android.view.View;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
@@ -110,6 +107,8 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     protected static final int REQUEST_EDIT = 0;
 
+    private static final int ID_LOADER_COMMENTS = 0;
+
     protected String mRepoOwner;
     protected String mRepoName;
     protected String mPath;
@@ -140,32 +139,12 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     private static final int MENU_ITEM_VIEW = 10;
 
-    private final LoaderCallbacks<List<C>> mCommentCallback = new LoaderCallbacks<List<C>>(this) {
-        @Override
-        protected Loader<LoaderResult<List<C>>> onCreateLoader() {
-            return createCommentLoader();
-        }
-
-        @Override
-        protected void onResultReady(List<C> result) {
-            addCommentsToMap(new ArrayList<>(result));
-            onDataReady();
-        }
-    };
-
     @Override
     @SuppressWarnings("unchecked")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        List<C> comments = getIntent().getParcelableArrayListExtra("comments");
-
-        if (comments != null) {
-            addCommentsToMap(comments);
-            onDataReady();
-        } else {
-            getSupportLoaderManager().initLoader(0, null, mCommentCallback);
-        }
+        loadComments(false, false);
     }
 
     @Nullable
@@ -210,7 +189,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     @Override
     public void onRefresh() {
-        if (forceLoaderReload(0)) {
+        if (loadComments(true, true)) {
             mCommitCommentsByPos.clear();
             setContentShown(false);
         }
@@ -443,11 +422,11 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     private void refresh() {
         mCommitComments.clear();
         mCommitCommentsByPos.clear();
-        getSupportLoaderManager().restartLoader(0, null, mCommentCallback);
+        loadComments(false, true);
         setContentShown(false);
     }
 
-    protected abstract Loader<LoaderResult<List<C>>> createCommentLoader();
+    protected abstract Single<List<C>> createCommentSingle();
     protected abstract void openCommentDialog(long id, long replyToId, String line,
             int position, int leftLine, int rightLine, PositionalCommentBase commitComment);
     protected abstract Single<Response<Void>> doDeleteComment(long id);
@@ -557,5 +536,23 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
                     refresh();
                     setResult(RESULT_OK);
                 }, error -> {});
+    }
+
+    private boolean loadComments(boolean refreshOnly, boolean force) {
+        List<C> comments = getIntent().getParcelableArrayListExtra("comments");
+        if (comments != null && refreshOnly) {
+            return false;
+        }
+
+        Single<List<C>> commentSingle = comments != null
+                ? Single.just(comments)
+                : createCommentSingle().compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));
+
+        commentSingle.subscribe(result -> {
+            addCommentsToMap(new ArrayList<>(result));
+            onDataReady();
+        }, error -> {});
+
+        return true;
     }
 }

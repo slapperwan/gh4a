@@ -78,7 +78,11 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
 
     @Override
     public void onRefresh() {
-        hideContentAndRestartLoaders(0);
+        setContentShown(false);
+        Loader loader = getLoaderManager().getLoader(0);
+        if (loader != null) {
+            loader.onContentChanged();
+        }
     }
 
     @Override

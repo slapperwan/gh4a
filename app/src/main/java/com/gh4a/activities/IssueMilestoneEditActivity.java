@@ -450,7 +450,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return getBaseActivity().getString(TITLES[position]);
+            return getString(TITLES[position]);
         }
 
         @Override
