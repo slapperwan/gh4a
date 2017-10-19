@@ -6,20 +6,15 @@ import com.gh4a.model.Feed;
 import com.gh4a.model.NotificationHolder;
 import com.gh4a.model.NotificationListLoadResult;
 import com.gh4a.model.Trend;
+import com.gh4a.model.TrendService;
+import com.meisolsson.githubsdk.core.ServiceGenerator;
 import com.meisolsson.githubsdk.model.NotificationThread;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.activity.NotificationService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.io.BufferedInputStream;
-import java.io.CharArrayWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -27,13 +22,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import io.reactivex.Single;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class SingleFactory {
     public static Single<Boolean> isAppUserRepoCollaborator(String repoOwner, String repoName) {
@@ -144,58 +141,13 @@ public class SingleFactory {
     }
 
     public static Single<List<Trend>> loadTrends(String type) {
-        return Single.fromCallable(() -> {
-            String urlString = String.format(Locale.US,
-                    "http://octodroid.s3.amazonaws.com/trends/trending_%s-all.json", type);
-            URL url = new URL(urlString);
-            List<Trend> trends = new ArrayList<>();
-
-            HttpURLConnection connection = null;
-            CharArrayWriter writer = null;
-
-            try {
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("GET");
-                connection.setRequestProperty("Content-Type", "application/json");
-
-                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                    return trends;
-                }
-
-                InputStream in = new BufferedInputStream(connection.getInputStream());
-                InputStreamReader reader = new InputStreamReader(in, "UTF-8");
-                int length = connection.getContentLength();
-                writer = new CharArrayWriter(Math.max(0, length));
-                char[] tmp = new char[4096];
-
-                int l;
-                while ((l = reader.read(tmp)) != -1) {
-                    writer.write(tmp, 0, l);
-                }
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-                if (writer != null) {
-                    writer.close();
-                }
-            }
-
-            JSONArray resultArray = new JSONArray(writer.toString());
-            for (int i = 0; i < resultArray.length(); i++) {
-                JSONObject repoObject = resultArray.getJSONObject(i);
-
-                trends.add(new Trend(
-                        repoObject.getString("owner"),
-                        repoObject.getString("repo"),
-                        repoObject.isNull("description") ? null : repoObject.optString("description"),
-                        (int) repoObject.getDouble("stars"),
-                        (int) repoObject.getDouble("new_stars"),
-                        (int) repoObject.getDouble("forks")));
-            }
-            return trends;
-
-        });
+        return new Retrofit.Builder()
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(MoshiConverterFactory.create(ServiceGenerator.moshi))
+                .baseUrl("http://octodroid.s3.amazonaws.com")
+                .build()
+                .create(TrendService.class)
+                .getTrends(type)
+                .map(ApiHelpers::throwOnFailure);
     }
-
 }
