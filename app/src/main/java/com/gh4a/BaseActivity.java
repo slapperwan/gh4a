@@ -47,6 +47,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.view.SupportMenuInflater;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -178,6 +179,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     public void handleLoadFailure(Throwable e) {
         // FIXME: handle auth error by integrating handleAuthFailureDuringLoad
+        Log.d(Gh4Application.LOG_TAG, "Loading data failed", e);
         setErrorViewVisibility(true, e);
     }
 
