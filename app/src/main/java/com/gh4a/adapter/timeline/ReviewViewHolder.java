@@ -141,7 +141,7 @@ class ReviewViewHolder
                 ReviewComment commitComment = diffHunk.getInitialComment();
                 String filename = commitComment.path();
                 int commentCount = diffHunk.comments.size();
-                boolean isOutdated = commitComment.position() == -1;
+                boolean isOutdated = commitComment.position() == null;
 
                 if (files.containsKey(filename)) {
                     FileDetails details = files.get(filename);

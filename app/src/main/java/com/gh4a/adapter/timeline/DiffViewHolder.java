@@ -84,7 +84,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mFileTextView.setTag(item.getInitialTimelineComment());
         mFileTextView.setText(comment.path());
 
-        boolean isOutdated = comment.position() == -1;
+        boolean isOutdated = comment.position() == null;
         mFileTextView.setPaintFlags(isOutdated
                 ? mFileTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : mFileTextView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
@@ -226,7 +226,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         Menu menu = popupMenu.getMenu();
         popupMenu.getMenuInflater().inflate(R.menu.review_diff_hunk_menu, menu);
 
-        menu.findItem(R.id.view_in_file).setVisible(diff.getInitialComment().position() != -1);
+        menu.findItem(R.id.view_in_file).setVisible(diff.getInitialComment().position() != null);
 
         popupMenu.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {

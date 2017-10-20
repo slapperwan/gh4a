@@ -58,7 +58,7 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
         Single<List<ReviewComment>> commentsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(RxUtils.filter(c -> c.position() >= 0))
+                .compose(RxUtils.filter(c -> c.position() != null))
                 .cache(); // single is used multiple times -> avoid refetching data
 
         Single<List<GitHubFile>> filesSingle = ApiHelpers.PageIterator

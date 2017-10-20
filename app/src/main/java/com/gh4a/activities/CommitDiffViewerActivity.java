@@ -98,7 +98,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
                 Gh4Application.get().getGitHubService(RepositoryCommentService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mSha, page))
-                .compose(RxUtils.filter(c -> c.position() >= 0));
+                .compose(RxUtils.filter(c -> c.position() != null));
     }
 
     @Override

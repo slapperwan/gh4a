@@ -46,7 +46,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
         ArrayList<GitComment> comments = new ArrayList<>();
         // we're only interested in unpositional comments
         for (GitComment comment : allComments) {
-            if (comment.position() < 0) {
+            if (comment.position() == null) {
                 comments.add(comment);
             }
         }
@@ -236,7 +236,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mObjectSha, page))
-                .compose(RxUtils.filter(comment -> comment.position() < 0));
+                .compose(RxUtils.filter(comment -> comment.position() == null));
     }
 
     @Override
