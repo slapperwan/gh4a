@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.Subject;
 import retrofit2.Response;
@@ -45,6 +46,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     private List<T> mPreviouslyLoadedData;
     private Integer mNextPage;
     private View mLoadingView;
+    private Disposable mSubscription;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -61,6 +63,10 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     public void onRefresh() {
         if (mAdapter != null) {
             mAdapter.clear();
+        }
+        if (mSubscription != null) {
+            mSubscription.dispose();
+            mSubscription = null;
         }
         mNextPage = 0;
         mPreviouslyLoadedData = null;
@@ -91,7 +97,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     private void load(boolean force) {
-        mPageSubject
+        mSubscription = mPageSubject
                 .concatMap(page -> loadPage(page)
                         .map(ApiHelpers::throwOnFailure)
                         .compose(RxUtils::doInBackground)
