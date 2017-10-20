@@ -84,13 +84,17 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        fillHeader();
-        fillStats(mCommit.files(), mComments);
+        populateUiIfReady();
     }
 
     @Override
     public void onRefresh() {
         // we got all our data through arguments
+    }
+
+    protected void populateUiIfReady() {
+        fillHeader();
+        fillStats(mCommit.files(), mComments);
     }
 
     protected void fillHeader() {
