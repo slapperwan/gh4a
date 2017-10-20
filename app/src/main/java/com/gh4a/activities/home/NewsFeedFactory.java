@@ -106,15 +106,23 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        mSelectedOrganization = position != 0 ? mUserScopes.get(position - 1) : null;
-        mActivity.invalidateFragments();
+        User selectedOrganization = position != 0 ? mUserScopes.get(position - 1) : null;
+        boolean isChange = selectedOrganization == null || mSelectedOrganization == null
+                ? selectedOrganization != mSelectedOrganization
+                : selectedOrganization.equals(mSelectedOrganization);
+        if (isChange) {
+            mSelectedOrganization = selectedOrganization;
+            mActivity.invalidateFragments();
+        }
 
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> view) {
-        mSelectedOrganization = null;
-        mActivity.invalidateFragments();
+        if (mSelectedOrganization != null) {
+            mSelectedOrganization = null;
+            mActivity.invalidateFragments();
+        }
     }
 
     private static class UserAdapter extends BaseAdapter {
