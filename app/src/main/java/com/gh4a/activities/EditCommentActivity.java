@@ -51,7 +51,10 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
         }
 
         mEditorSheet.setCallback(this);
-        mEditorSheet.setCommentText(getIntent().getStringExtra("body"), false);
+        if (getIntent().hasExtra("body")) {
+            mEditorSheet.setCommentText(getIntent().getStringExtra("body"), false);
+            getIntent().removeExtra("body");
+        }
 
         @AttrRes int highlightColorAttr = getIntent().getIntExtra("highlight_color_attr", 0);
         if (highlightColorAttr != 0) {
