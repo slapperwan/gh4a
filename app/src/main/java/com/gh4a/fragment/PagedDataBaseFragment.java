@@ -43,7 +43,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
     private RxLoader mRxLoader;
     private Subject<Integer> mPageSubject;
-    private List<T> mPreviouslyLoadedData;
     private Integer mNextPage;
     private View mLoadingView;
     private Disposable mSubscription;
@@ -55,7 +54,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         setContentShown(false);
 
         mRxLoader = new RxLoader(getActivity(), getLoaderManager());
-        mPageSubject = BehaviorSubject.createDefault(1);
+        resetSubject();
         load(false);
     }
 
@@ -68,8 +67,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
             mSubscription.dispose();
             mSubscription = null;
         }
-        mNextPage = 0;
-        mPreviouslyLoadedData = null;
+        resetSubject();
         setContentShown(false);
         load(true);
     }
@@ -96,23 +94,24 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         return mAdapter.isCardStyle();
     }
 
+    private void resetSubject() {
+        mNextPage = null;
+        mPageSubject = BehaviorSubject.createDefault(1);
+        mPageSubject.onNext(1);
+    }
+
     private void load(boolean force) {
         mSubscription = mPageSubject
-                .concatMap(page -> loadPage(page)
+                .flatMap(page -> loadPage(page)
                         .map(ApiHelpers::throwOnFailure)
                         .compose(RxUtils::doInBackground)
-                        .map(result -> {
-                            final List<T> items;
-                            if (mPreviouslyLoadedData != null) {
-                                items = new ArrayList<>(mPreviouslyLoadedData);
-                                items.addAll(result.items());
-                            } else {
-                                items = result.items();
-                            }
-                            return Pair.create(items, result.next());
-                        })
-                        .toObservable()
-                )
+                        .toObservable())
+                .scan(Pair.create(new ArrayList<T>(), 0), (pair, page) -> {
+                    pair.first.addAll(page.items());
+                    return Pair.create(pair.first, page.next());
+                })
+                // filter out initial value
+                .filter(pair -> pair.second == null || pair.second != 0)
                 .compose(mRxLoader.makeObservableTransformer(0, force))
                 .subscribe(result -> {
                     fillData(result.first, result.second);
@@ -122,7 +121,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     private void fillData(List<T> data, Integer nextPage) {
-        mPreviouslyLoadedData = data;
         mNextPage = nextPage;
         mLoadingView.setVisibility(nextPage != null ? View.VISIBLE : View.GONE);
 
