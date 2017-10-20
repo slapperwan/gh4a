@@ -10,6 +10,7 @@ import android.view.animation.AnimationUtils;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.philosophicalhacker.lib.RxLoader;
@@ -79,8 +80,7 @@ public abstract class LoadingFragmentBase extends Fragment implements
 
     protected <T> SingleTransformer<T, T> makeLoaderSingle(int id, boolean force) {
         return upstream -> upstream
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .compose(RxUtils::doInBackground)
                 .doOnError(error -> getBaseActivity().handleLoadFailure(error))
                 .compose(mRxLoader.makeSingleTransformer(id, force));
     }
