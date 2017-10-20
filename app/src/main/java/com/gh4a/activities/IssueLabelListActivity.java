@@ -313,7 +313,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         final IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
-                .compose(RxUtils.mapList(label -> new IssueLabelAdapter.EditableLabel(label)))
+                .compose(RxUtils.mapList(IssueLabelAdapter.EditableLabel::new))
                 .compose(makeLoaderSingle(ID_LOADER_LABELS, force))
                 .subscribe(result -> {
                     UiUtils.hideImeForView(getCurrentFocus());

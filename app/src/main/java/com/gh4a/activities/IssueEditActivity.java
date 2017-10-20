@@ -361,15 +361,12 @@ public class IssueEditActivity extends BasePagerActivity implements
                 }
             }
 
-            final DialogInterface.OnClickListener selectCb = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    mEditIssue = mEditIssue.toBuilder()
-                            .milestone(which == 0 ? null : mAllMilestone.get(which - 1))
-                            .build();
-                    updateOptionViews();
-                    dialog.dismiss();
-                }
+            final DialogInterface.OnClickListener selectCb = (dialog, which) -> {
+                mEditIssue = mEditIssue.toBuilder()
+                        .milestone(which == 0 ? null : mAllMilestone.get(which - 1))
+                        .build();
+                updateOptionViews();
+                dialog.dismiss();
             };
 
             new AlertDialog.Builder(this)
@@ -377,15 +374,11 @@ public class IssueEditActivity extends BasePagerActivity implements
                     .setTitle(R.string.issue_milestone_hint)
                     .setSingleChoiceItems(milestones, selected, selectCb)
                     .setNegativeButton(R.string.cancel, null)
-                    .setNeutralButton(R.string.issue_manage_milestones,
-                            new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = IssueMilestoneListActivity.makeIntent(
-                                    IssueEditActivity.this, mRepoOwner, mRepoName,
-                                    mEditIssue.pullRequest() != null);
-                            startActivityForResult(intent, REQUEST_MANAGE_MILESTONES);
-                        }
+                    .setNeutralButton(R.string.issue_manage_milestones, (dialog, which) -> {
+                        Intent intent = IssueMilestoneListActivity.makeIntent(
+                                IssueEditActivity.this, mRepoOwner, mRepoName,
+                                mEditIssue.pullRequest() != null);
+                        startActivityForResult(intent, REQUEST_MANAGE_MILESTONES);
                     })
                     .show();
         }
@@ -398,7 +391,7 @@ public class IssueEditActivity extends BasePagerActivity implements
             final String[] assigneeNames = new String[mAllAssignee.size()];
             final boolean[] selection = new boolean[mAllAssignee.size()];
             final List<User> oldAssigneeList = mEditIssue.assignees() != null
-                    ? mEditIssue.assignees() : new ArrayList<User>();
+                    ? mEditIssue.assignees() : new ArrayList<>();
             List<String> assigneeLogins = new ArrayList<>();
             for (User assignee : oldAssigneeList) {
                 assigneeLogins.add(assignee.login());
@@ -411,28 +404,19 @@ public class IssueEditActivity extends BasePagerActivity implements
             }
 
             DialogInterface.OnMultiChoiceClickListener selectCb =
-                    new DialogInterface.OnMultiChoiceClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int which,
-                        boolean isChecked) {
-                    selection[which] = isChecked;
-                }
-            };
-            DialogInterface.OnClickListener okCb = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    List<User> newAssigneeList = new ArrayList<>();
-                    for (int i = 0; i < selection.length; i++) {
-                        if (selection[i]) {
-                            newAssigneeList.add(mAllAssignee.get(i));
-                        }
+                    (dialogInterface, which, isChecked) -> selection[which] = isChecked;
+            DialogInterface.OnClickListener okCb = (dialog, which) -> {
+                List<User> newAssigneeList = new ArrayList<>();
+                for (int i = 0; i < selection.length; i++) {
+                    if (selection[i]) {
+                        newAssigneeList.add(mAllAssignee.get(i));
                     }
-                    mEditIssue = mEditIssue.toBuilder()
-                            .assignees(newAssigneeList)
-                            .build();
-                    updateOptionViews();
-                    dialog.dismiss();
                 }
+                mEditIssue = mEditIssue.toBuilder()
+                        .assignees(newAssigneeList)
+                        .build();
+                updateOptionViews();
+                dialog.dismiss();
             };
 
             new AlertDialog.Builder(this)
@@ -451,21 +435,18 @@ public class IssueEditActivity extends BasePagerActivity implements
         } else {
             LayoutInflater inflater = getLayoutInflater();
             final List<Label> selectedLabels = mEditIssue.labels() != null
-                    ? new ArrayList<>(mEditIssue.labels()) : new ArrayList<Label>();
+                    ? new ArrayList<>(mEditIssue.labels()) : new ArrayList<>();
             View labelContainerView = inflater.inflate(R.layout.generic_linear_container, null);
             ViewGroup container = labelContainerView.findViewById(R.id.container);
 
-            View.OnClickListener clickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Label label = (Label) view.getTag();
-                    if (selectedLabels.contains(label)) {
-                        selectedLabels.remove(label);
-                        setLabelSelection((TextView) view, false);
-                    } else {
-                        selectedLabels.add(label);
-                        setLabelSelection((TextView) view, true);
-                    }
+            View.OnClickListener clickListener = view -> {
+                Label label = (Label) view.getTag();
+                if (selectedLabels.contains(label)) {
+                    selectedLabels.remove(label);
+                    setLabelSelection((TextView) view, false);
+                } else {
+                    selectedLabels.add(label);
+                    setLabelSelection((TextView) view, true);
                 }
             };
 
@@ -488,24 +469,17 @@ public class IssueEditActivity extends BasePagerActivity implements
                     .setTitle(R.string.issue_labels)
                     .setView(labelContainerView)
                     .setNegativeButton(R.string.cancel, null)
-                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            mEditIssue = mEditIssue.toBuilder()
-                                    .labels(selectedLabels)
-                                    .build();
-                            updateOptionViews();
-                        }
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
+                        mEditIssue = mEditIssue.toBuilder()
+                                .labels(selectedLabels)
+                                .build();
+                        updateOptionViews();
                     })
-                    .setNeutralButton(R.string.issue_manage_labels,
-                            new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Intent intent = IssueLabelListActivity.makeIntent(
-                                    IssueEditActivity.this, mRepoOwner, mRepoName,
-                                    mEditIssue.pullRequest() != null);
-                            startActivityForResult(intent, REQUEST_MANAGE_LABELS);
-                        }
+                    .setNeutralButton(R.string.issue_manage_labels, (dialog, which) -> {
+                        Intent intent = IssueLabelListActivity.makeIntent(
+                                IssueEditActivity.this, mRepoOwner, mRepoName,
+                                mEditIssue.pullRequest() != null);
+                        startActivityForResult(intent, REQUEST_MANAGE_LABELS);
                     })
                     .show();
         }

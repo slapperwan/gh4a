@@ -234,18 +234,15 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
             onBindViewHolder((VH) holder, getItemFromAdapterPosition(position));
             if (position == mHighlightPosition) {
                 final View v = holder.itemView;
-                v.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (v.getBackground() != null) {
-                            final int centerX = v.getWidth() / 2;
-                            final int centerY = v.getHeight() / 2;
-                            DrawableCompat.setHotspot(v.getBackground(), centerX, centerY);
-                        }
-                        v.setPressed(true);
-                        v.setPressed(false);
-                        mHighlightPosition = -1;
+                v.post(() -> {
+                    if (v.getBackground() != null) {
+                        final int centerX = v.getWidth() / 2;
+                        final int centerY = v.getHeight() / 2;
+                        DrawableCompat.setHotspot(v.getBackground(), centerX, centerY);
                     }
+                    v.setPressed(true);
+                    v.setPressed(false);
+                    mHighlightPosition = -1;
                 });
             }
         }

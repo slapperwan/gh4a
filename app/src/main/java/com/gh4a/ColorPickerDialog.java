@@ -40,15 +40,12 @@ public class ColorPickerDialog extends AlertDialog {
 
         setView(view);
 
-        setButton(BUTTON_POSITIVE, context.getString(R.string.ok), new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (mColorChangedListener != null) {
-                    int colorValue = mColorPicker.getColor();
-                    String color = String.format(Locale.US, "%02x%02x%02x",
-                            Color.red(colorValue), Color.green(colorValue), Color.blue(colorValue));
-                    mColorChangedListener.colorChanged(color);
-                }
+        setButton(BUTTON_POSITIVE, context.getString(R.string.ok), (dialog, which) -> {
+            if (mColorChangedListener != null) {
+                int colorValue = mColorPicker.getColor();
+                String color1 = String.format(Locale.US, "%02x%02x%02x",
+                        Color.red(colorValue), Color.green(colorValue), Color.blue(colorValue));
+                mColorChangedListener.colorChanged(color1);
             }
         });
 

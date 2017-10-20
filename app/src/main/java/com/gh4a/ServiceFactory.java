@@ -35,34 +35,32 @@ public class ServiceFactory {
     public static <S> S createService(Class<S> serviceClass, final String acceptHeader,
             final String token, final Integer pageSize) {
         OkHttpClient client = httpClient.newBuilder()
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public Response intercept(Chain chain) throws IOException {
-                        Request original = chain.request();
+                .addInterceptor(chain -> {
+                    Request original = chain.request();
 
-                        Request.Builder requestBuilder = original.newBuilder()
-                                .method(original.method(), original.body());
+                    Request.Builder requestBuilder = original.newBuilder()
+                            .method(original.method(), original.body());
 
-                        String tokenToUse = token != null
-                                ? token : Gh4Application.get().getAuthToken();
-                        if (tokenToUse != null) {
-                            requestBuilder.header("Authorization", "Token " + tokenToUse);
-                        }
-                        if (pageSize != null) {
-                            requestBuilder.url(original.url().newBuilder()
-                                    .addQueryParameter("page_size", String.valueOf(pageSize))
-                                    .build());
-                        }
-                        if (original.header("Accept") == null) {
-                            requestBuilder.addHeader("Accept", acceptHeader != null
-                                    ? acceptHeader : DEFAULT_HEADER_ACCEPT);
-                        }
-
-                        Request request = requestBuilder.build();
-                        Gh4Application.trackVisitedUrl(request.url().toString());
-                        return chain.proceed(request);
+                    String tokenToUse = token != null
+                            ? token : Gh4Application.get().getAuthToken();
+                    if (tokenToUse != null) {
+                        requestBuilder.header("Authorization", "Token " + tokenToUse);
                     }
-                }).build();
+                    if (pageSize != null) {
+                        requestBuilder.url(original.url().newBuilder()
+                                .addQueryParameter("page_size", String.valueOf(pageSize))
+                                .build());
+                    }
+                    if (original.header("Accept") == null) {
+                        requestBuilder.addHeader("Accept", acceptHeader != null
+                                ? acceptHeader : DEFAULT_HEADER_ACCEPT);
+                    }
+
+                    Request request = requestBuilder.build();
+                    Gh4Application.trackVisitedUrl(request.url().toString());
+                    return chain.proceed(request);
+                })
+                .build();
 
         Retrofit retrofit = builder.baseUrl("https://api.github.com")
                 .client(client)

@@ -426,9 +426,9 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         mTopRepoSubscription = observable
                 .map(ApiHelpers::throwOnFailure)
-                .map(page -> page.items())
+                .map(Page::items)
                 .compose(makeLoaderSingle(ID_LOADER_REPO_LIST, false))
-                .subscribe(result -> fillTopRepos(result), error -> {});
+                .subscribe(this::fillTopRepos, error -> {});
     }
 
     private void loadOrganizations() {
@@ -440,7 +440,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                         : service.getUserPublicOrganizations(mUserLogin, page)
                 )
                 .compose(makeLoaderSingle(ID_LOADER_ORG_LIST, false))
-                .subscribe(result -> fillOrganizations(result), error -> {});
+                .subscribe(this::fillOrganizations, error -> {});
     }
 
     private void loadIsFollowingState(boolean force) {

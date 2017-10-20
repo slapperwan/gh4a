@@ -79,11 +79,11 @@ public class IssueFragment extends IssueFragmentBase {
 
         Single<List<TimelineItem>> commentSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
-                .compose(RxUtils.mapList(comment -> new TimelineItem.TimelineComment(comment)));
+                .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
         Single<List<TimelineItem>> eventSingle = ApiHelpers.PageIterator
                 .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
-                .compose((RxUtils.mapList(event -> new TimelineItem.TimelineEvent(event))));
+                .compose((RxUtils.mapList(TimelineItem.TimelineEvent::new)));
 
         return Single.zip(commentSingle, eventSingle, (comments, events) -> {
             ArrayList<TimelineItem> result = new ArrayList<>();

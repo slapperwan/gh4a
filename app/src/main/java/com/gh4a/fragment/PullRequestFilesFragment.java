@@ -132,7 +132,7 @@ public class PullRequestFilesFragment extends CommitFragment {
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
                 .compose(RxUtils.filter(c -> c.position() >= 0));
 
-        Single.zip(fileSingle, commentSingle, (files, comments) -> Pair.create(files, comments))
+        Single.zip(fileSingle, commentSingle, Pair::create)
                 .compose(makeLoaderSingle(ID_LOADER_FILES_AND_COMMENTS, force))
                 .subscribe(result -> {
                     mComments = result.second;

@@ -34,6 +34,6 @@ public class Triplet<F, S, T> {
     }
 
     public static <F, S, T> Triplet <F, S, T> create(F f, S s, T t) {
-        return new Triplet<F, S, T>(f, s, t);
+        return new Triplet<>(f, s, t);
     }
 }

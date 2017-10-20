@@ -413,15 +413,12 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             try {
                 List<Reaction> reactions = mCallback.loadReactionDetailsInBackground(mItem)
                         .blockingGet();
-                Collections.sort(reactions, new Comparator<Reaction>() {
-                    @Override
-                    public int compare(Reaction lhs, Reaction rhs) {
-                        int result = lhs.content().compareTo(rhs.content());
-                        if (result == 0) {
-                            result = rhs.createdAt().compareTo(lhs.createdAt());
-                        }
-                        return result;
+                Collections.sort(reactions, (lhs, rhs) -> {
+                    int result = lhs.content().compareTo(rhs.content());
+                    if (result == 0) {
+                        result = rhs.createdAt().compareTo(lhs.createdAt());
                     }
+                    return result;
                 });
                 return reactions;
             } catch (RuntimeException e) {

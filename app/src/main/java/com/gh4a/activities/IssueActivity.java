@@ -259,12 +259,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
         // onRefresh() can be triggered in the draw loop, and CoordinatorLayout doesn't
         // like its child list being changed while drawing
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                updateFabVisibility();
-            }
-        });
+        mHandler.post(this::updateFabVisibility);
 
         supportInvalidateOptionsMenu();
         loadIssue(true);
@@ -289,12 +284,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                 .setMessage(messageResId)
                 .setIconAttribute(android.R.attr.alertDialogIcon)
                 .setCancelable(false)
-                .setPositiveButton(buttonResId, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        updateIssueState(reopen);
-                    }
-                })
+                .setPositiveButton(buttonResId, (dialog, which) -> updateIssueState(reopen))
                 .setNegativeButton(R.string.cancel, null)
                 .show();
     }

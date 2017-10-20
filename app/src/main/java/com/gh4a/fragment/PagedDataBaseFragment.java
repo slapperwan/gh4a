@@ -98,7 +98,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
                         .map(result -> {
                             final List<T> items;
                             if (mPreviouslyLoadedData != null) {
-                                items = new ArrayList<T>(mPreviouslyLoadedData);
+                                items = new ArrayList<>(mPreviouslyLoadedData);
                                 items.addAll(result.items());
                             } else {
                                 items = result.items();

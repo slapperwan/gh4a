@@ -85,13 +85,10 @@ public class SingleFactory {
 
         // sort groups by updatedAt of top notification
         ArrayList<Repository> reposByTimestamp = new ArrayList<>(notificationsByRepo.keySet());
-        Collections.sort(reposByTimestamp, new Comparator<Repository>() {
-            @Override
-            public int compare(Repository lhs, Repository rhs) {
-                NotificationThread lhsNotification = notificationsByRepo.get(lhs).get(0);
-                NotificationThread rhsNotification = notificationsByRepo.get(rhs).get(0);
-                return rhsNotification.updatedAt().compareTo(lhsNotification.updatedAt());
-            }
+        Collections.sort(reposByTimestamp, (lhs, rhs) -> {
+            NotificationThread lhsNotification = notificationsByRepo.get(lhs).get(0);
+            NotificationThread rhsNotification = notificationsByRepo.get(rhs).get(0);
+            return rhsNotification.updatedAt().compareTo(lhsNotification.updatedAt());
         });
 
         // add to list

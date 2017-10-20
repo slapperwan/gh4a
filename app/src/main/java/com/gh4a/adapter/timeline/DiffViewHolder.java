@@ -229,21 +229,18 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
         menu.findItem(R.id.view_in_file).setVisible(diff.getInitialComment().position() != -1);
 
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.share:
-                        IntentUtils.share(mContext, "Line", createUrl(diff, line, isRightLine));
-                        return true;
-                    case R.id.view_in_file:
-                        Intent intent = diff.getInitialTimelineComment()
-                                .makeDiffIntent(mContext, line, isRightLine);
-                        mContext.startActivity(intent);
-                        return true;
-                }
-                return false;
+        popupMenu.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.share:
+                    IntentUtils.share(mContext, "Line", createUrl(diff, line, isRightLine));
+                    return true;
+                case R.id.view_in_file:
+                    Intent intent = diff.getInitialTimelineComment()
+                            .makeDiffIntent(mContext, line, isRightLine);
+                    mContext.startActivity(intent);
+                    return true;
             }
+            return false;
         });
         popupMenu.show();
     }

@@ -201,11 +201,11 @@ public class PullRequestFragment extends IssueFragmentBase {
 
         Single<List<TimelineItem>> issueCommentItemSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
-                .compose(RxUtils.mapList(comment -> new TimelineItem.TimelineComment(comment)));
+                .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
         Single<List<TimelineItem>> eventItemSingle = ApiHelpers.PageIterator
                 .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
-                .compose((RxUtils.mapList(event -> new TimelineItem.TimelineEvent(event))));
+                .compose((RxUtils.mapList(TimelineItem.TimelineEvent::new)));
         Single<Map<String, GitHubFile>> filesByNameSingle = ApiHelpers.PageIterator
                 .toSingle(page -> prService.getPullRequestFiles(mRepoOwner, mRepoName, issueNumber, page))
                 .map(files -> {
@@ -235,7 +235,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                         Single<List<ReviewComment>> single = ApiHelpers.PageIterator
                                 .toSingle(page -> reviewService.getReviewComments(mRepoOwner,
                                         mRepoName, issueNumber, r.id()));
-                        obsList.add(Single.zip(Single.just(r.id()), single, (id, s) -> Pair.create(id, s))
+                        obsList.add(Single.zip(Single.just(r.id()), single, Pair::create)
                                 .toObservable());
                     }
                     return Observable.concat(obsList);
@@ -470,7 +470,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                     // sort by status, then context
                     .compose(RxUtils.sortList(STATUS_AND_CONTEXT_COMPARATOR))
                     .compose(makeLoaderSingle(ID_LOADER_STATUS, force))
-                    .subscribe(statuses -> fillStatus(statuses), error -> {});
+                    .subscribe(this::fillStatus, error -> {});
     }
 
     private void loadHeadReference(boolean force) {

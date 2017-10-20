@@ -53,14 +53,11 @@ public class DropDownUserAdapter extends BaseAdapter implements Filterable {
                 }
             }
 
-            Collections.sort(mOriginalUsers, new Comparator<User>() {
-                @Override
-                public int compare(User first, User second) {
-                    final String firstUsername = ApiHelpers.getUserLogin(mContext, first);
-                    final String secondUsername = ApiHelpers.getUserLogin(mContext, second);
+            Collections.sort(mOriginalUsers, (first, second) -> {
+                final String firstUsername = ApiHelpers.getUserLogin(mContext, first);
+                final String secondUsername = ApiHelpers.getUserLogin(mContext, second);
 
-                    return firstUsername.compareToIgnoreCase(secondUsername);
-                }
+                return firstUsername.compareToIgnoreCase(secondUsername);
             });
         }
 

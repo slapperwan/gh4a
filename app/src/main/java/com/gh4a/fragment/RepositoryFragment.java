@@ -47,6 +47,7 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.meisolsson.githubsdk.model.Permissions;
 import com.meisolsson.githubsdk.model.Repository;
+import com.meisolsson.githubsdk.model.SearchPage;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 import com.meisolsson.githubsdk.service.search.SearchService;
 import com.vdurmont.emoji.EmojiParser;
@@ -379,7 +380,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
         service.searchIssues(query, null, null, 0)
                 .map(ApiHelpers::throwOnFailure)
-                .map(page -> page.totalCount())
+                .map(SearchPage::totalCount)
                 .compose(makeLoaderSingle(ID_LOADER_PULL_REQUEST_COUNT, force))
                 .subscribe(count -> {
                     View v = getView();

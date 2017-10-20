@@ -161,7 +161,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         Single<TimelineItem.TimelineReview> reviewItemSingle =
                 reviewService.getReview(mRepoOwner, mRepoName, mIssueNumber, mReview.id())
                 .map(ApiHelpers::throwOnFailure)
-                .map(review -> new TimelineItem.TimelineReview(review));
+                .map(TimelineItem.TimelineReview::new);
 
         Single<List<ReviewComment>> reviewCommentsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> reviewService.getReviewComments(
@@ -403,13 +403,11 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     public Single<List<Reaction>> loadReactionDetailsInBackground(final GitHubCommentBase comment) {
         final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
         return ApiHelpers.PageIterator
-                .toSingle(page -> {
-                    return comment instanceof ReviewComment
-                            ? service.getPullRequestReviewCommentReactions(
-                                    mRepoOwner, mRepoName, comment.id(), page)
-                            : service.getIssueCommentReactions(
-                                    mRepoOwner, mRepoName, comment.id(), page);
-                });
+                .toSingle(page -> comment instanceof ReviewComment
+                        ? service.getPullRequestReviewCommentReactions(
+                                mRepoOwner, mRepoName, comment.id(), page)
+                        : service.getIssueCommentReactions(
+                                mRepoOwner, mRepoName, comment.id(), page));
     }
 
     @Override

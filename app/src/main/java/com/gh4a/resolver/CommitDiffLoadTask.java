@@ -8,6 +8,7 @@ import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
+import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.git.GitComment;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
@@ -46,7 +47,7 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
                 Gh4Application.get().getGitHubService(RepositoryCommitService.class);
         return service.getCommit(mRepoOwner, mRepoName, mSha)
                 .map(ApiHelpers::throwOnFailure)
-                .map(commit -> commit.files());
+                .map(Commit::files);
     }
 
     @Override
