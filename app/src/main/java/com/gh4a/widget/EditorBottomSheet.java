@@ -38,7 +38,6 @@ import com.meisolsson.githubsdk.model.User;
 import java.util.Set;
 
 import io.reactivex.Single;
-import retrofit2.Response;
 
 public class EditorBottomSheet extends FrameLayout implements View.OnClickListener,
         View.OnTouchListener, AppBarLayout.OnOffsetChangedListener {

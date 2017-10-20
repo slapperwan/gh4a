@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.gh4a.ColorPickerDialog;
-import com.gh4a.ColorPickerDialog.OnColorChangedListener;
 import com.gh4a.R;
 import com.gh4a.utils.TypefaceCache;
 import com.gh4a.utils.UiUtils;

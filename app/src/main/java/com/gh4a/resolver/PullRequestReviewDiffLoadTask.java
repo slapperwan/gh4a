@@ -9,12 +9,8 @@ import com.gh4a.activities.ReviewActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
-import com.meisolsson.githubsdk.model.Review;
-import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
-
-import java.util.List;
 
 import io.reactivex.Single;
 

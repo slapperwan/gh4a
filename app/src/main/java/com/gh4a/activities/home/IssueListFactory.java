@@ -11,9 +11,6 @@ import com.gh4a.R;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.utils.ApiHelpers;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class IssueListFactory extends FragmentFactory {
     private static final String QUERY = "is:%s is:%s %s:%s";
 
