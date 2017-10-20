@@ -33,7 +33,9 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> i
 
     public void setQuery(String query) {
         getArguments().putString("query", query);
-        onRefresh();
+        if (isAdded()) {
+            onRefresh();
+        }
     }
 
     @Override
