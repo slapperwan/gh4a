@@ -17,7 +17,6 @@ import com.meisolsson.githubsdk.model.SearchPage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 import io.reactivex.Single;
@@ -36,20 +35,27 @@ public class RxUtils {
             if (list == null) {
                 return null;
             }
-            Iterator<T> iter = list.iterator();
-            while (iter.hasNext()) {
-                if (!predicate.test(iter.next())) {
-                    iter.remove();
+            List<T> result = new ArrayList<>();
+            for (T item : list) {
+                if (predicate.test(item)) {
+                    result.add(item);
                 }
             }
-            return list;
+            return result;
         });
     }
 
     public static <T> SingleTransformer<List<T>, T> filterAndMapToFirstOrNull(Predicate<T> predicate) {
-        return upstream -> upstream
-                .compose(filter(predicate))
-                .map(list -> list.isEmpty() ? null : list.get(0));
+        return upstream -> upstream.map(list -> {
+            if (list != null) {
+                for (T item : list) {
+                    if (predicate.test(item)) {
+                        return item;
+                    }
+                }
+            }
+            return null;
+        });
     }
 
     public static <T, R> SingleTransformer<List<T>, List<R>> mapList(Function<T, R> transformer) {
@@ -68,6 +74,7 @@ public class RxUtils {
     public static <T> SingleTransformer<List<T>, List<T>> sortList(Comparator<? super T> comparator) {
         return upstream ->  upstream.map(list -> {
             if (list != null) {
+                list = new ArrayList<>(list);
                 Collections.sort(list, comparator);
             }
             return list;
