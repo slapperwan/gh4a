@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 
 import io.reactivex.Single;
-import retrofit2.Response;
 
 public class CommitNoteFragment extends ListDataBaseFragment<GitComment> implements
         CommitNoteAdapter.OnCommentAction<GitComment>,

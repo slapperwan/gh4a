@@ -3,7 +3,6 @@ package com.gh4a.resolver;
 import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;

@@ -37,7 +37,6 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.core.ServiceGenerator;
-import com.meisolsson.githubsdk.model.GitHubToken;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.request.RequestToken;
 import com.meisolsson.githubsdk.service.OAuthService;

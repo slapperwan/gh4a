@@ -38,7 +38,6 @@ import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.ContentType;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
-import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;

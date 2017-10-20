@@ -15,7 +15,6 @@ import android.text.style.ClickableSpan;
 import android.text.style.LineBackgroundSpan;
 import android.util.TypedValue;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 

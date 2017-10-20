@@ -16,7 +16,6 @@
 package com.gh4a.fragment;
 
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -63,7 +62,6 @@ import com.meisolsson.githubsdk.service.reactions.ReactionService;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 

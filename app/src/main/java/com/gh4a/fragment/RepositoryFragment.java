@@ -55,8 +55,6 @@ import com.vdurmont.emoji.EmojiParser;
 import java.net.HttpURLConnection;
 import java.util.Locale;
 
-import retrofit2.Response;
-
 public class RepositoryFragment extends LoadingFragmentBase implements OnClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
         RepositoryFragment f = new RepositoryFragment();
