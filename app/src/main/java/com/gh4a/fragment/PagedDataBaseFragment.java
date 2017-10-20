@@ -117,7 +117,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
                 .subscribe(result -> {
                     fillData(result.first, result.second);
                     setContentShown(true);
-                    mAdapter.notifyDataSetChanged();
                     updateEmptyState();
                 }, error -> {});
     }
