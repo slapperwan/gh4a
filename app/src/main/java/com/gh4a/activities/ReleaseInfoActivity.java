@@ -285,6 +285,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
         mBodySubscription = service.renderMarkdown(request)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_BODY, false))
-                .subscribe(result -> fillNotes(result), error -> {});
+                .subscribe(this::fillNotes, error -> {});
     }
 }

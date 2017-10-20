@@ -136,7 +136,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
                 });
 
         return compareSingle
-                .map(compare -> compare.commits())
+                .map(CommitCompare::commits)
                 // Bummer, at least one branch was deleted.
                 // Can't do anything here, so return an empty list.
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND,new ArrayList<>()));

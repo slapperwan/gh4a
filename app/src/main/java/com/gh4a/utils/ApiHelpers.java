@@ -38,17 +38,14 @@ public class ApiHelpers {
         String UNMERGED = "unmerged";
     }
 
-    public static final Comparator<GitHubCommentBase> COMMENT_COMPARATOR = new Comparator<GitHubCommentBase>() {
-        @Override
-        public int compare(GitHubCommentBase lhs, GitHubCommentBase rhs) {
-            if (lhs.createdAt() == null) {
-                return 1;
-            }
-            if (rhs.createdAt() == null) {
-                return -1;
-            }
-            return lhs.createdAt().compareTo(rhs.createdAt());
+    public static final Comparator<GitHubCommentBase> COMMENT_COMPARATOR = (lhs, rhs) -> {
+        if (lhs.createdAt() == null) {
+            return 1;
         }
+        if (rhs.createdAt() == null) {
+            return -1;
+        }
+        return lhs.createdAt().compareTo(rhs.createdAt());
     };
 
     //RepositoryCommit
@@ -242,7 +239,7 @@ public class ApiHelpers {
             return toObservable(producer)
                     .toList()
                     .map(lists -> {
-                        List<T> result = new ArrayList<T>();
+                        List<T> result = new ArrayList<>();
                         for (List<T> l : lists) {
                             result.addAll(l);
                         }

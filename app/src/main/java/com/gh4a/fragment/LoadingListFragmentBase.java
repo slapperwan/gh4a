@@ -60,22 +60,19 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
         mFastScroller = view.findViewById(R.id.fast_scroller);
         mFastScroller.attachRecyclerView(mRecyclerView);
         mFastScroller.setVisibility(View.VISIBLE);
-        mFastScroller.setOnHandleTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        getBaseActivity().setRightDrawerLockedClosed(true);
-                        break;
+        mFastScroller.setOnHandleTouchListener((v, event) -> {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    getBaseActivity().setRightDrawerLockedClosed(true);
+                    break;
 
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        getBaseActivity().setRightDrawerLockedClosed(false);
-                        break;
-                }
-
-                return false;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    getBaseActivity().setRightDrawerLockedClosed(false);
+                    break;
             }
+
+            return false;
         });
 
         return view;
@@ -120,12 +117,7 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
         mLayoutManager.scrollToPositionWithOffset(position, 0);
         final RecyclerView.Adapter<?> adapter = mRecyclerView.getAdapter();
         if (adapter instanceof RootAdapter) {
-            mRecyclerView.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ((RootAdapter) adapter).highlight(position);
-                }
-            }, 600);
+            mRecyclerView.postDelayed(() -> ((RootAdapter) adapter).highlight(position), 600);
         }
     }
 

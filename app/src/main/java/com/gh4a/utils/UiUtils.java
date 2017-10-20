@@ -279,15 +279,11 @@ public class UiUtils {
             final String url, final String mimeType, final String fileName,
             final String description, final String mediaType) {
         final ActivityCompat.OnRequestPermissionsResultCallback cb =
-                new ActivityCompat.OnRequestPermissionsResultCallback() {
-            @Override
-            public void onRequestPermissionsResult(int requestCode,
-                    @NonNull String[] permissions, @NonNull int[] grantResults) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    enqueueDownload(activity, url, mimeType, fileName, description, mediaType);
-                }
-            }
-        };
+                (requestCode, permissions, grantResults) -> {
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        enqueueDownload(activity, url, mimeType, fileName, description, mediaType);
+                    }
+                };
         activity.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, cb,
                 R.string.download_permission_rationale);
     }
@@ -307,13 +303,10 @@ public class UiUtils {
             return;
         }
 
-        DialogInterface.OnClickListener buttonListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                boolean wifiOnly = which == DialogInterface.BUTTON_NEUTRAL;
-                enqueueDownload(context, uri, fileName, description,
-                        mimeType, mediaType, wifiOnly);
-            }
+        DialogInterface.OnClickListener buttonListener = (dialog, which) -> {
+            boolean wifiOnly = which == DialogInterface.BUTTON_NEUTRAL;
+            enqueueDownload(context, uri, fileName, description,
+                    mimeType, mediaType, wifiOnly);
         };
 
         new AlertDialog.Builder(context)

@@ -144,15 +144,12 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
         mContainer = view.findViewById(R.id.bottom_sheet_header_container);
 
-        post(new Runnable() {
-            @Override
-            public void run() {
-                getBehavior().setBottomSheetCallback(mBehaviorCallback);
-                resetPeekHeight(0);
+        post(() -> {
+            getBehavior().setBottomSheetCallback(mBehaviorCallback);
+            resetPeekHeight(0);
 
-                if (!mIsCollapsible && !isInAdvancedMode()) {
-                    setAdvancedMode(true);
-                }
+            if (!mIsCollapsible && !isInAdvancedMode()) {
+                setAdvancedMode(true);
             }
         });
     }
@@ -307,14 +304,11 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         }
 
         // Expand bottom sheet through message queue so the animation can play.
-        post(new Runnable() {
-            @Override
-            public void run() {
-                updatePeekHeight(visible);
+        post(() -> {
+            updatePeekHeight(visible);
 
-                getBehavior().setState(visible
-                        ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_COLLAPSED);
-            }
+            getBehavior().setState(visible
+                    ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_COLLAPSED);
         });
     }
 

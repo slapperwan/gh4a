@@ -276,12 +276,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         mPendingReview = null;
         setContentShown(false);
         if (mEditFab != null) {
-            mEditFab.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateFabVisibility();
-                }
-            });
+            mEditFab.post(this::updateFabVisibility);
         }
         mHeader.setVisibility(View.GONE);
         mHeaderColorAttrs = null;
@@ -552,8 +547,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         Single<Boolean> isCollaboratorSingle =
                 SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName);
 
-        Single.zip(issueSingle, prSingle, isCollaboratorSingle,
-                (issue, pr, isCollaborator) -> Triplet.create(issue, pr, isCollaborator))
+        Single.zip(issueSingle, prSingle, isCollaboratorSingle, Triplet::create)
                 .compose(makeLoaderSingle(0, force))
                 .subscribe(result -> {
                     mIssue = result.first;

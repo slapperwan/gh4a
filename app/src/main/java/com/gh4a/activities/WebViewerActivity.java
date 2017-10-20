@@ -83,22 +83,14 @@ public abstract class WebViewerActivity extends BaseActivity implements
     private class DisplayJavascriptInterface {
         @JavascriptInterface
         public void onLineTouched(final int line) {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    WebViewerActivity.this.onLineTouched(line, mLastTouchDown.x, mLastTouchDown.y);
-                }
-            });
+            mHandler.post(() -> WebViewerActivity.this.onLineTouched(line, mLastTouchDown.x, mLastTouchDown.y));
         }
 
         @JavascriptInterface
         public void onRenderingDone() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mRenderingDone = true;
-                    showContentIfDone();
-                }
+            mHandler.post(() -> {
+                mRenderingDone = true;
+                showContentIfDone();
             });
         }
     }
@@ -111,12 +103,9 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
         @JavascriptInterface
         public void onRenderingDone() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mPrintWebView.loadUrl("javascript:applyLineWrapping(true)");
-                    doPrintHtml();
-                }
+            mHandler.post(() -> {
+                mPrintWebView.loadUrl("javascript:applyLineWrapping(true)");
+                doPrintHtml();
             });
         }
     }

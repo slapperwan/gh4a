@@ -179,11 +179,9 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
         final Gh4Application app = Gh4Application.get();
         final OrganizationService service = app.getGitHubService(OrganizationService.class);
         mOrganizationSubscription = ApiHelpers.PageIterator
-                .toSingle(page -> {
-                    return ApiHelpers.loginEquals(mUserLogin, app.getAuthLogin())
-                            ? service.getMyOrganizations(page)
-                            : service.getUserPublicOrganizations(mUserLogin, page);
-                })
+                .toSingle(page -> ApiHelpers.loginEquals(mUserLogin, app.getAuthLogin())
+                        ? service.getMyOrganizations(page)
+                        : service.getUserPublicOrganizations(mUserLogin, page))
                 .compose(mActivity.makeLoaderSingle(ID_LOADER_ORGS, force))
                 .subscribe(result -> {
                     mUserScopes = result != null && result.size() > 0 ? result : null;

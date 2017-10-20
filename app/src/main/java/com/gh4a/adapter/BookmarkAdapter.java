@@ -169,12 +169,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         context.getContentResolver().delete(uri, null, null);
 
         Snackbar.make(viewHolder.itemView, R.string.bookmark_removed, Snackbar.LENGTH_LONG)
-                .setAction(R.string.undo, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        BookmarksProvider.saveBookmark(context, name, type, url, extraData, false);
-                    }
-                })
+                .setAction(R.string.undo,
+                        v -> BookmarksProvider.saveBookmark(context, name, type, url, extraData, false))
                 .show();
     }
 

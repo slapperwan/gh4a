@@ -553,7 +553,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 .map(ApiHelpers::throwOnFailure)
                 .map(result -> !result.items().isEmpty())
                 .compose(makeLoaderSingle(ID_LOADER_NOTIFICATIONS_INDICATOR, force))
-                .subscribe(result -> setNotificationsIndicatorVisible(result), error -> {});
+                .subscribe(this::setNotificationsIndicatorVisible, error -> {});
     }
 
     public static class BrowserLogoutDialogFragment extends DialogFragment implements
