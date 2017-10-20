@@ -168,11 +168,13 @@ class CommentViewHolder
         boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
                 || ApiHelpers.loginEquals(mRepoOwner, ourLogin);
 
+        int position = item.getReviewComment() != null && item.getReviewComment().position() != null
+                ? item.getReviewComment().position() : -1;
+
         Menu menu = mPopupMenu.getMenu();
         menu.findItem(R.id.edit).setVisible(canEdit);
         menu.findItem(R.id.delete).setVisible(canEdit);
-        menu.findItem(R.id.view_in_file).setVisible(item.file != null
-                && item.getReviewComment() != null && item.getReviewComment().position() != -1);
+        menu.findItem(R.id.view_in_file).setVisible(item.file != null && position != -1);
     }
 
     @Nullable

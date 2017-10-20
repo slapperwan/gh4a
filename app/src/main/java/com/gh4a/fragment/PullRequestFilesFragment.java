@@ -146,7 +146,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(RxUtils.filter(c -> c.position() >= 0))
+                .compose(RxUtils.filter(c -> c.position() != null && c.position() >= 0))
                 .compose(makeLoaderSingle(ID_LOADER_COMMENTS, force))
                 .subscribe(result -> {
                     mComments = result;

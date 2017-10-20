@@ -59,6 +59,6 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(RxUtils.filter(c -> c.position() >= 0));
+                .compose(RxUtils.filter(c -> c.position() != null));
     }
 }
