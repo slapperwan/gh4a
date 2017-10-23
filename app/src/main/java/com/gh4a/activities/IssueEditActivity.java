@@ -42,6 +42,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.StringUtils;
@@ -673,32 +674,29 @@ public class IssueEditActivity extends BasePagerActivity implements
                 Gh4Application.get().getGitHubService(RepositoryContentService.class);
 
         registerTemporarySubscription(getIssueTemplateContentSingle("")
-                .flatMap(c -> c != null ? Single.just(c) : getIssueTemplateContentSingle("/.github"))
-                .flatMap(c -> {
-                    if (c == null) {
-                        return Single.just(null);
-                    }
+                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplateContentSingle("/.github")))
+                .flatMap(opt -> opt.flatMap(c -> {
                     return service.getContents(mRepoOwner, mRepoName, c.path(), null)
                             .map(ApiHelpers::throwOnFailure)
                             .compose(RxUtils::doInBackground);
-                })
-                .map(c -> c != null ? StringUtils.fromBase64(c.content()) : null)
+                }))
+                .map(opt -> opt.map(c -> StringUtils.fromBase64(c.content())))
                 .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                 .subscribe(result -> {
                     mDescView.setHint(null);
                     mDescView.setEnabled(true);
-                    mDescView.setText(result);
+                    mDescView.setText(result.orNull());
                 }, error -> {}));
     }
 
-    private Single<Content> getIssueTemplateContentSingle(String path) {
+    private Single<Optional<Content>> getIssueTemplateContentSingle(String path) {
         RepositoryContentService service =
                 Gh4Application.get().getGitHubService(RepositoryContentService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page))
                 .compose(RxUtils::doInBackground)
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, null))
-                .compose(RxUtils.filterAndMapToFirstOrNull(
-                        c -> c.type() == ContentType.File && c.name().startsWith("ISSUE_TEMPLATE")));
+                .compose(RxUtils.filterAndMapToFirst(
+                        c -> c.type() == ContentType.File && c.name().startsWith("ISSUE_TEMPLATE")))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.absent()));
     }
 }

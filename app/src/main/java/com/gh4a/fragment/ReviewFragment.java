@@ -22,6 +22,7 @@ import com.gh4a.adapter.timeline.TimelineItemAdapter;
 import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.EditorBottomSheet;
 
@@ -172,33 +173,37 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         Single<Boolean> hasCommentsSingle = reviewCommentsSingle
                 .map(comments -> !comments.isEmpty());
 
-        Single<List<GitHubFile>> filesSingle = hasCommentsSingle
+        Single<Optional<List<GitHubFile>>> filesSingle = hasCommentsSingle
                 .flatMap(hasComments -> {
                     if (!hasComments) {
-                        return Single.just(null);
+                        return Single.just(Optional.absent());
                     }
                     return ApiHelpers.PageIterator
                             .toSingle(page -> prService.getPullRequestFiles(
-                                    mRepoOwner, mRepoName, mIssueNumber, page));
+                                    mRepoOwner, mRepoName, mIssueNumber, page))
+                            .map(result -> Optional.of(result));
                 });
 
-        Single<List<ReviewComment>> commentsSingle = hasCommentsSingle
+        Single<Optional<List<ReviewComment>>> commentsSingle = hasCommentsSingle
                 .flatMap(hasComments -> {
                     if (!hasComments) {
-                        return Single.just(null);
+                        return Single.just(Optional.absent());
                     }
                     return ApiHelpers.PageIterator
                             .toSingle(page -> commentService.getPullRequestComments(
                                     mRepoOwner, mRepoName, mIssueNumber, page))
-                            .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR));
+                            .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR))
+                            .map(result -> Optional.of(result));
                 });
 
         return Single.zip(reviewItemSingle, reviewCommentsSingle, filesSingle, commentsSingle,
-                (reviewItem, reviewComments, files, comments) -> {
+                (reviewItem, reviewComments, filesOpt, commentsOpt) -> {
             if (!reviewComments.isEmpty()) {
                 HashMap<String, GitHubFile> filesByName = new HashMap<>();
-                for (GitHubFile file : files) {
-                    filesByName.put(file.filename(), file);
+                if (filesOpt.isPresent()) {
+                    for (GitHubFile file : filesOpt.get()) {
+                        filesByName.put(file.filename(), file);
+                    }
                 }
 
                 // Add all of the review comments to the review item creating necessary diff hunks
@@ -207,15 +212,17 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
                     reviewItem.addComment(reviewComment, file, true);
                 }
 
-                for (ReviewComment commitComment : comments) {
-                    if (reviewComments.contains(commitComment)) {
-                        continue;
-                    }
+                if (commentsOpt.isPresent()) {
+                    for (ReviewComment commitComment : commentsOpt.get()) {
+                        if (reviewComments.contains(commitComment)) {
+                            continue;
+                        }
 
-                    // Rest of the comments should be added only if they are under the same diff hunks
-                    // as the original review comments.
-                    GitHubFile file = filesByName.get(commitComment.path());
-                    reviewItem.addComment(commitComment, file, false);
+                        // Rest of the comments should be added only if they are under the same
+                        // diff hunks as the original review comments.
+                        GitHubFile file = filesByName.get(commitComment.path());
+                        reviewItem.addComment(commitComment, file, false);
+                    }
                 }
             }
 

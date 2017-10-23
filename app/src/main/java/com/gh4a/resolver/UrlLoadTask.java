@@ -5,10 +5,11 @@ import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.BackgroundTask;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 
 import io.reactivex.Single;
 
-public abstract class UrlLoadTask extends BackgroundTask<Intent> {
+public abstract class UrlLoadTask extends BackgroundTask<Optional<Intent>> {
     protected final FragmentActivity mActivity;
     private final boolean mFinishCurrentActivity;
     private ProgressDialogFragment mProgressDialog;
@@ -31,18 +32,18 @@ public abstract class UrlLoadTask extends BackgroundTask<Intent> {
     }
 
     @Override
-    protected Intent run() throws Exception {
+    protected Optional<Intent> run() throws Exception {
         return getSingle().blockingGet();
     }
 
     @Override
-    protected void onSuccess(Intent result) {
+    protected void onSuccess(Optional<Intent> result) {
         if (mActivity.isFinishing()) {
             return;
         }
 
-        if (result != null) {
-            mActivity.startActivity(result);
+        if (result.isPresent()) {
+            mActivity.startActivity(result.get());
         } else {
             IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData());
         }
@@ -65,5 +66,5 @@ public abstract class UrlLoadTask extends BackgroundTask<Intent> {
         }
     }
 
-    protected abstract Single<Intent> getSingle();
+    protected abstract Single<Optional<Intent>> getSingle();
 }

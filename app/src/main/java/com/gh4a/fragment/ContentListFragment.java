@@ -208,7 +208,7 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> contentService.getDirectoryContents(repoOwner, repoName, mPath, ref, page))
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, null))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, new ArrayList<Content>()))
                 .compose(RxUtils.sortList(COMPARATOR));
     }
 }

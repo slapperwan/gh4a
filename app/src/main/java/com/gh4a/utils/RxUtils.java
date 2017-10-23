@@ -32,9 +32,6 @@ import retrofit2.Response;
 public class RxUtils {
     public static <T> SingleTransformer<List<T>, List<T>> filter(Predicate<T> predicate) {
         return upstream -> upstream.map(list -> {
-            if (list == null) {
-                return null;
-            }
             List<T> result = new ArrayList<>();
             for (T item : list) {
                 if (predicate.test(item)) {
@@ -45,24 +42,19 @@ public class RxUtils {
         });
     }
 
-    public static <T> SingleTransformer<List<T>, T> filterAndMapToFirstOrNull(Predicate<T> predicate) {
+    public static <T> SingleTransformer<List<T>, Optional<T>> filterAndMapToFirst(Predicate<T> predicate) {
         return upstream -> upstream.map(list -> {
-            if (list != null) {
-                for (T item : list) {
-                    if (predicate.test(item)) {
-                        return item;
-                    }
+            for (T item : list) {
+                if (predicate.test(item)) {
+                    return Optional.of(item);
                 }
             }
-            return null;
+            return Optional.absent();
         });
     }
 
     public static <T, R> SingleTransformer<List<T>, List<R>> mapList(Function<T, R> transformer) {
         return upstream -> upstream.map(list -> {
-            if (list == null) {
-                return null;
-            }
             List<R> result = new ArrayList<>();
             for (T item : list) {
                 result.add(transformer.apply(item));
@@ -73,10 +65,8 @@ public class RxUtils {
 
     public static <T> SingleTransformer<List<T>, List<T>> sortList(Comparator<? super T> comparator) {
         return upstream ->  upstream.map(list -> {
-            if (list != null) {
-                list = new ArrayList<>(list);
-                Collections.sort(list, comparator);
-            }
+            list = new ArrayList<>(list);
+            Collections.sort(list, comparator);
             return list;
         });
     }

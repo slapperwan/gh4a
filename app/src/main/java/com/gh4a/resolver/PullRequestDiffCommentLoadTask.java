@@ -11,6 +11,7 @@ import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.PullRequest;
@@ -46,7 +47,7 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Single<Intent> getSingle() {
+    protected Single<Optional<Intent>> getSingle() {
         PullRequestService service =
                 Gh4Application.get().getGitHubService(PullRequestService.class);
         Single<PullRequest> pullRequestSingle = service.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
@@ -65,33 +66,35 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
                 .toSingle(page -> service.getPullRequestFiles(mRepoOwner, mRepoName, mPullRequestNumber, page));
 
         return commentsSingle
-                .compose(RxUtils.filterAndMapToFirstOrNull(c -> mMarker.matches(c.id(), c.createdAt())))
-                .zipWith(filesSingle, (comment, files) -> {
-                    if (comment != null) {
-                        for (GitHubFile commitFile : files) {
-                            if (commitFile.filename().equals(comment.path())) {
-                                return Pair.create(true, commitFile);
-                            }
+                .compose(RxUtils.filterAndMapToFirst(c -> mMarker.matches(c.id(), c.createdAt())))
+                .zipWith(filesSingle, (commentOpt, files) -> commentOpt.map(comment -> {
+                    for (GitHubFile commitFile : files) {
+                        if (commitFile.filename().equals(comment.path())) {
+                            return Pair.create(true, commitFile);
                         }
                     }
                     return Pair.create(comment != null, (GitHubFile) null);
-                })
+                }))
                 .flatMap(result -> {
-                    boolean foundComment = result.first;
-                    GitHubFile file = result.second;
-                    if (foundComment && file != null && !FileUtils.isImage(file.filename())) {
-                        return Single.zip(pullRequestSingle, commentsSingle, (pr, comments) -> {
-                            return PullRequestDiffViewerActivity.makeIntent(mActivity, mRepoOwner,
-                                    mRepoName, mPullRequestNumber, pr.head().sha(),
-                                    file.filename(), file.patch(), comments, -1, -1, -1,
-                                    false, mMarker);
-                        });
+                    if (result.isPresent()) {
+                        boolean foundComment = result.get().first;
+                        GitHubFile file = result.get().second;
+                        if (foundComment && file != null && !FileUtils.isImage(file.filename())) {
+                            return Single.zip(pullRequestSingle, commentsSingle, (pr, comments) -> {
+                                return Optional
+                                        .of(PullRequestDiffViewerActivity.makeIntent(mActivity,
+                                                mRepoOwner, mRepoName, mPullRequestNumber,
+                                                pr.head().sha(),
+                                                file.filename(), file.patch(), comments, -1, -1, -1,
+                                                false, mMarker));
+                            });
+                        }
+                        if (foundComment && file == null) {
+                            return Single.just(Optional.of(PullRequestActivity.makeIntent(mActivity,
+                                    mRepoOwner, mRepoName, mPullRequestNumber, mPage, mMarker)));
+                        }
                     }
-                    if (foundComment && file == null) {
-                        return Single.just(PullRequestActivity.makeIntent(mActivity,
-                                mRepoOwner, mRepoName, mPullRequestNumber, mPage, mMarker));
-                    }
-                    return Single.just(null);
+                    return Single.just(Optional.absent());
                 });
     }
 }

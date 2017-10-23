@@ -11,6 +11,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.Optional;
 import com.meisolsson.githubsdk.model.Branch;
 import com.meisolsson.githubsdk.service.repositories.RepositoryBranchService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
@@ -59,9 +60,13 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
     }
 
     @Override
-    protected Single<Intent> getSingle() {
+    protected Single<Optional<Intent>> getSingle() {
         return resolve()
-                .map(refAndPath -> {
+                .map(refAndPathOpt -> {
+                    if (!refAndPathOpt.isPresent()) {
+                        return Optional.absent();
+                    }
+                    Pair<String, String> refAndPath = refAndPathOpt.get();
                     if (mGoToFileViewer && refAndPath.second != null) {
                         // parse line numbers from fragment
                         int highlightStart = -1, highlightEnd = -1;
@@ -79,41 +84,41 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
                                 // ignore
                             }
                         }
-                        return FileViewerActivity.makeIntentWithHighlight(mActivity,
+                        return Optional.of(FileViewerActivity.makeIntentWithHighlight(mActivity,
                                 mRepoOwner, mRepoName, refAndPath.first, refAndPath.second,
-                                highlightStart, highlightEnd);
+                                highlightStart, highlightEnd));
                     } else if (!mGoToFileViewer) {
-                        return RepositoryActivity.makeIntent(mActivity,
+                        return Optional.of(RepositoryActivity.makeIntent(mActivity,
                                 mRepoOwner, mRepoName, refAndPath.first,
-                                refAndPath.second, mInitialPage);
+                                refAndPath.second, mInitialPage));
                     }
-                    return null;
+                    return Optional.absent();
                 });
     }
 
-    private Single<Pair<String, String>> matchBranch(Single<List<Branch>> input) {
+    private Single<Optional<Pair<String, String>>> matchBranch(Single<List<Branch>> input) {
         return input.map(branches -> {
             for (Branch branch : branches) {
                 if (TextUtils.equals(mRefAndPath, branch.name())) {
-                    return Pair.create(branch.name(), null);
+                    return Optional.of(Pair.create(branch.name(), null));
                 } else {
                     String nameWithSlash = branch.name() + "/";
                     if (mRefAndPath.startsWith(nameWithSlash)) {
-                        return Pair.create(branch.name(),
-                                mRefAndPath.substring(nameWithSlash.length()));
+                        return Optional.of(Pair.create(branch.name(),
+                                mRefAndPath.substring(nameWithSlash.length())));
                     }
                 }
             }
-            return null;
+            return Optional.absent();
         });
     }
 
     // returns ref, path
-    private Single<Pair<String, String>> resolve() throws ApiRequestException {
+    private Single<Optional<Pair<String, String>>> resolve() throws ApiRequestException {
         // first check whether the path redirects to HEAD
         if (mRefAndPath.startsWith("HEAD")) {
-            return Single.just(Pair.create("HEAD",
-                    mRefAndPath.startsWith("HEAD/") ? mRefAndPath.substring(5) : null));
+            return Single.just(Optional.of(Pair.create("HEAD",
+                    mRefAndPath.startsWith("HEAD/") ? mRefAndPath.substring(5) : null)));
         }
 
         final Gh4Application app = Gh4Application.get();
@@ -125,30 +130,21 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
         return ApiHelpers.PageIterator
                 .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page))
                 .compose(this::matchBranch)
-                .flatMap(result -> {
-                    if (result != null) {
-                        return Single.just(result);
-                    }
-
-                    // and tags after that
-                    return ApiHelpers.PageIterator
-                            .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page))
-                            .compose(this::matchBranch);
-                })
-                .map(result -> {
-                    if (result != null) {
-                        return null;
-                    }
-
+                // and tags after that
+                .flatMap(result -> result.orOptionalSingle(() -> ApiHelpers.PageIterator
+                        .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page))
+                        .compose(this::matchBranch))
+                )
+                .map(resultOpt -> resultOpt.orOptional(() -> {
                     // at this point, the first item may still be a SHA1 - check with a simple regex
                     int slashPos = mRefAndPath.indexOf('/');
                     String potentialSha = slashPos > 0
                             ? mRefAndPath.substring(0, slashPos) : mRefAndPath;
                     if (SHA1_PATTERN.matcher(potentialSha).matches()) {
-                        return Pair.create(potentialSha,
-                                slashPos > 0 ? mRefAndPath.substring(slashPos + 1) : "");
+                        return Optional.of(Pair.create(potentialSha,
+                                slashPos > 0 ? mRefAndPath.substring(slashPos + 1) : ""));
                     }
-                    return null;
-                });
+                    return Optional.absent();
+                }));
     }
 }
