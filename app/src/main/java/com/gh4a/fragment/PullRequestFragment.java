@@ -34,6 +34,7 @@ import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.PullRequestBranchInfoView;
 import com.gh4a.widget.CommitStatusBox;
@@ -59,6 +60,7 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryStatusService;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -478,17 +480,19 @@ public class PullRequestFragment extends IssueFragmentBase {
 
         PullRequestMarker head = mPullRequest.head();
         Repository repo = head.repo();
-        Single<GitReference> refSingle = repo == null
-                ? Single.just(null)
+        Single<Optional<GitReference>> refSingle = repo == null
+                ? Single.just(Optional.absent())
                 : service.getGitReference(repo.owner().login(), repo.name(), head.ref())
-                        .map(ApiHelpers::throwOnFailure);
+                        .map(ApiHelpers::throwOnFailure)
+                        .map(ref -> Optional.of(ref))
+                        .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<GitReference>absent()))
+                        .compose(makeLoaderSingle(ID_LOADER_HEAD_REF, force));
 
-        refSingle.compose(makeLoaderSingle(ID_LOADER_HEAD_REF, force))
-                .subscribe(ref -> {
-                    mHeadReference = ref;
-                    mHasLoadedHeadReference = true;
-                    getActivity().invalidateOptionsMenu();
-                    bindSpecialViews(mListHeaderView);
-                }, error -> {});
+        refSingle.subscribe(refOpt -> {
+            mHeadReference = refOpt.orNull();
+            mHasLoadedHeadReference = true;
+            getActivity().invalidateOptionsMenu();
+            bindSpecialViews(mListHeaderView);
+        }, error -> {});
     }
 }

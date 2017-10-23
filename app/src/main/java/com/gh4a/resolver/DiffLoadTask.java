@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
@@ -28,19 +29,18 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
     }
 
     @Override
-    protected Single<Intent> getSingle() {
-        Single<GitHubFile> fileSingle = getFiles()
-                .compose(RxUtils.filterAndMapToFirstOrNull(
+    protected Single<Optional<Intent>> getSingle() {
+        Single<Optional<GitHubFile>> fileSingle = getFiles()
+                .compose(RxUtils.filterAndMapToFirst(
                         f -> ApiHelpers.md5(f.filename()).equalsIgnoreCase(mDiffId.fileHash)));
-
-        return Single.zip(getSha(), fileSingle, (sha, file) -> {
+        return Single.zip(getSha(), fileSingle, (sha, fileOpt) -> fileOpt.map(file -> {
             if (FileUtils.isImage(file.filename())) {
                 return FileViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                         sha, file.filename());
             }
 
             return getLaunchIntent(sha, file, getComments().blockingGet(), mDiffId);
-        });
+        }));
     }
 
     protected abstract Single<List<GitHubFile>> getFiles();

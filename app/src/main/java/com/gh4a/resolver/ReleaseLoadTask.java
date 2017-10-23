@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
@@ -30,17 +31,13 @@ public class ReleaseLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Single<Intent> getSingle() {
+    protected Single<Optional<Intent>> getSingle() {
         RepositoryReleaseService service =
                 Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getReleases(mRepoOwner, mRepoName, page))
-                .compose(RxUtils.filterAndMapToFirstOrNull(r -> TextUtils.equals(r.tagName(), mTagName)))
-                .map(r -> {
-                    if (r == null) {
-                        return null;
-                    }
-                    return ReleaseInfoActivity.makeIntent(mActivity, mRepoOwner, mRepoName, r);
-                });
+                .compose(RxUtils.filterAndMapToFirst(r -> TextUtils.equals(r.tagName(), mTagName)))
+                .map(releaseOpt -> releaseOpt.map(r -> ReleaseInfoActivity.makeIntent(mActivity,
+                        mRepoOwner, mRepoName, r)));
     }
 }

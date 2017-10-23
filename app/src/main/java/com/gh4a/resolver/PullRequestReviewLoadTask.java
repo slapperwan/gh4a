@@ -8,6 +8,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
 import io.reactivex.Single;
@@ -32,12 +33,12 @@ public class PullRequestReviewLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Single<Intent> getSingle() {
+    protected Single<Optional<Intent>> getSingle() {
         PullRequestReviewService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewService.class);
         return service.getReview(mRepoOwner, mRepoName, mPullRequestNumber, mMarker.commentId)
                 .map(ApiHelpers::throwOnFailure)
-                .map(review -> ReviewActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                        mPullRequestNumber, review, mMarker));
+                .map(review -> Optional.of(ReviewActivity.makeIntent(mActivity,
+                        mRepoOwner, mRepoName, mPullRequestNumber, review, mMarker)));
     }
 }

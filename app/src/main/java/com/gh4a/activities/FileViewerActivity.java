@@ -37,6 +37,7 @@ import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.ClientErrorResponse;
 import com.meisolsson.githubsdk.model.Content;
@@ -321,6 +322,7 @@ public class FileViewerActivity extends WebViewerActivity
                 Gh4Application.get().getGitHubService(RepositoryContentService.class);
         service.getContents(mRepoOwner, mRepoName, mPath, mRef)
                 .map(ApiHelpers::throwOnFailure)
+                .map(result -> Optional.of(result))
                 .onErrorResumeNext(error -> {
                     if (error instanceof ApiRequestException) {
                         ClientErrorResponse response = ((ApiRequestException) error).getResponse();
@@ -330,7 +332,7 @@ public class FileViewerActivity extends WebViewerActivity
                             for (ClientErrorResponse.FieldError fe : errors) {
                                 if (fe.reason() == ClientErrorResponse.FieldError.Reason.TooLarge) {
                                     openUnsuitableFileAndFinish();
-                                    return Single.just(null);
+                                    return Single.just(Optional.absent());
                                 }
                             }
                         }
@@ -339,8 +341,8 @@ public class FileViewerActivity extends WebViewerActivity
                 })
                 .compose(makeLoaderSingle(ID_LOADER_FILE, force))
                 .subscribe(result -> {
-                    if (result != null) {
-                        mContent = result;
+                    if (result.isPresent()) {
+                        mContent = result.get();
                         onDataReady();
                         setContentEmpty(false);
                     } else {

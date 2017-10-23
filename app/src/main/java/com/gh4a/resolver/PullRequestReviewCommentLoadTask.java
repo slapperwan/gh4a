@@ -10,7 +10,9 @@ import com.gh4a.activities.ReviewActivity;
 import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
+import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
@@ -41,11 +43,11 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Single<Intent> getSingle() {
+    protected Single<Optional<Intent>> getSingle() {
         return load(mActivity, mRepoOwner, mRepoName, mPullRequestNumber, mMarker);
     }
 
-    public static Single<Intent> load(Context context, String repoOwner, String repoName,
+    public static Single<Optional<Intent>> load(Context context, String repoOwner, String repoName,
             int pullRequestNumber, IntentUtils.InitialCommentMarker marker) {
         final Gh4Application app = Gh4Application.get();
         final PullRequestReviewService reviewService =
@@ -77,17 +79,13 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
 
                             return reviewService
                                     .getReview(repoOwner, repoName, pullRequestNumber, reviewId)
-                                    .map(ApiHelpers::throwOnFailure);
+                                    .map(ApiHelpers::throwOnFailure)
+                                    .map(result -> Optional.of(result));
                         }
                     }
-                    return Single.just(null);
+                    return Single.just(Optional.<Review>absent());
                 })
-                .map(review -> {
-                    if (review == null) {
-                        return null;
-                    }
-                    return ReviewActivity.makeIntent(context, repoOwner, repoName,
-                            pullRequestNumber, review, marker);
-                });
+                .map(reviewOpt -> reviewOpt.map(review -> ReviewActivity.makeIntent(context,
+                        repoOwner, repoName, pullRequestNumber, review, marker)));
     }
 }

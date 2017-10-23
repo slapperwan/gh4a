@@ -41,6 +41,7 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -346,20 +347,23 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
         service.getReadmeHtml(repoOwner, repoName, mRef)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, null))
-                .map(html -> {
-                    if (html != null) {
-                        html = HtmlUtils.rewriteRelativeUrls(html, repoOwner, repoName, mRef);
+                .map(html -> Optional.of(html))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<String>absent()))
+                .map(htmlOpt -> {
+                    if (htmlOpt.isPresent()) {
+                        String html = HtmlUtils.rewriteRelativeUrls(htmlOpt.get(),
+                                repoOwner, repoName, mRef);
                         mImageGetter.encode(context, id, html);
+                        return Optional.of(html);
                     }
-                    return html;
+                    return Optional.<String>absent();
                 })
                 .doOnSubscribe(disposable -> mIsReadmeLoaded = false)
                 .compose(makeLoaderSingle(ID_LOADER_README, force))
-                .subscribe(readme -> {
-                    if (readme != null) {
+                .subscribe(readmeOpt -> {
+                    if (readmeOpt.isPresent()) {
                         mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
-                        mImageGetter.bind(mReadmeView, readme, id);
+                        mImageGetter.bind(mReadmeView, readmeOpt.get(), id);
                     } else {
                         mReadmeView.setText(R.string.repo_no_readme);
                         mReadmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);

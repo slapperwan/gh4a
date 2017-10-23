@@ -11,6 +11,7 @@ import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubFile;
@@ -43,11 +44,11 @@ public class CommitCommentLoadTask extends UrlLoadTask {
     }
 
     @Override
-    protected Single<Intent> getSingle() {
+    protected Single<Optional<Intent>> getSingle() {
         return load(mActivity, mRepoOwner, mRepoName, mCommitSha, mMarker);
     }
 
-    public static Single<Intent> load(Context context,
+    public static Single<Optional<Intent>> load(Context context,
             String repoOwner, String repoName, String commitSha,
             IntentUtils.InitialCommentMarker marker) {
         RepositoryCommitService commitService =
@@ -61,28 +62,30 @@ public class CommitCommentLoadTask extends UrlLoadTask {
                 .toSingle(page -> commentService.getCommitComments(repoOwner, repoName, commitSha, page))
                 .cache(); // single is used multiple times -> avoid refetching data
 
-        Single<GitHubFile> fileSingle = commentSingle
-                .compose(RxUtils.filterAndMapToFirstOrNull(c -> marker.matches(c.id(), c.createdAt())))
+        Single<Optional<GitHubFile>> fileSingle = commentSingle
+                .compose(RxUtils.filterAndMapToFirst(c -> marker.matches(c.id(), c.createdAt())))
                 .zipWith(commitSingle, (comment, commit) -> {
-                    if (comment != null) {
+                    if (comment.isPresent()) {
                         for (GitHubFile commitFile : commit.files()) {
-                            if (commitFile.filename().equals(comment.path())) {
-                                return commitFile;
+                            if (commitFile.filename().equals(comment.get().path())) {
+                                return Optional.of(commitFile);
                             }
                         }
                     }
-                    return null;
+                    return Optional.absent();
                 });
 
-        return Single.zip(commitSingle, commentSingle, fileSingle, (commit, comments, file) -> {
+        return Single.zip(commitSingle, commentSingle, fileSingle, (commit, comments, fileOpt) -> {
+            GitHubFile file = fileOpt.orNull();
             if (file != null && !FileUtils.isImage(file.filename())) {
-                return CommitDiffViewerActivity.makeIntent(context, repoOwner, repoName,
-                        commitSha, file.filename(), file.patch(),
-                        comments, -1, -1, false, marker);
+                return Optional.of(CommitDiffViewerActivity.makeIntent(context,
+                        repoOwner, repoName, commitSha, file.filename(), file.patch(),
+                        comments, -1, -1, false, marker));
             } else if (file == null) {
-                return CommitActivity.makeIntent(context, repoOwner, repoName, commitSha, marker);
+                return Optional.of(
+                        CommitActivity.makeIntent(context, repoOwner, repoName, commitSha, marker));
             }
-            return null;
+            return Optional.absent();
         });
     }
 }

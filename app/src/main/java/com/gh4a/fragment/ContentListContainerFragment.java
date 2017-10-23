@@ -17,6 +17,7 @@ import com.gh4a.R;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.PathBreadcrumbs;
@@ -27,6 +28,7 @@ import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 import com.philosophicalhacker.lib.RxLoader;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -312,25 +314,27 @@ public class ContentListContainerFragment extends Fragment implements
         String repoName = mRepository.name();
 
         service.getContents(repoOwner, repoName, ".gitmodules", mSelectedRef)
-                .compose(RxUtils.mapFailureToValue(404, null))
                 .map(ApiHelpers::throwOnFailure)
-                .map(content -> content != null ? StringUtils.fromBase64(content.content()) : null)
+                .map(content -> Optional.of(content))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<Content>absent()))
+                .map(contentOpt -> contentOpt.map(content -> StringUtils.fromBase64(content.content())))
                 .map(this::parseModuleMap)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError(error -> ((BaseActivity) getActivity()).handleLoadFailure(error))
                 .compose(mRxLoader.makeSingleTransformer(ID_LOADER_MODULEMAP, true))
-                .subscribe(result -> {
-                    mGitModuleMap = result;
+                .subscribe(resultOpt -> {
+                    mGitModuleMap = resultOpt.orNull();
                     if (mContentListFragment != null) {
                         mContentListFragment.onSubModuleNamesChanged(getSubModuleNames(mContentListFragment));
                     }
                 }, error -> {});
     }
 
-    private Map<String, String> parseModuleMap(String input) {
+    private Optional<Map<String, String>> parseModuleMap(Optional<String> inputOpt) {
+        String input = inputOpt.orNull();
         if (StringUtils.isBlank(input)) {
-            return null;
+            return Optional.absent();
         }
         Map<String, String> result = new HashMap<>();
         String pendingPath = null;
@@ -377,7 +381,7 @@ public class ContentListContainerFragment extends Fragment implements
             result.put(pendingPath, pendingTarget);
         }
 
-        return result;
+        return Optional.of(result);
 
     }
 }

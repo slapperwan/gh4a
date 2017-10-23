@@ -43,6 +43,7 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.resolver.CommitCommentLoadTask;
 import com.gh4a.resolver.PullRequestReviewCommentLoadTask;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
@@ -120,7 +121,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
         String repoOwner = "";
         String repoName = "";
         Intent intent = null;
-        Single<Intent> intentSingle = null;
+        Single<Optional<Intent>> intentSingle = null;
 
         if (eventRepo != null) {
             String[] repoNamePart = eventRepo.repoWithUserName().split("/");
@@ -311,7 +312,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             intentSingle
                     .compose(RxUtils::doInBackground)
                     .compose(RxUtils.wrapWithProgressDialog(getActivity(), R.string.loading_msg))
-                    .subscribe(result -> startActivity(result), error -> {});
+                    .subscribe(result -> result.doIfPresent(i -> startActivity(i)), error -> {});
         }
     }
 
