@@ -547,4 +547,5 @@
     <string name="notification_subject_pr">PR</string>
     <string name="notification_subject_release">Release</string>
     <string name="notification_interval">Sync interval</string>
+    <string name="detach">Open in new window</string>
 </resources>
