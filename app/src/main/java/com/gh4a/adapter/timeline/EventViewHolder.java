@@ -3,6 +3,7 @@ package com.gh4a.adapter.timeline;
 import android.content.Context;
 import android.content.Intent;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.style.TypefaceSpan;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,7 +27,9 @@ import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Rename;
 import com.meisolsson.githubsdk.model.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,6 +57,8 @@ class EventViewHolder
         EVENT_ICONS.put(IssueEventType.Renamed, R.attr.issueEventRenamedIcon);
         EVENT_ICONS.put(IssueEventType.HeadRefDeleted, R.attr.timelineEventBranchIcon);
         EVENT_ICONS.put(IssueEventType.HeadRefRestored, R.attr.timelineEventBranchIcon);
+        EVENT_ICONS.put(IssueEventType.ReviewRequested, R.attr.timelineEventReviewRequested);
+        EVENT_ICONS.put(IssueEventType.ReviewRequestRemoved, R.attr.timelineEventReviewRequestRemoved);
     }
 
     private final Context mContext;
@@ -187,6 +192,22 @@ class EventViewHolder
                 Rename rename = event.rename();
                 textBase = mContext.getString(R.string.issue_event_renamed,
                         ApiHelpers.getUserLogin(mContext, user), rename.from(), rename.to());
+                break;
+            }
+            case ReviewRequested:
+            case ReviewRequestRemoved: {
+                final String reviewerNames;
+                if (event.requestedReviewers() != null) {
+                    ArrayList<String> reviewers = new ArrayList<>();
+                    for (User reviewer : event.requestedReviewers()) {
+                        reviewers.add(ApiHelpers.getUserLogin(mContext, reviewer));
+                    }
+                    reviewerNames = TextUtils.join(", ", reviewers);
+                } else {
+                    reviewerNames = ApiHelpers.getUserLogin(mContext, event.requestedReviewer());
+                }
+                textBase = mContext.getString(R.string.pull_request_event_review_requested,
+                        ApiHelpers.getUserLogin(mContext, event.reviewRequester()), reviewerNames);
                 break;
             }
             case HeadRefDeleted:

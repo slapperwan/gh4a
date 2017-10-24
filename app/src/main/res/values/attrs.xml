@@ -93,6 +93,8 @@
     <attr name="timelineEventApproved" format="reference" />
     <attr name="timelineEventRequestedChanges" format="reference" />
     <attr name="timelineEventReviewed" format="reference" />
+    <attr name="timelineEventReviewRequested" format="reference" />
+    <attr name="timelineEventReviewRequestRemoved" format="reference" />
     <attr name="timelineEventBranchIcon" format="reference" />
     <attr name="expandIcon" format="reference" />
     <attr name="collapseIcon" format="reference" />
