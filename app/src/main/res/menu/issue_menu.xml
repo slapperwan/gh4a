@@ -28,4 +28,9 @@
         android:title="@string/copy_number"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/detach"
+        android:title="@string/detach"
+        app:showAsAction="never" />
+
 </menu>

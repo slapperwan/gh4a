@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.StringRes;
@@ -49,6 +50,7 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.TaskUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
@@ -224,6 +226,10 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             menu.removeItem(R.id.copy_number);
         }
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            menu.removeItem(R.id.detach);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -253,6 +259,12 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             case R.id.copy_number:
                 IntentUtils.copyToClipboard(this, "Issue #" + mIssueNumber,
                         String.valueOf(mIssueNumber));
+                return true;
+            case R.id.detach:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    TaskUtils.startNewTask(this, makeIntent(this, mRepoOwner, mRepoName,
+                            mIssueNumber, mInitialComment));
+                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
