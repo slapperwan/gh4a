@@ -75,6 +75,8 @@
         <item name="timelineEventApproved">@drawable/timeline_event_approved_dark</item>
         <item name="timelineEventRequestedChanges">@drawable/timeline_event_requested_changes_dark</item>
         <item name="timelineEventReviewed">@drawable/timeline_event_reviewed_dark</item>
+        <item name="timelineEventReviewRequested">@drawable/timeline_event_review_requested_dark</item>
+        <item name="timelineEventReviewRequestRemoved">@drawable/timeline_event_review_request_removed_dark</item>
         <item name="expandIcon">@drawable/expand_dark</item>
         <item name="collapseIcon">@drawable/collapse_dark</item>
         <item name="saveIcon">@drawable/save_dark</item>
@@ -209,6 +211,8 @@
         <item name="timelineEventApproved">@drawable/timeline_event_approved</item>
         <item name="timelineEventRequestedChanges">@drawable/timeline_event_requested_changes</item>
         <item name="timelineEventReviewed">@drawable/timeline_event_reviewed</item>
+        <item name="timelineEventReviewRequested">@drawable/timeline_event_review_requested</item>
+        <item name="timelineEventReviewRequestRemoved">@drawable/timeline_event_review_request_removed</item>
         <item name="expandIcon">@drawable/expand</item>
         <item name="collapseIcon">@drawable/collapse</item>
         <item name="saveIcon">@drawable/save</item>
