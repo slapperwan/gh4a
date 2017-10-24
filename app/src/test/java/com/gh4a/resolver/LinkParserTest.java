@@ -762,7 +762,7 @@ public class LinkParserTest {
     }
 
     private LinkParser.ParseResult parseLink(String uriString) {
-        return LinkParser.parseUri(mActivity, Uri.parse(uriString));
+        return LinkParser.parseUri(mActivity, Uri.parse(uriString), null);
     }
 
     private static void assertRedirectsTo(LinkParser.ParseResult result, Class<?> cls) {
