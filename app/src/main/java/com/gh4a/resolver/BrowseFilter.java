@@ -33,7 +33,10 @@ public class BrowseFilter extends AppCompatActivity {
             return;
         }
 
-        LinkParser.ParseResult result = LinkParser.parseUri(this, uri);
+        IntentUtils.InitialCommentMarker initialComment =
+                getIntent().getParcelableExtra(EXTRA_INITIAL_COMMENT);
+
+        LinkParser.ParseResult result = LinkParser.parseUri(this, uri, initialComment);
         if (result == null) {
             IntentUtils.launchBrowser(this, uri);
             finish();

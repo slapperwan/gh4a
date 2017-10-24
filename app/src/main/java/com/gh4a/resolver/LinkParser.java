@@ -49,7 +49,8 @@ public class LinkParser {
      * loadTask} to execute that task in background.
      */
     @Nullable
-    public static ParseResult parseUri(FragmentActivity activity, @NonNull Uri uri) {
+    public static ParseResult parseUri(FragmentActivity activity, @NonNull Uri uri,
+            IntentUtils.InitialCommentMarker initialCommentFallback) {
         List<String> parts = new ArrayList<>(uri.getPathSegments());
 
         if (IGitHubConstants.HOST_GISTS.equals(uri.getHost())) {
@@ -97,15 +98,16 @@ public class LinkParser {
             case "commits":
                 return parseCommitsLink(activity, parts, user, repo, action);
             case "issues":
-                return parseIssuesLink(activity, uri, user, repo, id);
+                return parseIssuesLink(activity, uri, user, repo, id, initialCommentFallback);
             case "pulls":
                 return new ParseResult(IssueListActivity.makeIntent(activity, user, repo, true));
             case "wiki":
                 return new ParseResult(WikiListActivity.makeIntent(activity, user, repo, null));
             case "pull":
-                return parsePullRequestLink(activity, uri, parts, user, repo, id);
+                return parsePullRequestLink(activity, uri, parts, user,
+                        repo, id, initialCommentFallback);
             case "commit":
-                return parseCommitLink(activity, uri, user, repo, id);
+                return parseCommitLink(activity, uri, user, repo, id, initialCommentFallback);
             case "blob":
                 return parseBlobLink(activity, uri, parts, user, repo, id);
         }
@@ -197,7 +199,8 @@ public class LinkParser {
 
     @Nullable
     private static ParseResult parseIssuesLink(FragmentActivity activity, @NonNull Uri uri,
-            String user, String repo, String id) {
+            String user, String repo, String id,
+            IntentUtils.InitialCommentMarker initialCommentFallback) {
         if (StringUtils.isBlank(id)) {
             return new ParseResult(IssueListActivity.makeIntent(activity, user, repo));
         }
@@ -206,8 +209,8 @@ public class LinkParser {
         }
         try {
             int issueNumber = Integer.parseInt(id);
-            IntentUtils.InitialCommentMarker initialComment =
-                    generateInitialCommentMarker(activity, uri.getFragment(), "issuecomment-");
+            IntentUtils.InitialCommentMarker initialComment = generateInitialCommentMarker(
+                    uri.getFragment(), "issuecomment-", initialCommentFallback);
             return new ParseResult(IssueActivity.makeIntent(activity, user, repo, issueNumber,
                     initialComment));
         } catch (NumberFormatException e) {
@@ -217,7 +220,8 @@ public class LinkParser {
 
     @Nullable
     private static ParseResult parsePullRequestLink(FragmentActivity activity, @NonNull Uri uri,
-            List<String> parts, String user, String repo, String id) {
+            List<String> parts, String user, String repo, String id,
+            IntentUtils.InitialCommentMarker initialCommentFallback) {
         if (StringUtils.isBlank(id)) {
             return null;
         }
@@ -273,8 +277,8 @@ public class LinkParser {
                     reviewDiffHunkId, pullRequestNumber));
         }
 
-        IntentUtils.InitialCommentMarker initialComment =
-                generateInitialCommentMarker(activity, uri.getFragment(), "issuecomment-");
+        IntentUtils.InitialCommentMarker initialComment = generateInitialCommentMarker(
+                uri.getFragment(), "issuecomment-", initialCommentFallback);
         return new ParseResult(PullRequestActivity.makeIntent(activity, user, repo,
                 pullRequestNumber, page, initialComment));
     }
@@ -294,7 +298,8 @@ public class LinkParser {
 
     @Nullable
     private static ParseResult parseCommitLink(FragmentActivity activity, @NonNull Uri uri,
-            String user, String repo, String id) {
+            String user, String repo, String id,
+            IntentUtils.InitialCommentMarker initialCommentFallback) {
         if (StringUtils.isBlank(id)) {
             return null;
         }
@@ -304,8 +309,8 @@ public class LinkParser {
             return new ParseResult(new CommitDiffLoadTask(activity, user, repo, diffId, id));
         }
 
-        IntentUtils.InitialCommentMarker initialComment =
-                generateInitialCommentMarker(activity, uri.getFragment(), "commitcomment-");
+        IntentUtils.InitialCommentMarker initialComment = generateInitialCommentMarker(
+                uri.getFragment(), "commitcomment-", initialCommentFallback);
         if (initialComment != null) {
             return new ParseResult(new CommitCommentLoadTask(activity, user, repo, id,
                     initialComment, true));
@@ -338,13 +343,10 @@ public class LinkParser {
     }
 
     private static IntentUtils.InitialCommentMarker generateInitialCommentMarker(
-            FragmentActivity activity, String fragment, String prefix) {
+            String fragment, String prefix, IntentUtils.InitialCommentMarker fallback) {
         IntentUtils.InitialCommentMarker initialCommentMarker =
                 generateInitialCommentMarkerWithoutFallback(fragment, prefix);
-        if (initialCommentMarker == null) {
-            return activity.getIntent().getParcelableExtra("initial_comment");
-        }
-        return initialCommentMarker;
+        return initialCommentMarker != null ? initialCommentMarker : fallback;
     }
 
     private static DiffHighlightId extractDiffId(String fragment, String prefix,
