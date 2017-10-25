@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -116,7 +117,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         @TargetApi(21)
         @Override
         public void run() {
-            setTaskDescription(new ActivityManager.TaskDescription(null, null, mProgressColors[0]));
+            setTaskDescription(new ActivityManager.TaskDescription(getActivityTitle(), null,
+                    mProgressColors[0]));
         }
     };
 
@@ -131,6 +133,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
         setupSwipeToRefresh();
         setupNavigationDrawer();
         setupHeaderDrawable();
+    }
+
+    @Nullable
+    protected String getActivityTitle() {
+        return null;
     }
 
     @Override

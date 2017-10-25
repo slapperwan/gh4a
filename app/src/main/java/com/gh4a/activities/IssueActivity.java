@@ -23,6 +23,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -122,9 +124,9 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         setContentShown(false);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getString(R.string.issue) + " #" + mIssueNumber);
+        actionBar.setTitle(getActionBarTitle());
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(!TaskUtils.isNewTaskIntent(getIntent()));
 
         LayoutInflater inflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
@@ -138,6 +140,20 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
 
         getSupportLoaderManager().initLoader(0, null, mIssueCallback);
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
+    }
+
+    @Nullable
+    @Override
+    protected String getActivityTitle() {
+        if (TaskUtils.isNewTaskIntent(getIntent())) {
+            return getActionBarTitle();
+        }
+        return null;
+    }
+
+    @NonNull
+    private String getActionBarTitle() {
+        return getString(R.string.issue) + " #" + mIssueNumber;
     }
 
     @Override
