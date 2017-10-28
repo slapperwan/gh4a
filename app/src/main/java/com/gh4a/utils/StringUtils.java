@@ -172,7 +172,7 @@ public class StringUtils {
     }
 
     public static String toBase64(String data) {
-        return Base64.encodeToString(data.getBytes(), Base64.DEFAULT);
+        return Base64.encodeToString(data.getBytes(), Base64.NO_WRAP);
     }
 
     public static String fromBase64(String encoded) {
