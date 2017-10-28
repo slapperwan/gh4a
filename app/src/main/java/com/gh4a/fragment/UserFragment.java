@@ -417,11 +417,11 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         filterData.put("affiliation", "owner,collaborator");
 
         if (mIsSelf) {
-            observable = service.getUserRepositories(filterData, 0);
+            observable = service.getUserRepositories(filterData, 1);
         } else if (mUser.type() == UserType.Organization) {
-            observable = service.getOrganizationRepositories(mUserLogin, filterData, 0);
+            observable = service.getOrganizationRepositories(mUserLogin, filterData, 1);
         } else {
-            observable = service.getUserRepositories(mUserLogin, filterData, 0);
+            observable = service.getUserRepositories(mUserLogin, filterData, 1);
         }
 
         mTopRepoSubscription = observable
