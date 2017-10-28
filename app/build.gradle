@@ -15,7 +15,7 @@ repositories {
     mavenCentral()
     maven { url 'https://maven.fabric.io/public' }
     maven { url "https://jitpack.io" }
-    maven { url "https://maven.google.com" }
+    google()
 }
 
 apply plugin: 'com.android.application'
@@ -29,7 +29,7 @@ android {
         playStore
     }
     compileSdkVersion 26
-    buildToolsVersion '26.0.1'
+    buildToolsVersion '26.0.2'
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 26
@@ -50,48 +50,50 @@ android {
         }
     }
 
+    flavorDimensions "type"
+
     productFlavors {
         // includes proprietary libs
         playstore {
-
+            dimension "type"
         }
 
         // only foss
         foss {
-
+            dimension "type"
         }
     }
 }
 
 dependencies {
-    compile project(':github-api')
-    compile 'com.android.support:support-v4:26.0.1'
-    compile 'com.android.support:appcompat-v7:26.0.1'
-    compile 'com.android.support:cardview-v7:26.0.1'
-    compile 'com.android.support:preference-v7:26.0.1'
-    compile 'com.android.support:preference-v14:26.0.1'
-    compile 'com.android.support:customtabs:26.0.1'
-    compile 'com.android.support:design:26.0.1'
-    compile 'com.larswerkman:HoloColorPicker:1.5@aar'
-    compile 'com.caverock:androidsvg:1.2.2-beta-1@aar'
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
-    compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
-    compile 'com.github.castorflex.smoothprogressbar:library:1.1.0'
-    compile 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
-    compile 'com.github.pluscubed:recycler-fast-scroll:0.3.2@aar'
-    compile('com.vdurmont:emoji-java:3.2.0') {
+    implementation project(':github-api')
+    implementation 'com.android.support:support-v4:26.1.0'
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support:cardview-v7:26.1.0'
+    implementation 'com.android.support:preference-v7:26.1.0'
+    implementation 'com.android.support:preference-v14:26.1.0'
+    implementation 'com.android.support:customtabs:26.1.0'
+    implementation 'com.android.support:design:26.1.0'
+    implementation 'com.larswerkman:HoloColorPicker:1.5@aar'
+    implementation 'com.caverock:androidsvg:1.2.2-beta-1@aar'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
+    implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
+    implementation 'com.github.castorflex.smoothprogressbar:library:1.1.0'
+    implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
+    implementation 'com.github.pluscubed:recycler-fast-scroll:0.3.2@aar'
+    implementation('com.vdurmont:emoji-java:3.2.0') {
         exclude group: 'org.json', module : 'json'
     }
-    compile 'com.github.Tunous:MarkdownEdit:0.1.1'
-    compile 'com.evernote:android-job:1.2.0-RC4'
-    playstoreCompile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
-        transitive = true;
+    implementation 'com.github.Tunous:MarkdownEdit:0.1.1'
+    implementation 'com.evernote:android-job:1.2.0-RC4'
+    playstoreImplementation('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
+        transitive = true
     }
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.robolectric:robolectric:3.4.2'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.robolectric:robolectric:3.4.2'
 }
 
-def Properties props = new Properties()
+def props = new Properties()
 def propFile = new File('signing.properties')
 if (propFile.canRead()) {
     props.load(new FileInputStream(propFile))
