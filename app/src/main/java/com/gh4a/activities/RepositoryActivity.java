@@ -307,12 +307,12 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
             case R.id.watch:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                toggleStarringState();
+                toggleWatchingState();
                 return true;
             case R.id.star:
                 item.setActionView(R.layout.ab_loading);
                 item.expandActionView();
-                toggleWatchingState();
+                toggleStarringState();
                 return true;
             case R.id.ref:
                 loadOrShowRefSelection();
