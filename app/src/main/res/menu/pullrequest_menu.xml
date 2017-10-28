@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
         android:id="@+id/pull_merge"
         android:title="@string/pull_request_merge"
+        app:showAsAction="ifRoom|withText" />
+
+    <item
+        android:id="@+id/pull_review"
+        android:title="@string/pull_request_review_changes"
         app:showAsAction="ifRoom|withText" />
 
     <item

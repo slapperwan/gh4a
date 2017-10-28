@@ -11,6 +11,7 @@
     <string name="closing_msg">Closing\u2026</string>
     <string name="opening_msg">Opening\u2026</string>
     <string name="merging_msg">Merging\u2026</string>
+    <string name="reviewing_msg">Adding Review\u2026</string>
     <string name="authenticating">Authenticating\u2026</string>
     <string name="search">Search</string>
     <string name="search_code">Search code</string>
@@ -411,6 +412,7 @@
     <string name="pull_request_title">Pull Request</string>
     <string name="review_title_format">Pull Request #%1$d - Review</string>
     <string name="pull_request_conversation">Conversation</string>
+    <string name="pull_request_add_review">Reviews</string>
     <string name="pull_request_files">Files</string>
     <string name="pull_requests">Pull Requests</string>
     <string name="pull_requests_open">Open Pull Requests</string>
@@ -444,6 +446,16 @@
     <string name="pull_request_edit_title">Edit Pull Request #%1$d</string>
     <string name="review_reply_hint">Reply to selected group</string>
     <string name="no_reply_group_selected_hint">Select group to reply to</string>
+    <string name="pull_request_review_dialog_title">Review pull request #%1$d</string>
+    <string name="pull_request_review_event">Review type</string>
+    <string name="pull_request_review_event_comment">Comment</string>
+    <string name="pull_request_review_event_approve">Approve</string>
+    <string name="pull_request_review_event_requestchanges">Request Changes</string>
+    <string name="pull_request_review_body">Review Summary</string>
+    <string name="pull_request_review_description">Leave a comment about this review below.</string>
+    <string name="pull_request_review_button_affirm">Comment</string>
+    <string name="pull_request_review_error">Adding review to pull request #%1$d failed.</string>
+    <string name="pull_request_review_changes">Review</string>
 
     <!-- Object -->
     <string name="object_view_file_at">View file @ %1$s</string>

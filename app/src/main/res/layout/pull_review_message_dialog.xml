@@ -9,10 +9,10 @@
     <com.gh4a.widget.StyleableTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/pull_merge_method" />
+        android:text="@string/pull_request_review_event" />
 
     <Spinner
-        android:id="@+id/merge_method"
+        android:id="@+id/pull_request_review_event"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/pull_merge_message_description"
+        android:text="@string/pull_request_review_description"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <EditText

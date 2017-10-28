@@ -63,6 +63,7 @@ import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.PullRequestMarker;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
@@ -253,6 +254,9 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         switch (item.getItemId()) {
             case R.id.pull_merge:
                 showMergeDialog();
+                break;
+            case R.id.pull_review:
+                showReviewDialog();
                 break;
             case R.id.pull_close:
             case R.id.pull_reopen:
@@ -472,6 +476,55 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 .show();
     }
 
+    private void showReviewDialog() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        String title = getString(R.string.pull_request_review_dialog_title, mPullRequest.getNumber());
+        View view = inflater.inflate(R.layout.pull_review_message_dialog, null);
+
+        final View editorNotice = view.findViewById(R.id.notice);
+        final EditText editor = view.findViewById(R.id.et_commit_message);
+        editor.setText("");
+
+        final ArrayAdapter<ReviewEventDesc> adapter = new ArrayAdapter<>(this,
+                R.layout.pull_merge_method_item);
+        adapter.add(new ReviewEventDesc(R.string.pull_request_review_event_comment,
+                PullRequestService.REVIEW_EVENT_COMMENT));
+        adapter.add(new ReviewEventDesc(R.string.pull_request_review_event_approve,
+                PullRequestService.REVIEW_EVENT_APPROVE));
+        adapter.add(new ReviewEventDesc(R.string.pull_request_review_event_requestchanges,
+                PullRequestService.REVIEW_EVENT_REQUEST_CHANGES));
+
+        final Spinner reviewEvent = view.findViewById(R.id.pull_request_review_event);
+        reviewEvent.setAdapter(adapter);
+        reviewEvent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                int editorVisibility = View.VISIBLE;
+                editorNotice.setVisibility(editorVisibility);
+                editor.setVisibility(editorVisibility);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setView(view)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String text = editor.getText() == null ? null : editor.getText().toString();
+                        int methodIndex = reviewEvent.getSelectedItemPosition();
+                        String method = adapter.getItem(methodIndex).action;
+                        new PullRequestReviewTask(text, method).schedule();
+                    }
+                })
+                .setNegativeButton(getString(R.string.cancel), null)
+                .show();
+    }
+
     private void updateFabVisibility() {
         boolean isIssueOwner = mIssue != null
                 && ApiHelpers.loginEquals(mIssue.getUser(), Gh4Application.get().getAuthLogin());
@@ -620,6 +673,56 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         @Override
         protected String getErrorMessage() {
             return getContext().getString(R.string.pull_error_merge, mPullRequest.getNumber());
+        }
+    }
+
+    private class PullRequestReviewTask extends ProgressDialogTask<Review> {
+        private final String mReviewMessage;
+        private final String mReviewEvent;
+
+        public PullRequestReviewTask(String reviewMessage, String reviewEvent) {
+            super(getBaseActivity(), R.string.reviewing_msg);
+            mReviewMessage = reviewMessage;
+            mReviewEvent = reviewEvent;
+        }
+
+        @Override
+        protected ProgressDialogTask<Review> clone() {
+            return new PullRequestReviewTask(mReviewMessage, mReviewEvent);
+        }
+
+        @Override
+        protected Review run() throws Exception {
+            PullRequestService pullService = (PullRequestService)
+                    Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
+            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
+            return pullService.createReview(repoId,
+                    mPullRequest.getNumber(), mReviewEvent, mReviewMessage);
+        }
+
+        @Override
+        protected void onSuccess(Review result) {
+        }
+
+        @Override
+        protected String getErrorMessage() {
+            return getContext().getString(R.string.pull_request_review_error,
+                    mPullRequest.getNumber());
+        }
+    }
+
+    private class ReviewEventDesc {
+        final @StringRes int textResId;
+        final String action;
+
+        public ReviewEventDesc(@StringRes int textResId, String action) {
+            this.textResId = textResId;
+            this.action = action;
+        }
+
+        @Override
+        public String toString() {
+            return getString(textResId);
         }
     }
 }
