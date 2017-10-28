@@ -44,7 +44,7 @@ public class ServiceFactory {
                     }
                     if (pageSize != null) {
                         requestBuilder.url(original.url().newBuilder()
-                                .addQueryParameter("page_size", String.valueOf(pageSize))
+                                .addQueryParameter("per_page", String.valueOf(pageSize))
                                 .build());
                     }
                     if (original.header("Accept") == null) {
