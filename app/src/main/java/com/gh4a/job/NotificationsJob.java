@@ -1,5 +1,6 @@
 package com.gh4a.job;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -277,7 +278,7 @@ public class NotificationsJob extends Job {
                 .getQuantityString(R.plurals.unread_notifications_summary_text, totalCount,
                         totalCount);
 
-        android.app.Notification publicVersion = makeBaseBuilder()
+        Notification publicVersion = makeBaseBuilder()
                 .setContentTitle(title)
                 .setContentText(text)
                 .setNumber(totalCount)
