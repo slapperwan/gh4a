@@ -140,6 +140,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         actionBar.setTitle(getActionBarTitle());
         actionBar.setSubtitle(getActionBarSubtitle());
         actionBar.setDisplayHomeAsUpEnabled(!TaskUtils.isNewTaskIntent(getIntent()));
+
+        scheduleTaskDescriptionUpdate();
     }
 
     @Nullable
