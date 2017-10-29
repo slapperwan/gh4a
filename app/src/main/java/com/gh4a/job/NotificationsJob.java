@@ -15,7 +15,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -33,7 +32,6 @@ import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.NotificationHolder;
 import com.gh4a.loader.NotificationListLoader;
-import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 
 import org.eclipse.egit.github.core.Notification;
@@ -241,7 +239,8 @@ public class NotificationsJob extends Job {
 
         NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle("")
                 .setConversationTitle(title);
-        for (Notification n : notifications) {
+        for (int i = notifications.size() - 1; i >= 0; i--) {
+            Notification n = notifications.get(i);
             style.addMessage(n.getSubject().getTitle(),
                     n.getUpdatedAt().getTime(), determineNotificationTypeLabel(n));
             hasNewNotification = hasNewNotification ||
