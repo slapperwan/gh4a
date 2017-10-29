@@ -15,16 +15,16 @@
  */
 package com.gh4a.activities;
 
-import org.eclipse.egit.github.core.GollumPage;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 
 import com.gh4a.R;
 import com.gh4a.fragment.WikiListFragment;
+
+import org.eclipse.egit.github.core.GollumPage;
 
 public class WikiListActivity extends FragmentContainerActivity {
     public static Intent makeIntent(Context context, String repoOwner,
@@ -39,14 +39,16 @@ public class WikiListActivity extends FragmentContainerActivity {
     private String mUserLogin;
     private String mRepoName;
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected String getActionBarTitle() {
+        return getString(R.string.recent_wiki);
+    }
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.recent_wiki);
-        actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mUserLogin + "/" + mRepoName;
     }
 
     @Override

@@ -18,7 +18,7 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.support.annotation.Nullable;
 
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
@@ -39,12 +39,19 @@ public class WikiActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getIntent().getStringExtra("title"));
-        actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         onDataReady();
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getIntent().getStringExtra("title");
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mUserLogin + "/" + mRepoName;
     }
 
     @Override

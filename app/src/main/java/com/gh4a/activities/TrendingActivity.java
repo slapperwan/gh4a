@@ -1,9 +1,8 @@
 package com.gh4a.activities;
 
 import android.content.Intent;
-import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.R;
@@ -14,13 +13,10 @@ public class TrendingActivity extends BaseFragmentPagerActivity {
         R.string.trend_today, R.string.trend_week, R.string.trend_month
     };
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        final ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.trend);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    protected String getActionBarTitle() {
+        return getString(R.string.trend);
     }
 
     @Override

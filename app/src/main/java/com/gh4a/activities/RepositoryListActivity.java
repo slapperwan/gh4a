@@ -18,8 +18,8 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -54,11 +54,18 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
         mFragment = (RepositoryListContainerFragment) getFragment();
         mSortDrawerHelper.setFilterType(mFragment.getFilterType());
         updateRightNavigationDrawer();
+    }
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.user_pub_repos);
-        actionBar.setSubtitle(mUserLogin);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getString(R.string.user_pub_repos);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mUserLogin;
     }
 
     @Override

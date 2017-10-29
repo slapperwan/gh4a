@@ -20,12 +20,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -214,11 +214,18 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         }
 
         getSupportLoaderManager().initLoader(3, null, mIsCollaboratorCallback);
+    }
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mIsPullRequest ? R.string.pull_requests : R.string.issues);
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getString(mIsPullRequest ? R.string.pull_requests : R.string.issues);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override

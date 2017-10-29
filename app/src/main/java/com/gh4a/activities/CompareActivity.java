@@ -18,8 +18,8 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 
 import com.gh4a.R;
 import com.gh4a.fragment.CommitCompareFragment;
@@ -37,14 +37,16 @@ public class CompareActivity extends FragmentContainerActivity {
     private String mRepoOwner;
     private String mRepoName;
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected String getActionBarTitle() {
+        return getString(R.string.commit_compare);
+    }
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.commit_compare);
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override

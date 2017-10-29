@@ -18,8 +18,8 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.R;
@@ -40,13 +40,10 @@ public class WatcherListActivity extends BaseFragmentPagerActivity {
         R.string.repo_stargazers, R.string.repo_watchers
     };
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    protected String getActionBarTitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override

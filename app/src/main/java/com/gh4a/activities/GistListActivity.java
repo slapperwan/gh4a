@@ -18,8 +18,8 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 
 import com.gh4a.R;
 import com.gh4a.fragment.GistListFragment;
@@ -32,14 +32,16 @@ public class GistListActivity extends FragmentContainerActivity {
 
     private String mUserLogin;
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected String getActionBarTitle() {
+        return getString(R.string.gists);
+    }
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.gists);
-        actionBar.setSubtitle(mUserLogin);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mUserLogin;
     }
 
     @Override

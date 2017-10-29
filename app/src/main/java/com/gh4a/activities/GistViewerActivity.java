@@ -19,8 +19,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -66,11 +66,13 @@ public class GistViewerActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(mFileName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return mFileName;
     }
 
     @Override

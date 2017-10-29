@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -29,7 +30,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.util.ObjectsCompat;
 import android.support.v4.view.PagerAdapter;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -270,22 +270,28 @@ public class IssueEditActivity extends BasePagerActivity implements
             }
         });
 
-        boolean isPullRequest = mEditIssue.getPullRequest() != null;
-
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(!isInEditMode()
-                ? getString(R.string.issue_create)
-                : isPullRequest
-                        ? getString(R.string.pull_request_edit_title, mEditIssue.getNumber())
-                        : getString(R.string.issue_edit_title, mEditIssue.getNumber()));
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         adjustTabsForHeaderAlignedFab(true);
         setToolbarScrollable(false);
         updateOptionViews();
 
         addAppBarOffsetListener(this);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        boolean isPullRequest = mEditIssue.getPullRequest() != null;
+        return !isInEditMode()
+                ? getString(R.string.issue_create)
+                : isPullRequest
+                        ? getString(R.string.pull_request_edit_title, mEditIssue.getNumber())
+                        : getString(R.string.issue_edit_title, mEditIssue.getNumber());
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override

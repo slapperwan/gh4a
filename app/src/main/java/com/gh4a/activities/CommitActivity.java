@@ -19,10 +19,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -119,15 +119,22 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getString(R.string.commit_title, mObjectSha.substring(0, 7)));
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         setContentShown(false);
 
         getSupportLoaderManager().initLoader(0, null, mCommitCallback);
         getSupportLoaderManager().initLoader(1, null, mCommentCallback);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getString(R.string.commit_title, mObjectSha.substring(0, 7));
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override

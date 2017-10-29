@@ -30,7 +30,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,7 +50,6 @@ import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.TaskUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
@@ -122,11 +120,6 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         setContentView(R.layout.frame_layout);
         setContentShown(false);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getActionBarTitle());
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(!TaskUtils.isNewTaskIntent(getIntent()));
-
         LayoutInflater inflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
         mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
@@ -141,18 +134,15 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         getSupportLoaderManager().initLoader(1, null, mCollaboratorCallback);
     }
 
-    @Nullable
-    @Override
-    protected String getActivityTitle() {
-        if (TaskUtils.isNewTaskIntent(getIntent())) {
-            return getActionBarTitle();
-        }
-        return null;
+    @NonNull
+    protected String getActionBarTitle() {
+        return getString(R.string.issue) + " #" + mIssueNumber;
     }
 
-    @NonNull
-    private String getActionBarTitle() {
-        return getString(R.string.issue) + " #" + mIssueNumber;
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override

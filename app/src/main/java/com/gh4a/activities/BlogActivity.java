@@ -18,7 +18,7 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.support.annotation.Nullable;
 
 import com.gh4a.R;
 import com.gh4a.holder.Feed;
@@ -34,12 +34,19 @@ public class BlogActivity extends WebViewerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getDocumentTitle());
-        actionBar.setSubtitle(R.string.blog);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         onDataReady();
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getDocumentTitle();
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return getString(R.string.blog);
     }
 
     @Override

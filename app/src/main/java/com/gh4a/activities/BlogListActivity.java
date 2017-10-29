@@ -16,21 +16,17 @@
 package com.gh4a.activities;
 
 import android.content.Intent;
-import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 
 import com.gh4a.R;
 import com.gh4a.fragment.BlogListFragment;
 
 public class BlogListActivity extends FragmentContainerActivity {
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.blog);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    protected String getActionBarTitle() {
+        return getString(R.string.blog);
     }
 
     @Override

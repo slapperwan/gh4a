@@ -19,10 +19,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -96,11 +96,6 @@ public class IssueLabelListActivity extends BaseActivity implements
         setContentView(R.layout.generic_list);
         setContentShown(false);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.issue_labels);
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         mAdapter = new IssueLabelAdapter(this);
         mAdapter.setOnItemClickListener(this);
 
@@ -140,6 +135,18 @@ public class IssueLabelListActivity extends BaseActivity implements
                 }
             }
         }
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getString(R.string.issue_labels);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override
