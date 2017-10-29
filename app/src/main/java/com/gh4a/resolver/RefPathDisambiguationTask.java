@@ -94,6 +94,13 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
 
     // returns ref, path
     private Pair<String, String> resolve() throws Exception {
+        if (mRefAndPath.startsWith("HEAD")) {
+            if (mRefAndPath.startsWith("HEAD/")) {
+                return Pair.create("HEAD", mRefAndPath.substring(5));
+            }
+            return Pair.create("HEAD", null);
+        }
+
         RepositoryService repoService = (RepositoryService)
                 Gh4Application.get().getService(Gh4Application.REPO_SERVICE);
         RepositoryId repo = new RepositoryId(mRepoOwner, mRepoName);
