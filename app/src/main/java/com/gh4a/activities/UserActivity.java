@@ -91,6 +91,11 @@ public class UserActivity extends BaseFragmentPagerActivity {
     }
 
     @Override
+    public boolean displayDetachAction() {
+        return true;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.user_menu, menu);
