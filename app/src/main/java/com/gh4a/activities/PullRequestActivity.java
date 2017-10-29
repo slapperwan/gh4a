@@ -21,6 +21,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -51,9 +53,9 @@ import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
-import com.gh4a.loader.ReferenceLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.TaskUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
@@ -62,11 +64,8 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.PullRequestMarker;
-import org.eclipse.egit.github.core.Reference;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.TypedResource;
 import org.eclipse.egit.github.core.User;
-import org.eclipse.egit.github.core.service.DataService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.io.IOException;
@@ -182,15 +181,26 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         addHeaderView(mHeader, !hasTabsInToolbar());
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getResources().getString(R.string.pull_request_title) + " #" + mPullRequestNumber);
+        actionBar.setTitle(getActionBarTitle());
         actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(!TaskUtils.isNewTaskIntent(getIntent()));
 
         setContentShown(false);
 
         getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
         getSupportLoaderManager().initLoader(1, null, mIssueCallback);
         getSupportLoaderManager().initLoader(2, null, mCollaboratorCallback);
+    }
+
+    @Nullable
+    @Override
+    protected String getActivityTitle() {
+        return TaskUtils.isNewTaskIntent(getIntent()) ? getActionBarTitle() : null;
+    }
+
+    @NonNull
+    private String getActionBarTitle() {
+        return getString(R.string.pull_request_title) + " #" + mPullRequestNumber;
     }
 
     @Override
@@ -238,6 +248,11 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean displayDetachAction() {
+        return true;
     }
 
     @Override

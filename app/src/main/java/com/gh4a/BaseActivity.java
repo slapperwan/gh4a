@@ -66,6 +66,7 @@ import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
+import com.gh4a.utils.TaskUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
@@ -425,6 +426,19 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && displayDetachAction()) {
+            menu.add(Menu.NONE, R.id.detach, Menu.NONE, R.string.detach);
+        }
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    public boolean displayDetachAction() {
+        return false;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             Intent intent = navigateUp();
@@ -433,6 +447,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 startActivity(intent);
             } else {
                 finish();
+            }
+            return true;
+        }
+
+        if (item.getItemId() == R.id.detach) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                TaskUtils.startNewTask(this, getIntent());
             }
             return true;
         }

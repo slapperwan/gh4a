@@ -2,4 +2,5 @@
 <resources>
     <item name="search_match_index" type="id" />
     <item name="review_comment_id" type="id" />
+    <item name="detach" type="id" />
 </resources>
