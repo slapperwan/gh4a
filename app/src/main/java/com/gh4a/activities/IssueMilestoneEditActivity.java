@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -131,11 +132,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         findViewById(R.id.due_container).setOnClickListener(this);
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(isInEditMode()
-                ? R.string.issue_milestone_edit : R.string.issue_milestone_new);
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
 
         if (mMilestone == null) {
             mMilestone = new Milestone();
@@ -160,6 +157,20 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         updateLabels();
         setToolbarScrollable(false);
         adjustTabsForHeaderAlignedFab(true);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getString(isInEditMode()
+                ? R.string.issue_milestone_edit
+                : R.string.issue_milestone_new);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override

@@ -18,8 +18,8 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 
 import com.gh4a.R;
 import com.gh4a.fragment.ContributorListFragment;
@@ -34,14 +34,16 @@ public class ContributorListActivity extends FragmentContainerActivity {
     private String mUserLogin;
     private String mRepoName;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected String getActionBarTitle() {
+        return getString(R.string.repo_contributors);
+    }
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.repo_contributors);
-        actionBar.setSubtitle(mUserLogin + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mUserLogin + "/" + mRepoName;
     }
 
     @Override

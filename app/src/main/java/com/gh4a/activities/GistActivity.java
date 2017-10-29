@@ -18,8 +18,8 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -90,12 +90,14 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
         setContentView(R.layout.gist);
         setContentShown(false);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getString(R.string.gist_title, mGistId));
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         getSupportLoaderManager().initLoader(0, null, mGistCallback);
         getSupportLoaderManager().initLoader(1, null, mStarCallback);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getString(R.string.gist_title, mGistId);
     }
 
     @Override

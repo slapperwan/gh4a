@@ -2,7 +2,7 @@ package com.gh4a.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
+import android.support.annotation.Nullable;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
@@ -19,10 +19,6 @@ public class SettingsActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.settings);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         if (savedInstanceState == null) {
             mResultIntent = new Intent();
 
@@ -35,6 +31,12 @@ public class SettingsActivity extends BaseActivity implements
         }
 
         setResult(RESULT_OK, mResultIntent);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getString(R.string.settings);
     }
 
     @Override

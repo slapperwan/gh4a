@@ -28,7 +28,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -55,7 +54,6 @@ import com.gh4a.loader.LoaderResult;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.TaskUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
@@ -180,11 +178,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         mHeader.setVisibility(View.GONE);
         addHeaderView(mHeader, !hasTabsInToolbar());
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(getActionBarTitle());
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(!TaskUtils.isNewTaskIntent(getIntent()));
-
         setContentShown(false);
 
         getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
@@ -192,15 +185,15 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         getSupportLoaderManager().initLoader(2, null, mCollaboratorCallback);
     }
 
-    @Nullable
-    @Override
-    protected String getActivityTitle() {
-        return TaskUtils.isNewTaskIntent(getIntent()) ? getActionBarTitle() : null;
+    @NonNull
+    protected String getActionBarTitle() {
+        return getString(R.string.pull_request_title) + " #" + mPullRequestNumber;
     }
 
-    @NonNull
-    private String getActionBarTitle() {
-        return getString(R.string.pull_request_title) + " #" + mPullRequestNumber;
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override

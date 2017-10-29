@@ -3,8 +3,8 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 
 import com.gh4a.R;
 import com.gh4a.fragment.CommitListFragment;
@@ -24,14 +24,16 @@ public class CommitHistoryActivity extends FragmentContainerActivity {
     private String mRef;
     private String mFilePath;
 
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected String getActionBarTitle() {
+        return getString(R.string.history);
+    }
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.history);
-        actionBar.setSubtitle(mFilePath);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mFilePath;
     }
 
     @Override

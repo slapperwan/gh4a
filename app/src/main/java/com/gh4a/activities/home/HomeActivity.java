@@ -11,6 +11,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -142,11 +143,15 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(mFactory.getTitleResId());
 
         getSupportLoaderManager().initLoader(0, null, mUserCallback);
         getSupportLoaderManager().initLoader(1, null, mHasNotificationsCallback);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getString(mFactory.getTitleResId());
     }
 
     private void updateNotificationIndicator(int checkedItemId) {

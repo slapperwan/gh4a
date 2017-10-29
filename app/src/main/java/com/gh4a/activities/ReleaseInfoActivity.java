@@ -19,8 +19,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -112,17 +112,24 @@ public class ReleaseInfoActivity extends BaseActivity implements
         mImageGetter = new HttpImageGetter(this);
         setChildScrollDelegate(this);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.release_title);
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
         if (mRelease != null) {
             handleReleaseReady();
         } else {
             setContentShown(false);
             getSupportLoaderManager().initLoader(0, null, mReleaseCallback);
         }
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return getString(R.string.release_title);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override

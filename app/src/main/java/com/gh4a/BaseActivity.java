@@ -118,7 +118,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         @TargetApi(21)
         @Override
         public void run() {
-            setTaskDescription(new ActivityManager.TaskDescription(getActivityTitle(), null,
+            String label = TaskUtils.isNewTaskIntent(getIntent()) ? getActionBarTitle() : null;
+            setTaskDescription(new ActivityManager.TaskDescription(label, null,
                     mProgressColors[0]));
         }
     };
@@ -134,10 +135,20 @@ public abstract class BaseActivity extends AppCompatActivity implements
         setupSwipeToRefresh();
         setupNavigationDrawer();
         setupHeaderDrawable();
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle(getActionBarTitle());
+        actionBar.setSubtitle(getActionBarSubtitle());
+        actionBar.setDisplayHomeAsUpEnabled(!TaskUtils.isNewTaskIntent(getIntent()));
     }
 
     @Nullable
-    protected String getActivityTitle() {
+    protected String getActionBarTitle() {
+        return null;
+    }
+
+    @Nullable
+    protected String getActionBarSubtitle() {
         return null;
     }
 

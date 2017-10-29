@@ -22,9 +22,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v4.print.PrintHelper;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.PopupMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -140,11 +140,18 @@ public class FileViewerActivity extends WebViewerActivity
         } else {
             getSupportLoaderManager().initLoader(0, null, mFileCallback);
         }
+    }
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(filename);
-        actionBar.setSubtitle(mRepoOwner + "/" + mRepoName);
-        actionBar.setDisplayHomeAsUpEnabled(true);
+    @Nullable
+    @Override
+    protected String getActionBarTitle() {
+        return FileUtils.getFileName(mPath);
+    }
+
+    @Nullable
+    @Override
+    protected String getActionBarSubtitle() {
+        return mRepoOwner + "/" + mRepoName;
     }
 
     @Override
