@@ -30,6 +30,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.CallSuper;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -439,6 +440,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     @Override
+    @CallSuper
     public boolean onCreateOptionsMenu(Menu menu) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && displayDetachAction()) {
             menu.add(Menu.NONE, R.id.detach, Menu.NONE, R.string.detach);
