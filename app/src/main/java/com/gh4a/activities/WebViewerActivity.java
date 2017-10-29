@@ -168,6 +168,11 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     @Override
+    public boolean displayDetachAction() {
+        return true;
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         mStarted = true;

@@ -186,6 +186,11 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
+    public boolean displayDetachAction() {
+        return true;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.commit_menu, menu);
