@@ -47,8 +47,11 @@ public class WikiListFragment extends ListDataBaseFragment<Feed> implements
     @Override
     protected Single<List<Feed>> onCreateDataSingle() {
         String relativeUrl = mUserLogin + "/" + mRepoName + "/wiki.atom";
+        final List<Feed> empty = new ArrayList<>();
         return SingleFactory.loadFeed(relativeUrl)
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, new ArrayList<>()));
+                // for empty repos, Github redirects to the repo's home page
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_MOVED_TEMP, empty))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, empty));
     }
 
     @Override
