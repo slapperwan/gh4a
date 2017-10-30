@@ -531,6 +531,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         if (isAdded()) {
             reloadEvents(false);
         }
+        getActivity().setResult(Activity.RESULT_OK);
     }
 
     @Override
