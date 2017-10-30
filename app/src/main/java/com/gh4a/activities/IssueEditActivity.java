@@ -567,8 +567,8 @@ public class IssueEditActivity extends BasePagerActivity implements
             builder.labels(labels);
         }
 
-        int issueNumber = mEditIssue.number();
-        String errorMessage = issueNumber != 0
+        Integer issueNumber = mEditIssue.number();
+        String errorMessage = issueNumber != null
                 ? getString(R.string.issue_error_edit, issueNumber)
                 : getString(R.string.issue_error_create);
 
