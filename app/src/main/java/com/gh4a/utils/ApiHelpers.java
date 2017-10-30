@@ -188,6 +188,38 @@ public class ApiHelpers {
         throw new ApiRequestException(response);
     }
 
+    public static class DummyPage<T> extends Page<T> {
+        @Nullable
+        @Override
+        public Integer next() {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public Integer last() {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public Integer first() {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public Integer prev() {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        public List<T> items() {
+            return new ArrayList<>();
+        }
+    }
+
     public static class SearchPageAdapter<T> extends Page<T> {
         private final SearchPage<T> mPage;
 
