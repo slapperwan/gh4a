@@ -25,11 +25,14 @@ import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
+
+import java.net.HttpURLConnection;
 
 import io.reactivex.Single;
 import retrofit2.Response;
@@ -104,6 +107,13 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
     protected Single<Response<Page<Commit>>> loadPage(int page) {
         final RepositoryCommitService service =
                 Gh4Application.get().getGitHubService(RepositoryCommitService.class);
-        return service.getCommits(mRepoOwner, mRepoName, mRef, mFilePath, page);
+        return service.getCommits(mRepoOwner, mRepoName, mRef, mFilePath, page)
+                .map(response -> {
+                    // 409 is returned for empty repos
+                    if (response.code() == HttpURLConnection.HTTP_CONFLICT) {
+                        return Response.success(new ApiHelpers.DummyPage<>());
+                    }
+                    return response;
+                });
     }
 }
