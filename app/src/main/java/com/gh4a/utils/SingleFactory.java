@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import io.reactivex.Single;
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -150,10 +151,15 @@ public class SingleFactory {
                 }
             });
 
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .followRedirects(false)
+                    .build();
+
             FEED_BUILDER = new Retrofit.Builder()
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(SimpleXmlConverterFactory.create(new Persister(matcher)))
-                    .baseUrl("https://github.com/");
+                    .baseUrl("https://github.com/")
+                    .client(client);
             TREND_BUILDER = new Retrofit.Builder()
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(MoshiConverterFactory.create(ServiceGenerator.moshi))
