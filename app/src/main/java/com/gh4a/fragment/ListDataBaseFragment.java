@@ -8,9 +8,11 @@ import android.view.LayoutInflater;
 import com.gh4a.adapter.RootAdapter;
 
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
 
 public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
     private RootAdapter<T, ? extends RecyclerView.ViewHolder> mAdapter;
+    private Disposable mSubscription;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -23,6 +25,9 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
     @Override
     public void onRefresh() {
         setContentShown(false);
+        if (mSubscription != null) {
+            mSubscription.dispose();
+        }
         loadData(true);
         if (mAdapter != null) {
             mAdapter.clear();
@@ -53,7 +58,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
     }
 
     private void loadData(boolean force) {
-        onCreateDataSingle()
+        mSubscription = onCreateDataSingle()
                 .compose(makeLoaderSingle(0, force))
                 .subscribe(result -> {
                     mAdapter.clear();
