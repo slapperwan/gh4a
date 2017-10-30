@@ -28,6 +28,7 @@ import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Page;
 import com.philosophicalhacker.lib.RxLoader;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -103,6 +104,12 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     private void load(boolean force) {
         mSubscription = mPageSubject
                 .flatMap(page -> loadPage(page)
+                        .map(response -> {
+                            if (response.code() == HttpURLConnection.HTTP_NO_CONTENT) {
+                                return Response.success(new ApiHelpers.DummyPage<T>());
+                            }
+                            return response;
+                        })
                         .map(ApiHelpers::throwOnFailure)
                         .compose(RxUtils::doInBackground)
                         .toObservable())
