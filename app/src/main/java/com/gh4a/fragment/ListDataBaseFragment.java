@@ -65,7 +65,6 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
                     onAddData(mAdapter, result);
                     setContentShown(true);
                     updateEmptyState();
-                    getActivity().invalidateOptionsMenu();
                 }, error -> {});
     }
 
