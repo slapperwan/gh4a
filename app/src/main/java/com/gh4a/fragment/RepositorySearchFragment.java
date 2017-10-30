@@ -48,7 +48,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> i
         }
 
         SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
-        String params = query + " fork:true user: " + login;
+        String params = query + " fork:true user:" + login;
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.searchRepositories(params.toString(), null, null, page)
