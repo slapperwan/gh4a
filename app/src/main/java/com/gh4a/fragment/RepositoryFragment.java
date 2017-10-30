@@ -121,8 +121,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         if (mImageGetter != null) {
             mImageGetter.clearHtmlCache();
         }
-        setContentShown(false);
-        loadReadme(true);
+        if (mIsReadmeLoaded) {
+            loadReadme(true);
+        }
         loadPullRequestCount(true);
     }
 
@@ -170,7 +171,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         getArguments().putString("ref", ref);
 
         // Reload readme
-        loadReadme(true);
+        if (mIsReadmeLoaded) {
+            loadReadme(true);
+        }
         if (mReadmeView != null) {
             mReadmeView.setVisibility(View.GONE);
         }
@@ -358,7 +361,10 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                     }
                     return Optional.<String>absent();
                 })
-                .doOnSubscribe(disposable -> mIsReadmeLoaded = false)
+                .doOnSubscribe(disposable -> {
+                    mIsReadmeLoaded = false;
+                    updateReadmeVisibility();
+                })
                 .compose(makeLoaderSingle(ID_LOADER_README, force))
                 .subscribe(readmeOpt -> {
                     if (readmeOpt.isPresent()) {
@@ -368,10 +374,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                         mReadmeView.setText(R.string.repo_no_readme);
                         mReadmeView.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);
                     }
-                    mReadmeView.setVisibility(mIsReadmeExpanded ? View.VISIBLE : View.GONE);
-                    mLoadingView.setVisibility(View.GONE);
                     mIsReadmeLoaded = true;
-
+                    updateReadmeVisibility();
                 }, error -> {});
     }
 
