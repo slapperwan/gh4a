@@ -521,8 +521,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         IssueCommentService service = Gh4Application.get().getGitHubService(IssueCommentService.class);
         CommentRequest request = CommentRequest.builder().body(comment).build();
         return service.createIssueComment(mRepoOwner, mRepoName, mIssue.number(), request)
-                .map(ApiHelpers::throwOnFailure)
-                .map(response -> response);
+                .map(ApiHelpers::throwOnFailure);
     }
 
     @Override
