@@ -10,8 +10,12 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.customtabs.CustomTabsIntent;
 import android.widget.Toast;
 
@@ -23,6 +27,11 @@ import java.util.Date;
 import java.util.List;
 
 public class IntentUtils {
+    private static final String EXTRA_NEW_TASK = "IntentUtils.new_task";
+
+    private IntentUtils() {
+    }
+
     public static void launchBrowser(Context context, Uri uri) {
         launchBrowser(context, uri, 0);
     }
@@ -134,6 +143,22 @@ public class IntentUtils {
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
                 chooserIntents.toArray(new Intent[chooserIntents.size()]));
         return chooserIntent;
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void startNewTask(@NonNull Context context, @NonNull Intent intent) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT);
+        }
+        intent.putExtra(EXTRA_NEW_TASK, true);
+        context.startActivity(intent);
+    }
+
+    public static boolean isNewTaskIntent(@Nullable Intent intent) {
+        return intent != null && intent.getBooleanExtra(EXTRA_NEW_TASK, false);
     }
 
     public static class InitialCommentMarker implements Parcelable {
