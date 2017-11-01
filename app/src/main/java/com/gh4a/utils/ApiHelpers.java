@@ -176,14 +176,14 @@ public class ApiHelpers {
 
     public static Boolean mapToBooleanOrThrowOnFailure(Response<Void> response)
             throws ApiRequestException {
-        switch (response.code()) {
-            case HttpURLConnection.HTTP_NO_CONTENT:
-                return true;
-            case HttpURLConnection.HTTP_NOT_FOUND:
-                return false;
-            case HttpURLConnection.HTTP_UNAUTHORIZED:
-                Gh4Application.get().logout();
-                break;
+        if (response.isSuccessful()) {
+            return true;
+        } else if (response.code() == HttpURLConnection.HTTP_NOT_FOUND) {
+            return false;
+        }
+
+        if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            Gh4Application.get().logout();
         }
         throw new ApiRequestException(response);
     }

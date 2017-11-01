@@ -272,7 +272,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             }
         }
 
-        responseSingle.map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+        responseSingle
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(RxUtils::doInBackground)
                 .subscribe(result -> handleMarkAsRead(repository, notification), error -> {});
     }
