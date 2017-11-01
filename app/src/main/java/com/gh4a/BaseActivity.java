@@ -67,7 +67,7 @@ import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.loader.LoaderCallbacks;
-import com.gh4a.utils.TaskUtils;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
@@ -119,7 +119,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         @TargetApi(21)
         @Override
         public void run() {
-            String label = TaskUtils.isNewTaskIntent(getIntent()) ? getActionBarTitle() : null;
+            String label = IntentUtils.isNewTaskIntent(getIntent()) ? getActionBarTitle() : null;
             setTaskDescription(new ActivityManager.TaskDescription(label, null,
                     mProgressColors[0]));
         }
@@ -140,7 +140,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getActionBarTitle());
         actionBar.setSubtitle(getActionBarSubtitle());
-        actionBar.setDisplayHomeAsUpEnabled(!TaskUtils.isNewTaskIntent(getIntent()));
+        actionBar.setDisplayHomeAsUpEnabled(!IntentUtils.isNewTaskIntent(getIntent()));
 
         scheduleTaskDescriptionUpdate();
     }
@@ -468,7 +468,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         if (item.getItemId() == R.id.detach) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                TaskUtils.startNewTask(this, getIntent());
+                IntentUtils.startNewTask(this, getIntent());
             }
             return true;
         }
