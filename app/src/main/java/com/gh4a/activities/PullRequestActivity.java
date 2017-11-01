@@ -186,7 +186,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
         if (!canMerge) {
             menu.removeItem(R.id.pull_merge);
-        } else if (mPullRequest.merged() || !mPullRequest.mergeable()) {
+        } else if (mPullRequest.merged()
+                || mPullRequest.mergeable() == null || !mPullRequest.mergeable()) {
             MenuItem mergeItem = menu.findItem(R.id.pull_merge);
             mergeItem.setEnabled(false);
         }
