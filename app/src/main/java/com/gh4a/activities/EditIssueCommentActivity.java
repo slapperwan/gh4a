@@ -30,8 +30,7 @@ public class EditIssueCommentActivity extends EditCommentActivity {
                 Gh4Application.get().getGitHubService(IssueCommentService.class);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.createIssueComment(repoOwner, repoName, issueNumber, request)
-                .map(ApiHelpers::throwOnFailure)
-                .map(response -> response);
+                .map(ApiHelpers::throwOnFailure);
     }
 
     @Override
@@ -41,7 +40,6 @@ public class EditIssueCommentActivity extends EditCommentActivity {
                 Gh4Application.get().getGitHubService(IssueCommentService.class);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editIssueComment(repoOwner, repoName, commentId, request)
-                .map(ApiHelpers::throwOnFailure)
-                .map(response -> response);
+                .map(ApiHelpers::throwOnFailure);
     }
 }
