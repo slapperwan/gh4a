@@ -147,7 +147,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                 getBehavior().setBottomSheetCallback(mBehaviorCallback);
                 resetPeekHeight(0);
 
-                if (!mIsCollapsible) {
+                if (!mIsCollapsible && !isInAdvancedMode()) {
                     setAdvancedMode(true);
                 }
             }
