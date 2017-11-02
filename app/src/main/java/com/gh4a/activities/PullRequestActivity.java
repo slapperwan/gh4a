@@ -71,7 +71,8 @@ import java.io.IOException;
 import java.util.Locale;
 
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
-        View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
+        View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener,
+        ReviewDialogFragment.Callback {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
         return makeIntent(context, repoOwner, repoName, number, -1, null);
     }
@@ -395,6 +396,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
     }
 
+    @Override
+    public void onReviewCreated(Review result) {
+        if (mPullRequestFragment != null) {
+            mPullRequestFragment.reloadEvents(false);
+        }
+    }
+
     private void showContentIfReady() {
         if (mPullRequest != null && mIssue != null && mIsCollaborator != null) {
             setContentShown(true);
@@ -437,7 +445,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         editor.setText(mPullRequest.getTitle());
 
         final ArrayAdapter<MergeMethodDesc> adapter = new ArrayAdapter<>(this,
-                R.layout.pull_merge_method_item);
+                R.layout.spinner_item);
         adapter.add(new MergeMethodDesc(R.string.pull_merge_method_merge,
                 PullRequestService.MERGE_METHOD_MERGE));
         adapter.add(new MergeMethodDesc(R.string.pull_merge_method_squash,
@@ -477,52 +485,9 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     private void showReviewDialog() {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        String title = getString(R.string.pull_request_review_dialog_title, mPullRequest.getNumber());
-        View view = inflater.inflate(R.layout.pull_review_message_dialog, null);
-
-        final View editorNotice = view.findViewById(R.id.notice);
-        final EditText editor = view.findViewById(R.id.et_commit_message);
-        editor.setText("");
-
-        final ArrayAdapter<ReviewEventDesc> adapter = new ArrayAdapter<>(this,
-                R.layout.pull_merge_method_item);
-        adapter.add(new ReviewEventDesc(R.string.pull_request_review_event_comment,
-                PullRequestService.REVIEW_EVENT_COMMENT));
-        adapter.add(new ReviewEventDesc(R.string.pull_request_review_event_approve,
-                PullRequestService.REVIEW_EVENT_APPROVE));
-        adapter.add(new ReviewEventDesc(R.string.pull_request_review_event_requestchanges,
-                PullRequestService.REVIEW_EVENT_REQUEST_CHANGES));
-
-        final Spinner reviewEvent = view.findViewById(R.id.pull_request_review_event);
-        reviewEvent.setAdapter(adapter);
-        reviewEvent.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                int editorVisibility = View.VISIBLE;
-                editorNotice.setVisibility(editorVisibility);
-                editor.setVisibility(editorVisibility);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setView(view)
-                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String text = editor.getText() == null ? null : editor.getText().toString();
-                        int methodIndex = reviewEvent.getSelectedItemPosition();
-                        String method = adapter.getItem(methodIndex).action;
-                        new PullRequestReviewTask(text, method).schedule();
-                    }
-                })
-                .setNegativeButton(getString(R.string.cancel), null)
-                .show();
+        ReviewDialogFragment reviewDialog = ReviewDialogFragment.newInstance(mRepoOwner, mRepoName,
+                mPullRequestNumber);
+        reviewDialog.show(getSupportFragmentManager(), "review_dialog");
     }
 
     private void updateFabVisibility() {
@@ -673,56 +638,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         @Override
         protected String getErrorMessage() {
             return getContext().getString(R.string.pull_error_merge, mPullRequest.getNumber());
-        }
-    }
-
-    private class PullRequestReviewTask extends ProgressDialogTask<Review> {
-        private final String mReviewMessage;
-        private final String mReviewEvent;
-
-        public PullRequestReviewTask(String reviewMessage, String reviewEvent) {
-            super(getBaseActivity(), R.string.reviewing_msg);
-            mReviewMessage = reviewMessage;
-            mReviewEvent = reviewEvent;
-        }
-
-        @Override
-        protected ProgressDialogTask<Review> clone() {
-            return new PullRequestReviewTask(mReviewMessage, mReviewEvent);
-        }
-
-        @Override
-        protected Review run() throws Exception {
-            PullRequestService pullService = (PullRequestService)
-                    Gh4Application.get().getService(Gh4Application.PULL_SERVICE);
-            RepositoryId repoId = new RepositoryId(mRepoOwner, mRepoName);
-            return pullService.createReview(repoId,
-                    mPullRequest.getNumber(), mReviewEvent, mReviewMessage);
-        }
-
-        @Override
-        protected void onSuccess(Review result) {
-        }
-
-        @Override
-        protected String getErrorMessage() {
-            return getContext().getString(R.string.pull_request_review_error,
-                    mPullRequest.getNumber());
-        }
-    }
-
-    private class ReviewEventDesc {
-        final @StringRes int textResId;
-        final String action;
-
-        public ReviewEventDesc(@StringRes int textResId, String action) {
-            this.textResId = textResId;
-            this.action = action;
-        }
-
-        @Override
-        public String toString() {
-            return getString(textResId);
         }
     }
 }

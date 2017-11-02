@@ -450,7 +450,7 @@
     <string name="pull_request_review_event">Review type</string>
     <string name="pull_request_review_event_comment">Comment</string>
     <string name="pull_request_review_event_approve">Approve</string>
-    <string name="pull_request_review_event_requestchanges">Request Changes</string>
+    <string name="pull_request_review_event_request_changes">Request Changes</string>
     <string name="pull_request_review_body">Review Summary</string>
     <string name="pull_request_review_description">Leave a comment about this review below.</string>
     <string name="pull_request_review_button_affirm">Comment</string>
