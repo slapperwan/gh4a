@@ -3,7 +3,6 @@ package com.gh4a.widget;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IdRes;
@@ -17,7 +16,6 @@ import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,12 +26,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.Optional;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Reaction;
 import com.meisolsson.githubsdk.model.Reactions;
@@ -41,7 +40,6 @@ import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.reactions.ReactionService;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -248,35 +246,26 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             if (details != null) {
                 populateAdapter(details);
             } else {
-                new FetchReactionTask(mCallback, mItem, mDetailsCache) {
-                    @Override
-                    protected void onPostExecute(List<Reaction> reactions) {
-                        super.onPostExecute(reactions);
-                        populateAdapter(reactions);
-                    }
-                }.execute();
+                fetchReactions(mCallback, mItem, mDetailsCache)
+                        .subscribe(reactions -> populateAdapter(reactions), error -> dismiss());
             }
         }
 
         public void toggleOwnReaction(Reaction currentReaction) {
             final long id = currentReaction != null ? currentReaction.id() : 0;
-            new ToggleReactionTask(mContent, id, mLastKnownDetails, mCallback, mItem, mDetailsCache)
-                    .execute();
+            toggleReaction(mContent, id, mLastKnownDetails, mCallback, mItem, mDetailsCache)
+                    .subscribe(result -> dismiss(), error -> dismiss());
         }
 
         private void populateAdapter(List<Reaction> details) {
-            if (details != null) {
-                List<Reaction> reactions = new ArrayList<>();
-                for (Reaction reaction : details) {
-                    if (TextUtils.equals(mContent, reaction.content())) {
-                        reactions.add(reaction);
-                    }
+            List<Reaction> reactions = new ArrayList<>();
+            for (Reaction reaction : details) {
+                if (TextUtils.equals(mContent, reaction.content())) {
+                    reactions.add(reaction);
                 }
-                mLastKnownDetails = details;
-                mAdapter.setReactions(reactions);
-            } else {
-                dismiss();
             }
+            mLastKnownDetails = details;
+            mAdapter.setReactions(reactions);
         }
     }
 
@@ -395,100 +384,50 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
     }
 
-    private static class FetchReactionTask extends AsyncTask<Void, Void, List<Reaction>> {
-        private final Callback mCallback;
-        private final Item mItem;
-        private final ReactionDetailsCache mDetailsCache;
-
-        public FetchReactionTask(Callback callback, Item item,
-                ReactionDetailsCache detailsCache) {
-            mCallback = callback;
-            mItem = item;
-            mDetailsCache = detailsCache;
-        }
-
-        @Override
-        protected List<Reaction> doInBackground(Void... voids) {
-            try {
-                List<Reaction> reactions = mCallback.loadReactionDetailsInBackground(mItem)
-                        .blockingGet();
-                Collections.sort(reactions, (lhs, rhs) -> {
+    private static Single<List<Reaction>> fetchReactions(Callback callback, Item item,
+            ReactionDetailsCache cache) {
+        return callback.loadReactionDetailsInBackground(item)
+                .compose(RxUtils::doInBackground)
+                .compose(RxUtils.sortList((lhs, rhs) -> {
                     int result = lhs.content().compareTo(rhs.content());
                     if (result == 0) {
                         result = rhs.createdAt().compareTo(lhs.createdAt());
                     }
                     return result;
-                });
-                return reactions;
-            } catch (RuntimeException e) {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(List<Reaction> reactions) {
-            if (reactions != null) {
-                mDetailsCache.putEntry(mItem, reactions);
-            }
-            super.onPostExecute(reactions);
-        }
+                }))
+                .doOnSuccess(result -> cache.putEntry(item, result));
     }
 
-    private static class ToggleReactionTask extends AsyncTask<Void, Void, Pair<Boolean, Reaction>> {
-        private final String mContent;
-        private final long mId;
-        private final List<Reaction> mExistingDetails;
-        private final Callback mCallback;
-        private final Item mItem;
-        private final ReactionDetailsCache mDetailsCache;
+    private static Single<Optional<Reaction>> toggleReaction(String content, long id,
+            List<Reaction> existingDetails, Callback callback, Item item,
+            ReactionDetailsCache cache) {
+        final Single<Optional<Reaction>> resultSingle;
 
-        public ToggleReactionTask(String content, long id, List<Reaction> existingDetails,
-                Callback callback, Item item, ReactionDetailsCache detailsCache) {
-            mContent = content;
-            mId = id;
-            mExistingDetails = existingDetails;
-            mCallback = callback;
-            mItem = item;
-            mDetailsCache = detailsCache;
+        if (id == 0) {
+            resultSingle = callback.addReactionInBackground(item, content)
+                    .map(reaction -> Optional.of(reaction));
+        } else {
+            ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+            resultSingle = service.deleteReaction(id)
+                    .map(response -> Optional.absent());
         }
 
-        @Override
-        protected Pair<Boolean, Reaction> doInBackground(Void... voids) {
-            try {
-                if (mId == 0) {
-                    Reaction result = mCallback.addReactionInBackground(mItem, mContent)
-                            .blockingGet();
-                    return Pair.create(true, result);
-                } else {
-                    ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
-                    service.deleteReaction(mId);
-                    return Pair.create(true, null);
-                }
-            } catch (ApiRequestException e) {
-                android.util.Log.d("foo", "save fail", e);
-                return Pair.create(false, null);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Pair<Boolean, Reaction> result) {
-            if (!result.first) {
-                return;
-            }
-
-            if (result.second != null) {
-                mExistingDetails.add(result.second);
-            } else {
-                for (int i = 0; i < mExistingDetails.size(); i++) {
-                    Reaction reaction = mExistingDetails.get(i);
-                    if (reaction.id() == mId) {
-                        mExistingDetails.remove(i);
-                        break;
+        return resultSingle
+                .compose(RxUtils::doInBackground)
+                .doOnSuccess(reactionOpt -> {
+                    if (reactionOpt.isPresent()) {
+                        existingDetails.add(reactionOpt.get());
+                    } else {
+                        for (int i = 0; i < existingDetails.size(); i++) {
+                            Reaction reaction = existingDetails.get(i);
+                            if (reaction.id() == id) {
+                                existingDetails.remove(i);
+                                break;
+                            }
+                        }
                     }
-                }
-            }
-            mDetailsCache.putEntry(mItem, mExistingDetails);
-        }
+                    cache.putEntry(item, existingDetails);
+                });
     }
 
     public static class AddReactionMenuHelper {
@@ -568,13 +507,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             } else if (mDetailsCache.hasEntryFor(mItem)) {
                 update();
             } else {
-                new FetchReactionTask(mCallback, mItem, mDetailsCache) {
-                    @Override
-                    protected void onPostExecute(List<Reaction> reactions) {
-                        super.onPostExecute(reactions);
-                        update();
-                    }
-                }.execute();
+                fetchReactions(mCallback, mItem, mDetailsCache)
+                        .subscribe(reactions -> update(), error -> update());
             }
         }
 
@@ -604,22 +538,15 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
 
         private void addOrRemoveReaction(final String content, final long id) {
-            new ToggleReactionTask(content, id, mLastKnownDetails, mCallback, mItem,
-                    mDetailsCache) {
-                @Override
-                protected void onPostExecute(Pair<Boolean, Reaction> result) {
-                    if (result.first) {
+            toggleReaction(content, id, mLastKnownDetails, mCallback, mItem, mDetailsCache)
+                    .subscribe(result -> {
                         for (int i = 0; i < CONTENTS.length; i++) {
                             if (TextUtils.equals(CONTENTS[i], content)) {
-                                mOldReactionIds[i] =
-                                        result.second != null ? result.second.id() : 0;
+                                mOldReactionIds[i] = result.isPresent() ? result.get().id() : 0;
                                 break;
                             }
                         }
-                    }
-                    super.onPostExecute(result);
-                }
-            }.execute();
+                    }, error -> {});
         }
     }
 
