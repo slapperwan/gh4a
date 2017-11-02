@@ -17,6 +17,11 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             int prNumber, long id, long replyToCommentId, String body,
             @AttrRes int highlightColorAttr) {
+        // This activity only supports editing or replying to comments,
+        // not creating new unrelated ones.
+        if (id == 0L && replyToCommentId == 0L) {
+            throw new IllegalStateException("Only editing and replying allowed");
+        }
         Intent intent = new Intent(context, EditPullRequestCommentActivity.class)
                 .putExtra("pr", prNumber);
         return EditCommentActivity.fillInIntent(intent,
@@ -29,11 +34,11 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
         int prNumber = getIntent().getIntExtra("pr", 0);
         PullRequestReviewCommentService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
-        CreateReviewComment.Builder requestBuilder = CreateReviewComment.builder().body(body);
-        if (replyToCommentId != 0) {
-            requestBuilder.inReplyTo(replyToCommentId);
-        }
-        return service.createReviewComment(repoOwner, repoName, prNumber, requestBuilder.build())
+        CreateReviewComment request = CreateReviewComment.builder()
+                .body(body)
+                .inReplyTo(replyToCommentId)
+                .build();
+        return service.createReviewComment(repoOwner, repoName, prNumber, request)
                 .map(ApiHelpers::throwOnFailure);
     }
 
