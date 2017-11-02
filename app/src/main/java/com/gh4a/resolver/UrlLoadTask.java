@@ -1,15 +1,18 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
-import com.gh4a.BackgroundTask;
+import com.gh4a.ApiRequestException;
+import com.gh4a.Gh4Application;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 
 import io.reactivex.Single;
 
-public abstract class UrlLoadTask extends BackgroundTask<Optional<Intent>> {
+public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>> {
     protected final FragmentActivity mActivity;
     private final boolean mFinishCurrentActivity;
     private ProgressDialogFragment mProgressDialog;
@@ -19,7 +22,7 @@ public abstract class UrlLoadTask extends BackgroundTask<Optional<Intent>> {
     }
 
     public UrlLoadTask(FragmentActivity activity, boolean finishCurrentActivity) {
-        super(activity);
+        super();
         mActivity = activity;
         mFinishCurrentActivity = finishCurrentActivity;
     }
@@ -32,12 +35,17 @@ public abstract class UrlLoadTask extends BackgroundTask<Optional<Intent>> {
     }
 
     @Override
-    protected Optional<Intent> run() throws Exception {
-        return getSingle().blockingGet();
+    protected Optional<Intent> doInBackground(Void... params) {
+        try {
+            return getSingle().blockingGet();
+        } catch (ApiRequestException e) {
+            Log.e(Gh4Application.LOG_TAG, "Failure during intent resolving", e);
+            return Optional.absent();
+        }
     }
 
     @Override
-    protected void onSuccess(Optional<Intent> result) {
+    protected void onPostExecute(Optional<Intent> result) {
         if (mActivity.isFinishing()) {
             return;
         }
@@ -48,16 +56,6 @@ public abstract class UrlLoadTask extends BackgroundTask<Optional<Intent>> {
             IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData());
         }
 
-        dismiss();
-    }
-
-    @Override
-    protected void onError(Exception e) {
-        IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData());
-        dismiss();
-    }
-
-    private void dismiss() {
         if (mProgressDialog != null && mProgressDialog.isAdded()) {
             mProgressDialog.dismissAllowingStateLoss();
         }
