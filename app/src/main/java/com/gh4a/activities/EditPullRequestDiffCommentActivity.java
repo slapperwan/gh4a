@@ -56,14 +56,16 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
         PullRequestReviewCommentService service =
                 Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
         CreateReviewComment.Builder builder = CreateReviewComment.builder()
-                .body(body)
-                .commitId(extras.getString("commit_id"))
-                .path(extras.getString("path"))
-                .position(extras.getInt("position"));
+                .body(body);
 
         if (replyToCommentId != 0) {
             builder.inReplyTo(replyToCommentId);
+        } else {
+            builder.commitId(extras.getString("commit_id"))
+                    .path(extras.getString("path"))
+                    .position(extras.getInt("position"));
         }
+
         return service.createReviewComment(repoOwner, repoName, prNumber, builder.build())
                 .map(ApiHelpers::throwOnFailure);
     }
