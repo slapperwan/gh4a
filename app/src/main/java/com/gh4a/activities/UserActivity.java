@@ -31,7 +31,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
         return makeIntent(context, user.login(), user.name());
     }
 
-    public static Intent makeIntent(Context context, String login, String name) {
+    private static Intent makeIntent(Context context, String login, String name) {
         if (login == null) {
             return null;
         }

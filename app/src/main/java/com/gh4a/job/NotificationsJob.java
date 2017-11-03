@@ -131,7 +131,7 @@ public class NotificationsJob extends Job {
                     SingleFactory.getNotifications(false, false).blockingGet();
             for (NotificationHolder holder : result.notifications) {
                 if (holder.notification == null) {
-                    notifsGroupedByRepo.add(new ArrayList<NotificationThread>());
+                    notifsGroupedByRepo.add(new ArrayList<>());
                 } else {
                     List<NotificationThread> list =
                             notifsGroupedByRepo.get(notifsGroupedByRepo.size() - 1);

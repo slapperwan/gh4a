@@ -39,7 +39,7 @@ import retrofit2.Response;
 public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     private String mLogin;
     private String mRepoType;
-    private Map<String, String> mFilterData = new HashMap<>();
+    private final Map<String, String> mFilterData = new HashMap<>();
 
     public static RepositoryListFragment newInstance(String login, boolean isOrg,
             String repoType, String sortOrder, String sortDirection) {

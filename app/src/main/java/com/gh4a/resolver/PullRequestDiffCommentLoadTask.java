@@ -81,12 +81,11 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
                         GitHubFile file = result.get().second;
                         if (foundComment && file != null && !FileUtils.isImage(file.filename())) {
                             return Single.zip(pullRequestSingle, commentsSingle, (pr, comments) -> {
-                                return Optional
-                                        .of(PullRequestDiffViewerActivity.makeIntent(mActivity,
-                                                mRepoOwner, mRepoName, mPullRequestNumber,
-                                                pr.head().sha(),
-                                                file.filename(), file.patch(), comments, -1, -1, -1,
-                                                false, mMarker));
+                                //noinspection CodeBlock2Expr
+                                return Optional.of(PullRequestDiffViewerActivity.makeIntent(
+                                        mActivity, mRepoOwner, mRepoName, mPullRequestNumber,
+                                        pr.head().sha(), file.filename(), file.patch(), comments,
+                                        -1, -1, -1, false, mMarker));
                             });
                         }
                         if (foundComment && file == null) {

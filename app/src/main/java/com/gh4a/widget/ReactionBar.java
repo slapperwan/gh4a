@@ -247,7 +247,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 populateAdapter(details);
             } else {
                 fetchReactions(mCallback, mItem, mDetailsCache)
-                        .subscribe(reactions -> populateAdapter(reactions), error -> dismiss());
+                        .subscribe(this::populateAdapter, error -> dismiss());
             }
         }
 
@@ -405,7 +405,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
         if (id == 0) {
             resultSingle = callback.addReactionInBackground(item, content)
-                    .map(reaction -> Optional.of(reaction));
+                    .map(Optional::of);
         } else {
             ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
             resultSingle = service.deleteReaction(id)

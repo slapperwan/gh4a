@@ -350,7 +350,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
         service.getReadmeHtml(repoOwner, repoName, mRef)
                 .map(ApiHelpers::throwOnFailure)
-                .map(html -> Optional.of(html))
+                .map(Optional::of)
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<String>absent()))
                 .map(htmlOpt -> {
                     if (htmlOpt.isPresent()) {

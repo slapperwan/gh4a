@@ -676,6 +676,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         registerTemporarySubscription(getIssueTemplateContentSingle("")
                 .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplateContentSingle("/.github")))
                 .flatMap(opt -> opt.flatMap(c -> {
+                    //noinspection CodeBlock2Expr
                     return service.getContents(mRepoOwner, mRepoName, c.path(), null)
                             .map(ApiHelpers::throwOnFailure)
                             .compose(RxUtils::doInBackground);

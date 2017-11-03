@@ -143,21 +143,20 @@ public class ApiHelpers {
                 .build();
     }
 
+    private final static char[] HEX_CHARS = "0123456789ABCDEF".toCharArray();
+
     public static String md5(String input) {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
             digest.update(input.getBytes());
             byte[] messageDigest = digest.digest();
-
-            StringBuilder builder = new StringBuilder();
-            for (byte b : messageDigest) {
-                String hexString = Integer.toHexString(0xFF & b);
-                while (hexString.length() < 2) {
-                    hexString = "0" + hexString;
-                }
-                builder.append(hexString);
+            char[] hexChars = new char[messageDigest.length * 2];
+            for ( int i = 0; i < messageDigest.length; i++ ) {
+                int b = messageDigest[i] & 0xFF;
+                hexChars[i * 2] = HEX_CHARS[b >>> 4];
+                hexChars[i * 2 + 1] = HEX_CHARS[b & 0x0F];
             }
-            return builder.toString();
+            return new String(hexChars);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

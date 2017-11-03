@@ -57,7 +57,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
         return makeIntent(context, repoOwner, repoName, -1, sha, initialComment);
     }
 
-    public static Intent makeIntent(Context context, String repoOwner, String repoName,
+    private static Intent makeIntent(Context context, String repoOwner, String repoName,
             int pullRequestNumber, String sha, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, CommitActivity.class)
                 .putExtra("owner", repoOwner)

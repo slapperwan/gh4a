@@ -51,7 +51,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> i
         String params = query + " fork:true user:" + login;
 
         return ApiHelpers.PageIterator
-                .toSingle(page -> service.searchRepositories(params.toString(), null, null, page)
+                .toSingle(page -> service.searchRepositories(params, null, null, page)
                         .compose(RxUtils::searchPageAdapter))
                 // With that status code, Github wants to tell us there are no
                 // repositories to search in. Just pretend no error and return

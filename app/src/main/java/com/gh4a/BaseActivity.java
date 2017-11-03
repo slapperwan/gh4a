@@ -79,10 +79,8 @@ import java.util.List;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 import io.reactivex.SingleTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 public abstract class BaseActivity extends AppCompatActivity implements
         SwipeRefreshLayout.OnRefreshListener,
@@ -180,7 +178,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         setErrorViewVisibility(true, e);
     }
 
-    public void registerTemporarySubscription(Disposable disposable) {
+    protected void registerTemporarySubscription(Disposable disposable) {
         mDisposeOnStop.add(disposable);
     }
 

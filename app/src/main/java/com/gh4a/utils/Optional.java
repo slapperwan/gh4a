@@ -68,7 +68,7 @@ public class Optional<T> {
         if (isPresent()) {
             return Single.just(of(mValue));
         }
-        return supplier.get().map(result -> of(result));
+        return supplier.get().map(Optional::of);
     }
 
     public Single<Optional<T>> orOptionalSingle(Supplier<Single<Optional<T>>> supplier) {
@@ -95,6 +95,6 @@ public class Optional<T> {
         if (mValue == null) {
             return Single.just(absent());
         }
-        return mapper.map(mValue).map(result -> of(result));
+        return mapper.map(mValue).map(Optional::of);
     }
 }

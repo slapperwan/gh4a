@@ -92,9 +92,7 @@ public class ContentListContainerFragment extends Fragment implements
         mStateSaved = false;
 
         if (savedInstanceState != null) {
-            for (String entry : savedInstanceState.getStringArrayList(STATE_KEY_DIR_STACK)) {
-                mDirStack.add(entry);
-            }
+            mDirStack.addAll(savedInstanceState.getStringArrayList(STATE_KEY_DIR_STACK));
 
             int prefixLen = STATE_KEY_CONTENT_CACHE_PREFIX.length();
             for (String key : savedInstanceState.keySet()) {
@@ -315,7 +313,7 @@ public class ContentListContainerFragment extends Fragment implements
 
         service.getContents(repoOwner, repoName, ".gitmodules", mSelectedRef)
                 .map(ApiHelpers::throwOnFailure)
-                .map(content -> Optional.of(content))
+                .map(Optional::of)
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<Content>absent()))
                 .map(contentOpt -> contentOpt.map(content -> StringUtils.fromBase64(content.content())))
                 .map(this::parseModuleMap)

@@ -67,7 +67,7 @@ public class FileViewerActivity extends WebViewerActivity
         return makeIntent(context, repoOwner, repoName, ref, fullPath, -1, -1, textMatch);
     }
 
-    public static Intent makeIntent(Context context, String repoOwner, String repoName, String ref,
+    private static Intent makeIntent(Context context, String repoOwner, String repoName, String ref,
             String fullPath, int highlightStart, int highlightEnd, TextMatch textMatch) {
         return new Intent(context, FileViewerActivity.class)
                 .putExtra("owner", repoOwner)
@@ -322,7 +322,7 @@ public class FileViewerActivity extends WebViewerActivity
                 Gh4Application.get().getGitHubService(RepositoryContentService.class);
         service.getContents(mRepoOwner, mRepoName, mPath, mRef)
                 .map(ApiHelpers::throwOnFailure)
-                .map(result -> Optional.of(result))
+                .map(Optional::of)
                 .onErrorResumeNext(error -> {
                     if (error instanceof ApiRequestException) {
                         ClientErrorResponse response = ((ApiRequestException) error).getResponse();

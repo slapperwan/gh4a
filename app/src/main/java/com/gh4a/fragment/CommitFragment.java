@@ -97,7 +97,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         fillStats(mCommit.files(), mComments);
     }
 
-    protected void fillHeader() {
+    private void fillHeader() {
         final Activity activity = getActivity();
         final Gh4Application app = Gh4Application.get();
 

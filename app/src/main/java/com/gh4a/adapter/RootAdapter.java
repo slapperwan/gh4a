@@ -68,7 +68,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     private static final int VIEW_TYPE_FOOTER = 1;
     private static final int VIEW_TYPE_ITEM = 2;
 
-    public static final int CUSTOM_VIEW_TYPE_START = VIEW_TYPE_ITEM;
+    protected static final int CUSTOM_VIEW_TYPE_START = VIEW_TYPE_ITEM;
 
     private final Filter mFilter = new Filter() {
         @Override
@@ -103,7 +103,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
      *
      * @param context the context
      */
-    public RootAdapter(Context context) {
+    protected RootAdapter(Context context) {
         mObjects = new ArrayList<>();
         mUnfilteredObjects = new ArrayList<>();
         mContext = context;
