@@ -173,7 +173,6 @@
     <string name="no_comments_found">Nobody has commented so far.</string>
     <string name="no_files_found">No files found.</string>
     <string name="no_trends_found">No trending repositories found.</string>
-    <string name="no_downloads_found">This repository doesn\'t provide any downloads.</string>
     <string name="no_open_milestones_found">This repository doesn\'t have any open milestones.</string>
     <string name="no_closed_milestones_found">This repository doesn\'t have any closed milestones.</string>
     <string name="no_commits_found">No commits found.</string>
@@ -252,7 +251,6 @@
     <string name="user_members">Members</string><!-- For type organization -->
     <string name="user_created_at">Member since %1$s</string>
     <string name="user_pub_repos">Repositories</string>
-    <string name="user_extra_data">%1$d followers\u00a0\u00a0\u00a0%2$d repos</string>
     <string name="user_news_feed">News Feed</string>
     <string name="user_public_activity">Public Activity</string>
     <string name="user_organizations">Organizations</string>

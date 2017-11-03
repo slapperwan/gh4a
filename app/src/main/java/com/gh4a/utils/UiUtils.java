@@ -318,6 +318,7 @@ public class UiUtils {
                 .show();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean downloadNeedsWarning(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

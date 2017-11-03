@@ -5,7 +5,7 @@
     android:id="@+id/pr_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="RelativeLayout"
+    tools:parentTag="android.widget.RelativeLayout"
     tools:visibility="visible">
 
     <ImageView

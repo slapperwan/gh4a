@@ -312,7 +312,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             intentSingle
                     .compose(RxUtils::doInBackground)
                     .compose(RxUtils.wrapWithProgressDialog(getActivity(), R.string.loading_msg))
-                    .subscribe(result -> result.doIfPresent(i -> startActivity(i)), error -> {});
+                    .subscribe(result -> result.doIfPresent(this::startActivity), error -> {});
         }
     }
 

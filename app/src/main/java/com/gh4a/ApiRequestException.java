@@ -8,6 +8,7 @@ import com.meisolsson.githubsdk.model.ClientErrorResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Response;
 
@@ -59,10 +60,10 @@ public class ApiRequestException extends RuntimeException {
         }
 
         if (!TextUtils.isEmpty(message) && !errors.isEmpty()) {
-            return String.format("%1$s (%2$d) [%3$s]",
+            return String.format(Locale.US, "%1$s (%2$d) [%3$s]",
                     message, mStatus, TextUtils.join(", ", errors));
         } else if (!TextUtils.isEmpty(message)) {
-            return String.format("%1$s (%2$d)", message, mStatus);
+            return String.format(Locale.US, "%1$s (%2$d)", message, mStatus);
         } else {
             return "HTTP status " + mStatus;
         }

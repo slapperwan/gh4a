@@ -12,7 +12,7 @@ import com.gh4a.R;
 
 @SuppressWarnings("unused")
 public class ScrollAwareFloatingActionButtonBehavior extends FloatingActionButton.Behavior {
-    private FloatingActionButton.OnVisibilityChangedListener mVisibilityChangedListener =
+    private final FloatingActionButton.OnVisibilityChangedListener mVisibilityChangedListener =
             new FloatingActionButton.OnVisibilityChangedListener() {
         @Override
         public void onHidden(FloatingActionButton fab) {

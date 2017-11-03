@@ -54,6 +54,7 @@ public class IssueLabelSpan extends ReplacementSpan {
         return (int) Math.ceil(textSize) + 2 * mPadding + mRightAndBottomMargin;
     }
 
+    @SuppressWarnings("UnnecessaryLocalVariable")
     @Override
     public void draw(@NonNull Canvas canvas, CharSequence text, int start, int end,
             float x, int top, int y, int bottom, @NonNull Paint paint) {

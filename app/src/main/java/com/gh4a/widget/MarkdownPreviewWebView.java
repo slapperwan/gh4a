@@ -174,7 +174,7 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
         loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
     }
 
-    protected String generateMarkdownHtml(String base64Data, String cssTheme) {
+    private String generateMarkdownHtml(String base64Data, String cssTheme) {
         StringBuilder content = new StringBuilder();
         content.append("<html><head>");
         writeScriptInclude(content, "showdown");
@@ -201,13 +201,13 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
         return content.toString();
     }
 
-    protected static void writeScriptInclude(StringBuilder builder, String scriptName) {
+    private static void writeScriptInclude(StringBuilder builder, String scriptName) {
         builder.append("<script src='file:///android_asset/");
         builder.append(scriptName);
         builder.append(".js' type='text/javascript'></script>");
     }
 
-    protected static void writeCssInclude(StringBuilder builder, String cssType, String cssTheme) {
+    private static void writeCssInclude(StringBuilder builder, String cssType, String cssTheme) {
         builder.append("<link href='file:///android_asset/");
         builder.append(cssType);
         builder.append("-");

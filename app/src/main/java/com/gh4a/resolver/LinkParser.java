@@ -265,7 +265,7 @@ public class LinkParser {
                         "discussion_r");
         if (reviewCommentMarker != null) {
             return new ParseResult(new PullRequestReviewCommentLoadTask(activity, user, repo,
-                    pullRequestNumber, reviewCommentMarker, true));
+                    pullRequestNumber, reviewCommentMarker));
         }
 
         DiffHighlightId reviewDiffHunkId =
@@ -310,8 +310,7 @@ public class LinkParser {
         IntentUtils.InitialCommentMarker initialComment = generateInitialCommentMarker(
                 uri.getFragment(), "commitcomment-", initialCommentFallback);
         if (initialComment != null) {
-            return new ParseResult(new CommitCommentLoadTask(activity, user, repo, id,
-                    initialComment, true));
+            return new ParseResult(new CommitCommentLoadTask(activity, user, repo, id, initialComment));
         }
         return new ParseResult(CommitActivity.makeIntent(activity, user, repo, id, null));
     }

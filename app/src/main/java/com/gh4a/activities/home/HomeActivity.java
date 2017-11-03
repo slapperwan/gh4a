@@ -500,7 +500,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 }
 
                 MenuItem item = mLeftDrawerMenu.add(R.id.other_accounts, id++, Menu.NONE, login);
-                AvatarHandler.assignAvatar(this, item, login, accounts.keyAt(i), null);
+                AvatarHandler.assignAvatar(this, item, login, accounts.keyAt(i));
             }
         }
 

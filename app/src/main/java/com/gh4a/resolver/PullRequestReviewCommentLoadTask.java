@@ -33,9 +33,8 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
     protected final IntentUtils.InitialCommentMarker mMarker;
 
     public PullRequestReviewCommentLoadTask(FragmentActivity activity, String repoOwner,
-            String repoName, int pullRequestNumber, IntentUtils.InitialCommentMarker marker,
-            boolean finishCurrentActivity) {
-        super(activity, finishCurrentActivity);
+            String repoName, int pullRequestNumber, IntentUtils.InitialCommentMarker marker) {
+        super(activity);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mPullRequestNumber = pullRequestNumber;
@@ -80,7 +79,7 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
                             return reviewService
                                     .getReview(repoOwner, repoName, pullRequestNumber, reviewId)
                                     .map(ApiHelpers::throwOnFailure)
-                                    .map(result -> Optional.of(result));
+                                    .map(Optional::of);
                         }
                     }
                     return Single.just(Optional.<Review>absent());

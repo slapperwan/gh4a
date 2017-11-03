@@ -26,10 +26,6 @@
         <item name="android:textColor">@color/abc_primary_text_material_dark</item>
     </style>
 
-    <style name="TextAppearance.Caption" parent="TextAppearance.AppCompat.Caption">
-        <item name="android:textAllCaps">true</item>
-    </style>
-
     <style name="TextAppearance.NotificationEmphasized" parent="TextAppearance.AppCompat.Notification">
         <item name="android:textColor">#cccccc</item>
     </style>
@@ -59,7 +55,7 @@
     </style>
 
     <style name="SelectableItem">
-        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 
     <style name="SelectableBorderlessItem" parent="SelectableItem" />
@@ -103,30 +99,24 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="Base.CardView.Light" parent="CardView.Light">
+    <style name="Theme.CardView.Light" parent="CardView.Light">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginLeft">@dimen/card_margin</item>
         <item name="android:layout_marginRight">@dimen/card_margin</item>
         <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
         <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
     </style>
 
-    <style name="Theme.CardView.Light" parent="Base.CardView.Light">
-        <item name="android:foreground">?attr/selectableItemBackground</item>
-    </style>
-
-    <style name="Base.CardView.Dark" parent="CardView.Dark">
+    <style name="Theme.CardView.Dark" parent="CardView.Dark">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginLeft">@dimen/card_margin</item>
         <item name="android:layout_marginRight">@dimen/card_margin</item>
         <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
         <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
-    </style>
-
-    <style name="Theme.CardView.Dark" parent="Base.CardView.Dark">
-        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
     </style>
 
     <style name="ImageButton" parent="SelectableBorderlessItem">

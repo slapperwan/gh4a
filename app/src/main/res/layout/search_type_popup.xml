@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:ellipsize="marquee"
-        android:maxLines="1"
-        tools:text="Sort type" />
+        tools:text="Sort type"
+        android:singleLine="true" />
 
 </LinearLayout>

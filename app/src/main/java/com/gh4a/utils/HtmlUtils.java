@@ -671,7 +671,7 @@ public class HtmlUtils {
             text.setSpan(mark, len, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         }
 
-        private static void end(Editable text, Class kind, Object repl) {
+        private static void end(Editable text, Class<?> kind, Object repl) {
             Object obj = getLast(text, kind);
             if (obj != null) {
                 setSpanFromMark(text, obj, repl);

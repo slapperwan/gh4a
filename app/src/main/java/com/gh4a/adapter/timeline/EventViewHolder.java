@@ -2,6 +2,7 @@ package com.gh4a.adapter.timeline;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.StringRes;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.TypefaceSpan;
@@ -29,7 +30,6 @@ import com.meisolsson.githubsdk.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -206,7 +206,10 @@ class EventViewHolder
                 } else {
                     reviewerNames = ApiHelpers.getUserLogin(mContext, event.requestedReviewer());
                 }
-                textBase = mContext.getString(R.string.pull_request_event_review_requested,
+                @StringRes int stringResId = event.event() == IssueEventType.ReviewRequested
+                        ? R.string.pull_request_event_review_requested
+                        : R.string.pull_request_event_review_request_removed;
+                textBase = mContext.getString(stringResId,
                         ApiHelpers.getUserLogin(mContext, event.reviewRequester()), reviewerNames);
                 break;
             }

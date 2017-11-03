@@ -137,7 +137,7 @@ public class SingleFactory {
         static {
             RegistryMatcher matcher = new RegistryMatcher();
             matcher.bind(Date.class, new Transform<Date>() {
-                private DateFormat mFormat =
+                private final DateFormat mFormat =
                         new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
 
                 @Override

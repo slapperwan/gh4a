@@ -17,8 +17,6 @@ import com.philosophicalhacker.lib.RxLoader;
 
 import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 import io.reactivex.SingleTransformer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public abstract class LoadingFragmentBase extends Fragment implements
         BaseActivity.RefreshableChild, SwipeRefreshLayout.ChildScrollDelegate {

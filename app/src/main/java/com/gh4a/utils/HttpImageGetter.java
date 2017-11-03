@@ -389,7 +389,7 @@ public class HttpImageGetter {
         findOrCreateInfo(id).bind(view, html);
     }
 
-    public void unbind(final TextView view) {
+    private void unbind(final TextView view) {
         for (ObjectInfo info : mObjectInfos.values()) {
             info.unbind(view);
         }

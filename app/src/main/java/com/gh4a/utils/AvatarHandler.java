@@ -106,8 +106,8 @@ public class AvatarHandler {
     }
 
     public static void assignAvatar(Context context, MenuItem item,
-            String userName, long userId, String url) {
-        assignAvatarInternal(new MenuItemDelegate(context, item), userName, userId, url);
+            String userName, long userId) {
+        assignAvatarInternal(new MenuItemDelegate(context, item), userName, userId, null);
     }
 
     public static Bitmap loadUserAvatarSynchronously(Context context, User user) {

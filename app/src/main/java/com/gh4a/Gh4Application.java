@@ -46,7 +46,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public static int THEME = R.style.LightTheme;
 
     private static Gh4Application sInstance;
-    private HashMap<Class<?>, Object> mServiceCache = new HashMap<>();
+    private final HashMap<Class<?>, Object> mServiceCache = new HashMap<>();
     private PrettyTime mPt;
 
     private static final int THEME_DARK = 0;

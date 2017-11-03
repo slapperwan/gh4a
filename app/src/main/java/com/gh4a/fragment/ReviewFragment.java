@@ -181,7 +181,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
                     return ApiHelpers.PageIterator
                             .toSingle(page -> prService.getPullRequestFiles(
                                     mRepoOwner, mRepoName, mIssueNumber, page))
-                            .map(result -> Optional.of(result));
+                            .map(Optional::of);
                 });
 
         Single<Optional<List<ReviewComment>>> commentsSingle = hasCommentsSingle
@@ -193,7 +193,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
                             .toSingle(page -> commentService.getPullRequestComments(
                                     mRepoOwner, mRepoName, mIssueNumber, page))
                             .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR))
-                            .map(result -> Optional.of(result));
+                            .map(Optional::of);
                 });
 
         return Single.zip(reviewItemSingle, reviewCommentsSingle, filesSingle, commentsSingle,
@@ -234,9 +234,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
             for (TimelineItem.Diff diffHunk : diffHunks) {
                 items.add(diffHunk);
-                for (TimelineItem.TimelineComment comment : diffHunk.comments) {
-                    items.add(comment);
-                }
+                items.addAll(diffHunk.comments);
 
                 if (!diffHunk.isReply()) {
                     items.add(new TimelineItem.Reply(diffHunk.getInitialTimelineComment()));

@@ -290,6 +290,7 @@ public class PullRequestFragment extends IssueFragmentBase {
             return reviews;
         })
         .compose(RxUtils.filter(item -> {
+            //noinspection CodeBlock2Expr
             return item.review().state() != ReviewState.Commented
                     || !TextUtils.isEmpty(item.review().body())
                     || !item.getDiffHunks().isEmpty();
@@ -484,7 +485,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                 ? Single.just(Optional.absent())
                 : service.getGitReference(repo.owner().login(), repo.name(), head.ref())
                         .map(ApiHelpers::throwOnFailure)
-                        .map(ref -> Optional.of(ref))
+                        .map(Optional::of)
                         .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<GitReference>absent()))
                         .compose(makeLoaderSingle(ID_LOADER_HEAD_REF, force));
 

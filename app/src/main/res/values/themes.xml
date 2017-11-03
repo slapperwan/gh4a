@@ -284,7 +284,5 @@
         <item name="android:colorBackground">#ffffff</item>
     </style>
 
-    <style name="PreferenceTheme" parent="PreferenceThemeOverlay">
-        <item name="android:textAppearanceLarge">@style/TextAppearance.AppCompat.Subhead</item>
-    </style>
+    <style name="PreferenceTheme" parent="PreferenceThemeOverlay.v14.Material" />
 </resources>

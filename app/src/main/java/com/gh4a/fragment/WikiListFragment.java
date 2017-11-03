@@ -23,7 +23,6 @@ public class WikiListFragment extends ListDataBaseFragment<Feed> implements
     private String mUserLogin;
     private String mRepoName;
     private String mInitialPage;
-    private CommonFeedAdapter mAdapter;
 
     public static WikiListFragment newInstance(String owner, String repo, String initialPage) {
         WikiListFragment f = new WikiListFragment();
@@ -56,9 +55,9 @@ public class WikiListFragment extends ListDataBaseFragment<Feed> implements
 
     @Override
     protected RootAdapter<Feed, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        mAdapter = new CommonFeedAdapter(getActivity(), false);
-        mAdapter.setOnItemClickListener(this);
-        return mAdapter;
+        CommonFeedAdapter adapter = new CommonFeedAdapter(getActivity(), false);
+        adapter.setOnItemClickListener(this);
+        return adapter;
     }
 
     @Override

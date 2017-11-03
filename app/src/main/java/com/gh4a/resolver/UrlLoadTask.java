@@ -1,36 +1,38 @@
 package com.gh4a.resolver;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
+import com.gh4a.R;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
+import com.gh4a.utils.UiUtils;
 
 import io.reactivex.Single;
 
 public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>> {
     protected final FragmentActivity mActivity;
-    private final boolean mFinishCurrentActivity;
     private ProgressDialogFragment mProgressDialog;
 
     public UrlLoadTask(FragmentActivity activity) {
-        this(activity, true);
-    }
-
-    public UrlLoadTask(FragmentActivity activity, boolean finishCurrentActivity) {
         super();
         mActivity = activity;
-        mFinishCurrentActivity = finishCurrentActivity;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        mProgressDialog = ProgressDialogFragment.newInstance(mFinishCurrentActivity);
+        mProgressDialog = new ProgressDialogFragment();
         mProgressDialog.show(mActivity.getSupportFragmentManager(), "progress");
     }
 
@@ -59,10 +61,16 @@ public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>
         if (mProgressDialog != null && mProgressDialog.isAdded()) {
             mProgressDialog.dismissAllowingStateLoss();
         }
-        if (mFinishCurrentActivity) {
-            mActivity.finish();
-        }
+        mActivity.finish();
     }
 
     protected abstract Single<Optional<Intent>> getSingle();
+
+    public static class ProgressDialogFragment extends DialogFragment {
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return UiUtils.createProgressDialog(getActivity(), R.string.loading_msg);
+        }
+    }
 }
