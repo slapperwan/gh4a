@@ -549,7 +549,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         options.put("all", false);
         options.put("participating", false);
 
-        service.getNotifications(options, 0)
+        service.getNotifications(options, 1)
                 .map(ApiHelpers::throwOnFailure)
                 .map(result -> !result.items().isEmpty())
                 .compose(makeLoaderSingle(ID_LOADER_NOTIFICATIONS_INDICATOR, force))
