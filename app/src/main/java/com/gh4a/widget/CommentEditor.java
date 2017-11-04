@@ -25,6 +25,8 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView
     private boolean mLocked;
     @StringRes
     private int mCommentEditorHintResId;
+    @StringRes
+    private int mLockedHintResId;
 
     public CommentEditor(Context context) {
         super(context);
@@ -69,8 +71,14 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView
         updateLockState();
     }
 
-    public void setLocked(boolean locked) {
+    @StringRes
+    public int getLockedHintResId() {
+        return mLockedHintResId;
+    }
+
+    public void setLocked(boolean locked, @StringRes int lockedHintResId) {
         mLocked = locked;
+        mLockedHintResId = lockedHintResId;
         updateLockState();
     }
 
@@ -105,7 +113,7 @@ public class CommentEditor extends AppCompatMultiAutoCompleteTextView
     private void updateLockState() {
         setEnabled(!mLocked);
         if (mLocked) {
-            setHint(R.string.comment_editor_locked_hint);
+            setHint(mLockedHintResId != 0 ? mLockedHintResId : R.string.comment_editor_locked_hint);
         } else if (mCommentEditorHintResId != 0) {
             setHint(mCommentEditorHintResId);
         } else {

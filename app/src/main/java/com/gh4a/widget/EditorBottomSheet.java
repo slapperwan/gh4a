@@ -173,10 +173,10 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         }
     }
 
-    public void setLocked(boolean locked) {
-        mBasicEditor.setLocked(locked);
+    public void setLocked(boolean locked, @StringRes int lockedHintResId) {
+        mBasicEditor.setLocked(locked, lockedHintResId);
         if (mAdvancedEditor != null) {
-            mAdvancedEditor.setLocked(locked);
+            mAdvancedEditor.setLocked(locked, lockedHintResId);
         }
         mAdvancedEditorToggle.setVisibility(locked ? View.GONE : View.VISIBLE);
         setAdvancedMode(false);
@@ -384,7 +384,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         if (mCallback != null) {
             mAdvancedEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
         }
-        mAdvancedEditor.setLocked(mBasicEditor.isLocked());
+        mAdvancedEditor.setLocked(mBasicEditor.isLocked(), mBasicEditor.getLockedHintResId());
         mAdvancedEditor.setMentionUsers(mBasicEditor.getMentionUsers());
 
         mMarkdownButtons =
