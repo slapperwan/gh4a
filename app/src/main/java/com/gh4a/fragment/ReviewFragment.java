@@ -159,6 +159,8 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         super.onAddData(adapter, data);
         if (mSelectedReplyCommentId == 0) {
             selectFirstReply(data);
+        } else {
+            mBottomSheet.setLocked(false, 0);
         }
         if (mInitialComment != null) {
             highlightInitialComment(data);
@@ -166,13 +168,26 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     private void selectFirstReply(List<TimelineItem> data) {
+        int replyItemCount = 0;
+        long firstReplyId = 0;
         for (TimelineItem timelineItem : data) {
             if (timelineItem instanceof TimelineItem.Reply) {
-                mSelectedReplyCommentId =
-                        ((TimelineItem.Reply) timelineItem).timelineComment.comment.getId();
-                break;
+                replyItemCount += 1;
+
+                if (replyItemCount > 1) {
+                    mBottomSheet.setLocked(true, R.string.no_reply_group_selected_hint);
+                    // Do not auto-select reply group if there are more than 1 of them
+                    return;
+                }
+
+                if (firstReplyId == 0) {
+                    TimelineItem.Reply timelineReply = (TimelineItem.Reply) timelineItem;
+                    firstReplyId = timelineReply.timelineComment.comment.getId();
+                }
             }
         }
+
+        mSelectedReplyCommentId = firstReplyId;
     }
 
     private void highlightInitialComment(List<TimelineItem> data) {
@@ -263,6 +278,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     @Override
     public void onReplyCommentSelected(long replyToId) {
         mSelectedReplyCommentId = replyToId;
+        mBottomSheet.setLocked(false, 0);
     }
 
     @Override

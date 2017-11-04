@@ -545,4 +545,5 @@
     <string name="notification_subject_release">Release</string>
     <string name="notification_interval">Sync interval</string>
     <string name="detach">Open in new window</string>
+    <string name="no_reply_group_selected_hint">Select comment group to reply to</string>
 </resources>

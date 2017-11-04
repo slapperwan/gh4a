@@ -328,7 +328,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     private void updateCommentLockState() {
-        mBottomSheet.setLocked(isLocked());
+        mBottomSheet.setLocked(isLocked(), R.string.comment_editor_locked_hint);
     }
 
     private void fillData() {
