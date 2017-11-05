@@ -104,6 +104,12 @@ public class StringUtils {
         return Gh4Application.get().getPrettyTimeInstance().format(date);
     }
 
+    public static CharSequence formatExactTime(Context context, Date date) {
+        return DateUtils.formatDateTime(context, date.getTime(), DateUtils.FORMAT_SHOW_DATE
+                | DateUtils.FORMAT_SHOW_TIME
+                | DateUtils.FORMAT_SHOW_YEAR);
+    }
+
     public static void applyBoldTagsAndSetText(StyleableTextView view, String input) {
         SpannableStringBuilder text = applyBoldTags(input, view.getTypefaceValue());
         view.setText(text);
