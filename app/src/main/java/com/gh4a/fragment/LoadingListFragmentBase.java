@@ -116,7 +116,8 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
     }
 
     protected void scrollToAndHighlightPosition(final int position) {
-        mLayoutManager.scrollToPosition(position);
+        getBaseActivity().collapseAppBar();
+        mLayoutManager.scrollToPositionWithOffset(position, 0);
         final RecyclerView.Adapter<?> adapter = mRecyclerView.getAdapter();
         if (adapter instanceof RootAdapter) {
             mRecyclerView.postDelayed(new Runnable() {
