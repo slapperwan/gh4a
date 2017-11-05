@@ -89,7 +89,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     static {
         START_PAGE_MAPPING.put(R.id.news_feed, "newsfeed");
         START_PAGE_MAPPING.put(R.id.notifications, "notifications");
-        START_PAGE_MAPPING.put(R.id.my_repos, "repos");
+        START_PAGE_MAPPING.put(R.id.repositories, "repos");
         START_PAGE_MAPPING.put(R.id.my_issues, "issues");
         START_PAGE_MAPPING.put(R.id.my_prs, "prs");
         START_PAGE_MAPPING.put(R.id.my_gists, "gists");
@@ -314,7 +314,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 return new NewsFeedFactory(this, mUserLogin);
             case R.id.notifications:
                 return new NotificationListFactory(this);
-            case R.id.my_repos:
+            case R.id.repositories:
                 return new RepositoryFactory(this, mUserLogin, getPrefs());
             case R.id.my_issues:
                 return new IssueListFactory(this, mUserLogin, false);

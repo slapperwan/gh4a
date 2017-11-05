@@ -56,7 +56,7 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
         updateRightNavigationDrawer();
 
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.user_pub_repos);
+        actionBar.setTitle(R.string.repositories);
         actionBar.setSubtitle(mUserLogin);
         actionBar.setDisplayHomeAsUpEnabled(true);
     }

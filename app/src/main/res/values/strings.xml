@@ -102,6 +102,8 @@
     <string name="my_issues">My issues</string>
     <string name="my_pull_requests">My pull requests</string>
     <string name="my_gists">My gists</string>
+    <string name="my">My</string>
+    <string name="repositories">Repositories</string>
     <string name="start_page">Start page</string>
     <string name="start_page_last_selected">Last selected</string>
     <string name="comment_editor_locked_hint">Comments are only available to collaborators</string>
@@ -249,7 +251,6 @@
     <string name="user_followers">Followers</string><!-- For type organization -->
     <string name="user_members">Members</string><!-- For type organization -->
     <string name="user_created_at">Member since %1$s</string>
-    <string name="user_pub_repos">Repositories</string>
     <string name="user_extra_data">%1$d followers\u00a0\u00a0\u00a0%2$d repos</string>
     <string name="user_news_feed">News Feed</string>
     <string name="user_public_activity">Public Activity</string>

@@ -15,8 +15,8 @@
             android:title="@string/notifications"
             app:actionLayout="@layout/notifications_indicator" />
         <item
-            android:id="@+id/my_repos"
-            android:title="@string/my_repositories"
+            android:id="@+id/repositories"
+            android:title="@string/repositories"
             android:icon="@drawable/icon_repositories"/>
         <item
             android:id="@+id/my_issues"

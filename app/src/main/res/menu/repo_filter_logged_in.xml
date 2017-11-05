@@ -24,12 +24,6 @@
                 <item
                     android:id="@+id/filter_type_forks"
                     android:title="@string/repo_type_forks" />
-                <item
-                    android:id="@+id/filter_type_watched"
-                    android:title="@string/repo_type_watched" />
-                <item
-                    android:id="@+id/filter_type_starred"
-                    android:title="@string/repo_type_starred" />
             </group>
         </menu>
     </item>
