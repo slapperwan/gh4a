@@ -156,20 +156,20 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
     @Override
     protected void onAddData(RootAdapter<TimelineItem, ?> adapter, List<TimelineItem> data) {
-        super.onAddData(adapter, data);
         if (mSelectedReplyCommentId == 0) {
-            selectFirstReply(data);
+            selectAndRemoveFirstReply(data);
         } else {
             mBottomSheet.setLocked(false, 0);
         }
+        super.onAddData(adapter, data);
         if (mInitialComment != null) {
             highlightInitialComment(data);
         }
     }
 
-    private void selectFirstReply(List<TimelineItem> data) {
+    private void selectAndRemoveFirstReply(List<TimelineItem> data) {
         int replyItemCount = 0;
-        long firstReplyId = 0;
+        TimelineItem.Reply firstReplyItem = null;
         for (TimelineItem timelineItem : data) {
             if (timelineItem instanceof TimelineItem.Reply) {
                 replyItemCount += 1;
@@ -180,14 +180,17 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
                     return;
                 }
 
-                if (firstReplyId == 0) {
-                    TimelineItem.Reply timelineReply = (TimelineItem.Reply) timelineItem;
-                    firstReplyId = timelineReply.timelineComment.comment.getId();
+                if (firstReplyItem == null) {
+                    firstReplyItem = (TimelineItem.Reply) timelineItem;
                 }
             }
         }
 
-        mSelectedReplyCommentId = firstReplyId;
+        if (firstReplyItem != null) {
+            mSelectedReplyCommentId = firstReplyItem.timelineComment.comment.getId();
+            // When there is only one reply item we don't need to display it
+            data.remove(firstReplyItem);
+        }
     }
 
     private void highlightInitialComment(List<TimelineItem> data) {
