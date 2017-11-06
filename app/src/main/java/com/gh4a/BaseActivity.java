@@ -442,7 +442,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     @CallSuper
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && displayDetachAction()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && !IntentUtils.isNewTaskIntent(getIntent())
+                && displayDetachAction()) {
             menu.add(Menu.NONE, R.id.detach, Menu.NONE, R.string.detach);
         }
 
