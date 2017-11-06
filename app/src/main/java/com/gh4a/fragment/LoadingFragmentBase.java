@@ -1,5 +1,6 @@
 package com.gh4a.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -31,9 +32,9 @@ public abstract class LoadingFragmentBase extends Fragment implements
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mRxLoader = new RxLoader(getActivity(), getLoaderManager());
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mRxLoader = new RxLoader(context, getLoaderManager());
     }
 
     @Override
