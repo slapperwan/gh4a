@@ -83,6 +83,7 @@ public class ReviewTimelineLoader extends BaseLoader<List<TimelineItem>> {
         for (TimelineItem.Diff diffHunk : diffHunks) {
             items.add(diffHunk);
             for (TimelineItem.TimelineComment comment : diffHunk.comments) {
+                comment.diff = diffHunk;
                 items.add(comment);
             }
 
