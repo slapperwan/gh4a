@@ -107,10 +107,10 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         User selectedOrganization = position != 0 ? mUserScopes.get(position - 1) : null;
-        boolean isChange = selectedOrganization == null || mSelectedOrganization == null
-                ? selectedOrganization != mSelectedOrganization
+        boolean isSameUser = selectedOrganization == null || mSelectedOrganization == null
+                ? selectedOrganization == mSelectedOrganization
                 : selectedOrganization.equals(mSelectedOrganization);
-        if (isChange) {
+        if (!isSameUser) {
             mSelectedOrganization = selectedOrganization;
             mActivity.invalidateFragments();
         }
