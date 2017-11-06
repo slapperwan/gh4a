@@ -113,21 +113,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
     };
 
-    private class MergeMethodDesc {
-        final @StringRes int textResId;
-        final MergeRequest.Method action;
-
-        public MergeMethodDesc(@StringRes int textResId, MergeRequest.Method action) {
-            this.textResId = textResId;
-            this.action = action;
-        }
-
-        @Override
-        public String toString() {
-            return getString(textResId);
-        }
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -588,5 +573,20 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     mPendingReviewLoaded = true;
                     supportInvalidateOptionsMenu();
                 }, error -> {});
+    }
+
+    private class MergeMethodDesc {
+        final @StringRes int textResId;
+        final MergeRequest.Method action;
+
+        public MergeMethodDesc(@StringRes int textResId, MergeRequest.Method action) {
+            this.textResId = textResId;
+            this.action = action;
+        }
+
+        @Override
+        public String toString() {
+            return getString(textResId);
+        }
     }
 }

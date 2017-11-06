@@ -589,34 +589,6 @@ public class IssueEditActivity extends BasePagerActivity implements
                 }, error -> {});
     }
 
-    private class EditPagerAdapter extends PagerAdapter {
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            @IdRes int resId = 0;
-            switch (position) {
-                case 0: resId = R.id.editor_container; break;
-                case 1: resId = R.id.preview; break;
-                case 2: resId = R.id.options; break;
-            }
-            return container.findViewById(resId);
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return getString(TITLES[position]);
-        }
-
-        @Override
-        public int getCount() {
-            return mIsCollaborator ? TITLES.length : TITLES.length - 1;
-        }
-    }
-
     private void loadCollaboratorStatus(boolean force) {
         SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName)
                 .compose(makeLoaderSingle(ID_LOADER_COLLABORATOR_STATUS, force))
@@ -699,5 +671,33 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .compose(RxUtils.filterAndMapToFirst(
                         c -> c.type() == ContentType.File && c.name().startsWith("ISSUE_TEMPLATE")))
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.absent()));
+    }
+
+    private class EditPagerAdapter extends PagerAdapter {
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            @IdRes int resId = 0;
+            switch (position) {
+                case 0: resId = R.id.editor_container; break;
+                case 1: resId = R.id.preview; break;
+                case 2: resId = R.id.options; break;
+            }
+            return container.findViewById(resId);
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return getString(TITLES[position]);
+        }
+
+        @Override
+        public int getCount() {
+            return mIsCollaborator ? TITLES.length : TITLES.length - 1;
+        }
     }
 }

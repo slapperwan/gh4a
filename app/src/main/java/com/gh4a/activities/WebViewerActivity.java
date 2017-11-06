@@ -79,37 +79,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         50, 75, 100, 150, 200
     };
 
-    @SuppressWarnings("unused")
-    private class DisplayJavascriptInterface {
-        @JavascriptInterface
-        public void onLineTouched(final int line) {
-            mHandler.post(() -> WebViewerActivity.this.onLineTouched(line, mLastTouchDown.x, mLastTouchDown.y));
-        }
-
-        @JavascriptInterface
-        public void onRenderingDone() {
-            mHandler.post(() -> {
-                mRenderingDone = true;
-                showContentIfDone();
-            });
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private class PrintJavascriptInterface {
-        @JavascriptInterface
-        public void onLineTouched(int line) {
-        }
-
-        @JavascriptInterface
-        public void onRenderingDone() {
-            mHandler.post(() -> {
-                mPrintWebView.loadUrl("javascript:applyLineWrapping(true)");
-                doPrintHtml();
-            });
-        }
-    }
-
     private final WebViewClient mWebViewClient = new WebViewClient() {
         @Override
         public void onPageFinished(WebView view, String url) {
@@ -516,4 +485,35 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
     protected abstract String generateHtml(String cssTheme, boolean addTitleHeader);
     protected abstract String getDocumentTitle();
+
+    @SuppressWarnings("unused")
+    private class DisplayJavascriptInterface {
+        @JavascriptInterface
+        public void onLineTouched(final int line) {
+            mHandler.post(() -> WebViewerActivity.this.onLineTouched(line, mLastTouchDown.x, mLastTouchDown.y));
+        }
+
+        @JavascriptInterface
+        public void onRenderingDone() {
+            mHandler.post(() -> {
+                mRenderingDone = true;
+                showContentIfDone();
+            });
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private class PrintJavascriptInterface {
+        @JavascriptInterface
+        public void onLineTouched(int line) {
+        }
+
+        @JavascriptInterface
+        public void onRenderingDone() {
+            mHandler.post(() -> {
+                mPrintWebView.loadUrl("javascript:applyLineWrapping(true)");
+                doPrintHtml();
+            });
+        }
+    }
 }

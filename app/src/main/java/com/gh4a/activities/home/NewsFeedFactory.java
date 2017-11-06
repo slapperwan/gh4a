@@ -125,6 +125,20 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
         }
     }
 
+    private void loadOrganizations(boolean force) {
+        final Gh4Application app = Gh4Application.get();
+        final OrganizationService service = app.getGitHubService(OrganizationService.class);
+        mOrganizationSubscription = ApiHelpers.PageIterator
+                .toSingle(page -> ApiHelpers.loginEquals(mUserLogin, app.getAuthLogin())
+                        ? service.getMyOrganizations(page)
+                        : service.getUserPublicOrganizations(mUserLogin, page))
+                .compose(mActivity.makeLoaderSingle(ID_LOADER_ORGS, force))
+                .subscribe(result -> {
+                    mUserScopes = result.isEmpty() ? null : result;
+                    mActivity.supportInvalidateOptionsMenu();
+                }, error -> {});
+    }
+
     private static class UserAdapter extends BaseAdapter {
         private final User mSelf;
         private final List<User> mUsers;
@@ -181,19 +195,5 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
             return convertView;
         }
-    }
-
-    private void loadOrganizations(boolean force) {
-        final Gh4Application app = Gh4Application.get();
-        final OrganizationService service = app.getGitHubService(OrganizationService.class);
-        mOrganizationSubscription = ApiHelpers.PageIterator
-                .toSingle(page -> ApiHelpers.loginEquals(mUserLogin, app.getAuthLogin())
-                        ? service.getMyOrganizations(page)
-                        : service.getUserPublicOrganizations(mUserLogin, page))
-                .compose(mActivity.makeLoaderSingle(ID_LOADER_ORGS, force))
-                .subscribe(result -> {
-                    mUserScopes = result != null && result.size() > 0 ? result : null;
-                    mActivity.supportInvalidateOptionsMenu();
-                }, error -> {});
     }
 }

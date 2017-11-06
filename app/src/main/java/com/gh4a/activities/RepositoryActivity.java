@@ -390,54 +390,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         mCommitListFragment = null;
     }
 
-    private class BranchAndTagAdapter extends BaseAdapter {
-        private final ArrayList<Branch> mItems;
-        private final LayoutInflater mInflater;
-        private final int mBranchDrawableResId;
-        private final int mTagDrawableResId;
-        private final int mFirstTagIndex;
-
-        public BranchAndTagAdapter() {
-            mItems = new ArrayList<>();
-            mItems.addAll(mBranches);
-            mItems.addAll(mTags);
-            mFirstTagIndex = mBranches.size();
-            mInflater = LayoutInflater.from(RepositoryActivity.this);
-            mBranchDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.branchIcon);
-            mTagDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.tagIcon);
-        }
-
-        @Override
-        public int getCount() {
-            return mItems.size();
-        }
-
-        @Override
-        public Branch getItem(int position) {
-            return mItems.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.row_branch, parent, false);
-            }
-            ImageView icon = convertView.findViewById(R.id.icon);
-            TextView title = convertView.findViewById(R.id.title);
-
-            icon.setImageResource(position >= mFirstTagIndex
-                    ? mTagDrawableResId : mBranchDrawableResId);
-            title.setText(mItems.get(position).name());
-
-            return convertView;
-        }
-    }
-
     private void toggleStarringState() {
         StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
         Single<Response<Void>> responseSingle = mIsStarring
@@ -559,6 +511,54 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                         mTags = result.second;
                         showRefSelectionDialog();
                     }, error -> {}));
+        }
+    }
+
+    private class BranchAndTagAdapter extends BaseAdapter {
+        private final ArrayList<Branch> mItems;
+        private final LayoutInflater mInflater;
+        private final int mBranchDrawableResId;
+        private final int mTagDrawableResId;
+        private final int mFirstTagIndex;
+
+        public BranchAndTagAdapter() {
+            mItems = new ArrayList<>();
+            mItems.addAll(mBranches);
+            mItems.addAll(mTags);
+            mFirstTagIndex = mBranches.size();
+            mInflater = LayoutInflater.from(RepositoryActivity.this);
+            mBranchDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.branchIcon);
+            mTagDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.tagIcon);
+        }
+
+        @Override
+        public int getCount() {
+            return mItems.size();
+        }
+
+        @Override
+        public Branch getItem(int position) {
+            return mItems.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = mInflater.inflate(R.layout.row_branch, parent, false);
+            }
+            ImageView icon = convertView.findViewById(R.id.icon);
+            TextView title = convertView.findViewById(R.id.title);
+
+            icon.setImageResource(position >= mFirstTagIndex
+                    ? mTagDrawableResId : mBranchDrawableResId);
+            title.setText(mItems.get(position).name());
+
+            return convertView;
         }
     }
 }
