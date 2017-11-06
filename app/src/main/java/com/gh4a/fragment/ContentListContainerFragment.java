@@ -56,7 +56,7 @@ public class ContentListContainerFragment extends Fragment implements
         private static final int MAX_CACHE_ENTRIES = 100;
 
         @Override
-        protected boolean removeEldestEntry(Entry<String, ArrayList<Content>> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<String, ArrayList<Content>> eldest) {
             return size() > MAX_CACHE_ENTRIES;
         }
     };
