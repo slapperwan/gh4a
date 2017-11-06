@@ -279,43 +279,38 @@
     <string name="repo_activity">Activity</string>
 
     <!-- Issue events -->
-    <string name="issue_event_closed">Issue was closed by %1$s</string>
-    <string name="issue_event_closed_with_commit">Issue was closed by %1$s with commit [commit]</string>
-    <string name="issue_event_reopened">Issue was reopened by %1$s</string>
-    <string name="issue_event_referenced">Issue was referenced by %1$s</string>
-    <string name="issue_event_referenced_with_commit">Issue was referenced by %1$s from commit [commit]</string>
-    <string name="issue_event_assigned">Issue was assigned to [b]%2$s[/b] by %1$s</string>
-    <string name="issue_event_assigned_self">Issue was self-assigned by %1$s</string>
-    <string name="issue_event_unassigned">Issue was unassigned from [b]%2$s[/b] by %1$s</string>
-    <string name="issue_event_unassigned_self">Issue was self-unassigned from %1$s</string>
-    <string name="issue_event_labeled">Label [label] was added by %1$s</string>
-    <string name="issue_event_unlabeled">Label [label] was removed by %1$s</string>
-    <string name="issue_event_milestoned">Milestone [b]%1$s[/b] was set by %2$s</string>
-    <string name="issue_event_demilestoned">Milestone [b]%1$s[/b] was removed by %2$s</string>
-    <string name="issue_event_renamed">Title was changed from [b]%1$s[/b] to [b]%2$s[/b] by %3$s</string>
-    <string name="issue_event_locked">Issue was [b]locked[/b] by %1$s</string>
-    <string name="issue_event_unlocked">Issue was unlocked by %1$s</string>
+    <string name="issue_event_closed">[b]%1$s[/b] closed this issue [time]</string>
+    <string name="issue_event_closed_with_commit">[b]%1$s[/b] closed this issue in [commit] [time]</string>
+    <string name="issue_event_reopened">[b]%1$s[/b] reopened this issue [time]</string>
+    <string name="issue_event_referenced">[b]%1$s[/b] referenced this issue [time]</string>
+    <string name="issue_event_referenced_with_commit">[b]%1$s[/b] added commit [commit] that referenced this issue [time]</string>
+    <string name="issue_event_assigned">[b]%1$s[/b] assigned [b]%2$s[/b] [time]</string>
+    <string name="issue_event_assigned_self">[b]%1$s[/b] self-assigned this issue [time]</string>
+    <string name="issue_event_unassigned">[b]%1$s[/b] unassigned [b]%2$s[/b] [time]</string>
+    <string name="issue_event_unassigned_self">[b]%1$s[/b] removed their assignment [time]</string>
+    <string name="issue_event_labeled">[b]%1$s[/b] added the [label] label [time]</string>
+    <string name="issue_event_unlabeled">[b]%1$s[/b] removed the [label] label [time]</string>
+    <string name="issue_event_milestoned">[b]%1$s[/b] added this to the [b]%2$s[/b] milestone [time]</string>
+    <string name="issue_event_demilestoned">[b]%1$s[/b] removed this from the [b]%2$s[/b] milestone [time]</string>
+    <string name="issue_event_renamed">[b]%1$s[/b] changed the title from [b]%2$s[/b] to [b]%3$s[/b] [time]</string>
+    <string name="issue_event_locked">[b]%1$s[/b] locked and limited conversation to collaborators [time]</string>
+    <string name="issue_event_unlocked">[b]%1$s[/b] unlocked this conversation [time]</string>
 
     <!-- Pull request events -->
-    <string name="pull_request_event_closed">Pull request was closed by %1$s</string>
-    <string name="pull_request_event_closed_with_commit">Pull request was closed by %1$s with commit [commit]</string>
-    <string name="pull_request_event_reopened">Pull request was reopened by %1$s</string>
-    <string name="pull_request_event_merged">Pull request was merged by %1$s</string>
-    <string name="pull_request_event_merged_with_commit">Pull request was merged as commit [commit] by %1$s</string>
-    <string name="pull_request_event_referenced">Pull request was referenced by %1$s</string>
-    <string name="pull_request_event_referenced_with_commit">Pull request was referenced by %1$s from commit [commit]</string>
-    <string name="pull_request_event_assigned">Pull request was assigned to [b]%2$s[/b] by %1$s</string>
-    <string name="pull_request_event_assigned_self">Pull request was self-assigned by %1$s</string>
-    <string name="pull_request_event_unassigned">Pull request was unassigned from [b]%2$s[/b] by %1$s</string>
-    <string name="pull_request_event_unassigned_self">Pull request was self-unassigned from %1$s</string>
-    <string name="pull_request_event_locked">Pull request was [b]locked[/b] by %1$s</string>
-    <string name="pull_request_event_unlocked">Pull request was unlocked by %1$s</string>
-    <string name="pull_request_event_review_approved">[b]%1$s[/b] approved these changes %2$s</string>
-    <string name="pull_request_event_review_requested_changes">[b]%1$s[/b] requested changes %2$s</string>
-    <string name="pull_request_event_review_reviewed">[b]%1$s[/b] reviewed %2$s</string>
-    <string name="pull_request_event_review_started_review">[b]%1$s[/b] started a review %2$s</string>
-    <string name="pull_request_event_ref_deleted">[b]%1$s[/b] deleted the pull request branch</string>
-    <string name="pull_request_event_ref_restored">[b]%1$s[/b] restored the pull request branch</string>
+    <string name="pull_request_event_closed">[b]%1$s[/b] closed this pull request [time]</string>
+    <string name="pull_request_event_closed_with_commit">[b]%1$s[/b] closed this pull request in [commit] [time]</string>
+    <string name="pull_request_event_reopened">[b]%1$s[/b] reopened this pull request [time]</string>
+    <string name="pull_request_event_merged">[b]%1$s[/b] merged this pull request [time]</string>
+    <string name="pull_request_event_merged_with_commit">[b]%1$s[/b] merged this pull request as commit [commit] [time]</string>
+    <string name="pull_request_event_referenced">[b]%1$s[/b] referenced this pull request [time]</string>
+    <string name="pull_request_event_referenced_with_commit">[b]%1$s[/b] added commit [commit] that referenced this pull request [time]</string>
+    <string name="pull_request_event_assigned_self">[b]%1$s[/b] self-assigned this pull request [time]</string>
+    <string name="pull_request_event_review_approved">[b]%1$s[/b] approved these changes [time]</string>
+    <string name="pull_request_event_review_requested_changes">[b]%1$s[/b] requested changes [time]</string>
+    <string name="pull_request_event_review_reviewed">[b]%1$s[/b] reviewed [time]</string>
+    <string name="pull_request_event_review_started_review">[b]%1$s[/b] started a review [time]</string>
+    <string name="pull_request_event_ref_deleted">[b]%1$s[/b] deleted the pull request branch [time]</string>
+    <string name="pull_request_event_ref_restored">[b]%1$s[/b] restored the pull request branch [time]</string>
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>
