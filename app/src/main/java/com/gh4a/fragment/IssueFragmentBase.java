@@ -77,7 +77,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     protected static final List<IssueEventType> INTERESTING_EVENTS = Arrays.asList(
             IssueEventType.Closed, IssueEventType.Reopened, IssueEventType.Merged,
             IssueEventType.Referenced, IssueEventType.Assigned, IssueEventType.Unassigned,
-            IssueEventType.Labeled, IssueEventType.Unlocked, IssueEventType.Locked,
+            IssueEventType.Labeled, IssueEventType.Unlabeled, IssueEventType.Locked,
             IssueEventType.Unlocked, IssueEventType.Milestoned, IssueEventType.Demilestoned,
             IssueEventType.Renamed, IssueEventType.HeadRefDeleted, IssueEventType.HeadRefRestored,
             IssueEventType.ReviewRequested, IssueEventType.ReviewRequestRemoved
