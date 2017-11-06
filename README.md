@@ -87,8 +87,16 @@ Open Source Libraries
 * [Android-Job](https://github.com/evernote/android-job)
 * [AndroidSVG](https://github.com/BigBadaboom/androidsvg)
 * [emoji-java](https://github.com/vdurmont/emoji-java)
+* [GitHubSdk](https://github.com/maniac103/GitHubSdk)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
+* [MarkdownEdit](https://github.com/Tunous/MarkdownEdit)
 * [Material Design Icons](https://github.com/google/material-design-icons)
+* [PrettyTime](https://github.com/ocpsoft/prettytime)
+* [Recycler Fast Scroll](https://github.com/pluscubed/recycler-fast-scroll)
+* [Retrofit](https://github.com/square/retrofit)
+* [RxAndroid](https://github.com/ReactiveX/RxAndroid)
+* [RxJava](https://github.com/ReactiveX/RxJava)
+* [RxLoader](https://github.com/maniac103/RxLoader)
 * [SmoothProgressBar](https://github.com/castorflex/SmoothProgressBar)
 
 Contributions
