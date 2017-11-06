@@ -443,6 +443,27 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         return (isRight ? "R" : "L") + line;
     }
 
+    private void deleteComment(long id) {
+        doDeleteComment(id)
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg,
+                        getString(R.string.error_delete_commit_comment)))
+                .subscribe(result -> refresh(), error -> {});
+    }
+
+    private void loadComments(boolean useIntentExtraIfPresent, boolean force) {
+        List<C> intentComments = useIntentExtraIfPresent
+                ? getIntent().getParcelableArrayListExtra("comments") : null;
+        Single<List<C>> commentSingle = intentComments != null
+                ? Single.just(intentComments)
+                : createCommentSingle().compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));
+
+        commentSingle.subscribe(result -> {
+            addCommentsToMap(result);
+            onDataReady();
+        }, error -> {});
+    }
+
     private class CommentActionPopup extends PopupMenu implements
             PopupMenu.OnMenuItemClickListener {
         private final long mId;
@@ -529,26 +550,5 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             }
             return true;
         }
-    }
-
-    private void deleteComment(long id) {
-        doDeleteComment(id)
-                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
-                .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg,
-                        getString(R.string.error_delete_commit_comment)))
-                .subscribe(result -> refresh(), error -> {});
-    }
-
-    private void loadComments(boolean useIntentExtraIfPresent, boolean force) {
-        List<C> intentComments = useIntentExtraIfPresent
-                ? getIntent().getParcelableArrayListExtra("comments") : null;
-        Single<List<C>> commentSingle = intentComments != null
-                ? Single.just(intentComments)
-                : createCommentSingle().compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));
-
-        commentSingle.subscribe(result -> {
-            addCommentsToMap(result);
-            onDataReady();
-        }, error -> {});
     }
 }
