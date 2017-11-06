@@ -506,18 +506,23 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public void onSendCommentInBackground(String comment) throws IOException {
+    public void onEditorSendInBackground(String comment) throws IOException {
         IssueService issueService = (IssueService)
                 Gh4Application.get().getService(Gh4Application.ISSUE_SERVICE);
         issueService.createComment(mRepoOwner, mRepoName, mIssue.getNumber(), comment);
     }
 
     @Override
-    public void onCommentSent() {
+    public void onEditorTextSent() {
         // reload comments
         if (isAdded()) {
             reloadEvents(false);
         }
+    }
+
+    @Override
+    public int getEditorErrorMessageResId() {
+        return R.string.issue_error_comment;
     }
 
     @Override

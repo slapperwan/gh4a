@@ -63,7 +63,6 @@ import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.PullRequestMarker;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
@@ -71,8 +70,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
-        View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener,
-        ReviewDialogFragment.Callback {
+        View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
         return makeIntent(context, repoOwner, repoName, number, -1, null);
     }
@@ -91,6 +89,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     public static final int PAGE_FILES = 2;
 
     private static final int REQUEST_EDIT_ISSUE = 1001;
+    private static final int REQUEST_CREATE_REVIEW = 1002;
 
     private String mRepoOwner;
     private String mRepoName;
@@ -286,6 +285,12 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 setResult(Activity.RESULT_OK);
                 onRefresh();
             }
+        } else if (requestCode == REQUEST_CREATE_REVIEW) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (mPullRequestFragment != null) {
+                    mPullRequestFragment.reloadEvents(false);
+                }
+            }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
@@ -396,13 +401,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
     }
 
-    @Override
-    public void onReviewCreated(Review result) {
-        if (mPullRequestFragment != null) {
-            mPullRequestFragment.reloadEvents(false);
-        }
-    }
-
     private void showContentIfReady() {
         if (mPullRequest != null && mIssue != null && mIsCollaborator != null) {
             setContentShown(true);
@@ -485,9 +483,9 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     private void showReviewDialog() {
-        ReviewDialogFragment reviewDialog = ReviewDialogFragment.newInstance(mRepoOwner, mRepoName,
-                mPullRequestNumber);
-        reviewDialog.show(getSupportFragmentManager(), "review_dialog");
+        Intent intent = CreateReviewActivity.makeIntent(this, mRepoOwner, mRepoName,
+                mPullRequestNumber, "");
+        startActivityForResult(intent, REQUEST_CREATE_REVIEW);
     }
 
     private void updateFabVisibility() {

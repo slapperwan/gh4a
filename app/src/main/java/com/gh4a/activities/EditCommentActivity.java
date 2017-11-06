@@ -70,7 +70,7 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onSendCommentInBackground(String body) throws IOException {
+    public void onEditorSendInBackground(String body) throws IOException {
         Bundle extras = getIntent().getExtras();
         RepositoryId repoId = new RepositoryId(extras.getString("owner"), extras.getString("repo"));
         long id = extras.getLong("id", 0L);
@@ -86,9 +86,14 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onCommentSent() {
+    public void onEditorTextSent() {
         setResult(RESULT_OK);
         finish();
+    }
+
+    @Override
+    public int getEditorErrorMessageResId() {
+        return R.string.issue_error_comment;
     }
 
     @Override

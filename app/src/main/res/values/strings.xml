@@ -456,6 +456,7 @@
     <string name="pull_request_review_button_affirm">Comment</string>
     <string name="pull_request_review_error">Adding review to pull request #%1$d failed.</string>
     <string name="pull_request_review_changes">Review</string>
+    <string name="review_create_error">Review creation failed.</string>
 
     <!-- Object -->
     <string name="object_view_file_at">View file @ %1$s</string>
