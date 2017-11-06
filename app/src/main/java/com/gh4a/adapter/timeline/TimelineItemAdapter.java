@@ -280,6 +280,7 @@ public class TimelineItemAdapter
             case VIEW_TYPE_REPLY:
                 //noinspection unchecked
                 holder.bind(item);
+                holder.itemView.setAlpha(shouldFadeReplyGroup(item) ? 0.5f : 1f);
                 break;
         }
     }
@@ -288,6 +289,24 @@ public class TimelineItemAdapter
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         CommentViewHolder holder = (CommentViewHolder) item;
         holder.updateReactions(reactions);
+    }
+
+    private boolean shouldFadeReplyGroup(TimelineItem item) {
+        long replyCommentId = mActionCallback.getSelectedReplyCommentId();
+        if (replyCommentId == 0) {
+            return false;
+        }
+        if (item instanceof TimelineItem.Diff) {
+            return ((TimelineItem.Diff) item).getInitialComment().getId() != replyCommentId;
+        }
+        if (item instanceof TimelineItem.TimelineComment) {
+            TimelineItem.TimelineComment tc = (TimelineItem.TimelineComment) item;
+            if (tc.getParentDiff() != null) {
+                return tc.getParentDiff().getInitialComment().getId() != replyCommentId;
+            }
+            return tc.comment.getId() != replyCommentId;
+        }
+        return false;
     }
 
     public static abstract class TimelineItemViewHolder<TItem extends TimelineItem> extends

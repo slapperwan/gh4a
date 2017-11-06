@@ -34,6 +34,8 @@ public abstract class TimelineItem {
         @Nullable
         public final CommitFile file;
 
+        Diff diff;
+
         public TimelineComment(@NonNull Comment comment) {
             this.comment = comment;
             this.file = null;
@@ -47,6 +49,10 @@ public abstract class TimelineItem {
         @Nullable
         public CommitComment getCommitComment() {
             return comment instanceof CommitComment ? (CommitComment) comment : null;
+        }
+
+        public Diff getParentDiff() {
+            return diff;
         }
 
         @Override
