@@ -154,7 +154,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         protected void onResultReady(List<User> result) {
             mAllAssignee = result;
             User creator = mEditIssue.getUser();
-            if (creator != null) {
+            if (creator != null && !mAllAssignee.contains(creator)) {
                 mAllAssignee.add(creator);
             }
             showAssigneesDialog();
