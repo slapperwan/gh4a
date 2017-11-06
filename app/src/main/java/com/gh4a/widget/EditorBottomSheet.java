@@ -166,7 +166,13 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
 
     public void setCallback(Callback callback) {
         mCallback = callback;
+        updateHint();
+    }
 
+    public void updateHint() {
+        if (mCallback == null) {
+            return;
+        }
         mBasicEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
         if (mAdvancedEditor != null) {
             mAdvancedEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
@@ -381,9 +387,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mAdvancedEditor.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor,
                 findViewById(R.id.send_button)));
 
-        if (mCallback != null) {
-            mAdvancedEditor.setCommentEditorHintResId(mCallback.getCommentEditorHintResId());
-        }
+        updateHint();
         mAdvancedEditor.setLocked(mBasicEditor.isLocked(), mBasicEditor.getLockedHintResId());
         mAdvancedEditor.setMentionUsers(mBasicEditor.getMentionUsers());
 

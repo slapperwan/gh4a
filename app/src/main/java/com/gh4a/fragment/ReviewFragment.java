@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AlertDialog;
@@ -69,6 +70,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     private Review mReview;
     private IntentUtils.InitialCommentMarker mInitialComment;
     private long mSelectedReplyCommentId;
+    private @StringRes int mCommentEditorHintResId = R.string.review_reply_hint;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -161,6 +163,16 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         } else {
             mBottomSheet.setLocked(false, 0);
         }
+
+        mCommentEditorHintResId = R.string.reply;
+        for (TimelineItem item : data) {
+            if (item instanceof TimelineItem.Reply) {
+                mCommentEditorHintResId = R.string.review_reply_hint;
+                break;
+            }
+        }
+        mBottomSheet.updateHint();
+
         super.onAddData(adapter, data);
         if (mInitialComment != null) {
             highlightInitialComment(data);
@@ -330,7 +342,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
     @Override
     public int getCommentEditorHintResId() {
-        return R.string.review_reply_hint;
+        return mCommentEditorHintResId;
     }
 
     @Override
