@@ -346,7 +346,12 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    public void onSendCommentInBackground(String comment) throws IOException {
+    public int getEditorErrorMessageResId() {
+        return R.string.issue_error_comment;
+    }
+
+    @Override
+    public void onEditorSendInBackground(String comment) throws IOException {
         Gh4Application app = Gh4Application.get();
         PullRequestService pullService =
                 (PullRequestService) app.getService(Gh4Application.PULL_SERVICE);
@@ -355,7 +360,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    public void onCommentSent() {
+    public void onEditorTextSent() {
         onRefresh();
     }
 

@@ -279,7 +279,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    public void onSendCommentInBackground(String comment) throws IOException {
+    public void onEditorSendInBackground(String comment) throws IOException {
         CommitService commitService = (CommitService)
                 Gh4Application.get().getService(Gh4Application.COMMIT_SERVICE);
         CommitComment commitComment = new CommitComment();
@@ -288,8 +288,13 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
     }
 
     @Override
-    public void onCommentSent() {
+    public void onEditorTextSent() {
         refreshComments();
+    }
+
+    @Override
+    public int getEditorErrorMessageResId() {
+        return R.string.issue_error_comment;
     }
 
     private void refreshComments() {
