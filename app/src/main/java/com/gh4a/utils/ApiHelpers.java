@@ -177,6 +177,20 @@ public class ApiHelpers {
         return response.body();
     }
 
+    public static Boolean mapToBooleanOrThrowOnFailure(Response<Void> response)
+            throws ApiRequestException {
+        switch (response.code()) {
+            case HttpURLConnection.HTTP_NO_CONTENT:
+                return true;
+            case HttpURLConnection.HTTP_NOT_FOUND:
+                return false;
+            case HttpURLConnection.HTTP_UNAUTHORIZED:
+                Gh4Application.get().logout();
+                break;
+        }
+        throw new ApiRequestException(response);
+    }
+
     public static class SearchPageAdapter<T> extends Page<T> {
         private final SearchPage<T> mPage;
 
