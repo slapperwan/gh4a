@@ -34,6 +34,7 @@ import java.util.Map;
 
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COMMENTS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_COMMITS;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_EVENTS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_FILES;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_MERGE;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_PULLS;
@@ -499,6 +500,34 @@ public class PullRequestService extends GitHubService {
 		uri.append(SEGMENT_PULLS);
 		uri.append('/').append(pullRequestId);
 		uri.append(SEGMENT_REVIEWS);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("event", reviewEvent);
+		params.put("body", reviewMessage);
+		return client.post(uri.toString(), params, Review.class);
+	}
+
+	/**
+	 * Submit a pending pull request review
+	 *
+	 * @param repository
+	 * @param pullRequestId
+	 * @param reviewId
+	 * @param reviewEvent
+	 * @param reviewMessage
+	 * @return created pull request review
+	 * @throws IOException
+	 */
+	public Review submitReview(IRepositoryIdProvider repository, int pullRequestId,
+			long reviewId, String reviewEvent,
+			String reviewMessage) throws IOException {
+		String repoId = getId(repository);
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+		uri.append('/').append(repoId);
+		uri.append(SEGMENT_PULLS);
+		uri.append('/').append(pullRequestId);
+		uri.append(SEGMENT_REVIEWS);
+		uri.append('/').append(reviewId);
+		uri.append(SEGMENT_EVENTS);
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("event", reviewEvent);
 		params.put("body", reviewMessage);
