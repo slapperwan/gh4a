@@ -15,6 +15,7 @@
  */
 package com.gh4a.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
+import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.ContentType;
 import com.meisolsson.githubsdk.model.Repository;
@@ -50,6 +52,7 @@ import io.reactivex.Single;
 public class ContentListFragment extends ListDataBaseFragment<Content> implements
         RootAdapter.OnItemClickListener<Content> {
     private static final int MENU_HISTORY = Menu.FIRST + 1;
+    private static final int REQUEST_FILE_HISTORY = 1000;
 
     private static final Comparator<Content> COMPARATOR = (lhs, rhs) -> {
         boolean lhsIsDir = lhs.type() == ContentType.Directory;
@@ -77,6 +80,7 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
     public interface ParentCallback {
         void onContentsLoaded(ContentListFragment fragment, List<Content> contents);
         void onTreeSelected(Content content);
+        void onCommitSelected(Commit commit);
         Set<String> getSubModuleNames(ContentListFragment fragment);
     }
 
@@ -164,12 +168,22 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
             Content contents = mAdapter.getItemFromAdapterPosition(info.position);
             Intent intent = CommitHistoryActivity.makeIntent(getActivity(),
                     mRepository.owner().login(), mRepository.name(),
-                    mRef, contents.path());
-            startActivity(intent);
+                    mRef, contents.path(), true);
+            startActivityForResult(intent, REQUEST_FILE_HISTORY);
             return true;
         }
 
         return super.onContextItemSelected(item);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_FILE_HISTORY && resultCode == Activity.RESULT_OK) {
+            Commit commit = data.getParcelableExtra("commit");
+            mCallback.onCommitSelected(commit);
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     public String getPath() {

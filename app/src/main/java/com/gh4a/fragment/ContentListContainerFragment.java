@@ -1,5 +1,6 @@
 package com.gh4a.fragment;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,6 +23,7 @@ import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.PathBreadcrumbs;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.ContentType;
 import com.meisolsson.githubsdk.model.Repository;
@@ -44,6 +46,9 @@ import io.reactivex.schedulers.Schedulers;
 public class ContentListContainerFragment extends Fragment implements
         ContentListFragment.ParentCallback, PathBreadcrumbs.SelectionCallback,
         BaseActivity.RefreshableChild, SwipeRefreshLayout.ChildScrollDelegate {
+    public interface CommitSelectionCallback {
+        void onCommitSelectedAsBase(Commit commit);
+    }
     private static final int ID_LOADER_MODULEMAP = 100;
 
     private static final String STATE_KEY_DIR_STACK = "dir_stack";
@@ -59,6 +64,7 @@ public class ContentListContainerFragment extends Fragment implements
     private final Stack<String> mDirStack = new Stack<>();
     private ArrayList<String> mInitialPathToLoad;
     private boolean mStateSaved;
+    private CommitSelectionCallback mCommitCallback;
     private final Map<String, ArrayList<Content>> mContentCache =
             new LinkedHashMap<String, ArrayList<Content>>() {
         private static final long serialVersionUID = -2379579224736389357L;
@@ -119,6 +125,16 @@ public class ContentListContainerFragment extends Fragment implements
                 }
                 mInitialPathToLoad.add(initialPath);
             }
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof CommitSelectionCallback) {
+            mCommitCallback = (CommitSelectionCallback) context;
+        } else {
+            throw new ClassCastException("No callback provided");
         }
     }
 
@@ -227,6 +243,11 @@ public class ContentListContainerFragment extends Fragment implements
                 mInitialPathToLoad = null;
             }
         }
+    }
+
+    @Override
+    public void onCommitSelected(Commit commit) {
+        mCommitCallback.onCommitSelectedAsBase(commit);
     }
 
     @Override

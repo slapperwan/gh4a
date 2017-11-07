@@ -33,6 +33,7 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Branch;
+import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.Subscription;
 import com.meisolsson.githubsdk.model.request.activity.SubscriptionRequest;
@@ -48,7 +49,9 @@ import java.util.List;
 import io.reactivex.Single;
 import retrofit2.Response;
 
-public class RepositoryActivity extends BaseFragmentPagerActivity {
+public class RepositoryActivity extends BaseFragmentPagerActivity implements
+        CommitListFragment.ContextSelectionCallback,
+        ContentListContainerFragment.CommitSelectionCallback {
     public static Intent makeIntent(Context context, Repository repo) {
         return makeIntent(context, repo, null);
     }
@@ -77,6 +80,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                 .putExtra("initial_path", initialPath)
                 .putExtra("initial_page", initialPage);
     }
+
+    private static final String STATE_KEY_SELECTED_REF = "selected_ref";
 
     private static final int ID_LOADER_REPO = 0;
     private static final int ID_LOADER_WATCHING = 1;
@@ -114,6 +119,10 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (savedInstanceState != null) {
+            mSelectedRef = savedInstanceState.getString(STATE_KEY_SELECTED_REF);
+        }
+
         mActionBar = getSupportActionBar();
         mActionBar.setTitle(mRepoOwner + "/" + mRepoName);
         mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -133,6 +142,22 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         mSelectedRef = extras.getString("ref");
         mInitialPage = extras.getInt("initial_page", -1);
         mInitialPath = extras.getString("initial_path");
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_KEY_SELECTED_REF, mSelectedRef);
+    }
+
+    @Override
+    public void onCommitSelectedAsBase(Commit commit) {
+        setSelectedRef(commit.sha());
+    }
+
+    @Override
+    public boolean baseSelectionAllowed() {
+        return true;
     }
 
     private void updateTitle() {

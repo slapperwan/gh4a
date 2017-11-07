@@ -329,6 +329,7 @@
     <string name="commit_comment_dialog_title">Comment on line -%1$d +%2$d</string>
     <string name="error_delete_commit_comment">Deletion of commit comment failed.</string>
     <string name="error_delete_comment">Comment deletion failed.</string>
+    <string name="commit_use_as_ref">Select as branch reference</string>
 
     <!-- Release -->
     <string name="release_title">Release</string>
