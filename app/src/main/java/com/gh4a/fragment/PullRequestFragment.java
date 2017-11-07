@@ -388,7 +388,7 @@ public class PullRequestFragment extends IssueFragmentBase {
 
         GitService service = Gh4Application.get().getGitHubService(GitService.class);
         CreateGitReference request = CreateGitReference.builder()
-                .ref(head.ref())
+                .ref("refs/heads/" + head.ref())
                 .sha(head.sha())
                 .build();
 
@@ -409,8 +409,8 @@ public class PullRequestFragment extends IssueFragmentBase {
         String owner = head.repo().owner().login();
         String repo = head.repo().name();
 
-        service.deleteGitReference(owner, repo, head.ref())
-                .map(ApiHelpers::throwOnFailure)
+        service.deleteGitReference(owner, repo, "heads/" + head.ref())
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
                         R.string.deleting_msg, R.string.delete_branch_error))
                 .subscribe(result -> {
