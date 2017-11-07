@@ -51,6 +51,7 @@ import com.gh4a.loader.IsCollaboratorLoader;
 import com.gh4a.loader.IssueLoader;
 import com.gh4a.loader.LoaderCallbacks;
 import com.gh4a.loader.LoaderResult;
+import com.gh4a.loader.PendingReviewLoader;
 import com.gh4a.loader.PullRequestLoader;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -63,10 +64,12 @@ import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.PullRequestMarker;
 import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.User;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
@@ -102,6 +105,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private PullRequest mPullRequest;
     private PullRequestFragment mPullRequestFragment;
     private IssueStateTrackingFloatingActionButton mEditFab;
+    private Review mPendingReview;
 
     private ViewGroup mHeader;
     private int[] mHeaderColorAttrs;
@@ -169,6 +173,27 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
     };
 
+    private final LoaderCallbacks<List<Review>> mPendingReviewCallback =
+            new LoaderCallbacks<List<Review>>(this) {
+        @Override
+        protected Loader<LoaderResult<List<Review>>> onCreateLoader() {
+            return new PendingReviewLoader(PullRequestActivity.this,
+                    mRepoOwner, mRepoName, mPullRequestNumber);
+        }
+
+        @Override
+        protected void onResultReady(List<Review> result) {
+            String ownLogin = Gh4Application.get().getAuthLogin();
+            mPendingReview = null;
+            for (Review review : result) {
+                if (ApiHelpers.loginEquals(review.getUser(), ownLogin)) {
+                    mPendingReview = review;
+                    break;
+                }
+            }
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,6 +209,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         getSupportLoaderManager().initLoader(0, null, mPullRequestCallback);
         getSupportLoaderManager().initLoader(1, null, mIssueCallback);
         getSupportLoaderManager().initLoader(2, null, mCollaboratorCallback);
+        getSupportLoaderManager().initLoader(3, null, mPendingReviewCallback);
     }
 
     @NonNull
@@ -290,6 +316,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 if (mPullRequestFragment != null) {
                     mPullRequestFragment.reloadEvents(false);
                 }
+                // reload pending reviews
+                getSupportLoaderManager().getLoader(3).onContentChanged();
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -484,7 +512,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private void showReviewDialog() {
         Intent intent = CreateReviewActivity.makeIntent(this, mRepoOwner, mRepoName,
-                mPullRequestNumber, "");
+                mPullRequestNumber, mPendingReview);
         startActivityForResult(intent, REQUEST_CREATE_REVIEW);
     }
 
