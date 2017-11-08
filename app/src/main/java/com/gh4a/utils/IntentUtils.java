@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -21,10 +22,15 @@ import android.widget.Toast;
 
 import com.gh4a.R;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class IntentUtils {
     private static final String EXTRA_NEW_TASK = "IntentUtils.new_task";
@@ -162,6 +168,58 @@ public class IntentUtils {
 
     public static boolean isNewTaskIntent(@Nullable Intent intent) {
         return intent != null && intent.getBooleanExtra(EXTRA_NEW_TASK, false);
+    }
+
+    public static void putParcelableToBundleCompressed(Bundle bundle,
+            String key, Parcelable parcelable, int thresholdBytes) {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeParcelable(parcelable, 0);
+        byte[] bytes = parcel.marshall();
+        parcel.recycle();
+
+        if (bytes.length > thresholdBytes) {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
+                    GZIPOutputStream gzos = new GZIPOutputStream(baos)) {
+                gzos.write(bytes);
+                gzos.close();
+                bundle.putByteArray(key + "_compressed", baos.toByteArray());
+                return;
+            } catch (IOException e) {
+                // Fall back to storing uncompressed
+            }
+        }
+        bundle.putParcelable(key, parcelable);
+    }
+
+    public static <T> T readCompressedParcelableFromBundle(Bundle bundle, String key) {
+        byte[] uncompressedData = null;
+
+        if (bundle.containsKey(key + "_compressed")) {
+            byte[] compressedData = bundle.getByteArray(key + "_compressed");
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(compressedData);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    GZIPInputStream gzis = new GZIPInputStream(bais)) {
+                byte[] buffer = new byte[2048];
+                int len;
+                while ((len = gzis.read(buffer)) != -1) {
+                    baos.write(buffer, 0, len);
+                }
+                uncompressedData = baos.toByteArray();
+            } catch (IOException e) {
+                uncompressedData = null;
+            }
+        }
+
+        if (uncompressedData != null) {
+            Parcel parcel = Parcel.obtain();
+            parcel.unmarshall(uncompressedData, 0, uncompressedData.length);
+            parcel.setDataPosition(0);
+            T result = parcel.readParcelable(FileUtils.class.getClassLoader());
+            parcel.recycle();
+            return result;
+        } else {
+            return bundle.getParcelable(key);
+        }
     }
 
     public static class InitialCommentMarker implements Parcelable {

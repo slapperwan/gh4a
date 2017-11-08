@@ -22,6 +22,7 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
@@ -46,7 +47,10 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putString("sha", commitSha);
-        args.putParcelable("commit", commit);
+        // Commit objects can be huge, depending on the number of patches attached to it.
+        // In order to avoid TransactionTooLargeExceptions being thrown when the activity we're
+        // attached to is recreated, store the data in compressed form
+        IntentUtils.putParcelableToBundleCompressed(args, "commit", commit, 100000);
         args.putParcelableArrayList("comments", new ArrayList<>(comments));
         f.setArguments(args);
         return f;
@@ -68,11 +72,12 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString("owner");
-        mRepoName = getArguments().getString("repo");
-        mObjectSha = getArguments().getString("sha");
-        mCommit = getArguments().getParcelable("commit");
-        mComments = getArguments().getParcelableArrayList("comments");
+        Bundle args = getArguments();
+        mRepoOwner = args.getString("owner");
+        mRepoName = args.getString("repo");
+        mObjectSha = args.getString("sha");
+        mCommit = IntentUtils.readCompressedParcelableFromBundle(args, "commit");
+        mComments = args.getParcelableArrayList("comments");
     }
 
     @Override
