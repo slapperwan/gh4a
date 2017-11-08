@@ -439,6 +439,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         private long[] mOldReactionIds;
         private final Callback mCallback;
         private final Item mItem;
+        private boolean mLoading;
 
         public AddReactionMenuHelper(@NonNull Context context, Menu menu,
                 Callback callback, Item item, ReactionDetailsCache detailsCache) {
@@ -506,8 +507,11 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 syncCheckStates();
             } else if (mDetailsCache.hasEntryFor(mItem)) {
                 update();
-            } else {
+            } else if (!mLoading) {
                 fetchReactions(mCallback, mItem, mDetailsCache)
+                        .doOnSubscribe(disposable -> mLoading = true)
+                        .doOnSuccess(result -> mLoading = false)
+                        .doOnError(error -> mLoading = false)
                         .subscribe(reactions -> update(), error -> update());
             }
         }
