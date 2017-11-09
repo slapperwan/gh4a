@@ -65,8 +65,8 @@ class CommentViewHolder
         void quoteText(CharSequence text);
         void addText(CharSequence text);
         boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem);
-        Single<List<Reaction>> loadReactionDetailsInBackground(TimelineItem.TimelineComment item);
-        Single<Reaction> addReactionInBackground(TimelineItem.TimelineComment item, String content);
+        Single<List<Reaction>> loadReactionDetails(TimelineItem.TimelineComment item);
+        Single<Reaction> addReaction(TimelineItem.TimelineComment item, String content);
     }
 
     public CommentViewHolder(View view, HttpImageGetter imageGetter, String repoOwner,
@@ -248,12 +248,12 @@ class CommentViewHolder
 
 
     @Override
-    public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
-        return mCallback.loadReactionDetailsInBackground(mBoundItem);
+    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item) {
+        return mCallback.loadReactionDetails(mBoundItem);
     }
 
     @Override
-    public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
-        return mCallback.addReactionInBackground(mBoundItem, content);
+    public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
+        return mCallback.addReaction(mBoundItem, content);
     }
 }

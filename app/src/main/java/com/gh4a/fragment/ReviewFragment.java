@@ -404,7 +404,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetailsInBackground(final GitHubCommentBase comment) {
+    public Single<List<Reaction>> loadReactionDetails(final GitHubCommentBase comment) {
         final ReactionService service = ServiceFactory.get(ReactionService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> comment instanceof ReviewComment
@@ -415,7 +415,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    public Single<Reaction> addReactionInBackground(GitHubCommentBase comment, String content) {
+    public Single<Reaction> addReaction(GitHubCommentBase comment, String content) {
         final ReactionService service = ServiceFactory.get(ReactionService.class);
         final ReactionRequest request = ReactionRequest.builder().content(content).build();
         final Single<Response<Reaction>> responseSingle = comment instanceof ReviewComment

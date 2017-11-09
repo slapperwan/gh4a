@@ -440,14 +440,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
+    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item) {
         final ReactionService service = ServiceFactory.get(ReactionService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getIssueReactions(mRepoOwner, mRepoName, mIssue.number(), page));
     }
 
     @Override
-    public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
+    public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
         ReactionService service = ServiceFactory.get(ReactionService.class);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createIssueReaction(mRepoOwner, mRepoName, mIssue.number(), request)
@@ -455,14 +455,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetailsInBackground(final GitHubCommentBase comment) {
+    public Single<List<Reaction>> loadReactionDetails(final GitHubCommentBase comment) {
         final ReactionService service = ServiceFactory.get(ReactionService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getIssueCommentReactions(mRepoOwner, mRepoName, comment.id(), page));
     }
 
     @Override
-    public Single<Reaction> addReactionInBackground(GitHubCommentBase comment, String content) {
+    public Single<Reaction> addReaction(GitHubCommentBase comment, String content) {
         ReactionService service = ServiceFactory.get(ReactionService.class);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createIssueCommentReaction(mRepoOwner, mRepoName,comment.id(), request)
