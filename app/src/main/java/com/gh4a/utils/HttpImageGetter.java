@@ -339,7 +339,7 @@ public class HttpImageGetter {
     public HttpImageGetter(Context context) {
         mContext = context;
         mCacheDir = context.getCacheDir();
-        mClient = ServiceFactory.getHttpClientBuilder().build();
+        mClient = ServiceFactory.getImageHttpClient();
 
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         final Point size = new Point();

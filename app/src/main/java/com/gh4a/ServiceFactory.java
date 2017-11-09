@@ -86,7 +86,8 @@ public class ServiceFactory {
             .addConverterFactory(new StringResponseConverterFactory())
             .addConverterFactory(MoshiConverterFactory.create(ServiceGenerator.moshi));
 
-    private static OkHttpClient sHttpClient;
+    private static OkHttpClient sApiHttpClient;
+    private static OkHttpClient sImageHttpClient;
 
     private final static HashMap<String, Object> sCache = new HashMap<>();
 
@@ -115,7 +116,7 @@ public class ServiceFactory {
 
     private static <S> S createService(Class<S> serviceClass, final boolean bypassCache,
             final String acceptHeader, final String token, final Integer pageSize) {
-        OkHttpClient.Builder clientBuilder = sHttpClient.newBuilder()
+        OkHttpClient.Builder clientBuilder = sApiHttpClient.newBuilder()
                 .addInterceptor(PAGINATION_INTRCEPTOR)
                 .addNetworkInterceptor(CACHE_MAX_AGE_INTERCEPTOR)
                 .addInterceptor(chain -> {
@@ -160,12 +161,19 @@ public class ServiceFactory {
     }
 
     public static OkHttpClient.Builder getHttpClientBuilder() {
-        return sHttpClient.newBuilder();
+        return sApiHttpClient.newBuilder();
+    }
+
+    public static OkHttpClient getImageHttpClient() {
+        return sImageHttpClient;
     }
 
     static void initClient(Context context) {
-        sHttpClient = new OkHttpClient.Builder()
-                .cache(new Cache(new File(context.getCacheDir(), "http"), 20 * 1024 * 1024))
+        sApiHttpClient = new OkHttpClient.Builder()
+                .cache(new Cache(new File(context.getCacheDir(), "api-http"), 20 * 1024 * 1024))
+                .build();
+        sImageHttpClient = new OkHttpClient.Builder()
+                .cache(new Cache(new File(context.getCacheDir(), "image-http"), 20 * 1024 * 1024))
                 .build();
     }
 }
