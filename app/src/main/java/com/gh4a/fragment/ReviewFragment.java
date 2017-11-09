@@ -180,18 +180,23 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     private void selectAndRemoveFirstReply(List<TimelineItem> data) {
-        int replyItemCount = 0;
+        int groupCount = 0;
         TimelineItem.Reply firstReplyItem = null;
+        TimelineItem.Diff firstDiffItem = null;
         for (TimelineItem timelineItem : data) {
-            if (timelineItem instanceof TimelineItem.Reply) {
-                replyItemCount += 1;
-
-                if (replyItemCount > 1) {
+            if (timelineItem instanceof TimelineItem.Diff) {
+                groupCount += 1;
+                if (groupCount > 1) {
                     return;
                 }
 
-                if (firstReplyItem == null) {
-                    firstReplyItem = (TimelineItem.Reply) timelineItem;
+                if (firstDiffItem == null) {
+                    firstDiffItem = (TimelineItem.Diff) timelineItem;
+                }
+            } else if (firstDiffItem != null && timelineItem instanceof TimelineItem.Reply) {
+                TimelineItem.Reply replyItem = (TimelineItem.Reply) timelineItem;
+                if (replyItem.timelineComment.getParentDiff().equals(firstDiffItem)) {
+                    firstReplyItem = replyItem;
                 }
             }
         }
