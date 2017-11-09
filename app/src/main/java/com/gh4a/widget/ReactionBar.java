@@ -51,8 +51,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         Object getCacheKey();
     }
     public interface Callback {
-        Single<List<Reaction>> loadReactionDetailsInBackground(Item item);
-        Single<Reaction> addReactionInBackground(Item item, String content);
+        Single<List<Reaction>> loadReactionDetails(Item item);
+        Single<Reaction> addReaction(Item item, String content);
     }
 
     private static final @IdRes int[] VIEW_IDS = {
@@ -387,7 +387,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
     private static Single<List<Reaction>> fetchReactions(Callback callback, Item item,
             ReactionDetailsCache cache) {
-        return callback.loadReactionDetailsInBackground(item)
+        return callback.loadReactionDetails(item)
                 .compose(RxUtils::doInBackground)
                 .compose(RxUtils.sortList((lhs, rhs) -> {
                     int result = lhs.content().compareTo(rhs.content());
@@ -405,7 +405,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         final Single<Optional<Reaction>> resultSingle;
 
         if (id == 0) {
-            resultSingle = callback.addReactionInBackground(item, content)
+            resultSingle = callback.addReaction(item, content)
                     .map(Optional::of);
         } else {
             ReactionService service = ServiceFactory.get(ReactionService.class);

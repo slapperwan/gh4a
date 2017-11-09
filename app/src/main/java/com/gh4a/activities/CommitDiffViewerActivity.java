@@ -100,7 +100,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
+    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item) {
         final CommitCommentWrapper comment = (CommitCommentWrapper) item;
         final ReactionService service = ServiceFactory.get(ReactionService.class);
         return ApiHelpers.PageIterator
@@ -108,7 +108,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     }
 
     @Override
-    public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
+    public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
         CommitCommentWrapper comment = (CommitCommentWrapper) item;
         final ReactionService service = ServiceFactory.get(ReactionService.class);
         ReactionRequest request = ReactionRequest.builder().content(content).build();

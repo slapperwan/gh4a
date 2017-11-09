@@ -57,8 +57,8 @@ public class TimelineItemAdapter
         void onReplyCommentSelected(long replyToId);
         long getSelectedReplyCommentId();
         String getShareSubject(GitHubCommentBase comment);
-        Single<List<Reaction>> loadReactionDetailsInBackground(GitHubCommentBase comment);
-        Single<Reaction> addReactionInBackground(GitHubCommentBase comment, String content);
+        Single<List<Reaction>> loadReactionDetails(GitHubCommentBase comment);
+        Single<Reaction> addReaction(GitHubCommentBase comment, String content);
     }
 
     private final ReviewViewHolder.Callback mReviewCallback = new ReviewViewHolder.Callback() {
@@ -117,13 +117,13 @@ public class TimelineItemAdapter
         }
 
         @Override
-        public Single<List<Reaction>> loadReactionDetailsInBackground(TimelineItem.TimelineComment item) {
-            return mActionCallback.loadReactionDetailsInBackground(item.comment());
+        public Single<List<Reaction>> loadReactionDetails(TimelineItem.TimelineComment item) {
+            return mActionCallback.loadReactionDetails(item.comment());
         }
 
         @Override
-        public Single<Reaction> addReactionInBackground(TimelineItem.TimelineComment item, String content) {
-            return mActionCallback.addReactionInBackground(item.comment(), content);
+        public Single<Reaction> addReaction(TimelineItem.TimelineComment item, String content) {
+            return mActionCallback.addReaction(item.comment(), content);
         }
     };
 
