@@ -26,10 +26,10 @@ public class OrganizationMemberListFragment extends PagedDataBaseFragment<User> 
     }
 
     @Override
-    protected Single<Response<Page<User>>> loadPage(int page) {
+    protected Single<Response<Page<User>>> loadPage(int page, boolean bypassCache) {
         String organization = getArguments().getString("org");
         final OrganizationMemberService service =
-                ServiceFactory.get(OrganizationMemberService.class);
+                ServiceFactory.get(OrganizationMemberService.class, bypassCache);
         return service.getMembers(organization, page);
     }
 

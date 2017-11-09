@@ -72,8 +72,8 @@ public class StargazerListFragment extends PagedDataBaseFragment<User> {
     }
 
     @Override
-    protected Single<Response<Page<User>>> loadPage(int page) {
-        final StarringService service = ServiceFactory.get(StarringService.class);
+    protected Single<Response<Page<User>>> loadPage(int page, boolean bypassCache) {
+        final StarringService service = ServiceFactory.get(StarringService.class, bypassCache);
         return service.getStargazers(mRepoOwner, mRepoName, page);
     }
 }

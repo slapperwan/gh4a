@@ -23,7 +23,7 @@ public class EditCommitCommentActivity extends EditCommentActivity {
     @Override
     protected Single<GitHubCommentBase> createComment(String repoOwner, String repoName,
             String body, long replyToCommentId) {
-        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
+        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class, false);
         CreateCommitComment request = CreateCommitComment.builder().body(body).build();
         String sha = getIntent().getStringExtra("commit");
         return service.createCommitComment(repoOwner, repoName, sha, request)
@@ -33,7 +33,7 @@ public class EditCommitCommentActivity extends EditCommentActivity {
     @Override
     protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
             long commentId, String body) {
-        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
+        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class, false);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editCommitComment(repoOwner, repoName, commentId, request)
                 .map(ApiHelpers::throwOnFailure);

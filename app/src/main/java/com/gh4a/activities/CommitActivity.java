@@ -208,7 +208,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     }
 
     private void loadCommit(boolean force) {
-        RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class);
+        RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class, force);
 
         service.getCommit(mRepoOwner, mRepoName, mObjectSha)
                 .map(ApiHelpers::throwOnFailure)
@@ -220,7 +220,8 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     }
 
     private void loadComments(boolean force) {
-        final RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
+        final RepositoryCommentService service =
+                ServiceFactory.get(RepositoryCommentService.class, force);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mObjectSha, page))
                 .compose(makeLoaderSingle(ID_LOADER_COMMENTS, force))

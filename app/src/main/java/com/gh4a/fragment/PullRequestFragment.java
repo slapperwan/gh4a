@@ -189,16 +189,18 @@ public class PullRequestFragment extends IssueFragmentBase {
    }
 
     @Override
-    protected Single<List<TimelineItem>> onCreateDataSingle() {
+    protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
         final int issueNumber = mIssue.number();
-        final IssueEventService eventService = ServiceFactory.get(IssueEventService.class);
-        final IssueCommentService commentService = ServiceFactory.get(IssueCommentService.class);
+        final IssueEventService eventService =
+                ServiceFactory.get(IssueEventService.class, bypassCache);
+        final IssueCommentService commentService =
+                ServiceFactory.get(IssueCommentService.class, bypassCache);
 
-        final PullRequestService prService = ServiceFactory.get(PullRequestService.class);
+        final PullRequestService prService = ServiceFactory.get(PullRequestService.class, bypassCache);
         final PullRequestReviewService reviewService =
-                ServiceFactory.get(PullRequestReviewService.class);
+                ServiceFactory.get(PullRequestReviewService.class, bypassCache);
         final PullRequestReviewCommentService prCommentService =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
 
         Single<List<TimelineItem>> issueCommentItemSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
@@ -341,10 +343,10 @@ public class PullRequestFragment extends IssueFragmentBase {
     protected Single<Response<Void>> doDeleteComment(GitHubCommentBase comment) {
         if (comment instanceof ReviewComment) {
             PullRequestReviewCommentService service =
-                    ServiceFactory.get(PullRequestReviewCommentService.class);
+                    ServiceFactory.get(PullRequestReviewCommentService.class, false);
             return service.deleteComment(mRepoOwner, mRepoName, comment.id());
         } else {
-            IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
+            IssueCommentService service = ServiceFactory.get(IssueCommentService.class, false);
             return service.deleteIssueComment(mRepoOwner, mRepoName, comment.id());
         }
     }
@@ -384,7 +386,7 @@ public class PullRequestFragment extends IssueFragmentBase {
         String owner = head.repo().owner().login();
         String repo = head.repo().name();
 
-        GitService service = ServiceFactory.get(GitService.class);
+        GitService service = ServiceFactory.get(GitService.class, false);
         CreateGitReference request = CreateGitReference.builder()
                 .ref("refs/heads/" + head.ref())
                 .sha(head.sha())
@@ -401,7 +403,7 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     private void deletePullRequestBranch() {
-        GitService service = ServiceFactory.get(GitService.class);
+        GitService service = ServiceFactory.get(GitService.class, false);
 
         PullRequestMarker head = mPullRequest.head();
         String owner = head.repo().owner().login();
@@ -446,7 +448,7 @@ public class PullRequestFragment extends IssueFragmentBase {
             return;
         }
 
-        RepositoryStatusService service = ServiceFactory.get(RepositoryStatusService.class);
+        RepositoryStatusService service = ServiceFactory.get(RepositoryStatusService.class, force);
         String sha = mPullRequest.head().sha();
 
         ApiHelpers.PageIterator
@@ -474,7 +476,7 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     private void loadHeadReference(boolean force) {
-        GitService service = ServiceFactory.get(GitService.class);
+        GitService service = ServiceFactory.get(GitService.class, force);
 
         PullRequestMarker head = mPullRequest.head();
         Repository repo = head.repo();

@@ -100,7 +100,7 @@ public class NotificationHandlingService extends IntentService {
     }
 
     private void markNotificationAsRead(String repoOwner, String repoName, long timestamp) {
-        NotificationService service = ServiceFactory.get(NotificationService.class);
+        NotificationService service = ServiceFactory.get(NotificationService.class, false);
         NotificationReadRequest request = NotificationReadRequest.builder()
                 .lastReadAt(new Date(timestamp))
                 .build();

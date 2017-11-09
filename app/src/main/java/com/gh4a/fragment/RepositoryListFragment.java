@@ -128,8 +128,8 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected Single<Response<Page<Repository>>> loadPage(int page) {
-        final RepositoryService service = ServiceFactory.get(RepositoryService.class);
+    protected Single<Response<Page<Repository>>> loadPage(int page, boolean bypassCache) {
+        final RepositoryService service = ServiceFactory.get(RepositoryService.class, bypassCache);
         return ApiHelpers.loginEquals(mLogin, Gh4Application.get().getAuthLogin())
                 ? service.getUserRepositories(mFilterData, page)
                 : service.getUserRepositories(mLogin, mFilterData, page);

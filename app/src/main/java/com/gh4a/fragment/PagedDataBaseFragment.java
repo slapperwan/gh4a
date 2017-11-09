@@ -103,7 +103,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     private void load(boolean force) {
         mSubscription = mPageSubject
-                .flatMap(page -> loadPage(page)
+                .flatMap(page -> loadPage(page, force)
                         .map(response -> {
                             if (response.code() == HttpURLConnection.HTTP_NO_CONTENT) {
                                 return Response.success(new ApiHelpers.DummyPage<T>());
@@ -162,6 +162,6 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     }
 
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
-    protected abstract Single<Response<Page<T>>> loadPage(int page);
+    protected abstract Single<Response<Page<T>>> loadPage(int page, boolean bypassCache);
     public abstract void onItemClick(T item);
 }

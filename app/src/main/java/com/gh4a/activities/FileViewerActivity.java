@@ -318,7 +318,7 @@ public class FileViewerActivity extends WebViewerActivity
     }
 
     private void loadFile(boolean force) {
-        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, force);
         service.getContents(mRepoOwner, mRepoName, mPath, mRef)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Optional::of)

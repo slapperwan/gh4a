@@ -54,7 +54,7 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
         Bundle extras = getIntent().getExtras();
         int prNumber = extras.getInt("pull_request_number", 0);
         PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, false);
         CreateReviewComment.Builder builder = CreateReviewComment.builder()
                 .body(body);
 
@@ -74,7 +74,7 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
     protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
             long commentId, String body) {
         PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, false);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editReviewComment(repoOwner, repoName, commentId, request)
                 .map(ApiHelpers::throwOnFailure);

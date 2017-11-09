@@ -37,7 +37,7 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
 
     @Override
     protected Single<String> getSha() {
-        PullRequestService service = ServiceFactory.get(PullRequestService.class);
+        PullRequestService service = ServiceFactory.get(PullRequestService.class, false);
         return service.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
                 .map(ApiHelpers::throwOnFailure)
                 .map(pr -> pr.head().sha());
@@ -45,7 +45,7 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
 
     @Override
     protected Single<List<GitHubFile>> getFiles() {
-        final PullRequestService service = ServiceFactory.get(PullRequestService.class);
+        final PullRequestService service = ServiceFactory.get(PullRequestService.class, false);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestFiles(mRepoOwner, mRepoName, mPullRequestNumber, page));
     }
@@ -53,7 +53,7 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
     @Override
     protected Single<List<ReviewComment>> getComments() {
         final PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, false);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))

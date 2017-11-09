@@ -306,7 +306,7 @@ public class ContentListContainerFragment extends Fragment implements
     }
 
     private void loadModuleMap() {
-        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, false);
         String repoOwner = mRepository.owner().login();
         String repoName = mRepository.name();
 

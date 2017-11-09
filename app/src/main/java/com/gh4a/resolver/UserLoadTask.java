@@ -23,7 +23,7 @@ public abstract class UserLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        UserService userService = ServiceFactory.get(UserService.class);
+        UserService userService = ServiceFactory.get(UserService.class, false);
         return userService.getUser(mUserLogin)
                 .map(ApiHelpers::throwOnFailure)
                 .map(user -> Optional.of(getIntent(user)));

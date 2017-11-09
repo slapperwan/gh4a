@@ -440,30 +440,31 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item) {
-        final ReactionService service = ServiceFactory.get(ReactionService.class);
+    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getIssueReactions(mRepoOwner, mRepoName, mIssue.number(), page));
     }
 
     @Override
     public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
-        ReactionService service = ServiceFactory.get(ReactionService.class);
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createIssueReaction(mRepoOwner, mRepoName, mIssue.number(), request)
                 .map(ApiHelpers::throwOnFailure);
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetails(final GitHubCommentBase comment) {
-        final ReactionService service = ServiceFactory.get(ReactionService.class);
+    public Single<List<Reaction>> loadReactionDetails(final GitHubCommentBase comment,
+            boolean bypassCache) {
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getIssueCommentReactions(mRepoOwner, mRepoName, comment.id(), page));
     }
 
     @Override
     public Single<Reaction> addReaction(GitHubCommentBase comment, String content) {
-        ReactionService service = ServiceFactory.get(ReactionService.class);
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createIssueCommentReaction(mRepoOwner, mRepoName,comment.id(), request)
                 .map(ApiHelpers::throwOnFailure);
@@ -519,7 +520,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public Single<?> onEditorDoSend(String comment) {
-        IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
+        IssueCommentService service = ServiceFactory.get(IssueCommentService.class, false);
         CommentRequest request = CommentRequest.builder().body(comment).build();
         return service.createIssueComment(mRepoOwner, mRepoName, mIssue.number(), request)
                 .map(ApiHelpers::throwOnFailure);

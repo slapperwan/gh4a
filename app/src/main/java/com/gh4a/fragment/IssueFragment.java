@@ -71,10 +71,11 @@ public class IssueFragment extends IssueFragmentBase {
     }
 
     @Override
-    protected Single<List<TimelineItem>> onCreateDataSingle() {
+    protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
         final int issueNumber = mIssue.number();
-        final IssueEventService eventService = ServiceFactory.get(IssueEventService.class);
-        final IssueCommentService commentService = ServiceFactory.get(IssueCommentService.class);
+        final IssueEventService eventService = ServiceFactory.get(IssueEventService.class, bypassCache);
+        final IssueCommentService commentService =
+                ServiceFactory.get(IssueCommentService.class, bypassCache);
 
         Single<List<TimelineItem>> commentSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
@@ -104,7 +105,7 @@ public class IssueFragment extends IssueFragmentBase {
 
     @Override
     protected Single<Response<Void>> doDeleteComment(GitHubCommentBase comment) {
-        IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
+        IssueCommentService service = ServiceFactory.get(IssueCommentService.class, false);
         return service.deleteIssueComment(mRepoOwner, mRepoName, comment.id());
     }
 

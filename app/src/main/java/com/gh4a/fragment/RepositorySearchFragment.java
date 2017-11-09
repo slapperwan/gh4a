@@ -39,7 +39,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> i
     }
 
     @Override
-    protected Single<List<Repository>> onCreateDataSingle() {
+    protected Single<List<Repository>> onCreateDataSingle(boolean bypassCache) {
         String login = getArguments().getString("user");
         String query = getArguments().getString("query");
 
@@ -47,7 +47,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> i
             return Single.just(new ArrayList<Repository>());
         }
 
-        SearchService service = ServiceFactory.get(SearchService.class);
+        SearchService service = ServiceFactory.get(SearchService.class, bypassCache);
         String params = query + " fork:true user:" + login;
 
         return ApiHelpers.PageIterator

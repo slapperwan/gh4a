@@ -72,8 +72,8 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     }
 
     @Override
-    protected Single<Response<Page<User>>> loadPage(int page) {
-        final UserFollowerService service = ServiceFactory.get(UserFollowerService.class);
+    protected Single<Response<Page<User>>> loadPage(int page, boolean bypassCache) {
+        final UserFollowerService service = ServiceFactory.get(UserFollowerService.class, bypassCache);
         return mShowFollowers
                 ? service.getFollowers(mLogin, page)
                 : service.getFollowing(mLogin, page);

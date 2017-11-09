@@ -128,7 +128,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
     private void loadOrganizations(boolean force) {
         final Gh4Application app = Gh4Application.get();
-        final OrganizationService service = ServiceFactory.get(OrganizationService.class);
+        final OrganizationService service = ServiceFactory.get(OrganizationService.class, force);
         mOrganizationSubscription = ApiHelpers.PageIterator
                 .toSingle(page -> ApiHelpers.loginEquals(mUserLogin, app.getAuthLogin())
                         ? service.getMyOrganizations(page)

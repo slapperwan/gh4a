@@ -52,7 +52,7 @@ public class EditDiffCommentActivity extends EditCommentActivity {
             String body, long replyToCommentId) {
         Bundle extras = getIntent().getExtras();
         String commitId = extras.getString("commit_id");
-        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
+        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class, false);
         CreateCommitComment request = CreateCommitComment.builder()
                 .body(body)
                 .path(extras.getString("path"))
@@ -65,7 +65,7 @@ public class EditDiffCommentActivity extends EditCommentActivity {
     @Override
     protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
             long commentId, String body) {
-        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
+        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class, false);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editCommitComment(repoOwner, repoName, commentId, request)
                 .map(ApiHelpers::throwOnFailure);

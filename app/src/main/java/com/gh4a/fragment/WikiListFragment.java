@@ -44,7 +44,7 @@ public class WikiListFragment extends ListDataBaseFragment<Feed> implements
     }
 
     @Override
-    protected Single<List<Feed>> onCreateDataSingle() {
+    protected Single<List<Feed>> onCreateDataSingle(boolean bypassCache) {
         String relativeUrl = mUserLogin + "/" + mRepoName + "/wiki.atom";
         final List<Feed> empty = new ArrayList<>();
         return SingleFactory.loadFeed(relativeUrl)

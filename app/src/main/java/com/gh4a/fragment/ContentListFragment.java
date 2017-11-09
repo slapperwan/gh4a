@@ -194,13 +194,14 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
     }
 
     @Override
-    protected Single<List<Content>> onCreateDataSingle() {
+    protected Single<List<Content>> onCreateDataSingle(boolean bypassCache) {
         ArrayList<Content> contents = getArguments().getParcelableArrayList("contents");
         if (contents != null && !contents.isEmpty()) {
             return Single.just(contents);
         }
 
-        RepositoryContentService contentService = ServiceFactory.get(RepositoryContentService.class);
+        RepositoryContentService contentService =
+                ServiceFactory.get(RepositoryContentService.class, bypassCache);
         String repoOwner = mRepository.owner().login();
         String repoName = mRepository.name();
         String ref = mRef != null ? mRef : mRepository.defaultBranch();

@@ -28,11 +28,11 @@ public class CollaboratorListFragment extends PagedDataBaseFragment<User> implem
     }
 
     @Override
-    protected Single<Response<Page<User>>> loadPage(int page) {
+    protected Single<Response<Page<User>>> loadPage(int page, boolean bypassCache) {
         String owner = getArguments().getString("owner");
         String repo = getArguments().getString("repo");
         final RepositoryCollaboratorService service =
-                ServiceFactory.get(RepositoryCollaboratorService.class);
+                ServiceFactory.get(RepositoryCollaboratorService.class, bypassCache);
         return service.getCollaborators(owner, repo, page);
     }
 

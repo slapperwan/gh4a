@@ -34,7 +34,7 @@ public class PullRequestReviewLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class);
+        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class, false);
         return service.getReview(mRepoOwner, mRepoName, mPullRequestNumber, mMarker.commentId)
                 .map(ApiHelpers::throwOnFailure)
                 .map(review -> Optional.of(ReviewActivity.makeIntent(mActivity,

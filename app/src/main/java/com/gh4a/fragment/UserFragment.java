@@ -176,7 +176,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         return super.onOptionsItemSelected(item);
     }
 
-    private void fillData() {
+    private void fillData(boolean forceLoad) {
         ImageView gravatar = mContentView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mUser);
 
@@ -234,9 +234,9 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         fillTextView(R.id.tv_company, mUser.company());
         fillTextView(R.id.tv_location, mUser.location());
 
-        loadTopRepositories();
+        loadTopRepositories(forceLoad);
         if (mUser.type() == UserType.User) {
-            loadOrganizations();
+            loadOrganizations(forceLoad);
         } else {
             fillOrganizations(null);
         }
@@ -379,7 +379,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     private void toggleFollowingState() {
-        UserFollowerService service = ServiceFactory.get(UserFollowerService.class);
+        UserFollowerService service = ServiceFactory.get(UserFollowerService.class, false);
         Single<Response<Void>> responseSingle = mIsFollowing
                 ? service.unfollowUser(mUserLogin)
                 : service.followUser(mUserLogin);
@@ -393,21 +393,21 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     private void loadUser(boolean force) {
-        UserService service = ServiceFactory.get(UserService.class);
+        UserService service = ServiceFactory.get(UserService.class, force);
         service.getUser(mUserLogin)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_USER, force))
                 .subscribe(result -> {
                     mUser = result;
-                    fillData();
+                    fillData(force);
                     setContentShown(true);
                     getActivity().invalidateOptionsMenu();
                 }, error -> {});
 
     }
 
-    private void loadTopRepositories() {
-        RepositoryService service = ServiceFactory.get(RepositoryService.class, null, null, 5);
+    private void loadTopRepositories(boolean force) {
+        RepositoryService service = ServiceFactory.get(RepositoryService.class, force, null, null, 5);
         final Single<Response<Page<Repository>>> observable;
 
         Map<String, String> filterData = new HashMap<>();
@@ -425,23 +425,23 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         mTopRepoSubscription = observable
                 .map(ApiHelpers::throwOnFailure)
                 .map(Page::items)
-                .compose(makeLoaderSingle(ID_LOADER_REPO_LIST, false))
+                .compose(makeLoaderSingle(ID_LOADER_REPO_LIST, force))
                 .subscribe(this::fillTopRepos, error -> {});
     }
 
-    private void loadOrganizations() {
-        final OrganizationService service = ServiceFactory.get(OrganizationService.class);
+    private void loadOrganizations(boolean force) {
+        final OrganizationService service = ServiceFactory.get(OrganizationService.class, force);
         mOrgListSubscription = ApiHelpers.PageIterator
                 .toSingle(page -> mIsSelf
                         ? service.getMyOrganizations(page)
                         : service.getUserPublicOrganizations(mUserLogin, page)
                 )
-                .compose(makeLoaderSingle(ID_LOADER_ORG_LIST, false))
+                .compose(makeLoaderSingle(ID_LOADER_ORG_LIST, force))
                 .subscribe(this::fillOrganizations, error -> {});
     }
 
     private void loadIsFollowingState(boolean force) {
-        UserFollowerService service = ServiceFactory.get(UserFollowerService.class);
+        UserFollowerService service = ServiceFactory.get(UserFollowerService.class, force);
         mIsFollowingSubscription = service.isFollowing(mUserLogin)
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_IS_FOLLOWING, force))

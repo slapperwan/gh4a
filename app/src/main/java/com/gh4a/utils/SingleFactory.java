@@ -36,10 +36,11 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 public class SingleFactory {
-    public static Single<Boolean> isAppUserRepoCollaborator(String repoOwner, String repoName) {
+    public static Single<Boolean> isAppUserRepoCollaborator(String repoOwner, String repoName,
+            boolean bypassCache) {
         Gh4Application app = Gh4Application.get();
         RepositoryCollaboratorService service =
-                ServiceFactory.get(RepositoryCollaboratorService.class);
+                ServiceFactory.get(RepositoryCollaboratorService.class, bypassCache);
 
         if (!app.isAuthorized()) {
             return Single.just(false);
@@ -54,8 +55,10 @@ public class SingleFactory {
                 .map(result -> true);
     }
 
-    public static Single<NotificationListLoadResult> getNotifications(boolean all, boolean participating) {
-        final NotificationService service = ServiceFactory.get(NotificationService.class);
+    public static Single<NotificationListLoadResult> getNotifications(boolean all,
+            boolean participating, boolean bypassCache) {
+        final NotificationService service =
+                ServiceFactory.get(NotificationService.class, bypassCache);
         final Map<String, Object> options = new HashMap<>();
         options.put("all", all);
         options.put("participating", participating);
@@ -115,26 +118,37 @@ public class SingleFactory {
     }
 
     public static Single<List<Feed>> loadFeed(String relativeUrl) {
-        return RetrofitHelper.FEED_BUILDER
-                .build()
-                .create(GitHubFeedService.class)
+        return RetrofitHelper.feedService()
                 .getFeed(relativeUrl)
                 .map(ApiHelpers::throwOnFailure)
                 .map(feed -> feed.feed);
     }
 
     public static Single<List<Trend>> loadTrends(String type) {
-        return RetrofitHelper.TREND_BUILDER
-                .build()
-                .create(TrendService.class)
+        return RetrofitHelper.trendService()
                 .getTrends(type)
                 .map(ApiHelpers::throwOnFailure);
     }
 
     private static class RetrofitHelper {
-        private static final Retrofit.Builder FEED_BUILDER;
-        private static final Retrofit.Builder TREND_BUILDER;
-        static {
+        private static GitHubFeedService sFeedService;
+        private static TrendService sTrendService;
+
+        static GitHubFeedService feedService() {
+            if (sFeedService == null) {
+                initialize();
+            }
+            return sFeedService;
+        }
+
+        static TrendService trendService() {
+            if (sTrendService == null) {
+                initialize();
+            }
+            return sTrendService;
+        }
+
+        private static void initialize() {
             RegistryMatcher matcher = new RegistryMatcher();
             matcher.bind(Date.class, new Transform<Date>() {
                 private final DateFormat mFormat =
@@ -151,19 +165,23 @@ public class SingleFactory {
                 }
             });
 
-            OkHttpClient client = new OkHttpClient.Builder()
+            OkHttpClient client = ServiceFactory.getHttpClientBuilder()
                     .followRedirects(false)
                     .build();
 
-            FEED_BUILDER = new Retrofit.Builder()
+            sFeedService = new Retrofit.Builder()
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(SimpleXmlConverterFactory.create(new Persister(matcher)))
                     .baseUrl("https://github.com/")
-                    .client(client);
-            TREND_BUILDER = new Retrofit.Builder()
+                    .client(client)
+                    .build()
+                    .create(GitHubFeedService.class);
+            sTrendService = new Retrofit.Builder()
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(MoshiConverterFactory.create(ServiceGenerator.moshi))
-                    .baseUrl("http://octodroid.s3.amazonaws.com/");
+                    .baseUrl("http://octodroid.s3.amazonaws.com/")
+                    .build()
+                    .create(TrendService.class);
         }
     }
 

@@ -106,7 +106,7 @@ public class CreateReviewActivity extends AppCompatActivity implements
         @SuppressWarnings("ConstantConditions")
         ReviewEventDesc desc = mReviewEventAdapter.getItem(position);
 
-        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class);
+        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class, false);
         final Single<Response<Review>> resultSingle;
 
         if (mPendingReview == null) {
