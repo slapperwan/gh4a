@@ -158,11 +158,11 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
     @Override
     protected void onAddData(RootAdapter<TimelineItem, ?> adapter, List<TimelineItem> data) {
-        if (mSelectedReplyCommentId == 0) {
-            selectAndRemoveFirstReply(data);
-        } else {
-            mBottomSheet.setLocked(false, 0);
-        }
+        selectAndRemoveFirstReply(data);
+
+        // Lock the bottom sheet if there is no selected reply group
+        mBottomSheet.setLocked(mSelectedReplyCommentId <= 0,
+                R.string.no_reply_group_selected_hint);
 
         mCommentEditorHintResId = R.string.reply;
         for (TimelineItem item : data) {
@@ -187,8 +187,6 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
                 replyItemCount += 1;
 
                 if (replyItemCount > 1) {
-                    mBottomSheet.setLocked(true, R.string.no_reply_group_selected_hint);
-                    // Do not auto-select reply group if there are more than 1 of them
                     return;
                 }
 
