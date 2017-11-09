@@ -352,7 +352,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
         mHeader.setVisibility(View.GONE);
         mHeaderColorAttrs = null;
-        forceLoaderReload(0, 1, 2);
+        forceLoaderReload(0, 1, 2, 3);
         invalidateTabs();
         super.onRefresh();
     }
