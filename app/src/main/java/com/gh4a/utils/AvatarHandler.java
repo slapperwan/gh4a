@@ -1,9 +1,6 @@
 package com.gh4a.utils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 
 import android.content.Context;
@@ -30,13 +27,15 @@ import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.support.v4.util.LongSparseArray;
 import android.support.v4.util.LruCache;
-import android.support.v4.util.SparseArrayCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import com.gh4a.ServiceFactory;
 import com.meisolsson.githubsdk.model.User;
+
+import okhttp3.OkHttpClient;
 
 public class AvatarHandler {
     private static final String TAG = "GravatarHandler";
@@ -261,17 +260,20 @@ public class AvatarHandler {
     }
 
     private static Bitmap fetchBitmap(String url) throws IOException {
-        URL realUrl = new URL(url);
-        InputStream input = realUrl.openStream();
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        byte[] buffer = new byte[2048];
-        int read;
+        OkHttpClient client = ServiceFactory.getHttpClientBuilder().build();
+        okhttp3.Request request = new okhttp3.Request.Builder()
+                .url(url)
+                .build();
 
-        while ((read = input.read(buffer)) != -1) {
-            output.write(buffer, 0, read);
+        byte[] data;
+
+        try (okhttp3.Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("HTTP failure code " + response.code());
+            }
+            data = response.body().bytes();
         }
 
-        byte[] data = output.toByteArray();
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
 

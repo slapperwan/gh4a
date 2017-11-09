@@ -41,6 +41,7 @@ import android.widget.TextView;
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.SettingsFragment;
 
 import java.io.File;
@@ -49,14 +50,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import pl.droidsonroids.gif.GifDrawable;
 
 public class HttpImageGetter {
@@ -322,6 +325,7 @@ public class HttpImageGetter {
     private final Map<Object, ObjectInfo> mObjectInfos = new HashMap<>();
     private final Drawable mLoadingDrawable;
     private final Drawable mErrorDrawable;
+    private final OkHttpClient mClient;
 
     private final Context mContext;
 
@@ -335,6 +339,7 @@ public class HttpImageGetter {
     public HttpImageGetter(Context context) {
         mContext = context;
         mCacheDir = context.getCacheDir();
+        mClient = ServiceFactory.getHttpClientBuilder().build();
 
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         final Point size = new Point();
@@ -438,12 +443,14 @@ public class HttpImageGetter {
         if (!mDestroyed) {
             File output = null;
             InputStream is = null;
-            HttpURLConnection connection = null;
-            try {
-                connection = (HttpURLConnection) new URL(source).openConnection();
-                is = connection.getInputStream();
+            Request request = new Request.Builder()
+                    .url(source)
+                    .build();
+            try (Response response = mClient.newCall(request).execute()) {
+                is = response.body().byteStream();
                 if (is != null) {
-                    String mime = connection.getContentType();
+                    MediaType mediaType = response.body().contentType();
+                    String mime = mediaType != null ? mediaType.toString() : null;
                     if (mime == null) {
                         mime = URLConnection.guessContentTypeFromName(source);
                     }
@@ -480,9 +487,6 @@ public class HttpImageGetter {
                     } catch (IOException e) {
                         // ignored
                     }
-                }
-                if (connection != null) {
-                    connection.disconnect();
                 }
             }
         }
