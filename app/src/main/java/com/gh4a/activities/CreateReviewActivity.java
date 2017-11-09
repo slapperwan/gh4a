@@ -13,6 +13,7 @@ import android.widget.Spinner;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.widget.EditorBottomSheet;
 import com.gh4a.widget.StyleableTextView;
@@ -105,8 +106,7 @@ public class CreateReviewActivity extends AppCompatActivity implements
         @SuppressWarnings("ConstantConditions")
         ReviewEventDesc desc = mReviewEventAdapter.getItem(position);
 
-        PullRequestReviewService service =
-                Gh4Application.get().getGitHubService(PullRequestReviewService.class);
+        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class);
         final Single<Response<Review>> resultSingle;
 
         if (mPendingReview == null) {

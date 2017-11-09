@@ -5,7 +5,7 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.ApiRequestException;
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Commit;
@@ -43,8 +43,7 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
 
     @Override
     protected Single<List<GitHubFile>> getFiles() throws ApiRequestException {
-        RepositoryCommitService service =
-                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+        RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class);
         return service.getCommit(mRepoOwner, mRepoName, mSha)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Commit::files);
@@ -52,8 +51,7 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
 
     @Override
     protected Single<List<GitComment>> getComments() throws ApiRequestException {
-        final RepositoryCommentService service =
-                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        final RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mSha, page));
     }

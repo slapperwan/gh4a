@@ -27,8 +27,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.model.TimelineItem;
@@ -190,16 +190,15 @@ public class PullRequestFragment extends IssueFragmentBase {
 
     @Override
     protected Single<List<TimelineItem>> onCreateDataSingle() {
-        final Gh4Application app = Gh4Application.get();
         final int issueNumber = mIssue.number();
-        final IssueEventService eventService = app.getGitHubService(IssueEventService.class);
-        final IssueCommentService commentService = app.getGitHubService(IssueCommentService.class);
+        final IssueEventService eventService = ServiceFactory.get(IssueEventService.class);
+        final IssueCommentService commentService = ServiceFactory.get(IssueCommentService.class);
 
-        final PullRequestService prService = app.getGitHubService(PullRequestService.class);
+        final PullRequestService prService = ServiceFactory.get(PullRequestService.class);
         final PullRequestReviewService reviewService =
-                app.getGitHubService(PullRequestReviewService.class);
+                ServiceFactory.get(PullRequestReviewService.class);
         final PullRequestReviewCommentService prCommentService =
-                app.getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
 
         Single<List<TimelineItem>> issueCommentItemSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
@@ -342,11 +341,10 @@ public class PullRequestFragment extends IssueFragmentBase {
     protected Single<Response<Void>> doDeleteComment(GitHubCommentBase comment) {
         if (comment instanceof ReviewComment) {
             PullRequestReviewCommentService service =
-                    Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                    ServiceFactory.get(PullRequestReviewCommentService.class);
             return service.deleteComment(mRepoOwner, mRepoName, comment.id());
         } else {
-            IssueCommentService service =
-                    Gh4Application.get().getGitHubService(IssueCommentService.class);
+            IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
             return service.deleteIssueComment(mRepoOwner, mRepoName, comment.id());
         }
     }
@@ -386,7 +384,7 @@ public class PullRequestFragment extends IssueFragmentBase {
         String owner = head.repo().owner().login();
         String repo = head.repo().name();
 
-        GitService service = Gh4Application.get().getGitHubService(GitService.class);
+        GitService service = ServiceFactory.get(GitService.class);
         CreateGitReference request = CreateGitReference.builder()
                 .ref("refs/heads/" + head.ref())
                 .sha(head.sha())
@@ -403,7 +401,7 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     private void deletePullRequestBranch() {
-        GitService service = Gh4Application.get().getGitHubService(GitService.class);
+        GitService service = ServiceFactory.get(GitService.class);
 
         PullRequestMarker head = mPullRequest.head();
         String owner = head.repo().owner().login();
@@ -448,8 +446,7 @@ public class PullRequestFragment extends IssueFragmentBase {
             return;
         }
 
-        RepositoryStatusService service =
-                Gh4Application.get().getGitHubService(RepositoryStatusService.class);
+        RepositoryStatusService service = ServiceFactory.get(RepositoryStatusService.class);
         String sha = mPullRequest.head().sha();
 
         ApiHelpers.PageIterator
@@ -477,7 +474,7 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     private void loadHeadReference(boolean force) {
-        GitService service = Gh4Application.get().getGitHubService(GitService.class);
+        GitService service = ServiceFactory.get(GitService.class);
 
         PullRequestMarker head = mPullRequest.head();
         Repository repo = head.repo();

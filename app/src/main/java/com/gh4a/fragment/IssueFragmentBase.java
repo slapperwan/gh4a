@@ -36,6 +36,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
@@ -440,14 +441,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
-        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getIssueReactions(mRepoOwner, mRepoName, mIssue.number(), page));
     }
 
     @Override
     public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
-        ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        ReactionService service = ServiceFactory.get(ReactionService.class);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createIssueReaction(mRepoOwner, mRepoName, mIssue.number(), request)
                 .map(ApiHelpers::throwOnFailure);
@@ -455,14 +456,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public Single<List<Reaction>> loadReactionDetailsInBackground(final GitHubCommentBase comment) {
-        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getIssueCommentReactions(mRepoOwner, mRepoName, comment.id(), page));
     }
 
     @Override
     public Single<Reaction> addReactionInBackground(GitHubCommentBase comment, String content) {
-        ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        ReactionService service = ServiceFactory.get(ReactionService.class);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createIssueCommentReaction(mRepoOwner, mRepoName,comment.id(), request)
                 .map(ApiHelpers::throwOnFailure);
@@ -518,7 +519,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public Single<?> onEditorDoSend(String comment) {
-        IssueCommentService service = Gh4Application.get().getGitHubService(IssueCommentService.class);
+        IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
         CommentRequest request = CommentRequest.builder().body(comment).build();
         return service.createIssueComment(mRepoOwner, mRepoName, mIssue.number(), request)
                 .map(ApiHelpers::throwOnFailure);

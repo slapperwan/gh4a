@@ -37,6 +37,7 @@ import android.view.View;
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.utils.ApiHelpers;
@@ -617,8 +618,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         if (mAssignees != null) {
             showAssigneesDialog();
         } else {
-            final IssueAssigneeService service =
-                    Gh4Application.get().getGitHubService(IssueAssigneeService.class);
+            final IssueAssigneeService service = ServiceFactory.get(IssueAssigneeService.class);
             registerTemporarySubscription(ApiHelpers.PageIterator
                     .toSingle(page -> service.getAssignees(mRepoOwner, mRepoName, page))
                     .compose(RxUtils::doInBackground)
@@ -634,8 +634,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         if (mMilestones != null) {
             showMilestonesDialog();
         } else {
-            final IssueMilestoneService service =
-                    Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+            final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class);
             registerTemporarySubscription(ApiHelpers.PageIterator
                     .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
                     .compose(RxUtils::doInBackground)
@@ -651,8 +650,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         if (mLabels != null) {
             showLabelsDialog();
         } else {
-            final IssueLabelService service =
-                    Gh4Application.get().getGitHubService(IssueLabelService.class);
+            final IssueLabelService service = ServiceFactory.get(IssueLabelService.class);
             registerTemporarySubscription(ApiHelpers.PageIterator
                     .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                     .compose(RxUtils::doInBackground)

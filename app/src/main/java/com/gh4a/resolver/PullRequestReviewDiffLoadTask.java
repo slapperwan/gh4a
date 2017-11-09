@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -36,11 +36,10 @@ public class PullRequestReviewDiffLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        final Gh4Application app = Gh4Application.get();
         final PullRequestReviewCommentService service =
-                app.getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
         final PullRequestReviewService reviewService =
-                app.getGitHubService(PullRequestReviewService.class);
+                ServiceFactory.get(PullRequestReviewService.class);
         long diffCommentId = Long.parseLong(mDiffId.fileHash);
 
         return ApiHelpers.PageIterator

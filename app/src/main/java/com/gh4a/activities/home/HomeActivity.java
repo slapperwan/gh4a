@@ -531,7 +531,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     }
 
     private void loadUserInfo(boolean force) {
-        UserService service = Gh4Application.get().getGitHubService(UserService.class);
+        UserService service = ServiceFactory.get(UserService.class);
         service.getUser(mUserLogin)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_USER, force))
@@ -543,7 +543,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     }
 
     private void loadNotificationIndicator(boolean force) {
-        NotificationService service = ServiceFactory.createService(
+        NotificationService service = ServiceFactory.get(
                 NotificationService.class, null, null, 1);
         HashMap<String, Object> options = new HashMap<>();
         options.put("all", false);

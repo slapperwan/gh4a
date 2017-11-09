@@ -3,8 +3,8 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
@@ -29,7 +29,7 @@ public class OrganizationMemberListFragment extends PagedDataBaseFragment<User> 
     protected Single<Response<Page<User>>> loadPage(int page) {
         String organization = getArguments().getString("org");
         final OrganizationMemberService service =
-                Gh4Application.get().getGitHubService(OrganizationMemberService.class);
+                ServiceFactory.get(OrganizationMemberService.class);
         return service.getMembers(organization, page);
     }
 

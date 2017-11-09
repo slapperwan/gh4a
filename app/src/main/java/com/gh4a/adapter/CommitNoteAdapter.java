@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
@@ -207,7 +208,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     @Override
     public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
         final GitComment comment = ((ViewHolder) item).mBoundItem;
-        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitCommentReactions(mRepoOwner, mRepoName, comment.id(), page));
     }
@@ -215,7 +216,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     @Override
     public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
         GitComment comment = ((ViewHolder) item).mBoundItem;
-        ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        ReactionService service = ServiceFactory.get(ReactionService.class);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createCommitCommentReaction(mRepoOwner, mRepoName, comment.id(), request)
                 .map(ApiHelpers::throwOnFailure);

@@ -12,8 +12,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -207,8 +207,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     @Override
     public void unsubscribe(NotificationHolder notificationHolder) {
         NotificationThread notification = notificationHolder.notification;
-        NotificationService service =
-                Gh4Application.get().getGitHubService(NotificationService.class);
+        NotificationService service = ServiceFactory.get(NotificationService.class);
         SubscriptionRequest request = SubscriptionRequest.builder()
                 .subscribed(false)
                 .build();
@@ -255,8 +254,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     }
 
     private void markAsRead(Repository repository, NotificationThread notification) {
-        NotificationService service =
-                Gh4Application.get().getGitHubService(NotificationService.class);
+        NotificationService service = ServiceFactory.get(NotificationService.class);
         final Single<Response<Void>> responseSingle;
         if (notification != null) {
             responseSingle = service.markNotificationRead(notification.id());

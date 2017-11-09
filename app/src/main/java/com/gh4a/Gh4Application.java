@@ -34,7 +34,6 @@ import net.danlew.android.joda.JodaTimeAndroid;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +45,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     public static int THEME = R.style.LightTheme;
 
     private static Gh4Application sInstance;
-    private final HashMap<Class<?>, Object> mServiceCache = new HashMap<>();
     private PrettyTime mPt;
 
     private static final int THEME_DARK = 0;
@@ -110,15 +108,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         } else {
             NotificationsJob.cancelJob();
         }
-    }
-
-    public <S> S getGitHubService(Class<S> serviceClass) {
-        S service = (S) mServiceCache.get(serviceClass);
-        if (service == null) {
-            service = ServiceFactory.createService(serviceClass, null, null, null);
-            mServiceCache.put(serviceClass, service);
-        }
-        return service;
     }
 
     private void selectTheme(int theme) {

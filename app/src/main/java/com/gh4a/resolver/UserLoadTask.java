@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.Optional;
 import com.meisolsson.githubsdk.model.User;
@@ -23,7 +23,7 @@ public abstract class UserLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        UserService userService = Gh4Application.get().getGitHubService(UserService.class);
+        UserService userService = ServiceFactory.get(UserService.class);
         return userService.getUser(mUserLogin)
                 .map(ApiHelpers::throwOnFailure)
                 .map(user -> Optional.of(getIntent(user)));

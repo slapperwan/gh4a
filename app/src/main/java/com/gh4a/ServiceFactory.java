@@ -4,6 +4,9 @@ import com.meisolsson.githubsdk.core.GitHubPaginationInterceptor;
 import com.meisolsson.githubsdk.core.ServiceGenerator;
 import com.meisolsson.githubsdk.core.StringResponseConverterFactory;
 
+import java.util.HashMap;
+import java.util.Locale;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -28,7 +31,31 @@ public class ServiceFactory {
             .addInterceptor(new GitHubPaginationInterceptor())
             .build();
 
-    public static <S> S createService(Class<S> serviceClass, final String acceptHeader,
+    private final static HashMap<String, Object> sCache = new HashMap<>();
+
+    public static <S> S get(Class<S> serviceClass) {
+        return get(serviceClass, null, null, null);
+    }
+
+    public static <S> S get(Class<S> serviceClass, final String acceptHeader,
+            final String token, final Integer pageSize) {
+        String key = makeKey(serviceClass, acceptHeader, token, pageSize);
+        S service = (S) sCache.get(key);
+        if (service == null) {
+            service = createService(serviceClass, acceptHeader, token, pageSize);
+            sCache.put(key, service);
+        }
+        return service;
+    }
+
+    private static String makeKey(Class<?> serviceClass, String acceptHeader,
+            String token, Integer pageSize) {
+        return String.format(Locale.US, "%s-%s-%s-%d",
+                serviceClass.getSimpleName(), acceptHeader != null ? acceptHeader : "",
+                token != null ? token : "", pageSize != null ? pageSize : 0);
+    }
+
+    private static <S> S createService(Class<S> serviceClass, final String acceptHeader,
             final String token, final Integer pageSize) {
         OkHttpClient client = httpClient.newBuilder()
                 .addInterceptor(chain -> {

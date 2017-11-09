@@ -13,8 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.adapter.RootAdapter;
@@ -152,12 +152,11 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
     @Override
     protected Single<List<TimelineItem>> onCreateDataSingle() {
-        final Gh4Application app = Gh4Application.get();
-        final PullRequestService prService = app.getGitHubService(PullRequestService.class);
+        final PullRequestService prService = ServiceFactory.get(PullRequestService.class);
         final PullRequestReviewService reviewService =
-                app.getGitHubService(PullRequestReviewService.class);
+                ServiceFactory.get(PullRequestReviewService.class);
         final PullRequestReviewCommentService commentService =
-                app.getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
 
         Single<TimelineItem.TimelineReview> reviewItemSingle =
                 reviewService.getReview(mRepoOwner, mRepoName, mIssueNumber, mReview.id())
@@ -406,7 +405,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
     @Override
     public Single<List<Reaction>> loadReactionDetailsInBackground(final GitHubCommentBase comment) {
-        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> comment instanceof ReviewComment
                         ? service.getPullRequestReviewCommentReactions(
@@ -417,7 +416,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
     @Override
     public Single<Reaction> addReactionInBackground(GitHubCommentBase comment, String content) {
-        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class);
         final ReactionRequest request = ReactionRequest.builder().content(content).build();
         final Single<Response<Reaction>> responseSingle = comment instanceof ReviewComment
                 ? service.createPullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.id(), request)
@@ -438,7 +437,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     @Override
     public Single<?> onEditorDoSend(String comment) {
         PullRequestReviewCommentService service =
-                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
         CreateReviewComment request = CreateReviewComment.builder()
                 .body(comment)
                 .inReplyTo(mSelectedReplyCommentId)
@@ -461,11 +460,10 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         final Single<Response<Void>> responseSingle;
         if (comment instanceof ReviewComment) {
             PullRequestReviewCommentService service =
-                    Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                    ServiceFactory.get(PullRequestReviewCommentService.class);
             responseSingle = service.deleteComment(mRepoOwner, mRepoName, comment.id());
         } else {
-            IssueCommentService service =
-                    Gh4Application.get().getGitHubService(IssueCommentService.class);
+            IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
             responseSingle = service.deleteIssueComment(mRepoOwner, mRepoName, comment.id());
         }
 

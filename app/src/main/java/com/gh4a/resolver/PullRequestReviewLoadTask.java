@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -34,8 +34,7 @@ public class PullRequestReviewLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        PullRequestReviewService service =
-                Gh4Application.get().getGitHubService(PullRequestReviewService.class);
+        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class);
         return service.getReview(mRepoOwner, mRepoName, mPullRequestNumber, mMarker.commentId)
                 .map(ApiHelpers::throwOnFailure)
                 .map(review -> Optional.of(ReviewActivity.makeIntent(mActivity,

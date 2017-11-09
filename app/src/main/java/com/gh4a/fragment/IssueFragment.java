@@ -5,8 +5,8 @@ import android.support.annotation.AttrRes;
 import android.view.View;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.model.TimelineItem;
@@ -72,10 +72,9 @@ public class IssueFragment extends IssueFragmentBase {
 
     @Override
     protected Single<List<TimelineItem>> onCreateDataSingle() {
-        final Gh4Application app = Gh4Application.get();
         final int issueNumber = mIssue.number();
-        final IssueEventService eventService = app.getGitHubService(IssueEventService.class);
-        final IssueCommentService commentService = app.getGitHubService(IssueCommentService.class);
+        final IssueEventService eventService = ServiceFactory.get(IssueEventService.class);
+        final IssueCommentService commentService = ServiceFactory.get(IssueCommentService.class);
 
         Single<List<TimelineItem>> commentSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
@@ -105,8 +104,7 @@ public class IssueFragment extends IssueFragmentBase {
 
     @Override
     protected Single<Response<Void>> doDeleteComment(GitHubCommentBase comment) {
-        IssueCommentService service =
-                Gh4Application.get().getGitHubService(IssueCommentService.class);
+        IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
         return service.deleteIssueComment(mRepoOwner, mRepoName, comment.id());
     }
 

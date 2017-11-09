@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import android.util.Pair;
 
 import com.gh4a.ApiRequestException;
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.utils.ApiHelpers;
@@ -121,10 +121,9 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
                     mRefAndPath.startsWith("HEAD/") ? mRefAndPath.substring(5) : null)));
         }
 
-        final Gh4Application app = Gh4Application.get();
         final RepositoryBranchService branchService =
-                app.getGitHubService(RepositoryBranchService.class);
-        final RepositoryService repoService = app.getGitHubService(RepositoryService.class);
+                ServiceFactory.get(RepositoryBranchService.class);
+        final RepositoryService repoService = ServiceFactory.get(RepositoryService.class);
 
         // then look for matching branches
         return ApiHelpers.PageIterator

@@ -12,8 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.utils.ApiHelpers;
@@ -306,8 +306,7 @@ public class ContentListContainerFragment extends Fragment implements
     }
 
     private void loadModuleMap() {
-        RepositoryContentService service =
-                Gh4Application.get().getGitHubService(RepositoryContentService.class);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class);
         String repoOwner = mRepository.owner().login();
         String repoName = mRepository.name();
 

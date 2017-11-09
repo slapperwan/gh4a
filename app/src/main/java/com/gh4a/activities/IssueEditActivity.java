@@ -40,6 +40,7 @@ import android.widget.TextView;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.Optional;
@@ -572,7 +573,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 ? getString(R.string.issue_error_edit, issueNumber)
                 : getString(R.string.issue_error_create);
 
-        IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
+        IssueService service = ServiceFactory.get(IssueService.class);
         Single<Response<Issue>> single = isInEditMode()
                 ? service.editIssue(mRepoOwner, mRepoName, issueNumber, builder.build())
                 : service.createIssue(mRepoOwner, mRepoName, builder.build());
@@ -599,8 +600,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadLabels() {
-        final IssueLabelService service =
-                Gh4Application.get().getGitHubService(IssueLabelService.class);
+        final IssueLabelService service = ServiceFactory.get(IssueLabelService.class);
         registerTemporarySubscription(ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                 .compose(RxUtils::doInBackground)
@@ -612,8 +612,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadMilestones() {
-        final IssueMilestoneService service =
-                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class);
         registerTemporarySubscription(ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
                 .compose(RxUtils::doInBackground)
@@ -626,7 +625,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     private void loadPotentialAssignees() {
         final RepositoryCollaboratorService service =
-                Gh4Application.get().getGitHubService(RepositoryCollaboratorService.class);
+                ServiceFactory.get(RepositoryCollaboratorService.class);
         registerTemporarySubscription(ApiHelpers.PageIterator
                 .toSingle(page -> service.getCollaborators(mRepoOwner, mRepoName, page))
                 .compose(RxUtils::doInBackground)
@@ -642,8 +641,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadIssueTemplate() {
-        RepositoryContentService service =
-                Gh4Application.get().getGitHubService(RepositoryContentService.class);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class);
 
         registerTemporarySubscription(getIssueTemplateContentSingle("")
                 .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplateContentSingle("/.github")))
@@ -663,8 +661,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private Single<Optional<Content>> getIssueTemplateContentSingle(String path) {
-        RepositoryContentService service =
-                Gh4Application.get().getGitHubService(RepositoryContentService.class);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page))
                 .compose(RxUtils::doInBackground)

@@ -41,6 +41,7 @@ import android.widget.TextView;
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
 import com.gh4a.fragment.PullRequestFragment;
@@ -485,7 +486,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         @StringRes int errorMessageResId = open ? R.string.issue_error_reopen : R.string.issue_error_close;
         String errorMessage = getString(errorMessageResId, mPullRequest.number());
 
-        PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
+        PullRequestService service = ServiceFactory.get(PullRequestService.class);
         EditPullRequest request = EditPullRequest.builder()
                 .state(open ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED)
                 .build();
@@ -501,7 +502,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private void mergePullRequest(String commitMessage, MergeRequest.Method mergeMethod) {
         String errorMessage = getString(R.string.pull_error_merge, mPullRequest.number());
-        PullRequestService service = Gh4Application.get().getGitHubService(PullRequestService.class);
+        PullRequestService service = ServiceFactory.get(PullRequestService.class);
         MergeRequest request = MergeRequest.builder()
                 .commitMessage(commitMessage)
                 .method(mergeMethod)
@@ -522,9 +523,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     private void load(boolean force) {
-        Gh4Application app = Gh4Application.get();
-        PullRequestService prService = app.getGitHubService(PullRequestService.class);
-        IssueService issueService = app.getGitHubService(IssueService.class);
+        PullRequestService prService = ServiceFactory.get(PullRequestService.class);
+        IssueService issueService = ServiceFactory.get(IssueService.class);
 
         Single<PullRequest> prSingle = prService.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
                 .map(ApiHelpers::throwOnFailure);
@@ -553,9 +553,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     private void loadPendingReview(boolean force) {
-        Gh4Application app = Gh4Application.get();
-        String ownLogin = app.getAuthLogin();
-        PullRequestReviewService service = app.getGitHubService(PullRequestReviewService.class);
+        String ownLogin = Gh4Application.get().getAuthLogin();
+        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class);
 
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page))

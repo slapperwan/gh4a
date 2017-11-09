@@ -25,6 +25,7 @@ import android.text.TextUtils;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -128,8 +129,7 @@ public class RepositoryListFragment extends PagedDataBaseFragment<Repository> {
 
     @Override
     protected Single<Response<Page<Repository>>> loadPage(int page) {
-        final RepositoryService service =
-                Gh4Application.get().getGitHubService(RepositoryService.class);
+        final RepositoryService service = ServiceFactory.get(RepositoryService.class);
         return ApiHelpers.loginEquals(mLogin, Gh4Application.get().getAuthLogin())
                 ? service.getUserRepositories(mFilterData, page)
                 : service.getUserRepositories(mLogin, mFilterData, page);

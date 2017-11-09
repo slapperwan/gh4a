@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.PrivateEventListFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
@@ -127,7 +128,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
     private void loadOrganizations(boolean force) {
         final Gh4Application app = Gh4Application.get();
-        final OrganizationService service = app.getGitHubService(OrganizationService.class);
+        final OrganizationService service = ServiceFactory.get(OrganizationService.class);
         mOrganizationSubscription = ApiHelpers.PageIterator
                 .toSingle(page -> ApiHelpers.loginEquals(mUserLogin, app.getAuthLogin())
                         ? service.getMyOrganizations(page)

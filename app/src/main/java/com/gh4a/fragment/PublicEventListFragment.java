@@ -2,7 +2,7 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.meisolsson.githubsdk.model.GitHubEvent;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.service.activity.EventService;
@@ -29,7 +29,7 @@ public class PublicEventListFragment extends EventListFragment {
 
     @Override
     protected Single<Response<Page<GitHubEvent>>> loadPage(int page) {
-        final EventService service = Gh4Application.get().getGitHubService(EventService.class);
+        final EventService service = ServiceFactory.get(EventService.class);
         return service.getPublicUserPerformedEvents(mLogin, page);
     }
 }

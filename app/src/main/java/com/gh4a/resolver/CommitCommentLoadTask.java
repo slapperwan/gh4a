@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
@@ -50,10 +50,9 @@ public class CommitCommentLoadTask extends UrlLoadTask {
     public static Single<Optional<Intent>> load(Context context,
             String repoOwner, String repoName, String commitSha,
             IntentUtils.InitialCommentMarker marker) {
-        RepositoryCommitService commitService =
-                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+        RepositoryCommitService commitService = ServiceFactory.get(RepositoryCommitService.class);
         RepositoryCommentService commentService =
-                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+                ServiceFactory.get(RepositoryCommentService.class);
 
         Single<Commit> commitSingle = commitService.getCommit(repoOwner, repoName, commitSha)
                 .map(ApiHelpers::throwOnFailure);

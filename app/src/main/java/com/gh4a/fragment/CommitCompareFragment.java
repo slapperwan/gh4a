@@ -25,8 +25,8 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
 import com.gh4a.ApiRequestException;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -119,8 +119,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
 
     @Override
     protected Single<List<Commit>> onCreateDataSingle() {
-        RepositoryCommitService service =
-                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+        RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class);
 
         Single<CommitCompare> compareSingle = service.compareCommits(mRepoOwner, mRepoName, mBase, mHead)
                 .map(ApiHelpers::throwOnFailure)

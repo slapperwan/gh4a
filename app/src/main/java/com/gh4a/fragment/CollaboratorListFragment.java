@@ -3,8 +3,8 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
@@ -32,7 +32,7 @@ public class CollaboratorListFragment extends PagedDataBaseFragment<User> implem
         String owner = getArguments().getString("owner");
         String repo = getArguments().getString("repo");
         final RepositoryCollaboratorService service =
-                Gh4Application.get().getGitHubService(RepositoryCollaboratorService.class);
+                ServiceFactory.get(RepositoryCollaboratorService.class);
         return service.getCollaborators(owner, repo, page);
     }
 

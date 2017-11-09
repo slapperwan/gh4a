@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.request.CommentRequest;
@@ -54,7 +54,7 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
         Bundle extras = getIntent().getExtras();
         int prNumber = extras.getInt("pull_request_number", 0);
         PullRequestReviewCommentService service =
-                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
         CreateReviewComment.Builder builder = CreateReviewComment.builder()
                 .body(body);
 
@@ -74,7 +74,7 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
     protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
             long commentId, String body) {
         PullRequestReviewCommentService service =
-                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editReviewComment(repoOwner, repoName, commentId, request)
                 .map(ApiHelpers::throwOnFailure);

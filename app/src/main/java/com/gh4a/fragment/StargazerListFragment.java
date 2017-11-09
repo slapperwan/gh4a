@@ -19,8 +19,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
@@ -73,7 +73,7 @@ public class StargazerListFragment extends PagedDataBaseFragment<User> {
 
     @Override
     protected Single<Response<Page<User>>> loadPage(int page) {
-        final StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
+        final StarringService service = ServiceFactory.get(StarringService.class);
         return service.getStargazers(mRepoOwner, mRepoName, page);
     }
 }

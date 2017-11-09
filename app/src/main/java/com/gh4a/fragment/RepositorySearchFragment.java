@@ -7,8 +7,8 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -47,7 +47,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> i
             return Single.just(new ArrayList<Repository>());
         }
 
-        SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
+        SearchService service = ServiceFactory.get(SearchService.class);
         String params = query + " fork:true user:" + login;
 
         return ApiHelpers.PageIterator
