@@ -26,7 +26,7 @@ public class EditIssueCommentActivity extends EditCommentActivity {
     protected Single<GitHubCommentBase> createComment(String repoOwner, String repoName,
             String body, long replyToCommentId) {
         int issueNumber = getIntent().getIntExtra("issue", 0);
-        IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
+        IssueCommentService service = ServiceFactory.get(IssueCommentService.class, false);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.createIssueComment(repoOwner, repoName, issueNumber, request)
                 .map(ApiHelpers::throwOnFailure);
@@ -35,7 +35,7 @@ public class EditIssueCommentActivity extends EditCommentActivity {
     @Override
     protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
             long commentId, String body) {
-        IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
+        IssueCommentService service = ServiceFactory.get(IssueCommentService.class, false);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editIssueComment(repoOwner, repoName, commentId, request)
                 .map(ApiHelpers::throwOnFailure);

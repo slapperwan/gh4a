@@ -263,7 +263,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     private void loadRelease(boolean force) {
-        RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class);
+        RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class, force);
 
         service.getRelease(mRepoOwner, mRepoName, mReleaseId)
                 .map(ApiHelpers::throwOnFailure)
@@ -276,7 +276,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     private void loadBody() {
-        MarkdownService service = ServiceFactory.get(MarkdownService.class);
+        MarkdownService service = ServiceFactory.get(MarkdownService.class, false);
         RequestMarkdown request = RequestMarkdown.builder()
                 .context(mRepoOwner + "/" + mRepoName)
                 .mode("gfm")

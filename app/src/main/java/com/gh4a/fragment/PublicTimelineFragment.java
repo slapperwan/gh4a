@@ -39,8 +39,8 @@ public class PublicTimelineFragment extends EventListFragment {
     }
 
     @Override
-    protected Single<Response<Page<GitHubEvent>>> loadPage(int page) {
-        final EventService service = ServiceFactory.get(EventService.class);
+    protected Single<Response<Page<GitHubEvent>>> loadPage(int page, boolean bypassCache) {
+        final EventService service = ServiceFactory.get(EventService.class, bypassCache);
         return service.getPublicEvents(page);
     }
 }

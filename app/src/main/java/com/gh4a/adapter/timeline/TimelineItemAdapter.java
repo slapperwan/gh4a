@@ -57,7 +57,7 @@ public class TimelineItemAdapter
         void onReplyCommentSelected(long replyToId);
         long getSelectedReplyCommentId();
         String getShareSubject(GitHubCommentBase comment);
-        Single<List<Reaction>> loadReactionDetails(GitHubCommentBase comment);
+        Single<List<Reaction>> loadReactionDetails(GitHubCommentBase comment, boolean bypassCache);
         Single<Reaction> addReaction(GitHubCommentBase comment, String content);
     }
 
@@ -117,8 +117,9 @@ public class TimelineItemAdapter
         }
 
         @Override
-        public Single<List<Reaction>> loadReactionDetails(TimelineItem.TimelineComment item) {
-            return mActionCallback.loadReactionDetails(item.comment());
+        public Single<List<Reaction>> loadReactionDetails(TimelineItem.TimelineComment item,
+                boolean bypassCache) {
+            return mActionCallback.loadReactionDetails(item.comment(), bypassCache);
         }
 
         @Override

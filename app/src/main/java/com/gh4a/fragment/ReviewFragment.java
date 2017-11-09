@@ -151,12 +151,12 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    protected Single<List<TimelineItem>> onCreateDataSingle() {
-        final PullRequestService prService = ServiceFactory.get(PullRequestService.class);
+    protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
+        final PullRequestService prService = ServiceFactory.get(PullRequestService.class, bypassCache);
         final PullRequestReviewService reviewService =
-                ServiceFactory.get(PullRequestReviewService.class);
+                ServiceFactory.get(PullRequestReviewService.class, bypassCache);
         final PullRequestReviewCommentService commentService =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
 
         Single<TimelineItem.TimelineReview> reviewItemSingle =
                 reviewService.getReview(mRepoOwner, mRepoName, mIssueNumber, mReview.id())
@@ -404,8 +404,9 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetails(final GitHubCommentBase comment) {
-        final ReactionService service = ServiceFactory.get(ReactionService.class);
+    public Single<List<Reaction>> loadReactionDetails(final GitHubCommentBase comment,
+            boolean bypassCache) {
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> comment instanceof ReviewComment
                         ? service.getPullRequestReviewCommentReactions(
@@ -416,7 +417,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
 
     @Override
     public Single<Reaction> addReaction(GitHubCommentBase comment, String content) {
-        final ReactionService service = ServiceFactory.get(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, false);
         final ReactionRequest request = ReactionRequest.builder().content(content).build();
         final Single<Response<Reaction>> responseSingle = comment instanceof ReviewComment
                 ? service.createPullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.id(), request)
@@ -437,7 +438,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
     @Override
     public Single<?> onEditorDoSend(String comment) {
         PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, false);
         CreateReviewComment request = CreateReviewComment.builder()
                 .body(comment)
                 .inReplyTo(mSelectedReplyCommentId)
@@ -460,10 +461,10 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
         final Single<Response<Void>> responseSingle;
         if (comment instanceof ReviewComment) {
             PullRequestReviewCommentService service =
-                    ServiceFactory.get(PullRequestReviewCommentService.class);
+                    ServiceFactory.get(PullRequestReviewCommentService.class, false);
             responseSingle = service.deleteComment(mRepoOwner, mRepoName, comment.id());
         } else {
-            IssueCommentService service = ServiceFactory.get(IssueCommentService.class);
+            IssueCommentService service = ServiceFactory.get(IssueCommentService.class, false);
             responseSingle = service.deleteIssueComment(mRepoOwner, mRepoName, comment.id());
         }
 

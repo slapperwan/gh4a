@@ -58,7 +58,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
     }
 
     private void loadData(boolean force) {
-        mSubscription = onCreateDataSingle()
+        mSubscription = onCreateDataSingle(force)
                 .compose(makeLoaderSingle(0, force))
                 .subscribe(result -> {
                     mAdapter.clear();
@@ -68,6 +68,6 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
                 }, error -> {});
     }
 
-    protected abstract Single<List<T>> onCreateDataSingle();
+    protected abstract Single<List<T>> onCreateDataSingle(boolean bypassCache);
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
 }

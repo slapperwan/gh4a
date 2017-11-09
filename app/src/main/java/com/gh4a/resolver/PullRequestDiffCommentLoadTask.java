@@ -48,12 +48,12 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        PullRequestService service = ServiceFactory.get(PullRequestService.class);
+        PullRequestService service = ServiceFactory.get(PullRequestService.class, false);
         Single<PullRequest> pullRequestSingle = service.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
                 .map(ApiHelpers::throwOnFailure);
 
         final PullRequestReviewCommentService commentService =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, false);
 
         Single<List<ReviewComment>> commentsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getPullRequestComments(

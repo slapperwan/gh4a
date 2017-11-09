@@ -486,7 +486,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         @StringRes int errorMessageResId = open ? R.string.issue_error_reopen : R.string.issue_error_close;
         String errorMessage = getString(errorMessageResId, mPullRequest.number());
 
-        PullRequestService service = ServiceFactory.get(PullRequestService.class);
+        PullRequestService service = ServiceFactory.get(PullRequestService.class, false);
         EditPullRequest request = EditPullRequest.builder()
                 .state(open ? ApiHelpers.IssueState.OPEN : ApiHelpers.IssueState.CLOSED)
                 .build();
@@ -502,7 +502,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private void mergePullRequest(String commitMessage, MergeRequest.Method mergeMethod) {
         String errorMessage = getString(R.string.pull_error_merge, mPullRequest.number());
-        PullRequestService service = ServiceFactory.get(PullRequestService.class);
+        PullRequestService service = ServiceFactory.get(PullRequestService.class, false);
         MergeRequest request = MergeRequest.builder()
                 .commitMessage(commitMessage)
                 .method(mergeMethod)
@@ -523,15 +523,15 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     private void load(boolean force) {
-        PullRequestService prService = ServiceFactory.get(PullRequestService.class);
-        IssueService issueService = ServiceFactory.get(IssueService.class);
+        PullRequestService prService = ServiceFactory.get(PullRequestService.class, force);
+        IssueService issueService = ServiceFactory.get(IssueService.class, force);
 
         Single<PullRequest> prSingle = prService.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
                 .map(ApiHelpers::throwOnFailure);
         Single<Issue> issueSingle = issueService.getIssue(mRepoOwner, mRepoName, mPullRequestNumber)
                 .map(ApiHelpers::throwOnFailure);
         Single<Boolean> isCollaboratorSingle =
-                SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName);
+                SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName, force);
 
         Single.zip(issueSingle, prSingle, isCollaboratorSingle, Triplet::create)
                 .compose(makeLoaderSingle(0, force))
@@ -554,7 +554,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private void loadPendingReview(boolean force) {
         String ownLogin = Gh4Application.get().getAuthLogin();
-        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class);
+        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class, force);
 
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page))

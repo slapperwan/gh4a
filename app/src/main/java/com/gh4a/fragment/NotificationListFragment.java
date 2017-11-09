@@ -207,7 +207,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     @Override
     public void unsubscribe(NotificationHolder notificationHolder) {
         NotificationThread notification = notificationHolder.notification;
-        NotificationService service = ServiceFactory.get(NotificationService.class);
+        NotificationService service = ServiceFactory.get(NotificationService.class, false);
         SubscriptionRequest request = SubscriptionRequest.builder()
                 .subscribed(false)
                 .build();
@@ -254,7 +254,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     }
 
     private void markAsRead(Repository repository, NotificationThread notification) {
-        NotificationService service = ServiceFactory.get(NotificationService.class);
+        NotificationService service = ServiceFactory.get(NotificationService.class, false);
         final Single<Response<Void>> responseSingle;
         if (notification != null) {
             responseSingle = service.markNotificationRead(notification.id());
@@ -286,7 +286,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     }
 
     private void loadNotifications(boolean force) {
-        SingleFactory.getNotifications(mAll, mParticipating)
+        SingleFactory.getNotifications(mAll, mParticipating, force)
                 .compose(makeLoaderSingle(ID_LOADER_NOTIFICATIONS, force))
                 .subscribe(result -> {
                     mNotificationsLoadTime = result.loadTime;

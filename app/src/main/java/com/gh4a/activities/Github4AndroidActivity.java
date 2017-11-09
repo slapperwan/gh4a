@@ -111,7 +111,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
             service.getToken(request)
                     .map(ApiHelpers::throwOnFailure)
                     .flatMap(token -> {
-                        UserService userService = ServiceFactory.get(UserService.class,
+                        UserService userService = ServiceFactory.get(UserService.class, true,
                                 null, token.accessToken(), null);
                         Single<User> userSingle = userService.getUser()
                                 .map(ApiHelpers::throwOnFailure);

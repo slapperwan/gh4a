@@ -43,7 +43,7 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
 
     @Override
     protected Single<List<GitHubFile>> getFiles() throws ApiRequestException {
-        RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class);
+        RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class, false);
         return service.getCommit(mRepoOwner, mRepoName, mSha)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Commit::files);
@@ -51,7 +51,8 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
 
     @Override
     protected Single<List<GitComment>> getComments() throws ApiRequestException {
-        final RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
+        final RepositoryCommentService service =
+                ServiceFactory.get(RepositoryCommentService.class, false);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mSha, page));
     }

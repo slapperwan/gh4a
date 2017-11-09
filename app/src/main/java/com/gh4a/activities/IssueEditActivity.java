@@ -573,7 +573,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 ? getString(R.string.issue_error_edit, issueNumber)
                 : getString(R.string.issue_error_create);
 
-        IssueService service = ServiceFactory.get(IssueService.class);
+        IssueService service = ServiceFactory.get(IssueService.class, false);
         Single<Response<Issue>> single = isInEditMode()
                 ? service.editIssue(mRepoOwner, mRepoName, issueNumber, builder.build())
                 : service.createIssue(mRepoOwner, mRepoName, builder.build());
@@ -591,7 +591,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadCollaboratorStatus(boolean force) {
-        SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName)
+        SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName, force)
                 .compose(makeLoaderSingle(ID_LOADER_COLLABORATOR_STATUS, force))
                 .subscribe(result -> {
                     mIsCollaborator = result;
@@ -600,7 +600,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadLabels() {
-        final IssueLabelService service = ServiceFactory.get(IssueLabelService.class);
+        final IssueLabelService service = ServiceFactory.get(IssueLabelService.class, false);
         registerTemporarySubscription(ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                 .compose(RxUtils::doInBackground)
@@ -612,7 +612,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadMilestones() {
-        final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class);
+        final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
         registerTemporarySubscription(ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
                 .compose(RxUtils::doInBackground)
@@ -625,7 +625,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     private void loadPotentialAssignees() {
         final RepositoryCollaboratorService service =
-                ServiceFactory.get(RepositoryCollaboratorService.class);
+                ServiceFactory.get(RepositoryCollaboratorService.class, false);
         registerTemporarySubscription(ApiHelpers.PageIterator
                 .toSingle(page -> service.getCollaborators(mRepoOwner, mRepoName, page))
                 .compose(RxUtils::doInBackground)
@@ -641,7 +641,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadIssueTemplate() {
-        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, false);
 
         registerTemporarySubscription(getIssueTemplateContentSingle("")
                 .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplateContentSingle("/.github")))
@@ -661,7 +661,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private Single<Optional<Content>> getIssueTemplateContentSingle(String path) {
-        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, false);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page))
                 .compose(RxUtils::doInBackground)

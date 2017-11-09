@@ -33,7 +33,7 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
             String body, long replyToCommentId) {
         int prNumber = getIntent().getIntExtra("pr", 0);
         PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, false);
         CreateReviewComment request = CreateReviewComment.builder()
                 .body(body)
                 .inReplyTo(replyToCommentId)
@@ -46,7 +46,7 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
     protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
             long commentId, String body) {
         PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, false);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editReviewComment(repoOwner, repoName, commentId, request)
                 .map(ApiHelpers::throwOnFailure);

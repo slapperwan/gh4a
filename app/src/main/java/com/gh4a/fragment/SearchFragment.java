@@ -366,7 +366,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     private Single<SearchResult> makeRepoSearchSingle() {
-        SearchService service = ServiceFactory.get(SearchService.class);
+        SearchService service = ServiceFactory.get(SearchService.class, false);
         String params = mQuery + " fork:true";
 
         return ApiHelpers.PageIterator
@@ -380,7 +380,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     private Single<SearchResult> makeUserSearchSingle() {
-        final SearchService service = ServiceFactory.get(SearchService.class);
+        final SearchService service = ServiceFactory.get(SearchService.class, false);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.searchUsers(mQuery, null, null, page)
                         .compose(RxUtils::searchPageAdapter))
@@ -388,7 +388,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     private Single<SearchResult> makeCodeSearchSingle() {
-        SearchService service = ServiceFactory.get(SearchService.class,
+        SearchService service = ServiceFactory.get(SearchService.class, false,
                 "application/vnd.github.v3.text-match+json", null, null);
 
         return ApiHelpers.PageIterator

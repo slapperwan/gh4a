@@ -30,10 +30,10 @@ public class ContributorListFragment extends PagedDataBaseFragment<User> impleme
     }
 
     @Override
-    protected Single<Response<Page<User>>> loadPage(int page) {
+    protected Single<Response<Page<User>>> loadPage(int page, boolean bypassCache) {
         String repoOwner = getArguments().getString("owner");
         String repoName = getArguments().getString("repo");
-        RepositoryService service = ServiceFactory.get(RepositoryService.class);
+        RepositoryService service = ServiceFactory.get(RepositoryService.class, bypassCache);
         return service.getContributors(repoOwner, repoName, page);
     }
 

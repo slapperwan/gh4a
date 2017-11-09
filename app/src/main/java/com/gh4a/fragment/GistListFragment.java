@@ -39,8 +39,8 @@ public class GistListFragment extends PagedDataBaseFragment<Gist> implements
     }
 
     @Override
-    protected Single<Response<Page<Gist>>> loadPage(int page) {
-        final GistService service = ServiceFactory.get(GistService.class);
+    protected Single<Response<Page<Gist>>> loadPage(int page, boolean bypassCache) {
+        final GistService service = ServiceFactory.get(GistService.class, bypassCache);
         return mShowStarred
                 ? service.getUserStarredGists(page)
                 : service.getUserGists(mUserLogin, page);

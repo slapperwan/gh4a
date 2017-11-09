@@ -96,6 +96,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
         mPt = new PrettyTime();
         JodaTimeAndroid.init(this);
+        ServiceFactory.initClient(this);
 
         JobManager.create(this).addJobCreator(new Gh4JobCreator());
         updateNotificationJob(prefs);

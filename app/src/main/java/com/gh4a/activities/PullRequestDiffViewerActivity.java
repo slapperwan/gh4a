@@ -68,9 +68,9 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     }
 
     @Override
-    protected Single<List<ReviewComment>> createCommentSingle() {
+    protected Single<List<ReviewComment>> createCommentSingle(boolean bypassCache) {
         final PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
@@ -110,14 +110,14 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     @Override
     protected Single<Response<Void>> doDeleteComment(long id) {
         PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class, false);
         return service.deleteComment(mRepoOwner, mRepoName, id);
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item) {
+    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
         final CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        final ReactionService service = ServiceFactory.get(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestReviewCommentReactions(
                         mRepoOwner, mRepoName, comment.comment.id(), page));
@@ -126,7 +126,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     @Override
     public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
         CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        ReactionService service = ServiceFactory.get(ReactionService.class);
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
 
         return service.createPullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)

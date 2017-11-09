@@ -65,7 +65,7 @@ class CommentViewHolder
         void quoteText(CharSequence text);
         void addText(CharSequence text);
         boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem);
-        Single<List<Reaction>> loadReactionDetails(TimelineItem.TimelineComment item);
+        Single<List<Reaction>> loadReactionDetails(TimelineItem.TimelineComment item, boolean bypassCache);
         Single<Reaction> addReaction(TimelineItem.TimelineComment item, String content);
     }
 
@@ -248,8 +248,8 @@ class CommentViewHolder
 
 
     @Override
-    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item) {
-        return mCallback.loadReactionDetails(mBoundItem);
+    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
+        return mCallback.loadReactionDetails(mBoundItem, bypassCache);
     }
 
     @Override

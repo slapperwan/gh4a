@@ -68,8 +68,8 @@ public class ForkListFragment extends PagedDataBaseFragment<Repository> {
     }
 
     @Override
-    protected Single<Response<Page<Repository>>> loadPage(int page) {
-        final RepositoryForkService service = ServiceFactory.get(RepositoryForkService.class);
+    protected Single<Response<Page<Repository>>> loadPage(int page, boolean bypassCache) {
+        final RepositoryForkService service = ServiceFactory.get(RepositoryForkService.class, bypassCache);
         return service.getForks(mRepoOwner, mRepoName, page);
     }
 }

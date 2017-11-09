@@ -32,7 +32,7 @@ public class ReleaseLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class);
+        RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class, false);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getReleases(mRepoOwner, mRepoName, page))
                 .compose(RxUtils.filterAndMapToFirst(r -> TextUtils.equals(r.tagName(), mTagName)))

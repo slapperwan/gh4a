@@ -195,7 +195,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void updateStarringState() {
-        GistService service = ServiceFactory.get(GistService.class);
+        GistService service = ServiceFactory.get(GistService.class, false);
         Single<Response<Void>> responseSingle = mIsStarred
                 ? service.unstarGist(mGistId) : service.starGist(mGistId);
         responseSingle.map(ApiHelpers::mapToBooleanOrThrowOnFailure)
@@ -207,7 +207,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void loadGist(boolean force) {
-        GistService service = ServiceFactory.get(GistService.class);
+        GistService service = ServiceFactory.get(GistService.class, force);
         service.getGist(mGistId)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_GIST, force))
@@ -219,7 +219,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void loadStarredState(boolean force) {
-        GistService service = ServiceFactory.get(GistService.class);
+        GistService service = ServiceFactory.get(GistService.class, force);
         service.checkIfGistIsStarred(mGistId)
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_STARRED, force))

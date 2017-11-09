@@ -392,7 +392,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     private void toggleStarringState() {
-        StarringService service = ServiceFactory.get(StarringService.class);
+        StarringService service = ServiceFactory.get(StarringService.class, false);
         Single<Response<Void>> responseSingle = mIsStarring
                 ? service.unstarRepository(mRepoOwner, mRepoName)
                 : service.starRepository(mRepoOwner, mRepoName);
@@ -411,7 +411,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     private void toggleWatchingState() {
-        WatchingService service = ServiceFactory.get(WatchingService.class);
+        WatchingService service = ServiceFactory.get(WatchingService.class, false);
         final Single<?> responseSingle;
 
         if (mIsWatching) {
@@ -435,7 +435,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     private void loadRepository(boolean force) {
-        RepositoryService service = ServiceFactory.get(RepositoryService.class);
+        RepositoryService service = ServiceFactory.get(RepositoryService.class, force);
         service.getRepository(mRepoOwner, mRepoName)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_REPO, force))
@@ -457,7 +457,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         if (!Gh4Application.get().isAuthorized()) {
             return;
         }
-        StarringService service = ServiceFactory.get(StarringService.class);
+        StarringService service = ServiceFactory.get(StarringService.class, force);
         service.checkIfRepositoryIsStarred(mRepoOwner, mRepoName)
                 .map(ApiHelpers::throwOnFailure)
                 // success response means 'starred'
@@ -475,7 +475,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         if (!Gh4Application.get().isAuthorized()) {
             return;
         }
-        WatchingService service = ServiceFactory.get(WatchingService.class);
+        WatchingService service = ServiceFactory.get(WatchingService.class, force);
         service.getRepositorySubscription(mRepoOwner, mRepoName)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Subscription::subscribed)
@@ -493,8 +493,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
             showRefSelectionDialog();
         } else {
             final RepositoryBranchService branchService =
-                    ServiceFactory.get(RepositoryBranchService.class);
-            final RepositoryService repoService = ServiceFactory.get(RepositoryService.class);
+                    ServiceFactory.get(RepositoryBranchService.class, false);
+            final RepositoryService repoService = ServiceFactory.get(RepositoryService.class, false);
 
             Single<List<Branch>> branchSingle = ApiHelpers.PageIterator
                     .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page));

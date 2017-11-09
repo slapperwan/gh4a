@@ -118,8 +118,8 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
     }
 
     @Override
-    protected Single<List<Commit>> onCreateDataSingle() {
-        RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class);
+    protected Single<List<Commit>> onCreateDataSingle(boolean bypassCache) {
+        RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class, bypassCache);
 
         Single<CommitCompare> compareSingle = service.compareCommits(mRepoOwner, mRepoName, mBase, mHead)
                 .map(ApiHelpers::throwOnFailure)

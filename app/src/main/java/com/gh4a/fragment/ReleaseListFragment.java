@@ -38,8 +38,9 @@ public class ReleaseListFragment extends PagedDataBaseFragment<Release> implemen
     }
 
     @Override
-    protected Single<Response<Page<Release>>> loadPage(int page) {
-        final RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class);
+    protected Single<Response<Page<Release>>> loadPage(int page, boolean bypassCache) {
+        final RepositoryReleaseService service =
+                ServiceFactory.get(RepositoryReleaseService.class, bypassCache);
         return service.getReleases(mUserLogin, mRepoName, page);
     }
 

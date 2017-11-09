@@ -52,7 +52,7 @@ public class BlogListFragment extends ListDataBaseFragment<Feed> implements
     }
 
     @Override
-    protected Single<List<Feed>> onCreateDataSingle() {
+    protected Single<List<Feed>> onCreateDataSingle(boolean bypassCache) {
         return SingleFactory.loadFeed("blog.atom");
     }
 }

@@ -86,23 +86,24 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
 
     @Override
     public Single<Response<Void>> doDeleteComment(long id) {
-        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
+        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class, false);
 
         return service.deleteCommitComment(mRepoOwner, mRepoName, id);
     }
 
     @Override
-    protected Single<List<GitComment>> createCommentSingle() {
-        final RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
+    protected Single<List<GitComment>> createCommentSingle(boolean bypassCache) {
+        final RepositoryCommentService service =
+                ServiceFactory.get(RepositoryCommentService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mSha, page))
                 .compose(RxUtils.filter(c -> c.position() != null));
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item) {
+    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
         final CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        final ReactionService service = ServiceFactory.get(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitCommentReactions(mRepoOwner, mRepoName, comment.comment.id(), page));
     }
@@ -110,7 +111,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     @Override
     public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
         CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        final ReactionService service = ServiceFactory.get(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, false);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
 
         return service.createCommitCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)

@@ -124,7 +124,7 @@ public class GistViewerActivity extends WebViewerActivity {
     }
 
     private void loadGist(boolean force) {
-        GistService service = ServiceFactory.get(GistService.class);
+        GistService service = ServiceFactory.get(GistService.class, force);
         service.getGist(mGistId)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_GIST, force))

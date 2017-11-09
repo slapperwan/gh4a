@@ -74,8 +74,8 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
     }
 
     @Override
-    protected Single<Response<Page<Repository>>> loadPage(int page) {
-        final StarringService service = ServiceFactory.get(StarringService.class);
+    protected Single<Response<Page<Repository>>> loadPage(int page, boolean bypassCache) {
+        final StarringService service = ServiceFactory.get(StarringService.class, bypassCache);
         final HashMap<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortOrder);
         filterData.put("direction", mSortDirection);

@@ -206,9 +206,9 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     }
 
     @Override
-    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item) {
+    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
         final GitComment comment = ((ViewHolder) item).mBoundItem;
-        final ReactionService service = ServiceFactory.get(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitCommentReactions(mRepoOwner, mRepoName, comment.id(), page));
     }
@@ -216,7 +216,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     @Override
     public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
         GitComment comment = ((ViewHolder) item).mBoundItem;
-        ReactionService service = ServiceFactory.get(ReactionService.class);
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createCommitCommentReaction(mRepoOwner, mRepoName, comment.id(), request)
                 .map(ApiHelpers::throwOnFailure);

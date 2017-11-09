@@ -290,7 +290,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void updateIssueState(boolean reopen) {
-        IssueService service = ServiceFactory.get(IssueService.class);
+        IssueService service = ServiceFactory.get(IssueService.class, false);
         IssueRequest request = IssueRequest.builder()
                 .state(reopen ? IssueState.Open : IssueState.Closed)
                 .build();
@@ -369,7 +369,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void loadIssue(boolean force) {
-        IssueService service = ServiceFactory.get(IssueService.class);
+        IssueService service = ServiceFactory.get(IssueService.class, force);
         service.getIssue(mRepoOwner, mRepoName, mIssueNumber)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_ISSUE, force))
@@ -381,7 +381,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void loadCollaboratorStatus(boolean force) {
-        SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName)
+        SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName, force)
                 .compose(makeLoaderSingle(ID_LOADER_COLLABORATOR_STATUS, force))
                 .subscribe(result -> {
                     mIsCollaborator = result;

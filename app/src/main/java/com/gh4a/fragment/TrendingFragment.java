@@ -87,7 +87,7 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> implements
     }
 
     @Override
-    protected Single<List<Trend>> onCreateDataSingle() {
+    protected Single<List<Trend>> onCreateDataSingle(boolean bypassCache) {
         return SingleFactory.loadTrends(mType);
     }
 }

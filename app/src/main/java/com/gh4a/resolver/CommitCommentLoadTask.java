@@ -50,9 +50,9 @@ public class CommitCommentLoadTask extends UrlLoadTask {
     public static Single<Optional<Intent>> load(Context context,
             String repoOwner, String repoName, String commitSha,
             IntentUtils.InitialCommentMarker marker) {
-        RepositoryCommitService commitService = ServiceFactory.get(RepositoryCommitService.class);
+        RepositoryCommitService commitService = ServiceFactory.get(RepositoryCommitService.class, false);
         RepositoryCommentService commentService =
-                ServiceFactory.get(RepositoryCommentService.class);
+                ServiceFactory.get(RepositoryCommentService.class, false);
 
         Single<Commit> commitSingle = commitService.getCommit(repoOwner, repoName, commitSha)
                 .map(ApiHelpers::throwOnFailure);

@@ -129,8 +129,8 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     }
 
     @Override
-    protected Single<Response<Page<Issue>>> loadPage(int page) {
-        final SearchService service = ServiceFactory.get(SearchService.class);
+    protected Single<Response<Page<Issue>>> loadPage(int page, boolean bypassCache) {
+        final SearchService service = ServiceFactory.get(SearchService.class, bypassCache);
         return service.searchIssues(mQuery, mSortMode, mOrder, page)
                 .compose(RxUtils::searchPageAdapter);
     }

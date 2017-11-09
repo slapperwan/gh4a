@@ -51,7 +51,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         Object getCacheKey();
     }
     public interface Callback {
-        Single<List<Reaction>> loadReactionDetails(Item item);
+        Single<List<Reaction>> loadReactionDetails(Item item, boolean bypassCache);
         Single<Reaction> addReaction(Item item, String content);
     }
 
@@ -387,7 +387,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
     private static Single<List<Reaction>> fetchReactions(Callback callback, Item item,
             ReactionDetailsCache cache) {
-        return callback.loadReactionDetails(item)
+        return callback.loadReactionDetails(item, false)
                 .compose(RxUtils::doInBackground)
                 .compose(RxUtils.sortList((lhs, rhs) -> {
                     int result = lhs.content().compareTo(rhs.content());
@@ -408,7 +408,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             resultSingle = callback.addReaction(item, content)
                     .map(Optional::of);
         } else {
-            ReactionService service = ServiceFactory.get(ReactionService.class);
+            ReactionService service = ServiceFactory.get(ReactionService.class, false);
             resultSingle = service.deleteReaction(id)
                     .map(response -> Optional.absent());
         }

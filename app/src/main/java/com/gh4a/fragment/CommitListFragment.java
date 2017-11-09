@@ -104,8 +104,9 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
     }
 
     @Override
-    protected Single<Response<Page<Commit>>> loadPage(int page) {
-        final RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class);
+    protected Single<Response<Page<Commit>>> loadPage(int page, boolean bypassCache) {
+        final RepositoryCommitService service =
+                ServiceFactory.get(RepositoryCommitService.class, bypassCache);
         return service.getCommits(mRepoOwner, mRepoName, mRef, mFilePath, page)
                 .map(response -> {
                     // 409 is returned for empty repos

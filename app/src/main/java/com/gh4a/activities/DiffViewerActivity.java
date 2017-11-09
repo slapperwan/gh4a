@@ -430,7 +430,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         setContentShown(false);
     }
 
-    protected abstract Single<List<C>> createCommentSingle();
+    protected abstract Single<List<C>> createCommentSingle(boolean bypassCache);
     protected abstract void openCommentDialog(long id, long replyToId, String line,
             int position, int leftLine, int rightLine, PositionalCommentBase commitComment);
     protected abstract Single<Response<Void>> doDeleteComment(long id);
@@ -456,7 +456,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
                 ? getIntent().getParcelableArrayListExtra("comments") : null;
         Single<List<C>> commentSingle = intentComments != null
                 ? Single.just(intentComments)
-                : createCommentSingle().compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));
+                : createCommentSingle(force).compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));
 
         commentSingle.subscribe(result -> {
             addCommentsToMap(result);

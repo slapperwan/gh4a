@@ -72,8 +72,8 @@ public class WatcherListFragment extends PagedDataBaseFragment<User> {
     }
 
     @Override
-    protected Single<Response<Page<User>>> loadPage(int page) {
-        final WatchingService service = ServiceFactory.get(WatchingService.class);
+    protected Single<Response<Page<User>>> loadPage(int page, boolean bypassCache) {
+        final WatchingService service = ServiceFactory.get(WatchingService.class, bypassCache);
         return service.getRepositoryWatchers(mRepoOwner, mRepoName, page);
     }
 }

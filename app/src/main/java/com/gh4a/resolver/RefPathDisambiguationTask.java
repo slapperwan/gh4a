@@ -122,8 +122,8 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
         }
 
         final RepositoryBranchService branchService =
-                ServiceFactory.get(RepositoryBranchService.class);
-        final RepositoryService repoService = ServiceFactory.get(RepositoryService.class);
+                ServiceFactory.get(RepositoryBranchService.class, false);
+        final RepositoryService repoService = ServiceFactory.get(RepositoryService.class, false);
 
         // then look for matching branches
         return ApiHelpers.PageIterator
