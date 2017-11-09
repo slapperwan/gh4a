@@ -25,8 +25,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.CommitHistoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -200,8 +200,7 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
             return Single.just(contents);
         }
 
-        Gh4Application app = Gh4Application.get();
-        RepositoryContentService contentService = app.getGitHubService(RepositoryContentService.class);
+        RepositoryContentService contentService = ServiceFactory.get(RepositoryContentService.class);
         String repoOwner = mRepository.owner().login();
         String repoName = mRepository.name();
         String ref = mRef != null ? mRef : mRepository.defaultBranch();

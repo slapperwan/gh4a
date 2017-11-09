@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -194,7 +195,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void updateStarringState() {
-        GistService service = Gh4Application.get().getGitHubService(GistService.class);
+        GistService service = ServiceFactory.get(GistService.class);
         Single<Response<Void>> responseSingle = mIsStarred
                 ? service.unstarGist(mGistId) : service.starGist(mGistId);
         responseSingle.map(ApiHelpers::mapToBooleanOrThrowOnFailure)
@@ -206,7 +207,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void loadGist(boolean force) {
-        GistService service = Gh4Application.get().getGitHubService(GistService.class);
+        GistService service = ServiceFactory.get(GistService.class);
         service.getGist(mGistId)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_GIST, force))
@@ -218,7 +219,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     }
 
     private void loadStarredState(boolean force) {
-        GistService service = Gh4Application.get().getGitHubService(GistService.class);
+        GistService service = ServiceFactory.get(GistService.class);
         service.checkIfGistIsStarred(mGistId)
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_STARRED, force))

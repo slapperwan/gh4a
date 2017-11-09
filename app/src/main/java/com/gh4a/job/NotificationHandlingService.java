@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.home.HomeActivity;
 import com.meisolsson.githubsdk.model.request.NotificationReadRequest;
 import com.meisolsson.githubsdk.service.activity.NotificationService;
@@ -99,8 +100,7 @@ public class NotificationHandlingService extends IntentService {
     }
 
     private void markNotificationAsRead(String repoOwner, String repoName, long timestamp) {
-        NotificationService service =
-                Gh4Application.get().getGitHubService(NotificationService.class);
+        NotificationService service = ServiceFactory.get(NotificationService.class);
         NotificationReadRequest request = NotificationReadRequest.builder()
                 .lastReadAt(new Date(timestamp))
                 .build();

@@ -20,8 +20,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.IssueMilestoneEditActivity;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -91,8 +91,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
     @Override
     protected Single<List<Milestone>> onCreateDataSingle() {
-        final IssueMilestoneService service =
-                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class);
         String targetState = mShowClosed ? "closed" : "open";
 
         return ApiHelpers.PageIterator

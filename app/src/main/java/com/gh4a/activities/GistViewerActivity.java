@@ -24,8 +24,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
@@ -124,7 +124,7 @@ public class GistViewerActivity extends WebViewerActivity {
     }
 
     private void loadGist(boolean force) {
-        GistService service = Gh4Application.get().getGitHubService(GistService.class);
+        GistService service = ServiceFactory.get(GistService.class);
         service.getGist(mGistId)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_GIST, force))

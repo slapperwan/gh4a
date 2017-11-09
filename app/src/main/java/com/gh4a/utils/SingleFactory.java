@@ -1,6 +1,7 @@
 package com.gh4a.utils;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.model.Feed;
 import com.gh4a.model.GitHubFeedService;
 import com.gh4a.model.NotificationHolder;
@@ -38,7 +39,7 @@ public class SingleFactory {
     public static Single<Boolean> isAppUserRepoCollaborator(String repoOwner, String repoName) {
         Gh4Application app = Gh4Application.get();
         RepositoryCollaboratorService service =
-                app.getGitHubService(RepositoryCollaboratorService.class);
+                ServiceFactory.get(RepositoryCollaboratorService.class);
 
         if (!app.isAuthorized()) {
             return Single.just(false);
@@ -54,8 +55,7 @@ public class SingleFactory {
     }
 
     public static Single<NotificationListLoadResult> getNotifications(boolean all, boolean participating) {
-        final NotificationService service =
-                Gh4Application.get().getGitHubService(NotificationService.class);
+        final NotificationService service = ServiceFactory.get(NotificationService.class);
         final Map<String, Object> options = new HashMap<>();
         options.put("all", all);
         options.put("participating", participating);

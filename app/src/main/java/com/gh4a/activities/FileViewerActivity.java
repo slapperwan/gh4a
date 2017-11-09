@@ -32,8 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gh4a.ApiRequestException;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
@@ -318,8 +318,7 @@ public class FileViewerActivity extends WebViewerActivity
     }
 
     private void loadFile(boolean force) {
-        RepositoryContentService service =
-                Gh4Application.get().getGitHubService(RepositoryContentService.class);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class);
         service.getContents(mRepoOwner, mRepoName, mPath, mRef)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Optional::of)

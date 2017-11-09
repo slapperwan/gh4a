@@ -22,8 +22,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.IssueAdapter;
@@ -130,7 +130,7 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
 
     @Override
     protected Single<Response<Page<Issue>>> loadPage(int page) {
-        final SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
+        final SearchService service = ServiceFactory.get(SearchService.class);
         return service.searchIssues(mQuery, mSortMode, mOrder, page)
                 .compose(RxUtils::searchPageAdapter);
     }

@@ -345,8 +345,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         Long id = mRepository.id();
         String repoOwner = mRepository.owner().login();
         String repoName = mRepository.name();
-        RepositoryContentService service = ServiceFactory.createService(
-                RepositoryContentService.class, "application/vnd.github.v3.html", null, null);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class,
+                "application/vnd.github.v3.html", null, null);
 
         service.getReadmeHtml(repoOwner, repoName, mRef)
                 .map(ApiHelpers::throwOnFailure)
@@ -380,7 +380,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
     }
 
     private void loadPullRequestCount(boolean force) {
-        SearchService service = ServiceFactory.createService(SearchService.class, null, null, 1);
+        SearchService service = ServiceFactory.get(SearchService.class, null, null, 1);
         String query = String.format(Locale.US, "type:pr repo:%s/%s state:open",
                 mRepository.owner().login(), mRepository.name());
 

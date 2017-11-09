@@ -40,6 +40,7 @@ import android.widget.TextView;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.IssueFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -289,7 +290,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void updateIssueState(boolean reopen) {
-        IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
+        IssueService service = ServiceFactory.get(IssueService.class);
         IssueRequest request = IssueRequest.builder()
                 .state(reopen ? IssueState.Open : IssueState.Closed)
                 .build();
@@ -368,7 +369,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     }
 
     private void loadIssue(boolean force) {
-        IssueService service = Gh4Application.get().getGitHubService(IssueService.class);
+        IssueService service = ServiceFactory.get(IssueService.class);
         service.getIssue(mRepoOwner, mRepoName, mIssueNumber)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_ISSUE, force))

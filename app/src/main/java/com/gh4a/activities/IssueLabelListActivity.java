@@ -32,6 +32,7 @@ import android.view.View;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.adapter.IssueLabelAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ApiHelpers;
@@ -263,7 +264,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
     private void deleteLabel(IssueLabelAdapter.EditableLabel label) {
         String errorMessage = getString(R.string.issue_error_delete_label, label.base().name());
-        IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+        IssueLabelService service = ServiceFactory.get(IssueLabelService.class);
         service.deleteLabel(mRepoOwner, mRepoName, label.base().name())
                 .map(ApiHelpers::throwOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg, errorMessage))
@@ -276,7 +277,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     private void editLabel(IssueLabelAdapter.EditableLabel label) {
         Label oldLabel = label.base();
         String errorMessage = getString(R.string.issue_error_edit_label, oldLabel.name());
-        IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+        IssueLabelService service = ServiceFactory.get(IssueLabelService.class);
         Label newLabel = Label.builder()
                 .name(label.editedName)
                 .color(label.editedColor)
@@ -293,7 +294,7 @@ public class IssueLabelListActivity extends BaseActivity implements
 
     private void addLabel(IssueLabelAdapter.EditableLabel label) {
         String errorMessage = getString(R.string.issue_error_create_label, label.name());
-        IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+        IssueLabelService service = ServiceFactory.get(IssueLabelService.class);
         Label newLabel = Label.builder()
                 .name(label.name())
                 .color(label.color())
@@ -310,7 +311,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private void loadLabels(boolean force) {
-        final IssueLabelService service = Gh4Application.get().getGitHubService(IssueLabelService.class);
+        final IssueLabelService service = ServiceFactory.get(IssueLabelService.class);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                 .compose(RxUtils.mapList(IssueLabelAdapter.EditableLabel::new))

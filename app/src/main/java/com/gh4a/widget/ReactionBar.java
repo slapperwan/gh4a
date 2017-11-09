@@ -28,6 +28,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
@@ -407,7 +408,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             resultSingle = callback.addReactionInBackground(item, content)
                     .map(Optional::of);
         } else {
-            ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+            ReactionService service = ServiceFactory.get(ReactionService.class);
             resultSingle = service.deleteReaction(id)
                     .map(response -> Optional.absent());
         }

@@ -27,8 +27,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.gh4a.BaseFragmentPagerActivity;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.CommitFragment;
 import com.gh4a.fragment.CommitNoteFragment;
 import com.gh4a.utils.ApiHelpers;
@@ -208,8 +208,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     }
 
     private void loadCommit(boolean force) {
-        RepositoryCommitService service =
-                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+        RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class);
 
         service.getCommit(mRepoOwner, mRepoName, mObjectSha)
                 .map(ApiHelpers::throwOnFailure)
@@ -221,8 +220,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     }
 
     private void loadComments(boolean force) {
-        final RepositoryCommentService service =
-                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        final RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mObjectSha, page))
                 .compose(makeLoaderSingle(ID_LOADER_COMMENTS, force))

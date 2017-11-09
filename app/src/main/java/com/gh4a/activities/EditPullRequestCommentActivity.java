@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.AttrRes;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.request.CommentRequest;
@@ -33,7 +33,7 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
             String body, long replyToCommentId) {
         int prNumber = getIntent().getIntExtra("pr", 0);
         PullRequestReviewCommentService service =
-                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
         CreateReviewComment request = CreateReviewComment.builder()
                 .body(body)
                 .inReplyTo(replyToCommentId)
@@ -46,7 +46,7 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
     protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
             long commentId, String body) {
         PullRequestReviewCommentService service =
-                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editReviewComment(repoOwner, repoName, commentId, request)
                 .map(ApiHelpers::throwOnFailure);

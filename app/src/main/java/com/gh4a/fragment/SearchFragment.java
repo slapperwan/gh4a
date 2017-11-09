@@ -29,7 +29,6 @@ import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
 import com.gh4a.ApiRequestException;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.FileViewerActivity;
@@ -367,7 +366,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     private Single<SearchResult> makeRepoSearchSingle() {
-        SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
+        SearchService service = ServiceFactory.get(SearchService.class);
         String params = mQuery + " fork:true";
 
         return ApiHelpers.PageIterator
@@ -381,7 +380,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     private Single<SearchResult> makeUserSearchSingle() {
-        final SearchService service = Gh4Application.get().getGitHubService(SearchService.class);
+        final SearchService service = ServiceFactory.get(SearchService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.searchUsers(mQuery, null, null, page)
                         .compose(RxUtils::searchPageAdapter))
@@ -389,7 +388,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
     }
 
     private Single<SearchResult> makeCodeSearchSingle() {
-        SearchService service = ServiceFactory.createService(SearchService.class,
+        SearchService service = ServiceFactory.get(SearchService.class,
                 "application/vnd.github.v3.text-match+json", null, null);
 
         return ApiHelpers.PageIterator

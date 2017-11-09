@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
@@ -37,8 +37,7 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
 
     @Override
     protected Single<String> getSha() {
-        PullRequestService service =
-                Gh4Application.get().getGitHubService(PullRequestService.class);
+        PullRequestService service = ServiceFactory.get(PullRequestService.class);
         return service.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
                 .map(ApiHelpers::throwOnFailure)
                 .map(pr -> pr.head().sha());
@@ -46,8 +45,7 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
 
     @Override
     protected Single<List<GitHubFile>> getFiles() {
-        final PullRequestService service =
-                Gh4Application.get().getGitHubService(PullRequestService.class);
+        final PullRequestService service = ServiceFactory.get(PullRequestService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestFiles(mRepoOwner, mRepoName, mPullRequestNumber, page));
     }
@@ -55,7 +53,7 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
     @Override
     protected Single<List<ReviewComment>> getComments() {
         final PullRequestReviewCommentService service =
-                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))

@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.CommitListFragment;
 import com.gh4a.fragment.ContentListContainerFragment;
@@ -391,7 +392,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     private void toggleStarringState() {
-        StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
+        StarringService service = ServiceFactory.get(StarringService.class);
         Single<Response<Void>> responseSingle = mIsStarring
                 ? service.unstarRepository(mRepoOwner, mRepoName)
                 : service.starRepository(mRepoOwner, mRepoName);
@@ -410,7 +411,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     private void toggleWatchingState() {
-        WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
+        WatchingService service = ServiceFactory.get(WatchingService.class);
         final Single<?> responseSingle;
 
         if (mIsWatching) {
@@ -434,7 +435,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     private void loadRepository(boolean force) {
-        RepositoryService service = Gh4Application.get().getGitHubService(RepositoryService.class);
+        RepositoryService service = ServiceFactory.get(RepositoryService.class);
         service.getRepository(mRepoOwner, mRepoName)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_REPO, force))
@@ -453,11 +454,10 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     private void loadStarringState(boolean force) {
-        Gh4Application app = Gh4Application.get();
-        if (!app.isAuthorized()) {
+        if (!Gh4Application.get().isAuthorized()) {
             return;
         }
-        StarringService service = app.getGitHubService(StarringService.class);
+        StarringService service = ServiceFactory.get(StarringService.class);
         service.checkIfRepositoryIsStarred(mRepoOwner, mRepoName)
                 .map(ApiHelpers::throwOnFailure)
                 // success response means 'starred'
@@ -472,11 +472,10 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
     }
 
     private void loadWatchingState(boolean force) {
-        Gh4Application app = Gh4Application.get();
-        if (!app.isAuthorized()) {
+        if (!Gh4Application.get().isAuthorized()) {
             return;
         }
-        WatchingService service = app.getGitHubService(WatchingService.class);
+        WatchingService service = ServiceFactory.get(WatchingService.class);
         service.getRepositorySubscription(mRepoOwner, mRepoName)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Subscription::subscribed)
@@ -493,10 +492,9 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
         if (mBranches != null) {
             showRefSelectionDialog();
         } else {
-            Gh4Application app = Gh4Application.get();
             final RepositoryBranchService branchService =
-                    app.getGitHubService(RepositoryBranchService.class);
-            final RepositoryService repoService = app.getGitHubService(RepositoryService.class);
+                    ServiceFactory.get(RepositoryBranchService.class);
+            final RepositoryService repoService = ServiceFactory.get(RepositoryService.class);
 
             Single<List<Branch>> branchSingle = ApiHelpers.PageIterator
                     .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page));

@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.adapter.ReleaseAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -39,8 +39,7 @@ public class ReleaseListFragment extends PagedDataBaseFragment<Release> implemen
 
     @Override
     protected Single<Response<Page<Release>>> loadPage(int page) {
-        final RepositoryReleaseService service =
-                Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
+        final RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class);
         return service.getReleases(mUserLogin, mRepoName, page);
     }
 

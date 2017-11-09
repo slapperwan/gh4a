@@ -5,7 +5,7 @@ import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.util.Pair;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
@@ -48,13 +48,12 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        PullRequestService service =
-                Gh4Application.get().getGitHubService(PullRequestService.class);
+        PullRequestService service = ServiceFactory.get(PullRequestService.class);
         Single<PullRequest> pullRequestSingle = service.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
                 .map(ApiHelpers::throwOnFailure);
 
         final PullRequestReviewCommentService commentService =
-                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
 
         Single<List<ReviewComment>> commentsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getPullRequestComments(

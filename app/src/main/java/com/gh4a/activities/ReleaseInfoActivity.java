@@ -30,8 +30,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.adapter.ReleaseAssetAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ApiHelpers;
@@ -263,8 +263,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     private void loadRelease(boolean force) {
-        RepositoryReleaseService service =
-                Gh4Application.get().getGitHubService(RepositoryReleaseService.class);
+        RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class);
 
         service.getRelease(mRepoOwner, mRepoName, mReleaseId)
                 .map(ApiHelpers::throwOnFailure)
@@ -277,7 +276,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     private void loadBody() {
-        MarkdownService service = Gh4Application.get().getGitHubService(MarkdownService.class);
+        MarkdownService service = ServiceFactory.get(MarkdownService.class);
         RequestMarkdown request = RequestMarkdown.builder()
                 .context(mRepoOwner + "/" + mRepoName)
                 .mode("gfm")

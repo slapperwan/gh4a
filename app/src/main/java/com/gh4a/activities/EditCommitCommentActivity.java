@@ -3,7 +3,7 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.request.CommentRequest;
@@ -23,8 +23,7 @@ public class EditCommitCommentActivity extends EditCommentActivity {
     @Override
     protected Single<GitHubCommentBase> createComment(String repoOwner, String repoName,
             String body, long replyToCommentId) {
-        RepositoryCommentService service =
-                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
         CreateCommitComment request = CreateCommitComment.builder().body(body).build();
         String sha = getIntent().getStringExtra("commit");
         return service.createCommitComment(repoOwner, repoName, sha, request)
@@ -34,8 +33,7 @@ public class EditCommitCommentActivity extends EditCommentActivity {
     @Override
     protected Single<GitHubCommentBase> editComment(String repoOwner, String repoName,
             long commentId, String body) {
-        RepositoryCommentService service =
-                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
         CommentRequest request = CommentRequest.builder().body(body).build();
         return service.editCommitComment(repoOwner, repoName, commentId, request)
                 .map(ApiHelpers::throwOnFailure);

@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
@@ -128,8 +128,7 @@ public class PullRequestFilesFragment extends CommitFragment {
     }
 
     private void loadFiles(boolean force) {
-        final PullRequestService service =
-                Gh4Application.get().getGitHubService(PullRequestService.class);
+        final PullRequestService service = ServiceFactory.get(PullRequestService.class);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestFiles(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
@@ -142,7 +141,7 @@ public class PullRequestFilesFragment extends CommitFragment {
 
     private void loadComments(boolean force) {
         final PullRequestReviewCommentService service =
-                Gh4Application.get().getGitHubService(PullRequestReviewCommentService.class);
+                ServiceFactory.get(PullRequestReviewCommentService.class);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))

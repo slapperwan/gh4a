@@ -20,8 +20,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -105,8 +105,7 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
 
     @Override
     protected Single<Response<Page<Commit>>> loadPage(int page) {
-        final RepositoryCommitService service =
-                Gh4Application.get().getGitHubService(RepositoryCommitService.class);
+        final RepositoryCommitService service = ServiceFactory.get(RepositoryCommitService.class);
         return service.getCommits(mRepoOwner, mRepoName, mRef, mFilePath, page)
                 .map(response -> {
                     // 409 is returned for empty repos

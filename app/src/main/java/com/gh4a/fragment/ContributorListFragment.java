@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.ContributorAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -33,7 +33,7 @@ public class ContributorListFragment extends PagedDataBaseFragment<User> impleme
     protected Single<Response<Page<User>>> loadPage(int page) {
         String repoOwner = getArguments().getString("owner");
         String repoName = getArguments().getString("repo");
-        RepositoryService service = Gh4Application.get().getGitHubService(RepositoryService.class);
+        RepositoryService service = ServiceFactory.get(RepositoryService.class);
         return service.getContributors(repoOwner, repoName, page);
     }
 

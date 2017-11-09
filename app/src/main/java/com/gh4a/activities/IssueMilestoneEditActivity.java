@@ -46,6 +46,7 @@ import android.widget.TextView;
 import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
@@ -323,8 +324,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
 
     private void saveMilestone(String title, String desc) {
         String errorMessage = getString(R.string.issue_error_create_milestone, title);
-        IssueMilestoneService service =
-                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class);
         CreateMilestone request = CreateMilestone.builder()
                 .title(title)
                 .description(desc)
@@ -347,8 +347,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
     }
 
     private void deleteMilestone() {
-        IssueMilestoneService service =
-                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class);
         service.deleteMilestone(mRepoOwner, mRepoName, mMilestone.number())
                 .map(ApiHelpers::throwOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg, R.string.issue_error_delete_milestone))
@@ -363,8 +362,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         String errorMessage = getString(
                 open ? R.string.issue_milestone_reopen_error : R.string.issue_milestone_close_error,
                 mMilestone.title());
-        IssueMilestoneService service =
-                Gh4Application.get().getGitHubService(IssueMilestoneService.class);
+        IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class);
         CreateMilestone request = CreateMilestone.builder()
                 .state(open ? IssueState.Open : IssueState.Closed)
                 .build();

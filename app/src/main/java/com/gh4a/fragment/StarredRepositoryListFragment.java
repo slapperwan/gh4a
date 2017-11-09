@@ -18,8 +18,8 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -75,7 +75,7 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
 
     @Override
     protected Single<Response<Page<Repository>>> loadPage(int page) {
-        final StarringService service = Gh4Application.get().getGitHubService(StarringService.class);
+        final StarringService service = ServiceFactory.get(StarringService.class);
         final HashMap<String, String> filterData = new HashMap<>();
         filterData.put("sort", mSortOrder);
         filterData.put("direction", mSortDirection);

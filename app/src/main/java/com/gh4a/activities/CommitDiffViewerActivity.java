@@ -18,7 +18,7 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 
-import com.gh4a.Gh4Application;
+import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -86,16 +86,14 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
 
     @Override
     public Single<Response<Void>> doDeleteComment(long id) {
-        RepositoryCommentService service =
-                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
 
         return service.deleteCommitComment(mRepoOwner, mRepoName, id);
     }
 
     @Override
     protected Single<List<GitComment>> createCommentSingle() {
-        final RepositoryCommentService service =
-                Gh4Application.get().getGitHubService(RepositoryCommentService.class);
+        final RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mSha, page))
                 .compose(RxUtils.filter(c -> c.position() != null));
@@ -104,7 +102,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     @Override
     public Single<List<Reaction>> loadReactionDetailsInBackground(ReactionBar.Item item) {
         final CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitCommentReactions(mRepoOwner, mRepoName, comment.comment.id(), page));
     }
@@ -112,7 +110,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     @Override
     public Single<Reaction> addReactionInBackground(ReactionBar.Item item, String content) {
         CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        final ReactionService service = Gh4Application.get().getGitHubService(ReactionService.class);
+        final ReactionService service = ServiceFactory.get(ReactionService.class);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
 
         return service.createCommitCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)

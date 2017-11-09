@@ -18,8 +18,8 @@ package com.gh4a.fragment;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
@@ -66,7 +66,7 @@ public class WatchedRepositoryListFragment extends PagedDataBaseFragment<Reposit
 
     @Override
     protected Single<Response<Page<Repository>>> loadPage(int page) {
-        final WatchingService service = Gh4Application.get().getGitHubService(WatchingService.class);
+        final WatchingService service = ServiceFactory.get(WatchingService.class);
         return service.getWatchedRepositories(mLogin, page);
     }
 }
