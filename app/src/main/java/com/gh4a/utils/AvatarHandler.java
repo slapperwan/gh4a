@@ -260,7 +260,7 @@ public class AvatarHandler {
     }
 
     private static Bitmap fetchBitmap(String url) throws IOException {
-        OkHttpClient client = ServiceFactory.getHttpClientBuilder().build();
+        OkHttpClient client = ServiceFactory.getImageHttpClient();
         okhttp3.Request request = new okhttp3.Request.Builder()
                 .url(url)
                 .build();
