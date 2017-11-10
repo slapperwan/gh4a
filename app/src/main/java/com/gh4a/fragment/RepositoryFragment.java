@@ -361,11 +361,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                     }
                     return Optional.<String>absent();
                 })
+                .compose(makeLoaderSingle(ID_LOADER_README, force))
                 .doOnSubscribe(disposable -> {
                     mIsReadmeLoaded = false;
                     updateReadmeVisibility();
                 })
-                .compose(makeLoaderSingle(ID_LOADER_README, force))
                 .subscribe(readmeOpt -> {
                     if (readmeOpt.isPresent()) {
                         mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
