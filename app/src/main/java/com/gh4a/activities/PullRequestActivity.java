@@ -106,6 +106,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private PullRequestFragment mPullRequestFragment;
     private IssueStateTrackingFloatingActionButton mEditFab;
     private Review mPendingReview;
+    private boolean mPendingReviewLoaded;
 
     private ViewGroup mHeader;
     private int[] mHeaderColorAttrs;
@@ -191,6 +192,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     break;
                 }
             }
+            mPendingReviewLoaded = true;
+            supportInvalidateOptionsMenu();
         }
     };
 
@@ -265,6 +268,9 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             menu.removeItem(R.id.share);
             menu.removeItem(R.id.browser);
             menu.removeItem(R.id.copy_number);
+        }
+        if (!mPendingReviewLoaded || mPullRequest == null || isClosed) {
+            menu.removeItem(R.id.pull_review);
         }
 
         return super.onCreateOptionsMenu(menu);
@@ -341,6 +347,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         mIssue = null;
         mPullRequest = null;
         mIsCollaborator = null;
+        mPendingReview = null;
+        mPendingReviewLoaded = false;
         setContentShown(false);
         if (mEditFab != null) {
             mEditFab.post(new Runnable() {
@@ -354,6 +362,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         mHeaderColorAttrs = null;
         forceLoaderReload(0, 1, 2, 3);
         invalidateTabs();
+        supportInvalidateOptionsMenu();
         super.onRefresh();
     }
 
