@@ -345,8 +345,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
         Long id = mRepository.id();
         String repoOwner = mRepository.owner().login();
         String repoName = mRepository.name();
-        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, force,
-                "application/vnd.github.v3.html", null, null);
+        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, force);
 
         service.getReadmeHtml(repoOwner, repoName, mRef)
                 .map(ApiHelpers::throwOnFailure)
