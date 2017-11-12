@@ -355,7 +355,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                 .map(htmlOpt -> {
                     if (htmlOpt.isPresent()) {
                         String html = HtmlUtils.rewriteRelativeUrls(htmlOpt.get(),
-                                repoOwner, repoName, mRef);
+                                repoOwner, repoName, mRef != null ? mRef : mRepository.defaultBranch());
                         mImageGetter.encode(context, id, html);
                         return Optional.of(html);
                     }
