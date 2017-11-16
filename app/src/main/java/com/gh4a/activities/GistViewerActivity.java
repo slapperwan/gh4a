@@ -132,7 +132,7 @@ public class GistViewerActivity extends WebViewerActivity {
                     mGistOwner = ApiHelpers.getUserLogin(GistViewerActivity.this, result.owner());
                     mGistFile = result.files().get(mFileName);
                     onDataReady();
-                }, error -> {});
+                }, this::handleLoadFailure);
 
     }
 }

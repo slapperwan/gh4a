@@ -590,6 +590,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
                 .subscribe(result -> {
                     reloadEvents(false);
                     getActivity().setResult(Activity.RESULT_OK);
-                }, error -> {});
+                }, error -> handleActionFailure("Deleting comment failed", error));
     }
 }

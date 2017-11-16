@@ -273,7 +273,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         responseSingle
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(RxUtils::doInBackground)
-                .subscribe(result -> handleMarkAsRead(repository, notification), error -> {});
+                .subscribe(result -> handleMarkAsRead(repository, notification),
+                        error -> handleActionFailure("Mark notifications as read failed", error));
     }
 
     private void handleMarkAsRead(Repository repository, NotificationThread notification) {
@@ -300,6 +301,6 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
                         mCallback.setNotificationsIndicatorVisible(!result.notifications.isEmpty());
                     }
                     scrollToInitialNotification(result.notifications);
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 }

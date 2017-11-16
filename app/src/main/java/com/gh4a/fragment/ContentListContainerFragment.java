@@ -318,14 +318,13 @@ public class ContentListContainerFragment extends Fragment implements
                 .map(this::parseModuleMap)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError(error -> ((BaseActivity) getActivity()).handleLoadFailure(error))
                 .compose(mRxLoader.makeSingleTransformer(ID_LOADER_MODULEMAP, true))
                 .subscribe(resultOpt -> {
                     mGitModuleMap = resultOpt.orNull();
                     if (mContentListFragment != null) {
                         mContentListFragment.onSubModuleNamesChanged(getSubModuleNames(mContentListFragment));
                     }
-                }, error -> {});
+                }, ((BaseActivity) getActivity())::handleLoadFailure);
     }
 
     private Optional<Map<String, String>> parseModuleMap(Optional<String> inputOpt) {

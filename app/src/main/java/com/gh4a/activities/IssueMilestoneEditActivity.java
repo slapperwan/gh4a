@@ -343,7 +343,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                     mMilestone = result;
                     setResult(RESULT_OK);
                     finish();
-                }, error -> {});
+                }, error -> handleActionFailure("Saving milestone failed", error));
     }
 
     private void deleteMilestone() {
@@ -354,7 +354,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 .subscribe(result -> {
                     setResult(RESULT_OK);
                     finish();
-                }, error -> {});
+                }, error -> handleActionFailure("Deleting milestone failed", error));
     }
 
     private void setMilestoneState(boolean open) {
@@ -375,7 +375,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                     updateHighlightColor();
                     supportInvalidateOptionsMenu();
                     setResult(RESULT_OK);
-                }, error -> {});
+                }, error -> handleActionFailure("Updating milestone failed", error));
     }
 
     public static class DatePickerFragment extends DialogFragment

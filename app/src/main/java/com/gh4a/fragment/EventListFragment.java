@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CompareActivity;
@@ -312,7 +314,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             intentSingle
                     .compose(RxUtils::doInBackground)
                     .compose(RxUtils.wrapWithProgressDialog(getActivity(), R.string.loading_msg))
-                    .subscribe(result -> result.doIfPresent(this::startActivity), error -> {});
+                    .subscribe(result -> result.doIfPresent(this::startActivity),
+                            error -> Log.d(Gh4Application.LOG_TAG, "Loading click intent failed", error));
         }
     }
 

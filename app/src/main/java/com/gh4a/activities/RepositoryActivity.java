@@ -406,7 +406,10 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                         }
                         supportInvalidateOptionsMenu();
                     }
-                }, error -> supportInvalidateOptionsMenu());
+                }, error -> {
+                    handleActionFailure("Updating repo starring state failed", error);
+                    supportInvalidateOptionsMenu();
+                });
 
     }
 
@@ -431,7 +434,10 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                         mIsWatching = !mIsWatching;
                     }
                     supportInvalidateOptionsMenu();
-                }, error -> supportInvalidateOptionsMenu());
+                }, error -> {
+                    handleActionFailure("Updating repo watching state failed", error);
+                    supportInvalidateOptionsMenu();
+                });
     }
 
     private void loadRepository(boolean force) {
@@ -450,7 +456,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                     }
                     setContentShown(true);
                     supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadStarringState(boolean force) {
@@ -468,7 +474,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                 .subscribe(result -> {
                     mIsStarring = result;
                     supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadWatchingState(boolean force) {
@@ -485,7 +491,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                 .subscribe(result -> {
                     mIsWatching = result;
                     supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadOrShowRefSelection() {
@@ -508,7 +514,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity {
                         mBranches = result.first;
                         mTags = result.second;
                         showRefSelectionDialog();
-                    }, error -> {}));
+                    }, this::handleLoadFailure));
         }
     }
 

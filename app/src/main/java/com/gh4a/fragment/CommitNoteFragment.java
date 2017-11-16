@@ -312,6 +312,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
                 .map(ApiHelpers::throwOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
                         R.string.deleting_msg, R.string.error_delete_comment))
-                .subscribe(result -> refreshComments(), error -> {});
+                .subscribe(result -> refreshComments(),
+                        error -> handleActionFailure("Deleting comment failed", error));
     }
 }

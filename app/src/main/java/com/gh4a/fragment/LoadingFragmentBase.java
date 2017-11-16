@@ -4,12 +4,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
@@ -80,8 +82,15 @@ public abstract class LoadingFragmentBase extends Fragment implements
     protected <T> SingleTransformer<T, T> makeLoaderSingle(int id, boolean force) {
         return upstream -> upstream
                 .compose(RxUtils::doInBackground)
-                .doOnError(error -> getBaseActivity().handleLoadFailure(error))
                 .compose(mRxLoader.makeSingleTransformer(id, force));
+    }
+
+    protected void handleLoadFailure(Throwable error) {
+        getBaseActivity().handleLoadFailure(error);
+    }
+
+    protected void handleActionFailure(String text, Throwable error) {
+        getBaseActivity().handleActionFailure(text, error);
     }
 
     protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {

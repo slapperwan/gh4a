@@ -137,7 +137,7 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
                 .subscribe(result -> {
                     mUserScopes = result.isEmpty() ? null : result;
                     mActivity.supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, mActivity::handleLoadFailure);
     }
 
     private static class UserAdapter extends BaseAdapter {

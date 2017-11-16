@@ -626,7 +626,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                     .subscribe(assignees -> {
                         mAssignees = assignees;
                         showAssigneesDialog();
-                    }, error -> {}));
+                    }, this::handleLoadFailure));
         }
     }
 
@@ -642,7 +642,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                     .subscribe(milestones -> {
                         mMilestones = milestones;
                         showMilestonesDialog();
-                    }, error -> {}));
+                    }, this::handleLoadFailure));
         }
     }
 
@@ -658,7 +658,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                     .subscribe(labels -> {
                         mLabels = labels;
                         showLabelsDialog();
-                    }, error -> {}));
+                    }, this::handleLoadFailure));
         }
     }
 
@@ -688,6 +688,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                             updateRightNavigationDrawer();
                         }
                     }
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 }

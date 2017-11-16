@@ -448,7 +448,8 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg,
                         getString(R.string.error_delete_commit_comment)))
-                .subscribe(result -> refresh(), error -> {});
+                .subscribe(result -> refresh(),
+                        error -> handleActionFailure("Comment deletion failed", error));
     }
 
     private void loadComments(boolean useIntentExtraIfPresent, boolean force) {
@@ -461,7 +462,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         commentSingle.subscribe(result -> {
             addCommentsToMap(result);
             onDataReady();
-        }, error -> {});
+        }, this::handleLoadFailure);
     }
 
     private class CommentActionPopup extends PopupMenu implements

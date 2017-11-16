@@ -65,7 +65,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
                     onAddData(mAdapter, result);
                     setContentShown(true);
                     updateEmptyState();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     protected abstract Single<List<T>> onCreateDataSingle(boolean bypassCache);

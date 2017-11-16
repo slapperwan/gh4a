@@ -21,6 +21,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.NestedScrollView;
 import android.text.Editable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
@@ -422,7 +424,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
                     mCallback.onEditorTextSent();
                     setCommentText(null, true);
                     setAdvancedMode(false);
-                }, error -> {});
+                }, error -> Log.d(Gh4Application.LOG_TAG, "Sending comment failed", error));
     }
 
     private static class AdvancedEditorPagerAdapter extends PagerAdapter {

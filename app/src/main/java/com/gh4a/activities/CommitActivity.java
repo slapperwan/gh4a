@@ -216,7 +216,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
                 .subscribe(result -> {
                     mCommit = result;
                     showContentIfReady();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadComments(boolean force) {
@@ -231,6 +231,6 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
                         mInitialComment = null;
                     }
                     showContentIfReady();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 }

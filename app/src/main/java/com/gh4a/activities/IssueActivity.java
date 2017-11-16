@@ -313,7 +313,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                     }
                     setResult(RESULT_OK);
                     supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, error -> handleActionFailure("Updating issue state failed", error));
     }
 
     private void updateFabVisibility() {
@@ -377,7 +377,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                     mIssue = result;
                     showUiIfDone();
                     supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadCollaboratorStatus(boolean force) {
@@ -387,6 +387,6 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
                     mIsCollaborator = result;
                     showUiIfDone();
                     supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 }
