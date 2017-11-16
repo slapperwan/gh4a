@@ -472,6 +472,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem>
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
                         R.string.deleting_msg, R.string.error_delete_comment))
-                .subscribe(result -> reloadComments(false), error -> {});
+                .subscribe(result -> reloadComments(false),
+                        error -> handleActionFailure("Deleting comment failed", error));
     }
 }

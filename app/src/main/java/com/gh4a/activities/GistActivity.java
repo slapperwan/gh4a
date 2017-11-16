@@ -203,7 +203,10 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
                 .subscribe(result -> {
                     mIsStarred = !mIsStarred;
                     supportInvalidateOptionsMenu();
-                }, error -> supportInvalidateOptionsMenu());
+                }, error -> {
+                    handleActionFailure("Updating gist starring state failed", error);
+                    supportInvalidateOptionsMenu();
+                });
     }
 
     private void loadGist(boolean force) {
@@ -215,7 +218,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
                     fillData(result);
                     setContentShown(true);
                     supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadStarredState(boolean force) {
@@ -226,6 +229,6 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
                 .subscribe(result -> {
                     mIsStarred = result;
                     supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 }

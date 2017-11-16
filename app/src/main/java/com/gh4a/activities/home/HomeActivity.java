@@ -539,7 +539,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                     Gh4Application.get().setCurrentAccountInfo(result);
                     mUserInfo = result;
                     updateUserInfo();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadNotificationIndicator(boolean force) {
@@ -553,7 +553,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 .map(ApiHelpers::throwOnFailure)
                 .map(result -> !result.items().isEmpty())
                 .compose(makeLoaderSingle(ID_LOADER_NOTIFICATIONS_INDICATOR, force))
-                .subscribe(this::setNotificationsIndicatorVisible, error -> {});
+                .subscribe(this::setNotificationsIndicatorVisible, this::handleLoadFailure);
     }
 
     public static class BrowserLogoutDialogFragment extends DialogFragment implements

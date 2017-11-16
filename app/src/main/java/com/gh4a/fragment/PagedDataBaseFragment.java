@@ -119,13 +119,12 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
                 })
                 // filter out initial value
                 .filter(pair -> pair.second == null || pair.second != 0)
-                .doOnError(error -> getBaseActivity().handleLoadFailure(error))
                 .compose(mRxLoader.makeObservableTransformer(0, force))
                 .subscribe(result -> {
                     fillData(result.first, result.second);
                     setContentShown(true);
                     updateEmptyState();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void fillData(List<T> data, Integer nextPage) {

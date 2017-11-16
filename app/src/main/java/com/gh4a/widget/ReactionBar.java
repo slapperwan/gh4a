@@ -16,6 +16,7 @@ import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -248,14 +249,20 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 populateAdapter(details);
             } else {
                 fetchReactions(mCallback, mItem, mDetailsCache)
-                        .subscribe(this::populateAdapter, error -> dismiss());
+                        .subscribe(this::populateAdapter, error -> {
+                            Log.d(Gh4Application.LOG_TAG, "Fetching reactions failed", error);
+                            dismiss();
+                        });
             }
         }
 
         public void toggleOwnReaction(Reaction currentReaction) {
             final long id = currentReaction != null ? currentReaction.id() : 0;
             toggleReaction(mContent, id, mLastKnownDetails, mCallback, mItem, mDetailsCache)
-                    .subscribe(result -> dismiss(), error -> dismiss());
+                    .subscribe(result -> dismiss(), error -> {
+                        Log.d(Gh4Application.LOG_TAG, "Toggling reaction failed", error);
+                        dismiss();
+                    });
         }
 
         private void populateAdapter(List<Reaction> details) {
@@ -513,7 +520,10 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                         .doOnSubscribe(disposable -> mLoading = true)
                         .doOnSuccess(result -> mLoading = false)
                         .doOnError(error -> mLoading = false)
-                        .subscribe(reactions -> update(), error -> update());
+                        .subscribe(reactions -> update(), error -> {
+                            Log.d(Gh4Application.LOG_TAG, "Fetching reactions failed", error);
+                            update();
+                        });
             }
         }
 
@@ -551,7 +561,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                                 break;
                             }
                         }
-                    }, error -> {});
+                    }, error -> Log.d(Gh4Application.LOG_TAG, "Changing reaction failed", error));
         }
     }
 

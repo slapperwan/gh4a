@@ -375,7 +375,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
                     }
                     mIsReadmeLoaded = true;
                     updateReadmeVisibility();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadPullRequestCount(boolean force) {
@@ -397,6 +397,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
                     TextView tvPullRequestsCountView = v.findViewById(R.id.tv_pull_requests_count);
                     tvPullRequestsCountView.setText(String.valueOf(count));
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 }

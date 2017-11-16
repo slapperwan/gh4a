@@ -271,7 +271,7 @@ public class IssueLabelListActivity extends BaseActivity implements
                 .subscribe(result -> {
                     loadLabels(true);
                     setResult(RESULT_OK);
-                }, error -> {});
+                }, error -> handleActionFailure("Deleting label failed", error));
     }
 
     private void editLabel(IssueLabelAdapter.EditableLabel label) {
@@ -289,7 +289,7 @@ public class IssueLabelListActivity extends BaseActivity implements
                 .subscribe(result -> {
                     loadLabels(true);
                     setResult(RESULT_OK);
-                }, error -> {});
+                }, error -> handleActionFailure("Editing label failed", error));
     }
 
     private void addLabel(IssueLabelAdapter.EditableLabel label) {
@@ -307,7 +307,7 @@ public class IssueLabelListActivity extends BaseActivity implements
                     mAddedLabel = null;
                     loadLabels(true);
                     setResult(RESULT_OK);
-                }, error -> {});
+                }, error -> handleActionFailure("Adding label failed", error));
     }
 
     private void loadLabels(boolean force) {
@@ -321,6 +321,6 @@ public class IssueLabelListActivity extends BaseActivity implements
                     mAdapter.clear();
                     mAdapter.addAll(result);
                     setContentShown(true);
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 }

@@ -272,7 +272,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
                     mRelease = result;
                     handleReleaseReady();
                     setContentShown(true);
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadBody() {
@@ -285,6 +285,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
         mBodySubscription = service.renderMarkdown(request)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_BODY, false))
-                .subscribe(this::fillNotes, error -> {});
+                .subscribe(this::fillNotes, this::handleLoadFailure);
     }
 }

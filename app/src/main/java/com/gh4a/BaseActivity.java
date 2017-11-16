@@ -167,6 +167,15 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     public void handleLoadFailure(Throwable e) {
+        handleFailure("Loading data failed", e);
+        setErrorViewVisibility(true, e);
+    }
+
+    public void handleActionFailure(String text, Throwable e) {
+        handleFailure(text, e);
+    }
+
+    private void handleFailure(String text, Throwable e) {
         boolean isAuthError = e instanceof ApiRequestException
                 && ((ApiRequestException) e).getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED;
         if (isAuthError) {
@@ -174,8 +183,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
                     .setAction(R.string.login, v -> goToToplevelActivity())
                     .show();
         }
-        Log.d(Gh4Application.LOG_TAG, "Loading data failed", e);
-        setErrorViewVisibility(true, e);
+        if (e instanceof RuntimeException) {
+            // If this happens, it means Rx catched a programming error of us. Crash the app
+            // in that case, as that's what would have happened without Rx as well.
+            throw (RuntimeException) e;
+        }
+        Log.d(Gh4Application.LOG_TAG, text, e);
     }
 
     protected void registerTemporarySubscription(Disposable disposable) {
@@ -571,7 +584,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public <T> SingleTransformer<T, T> makeLoaderSingle(int id, boolean force) {
         return upstream -> upstream
                 .compose(RxUtils::doInBackground)
-                .doOnError(this::handleLoadFailure)
                 .compose(mRxLoader.makeSingleTransformer(id, force));
     }
 

@@ -399,7 +399,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                 .subscribe(result -> {
                     mHeadReference = result;
                     onHeadReferenceUpdated();
-                }, error -> {});
+                }, error -> handleActionFailure("Restoring PR branch failed", error));
     }
 
     private void deletePullRequestBranch() {
@@ -416,7 +416,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                 .subscribe(result -> {
                     mHeadReference = null;
                     onHeadReferenceUpdated();
-                }, error -> {});
+                }, error -> handleActionFailure("Deleting PR branch failed", error));
     }
 
     private static final Comparator<Status> STATUS_TIMESTAMP_COMPARATOR =
@@ -472,7 +472,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                     // sort by status, then context
                     .compose(RxUtils.sortList(STATUS_AND_CONTEXT_COMPARATOR))
                     .compose(makeLoaderSingle(ID_LOADER_STATUS, force))
-                    .subscribe(this::fillStatus, error -> {});
+                    .subscribe(this::fillStatus, this::handleLoadFailure);
     }
 
     private void loadHeadReference(boolean force) {
@@ -493,6 +493,6 @@ public class PullRequestFragment extends IssueFragmentBase {
             mHasLoadedHeadReference = true;
             getActivity().invalidateOptionsMenu();
             bindSpecialViews(mListHeaderView);
-        }, error -> {});
+        }, this::handleLoadFailure);
     }
 }

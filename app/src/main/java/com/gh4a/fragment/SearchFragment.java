@@ -321,7 +321,7 @@ public class SearchFragment extends LoadingListFragmentBase implements
                         }
                         updateEmptyState();
                         setContentShown(true);
-                    }, error -> {});
+                    }, this::handleLoadFailure);
         } else {
             updateEmptyState();
             setContentShown(true);

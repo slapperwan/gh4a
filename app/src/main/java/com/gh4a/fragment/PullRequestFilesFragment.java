@@ -136,7 +136,7 @@ public class PullRequestFilesFragment extends CommitFragment {
                 .subscribe(result -> {
                     mFiles = result;
                     populateUiIfReady();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadComments(boolean force) {
@@ -150,6 +150,6 @@ public class PullRequestFilesFragment extends CommitFragment {
                 .subscribe(result -> {
                     mComments = result;
                     populateUiIfReady();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 }

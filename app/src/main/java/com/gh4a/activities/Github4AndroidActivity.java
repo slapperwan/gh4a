@@ -123,7 +123,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                         Gh4Application.get().addAccount(pair.second, pair.first);
                         goToToplevelActivity();
                         finish();
-                    }, error -> setErrorViewVisibility(true, error));
+                    }, this::handleLoadFailure);
             return true;
         }
 

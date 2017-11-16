@@ -497,7 +497,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 .subscribe(result -> {
                     mPullRequest = result;
                     handlePullRequestUpdate();
-                }, error -> {});
+                }, error -> handleActionFailure("Updating pull request failed", error));
     }
 
     private void mergePullRequest(String commitMessage, MergeRequest.Method mergeMethod) {
@@ -519,7 +519,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                                 .build();
                     }
                     handlePullRequestUpdate();
-                }, error -> {});
+                }, error -> handleActionFailure("Merging pull request failed", error));
     }
 
     private void load(boolean force) {
@@ -549,7 +549,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                         getPager().setCurrentItem(mInitialPage);
                         mInitialPage = -1;
                     }
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadPendingReview(boolean force) {
@@ -571,7 +571,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     mPendingReview = result.orNull();
                     mPendingReviewLoaded = true;
                     supportInvalidateOptionsMenu();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private class MergeMethodDesc {

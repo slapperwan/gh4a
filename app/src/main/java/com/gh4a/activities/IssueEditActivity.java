@@ -587,7 +587,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                     data.putExtras(extras);
                     setResult(RESULT_OK, data);
                     finish();
-                }, error -> {});
+                }, error -> handleActionFailure("Saving issue failed", error));
     }
 
     private void loadCollaboratorStatus(boolean force) {
@@ -596,7 +596,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .subscribe(result -> {
                     mIsCollaborator = result;
                     invalidatePages();
-                }, error -> {});
+                }, this::handleLoadFailure);
     }
 
     private void loadLabels() {
@@ -608,7 +608,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .subscribe(result -> {
                     mAllLabels = result;
                     showLabelDialog();
-                }, error -> {}));
+                }, this::handleLoadFailure));
     }
 
     private void loadMilestones() {
@@ -620,7 +620,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .subscribe(result -> {
                     mAllMilestone = result;
                     showMilestonesDialog();
-                }, error -> {}));
+                }, this::handleLoadFailure));
     }
 
     private void loadPotentialAssignees() {
@@ -637,7 +637,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                         mAllAssignee.add(creator);
                     }
                     showAssigneesDialog();
-                }, error -> {}));
+                }, this::handleLoadFailure));
     }
 
     private void loadIssueTemplate() {
@@ -657,7 +657,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                     mDescView.setHint(null);
                     mDescView.setEnabled(true);
                     mDescView.setText(result.orNull());
-                }, error -> {}));
+                }, this::handleLoadFailure));
     }
 
     private Single<Optional<Content>> getIssueTemplateContentSingle(String path) {
