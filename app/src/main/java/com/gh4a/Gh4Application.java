@@ -21,7 +21,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
 import android.os.Build;
-import android.util.SparseArray;
+import android.util.LongSparseArray;
 
 import com.evernote.android.job.JobManager;
 import com.gh4a.fragment.SettingsFragment;
@@ -158,10 +158,10 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         return getPrefs().getString(KEY_ACTIVE_LOGIN, null);
     }
 
-    public SparseArray<String> getAccounts() {
-        SparseArray<String> accounts = new SparseArray<>();
+    public LongSparseArray<String> getAccounts() {
+        LongSparseArray<String> accounts = new LongSparseArray<>();
         for (String login : getPrefs().getStringSet(KEY_ALL_LOGINS, null)) {
-            int id = getPrefs().getInt(KEY_PREFIX_USER_ID + login, -1);
+            long id = getPrefs().getLong(KEY_PREFIX_USER_ID + login, -1);
             if (id > 0) {
                 accounts.put(id, login);
             }

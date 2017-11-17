@@ -20,6 +20,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.LongSparseArray;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -492,7 +493,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
             }
 
             int id = OTHER_ACCOUNTS_GROUP_BASE_ID;
-            SparseArray<String> accounts = Gh4Application.get().getAccounts();
+            LongSparseArray<String> accounts = Gh4Application.get().getAccounts();
             for (int i = 0; i < accounts.size(); i++) {
                 String login = accounts.valueAt(i);
                 if (ApiHelpers.loginEquals(mUserLogin, login)) {
