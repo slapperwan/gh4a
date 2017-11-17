@@ -124,6 +124,11 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            mEditIssue = savedInstanceState.getParcelable(STATE_KEY_ISSUE);
+            mOriginalIssue = savedInstanceState.getParcelable(STATE_KEY_ORIGINAL_ISSUE);
+        }
+
         super.onCreate(savedInstanceState);
 
         if (!Gh4Application.get().isAuthorized()) {
@@ -173,18 +178,10 @@ public class IssueEditActivity extends BasePagerActivity implements
 
         loadCollaboratorStatus(false);
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_KEY_ISSUE)) {
-            mEditIssue = savedInstanceState.getParcelable(STATE_KEY_ISSUE);
-            mOriginalIssue = savedInstanceState.getParcelable(STATE_KEY_ORIGINAL_ISSUE);
-        } else if (!isInEditMode()) {
+        if (savedInstanceState == null && !isInEditMode()) {
             loadIssueTemplate();
             mDescView.setEnabled(false);
             mDescView.setHint(getString(R.string.issue_loading_template_hint));
-        }
-
-        if (mEditIssue == null) {
-            mEditIssue = Issue.builder().build();
-            mOriginalIssue = Issue.builder().build();
         }
 
         mTitleView.setText(mEditIssue.title());
@@ -239,16 +236,22 @@ public class IssueEditActivity extends BasePagerActivity implements
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
-        mEditIssue = extras.getParcelable("issue");
-        if (mEditIssue != null) {
-            // Save only editable fields
-            mOriginalIssue = Issue.builder()
-                    .title(mEditIssue.title())
-                    .body(mEditIssue.body())
-                    .milestone(mEditIssue.milestone())
-                    .assignees(mEditIssue.assignees())
-                    .labels(mEditIssue.labels())
-                    .build();
+        // If mEditIssue is != null here, it was restored from saved state
+        if (mEditIssue == null) {
+            if (extras.containsKey("issue")) {
+                mEditIssue = extras.getParcelable("issue");
+                // Save only editable fields
+                mOriginalIssue = Issue.builder()
+                        .title(mEditIssue.title())
+                        .body(mEditIssue.body())
+                        .milestone(mEditIssue.milestone())
+                        .assignees(mEditIssue.assignees())
+                        .labels(mEditIssue.labels())
+                        .build();
+            } else {
+                mEditIssue = Issue.builder().build();
+                mOriginalIssue = Issue.builder().build();
+            }
         }
     }
 
@@ -309,12 +312,8 @@ public class IssueEditActivity extends BasePagerActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (mEditIssue != null) {
-            outState.putParcelable(STATE_KEY_ISSUE, mEditIssue);
-        }
-        if (mOriginalIssue != null) {
-            outState.putParcelable(STATE_KEY_ORIGINAL_ISSUE, mOriginalIssue);
-        }
+        outState.putParcelable(STATE_KEY_ISSUE, mEditIssue);
+        outState.putParcelable(STATE_KEY_ORIGINAL_ISSUE, mOriginalIssue);
     }
 
     @Override
