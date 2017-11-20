@@ -3,6 +3,7 @@ package com.gh4a;
 import android.content.Context;
 import android.util.Log;
 
+import com.gh4a.utils.CrashReportingHelper;
 import com.meisolsson.githubsdk.core.GitHubPaginationInterceptor;
 import com.meisolsson.githubsdk.core.ServiceGenerator;
 import com.meisolsson.githubsdk.core.StringResponseConverterFactory;
@@ -161,7 +162,7 @@ public class ServiceFactory {
                     }
 
                     Request request = requestBuilder.build();
-                    Gh4Application.trackVisitedUrl(request.url().toString());
+                    CrashReportingHelper.trackVisitedUrl(request.url().toString());
                     return chain.proceed(request);
                 });
 

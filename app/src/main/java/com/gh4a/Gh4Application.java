@@ -136,12 +136,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         }
     }
 
-    /* package */ static void trackVisitedUrl(String url) {
-        synchronized (Gh4Application.class) {
-            CrashReportingHelper.trackVisitedUrl(get(), url);
-        }
-    }
-
     public PrettyTime getPrettyTimeInstance() {
         return mPt;
     }

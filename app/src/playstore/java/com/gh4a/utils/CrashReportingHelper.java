@@ -1,6 +1,6 @@
 package com.gh4a.utils;
 
-import android.app.Application;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 
@@ -13,20 +13,22 @@ public class CrashReportingHelper {
     private static int sNextUrlTrackingPosition = 0;
     private static boolean sHasCrashlytics;
 
-    public static void onCreate(Application app) {
-        boolean isDebuggable = (app.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    public static void onCreate(Context context) {
+        boolean isDebuggable = (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         sHasCrashlytics = !isDebuggable && !isEmulator();
 
         if (sHasCrashlytics) {
-            Fabric.with(app, new Crashlytics());
+            Fabric.with(context, new Crashlytics());
         }
     }
-    public static void trackVisitedUrl(Application app, String url) {
+    public static void trackVisitedUrl(String url) {
         if (sHasCrashlytics) {
-            Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
-            Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
-            if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
-                sNextUrlTrackingPosition = 0;
+            synchronized (CrashReportingHelper.class) {
+                Crashlytics.setString("github-url-" + sNextUrlTrackingPosition, url);
+                Crashlytics.setInt("last-url-position", sNextUrlTrackingPosition);
+                if (++sNextUrlTrackingPosition >= MAX_TRACKED_URLS) {
+                    sNextUrlTrackingPosition = 0;
+                }
             }
         }
     }
