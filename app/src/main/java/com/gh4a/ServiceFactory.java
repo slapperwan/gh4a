@@ -49,6 +49,25 @@ public class ServiceFactory {
         return chain.proceed(request);
     };
 
+    // FIXME: The notifications endpoint currently returns invalid/empty ETags. GH support
+    //        says they're looking into it and to use If-Modified-Since in the meantime.
+    //        Unfortunately, the Last-Modified header can't be relied on either, as it's not
+    //        updated when marking notifications as read :-(
+    //        We thus check for the invalid ETag and prevent caching if we found it.
+    //        Once this is fixed on server side, this interceptor should be removed.
+    private final static CacheControl NO_STORE_CACHE_CONTROL =
+            new CacheControl.Builder().noStore().build();
+    private final static Interceptor ETAG_WORKAROUND_INTERCEPTOR = chain -> {
+        Response response = chain.proceed(chain.request());
+        String etag = response.header("ETag");
+        if (etag != null && etag.contains("\"\"")) {
+            return response.newBuilder()
+                    .header("Cache-Control", NO_STORE_CACHE_CONTROL.toString())
+                    .build();
+        }
+        return response;
+    };
+
     private final static Interceptor CACHE_MAX_AGE_INTERCEPTOR = chain -> {
         Response response = chain.proceed(chain.request());
         CacheControl origCacheControl = CacheControl.parse(response.headers());
@@ -118,6 +137,7 @@ public class ServiceFactory {
             final String acceptHeader, final String token, final Integer pageSize) {
         OkHttpClient.Builder clientBuilder = sApiHttpClient.newBuilder()
                 .addInterceptor(PAGINATION_INTRCEPTOR)
+                .addNetworkInterceptor(ETAG_WORKAROUND_INTERCEPTOR)
                 .addNetworkInterceptor(CACHE_MAX_AGE_INTERCEPTOR)
                 .addInterceptor(chain -> {
                     Request original = chain.request();
