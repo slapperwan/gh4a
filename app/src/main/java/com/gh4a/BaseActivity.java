@@ -176,14 +176,14 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private void handleFailure(String text, Throwable e) {
-        boolean isAuthError = e instanceof ApiRequestException
-                && ((ApiRequestException) e).getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED;
+        ApiRequestException are = e instanceof ApiRequestException ? (ApiRequestException) e : null;
+        boolean isAuthError = are != null && are.getStatus() == HttpURLConnection.HTTP_UNAUTHORIZED;
         if (isAuthError) {
             Snackbar.make(mCoordinatorLayout, R.string.load_auth_failure_notice, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.login, v -> goToToplevelActivity())
                     .show();
         }
-        if (e instanceof RuntimeException) {
+        if (are == null && e instanceof RuntimeException) {
             // If this happens, it means Rx catched a programming error of us. Crash the app
             // in that case, as that's what would have happened without Rx as well.
             throw (RuntimeException) e;
