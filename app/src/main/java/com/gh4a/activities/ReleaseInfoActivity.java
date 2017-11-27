@@ -38,6 +38,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.Optional;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
@@ -48,6 +49,7 @@ import com.meisolsson.githubsdk.model.request.RequestMarkdown;
 import com.meisolsson.githubsdk.service.misc.MarkdownService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
+import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 
 public class ReleaseInfoActivity extends BaseActivity implements
@@ -223,11 +225,11 @@ public class ReleaseInfoActivity extends BaseActivity implements
         }
     }
 
-    private void fillNotes(String bodyHtml) {
+    private void fillNotes(Optional<String> bodyHtmlOpt) {
         TextView body = findViewById(R.id.tv_release_notes);
 
-        if (!StringUtils.isBlank(bodyHtml)) {
-            mImageGetter.bind(body, bodyHtml, mRelease.id());
+        if (bodyHtmlOpt.isPresent()) {
+            mImageGetter.bind(body, bodyHtmlOpt.get(), mRelease.id());
             body.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         } else {
             body.setText(R.string.release_no_releasenotes);
@@ -276,14 +278,21 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     private void loadBody() {
-        MarkdownService service = ServiceFactory.get(MarkdownService.class, false);
-        RequestMarkdown request = RequestMarkdown.builder()
-                .context(mRepoOwner + "/" + mRepoName)
-                .mode("gfm")
-                .text(mRelease.body())
-                .build();
-        mBodySubscription = service.renderMarkdown(request)
-                .map(ApiHelpers::throwOnFailure)
+        final Single<Optional<String>> htmlSingle;
+        if (TextUtils.isEmpty(mRelease.body())) {
+            htmlSingle = Single.just(Optional.absent());
+        } else {
+            MarkdownService service = ServiceFactory.get(MarkdownService.class, false);
+            RequestMarkdown request = RequestMarkdown.builder()
+                    .context(mRepoOwner + "/" + mRepoName)
+                    .mode("gfm")
+                    .text(mRelease.body())
+                    .build();
+            htmlSingle = service.renderMarkdown(request)
+                    .map(ApiHelpers::throwOnFailure)
+                    .map(Optional::of);
+        }
+        mBodySubscription = htmlSingle
                 .compose(makeLoaderSingle(ID_LOADER_BODY, false))
                 .subscribe(this::fillNotes, this::handleLoadFailure);
     }
