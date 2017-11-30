@@ -165,9 +165,13 @@ public class RxUtils {
     }
 
     public static <T> Single<Response<Page<T>>> searchPageAdapter(Single<Response<SearchPage<T>>> upstream) {
+        return searchPageAdapter(upstream, item -> item);
+    }
+
+    public static <U, D> Single<Response<Page<D>>> searchPageAdapter(Single<Response<SearchPage<U>>> upstream, Optional.Mapper<U, D> mapper) {
         return upstream.map(response -> {
             if (response.isSuccessful()) {
-                return Response.success(new ApiHelpers.SearchPageAdapter<>(response.body()));
+                return Response.success(new ApiHelpers.SearchPageAdapter<U, D>(response.body(), mapper));
             }
             return Response.error(response.errorBody(), response.raw());
         });
