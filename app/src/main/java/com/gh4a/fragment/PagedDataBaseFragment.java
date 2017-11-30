@@ -95,7 +95,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         return mAdapter.isCardStyle();
     }
 
-    private void resetSubject() {
+    protected void resetSubject() {
         mNextPage = null;
         mPageSubject = BehaviorSubject.createDefault(1);
         mPageSubject.onNext(1);

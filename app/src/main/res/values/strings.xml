@@ -498,7 +498,6 @@
     <string name="search_hint_repo">Search for repositories</string>
     <string name="search_hint_user">Search for users</string>
     <string name="search_hint_code">Search for code</string>
-    <string name="code_search_too_broad">Your search was too broad. You need to specify both at least one search term as well as either a user or a repo.</string>
 
     <!-- Sharing -->
     <string name="send_email_title">Select email application</string>

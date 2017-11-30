@@ -219,11 +219,13 @@ public class ApiHelpers {
         }
     }
 
-    public static class SearchPageAdapter<T> extends Page<T> {
-        private final SearchPage<T> mPage;
+    public static class SearchPageAdapter<U, D> extends Page<D> {
+        private final SearchPage<U> mPage;
+        private final Optional.Mapper<U, D> mMapper;
 
-        public SearchPageAdapter(SearchPage<T> page) {
+        public SearchPageAdapter(SearchPage<U> page, Optional.Mapper<U, D> mapper) {
             mPage = page;
+            mMapper = mapper;
         }
 
         @Nullable
@@ -252,8 +254,16 @@ public class ApiHelpers {
 
         @NonNull
         @Override
-        public List<T> items() {
-            return mPage.items();
+        public List<D> items() {
+            List<U> items = mPage.items();
+            if (items == null) {
+                return null;
+            }
+            ArrayList<D> result = new ArrayList<>();
+            for (U item : items) {
+                result.add(mMapper.map(item));
+            }
+            return result;
         }
     }
 
