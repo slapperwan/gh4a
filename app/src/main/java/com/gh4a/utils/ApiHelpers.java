@@ -28,6 +28,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.Single;
+import io.reactivex.subjects.BehaviorSubject;
 import retrofit2.Response;
 
 public class ApiHelpers {
@@ -273,7 +274,19 @@ public class ApiHelpers {
         }
 
         public static <T> Observable<List<T>> toObservable(PageProducer<T> producer) {
-            return pageToObservable(producer, 1);
+            BehaviorSubject<Optional<Integer>> pageControl =
+                    BehaviorSubject.createDefault(Optional.of(1));
+            return pageControl.concatMap(page -> {
+                if (page.isPresent()) {
+                    return producer.getPage(page.get())
+                            .toObservable()
+                            .compose(PageIterator::evaluateError)
+                            .doOnNext(resultPage -> pageControl.onNext(Optional.ofWithNull(resultPage.next())))
+                            .map(responsePage -> responsePage.items());
+                } else {
+                    return Observable.<List<T>>empty().doOnComplete(() -> pageControl.onComplete());
+                }
+            });
         }
 
         public static <T> Single<List<T>> toSingle(PageProducer<T> producer) {
@@ -288,26 +301,10 @@ public class ApiHelpers {
                     });
         }
 
-        private static <T> Observable<List<T>> pageToObservable(PageProducer<T> producer, int page) {
-            return producer.getPage(page)
-                    .toObservable()
-                    .compose(PageIterator::evaluateError)
-                    .compose(chain(producer));
-        }
-
         private static <T> Observable<Page<T>> evaluateError(Observable<Response<Page<T>>> upstream) {
             return upstream.map(response -> {
                 throwOnFailure(response);
                 return response.body();
-            });
-        }
-
-        private static <T> ObservableTransformer<Page<T>, List<T>> chain(PageProducer<T> producer) {
-            return upstream -> upstream.concatMap(page -> {
-                Observable<List<T>> result = Observable.just(page.items());
-                return page.next() != null
-                        ? result.concatWith(pageToObservable(producer, page.next()))
-                        : result;
             });
         }
     }
