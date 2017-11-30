@@ -38,6 +38,10 @@ public class Optional<T> {
         return new Optional<>(value);
     }
 
+    public static <T> Optional<T> ofWithNull(T value) {
+        return value == null ? absent() : of(value);
+    }
+
     public T get() {
         if (mValue == null) {
             throw new NullPointerException("value is absent");
