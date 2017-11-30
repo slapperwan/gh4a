@@ -14,13 +14,14 @@ import com.gh4a.adapter.RepositoryAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
+import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.search.SearchService;
 
 import io.reactivex.Single;
+import retrofit2.Response;
 
-public class RepositorySearchFragment extends ListDataBaseFragment<Repository> implements
-        RootAdapter.OnItemClickListener<Repository> {
+public class RepositorySearchFragment extends PagedDataBaseFragment<Repository> {
     public static RepositorySearchFragment newInstance(String userLogin) {
         RepositorySearchFragment f = new RepositorySearchFragment();
 
@@ -39,24 +40,23 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> i
     }
 
     @Override
-    protected Single<List<Repository>> onCreateDataSingle(boolean bypassCache) {
+    protected Single<Response<Page<Repository>>> loadPage(int page, boolean bypassCache) {
         String login = getArguments().getString("user");
         String query = getArguments().getString("query");
 
         if (TextUtils.isEmpty(query)) {
-            return Single.just(new ArrayList<Repository>());
+            return Single.just(Response.success(new ApiHelpers.DummyPage<>()));
         }
 
         SearchService service = ServiceFactory.get(SearchService.class, bypassCache);
         String params = query + " fork:true user:" + login;
 
-        return ApiHelpers.PageIterator
-                .toSingle(page -> service.searchRepositories(params, null, null, page)
-                        .compose(RxUtils::searchPageAdapter))
+        return service.searchRepositories(params, null, null, page)
+                .compose(RxUtils::searchPageAdapter)
                 // With that status code, Github wants to tell us there are no
                 // repositories to search in. Just pretend no error and return
                 // an empty list in that case.
-                .compose(RxUtils.mapFailureToValue(422, new ArrayList<>()));
+                .compose(RxUtils.mapFailureToValue(422, Response.success(new ApiHelpers.DummyPage<>())));
     }
 
     @Override
@@ -66,9 +66,7 @@ public class RepositorySearchFragment extends ListDataBaseFragment<Repository> i
 
     @Override
     protected RootAdapter<Repository, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        RepositoryAdapter adapter = new RepositoryAdapter(getActivity());
-        adapter.setOnItemClickListener(this);
-        return adapter;
+        return new RepositoryAdapter(getActivity());
     }
 
     @Override
