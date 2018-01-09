@@ -15,6 +15,7 @@
  */
 package com.gh4a.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
@@ -428,7 +429,10 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         protected void onSuccess(Void result) {
             mIsFollowing = !mIsFollowing;
             updateFollowingAction();
-            getActivity().invalidateOptionsMenu();
+            Activity activity = getActivity();
+            if (activity != null) {
+                activity.invalidateOptionsMenu();
+            }
         }
     }
 }

@@ -124,7 +124,10 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
             public void run() {
                 // Fix an issue where the bottom sheet is initially located outside of the visible
                 // screen area
-                mBottomSheet.resetPeekHeight(getBaseActivity().getAppBarTotalScrollRange());
+                final BaseActivity activity = getBaseActivity();
+                if (activity != null) {
+                    mBottomSheet.resetPeekHeight(activity.getAppBarTotalScrollRange());
+                }
             }
         });
     }
@@ -173,8 +176,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<CommitComment> impl
 
     @Override
     public void onToggleAdvancedMode(boolean advancedMode) {
-        getBaseActivity().collapseAppBar();
-        getBaseActivity().setAppBarLocked(advancedMode);
+        BaseActivity activity = getBaseActivity();
+        if (activity != null) {
+            activity.collapseAppBar();
+            activity.setAppBarLocked(advancedMode);
+        }
         mBottomSheet.resetPeekHeight(0);
     }
 

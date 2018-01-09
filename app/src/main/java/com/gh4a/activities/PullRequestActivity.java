@@ -368,7 +368,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     @Override
     protected int[] getTabTitleResIds() {
-        return mPullRequest != null && mIssue != null ? TITLES : null;
+        return mPullRequest != null && mIssue != null && mIsCollaborator != null ? TITLES : null;
     }
 
     @Override

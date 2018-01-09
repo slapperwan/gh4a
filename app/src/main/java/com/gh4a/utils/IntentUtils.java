@@ -37,6 +37,9 @@ public class IntentUtils {
     }
 
     public static void launchBrowser(Context context, Uri uri, int flags) {
+        if (uri == null) {
+            return;
+        }
         Intent intent = createBrowserIntent(context, uri);
         if (intent != null) {
             intent.addFlags(flags);

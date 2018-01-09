@@ -307,10 +307,12 @@ public class FileViewerActivity extends WebViewerActivity
 
         View anchor = findViewById(R.id.popup_helper);
         anchor.layout(x, y, x + 1, y + 1);
-        PopupMenu popupMenu = new PopupMenu(this, anchor);
-        popupMenu.getMenuInflater().inflate(R.menu.file_line_menu, popupMenu.getMenu());
-        popupMenu.show();
-        popupMenu.setOnMenuItemClickListener(this);
+        if (!isFinishing()) {
+            PopupMenu popupMenu = new PopupMenu(this, anchor);
+            popupMenu.getMenuInflater().inflate(R.menu.file_line_menu, popupMenu.getMenu());
+            popupMenu.show();
+            popupMenu.setOnMenuItemClickListener(this);
+        }
     }
 
     @Override

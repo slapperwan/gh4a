@@ -172,7 +172,7 @@ public class HttpImageGetter {
 
             if (!mHasStartedImageLoad) {
                 ImageSpan[] spans = getImageSpans();
-                if (spans != null && spans.length > 0) {
+                if (spans.length > 0) {
                     ArrayList<PlaceholderDrawable> imagesToLoad = new ArrayList<>();
                     for (ImageSpan span : spans) {
                         Drawable d = span.getDrawable();
@@ -244,7 +244,11 @@ public class HttpImageGetter {
             }
         }
 
+        @NonNull
         private ImageSpan[] getImageSpans() {
+            if (TextUtils.isEmpty(mHtml)) {
+                return new ImageSpan[0];
+            }
             Spanned spanned = (Spanned) mHtml;
             return spanned.getSpans(0, spanned.length(), ImageSpan.class);
         }

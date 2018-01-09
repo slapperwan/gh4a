@@ -260,7 +260,7 @@ public abstract class DiffViewerActivity extends WebViewerActivity implements
         }
         content.append("<pre>");
 
-        mDiffLines = mDiff.split("\n");
+        mDiffLines = mDiff != null ? mDiff.split("\n") : new String[0];
 
         int highlightStartLine = -1, highlightEndLine = -1;
         int leftDiffPosition = -1, rightDiffPosition = -1;

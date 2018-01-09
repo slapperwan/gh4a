@@ -308,10 +308,12 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
     @TargetApi(19)
     private void doPrintHtml() {
-        final String title = getDocumentTitle();
-        PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
-        PrintDocumentAdapter printAdapter = getPrintAdapterForWebView(mPrintWebView, title);
-        printManager.print(title, printAdapter, new PrintAttributes.Builder().build());
+        if (!isFinishing()) {
+            final String title = getDocumentTitle();
+            PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
+            PrintDocumentAdapter printAdapter = getPrintAdapterForWebView(mPrintWebView, title);
+            printManager.print(title, printAdapter, new PrintAttributes.Builder().build());
+        }
         mPrintWebView = null;
         supportInvalidateOptionsMenu();
     }

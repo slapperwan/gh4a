@@ -166,7 +166,9 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SETTINGS) {
-            if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)) {
+            boolean themeChange = data != null
+                    && data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false);
+            if (themeChange) {
                 Intent intent = new Intent(getIntent());
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
