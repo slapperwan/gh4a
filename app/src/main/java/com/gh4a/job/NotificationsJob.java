@@ -222,12 +222,22 @@ public class NotificationsJob extends Job {
                 R.drawable.mark_read, getContext().getString(R.string.mark_as_read),
                 markReadPendingIntent);
 
+        android.app.Notification publicVersion = makeBaseBuilder()
+                .setContentTitle(getContext().getString(R.string.unread_notifications_summary_title))
+                .setContentText(text)
+                .setNumber(notifications.size())
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .build();
+
         NotificationCompat.Builder builder = makeBaseBuilder()
                 .setLargeIcon(loadRoundUserAvatar(repository.getOwner()))
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
                 .setWhen(when)
                 .setShowWhen(true)
+                .setNumber(notifications.size())
+                .setPublicVersion(publicVersion)
+                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setContentTitle(title)
                 .setContentIntent(contentIntent)
                 .setDeleteIntent(deleteIntent)
@@ -271,6 +281,7 @@ public class NotificationsJob extends Job {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setNumber(totalCount)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .build();
 
         PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
@@ -286,6 +297,7 @@ public class NotificationsJob extends Job {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setPublicVersion(publicVersion)
+                .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setNumber(totalCount);
 
