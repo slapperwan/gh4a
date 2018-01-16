@@ -9,6 +9,7 @@ import android.text.TextUtils;
 
 import com.gh4a.activities.BlogListActivity;
 import com.gh4a.activities.CommitActivity;
+import com.gh4a.activities.CompareActivity;
 import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
@@ -110,6 +111,8 @@ public class LinkParser {
                 return parseCommitLink(activity, uri, user, repo, id, initialCommentFallback);
             case "blob":
                 return parseBlobLink(activity, uri, parts, user, repo, id);
+            case "compare":
+                return parseCompareLink(activity, user, repo, id);
         }
         return null;
     }
@@ -327,6 +330,22 @@ public class LinkParser {
         String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
         return new ParseResult(new RefPathDisambiguationTask(activity, user, repo, refAndPath,
                 uri.getFragment()));
+    }
+
+    @Nullable
+    private static ParseResult parseCompareLink(FragmentActivity activity,
+            String user, String repo, String id) {
+        if (id == null) {
+            return null;
+        }
+        String[] parts = id.split("\\.\\.\\.");
+        if (parts.length != 2) {
+            return null;
+        }
+        if (StringUtils.isBlank(parts[0]) || StringUtils.isBlank(parts[1])) {
+            return null;
+        }
+        return new ParseResult(CompareActivity.makeIntent(activity, user, repo, parts[0], parts[1]));
     }
 
     private static IntentUtils.InitialCommentMarker generateInitialCommentMarkerWithoutFallback(

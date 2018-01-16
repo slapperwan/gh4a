@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentActivity;
 import com.gh4a.BuildConfig;
 import com.gh4a.activities.BlogListActivity;
 import com.gh4a.activities.CommitActivity;
+import com.gh4a.activities.CompareActivity;
 import com.gh4a.activities.DownloadsActivity;
 import com.gh4a.activities.GistActivity;
 import com.gh4a.activities.IssueActivity;
@@ -754,6 +755,30 @@ public class LinkParserTest {
     @Test
     public void blobLink_withoutBranchAndPath__opensBrowser() throws Exception {
         assertRedirectsToBrowser(parseLink("https://github.com/slapperwan/gh4a/blob"));
+    }
+
+    @Test
+    public void compareLink__redirectsToCompareView() throws Exception {
+
+    }
+
+    @Test
+    public void compareLink_withoutRefs__opensBrowser() throws Exception {
+        LinkParser.ParseResult result =
+                (parseLink("https://github.com/slapperwan/gh4a/compare/v4.2.0...v4.2.1"));
+        assertRedirectsTo(result, CompareActivity.class);
+        Bundle extras = result.intent.getExtras();
+
+        assertThat("Extras are missing", extras, is(notNullValue()));
+        assertThat("User name is incorrect", extras.getString("owner"), is("slapperwan"));
+        assertThat("Repo name is incorrect", extras.getString("repo"), is("gh4a"));
+        assertThat("Base ref is incorrect", extras.getString("base"), is("v4.2.0"));
+        assertThat("Head ref is incorrect", extras.getString("head"), is("v4.2.1"));
+    }
+
+    @Test
+    public void compareLink_withIncompleteRefs__opensBrowser() throws Exception {
+        assertRedirectsToBrowser(parseLink("https://github.com/slapperwan/gh4a/compare/v4.2.0..."));
     }
 
     @Test
