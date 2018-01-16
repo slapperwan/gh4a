@@ -30,7 +30,7 @@ public abstract class DiffLoadTask extends UrlLoadTask {
         List<CommitFile> files = getFiles();
         CommitFile file = null;
         for (CommitFile commitFile : files) {
-            if (ApiHelpers.md5(commitFile.getFilename()).equals(mDiffId.fileHash)) {
+            if (ApiHelpers.md5(commitFile.getFilename()).equalsIgnoreCase(mDiffId.fileHash)) {
                 file = commitFile;
                 break;
             }
