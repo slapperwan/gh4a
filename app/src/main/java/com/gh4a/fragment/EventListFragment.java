@@ -363,8 +363,10 @@ public abstract class EventListFragment extends PagedDataBaseFragment<Event> {
             }
 
         } else if (Event.TYPE_ISSUE_COMMENT.equals(eventType)) {
-            menu.add(getString(R.string.menu_issues))
-                    .setIntent(IssueListActivity.makeIntent(getActivity(),repoOwner, repoName));
+            IssueCommentPayload payload = (IssueCommentPayload) event.getPayload();
+            boolean isPullRequest = payload.getIssue().getPullRequest() != null;
+            menu.add(getString(isPullRequest ? R.string.menu_pulls : R.string.menu_issues))
+                    .setIntent(IssueListActivity.makeIntent(getActivity(),repoOwner, repoName, isPullRequest));
 
         } else if (Event.TYPE_ISSUES.equals(eventType)) {
             IssuesPayload payload = (IssuesPayload) event.getPayload();

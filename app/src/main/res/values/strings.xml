@@ -78,6 +78,7 @@
     <string name="menu_wiki">Wiki in browser</string>
     <string name="menu_pull">Pull request %1$d</string>
     <string name="menu_issues">Open issues</string>
+    <string name="menu_pulls">Open pull requests</string>
     <string name="delete_comment_message">Delete this comment?</string>
     <string name="saving_comment">Saving comment\u2026</string>
     <string name="ellipse" translatable="false">\u2026</string>
