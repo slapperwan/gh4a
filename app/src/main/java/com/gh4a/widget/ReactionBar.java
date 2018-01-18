@@ -231,7 +231,10 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
 
         public void update() {
-            populateAdapter(mDetailsCache.getEntry(mItem));
+            List<Reaction> details = mDetailsCache.getEntry(mItem);
+            if (details != null) {
+                populateAdapter(details);
+            }
         }
 
         public void show(String content) {
