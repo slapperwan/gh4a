@@ -38,6 +38,7 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.fragment.NotificationListFragment;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 import com.gh4a.fragment.SettingsFragment;
+import com.gh4a.fragment.UserPasswordLoginDialogFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.IntentUtils;
@@ -50,7 +51,7 @@ import java.util.HashMap;
 
 public class HomeActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, RepositoryListContainerFragment.Callback,
-        NotificationListFragment.ParentCallback {
+        NotificationListFragment.ParentCallback, UserPasswordLoginDialogFragment.ParentCallback {
     public static Intent makeIntent(Context context, @IdRes int initialPageId) {
         String initialPage = START_PAGE_MAPPING.get(initialPageId);
         Intent intent = new Intent(context, HomeActivity.class);
@@ -260,7 +261,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 finish();
                 return true;
             case R.id.add_account:
-                new BrowserLogoutDialogFragment().show(getSupportFragmentManager(), "browserlogout");
+                new LoginModeChooserFragment().show(getSupportFragmentManager(), "loginmode");
                 return true;
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
@@ -344,6 +345,17 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     @Override
     protected void onFragmentDestroyed(Fragment f) {
         mFactory.onFragmentDestroyed(f);
+    }
+
+    @Override
+    public void onLoginFinished(String token, User user) {
+        Gh4Application.get().addAccount(user, token);
+        switchActiveUser(user.login());
+    }
+
+    @Override
+    public void onLoginFailed(Throwable error) {
+        // TODO
     }
 
     @Override
@@ -557,6 +569,30 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 .subscribe(this::setNotificationsIndicatorVisible, this::handleLoadFailure);
     }
 
+    public static class LoginModeChooserFragment extends DialogFragment implements
+            DialogInterface.OnClickListener {
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return new AlertDialog.Builder(getActivity())
+                    .setMessage(R.string.login_mode_dialog_text)
+                    .setPositiveButton(R.string.login_mode_button_oauth, this)
+                    .setNegativeButton(R.string.login_mode_button_user_pw, this)
+                    .setNeutralButton(R.string.cancel, null)
+                    .create();
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == DialogInterface.BUTTON_POSITIVE) {
+                new BrowserLogoutDialogFragment().show(getFragmentManager(), "browserlogout");
+            } else {
+                UserPasswordLoginDialogFragment.newInstance(Github4AndroidActivity.SCOPES)
+                        .show(getFragmentManager(), "login");
+            }
+        }
+    }
+
     public static class BrowserLogoutDialogFragment extends DialogFragment implements
             DialogInterface.OnClickListener {
         @NonNull
@@ -573,7 +609,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         @Override
         public void onClick(DialogInterface dialog, int which) {
             if (which == DialogInterface.BUTTON_NEUTRAL) {
-                Github4AndroidActivity.launchLogin(getActivity());
+                Github4AndroidActivity.launchOauthLogin(getActivity());
             } else if (which == DialogInterface.BUTTON_POSITIVE) {
                 Uri uri = Uri.parse("https://github.com/logout");
                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -596,7 +632,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
 
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            Github4AndroidActivity.launchLogin(getActivity());
+            Github4AndroidActivity.launchOauthLogin(getActivity());
         }
     }
 }

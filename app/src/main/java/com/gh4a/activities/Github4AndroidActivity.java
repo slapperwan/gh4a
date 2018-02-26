@@ -33,6 +33,7 @@ import com.gh4a.BuildConfig;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
+import com.gh4a.fragment.UserPasswordLoginDialogFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -47,7 +48,8 @@ import io.reactivex.Single;
 /**
  * The Github4Android activity.
  */
-public class Github4AndroidActivity extends BaseActivity implements View.OnClickListener {
+public class Github4AndroidActivity extends BaseActivity implements
+        View.OnClickListener, UserPasswordLoginDialogFragment.ParentCallback {
     private static final String OAUTH_URL = "https://github.com/login/oauth/authorize";
     private static final String PARAM_CLIENT_ID = "client_id";
     private static final String PARAM_CODE = "code";
@@ -55,7 +57,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
     private static final String PARAM_CALLBACK_URI = "redirect_uri";
 
     private static final Uri CALLBACK_URI = Uri.parse("gh4a://oauth");
-    private static final String SCOPES = "user,repo,gist";
+    public static final String SCOPES = "user,repo,gist";
 
     private static final int REQUEST_SETTINGS = 10000;
 
@@ -81,7 +83,8 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
             FrameLayout contentContainer = (FrameLayout) findViewById(R.id.content).getParent();
             contentContainer.setForeground(null);
 
-            findViewById(R.id.login_button).setOnClickListener(this);
+            findViewById(R.id.oauth_login_button).setOnClickListener(this);
+            findViewById(R.id.user_pw_login_button).setOnClickListener(this);
             mContent = findViewById(R.id.welcome_container);
             mProgress = findViewById(R.id.login_progress_container);
 
@@ -119,11 +122,7 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                                 (t, user) -> Pair.create(t.accessToken(), user));
                     })
                     .compose(RxUtils::doInBackground)
-                    .subscribe(pair -> {
-                        Gh4Application.get().addAccount(pair.second, pair.first);
-                        goToToplevelActivity();
-                        finish();
-                    }, this::handleLoadFailure);
+                    .subscribe(pair -> onLoginFinished(pair.first, pair.second), this::handleLoadFailure);
             return true;
         }
 
@@ -192,18 +191,29 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.login_button) {
-            triggerLogin();
+        if (view.getId() == R.id.oauth_login_button) {
+            launchOauthLogin(this);
+            mContent.setVisibility(View.GONE);
+            mProgress.setVisibility(View.VISIBLE);
+        } else if (view.getId() == R.id.user_pw_login_button) {
+            UserPasswordLoginDialogFragment.newInstance(SCOPES)
+                    .show(getSupportFragmentManager(), "foo");
         }
     }
 
     @Override
-    public void onRefresh() {
-        super.onRefresh();
-        triggerLogin();
+    public void onLoginFinished(String token, User user) {
+        Gh4Application.get().addAccount(user, token);
+        goToToplevelActivity();
+        finish();
     }
 
-    public static void launchLogin(Activity activity) {
+    @Override
+    public void onLoginFailed(Throwable error) {
+        handleLoadFailure(error);
+    }
+
+    public static void launchOauthLogin(Activity activity) {
         Uri uri = Uri.parse(OAUTH_URL)
                 .buildUpon()
                 .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
@@ -211,11 +221,5 @@ public class Github4AndroidActivity extends BaseActivity implements View.OnClick
                 .appendQueryParameter(PARAM_CALLBACK_URI, CALLBACK_URI.toString())
                 .build();
         IntentUtils.openInCustomTabOrBrowser(activity, uri);
-    }
-
-    private void triggerLogin() {
-        launchLogin(this);
-        mContent.setVisibility(View.GONE);
-        mProgress.setVisibility(View.VISIBLE);
     }
 }
