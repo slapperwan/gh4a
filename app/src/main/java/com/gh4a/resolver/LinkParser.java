@@ -173,6 +173,13 @@ public class LinkParser {
             if (release != null) {
                 return new ParseResult(new ReleaseLoadTask(activity, user, repo, release));
             }
+        } else if (!TextUtils.isEmpty(id)) {
+            try {
+                long numericId = Long.parseLong(id);
+                return new ParseResult(new ReleaseLoadTask(activity, user, repo, numericId));
+            } catch (NumberFormatException e) {
+                // fall through to release list
+            }
         }
         return new ParseResult(ReleaseListActivity.makeIntent(activity, user, repo));
     }
