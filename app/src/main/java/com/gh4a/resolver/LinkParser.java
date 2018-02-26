@@ -32,7 +32,7 @@ public class LinkParser {
     private static final List<String> RESERVED_NAMES = Arrays.asList(
             "apps", "integrations", "login", "logout", "marketplace", "sessions", "settings",
             "updates", "support", "contact", "about", "personal", "open-source",
-            "business", "site", "security", "features"
+            "business", "site", "security", "features", "topics"
     );
 
     private LinkParser() {
