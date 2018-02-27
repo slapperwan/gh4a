@@ -110,14 +110,18 @@
                     android:id="@+id/stars_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_star" />
+                    app:rowIcon="@drawable/icon_star"
+                    app:rowIconActionHintOff="@string/repo_star_action"
+                    app:rowIconActionHintOn="@string/repo_unstar_action" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/watchers_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:rowText="54 Watchers"
-                    app:rowIcon="@drawable/icon_watch" />
+                    app:rowIcon="@drawable/icon_watch"
+                    app:rowIconActionHintOff="@string/repo_watch_action"
+                    app:rowIconActionHintOn="@string/repo_unwatch_action" />
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
