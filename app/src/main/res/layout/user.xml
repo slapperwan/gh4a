@@ -108,17 +108,21 @@
                     android:layout_height="wrap_content"
                     app:rowIcon="@drawable/icon_members" />
 
+                <!-- FIXME: icon -->
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/followers_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_members" /> <!-- FIXME -->
+                    app:rowIcon="@drawable/icon_members"
+                    app:rowIconActionHintOff="@string/user_follow_action"
+                    app:rowIconActionHintOn="@string/user_unfollow_action" />
 
+                <!-- FIXME: icon -->
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/following_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_members" /> <!-- FIXME -->
+                    app:rowIcon="@drawable/icon_members" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/repos_row"

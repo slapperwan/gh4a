@@ -7,9 +7,9 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.LinearLayoutCompat;
+import android.support.v7.widget.TooltipCompat;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,6 +28,9 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
 
     private Intent mClickIntent;
     private OnIconClickListener mIconClickListener;
+
+    private String mActionHintChecked;
+    private String mActionHintUnchecked;
 
     public OverviewRow(Context context) {
         this(context, null);
@@ -52,6 +55,9 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
         setText(a.getString(R.styleable.OverviewRow_rowText));
         setIcon(a.getDrawable(R.styleable.OverviewRow_rowIcon));
         setIconClickListener(null);
+
+        mActionHintChecked = a.getString(R.styleable.OverviewRow_rowIconActionHintOn);
+        mActionHintUnchecked = a.getString(R.styleable.OverviewRow_rowIconActionHintOff);
 
         a.recycle();
     }
@@ -93,6 +99,7 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
     public void setToggleState(boolean active) {
         mIcon.setImageState(
                 active ? new int[] { android.R.attr.state_checked } : new int[0], true);
+        TooltipCompat.setTooltipText(mIcon, active ? mActionHintChecked : mActionHintUnchecked);
     }
 
     private void setIcon(Drawable icon) {

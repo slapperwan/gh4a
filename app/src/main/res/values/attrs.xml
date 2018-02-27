@@ -145,5 +145,7 @@
         <attr name="overviewRowStyle" format="reference" />
         <attr name="rowText" format="string" />
         <attr name="rowIcon" format="color|reference" />
+        <attr name="rowIconActionHintOn" format="string" />
+        <attr name="rowIconActionHintOff" format="string" />
     </declare-styleable>
 </resources>
