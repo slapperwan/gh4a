@@ -2,11 +2,6 @@
 <merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
-    android:minHeight="?attr/listPreferredItemHeightSmall"
-    android:orientation="horizontal"
     tools:parentTag="android.widget.LinearLayout">
 
     <ImageView
@@ -17,7 +12,7 @@
         android:layout_marginRight="8dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:scaleType="centerInside"
-        tools:src="@drawable/ic_watch" />
+        tools:src="@drawable/icon_watch" />
 
     <ProgressBar
         android:id="@+id/progress"

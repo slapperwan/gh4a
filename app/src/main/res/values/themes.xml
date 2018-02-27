@@ -93,6 +93,7 @@
         <item name="colorBreadcrumbBackground">#587849</item>
         <item name="android:textColorLink">@color/dark_accent</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
+        <item name="overviewRowStyle">@style/OverviewRow</item>
         <item name="listBackground">@android:color/transparent</item>
         <item name="drawerBackground">@color/background_floating_material_dark</item>
         <item name="cardBackground">@color/cardview_dark_background</item>
@@ -231,6 +232,7 @@
         <item name="colorBreadcrumbBackground">#7baa67</item>
         <item name="android:textColorLink">@color/light_accent</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
+        <item name="overviewRowStyle">@style/OverviewRow</item>
         <item name="listBackground">@android:color/white</item>
         <item name="drawerBackground">@color/background_floating_material_light</item>
         <item name="cardBackground">@color/cardview_light_background</item>

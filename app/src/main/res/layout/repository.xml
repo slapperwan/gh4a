@@ -16,15 +16,19 @@
         <!-- repo info section -->
         <android.support.v7.widget.CardView style="?attr/cardViewTheme">
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/content_padding">
+                android:paddingTop="@dimen/content_padding"
+                android:paddingBottom="@dimen/content_padding"
+                android:orientation="vertical">
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_repo_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
                     android:textAppearance="@style/TextAppearance.HeaderTitle"
                     tools:text="Username/Repository" />
 
@@ -32,9 +36,10 @@
                     android:id="@+id/tv_parent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_repo_name"
                     android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="?android:attr/textColorLink"
                     app:ghFont="italic"
@@ -44,7 +49,8 @@
                     android:id="@+id/tv_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_parent"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textIsSelectable="true"
                     tools:text="Repository description" />
@@ -53,9 +59,10 @@
                     android:id="@+id/tv_url"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/tv_desc"
                     android:layout_marginTop="2dp"
                     android:autoLink="web"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColorLink="?android:attr/textColorLink"
                     tools:text="https://example.com" />
@@ -64,62 +71,55 @@
                     android:id="@+id/tv_private"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_url"
                     android:layout_marginTop="2dp"
                     android:drawableLeft="?attr/privateSmallIcon"
                     android:drawablePadding="4dp"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
                     android:text="@string/repo_type_private"
                     android:textAppearance="@style/TextAppearance.VerySmall.Bold"
                     android:visibility="gone"
                     tools:visibility="visible" />
 
-                <LinearLayout
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/language_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/tv_private"
-                    android:layout_marginBottom="@dimen/overview_header_spacing"
-                    android:layout_marginTop="@dimen/content_padding"
-                    android:orientation="vertical">
+                    android:layout_marginTop="16dp"
+                    app:rowIcon="@drawable/icon_language" />
 
-                    <com.gh4a.widget.OverviewRow
-                        android:id="@+id/language_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:rowIcon="@drawable/icon_language" />
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/issues_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_issues" />
 
-                    <com.gh4a.widget.OverviewRow
-                        android:id="@+id/issues_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:rowIcon="@drawable/icon_issues" />
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/pulls_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_pull_request" />
 
-                    <com.gh4a.widget.OverviewRow
-                        android:id="@+id/pulls_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:rowIcon="@drawable/icon_pull_request" />
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/forks_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_fork" />
 
-                    <com.gh4a.widget.OverviewRow
-                        android:id="@+id/forks_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:rowIcon="@drawable/icon_fork" />
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/stars_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_star" />
 
-                    <com.gh4a.widget.OverviewRow
-                        android:id="@+id/stars_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:rowIcon="@drawable/icon_star" />
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/watchers_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowText="54 Watchers"
+                    app:rowIcon="@drawable/icon_watch" />
 
-                    <com.gh4a.widget.OverviewRow
-                        android:id="@+id/watchers_row"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:rowText="54 Watchers"
-                        app:rowIcon="@drawable/icon_watch" />
-
-                </LinearLayout>
-            </RelativeLayout>
+            </LinearLayout>
         </android.support.v7.widget.CardView>
 
         <!-- README section -->

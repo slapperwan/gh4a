@@ -141,7 +141,8 @@
     <item name="EdgeColorHelper" type="id" />
     <item name="FloatingActionButtonScrollEnabled" type="id" />
 
-    <declare-styleable name="RepositoryStatView">
+    <declare-styleable name="OverviewRow">
+        <attr name="overviewRowStyle" format="reference" />
         <attr name="rowText" format="string" />
         <attr name="rowIcon" format="color|reference" />
     </declare-styleable>
