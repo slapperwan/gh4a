@@ -85,6 +85,13 @@
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
+    <style name="OverviewRow">
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:paddingLeft">@dimen/content_padding</item>
+        <item name="android:paddingRight">@dimen/content_padding</item>
+    </style>
+
     <style name="Widget.ActionBar.TabView" parent="Widget.AppCompat.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator</item>
     </style>

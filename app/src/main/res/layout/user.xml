@@ -23,12 +23,15 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:layout_marginTop="@dimen/overview_header_spacing"
                 android:orientation="vertical"
-                android:padding="@dimen/content_padding">
+                android:paddingTop="@dimen/content_padding"
+                android:paddingBottom="@dimen/content_padding">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/overview_item_spacing">
+                    android:layout_marginBottom="@dimen/overview_item_spacing"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding">
 
                     <com.gh4a.widget.FixedSizeImageView
                         android:id="@+id/iv_gravatar"

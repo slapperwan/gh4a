@@ -34,7 +34,7 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
     }
 
     public OverviewRow(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        this(context, attrs, R.attr.overviewRowStyle);
     }
 
     public OverviewRow(Context context, AttributeSet attrs, int defStyle) {
@@ -47,13 +47,25 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
         mProgress = findViewById(R.id.progress);
 
         final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.RepositoryStatView, defStyle, 0);
+                attrs, R.styleable.OverviewRow, defStyle, 0);
 
-        setText(a.getString(R.styleable.RepositoryStatView_rowText));
-        setIcon(a.getDrawable(R.styleable.RepositoryStatView_rowIcon));
+        setText(a.getString(R.styleable.OverviewRow_rowText));
+        setIcon(a.getDrawable(R.styleable.OverviewRow_rowIcon));
+        setIconClickListener(null);
 
         a.recycle();
     }
+
+    @Override
+    public void drawableHotspotChanged(float x, float y) {
+        super.drawableHotspotChanged(x, y);
+    }
+
+    @Override
+    protected void drawableStateChanged() {
+        super.drawableStateChanged();
+    }
+
 
     public void setText(CharSequence text) {
         mLabel.setText(text);
@@ -72,8 +84,8 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
     }
 
     public void setIconClickListener(OnIconClickListener l) {
-        mIcon.setOnClickListener(this);
-        mIcon.setClickable(l != null);
+        mIcon.setOnClickListener(l != null ? this : null);
+        mIcon.setEnabled(l != null);
         mIconClickListener = l;
         updateIconTint();
     }
