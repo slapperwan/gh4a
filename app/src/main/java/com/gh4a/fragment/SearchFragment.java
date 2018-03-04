@@ -155,10 +155,12 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
 
     @Override
     protected Single<Response<Page<Object>>> loadPage(int page, boolean bypassCache) {
-        if (TextUtils.isEmpty(mQuery)) {
+        if (TextUtils.isEmpty(mQuery) || mQuery.equals(getArguments().getString("initial_search"))) {
             return Single.just(Response.success(new ApiHelpers.DummyPage<>()));
         }
-        switch (mSelectedSearchType) {
+        int type = mInitialSearchType != SEARCH_TYPE_NONE
+                ? mInitialSearchType : mSelectedSearchType;
+        switch (type) {
             case SEARCH_TYPE_REPO: return makeRepoSearchSingle(page, bypassCache);
             case SEARCH_TYPE_USER: return makeUserSearchSingle(page, bypassCache);
             case SEARCH_TYPE_CODE: return makeCodeSearchSingle(page, bypassCache);
