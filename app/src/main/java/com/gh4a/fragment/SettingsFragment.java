@@ -20,7 +20,7 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.activities.IssueEditActivity;
+import com.gh4a.activities.IssueListActivity;
 import com.gh4a.job.NotificationsJob;
 import com.gh4a.widget.IntegerListPreference;
 
@@ -175,7 +175,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                         context.getString(R.string.send_email_title));
                 context.startActivity(chooserIntent);
             } else if (id == R.id.btn_by_gh4a) {
-                Intent intent = IssueEditActivity.makeCreateIntent(context,
+                Intent intent = IssueListActivity.makeIntent(context,
                         context.getString(R.string.my_username),
                         context.getString(R.string.my_repo));
                 context.startActivity(intent);
