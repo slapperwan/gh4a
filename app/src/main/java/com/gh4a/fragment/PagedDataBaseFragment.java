@@ -68,9 +68,11 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
             mSubscription.dispose();
             mSubscription = null;
         }
-        resetSubject();
-        setContentShown(false);
-        load(true);
+        if (mRxLoader != null) {
+            resetSubject();
+            setContentShown(false);
+            load(true);
+        }
     }
 
     @Override
