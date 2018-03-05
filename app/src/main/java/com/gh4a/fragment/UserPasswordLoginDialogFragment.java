@@ -122,10 +122,10 @@ public class UserPasswordLoginDialogFragment extends DialogFragment implements
                     .flatMap(request -> makeLoginSingle(request))
                     .subscribe(pair -> {
                         mCallback.onLoginFinished(pair.first, pair.second);
-                        dismiss();
+                        dismissAllowingStateLoss();
                     }, error -> {
                         mCallback.onLoginFailed(error);
-                        dismiss();
+                        dismissAllowingStateLoss();
                     });
         }
         updateContainerVisibility(true);
