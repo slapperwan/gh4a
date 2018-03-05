@@ -56,6 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -438,13 +439,14 @@ public class HttpImageGetter {
     }
 
     private Drawable loadImageForUrl(String source) {
+        HttpUrl url = HttpUrl.parse(source);
         Bitmap bitmap = null;
 
-        if (!mDestroyed) {
+        if (!mDestroyed && url != null) {
             File output = null;
             InputStream is = null;
             Request request = new Request.Builder()
-                    .url(source)
+                    .url(url)
                     .build();
             try (Response response = mClient.newCall(request).execute()) {
                 is = response.body().byteStream();
