@@ -119,7 +119,6 @@ public class UiUtils {
         private final RecyclerView mView;
         private int mColor;
         private EdgeEffect mTopEffect, mBottomEffect;
-        private Object mLastTopEffect, mLastBottomEffect;
 
         private static Method sTopEnsureMethod, sBottomEnsureMethod;
         private static Field sTopEffectField, sBottomEffectField;
@@ -145,19 +144,17 @@ public class UiUtils {
             try {
                 Object topEffect = sTopEffectField.get(mView);
                 Object bottomEffect = sBottomEffectField.get(mView);
-                if (topEffect == null || bottomEffect == null
-                        || topEffect != mLastTopEffect || bottomEffect != mLastBottomEffect) {
+                if (topEffect == null || bottomEffect == null) {
                     sTopEnsureMethod.invoke(mView);
                     sBottomEnsureMethod.invoke(mView);
-                    mLastTopEffect = sTopEffectField.get(mView);
-                    mLastBottomEffect = sBottomEffectField.get(mView);
 
-                    final Field edgeField = mLastTopEffect.getClass().getDeclaredField("mEdgeEffect");
-                    edgeField.setAccessible(true);
-                    mTopEffect = (EdgeEffect) edgeField.get(mLastTopEffect);
-                    mBottomEffect = (EdgeEffect) edgeField.get(mLastBottomEffect);
+                    mTopEffect = (EdgeEffect) sTopEffectField.get(mView);
+                    mBottomEffect = (EdgeEffect) sBottomEffectField.get(mView);
+                } else {
+                    mTopEffect = (EdgeEffect) topEffect;
+                    mBottomEffect = (EdgeEffect) bottomEffect;
                 }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchFieldException e) {
+            } catch (IllegalAccessException | InvocationTargetException e) {
                 mTopEffect = mBottomEffect = null;
             }
             applyColor(mTopEffect);

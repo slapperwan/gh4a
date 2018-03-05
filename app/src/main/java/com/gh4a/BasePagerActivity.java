@@ -245,15 +245,9 @@ public abstract class BasePagerActivity extends BaseActivity implements
             }
             if (mLeftEffect == null || mRightEffect == null) {
                 try {
-                    Object leftEffect = sLeftEffectField.get(mPager);
-                    Object rightEffect = sRightEffectField.get(mPager);
-
-                    final Field edgeField = leftEffect.getClass().getDeclaredField("mEdgeEffect");
-                    edgeField.setAccessible(true);
-
-                    mLeftEffect = (EdgeEffect) edgeField.get(leftEffect);
-                    mRightEffect = (EdgeEffect) edgeField.get(rightEffect);
-                } catch (IllegalAccessException | NoSuchFieldException e) {
+                    mLeftEffect = (EdgeEffect) sLeftEffectField.get(mPager);
+                    mRightEffect = (EdgeEffect) sRightEffectField.get(mPager);
+                } catch (IllegalAccessException e) {
                     mLeftEffect = mRightEffect = null;
                 }
             }
