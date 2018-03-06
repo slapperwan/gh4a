@@ -305,7 +305,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         resetSubject();
 
         // force re-filtering of the view
-        mSearch.setQuery(mQuery, false);
+        mSearch.setQuery(mQuery, true);
     }
 
     private void updateEmptyText(@StringRes int emptyTextResId) {
