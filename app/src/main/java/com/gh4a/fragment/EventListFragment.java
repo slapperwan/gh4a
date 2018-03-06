@@ -314,8 +314,11 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             intentSingle
                     .compose(RxUtils::doInBackground)
                     .compose(RxUtils.wrapWithProgressDialog(getActivity(), R.string.loading_msg))
-                    .subscribe(result -> result.doIfPresent(this::startActivity),
-                            error -> Log.d(Gh4Application.LOG_TAG, "Loading click intent failed", error));
+                    .subscribe(result -> {
+                        if (result.isPresent() && isAdded()) {
+                            startActivity(result.get());
+                        }
+                    }, error -> Log.d(Gh4Application.LOG_TAG, "Loading click intent failed", error));
         }
     }
 

@@ -5,9 +5,6 @@ import android.support.annotation.NonNull;
 import io.reactivex.Single;
 
 public class Optional<T> {
-    public interface Action<T> {
-        void execute(@NonNull T value);
-    }
     public interface Supplier<T> {
         @NonNull
         T get();
@@ -80,12 +77,6 @@ public class Optional<T> {
             return Single.just(of(mValue));
         }
         return supplier.get();
-    }
-
-    public void doIfPresent(Action<T> action) {
-        if (mValue != null) {
-            action.execute(mValue);
-        }
     }
 
     public <R> Optional<R> map(Mapper<T, R> mapper) {
