@@ -70,23 +70,40 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         SharedPreferences prefs = getPrefs();
         selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, THEME_LIGHT));
 
-        if (prefs.getInt(KEY_VERSION, 0) < 2) {
-            // convert old-style login/token pref to new-style login list
-            String login = prefs.getString("USER_LOGIN", null);
-            String token = prefs.getString("Token", null);
-            HashSet<String> loginSet = new HashSet<>();
-            if (login != null && token != null) {
-                loginSet.add(login);
-            }
-
+        int prefsVersion = prefs.getInt(KEY_VERSION, 0);
+        if (prefsVersion < 3) {
             SharedPreferences.Editor editor = prefs.edit()
-                    .putString(KEY_ACTIVE_LOGIN, login)
-                    .putStringSet(KEY_ALL_LOGINS, loginSet)
-                    .putInt(KEY_VERSION, 2)
-                    .remove("USER_LOGIN")
-                    .remove("Token");
-            if (login != null && token != null) {
-                editor.putString(KEY_PREFIX_TOKEN + login, token);
+                    .putInt(KEY_VERSION, 3);
+
+            if (prefsVersion < 2) {
+                // convert old-style login/token pref to new-style login list
+                String login = prefs.getString("USER_LOGIN", null);
+                String token = prefs.getString("Token", null);
+                HashSet<String> loginSet = new HashSet<>();
+                if (login != null && token != null) {
+                    loginSet.add(login);
+                }
+                editor.putString(KEY_ACTIVE_LOGIN, login)
+                        .putStringSet(KEY_ALL_LOGINS, loginSet)
+                        .remove("USER_LOGIN")
+                        .remove("Token");
+                if (login != null && token != null) {
+                    editor.putString(KEY_PREFIX_TOKEN + login, token);
+                }
+            }
+            if (prefsVersion < 3 && prefs.contains(KEY_ALL_LOGINS)) {
+                // Convert user IDs stored with old bindings (int) to format of new
+                // bindings (long) ... unfortunately we didn't update the version when
+                // doing that change :-/
+                for (String login : prefs.getStringSet(KEY_ALL_LOGINS, null)) {
+                    try {
+                        final String key = KEY_PREFIX_USER_ID + login;
+                        int userId = prefs.getInt(key, -1);
+                        editor.putLong(key, userId);
+                    } catch (ClassCastException e) {
+                        // already using the new format, ignore
+                    }
+                }
             }
             editor.apply();
         }
