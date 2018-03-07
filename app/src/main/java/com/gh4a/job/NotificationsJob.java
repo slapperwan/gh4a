@@ -138,7 +138,7 @@ public class NotificationsJob extends Job {
                     list.add(holder.notification);
                 }
             }
-        } catch (ApiRequestException e) {
+        } catch (Exception e) {
             return Result.FAILURE;
         }
 

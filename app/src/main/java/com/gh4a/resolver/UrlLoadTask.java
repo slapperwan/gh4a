@@ -11,7 +11,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.IntentUtils;
@@ -40,7 +39,7 @@ public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>
     protected Optional<Intent> doInBackground(Void... params) {
         try {
             return getSingle().blockingGet();
-        } catch (ApiRequestException e) {
+        } catch (Exception e) {
             Log.e(Gh4Application.LOG_TAG, "Failure during intent resolving", e);
             return Optional.absent();
         }
