@@ -63,7 +63,6 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         return f;
     }
 
-    private static final int SEARCH_TYPE_NONE = -1;
     public static final int SEARCH_TYPE_REPO = 0;
     public static final int SEARCH_TYPE_USER = 1;
     public static final int SEARCH_TYPE_CODE = 2;
@@ -89,8 +88,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
 
     private Spinner mSearchType;
     private SearchView mSearch;
-    private int mInitialSearchType;
-    private int mSelectedSearchType = SEARCH_TYPE_NONE;
+    private int mSelectedSearchType;
     private String mQuery;
 
     @Override
@@ -99,10 +97,10 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         setHasOptionsMenu(true);
         if (savedInstanceState != null) {
             mQuery = savedInstanceState.getString(STATE_KEY_QUERY);
-            mInitialSearchType = savedInstanceState.getInt(STATE_KEY_SEARCH_TYPE, SEARCH_TYPE_NONE);
+            mSelectedSearchType = savedInstanceState.getInt(STATE_KEY_SEARCH_TYPE, SEARCH_TYPE_REPO);
         } else {
             Bundle args = getArguments();
-            mInitialSearchType = args.getInt("search_type", SEARCH_TYPE_REPO);
+            mSelectedSearchType = args.getInt("search_type", SEARCH_TYPE_REPO);
             mQuery = args.getString("initial_search");
         }
     }
@@ -114,10 +112,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         mSearchType = (Spinner) menu.findItem(R.id.type).getActionView();
         mSearchType.setAdapter(new SearchTypeAdapter(mSearchType.getContext(), getActivity()));
         mSearchType.setOnItemSelectedListener(this);
-        if (mInitialSearchType != SEARCH_TYPE_NONE) {
-            mSearchType.setSelection(mInitialSearchType);
-            mInitialSearchType = SEARCH_TYPE_NONE;
-        }
+        mSearchType.setSelection(mSelectedSearchType);
 
         SuggestionAdapter adapter = new SuggestionAdapter(getActivity());
         adapter.setFilterQueryProvider(this);
@@ -135,7 +130,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
             mSearch.setQuery(mQuery, false);
         }
 
-        updateSelectedSearchType();
+        updateSearchViewHint();
 
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -150,6 +145,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
     @Override
     protected RootAdapter<Object, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
         mAdapter = new SearchAdapter(getActivity(), this);
+        mAdapter.setMode(mSelectedSearchType);
         return mAdapter;
     }
 
@@ -158,9 +154,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         if (TextUtils.isEmpty(mQuery) || mQuery.equals(getArguments().getString("initial_search"))) {
             return Single.just(Response.success(new ApiHelpers.DummyPage<>()));
         }
-        int type = mInitialSearchType != SEARCH_TYPE_NONE
-                ? mInitialSearchType : mSelectedSearchType;
-        switch (type) {
+        switch (mSelectedSearchType) {
             case SEARCH_TYPE_REPO: return makeRepoSearchSingle(page, bypassCache);
             case SEARCH_TYPE_USER: return makeUserSearchSingle(page, bypassCache);
             case SEARCH_TYPE_CODE: return makeCodeSearchSingle(page, bypassCache);
@@ -290,6 +284,12 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         onRefresh();
     }
 
+    private void updateSearchViewHint() {
+        int[] hintAndEmptyTextResIds = HINT_AND_EMPTY_TEXTS[mSelectedSearchType];
+        mSearch.setQueryHint(getString(hintAndEmptyTextResIds[0]));
+        updateEmptyText(hintAndEmptyTextResIds[1]);
+    }
+
     private void updateSelectedSearchType() {
         int newType = mSearchType.getSelectedItemPosition();
         if (newType == mSelectedSearchType) {
@@ -298,9 +298,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         mSelectedSearchType = newType;
         mAdapter.setMode(newType);
 
-        int[] hintAndEmptyTextResIds = HINT_AND_EMPTY_TEXTS[newType];
-        mSearch.setQueryHint(getString(hintAndEmptyTextResIds[0]));
-        updateEmptyText(hintAndEmptyTextResIds[1]);
+        updateSearchViewHint();
         updateEmptyState();
         resetSubject();
 
