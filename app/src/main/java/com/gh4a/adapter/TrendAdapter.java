@@ -20,6 +20,7 @@ import android.graphics.Typeface;
 import android.support.annotation.StringRes;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,6 +58,12 @@ public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
         String desc = trend.getDescription();
         holder.tvDesc.setText(desc != null ? EmojiParser.parseToUnicode(desc) : null);
 
+        String lang = trend.getLanguage();
+        if (TextUtils.isEmpty(lang)) {
+            holder.tvLang.setText(R.string.unknown);
+        } else {
+            holder.tvLang.setText(lang);
+        }
         holder.tvStars.setText(mContext.getString(mStarsTemplate,
                 trend.getNewStars(), trend.getStars()));
         holder.tvForks.setText(String.valueOf(trend.getForks()));
@@ -67,12 +74,14 @@ public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
             super(view);
             tvTitle = view.findViewById(R.id.tv_title);
             tvDesc = view.findViewById(R.id.tv_desc);
+            tvLang = view.findViewById(R.id.tv_lang);
             tvStars = view.findViewById(R.id.tv_stars);
             tvForks = view.findViewById(R.id.tv_forks);
         }
 
         private final TextView tvTitle;
         private final TextView tvDesc;
+        private final TextView tvLang;
         private final TextView tvStars;
         private final TextView tvForks;
     }

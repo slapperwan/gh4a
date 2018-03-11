@@ -23,15 +23,17 @@ public class Trend {
     @Json(name = "repo")
     private final String repoName;
     private final String description;
+    private final String language;
     private final int stars;
     @Json(name = "new_stars")
     private final int newStars;
     private final int forks;
 
-    public Trend(String owner, String repo, String desc, int stars, int newStars, int forks) {
+    public Trend(String owner, String repo, String desc, String lang, int stars, int newStars, int forks) {
         this.repoOwner = owner;
         this.repoName = repo;
         this.description = desc;
+        this.language = lang;
         this.forks = forks;
         this.stars = stars;
         this.newStars = newStars;
@@ -45,6 +47,9 @@ public class Trend {
     }
     public String getDescription() {
         return description;
+    }
+    public String getLanguage() {
+        return language;
     }
     public int getStars() {
         return stars;
