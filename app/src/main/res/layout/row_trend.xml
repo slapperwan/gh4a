@@ -33,23 +33,33 @@
         android:orientation="horizontal">
 
         <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_forks"
+            android:id="@+id/tv_lang"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="16dp"
-            android:drawableLeft="?attr/forkSmallIcon"
+            android:drawableLeft="?attr/languageSmallIcon"
             android:drawablePadding="4dp"
+            android:layout_marginRight="16dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
-            tools:text="2" />
+            tools:text="Language" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_stars"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
             android:drawableLeft="?attr/starSmallIcon"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
-            tools:text="3468" />
+            tools:text="1000 this month, 3468 total" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_forks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="?attr/forkSmallIcon"
+            android:drawablePadding="4dp"
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="2" />
 
     </LinearLayout>
 
