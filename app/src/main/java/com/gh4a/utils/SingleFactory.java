@@ -179,7 +179,7 @@ public class SingleFactory {
             sTrendService = new Retrofit.Builder()
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .addConverterFactory(MoshiConverterFactory.create(ServiceGenerator.moshi))
-                    .baseUrl("http://octodroid.s3.amazonaws.com/")
+                    .baseUrl("https://raw.githubusercontent.com/Unpublished/GithubTrending/")
                     .build()
                     .create(TrendService.class);
         }
