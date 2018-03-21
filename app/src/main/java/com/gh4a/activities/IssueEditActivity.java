@@ -67,6 +67,7 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import io.reactivex.Single;
 import retrofit2.Response;
@@ -642,8 +643,9 @@ public class IssueEditActivity extends BasePagerActivity implements
     private void loadIssueTemplate() {
         RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, false);
 
-        registerTemporarySubscription(getIssueTemplateContentSingle("")
-                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplateContentSingle("/.github")))
+        registerTemporarySubscription(getIssueTemplateContentSingle("/.github")
+                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplateContentSingle("")))
+                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplateContentSingle("/docs")))
                 .flatMap(opt -> opt.flatMap(c -> {
                     //noinspection CodeBlock2Expr
                     return service.getContents(mRepoOwner, mRepoName, c.path(), null)
@@ -665,7 +667,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page))
                 .compose(RxUtils::doInBackground)
                 .compose(RxUtils.filterAndMapToFirst(
-                        c -> c.type() == ContentType.File && c.name().startsWith("ISSUE_TEMPLATE")))
+                        c -> c.type() == ContentType.File && c.name().toLowerCase(Locale.US).startsWith("issue_template")))
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.absent()));
     }
 
