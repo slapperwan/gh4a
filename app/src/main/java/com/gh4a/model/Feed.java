@@ -41,7 +41,7 @@ public class Feed {
     @Element(name = "content")
     private String content;
     @Path(value = "author")
-    @Element(name = "name")
+    @Element(name = "name", required = false)
     private String author;
     @Path(value = "thumbnail")
     @Attribute(name = "url")
