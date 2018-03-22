@@ -23,7 +23,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@id/iv_gravatar"
+        android:layout_marginRight="16dp"
+        android:layout_toEndOf="@+id/iv_gravatar"
+        android:layout_toRightOf="@+id/iv_gravatar"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
         tools:text="username" />
@@ -33,7 +35,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/tv_extra"
-        android:layout_marginLeft="16dp"
         android:layout_toRightOf="@id/tv_extra"
         android:textAppearance="@style/TextAppearance.VerySmall"
         tools:text="yesterday" />
@@ -42,7 +43,7 @@
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_extra"
+        android:layout_below="@id/tv_timestamp"
         android:layout_toRightOf="@id/iv_gravatar"
         android:textAppearance="@style/TextAppearance.ItemTitle"
         android:textSize="16sp"

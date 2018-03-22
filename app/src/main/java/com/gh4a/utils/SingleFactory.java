@@ -124,6 +124,13 @@ public class SingleFactory {
                 .map(feed -> feed.feed);
     }
 
+    public static Single<List<Feed>> loadBlogFeed() {
+        return RetrofitHelper.feedService()
+                .getBlogFeed()
+                .map(ApiHelpers::throwOnFailure)
+                .map(feed -> feed.feed);
+    }
+
     public static Single<List<Trend>> loadTrends(String type) {
         return RetrofitHelper.trendService()
                 .getTrends(type)

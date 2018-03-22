@@ -16,6 +16,7 @@
 package com.gh4a.model;
 
 import android.net.Uri;
+import android.support.annotation.Nullable;
 
 import com.gh4a.utils.StringUtils;
 
@@ -31,21 +32,34 @@ import java.util.Date;
 public class Feed {
     @Element(name = "id")
     private String id;
-    @Element(name = "published")
+
+    @Nullable
+    @Element(name = "published", required = false)
     private Date published;
+
     @Path(value = "link")
     @Attribute(name = "href")
     private String link;
+
+    @Nullable
     @Element(name = "title", required = false)
     private String title;
+
     @Element(name = "content")
     private String content;
+
+    @Nullable
     @Path(value = "author")
     @Element(name = "name", required = false)
     private String author;
+
     @Path(value = "thumbnail")
     @Attribute(name = "url")
     private String avatarUrl;
+
+    @Nullable
+    @Element(name = "updated", required = false)
+    private Date updated;
 
     private int userId;
     private String preview;
@@ -64,9 +78,9 @@ public class Feed {
             return null;
         }
         String preview = content.length() > 2000 ? content.substring(0, 2000) : content;
-        preview = preview.replaceAll("<(.|\n)*?>","");
+        preview = preview.replaceAll("<(.|\n)*?>", "");
         if (preview.length() > 500) {
-            preview = preview.substring(0,  500);
+            preview = preview.substring(0, 500);
         }
         return preview;
     }
@@ -103,28 +117,44 @@ public class Feed {
     public String getId() {
         return id;
     }
+
+    @Nullable
     public Date getPublished() {
         return published;
     }
+
     public String getLink() {
         return link;
     }
+
+    @Nullable
     public String getTitle() {
         return title;
     }
+
     public String getContent() {
         return content;
     }
+
     public String getPreview() {
         return preview;
     }
+
+    @Nullable
     public String getAuthor() {
         return author;
     }
+
     public int getUserId() {
         return userId;
     }
+
     public String getAvatarUrl() {
         return avatarUrl;
+    }
+
+    @Nullable
+    public Date getUpdated() {
+        return updated;
     }
 }

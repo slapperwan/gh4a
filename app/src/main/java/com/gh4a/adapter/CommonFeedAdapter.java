@@ -31,6 +31,8 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.model.Feed;
 import com.gh4a.utils.AvatarHandler;
 
+import java.util.Date;
+
 public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewHolder> {
     private final boolean mShowExtra;
 
@@ -66,11 +68,12 @@ public class CommonFeedAdapter extends RootAdapter<Feed, CommonFeedAdapter.ViewH
         }
 
         if (mShowExtra) {
-            String published = feed.getPublished() != null
-                    ? DateFormat.getMediumDateFormat(mContext).format(feed.getPublished()) : "";
+            Date date = feed.getPublished() != null ? feed.getPublished() : feed.getUpdated();
+            String published = date != null
+                    ? DateFormat.getMediumDateFormat(mContext).format(date) : "";
             holder.tvExtra.setText(feed.getAuthor());
             holder.tvTimestamp.setText(published);
-            holder.tvExtra.setVisibility(View.VISIBLE);
+            holder.tvExtra.setVisibility(feed.getAuthor() != null ? View.VISIBLE : View.GONE);
             holder.tvTimestamp.setVisibility(View.VISIBLE);
         } else {
             holder.tvExtra.setVisibility(View.GONE);

@@ -94,11 +94,13 @@ public class LinkParserTest {
     @Test
     public void blogLink__opensBlogListActivity() throws Exception {
         assertRedirectsTo(parseLink("https://github.com/blog"), BlogListActivity.class);
+        assertRedirectsTo(parseLink("https://blog.github.com"), BlogListActivity.class);
     }
 
     @Test
     public void blogLink_withBlogInPath__opensBrowser() throws Exception {
         assertRedirectsToBrowser(parseLink("https://github.com/blog/blog-title"));
+        assertRedirectsToBrowser(parseLink("https://blog.github.com/blog-title"));
     }
 
     @Test
