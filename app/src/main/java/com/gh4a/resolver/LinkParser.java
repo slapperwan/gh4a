@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 
 import com.gh4a.activities.BlogListActivity;
+import com.gh4a.activities.BookmarkListActivity;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CompareActivity;
 import com.gh4a.activities.GistActivity;
@@ -53,6 +54,9 @@ public class LinkParser {
 
         if ("gist.github.com".equals(uri.getHost())) {
             return parseGistLink(activity, parts);
+        }
+        if ("blog.github.com".equals(uri.getHost())) {
+            return parseNewBlogLink(activity, parts);
         }
 
         if (parts.isEmpty()) {
@@ -124,6 +128,14 @@ public class LinkParser {
     @Nullable
     private static ParseResult parseBlogLink(FragmentActivity activity, List<String> parts) {
         if (parts.size() == 1) {
+            return new ParseResult(new Intent(activity, BlogListActivity.class));
+        }
+        return null;
+    }
+
+    @Nullable
+    private static ParseResult parseNewBlogLink(FragmentActivity activity, List<String> parts) {
+        if (parts.size() == 0) {
             return new ParseResult(new Intent(activity, BlogListActivity.class));
         }
         return null;

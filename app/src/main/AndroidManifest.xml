@@ -144,10 +144,16 @@
                     android:host="gist.github.com"
                     android:scheme="https" />
                 <data
+                    android:host="blog.github.com"
+                    android:scheme="https" />
+                <data
                     android:host="github.com"
                     android:scheme="http" />
 				<data
                     android:host="gist.github.com"
+                    android:scheme="http" />
+                <data
+                    android:host="blog.github.com"
                     android:scheme="http" />
             </intent-filter>
         </activity>
