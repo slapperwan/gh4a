@@ -92,7 +92,7 @@ public class AvatarHandler {
     };
 
     public static void assignAvatar(ImageView view, User user) {
-        if (user == null) {
+        if (user == null || user.id() == null) {
             assignAvatar(view, null, 0, null);
             return;
         }

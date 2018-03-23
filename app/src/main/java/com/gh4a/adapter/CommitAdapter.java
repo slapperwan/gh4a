@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,12 +52,13 @@ public class CommitAdapter extends RootAdapter<Commit, CommitAdapter.ViewHolder>
     @Override
     public void onBindViewHolder(ViewHolder holder, Commit commit) {
         User author = commit.author();
-        if (author != null) {
+        if (author != null && !TextUtils.isEmpty(author.name())) {
             AvatarHandler.assignAvatar(holder.ivGravatar, author);
         } else {
             GitUser commitAuthor = commit.commit().author();
+            String userName = commitAuthor != null ? commitAuthor.name() : null;
             String email = commitAuthor != null ? commitAuthor.email() : null;
-            holder.ivGravatar.setImageDrawable(new AvatarHandler.DefaultAvatarDrawable(null, email));
+            holder.ivGravatar.setImageDrawable(new AvatarHandler.DefaultAvatarDrawable(userName, email));
         }
         holder.ivGravatar.setTag(commit);
 

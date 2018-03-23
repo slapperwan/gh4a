@@ -51,11 +51,13 @@ public class ApiHelpers {
 
     //RepositoryCommit
     public static String getAuthorName(Context context, Commit commit) {
-        if (commit.author() != null) {
-            return commit.author().login();
+        User author = commit.author();
+        if (author != null && !TextUtils.isEmpty(author.login())) {
+            return author.login();
         }
-        if (commit.commit().author() != null) {
-            return commit.commit().author().name();
+        GitUser commitAuthor = commit.commit().author();
+        if (commitAuthor != null && !TextUtils.isEmpty(commitAuthor.name())) {
+            return commitAuthor.name();
         }
         return context.getString(R.string.unknown);
     }
