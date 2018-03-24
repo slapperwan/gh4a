@@ -27,10 +27,14 @@ import com.gh4a.fragment.StargazerListFragment;
 import com.gh4a.fragment.WatcherListFragment;
 
 public class WatcherListActivity extends BaseFragmentPagerActivity {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return new Intent(context, WatcherListActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName);
     }
 
     private String mRepoOwner;
@@ -49,8 +53,8 @@ public class WatcherListActivity extends BaseFragmentPagerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
     }
 
     @Override

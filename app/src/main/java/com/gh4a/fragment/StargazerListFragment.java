@@ -32,12 +32,15 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class StargazerListFragment extends PagedDataBaseFragment<User> {
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+
     public static StargazerListFragment newInstance(String repoOwner, String repoName) {
         StargazerListFragment f = new StargazerListFragment();
 
         Bundle args = new Bundle();
-        args.putString("owner", repoOwner);
-        args.putString("repo", repoName);
+        args.putString(EXTRA_OWNER, repoOwner);
+        args.putString(EXTRA_REPO, repoName);
         f.setArguments(args);
 
         return f;
@@ -49,8 +52,8 @@ public class StargazerListFragment extends PagedDataBaseFragment<User> {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepoOwner = getArguments().getString("owner");
-        mRepoName = getArguments().getString("repo");
+        mRepoOwner = getArguments().getString(EXTRA_OWNER);
+        mRepoName = getArguments().getString(EXTRA_REPO);
     }
 
     @Override

@@ -32,12 +32,15 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> {
+    private static final String EXTRA_USER = "user";
+    private static final String EXTRA_SHOW_FOLLOWERS = "show_followers";
+
     public static FollowersFollowingListFragment newInstance(String login, boolean showFollowers) {
         FollowersFollowingListFragment f = new FollowersFollowingListFragment();
 
         Bundle args = new Bundle();
-        args.putString("user", login);
-        args.putBoolean("show_followers", showFollowers);
+        args.putString(EXTRA_USER, login);
+        args.putBoolean(EXTRA_SHOW_FOLLOWERS, showFollowers);
         f.setArguments(args);
 
         return f;
@@ -49,8 +52,8 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString("user");
-        mShowFollowers = getArguments().getBoolean("show_followers");
+        mLogin = getArguments().getString(EXTRA_USER);
+        mShowFollowers = getArguments().getBoolean(EXTRA_SHOW_FOLLOWERS);
     }
 
     @Override

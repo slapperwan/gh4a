@@ -61,11 +61,13 @@ import io.reactivex.disposables.Disposable;
 import retrofit2.Response;
 
 public class UserFragment extends LoadingFragmentBase implements View.OnClickListener {
+    public static final String EXTRA_LOGIN = "login";
+
     public static UserFragment newInstance(String login) {
         UserFragment f = new UserFragment();
 
         Bundle args = new Bundle();
-        args.putString("login", login);
+        args.putString(EXTRA_LOGIN, login);
         f.setArguments(args);
 
         return f;
@@ -89,7 +91,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserLogin = getArguments().getString("login");
+        mUserLogin = getArguments().getString(EXTRA_LOGIN);
         mIsSelf = ApiHelpers.loginEquals(mUserLogin, Gh4Application.get().getAuthLogin());
         setHasOptionsMenu(true);
     }

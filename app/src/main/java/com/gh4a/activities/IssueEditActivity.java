@@ -75,19 +75,24 @@ import retrofit2.Response;
 public class IssueEditActivity extends BasePagerActivity implements
         AppBarLayout.OnOffsetChangedListener, View.OnClickListener,
         View.OnFocusChangeListener {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_ISSUE = "issue";
+
     public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
         // can't reuse makeEditIntent here, because even a null extra counts for hasExtra()
         return new Intent(context, IssueEditActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName);
     }
 
     public static Intent makeEditIntent(Context context, String repoOwner,
             String repoName, Issue issue) {
         return new Intent(context, IssueEditActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("issue", issue);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_ISSUE, issue);
     }
 
     private static final int REQUEST_MANAGE_LABELS = 1000;
@@ -120,7 +125,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     private ViewGroup mSelectedAssigneeContainer;
     private TextView mLabelsView;
 
-    private static final String STATE_KEY_ISSUE = "issue";
+    private static final String STATE_KEY_ISSUE = EXTRA_ISSUE;
     private static final String STATE_KEY_ORIGINAL_ISSUE = "original_issue";
 
     @Override
@@ -235,12 +240,12 @@ public class IssueEditActivity extends BasePagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
         // If mEditIssue is != null here, it was restored from saved state
         if (mEditIssue == null) {
-            if (extras.containsKey("issue")) {
-                mEditIssue = extras.getParcelable("issue");
+            if (extras.containsKey(EXTRA_ISSUE)) {
+                mEditIssue = extras.getParcelable(EXTRA_ISSUE);
                 // Save only editable fields
                 mOriginalIssue = Issue.builder()
                         .title(mEditIssue.title())
@@ -282,7 +287,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private boolean isInEditMode() {
-        return getIntent().hasExtra("issue");
+        return getIntent().hasExtra(EXTRA_ISSUE);
     }
 
     @Override
@@ -583,7 +588,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .subscribe(result -> {
                     Intent data = new Intent();
                     Bundle extras = new Bundle();
-                    extras.putParcelable("issue", result);
+                    extras.putParcelable(EXTRA_ISSUE, result);
                     data.putExtras(extras);
                     setResult(RESULT_OK, data);
                     finish();

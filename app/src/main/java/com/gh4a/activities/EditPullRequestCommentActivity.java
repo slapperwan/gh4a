@@ -14,6 +14,9 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentSer
 import io.reactivex.Single;
 
 public class EditPullRequestCommentActivity extends EditCommentActivity {
+
+    private static final String EXTRA_PR = "pr";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             int prNumber, long id, long replyToCommentId, String body,
             @AttrRes int highlightColorAttr) {
@@ -23,7 +26,7 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
             throw new IllegalStateException("Only editing and replying allowed");
         }
         Intent intent = new Intent(context, EditPullRequestCommentActivity.class)
-                .putExtra("pr", prNumber);
+                .putExtra(EXTRA_PR, prNumber);
         return EditCommentActivity.fillInIntent(intent,
                 repoOwner, repoName, id, replyToCommentId, body, highlightColorAttr);
     }
@@ -31,7 +34,7 @@ public class EditPullRequestCommentActivity extends EditCommentActivity {
     @Override
     protected Single<GitHubCommentBase> createComment(String repoOwner, String repoName,
             String body, long replyToCommentId) {
-        int prNumber = getIntent().getIntExtra("pr", 0);
+        int prNumber = getIntent().getIntExtra(EXTRA_PR, 0);
         PullRequestReviewCommentService service =
                 ServiceFactory.get(PullRequestReviewCommentService.class, false);
         CreateReviewComment request = CreateReviewComment.builder()

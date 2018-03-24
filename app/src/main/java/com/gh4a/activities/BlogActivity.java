@@ -24,10 +24,14 @@ import com.gh4a.R;
 import com.gh4a.model.Feed;
 
 public class BlogActivity extends WebViewerActivity {
+
+    private static final String EXTRA_TITLE = "title";
+    private static final String EXTRA_CONTENT = "content";
+
     public static Intent makeIntent(Context context, Feed blog) {
         return new Intent(context, BlogActivity.class)
-                .putExtra("title", blog.getTitle())
-                .putExtra("content", blog.getContent());
+                .putExtra(EXTRA_TITLE, blog.getTitle())
+                .putExtra(EXTRA_CONTENT, blog.getContent());
     }
 
     @Override
@@ -58,12 +62,12 @@ public class BlogActivity extends WebViewerActivity {
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         String title = addTitleHeader ? getDocumentTitle() : null;
-        return wrapUnthemedHtml(getIntent().getStringExtra("content"), cssTheme, title);
+        return wrapUnthemedHtml(getIntent().getStringExtra(EXTRA_CONTENT), cssTheme, title);
     }
 
     @Override
     protected String getDocumentTitle() {
-        return getIntent().getStringExtra("title");
+        return getIntent().getStringExtra(EXTRA_TITLE);
     }
 
     @Override

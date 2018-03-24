@@ -46,9 +46,12 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class GistActivity extends BaseActivity implements View.OnClickListener {
+
+    private static final String EXTRA_ID = "id";
+
     public static Intent makeIntent(Context context, String gistId) {
         return new Intent(context, GistActivity.class)
-                .putExtra("id", gistId);
+                .putExtra(EXTRA_ID, gistId);
     }
 
     private static final int ID_LOADER_GIST = 0;
@@ -78,7 +81,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mGistId = extras.getString("id");
+        mGistId = extras.getString(EXTRA_ID);
     }
 
     @Override

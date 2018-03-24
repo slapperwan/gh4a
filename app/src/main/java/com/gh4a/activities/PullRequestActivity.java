@@ -73,17 +73,24 @@ import io.reactivex.Single;
 
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_NUMBER = "number";
+    private static final String EXTRA_INITIAL_PAGE = "initial_page";
+    private static final String EXTRA_INITIAL_COMMENT = "initial_comment";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
         return makeIntent(context, repoOwner, repoName, number, -1, null);
     }
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             int number, int initialPage, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, PullRequestActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("number", number)
-                .putExtra("initial_page", initialPage)
-                .putExtra("initial_comment", initialComment);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_NUMBER, number)
+                .putExtra(EXTRA_INITIAL_PAGE, initialPage)
+                .putExtra(EXTRA_INITIAL_COMMENT, initialComment);
     }
 
     public static final int PAGE_CONVERSATION = 0;
@@ -246,13 +253,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mPullRequestNumber = extras.getInt("number");
-        mInitialComment = extras.getParcelable("initial_comment");
-        mInitialPage = extras.getInt("initial_page", -1);
-        extras.remove("initial_comment");
-        extras.remove("initial_page");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mPullRequestNumber = extras.getInt(EXTRA_NUMBER);
+        mInitialComment = extras.getParcelable(EXTRA_INITIAL_COMMENT);
+        mInitialPage = extras.getInt(EXTRA_INITIAL_PAGE, -1);
+        extras.remove(EXTRA_INITIAL_COMMENT);
+        extras.remove(EXTRA_INITIAL_PAGE);
     }
 
     @Override

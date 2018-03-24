@@ -49,21 +49,33 @@ import retrofit2.Response;
 
 public abstract class DiffViewerActivity<C extends PositionalCommentBase> extends WebViewerActivity
         implements ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_SHA = "sha";
+    private static final String EXTRA_PATH = "path";
+    private static final String EXTRA_DIFF = "diff";
+    private static final String EXTRA_COMMENTS = "comments";
+    private static final String EXTRA_INITIAL_LINE = "initial_line";
+    private static final String STRING = "highlight_start";
+    private static final String STRIN = "highlight_end";
+    private static final String EXTRA_HIGHLIGHT_RIGHT = "highlight_right";
+    private static final String EXTRA_INITIAL_COMMENT = "initial_comment";
+
     protected static <C extends PositionalCommentBase> Intent fillInIntent(Intent baseIntent,
             String repoOwner, String repoName, String commitSha, String path, String diff,
             List<C> comments, int initialLine, int highlightStartLine, int highlightEndLine,
             boolean highlightisRight, IntentUtils.InitialCommentMarker initialComment) {
-        return baseIntent.putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("sha", commitSha)
-                .putExtra("path", path)
-                .putExtra("diff", diff)
-                .putExtra("comments", comments != null ? new ArrayList<>(comments) : null)
-                .putExtra("initial_line", initialLine)
-                .putExtra("highlight_start", highlightStartLine)
-                .putExtra("highlight_end", highlightEndLine)
-                .putExtra("highlight_right", highlightisRight)
-                .putExtra("initial_comment", initialComment);
+        return baseIntent.putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_SHA, commitSha)
+                .putExtra(EXTRA_PATH, path)
+                .putExtra(EXTRA_DIFF, diff)
+                .putExtra(EXTRA_COMMENTS, comments != null ? new ArrayList<>(comments) : null)
+                .putExtra(EXTRA_INITIAL_LINE, initialLine)
+                .putExtra(STRING, highlightStartLine)
+                .putExtra(EXTRA_HIGHLIGHT_RIGHT, highlightisRight)
+                .putExtra(EXTRA_INITIAL_COMMENT, initialComment);
     }
 
     private static final String COMMENT_ADD_URI_FORMAT =
@@ -168,23 +180,23 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mPath = extras.getString("path");
-        mSha = extras.getString("sha");
-        mDiff = extras.getString("diff");
-        mInitialLine = extras.getInt("initial_line", -1);
-        mHighlightStartLine = extras.getInt("highlight_start", -1);
-        mHighlightEndLine = extras.getInt("highlight_end", -1);
-        mHighlightIsRight = extras.getBoolean("highlight_right", false);
-        mInitialComment = extras.getParcelable("initial_comment");
-        extras.remove("initial_comment");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mPath = extras.getString(EXTRA_PATH);
+        mSha = extras.getString(EXTRA_SHA);
+        mDiff = extras.getString(EXTRA_DIFF);
+        mInitialLine = extras.getInt(EXTRA_INITIAL_LINE, -1);
+        mHighlightStartLine = extras.getInt(STRING, -1);
+        mHighlightEndLine = extras.getInt(STRIN, -1);
+        mHighlightIsRight = extras.getBoolean(EXTRA_HIGHLIGHT_RIGHT, false);
+        mInitialComment = extras.getParcelable(EXTRA_INITIAL_COMMENT);
+        extras.remove(EXTRA_INITIAL_COMMENT);
     }
 
     @Override
     protected boolean canSwipeToRefresh() {
         // no need for pull-to-refresh if everything was passed in the intent extras
-        return !getIntent().hasExtra("comments");
+        return !getIntent().hasExtra(EXTRA_COMMENTS);
     }
 
     @Override
@@ -420,7 +432,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     private void refresh() {
         // Make sure we load the comments from remote, as we now know they've changed
-        getIntent().removeExtra("comments");
+        getIntent().removeExtra(EXTRA_COMMENTS);
 
         // Make sure our callers are aware of the change
         setResult(RESULT_OK);
@@ -454,7 +466,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     private void loadComments(boolean useIntentExtraIfPresent, boolean force) {
         List<C> intentComments = useIntentExtraIfPresent
-                ? getIntent().getParcelableArrayListExtra("comments") : null;
+                ? getIntent().getParcelableArrayListExtra(EXTRA_COMMENTS) : null;
         Single<List<C>> commentSingle = intentComments != null
                 ? Single.just(intentComments)
                 : createCommentSingle(force).compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));

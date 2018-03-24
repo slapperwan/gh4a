@@ -15,10 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,10 +32,23 @@ import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.CommitCompare;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.Single;
 
 public class CommitCompareFragment extends ListDataBaseFragment<Commit> implements
         RootAdapter.OnItemClickListener<Commit> {
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_BASE = "base";
+    private static final String EXTRA_BASE_LABEL = "base_label";
+    private static final String EXTRA_HEAD = "head";
+    private static final String EXTRA_HEAD_LABEL = "head_label";
+    private static final String EXTRA_PR = "pr";
+    private static final int REQUEST_COMMIT = 2000;
+
     public static CommitCompareFragment newInstance(String repoOwner, String repoName,
             String baseRef, String headRef) {
         return newInstance(repoOwner, repoName, -1, null, baseRef, null, headRef);
@@ -49,20 +58,18 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
             int pullRequestNumber, String baseRefLabel, String baseRef,
             String headRefLabel, String headRef) {
         Bundle args = new Bundle();
-        args.putString("owner", repoOwner);
-        args.putString("repo", repoName);
-        args.putString("base", baseRef);
-        args.putString("base_label", baseRefLabel);
-        args.putString("head", headRef);
-        args.putString("head_label", headRefLabel);
-        args.putInt("pr", pullRequestNumber);
+        args.putString(EXTRA_OWNER, repoOwner);
+        args.putString(EXTRA_REPO, repoName);
+        args.putString(EXTRA_BASE, baseRef);
+        args.putString(EXTRA_BASE_LABEL, baseRefLabel);
+        args.putString(EXTRA_HEAD, headRef);
+        args.putString(EXTRA_HEAD_LABEL, headRefLabel);
+        args.putInt(EXTRA_PR, pullRequestNumber);
 
         CommitCompareFragment f = new CommitCompareFragment();
         f.setArguments(args);
         return f;
     }
-
-    private static final int REQUEST_COMMIT = 2000;
 
     private String mRepoOwner;
     private String mRepoName;
@@ -77,13 +84,13 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        mRepoOwner = args.getString("owner");
-        mRepoName = args.getString("repo");
-        mBase = args.getString("base");
-        mBaseLabel = args.getString("base_label");
-        mHead = args.getString("head");
-        mHeadLabel = args.getString("head_label");
-        mPullRequestNumber = args.getInt("pr", -1);
+        mRepoOwner = args.getString(EXTRA_OWNER);
+        mRepoName = args.getString(EXTRA_REPO);
+        mBase = args.getString(EXTRA_BASE);
+        mBaseLabel = args.getString(EXTRA_BASE_LABEL);
+        mHead = args.getString(EXTRA_HEAD);
+        mHeadLabel = args.getString(EXTRA_HEAD_LABEL);
+        mPullRequestNumber = args.getInt(EXTRA_PR, -1);
     }
 
     @Override

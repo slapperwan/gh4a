@@ -32,6 +32,8 @@ import io.reactivex.Single;
 
 public class TrendingFragment extends ListDataBaseFragment<Trend> implements
         RootAdapter.OnItemClickListener<Trend> {
+    private static final String EXTRA_TYPE = "type";
+    private static final String EXTRA_STARS_TEMPLATE = "stars_template";
     public static final String TYPE_DAILY = "daily";
     public static final String TYPE_WEEKLY = "weekly";
     public static final String TYPE_MONTHLY = "monthly";
@@ -46,11 +48,11 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> implements
 
         TrendingFragment f = new TrendingFragment();
         Bundle args = new Bundle();
-        args.putString("type", type);
+        args.putString(EXTRA_TYPE, type);
         switch (type) {
-            case TYPE_DAILY: args.putInt("stars_template", R.string.trend_stars_today); break;
-            case TYPE_WEEKLY: args.putInt("stars_template", R.string.trend_stars_week); break;
-            case TYPE_MONTHLY: args.putInt("stars_template", R.string.trend_stars_month); break;
+            case TYPE_DAILY: args.putInt(EXTRA_STARS_TEMPLATE, R.string.trend_stars_today); break;
+            case TYPE_WEEKLY: args.putInt(EXTRA_STARS_TEMPLATE, R.string.trend_stars_week); break;
+            case TYPE_MONTHLY: args.putInt(EXTRA_STARS_TEMPLATE, R.string.trend_stars_month); break;
             default: throw new IllegalArgumentException();
         }
         f.setArguments(args);
@@ -61,8 +63,8 @@ public class TrendingFragment extends ListDataBaseFragment<Trend> implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mType = getArguments().getString("type");
-        mStarsTemplate = getArguments().getInt("stars_template", 0);
+        mType = getArguments().getString(EXTRA_TYPE);
+        mStarsTemplate = getArguments().getInt(EXTRA_STARS_TEMPLATE, 0);
     }
 
     @Override

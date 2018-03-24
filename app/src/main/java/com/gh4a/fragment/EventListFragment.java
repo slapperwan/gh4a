@@ -86,14 +86,14 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
     private static final int MENU_DOWNLOAD_START = 100;
     private static final int MENU_DOWNLOAD_END = 199;
 
-    private EventAdapter mAdapter;
-
     private static final GitHubEventType[] REPO_EVENTS = new GitHubEventType[] {
         GitHubEventType.PushEvent, GitHubEventType.IssuesEvent, GitHubEventType.WatchEvent,
         GitHubEventType.CreateEvent, GitHubEventType.PullRequestEvent, GitHubEventType.CommitCommentEvent,
         GitHubEventType.DeleteEvent, GitHubEventType.DownloadEvent, GitHubEventType.ForkApplyEvent,
         GitHubEventType.PublicEvent, GitHubEventType.MemberEvent, GitHubEventType.IssueCommentEvent
     };
+
+    private EventAdapter mAdapter;
 
     @Override
     protected void onRecyclerViewInflated(RecyclerView view, LayoutInflater inflater) {

@@ -36,9 +36,8 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
-import com.gh4a.widget.PullRequestBranchInfoView;
 import com.gh4a.widget.CommitStatusBox;
-
+import com.gh4a.widget.PullRequestBranchInfoView;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.Issue;
@@ -78,6 +77,7 @@ import retrofit2.Response;
 public class PullRequestFragment extends IssueFragmentBase {
     private static final int ID_LOADER_STATUS = 1;
     private static final int ID_LOADER_HEAD_REF = 2;
+    private static final String EXTRA_PR = "pr";
 
     private PullRequest mPullRequest;
     private GitReference mHeadReference;
@@ -90,7 +90,7 @@ public class PullRequestFragment extends IssueFragmentBase {
         Repository repo = pr.base().repo();
         Bundle args = buildArgs(repo.owner().login(), repo.name(),
                 issue, isCollaborator, initialComment);
-        args.putParcelable("pr", pr);
+        args.putParcelable(EXTRA_PR, pr);
         f.setArguments(args);
 
         return f;
@@ -110,7 +110,7 @@ public class PullRequestFragment extends IssueFragmentBase {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        mPullRequest = getArguments().getParcelable("pr");
+        mPullRequest = getArguments().getParcelable(EXTRA_PR);
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }

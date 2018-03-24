@@ -34,10 +34,14 @@ import com.meisolsson.githubsdk.model.GistFile;
 import com.meisolsson.githubsdk.service.gists.GistService;
 
 public class GistViewerActivity extends WebViewerActivity {
+
+    private static final String EXTRA_ID = "id";
+    private static final String EXTRA_FILE = "file";
+
     public static Intent makeIntent(Context context, String id, String fileName) {
         return new Intent(context, GistViewerActivity.class)
-                .putExtra("id", id)
-                .putExtra("file", fileName);
+                .putExtra(EXTRA_ID, id)
+                .putExtra(EXTRA_FILE, fileName);
     }
 
     private static final int ID_LOADER_GIST = 0;
@@ -62,8 +66,8 @@ public class GistViewerActivity extends WebViewerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mFileName = extras.getString("file");
-        mGistId = extras.getString("id");
+        mFileName = extras.getString(EXTRA_FILE);
+        mGistId = extras.getString(EXTRA_ID);
     }
 
     @Override

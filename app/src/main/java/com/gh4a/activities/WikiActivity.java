@@ -24,12 +24,18 @@ import com.gh4a.R;
 import com.gh4a.model.Feed;
 
 public class WikiActivity extends WebViewerActivity {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_TITLE = "title";
+    private static final String EXTRA_CONTENT = "content";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName, Feed feed) {
         return new Intent(context, WikiActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("title", feed.getTitle())
-                .putExtra("content", feed.getContent());
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_TITLE, feed.getTitle())
+                .putExtra(EXTRA_CONTENT, feed.getContent());
     }
 
     private String mUserLogin;
@@ -45,7 +51,7 @@ public class WikiActivity extends WebViewerActivity {
     @Nullable
     @Override
     protected String getActionBarTitle() {
-        return getIntent().getStringExtra("title");
+        return getIntent().getStringExtra(EXTRA_TITLE);
     }
 
     @Nullable
@@ -57,20 +63,20 @@ public class WikiActivity extends WebViewerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString("owner");
-        mRepoName = extras.getString("repo");
+        mUserLogin = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
     }
 
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         String title = addTitleHeader ? getDocumentTitle() : null;
-        return wrapUnthemedHtml(getIntent().getStringExtra("content"), cssTheme, title);
+        return wrapUnthemedHtml(getIntent().getStringExtra(EXTRA_CONTENT), cssTheme, title);
     }
 
     @Override
     protected String getDocumentTitle() {
         return getString(R.string.wiki_print_document_title,
-                getIntent().getStringExtra("title"), mUserLogin, mRepoName);
+                getIntent().getStringExtra(EXTRA_TITLE), mUserLogin, mRepoName);
     }
 
     @Override

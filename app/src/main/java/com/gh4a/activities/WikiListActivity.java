@@ -26,13 +26,18 @@ import com.gh4a.fragment.WikiListFragment;
 import com.meisolsson.githubsdk.model.GitHubWikiPage;
 
 public class WikiListActivity extends FragmentContainerActivity {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_INITIAL_PAGE = "initial_page";
+
     public static Intent makeIntent(Context context, String repoOwner,
             String repoName, GitHubWikiPage initialPage) {
         String initialPageId = initialPage != null ? initialPage.sha() : null;
         return new Intent(context, WikiListActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("initial_page", initialPageId);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_INITIAL_PAGE, initialPageId);
     }
 
     private String mUserLogin;
@@ -53,13 +58,13 @@ public class WikiListActivity extends FragmentContainerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString("owner");
-        mRepoName = extras.getString("repo");
+        mUserLogin = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
     }
 
     @Override
     protected Fragment onCreateFragment() {
-        String initialPage = getIntent().getStringExtra("initial_page");
+        String initialPage = getIntent().getStringExtra(EXTRA_INITIAL_PAGE);
         return WikiListFragment.newInstance(mUserLogin, mRepoName, initialPage);
     }
 

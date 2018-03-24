@@ -41,6 +41,9 @@ import io.reactivex.processors.PublishProcessor;
 
 public class UserPasswordLoginDialogFragment extends DialogFragment implements
         View.OnClickListener {
+
+    private static final String EXTRA_SCOPES = "scopes";
+
     public interface ParentCallback {
         void onLoginFinished(String token, User user);
         void onLoginFailed(Throwable error);
@@ -49,7 +52,7 @@ public class UserPasswordLoginDialogFragment extends DialogFragment implements
     public static UserPasswordLoginDialogFragment newInstance(String scopes) {
         UserPasswordLoginDialogFragment f = new UserPasswordLoginDialogFragment();
         Bundle args = new Bundle();
-        args.putString("scopes", scopes);
+        args.putString(EXTRA_SCOPES, scopes);
         f.setArguments(args);
         return f;
     }
@@ -156,7 +159,7 @@ public class UserPasswordLoginDialogFragment extends DialogFragment implements
         String description = "Octodroid - " + Build.MANUFACTURER + " " + Build.MODEL;
         String fingerprint = getHashedDeviceId();
         LoginService service = getService();
-        String scopes = getArguments().getString("scopes");
+        String scopes = getArguments().getString(EXTRA_SCOPES);
 
         return service.getAuthorizations()
                 .map(ApiHelpers::throwOnFailure)

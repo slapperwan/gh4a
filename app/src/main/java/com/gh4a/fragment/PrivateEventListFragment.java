@@ -11,14 +11,17 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class PrivateEventListFragment extends EventListFragment {
+    private static final String EXTRA_LOGIN = "login";
+    private static final String EXTRA_ORG = "org";
+
     private String mLogin;
     private String mOrganization;
 
     public static PrivateEventListFragment newInstance(String login, String organization) {
         PrivateEventListFragment f = new PrivateEventListFragment();
         Bundle args = new Bundle();
-        args.putString("login", login);
-        args.putString("org", organization);
+        args.putString(EXTRA_LOGIN, login);
+        args.putString(EXTRA_ORG, organization);
         f.setArguments(args);
         return f;
     }
@@ -26,8 +29,8 @@ public class PrivateEventListFragment extends EventListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mLogin = getArguments().getString("login");
-        mOrganization = getArguments().getString("org");
+        mLogin = getArguments().getString(EXTRA_LOGIN);
+        mOrganization = getArguments().getString(EXTRA_ORG);
     }
 
     @Override

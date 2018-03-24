@@ -40,6 +40,12 @@ import retrofit2.Response;
 
 public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     private static final int REQUEST_ISSUE = 1000;
+    private static final String EXTRA_QUERY = "query";
+    private static final String EXTRA_SORT_MODE = "sortmode";
+    private static final String EXTRA_ORDER = "order";
+    private static final String EXTRA_EMPTY_TEXT = "emptytext";
+    private static final String EXTRA_STATE = "state";
+    private static final String EXTRA_WITH_REPO = "withrepo";
 
     private String mQuery;
     private String mSortMode;
@@ -53,12 +59,12 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
         IssueListFragment f = new IssueListFragment();
 
         Bundle args = new Bundle();
-        args.putString("query", query);
-        args.putString("sortmode", sortMode);
-        args.putString("order", order);
-        args.putInt("emptytext", emptyTextResId);
-        args.putString("state", state);
-        args.putBoolean("withrepo", showRepository);
+        args.putString(EXTRA_QUERY, query);
+        args.putString(EXTRA_SORT_MODE, sortMode);
+        args.putString(EXTRA_ORDER, order);
+        args.putInt(EXTRA_EMPTY_TEXT, emptyTextResId);
+        args.putString(EXTRA_STATE, state);
+        args.putBoolean(EXTRA_WITH_REPO, showRepository);
 
         f.setArguments(args);
         return f;
@@ -69,12 +75,12 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        mQuery = args.getString("query");
-        mSortMode = args.getString("sortmode");
-        mOrder = args.getString("order");
-        mEmptyTextResId = args.getInt("emptytext");
-        mIssueState = args.getString("state");
-        mShowRepository = args.getBoolean("withrepo");
+        mQuery = args.getString(EXTRA_QUERY);
+        mSortMode = args.getString(EXTRA_SORT_MODE);
+        mOrder = args.getString(EXTRA_ORDER);
+        mEmptyTextResId = args.getInt(EXTRA_EMPTY_TEXT);
+        mIssueState = args.getString(EXTRA_STATE);
+        mShowRepository = args.getBoolean(EXTRA_WITH_REPO);
     }
 
     @Override

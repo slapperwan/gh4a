@@ -57,16 +57,22 @@ import com.meisolsson.githubsdk.service.issues.IssueService;
 import java.util.Locale;
 
 public class IssueActivity extends BaseActivity implements View.OnClickListener {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_NUMBER = "number";
+    private static final String EXTRA_INITIAL_COMMENT = "initial_comment";
+
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
         return makeIntent(context, login, repoName, number, null);
     }
     public static Intent makeIntent(Context context, String login, String repoName,
             int number, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, IssueActivity.class)
-                .putExtra("owner", login)
-                .putExtra("repo", repoName)
-                .putExtra("number", number)
-                .putExtra("initial_comment", initialComment);
+                .putExtra(EXTRA_OWNER, login)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_NUMBER, number)
+                .putExtra(EXTRA_INITIAL_COMMENT, initialComment);
     }
 
     private static final int ID_LOADER_ISSUE = 0;
@@ -124,11 +130,11 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mIssueNumber = extras.getInt("number");
-        mInitialComment = extras.getParcelable("initial_comment");
-        extras.remove("initial_comment");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mIssueNumber = extras.getInt(EXTRA_NUMBER);
+        mInitialComment = extras.getParcelable(EXTRA_INITIAL_COMMENT);
+        extras.remove(EXTRA_INITIAL_COMMENT);
     }
 
     private void showUiIfDone() {

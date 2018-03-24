@@ -12,12 +12,14 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class RepositoryEventListFragment extends EventListFragment {
+    private static final String EXTRA_REPOSITORY = "repository";
+
     private Repository mRepository;
 
     public static RepositoryEventListFragment newInstance(Repository repository) {
         RepositoryEventListFragment f = new RepositoryEventListFragment();
         Bundle args = new Bundle();
-        args.putParcelable("repository", repository);
+        args.putParcelable(EXTRA_REPOSITORY, repository);
         f.setArguments(args);
         return f;
     }
@@ -25,7 +27,7 @@ public class RepositoryEventListFragment extends EventListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRepository = getArguments().getParcelable("repository");
+        mRepository = getArguments().getParcelable(EXTRA_REPOSITORY);
     }
 
     @Override

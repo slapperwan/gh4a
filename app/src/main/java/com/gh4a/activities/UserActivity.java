@@ -20,6 +20,10 @@ import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.User;
 
 public class UserActivity extends BaseFragmentPagerActivity {
+
+    private static final String EXTRA_LOGIN = "login";
+    private static final String EXTRA_NAME = "name";
+
     public static Intent makeIntent(Context context, String login) {
         return makeIntent(context, login, null);
     }
@@ -36,8 +40,8 @@ public class UserActivity extends BaseFragmentPagerActivity {
             return null;
         }
         return new Intent(context, UserActivity.class)
-                .putExtra("login", login)
-                .putExtra("name", name);
+                .putExtra(EXTRA_LOGIN, login)
+                .putExtra(EXTRA_NAME, name);
     }
 
     private String mUserLogin;
@@ -57,8 +61,8 @@ public class UserActivity extends BaseFragmentPagerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mUserLogin = extras.getString("login");
-        mUserName = extras.getString("name");
+        mUserLogin = extras.getString(EXTRA_LOGIN);
+        mUserName = extras.getString(EXTRA_NAME);
     }
 
     @Override

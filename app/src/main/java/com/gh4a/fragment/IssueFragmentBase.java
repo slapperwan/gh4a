@@ -74,6 +74,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         EditorBottomSheet.Callback, EditorBottomSheet.Listener,
         ReactionBar.Callback, ReactionBar.Item, ReactionBar.ReactionDetailsCache.Listener {
     protected static final int REQUEST_EDIT = 1000;
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_ISSUE = "issue";
+    private static final String EXTRA_COLLABORATOR = "collaborator";
+    private static final String EXTRA_INITIAL_COMMENT = "initial_comment";
 
     protected static final List<IssueEventType> INTERESTING_EVENTS = Arrays.asList(
             IssueEventType.Closed, IssueEventType.Reopened, IssueEventType.Merged,
@@ -101,11 +106,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     protected static Bundle buildArgs(String repoOwner, String repoName,
             Issue issue, boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
         Bundle args = new Bundle();
-        args.putString("owner", repoOwner);
-        args.putString("repo", repoName);
-        args.putParcelable("issue", issue);
-        args.putBoolean("collaborator", isCollaborator);
-        args.putParcelable("initial_comment", initialComment);
+        args.putString(EXTRA_OWNER, repoOwner);
+        args.putString(EXTRA_REPO, repoName);
+        args.putParcelable(EXTRA_ISSUE, issue);
+        args.putBoolean(EXTRA_COLLABORATOR, isCollaborator);
+        args.putParcelable(EXTRA_INITIAL_COMMENT, initialComment);
         return args;
     }
 
@@ -114,12 +119,12 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         super.onCreate(savedInstanceState);
 
         Bundle args = getArguments();
-        mRepoOwner = args.getString("owner");
-        mRepoName = args.getString("repo");
-        mIssue = args.getParcelable("issue");
-        mIsCollaborator = args.getBoolean("collaborator");
-        mInitialComment = args.getParcelable("initial_comment");
-        args.remove("initial_comment");
+        mRepoOwner = args.getString(EXTRA_OWNER);
+        mRepoName = args.getString(EXTRA_REPO);
+        mIssue = args.getParcelable(EXTRA_ISSUE);
+        mIsCollaborator = args.getBoolean(EXTRA_COLLABORATOR);
+        mInitialComment = args.getParcelable(EXTRA_INITIAL_COMMENT);
+        args.remove(EXTRA_INITIAL_COMMENT);
 
         setHasOptionsMenu(true);
     }

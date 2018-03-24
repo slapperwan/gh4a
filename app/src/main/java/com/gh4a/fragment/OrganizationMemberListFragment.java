@@ -17,17 +17,19 @@ import retrofit2.Response;
 
 public class OrganizationMemberListFragment extends PagedDataBaseFragment<User> implements
         RootAdapter.OnItemClickListener<User> {
+    private static final String EXTRA_ORG = "org";
+
     public static OrganizationMemberListFragment newInstance(String organization) {
         OrganizationMemberListFragment f = new OrganizationMemberListFragment();
         Bundle args = new Bundle();
-        args.putString("org", organization);
+        args.putString(EXTRA_ORG, organization);
         f.setArguments(args);
         return f;
     }
 
     @Override
     protected Single<Response<Page<User>>> loadPage(int page, boolean bypassCache) {
-        String organization = getArguments().getString("org");
+        String organization = getArguments().getString(EXTRA_ORG);
         final OrganizationMemberService service =
                 ServiceFactory.get(OrganizationMemberService.class, bypassCache);
         return service.getMembers(organization, page);

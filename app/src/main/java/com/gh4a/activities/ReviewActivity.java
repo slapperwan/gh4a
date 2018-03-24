@@ -16,18 +16,23 @@ import com.meisolsson.githubsdk.model.Review;
 
 public class ReviewActivity extends FragmentContainerActivity {
 
-    private String mTitle;
+    private static final String EXTRA_REPO_OWNER = "repo_owner";
+    private static final String EXTRA_REPO_NAME = "repo_name";
+    private static final String EXTRA_ISSUE_NUMBER = "issue_number";
+    private static final String EXTRA_REVIEW = "review";
+    private static final String EXTRA_INITIAL_COMMENT = "initial_comment";
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             int issueNumber, Review review, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, ReviewActivity.class)
-                .putExtra("repo_owner", repoOwner)
-                .putExtra("repo_name", repoName)
-                .putExtra("issue_number", issueNumber)
-                .putExtra("review", review)
-                .putExtra("initial_comment", initialComment);
+                .putExtra(EXTRA_REPO_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO_NAME, repoName)
+                .putExtra(EXTRA_ISSUE_NUMBER, issueNumber)
+                .putExtra(EXTRA_REVIEW, review)
+                .putExtra(EXTRA_INITIAL_COMMENT, initialComment);
     }
 
+    private String mTitle;
     private String mRepoOwner;
     private String mRepoName;
     private int mIssueNumber;
@@ -50,12 +55,12 @@ public class ReviewActivity extends FragmentContainerActivity {
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("repo_owner");
-        mRepoName = extras.getString("repo_name");
-        mIssueNumber = extras.getInt("issue_number");
-        mReview = extras.getParcelable("review");
-        mInitialComment = extras.getParcelable("initial_comment");
-        extras.remove("initial_comment");
+        mRepoOwner = extras.getString(EXTRA_REPO_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO_NAME);
+        mIssueNumber = extras.getInt(EXTRA_ISSUE_NUMBER);
+        mReview = extras.getParcelable(EXTRA_REVIEW);
+        mInitialComment = extras.getParcelable(EXTRA_INITIAL_COMMENT);
+        extras.remove(EXTRA_INITIAL_COMMENT);
     }
 
     @Override

@@ -12,14 +12,22 @@ import com.meisolsson.githubsdk.model.Commit;
 
 public class CommitHistoryActivity extends FragmentContainerActivity implements
         CommitListFragment.ContextSelectionCallback {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_REF = "ref";
+    private static final String EXTRA_PATH = "path";
+    private static final String EXTRA_BASE_SELECTABLE = "base_selectable";
+    private static final String EXTRA_COMMIT = "commit";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
                                     String ref, String path, boolean supportBaseSelection) {
         return new Intent(context, CommitHistoryActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("ref", ref)
-                .putExtra("path", path)
-                .putExtra("base_selectable", supportBaseSelection);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_REF, ref)
+                .putExtra(EXTRA_PATH, path)
+                .putExtra(EXTRA_BASE_SELECTABLE, supportBaseSelection);
     }
 
     private String mRepoOwner;
@@ -43,11 +51,11 @@ public class CommitHistoryActivity extends FragmentContainerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mRef = extras.getString("ref");
-        mFilePath = extras.getString("path");
-        mSupportBaseSelection = extras.getBoolean("base_selectable");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mRef = extras.getString(EXTRA_REF);
+        mFilePath = extras.getString(EXTRA_PATH);
+        mSupportBaseSelection = extras.getBoolean(EXTRA_BASE_SELECTABLE);
     }
 
     @Override
@@ -68,7 +76,7 @@ public class CommitHistoryActivity extends FragmentContainerActivity implements
     @Override
     public void onCommitSelectedAsBase(Commit commit) {
         Intent result = new Intent();
-        result.putExtra("commit", commit);
+        result.putExtra(EXTRA_COMMIT, commit);
         setResult(RESULT_OK, result);
         finish();
     }

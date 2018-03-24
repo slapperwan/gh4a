@@ -51,6 +51,15 @@ import io.reactivex.Single;
 
 public class FileViewerActivity extends WebViewerActivity
         implements PopupMenu.OnMenuItemClickListener {
+
+    private static final String EXTRA_OWNER = "owner";
+    private static final String EXTRA_REPO = "repo";
+    private static final String EXTRA_PATH = "path";
+    private static final String EXTRA_REF = "ref";
+    private static final String EXTRA_HIGHLIGHT_START = "highlight_start";
+    private static final String EXTRA_HIGHLIGHT_END = "highlight_end";
+    private static final String EXTRA_TEXT_MATCH = "text_match";
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             String ref, String fullPath) {
         return makeIntent(context, repoOwner, repoName, ref, fullPath, -1, -1, null);
@@ -70,13 +79,13 @@ public class FileViewerActivity extends WebViewerActivity
     private static Intent makeIntent(Context context, String repoOwner, String repoName, String ref,
             String fullPath, int highlightStart, int highlightEnd, TextMatch textMatch) {
         return new Intent(context, FileViewerActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("path", fullPath)
-                .putExtra("ref", ref)
-                .putExtra("highlight_start", highlightStart)
-                .putExtra("highlight_end", highlightEnd)
-                .putExtra("text_match", textMatch);
+                .putExtra(EXTRA_OWNER, repoOwner)
+                .putExtra(EXTRA_REPO, repoName)
+                .putExtra(EXTRA_PATH, fullPath)
+                .putExtra(EXTRA_REF, ref)
+                .putExtra(EXTRA_HIGHLIGHT_START, highlightStart)
+                .putExtra(EXTRA_HIGHLIGHT_END, highlightEnd)
+                .putExtra(EXTRA_TEXT_MATCH, textMatch);
     }
 
     private String mRepoName;
@@ -121,13 +130,13 @@ public class FileViewerActivity extends WebViewerActivity
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
-        mPath = extras.getString("path");
-        mRef = extras.getString("ref");
-        mHighlightStart = extras.getInt("highlight_start", -1);
-        mHighlightEnd = extras.getInt("highlight_end", -1);
-        mTextMatch = extras.getParcelable("text_match");
+        mRepoOwner = extras.getString(EXTRA_OWNER);
+        mRepoName = extras.getString(EXTRA_REPO);
+        mPath = extras.getString(EXTRA_PATH);
+        mRef = extras.getString(EXTRA_REF);
+        mHighlightStart = extras.getInt(EXTRA_HIGHLIGHT_START, -1);
+        mHighlightEnd = extras.getInt(EXTRA_HIGHLIGHT_END, -1);
+        mTextMatch = extras.getParcelable(EXTRA_TEXT_MATCH);
     }
 
     @Override
