@@ -52,7 +52,7 @@ public class CommitAdapter extends RootAdapter<Commit, CommitAdapter.ViewHolder>
     @Override
     public void onBindViewHolder(ViewHolder holder, Commit commit) {
         User author = commit.author();
-        if (author != null && !TextUtils.isEmpty(author.name())) {
+        if (author != null && !TextUtils.isEmpty(author.login())) {
             AvatarHandler.assignAvatar(holder.ivGravatar, author);
         } else {
             GitUser commitAuthor = commit.commit().author();
