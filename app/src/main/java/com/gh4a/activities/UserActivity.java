@@ -12,41 +12,48 @@ import android.view.MenuItem;
 
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.UserFragment;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.users.UserService;
 
 public class UserActivity extends BaseFragmentPagerActivity {
-    public static Intent makeIntent(Context context, String login) {
-        return makeIntent(context, login, null);
-    }
-
     public static Intent makeIntent(Context context, User user) {
-        if (user == null) {
-            return null;
-        }
-        return makeIntent(context, user.login(), user.name());
+        // User responses from other endpoints are likely to not be complete, so
+        // we only use the login from it and reload all other info
+        return makeIntent(context, user != null ? user.login() : null);
     }
 
-    private static Intent makeIntent(Context context, String login, String name) {
+    public static Intent makeIntent(Context context, String login) {
         if (login == null) {
             return null;
         }
         return new Intent(context, UserActivity.class)
-                .putExtra("login", login)
-                .putExtra("name", name);
+                .putExtra("login", login);
     }
 
     private String mUserLogin;
-    private String mUserName;
+    private User mUser;
     private UserFragment mUserFragment;
+
+    private static final int ID_LOADER_USER = 0;
 
     private static final int[] TAB_TITLES = new int[] {
         R.string.about, R.string.user_public_activity
     };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentShown(false);
+        loadUser(false);
+    }
 
     @Nullable
     @Override
@@ -58,7 +65,6 @@ public class UserActivity extends BaseFragmentPagerActivity {
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
         mUserLogin = extras.getString("login");
-        mUserName = extras.getString("name");
     }
 
     @Override
@@ -67,10 +73,20 @@ public class UserActivity extends BaseFragmentPagerActivity {
     }
 
     @Override
+    public void onRefresh() {
+        mUser = null;
+        setContentShown(false);
+        invalidateTabs();
+        invalidateOptionsMenu();
+        loadUser(true);
+        super.onRefresh();
+    }
+
+    @Override
     protected Fragment makeFragment(int position) {
         switch (position) {
-            case 0: return UserFragment.newInstance(mUserLogin);
-            case 1: return PublicEventListFragment.newInstance(mUserLogin);
+            case 0: return UserFragment.newInstance(mUser);
+            case 1: return PublicEventListFragment.newInstance(mUser);
         }
         return null;
     }
@@ -109,6 +125,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
             bookmarkAction.setTitle(BookmarksProvider.hasBookmarked(this, url)
                     ? R.string.remove_bookmark
                     : R.string.bookmark);
+            bookmarkAction.setVisible(mUser != null);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -123,11 +140,13 @@ public class UserActivity extends BaseFragmentPagerActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         String url = "https://github.com/" + mUserLogin;
         switch (item.getItemId()) {
-            case R.id.share:
-                int subjectId = StringUtils.isBlank(mUserName)
+            case R.id.share: {
+                String userName = mUser != null ? mUser.name() : null;
+                int subjectId = StringUtils.isBlank(userName)
                         ? R.string.share_user_subject_loginonly : R.string.share_user_subject;
-                IntentUtils.share(this, getString(subjectId, mUserLogin, mUserName), url);
+                IntentUtils.share(this, getString(subjectId, mUserLogin, userName), url);
                 return true;
+            }
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(url));
                 return true;
@@ -136,10 +155,23 @@ public class UserActivity extends BaseFragmentPagerActivity {
                     BookmarksProvider.removeBookmark(this, url);
                 } else {
                     BookmarksProvider.saveBookmark(this, mUserLogin,
-                            BookmarksProvider.Columns.TYPE_USER, url, mUserName, true);
+                            BookmarksProvider.Columns.TYPE_USER, url, mUser.name(), true);
                 }
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadUser(boolean force) {
+        UserService service = ServiceFactory.get(UserService.class, force);
+        service.getUser(mUserLogin)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(makeLoaderSingle(ID_LOADER_USER, force))
+                .subscribe(result -> {
+                    mUser = result;
+                    invalidateTabs();
+                    setContentShown(true);
+                    invalidateOptionsMenu();
+                }, this::handleLoadFailure);
     }
 }

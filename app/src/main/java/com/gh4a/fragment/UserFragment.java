@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
@@ -49,7 +48,6 @@ import com.meisolsson.githubsdk.model.UserType;
 import com.meisolsson.githubsdk.service.organizations.OrganizationService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 import com.meisolsson.githubsdk.service.users.UserFollowerService;
-import com.meisolsson.githubsdk.service.users.UserService;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -57,40 +55,33 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Single;
-import io.reactivex.disposables.Disposable;
 import retrofit2.Response;
 
 public class UserFragment extends LoadingFragmentBase implements View.OnClickListener {
-    public static UserFragment newInstance(String login) {
+    public static UserFragment newInstance(User user) {
         UserFragment f = new UserFragment();
 
         Bundle args = new Bundle();
-        args.putString("login", login);
+        args.putParcelable("user", user);
         f.setArguments(args);
 
         return f;
     }
 
-    private static final int ID_LOADER_USER = 0;
-    private static final int ID_LOADER_REPO_LIST = 1;
-    private static final int ID_LOADER_ORG_LIST = 2;
-    private static final int ID_LOADER_IS_FOLLOWING = 3;
+    private static final int ID_LOADER_REPO_LIST = 0;
+    private static final int ID_LOADER_ORG_LIST = 1;
+    private static final int ID_LOADER_IS_FOLLOWING = 2;
 
-    private String mUserLogin;
     private User mUser;
     private View mContentView;
     private Boolean mIsFollowing;
     private boolean mIsSelf;
 
-    private Disposable mOrgListSubscription;
-    private Disposable mIsFollowingSubscription;
-    private Disposable mTopRepoSubscription;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUserLogin = getArguments().getString("login");
-        mIsSelf = ApiHelpers.loginEquals(mUserLogin, Gh4Application.get().getAuthLogin());
+        mUser = getArguments().getParcelable("user");
+        mIsSelf = ApiHelpers.loginEquals(mUser, Gh4Application.get().getAuthLogin());
         setHasOptionsMenu(true);
     }
 
@@ -102,38 +93,22 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
     @Override
     public void onRefresh() {
-        mUser = null;
         mIsFollowing = false;
-        if (mContentView != null) {
-            fillOrganizations(null);
-            fillTopRepos(null);
-        }
-        setContentShown(false);
-        loadUser(true);
-        if (mTopRepoSubscription != null) {
-            mTopRepoSubscription.dispose();
-            mTopRepoSubscription = null;
-        }
-        if (mIsFollowingSubscription != null) {
-            loadIsFollowingState(true);
-        }
-        if (mOrgListSubscription != null) {
-            mOrgListSubscription.dispose();
-            mOrgListSubscription = null;
-        }
-        getActivity().invalidateOptionsMenu();
+        loadTopRepositories(true);
+        loadOrganizationsIfUser(true);
+        loadIsFollowingStateIfNeeded(true);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setContentShown(false);
+        fillData();
+        loadTopRepositories(false);
+        loadOrganizationsIfUser(false);
+        loadIsFollowingStateIfNeeded(false);
 
-        loadUser(false);
-        if (!mIsSelf && Gh4Application.get().isAuthorized()) {
-            loadIsFollowingState(false);
-        }
+        setContentShown(true);
     }
 
     @Override
@@ -176,7 +151,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         return super.onOptionsItemSelected(item);
     }
 
-    private void fillData(boolean forceLoad) {
+    private void fillData() {
         ImageView gravatar = mContentView.findViewById(R.id.iv_gravatar);
         AvatarHandler.assignAvatar(gravatar, mUser);
 
@@ -233,13 +208,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         fillTextView(R.id.tv_website, mUser.blog());
         fillTextView(R.id.tv_company, mUser.company());
         fillTextView(R.id.tv_location, mUser.location());
-
-        loadTopRepositories(forceLoad);
-        if (mUser.type() == UserType.User) {
-            loadOrganizations(forceLoad);
-        } else {
-            fillOrganizations(null);
-        }
     }
 
     private void fillCountIfUser(int layoutId, int countId, int count) {
@@ -270,19 +238,19 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
 
         if (id == R.id.cell_followers) {
             if (mUser.type() == UserType.Organization) {
-                intent = OrganizationMemberListActivity.makeIntent(getActivity(), mUserLogin);
+                intent = OrganizationMemberListActivity.makeIntent(getActivity(), mUser.login());
             } else {
-                intent = FollowerFollowingListActivity.makeIntent(getActivity(), mUserLogin, true);
+                intent = FollowerFollowingListActivity.makeIntent(getActivity(), mUser.login(), true);
             }
         } else if (id == R.id.cell_following) {
-            intent = FollowerFollowingListActivity.makeIntent(getActivity(), mUserLogin, false);
+            intent = FollowerFollowingListActivity.makeIntent(getActivity(), mUser.login(), false);
         } else if (id == R.id.cell_repos || id == R.id.btn_repos) {
-            intent = RepositoryListActivity.makeIntent(getActivity(), mUserLogin,
+            intent = RepositoryListActivity.makeIntent(getActivity(), mUser.login(),
                     mUser.type() == UserType.Organization);
         } else if (id == R.id.cell_gists) {
-            intent = GistListActivity.makeIntent(getActivity(), mUserLogin);
+            intent = GistListActivity.makeIntent(getActivity(), mUser.login());
         } else if (id == R.id.cell_org_members) {
-            intent = OrganizationMemberListActivity.makeIntent(getActivity(), mUserLogin);
+            intent = OrganizationMemberListActivity.makeIntent(getActivity(), mUser.login());
         } else if (view.getTag() instanceof Repository) {
             intent = RepositoryActivity.makeIntent(getActivity(), (Repository) view.getTag());
         } else if (view.getTag() instanceof User) {
@@ -294,6 +262,7 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     }
 
     private void fillTopRepos(Collection<Repository> topRepos) {
+        View progress = mContentView.findViewById(R.id.pb_top_repos);
         LinearLayout ll = mContentView.findViewById(R.id.ll_top_repos);
         ll.removeAllViews();
 
@@ -336,8 +305,8 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
             ll.addView(hintView);
         }
 
-        getView().findViewById(R.id.pb_top_repos).setVisibility(View.GONE);
-        getView().findViewById(R.id.ll_top_repos).setVisibility(View.VISIBLE);
+        ll.setVisibility(View.VISIBLE);
+        progress.setVisibility(View.GONE);
     }
 
     private void fillOrganizations(List<User> organizations) {
@@ -381,8 +350,8 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
     private void toggleFollowingState() {
         UserFollowerService service = ServiceFactory.get(UserFollowerService.class, false);
         Single<Response<Void>> responseSingle = mIsFollowing
-                ? service.unfollowUser(mUserLogin)
-                : service.followUser(mUserLogin);
+                ? service.unfollowUser(mUser.login())
+                : service.followUser(mUser.login());
         responseSingle.map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(RxUtils::doInBackground)
                 .subscribe(result -> {
@@ -393,20 +362,6 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
                     handleActionFailure("Toggling following state failed", error);
                     getActivity().invalidateOptionsMenu();
                 });
-    }
-
-    private void loadUser(boolean force) {
-        UserService service = ServiceFactory.get(UserService.class, force);
-        service.getUser(mUserLogin)
-                .map(ApiHelpers::throwOnFailure)
-                .compose(makeLoaderSingle(ID_LOADER_USER, force))
-                .subscribe(result -> {
-                    mUser = result;
-                    fillData(force);
-                    setContentShown(true);
-                    getActivity().invalidateOptionsMenu();
-                }, this::handleLoadFailure);
-
     }
 
     private void loadTopRepositories(boolean force) {
@@ -420,32 +375,43 @@ public class UserFragment extends LoadingFragmentBase implements View.OnClickLis
         if (mIsSelf) {
             observable = service.getUserRepositories(filterData, 1);
         } else if (mUser.type() == UserType.Organization) {
-            observable = service.getOrganizationRepositories(mUserLogin, filterData, 1);
+            observable = service.getOrganizationRepositories(mUser.login(), filterData, 1);
         } else {
-            observable = service.getUserRepositories(mUserLogin, filterData, 1);
+            observable = service.getUserRepositories(mUser.login(), filterData, 1);
         }
 
-        mTopRepoSubscription = observable
-                .map(ApiHelpers::throwOnFailure)
+        observable.map(ApiHelpers::throwOnFailure)
                 .map(Page::items)
                 .compose(makeLoaderSingle(ID_LOADER_REPO_LIST, force))
+                .doOnSubscribe(disposable -> {
+                    mContentView.findViewById(R.id.pb_top_repos).setVisibility(View.VISIBLE);
+                    mContentView.findViewById(R.id.ll_top_repos).setVisibility(View.GONE);
+                })
                 .subscribe(this::fillTopRepos, this::handleLoadFailure);
     }
 
-    private void loadOrganizations(boolean force) {
+    private void loadOrganizationsIfUser(boolean force) {
+        if (mUser.type() != UserType.User) {
+            fillOrganizations(null);
+            return;
+        }
+
         final OrganizationService service = ServiceFactory.get(OrganizationService.class, force);
-        mOrgListSubscription = ApiHelpers.PageIterator
+        ApiHelpers.PageIterator
                 .toSingle(page -> mIsSelf
                         ? service.getMyOrganizations(page)
-                        : service.getUserPublicOrganizations(mUserLogin, page)
+                        : service.getUserPublicOrganizations(mUser.login(), page)
                 )
                 .compose(makeLoaderSingle(ID_LOADER_ORG_LIST, force))
                 .subscribe(this::fillOrganizations, this::handleLoadFailure);
     }
 
-    private void loadIsFollowingState(boolean force) {
+    private void loadIsFollowingStateIfNeeded(boolean force) {
+        if (mIsSelf || !Gh4Application.get().isAuthorized()) {
+            return;
+        }
         UserFollowerService service = ServiceFactory.get(UserFollowerService.class, force);
-        mIsFollowingSubscription = service.isFollowing(mUserLogin)
+        service.isFollowing(mUser.login())
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_IS_FOLLOWING, force))
                 .subscribe(result -> {
