@@ -275,7 +275,7 @@ public class PullRequestFragment extends IssueFragmentBase {
 
             for (ReviewComment commitComment : commitComments) {
                 GitHubFile file = filesByName.get(commitComment.path());
-                if (commitComment.pullRequestReviewId() != 0) {
+                if (commitComment.pullRequestReviewId() != null) {
                     String id = TimelineItem.Diff.getDiffHunkId(commitComment);
 
                     TimelineItem.TimelineReview review = reviewsBySpecialId.get(id);

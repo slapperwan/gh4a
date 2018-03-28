@@ -331,14 +331,18 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         String url = "https://github.com/" + mRepoOwner + "/" + mRepoName;
         switch (item.getItemId()) {
             case R.id.watch:
-                item.setActionView(R.layout.ab_loading);
-                item.expandActionView();
-                toggleWatchingState();
+                if (mIsWatching != null) {
+                    item.setActionView(R.layout.ab_loading);
+                    item.expandActionView();
+                    toggleWatchingState();
+                }
                 return true;
             case R.id.star:
-                item.setActionView(R.layout.ab_loading);
-                item.expandActionView();
-                toggleStarringState();
+                if (mIsStarring != null) {
+                    item.setActionView(R.layout.ab_loading);
+                    item.expandActionView();
+                    toggleStarringState();
+                }
                 return true;
             case R.id.ref:
                 loadOrShowRefSelection();

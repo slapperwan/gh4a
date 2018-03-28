@@ -231,26 +231,22 @@ class EventViewHolder
         int pos = text.toString().indexOf("[commit]");
         if (event.commitId() != null && pos >= 0) {
             text.replace(pos, pos + 8, event.commitId().substring(0, 7));
-            text.setSpan(new IntentSpan(mContext) {
-                @Override
-                protected Intent getIntent() {
-                    // The commit might be in a different repo. The API doesn't provide
-                    // that information directly, so get it indirectly by parsing the URL
-                    String repoOwner = mRepoOwner;
-                    String repoName = mRepoName;
-                    String url = event.commitUrl();
-                    if (url != null) {
-                        Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
-                        if (matcher.find()) {
-                            repoOwner = matcher.group(1);
-                            repoName = matcher.group(2);
-                        }
+            text.setSpan(new IntentSpan(mContext, context -> {
+                // The commit might be in a different repo. The API doesn't provide
+                // that information directly, so get it indirectly by parsing the URL
+                String repoOwner = mRepoOwner;
+                String repoName = mRepoName;
+                String url = event.commitUrl();
+                if (url != null) {
+                    Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
+                    if (matcher.find()) {
+                        repoOwner = matcher.group(1);
+                        repoName = matcher.group(2);
                     }
-
-                    return CommitActivity.makeIntent(mContext, repoOwner, repoName,
-                            event.commitId());
                 }
-            }, pos, pos + 7, 0);
+
+                return CommitActivity.makeIntent(context, repoOwner, repoName, event.commitId());
+            }), pos, pos + 7, 0);
             text.setSpan(new TypefaceSpan("monospace"), pos, pos + 7, 0);
         }
 

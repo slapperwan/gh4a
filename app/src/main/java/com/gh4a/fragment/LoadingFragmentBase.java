@@ -86,11 +86,17 @@ public abstract class LoadingFragmentBase extends Fragment implements
     }
 
     protected void handleLoadFailure(Throwable error) {
-        getBaseActivity().handleLoadFailure(error);
+        BaseActivity activity = getBaseActivity();
+        if (activity != null) {
+            activity.handleLoadFailure(error);
+        }
     }
 
     protected void handleActionFailure(String text, Throwable error) {
-        getBaseActivity().handleActionFailure(text, error);
+        BaseActivity activity = getBaseActivity();
+        if (activity != null) {
+            activity.handleActionFailure(text, error);
+        }
     }
 
     protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {

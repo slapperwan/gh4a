@@ -439,7 +439,7 @@ public class HttpImageGetter {
     }
 
     private Drawable loadImageForUrl(String source) {
-        HttpUrl url = HttpUrl.parse(source);
+        HttpUrl url = source != null ? HttpUrl.parse(source) : null;
         Bitmap bitmap = null;
 
         if (!mDestroyed && url != null) {

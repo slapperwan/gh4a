@@ -184,16 +184,13 @@ public class RepositoryFragment extends LoadingFragmentBase implements OnClickLi
 
     private void fillData() {
         TextView tvRepoName = mContentView.findViewById(R.id.tv_repo_name);
+        IntentSpan repoSpan = new IntentSpan(tvRepoName.getContext(),
+                context -> UserActivity.makeIntent(context, mRepository.owner()));
         SpannableStringBuilder repoName = new SpannableStringBuilder();
         repoName.append(mRepository.owner().login());
         repoName.append("/");
         repoName.append(mRepository.name());
-        repoName.setSpan(new IntentSpan(tvRepoName.getContext()) {
-            @Override
-            protected Intent getIntent() {
-                return UserActivity.makeIntent(getActivity(), mRepository.owner());
-            }
-        }, 0, mRepository.owner().login().length(), 0);
+        repoName.setSpan(repoSpan, 0, mRepository.owner().login().length(), 0);
         tvRepoName.setText(repoName);
         tvRepoName.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 

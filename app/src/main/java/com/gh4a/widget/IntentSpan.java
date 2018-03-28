@@ -9,16 +9,22 @@ import android.view.View;
 
 import com.gh4a.utils.UiUtils;
 
-public abstract class IntentSpan extends ClickableSpan {
+public class IntentSpan extends ClickableSpan {
     private final Context mContext;
+    private final IntentCallback mCallback;
 
-    public IntentSpan(Context context) {
+    public interface IntentCallback {
+        Intent getIntent(Context context);
+    }
+
+    public IntentSpan(@NonNull Context context, @NonNull IntentCallback cb) {
         mContext = context;
+        mCallback = cb;
     }
 
     @Override
     public void onClick(View view) {
-        Intent intent = getIntent();
+        Intent intent = mCallback.getIntent(mContext);
         if (intent != null) {
             mContext.startActivity(intent);
         }
@@ -29,6 +35,4 @@ public abstract class IntentSpan extends ClickableSpan {
         ds.setUnderlineText(false);
         ds.setColor(UiUtils.resolveColor(mContext, android.R.attr.textColorLink));
     }
-
-    protected abstract Intent getIntent();
 }

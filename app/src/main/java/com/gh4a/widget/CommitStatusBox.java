@@ -118,8 +118,10 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
 
         for (Status status : statuses) {
             View statusRow = mInflater.inflate(R.layout.row_commit_status, mStatusContainer, false);
-            statusRow.setTag(status);
-            statusRow.setOnClickListener(this);
+            if (status.targetUrl() != null) {
+                statusRow.setTag(status);
+                statusRow.setOnClickListener(this);
+            }
 
             final int iconDrawableAttrId;
             switch (status.state()) {
