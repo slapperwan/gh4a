@@ -125,7 +125,10 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
                 .map(ApiHelpers::throwOnFailure)
                 .onErrorResumeNext(error -> {
                     if (error instanceof ApiRequestException) {
-                        if (((ApiRequestException) error).getStatus() == HttpURLConnection.HTTP_NOT_FOUND) {
+                        ApiRequestException are = (ApiRequestException) error;
+                        if (are.getStatus() == HttpURLConnection.HTTP_NOT_FOUND
+                                && mBaseLabel != null
+                                && mHeadLabel != null) {
                             // We got a 404; likely the history of the base branch was rewritten. Try the labels.
                             return service.compareCommits(mRepoOwner, mRepoName, mBaseLabel, mHeadLabel)
                                     .map(ApiHelpers::throwOnFailure);
