@@ -14,8 +14,11 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
+import android.support.annotation.StyleRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -216,7 +219,7 @@ public class UiUtils {
     }
 
     public static Context makeHeaderThemedContext(Context context) {
-        int themeResId = resolveDrawable(context, R.attr.headerTheme);
+        @StyleRes int themeResId = resolveDrawable(context, R.attr.headerTheme);
         if (themeResId != 0) {
             return new ContextThemeWrapper(context, themeResId);
         }
@@ -233,7 +236,7 @@ public class UiUtils {
                 .create();
     }
 
-    public static int resolveDrawable(Context context, int styledAttributeId) {
+    public static int resolveDrawable(Context context, @AttrRes int styledAttributeId) {
         TypedArray a = context.obtainStyledAttributes(new int[] {
             styledAttributeId
         });
@@ -242,7 +245,7 @@ public class UiUtils {
         return resource;
     }
 
-    public static int resolveColor(Context context, int styledAttributeId) {
+    public static @ColorInt int resolveColor(Context context, @AttrRes int styledAttributeId) {
         TypedArray a = context.obtainStyledAttributes(new int[] {
             styledAttributeId
         });

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.IdRes;
@@ -140,7 +141,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
             return;
         }
 
-        @ColorRes  int colorResId = checkedItemId == R.id.notifications
+        @AttrRes int colorResId = checkedItemId == R.id.notifications
                 ? R.attr.colorAccent : android.R.attr.textColorPrimary;
         @ColorInt int tint = UiUtils.resolveColor(this, colorResId);
         DrawableCompat.setTint(mNotificationsIndicatorIcon, tint);
