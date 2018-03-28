@@ -557,7 +557,7 @@
     <string name="unread_notifications_summary_title">Unread GitHub notifications</string>
     <plurals name="unread_notifications_summary_text">
         <item quantity="zero">No unread notifications</item>
-        <item quantity="one">One unread notification</item>
+        <item quantity="one">1 unread notification</item>
         <item quantity="other">%1$d unread notifications</item>
     </plurals>
     <plurals name="notification">
