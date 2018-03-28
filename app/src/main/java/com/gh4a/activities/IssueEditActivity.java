@@ -551,7 +551,7 @@ public class IssueEditActivity extends BasePagerActivity implements
             builder.body(mEditIssue.body());
         }
         if (!ObjectsCompat.equals(mEditIssue.milestone(), mOriginalIssue.milestone())) {
-            builder.milestone(milestone != null ? milestone.id() : null);
+            builder.milestone(milestone != null ? milestone.number() : null);
         }
         if (!ObjectsCompat.equals(mEditIssue.assignees(), mOriginalIssue.assignees())) {
             List<String> assignees = new ArrayList<>();
