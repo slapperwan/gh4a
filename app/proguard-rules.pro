@@ -17,8 +17,7 @@
 # Keep SimpleXML
 -keep class org.simpleframework.xml.**{ *; }
 -keepclassmembers class * {
-    @org.simpleframework.xml.* <fields>;
-    @org.simpleframework.xml.* <init>(...);
+    @org.simpleframework.xml.** *;
 }
 # Keep attributes for SimpleXML
 -keepattributes ElementList, Root
