@@ -71,7 +71,7 @@ public class IssueListFactory extends FragmentFactory {
                 action, mLogin);
 
         return IssueListFragment.newInstance(query,
-                mDrawerHelper.getSortMode(), mDrawerHelper.getSortMode(),
+                mDrawerHelper.getSortMode(), mDrawerHelper.getSortOrder(),
                 mShowingClosed ? ApiHelpers.IssueState.CLOSED : ApiHelpers.IssueState.OPEN,
                 mIsPullRequest ? R.string.no_pull_requests_found : R.string.no_issues_found,
                 true);
