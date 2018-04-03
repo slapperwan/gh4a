@@ -459,7 +459,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
 
         responseSingle.compose(RxUtils::doInBackground)
                 .subscribe(result -> {
-                    if (mIsWatching == null) {
+                    if (mIsWatching != null) {
                         mIsWatching = !mIsWatching;
                     }
                     supportInvalidateOptionsMenu();
