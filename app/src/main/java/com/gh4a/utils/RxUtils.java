@@ -152,12 +152,22 @@ public class RxUtils {
             @Override
             public SingleSource<T> apply(Single<T> upstream) {
                 return upstream
-                        .doOnError(error -> showSnackbar())
+                        .doOnError(error -> showSnackbar(error))
                         .retryWhen(handler -> handler.flatMap(error -> mRetryProcessor));
             }
 
-            private void showSnackbar() {
+            private void showSnackbar(Throwable error) {
                 Snackbar.make(rootLayout, errorMessage, Snackbar.LENGTH_LONG)
+                        .addCallback(new Snackbar.BaseCallback<Snackbar>() {
+                            @Override
+                            public void onDismissed(Snackbar snackbar, int event) {
+                                // Propagate error if opportunity to retry isn't used, either
+                                // by dismissing the Snackbar or letting it time out
+                                if (event == DISMISS_EVENT_SWIPE || event == DISMISS_EVENT_TIMEOUT) {
+                                    mRetryProcessor.onError(error);
+                                }
+                            }
+                        })
                         .setAction(R.string.retry, view -> mRetryProcessor.onNext(0))
                         .show();
             }
