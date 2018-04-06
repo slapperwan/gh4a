@@ -34,7 +34,6 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,7 +51,6 @@ public class ContentListContainerFragment extends Fragment implements
     private static final int ID_LOADER_MODULEMAP = 100;
 
     private static final String STATE_KEY_DIR_STACK = "dir_stack";
-    private static final String STATE_KEY_CONTENT_CACHE_PREFIX = "content_cache_";
     private static final String STATE_KEY_INITIAL_PATH = "initial_path";
 
     private RxLoader mRxLoader;
@@ -65,16 +63,7 @@ public class ContentListContainerFragment extends Fragment implements
     private ArrayList<String> mInitialPathToLoad;
     private boolean mStateSaved;
     private CommitSelectionCallback mCommitCallback;
-    private final Map<String, ArrayList<Content>> mContentCache =
-            new LinkedHashMap<String, ArrayList<Content>>() {
-        private static final long serialVersionUID = -2379579224736389357L;
-        private static final int MAX_CACHE_ENTRIES = 100;
-
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<String, ArrayList<Content>> eldest) {
-            return size() > MAX_CACHE_ENTRIES;
-        }
-    };
+    private ContentListCacheFragment mCacheFragment;
 
     public static ContentListContainerFragment newInstance(Repository repository,
             String ref, String initialPath) {
@@ -97,20 +86,17 @@ public class ContentListContainerFragment extends Fragment implements
         mSelectedRef = getArguments().getString("ref");
         mStateSaved = false;
 
+        mCacheFragment = (ContentListCacheFragment)
+                getFragmentManager().findFragmentByTag("content_list_cache");
+        if (mCacheFragment == null) {
+            mCacheFragment = new ContentListCacheFragment();
+            getFragmentManager().beginTransaction()
+                    .add(mCacheFragment, "content_list_cache")
+                    .commitAllowingStateLoss();
+        }
+
         if (savedInstanceState != null) {
             mDirStack.addAll(savedInstanceState.getStringArrayList(STATE_KEY_DIR_STACK));
-
-            int prefixLen = STATE_KEY_CONTENT_CACHE_PREFIX.length();
-            for (String key : savedInstanceState.keySet()) {
-                if (key.startsWith(STATE_KEY_CONTENT_CACHE_PREFIX)) {
-                    String cacheKey = key.substring(prefixLen);
-                    if (cacheKey.equals("/")) {
-                        cacheKey = null;
-                    }
-                    ArrayList<Content> content = savedInstanceState.getParcelableArrayList(key);
-                    mContentCache.put(cacheKey, content);
-                }
-            }
             mInitialPathToLoad = savedInstanceState.getStringArrayList(STATE_KEY_INITIAL_PATH);
         } else {
             mDirStack.push("");
@@ -163,7 +149,7 @@ public class ContentListContainerFragment extends Fragment implements
 
         mDirStack.clear();
         mDirStack.push("");
-        mContentCache.clear();
+        mCacheFragment.clear();
         mContentListFragment = null;
         getChildFragmentManager().popBackStackImmediate(null,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
@@ -204,10 +190,6 @@ public class ContentListContainerFragment extends Fragment implements
         super.onSaveInstanceState(outState);
         outState.putStringArrayList(STATE_KEY_DIR_STACK, new ArrayList<>(mDirStack));
         outState.putStringArrayList(STATE_KEY_INITIAL_PATH, mInitialPathToLoad);
-        for (Map.Entry<String, ArrayList<Content>> entry : mContentCache.entrySet()) {
-            String key = entry.getKey();
-            outState.putParcelableArrayList(STATE_KEY_CONTENT_CACHE_PREFIX + key, entry.getValue());
-        }
         mStateSaved = true;
     }
 
@@ -216,7 +198,7 @@ public class ContentListContainerFragment extends Fragment implements
         if (contents == null) {
             return;
         }
-        mContentCache.put(fragment.getPath(), new ArrayList<>(contents));
+        mCacheFragment.addToCache(fragment.getPath(), contents);
         if (fragment.getPath() == null) {
             for (Content content : contents) {
                 if (content.type() == ContentType.File && content.name().equals(".gitmodules")) {
@@ -304,7 +286,7 @@ public class ContentListContainerFragment extends Fragment implements
         String path = mDirStack.peek();
         mContentListFragment = ContentListFragment.newInstance(mRepository,
                 TextUtils.isEmpty(path) ? null : path,
-                mContentCache.get(path), mSelectedRef);
+                mCacheFragment.getFromCache(path), mSelectedRef);
 
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         if (path != null) {
