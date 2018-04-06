@@ -209,11 +209,6 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
 
     @Override
     protected Single<List<Content>> onCreateDataSingle(boolean bypassCache) {
-        ArrayList<Content> contents = getArguments().getParcelableArrayList("contents");
-        if (contents != null && !contents.isEmpty()) {
-            return Single.just(contents);
-        }
-
         RepositoryContentService contentService =
                 ServiceFactory.get(RepositoryContentService.class, bypassCache);
         String repoOwner = mRepository.owner().login();
@@ -224,5 +219,11 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
                 .toSingle(page -> contentService.getDirectoryContents(repoOwner, repoName, mPath, ref, page))
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, new ArrayList<Content>()))
                 .compose(RxUtils.sortList(COMPARATOR));
+    }
+
+    @Override
+    protected List<Content> onGetInitialData() {
+        ArrayList<Content> contents = getArguments().getParcelableArrayList("contents");
+        return contents != null && !contents.isEmpty() ? contents : null;
     }
 }

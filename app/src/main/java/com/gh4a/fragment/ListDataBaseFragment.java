@@ -58,16 +58,26 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
     }
 
     private void loadData(boolean force) {
-        mSubscription = onCreateDataSingle(force)
-                .compose(makeLoaderSingle(0, force))
-                .subscribe(result -> {
-                    mAdapter.clear();
-                    onAddData(mAdapter, result);
-                    setContentShown(true);
-                    updateEmptyState();
-                }, this::handleLoadFailure);
+        List<T> initialData = force ? null : onGetInitialData();
+        if (initialData != null) {
+            handleNewData(initialData);
+        } else {
+            mSubscription = onCreateDataSingle(force)
+                    .compose(makeLoaderSingle(0, force))
+                    .subscribe(this::handleNewData, this::handleLoadFailure);
+        }
+    }
+
+    private void handleNewData(List<T> result) {
+        mAdapter.clear();
+        onAddData(mAdapter, result);
+        setContentShown(true);
+        updateEmptyState();
     }
 
     protected abstract Single<List<T>> onCreateDataSingle(boolean bypassCache);
+    protected List<T> onGetInitialData() {
+        return null;
+    }
     protected abstract RootAdapter<T, ? extends RecyclerView.ViewHolder> onCreateAdapter();
 }

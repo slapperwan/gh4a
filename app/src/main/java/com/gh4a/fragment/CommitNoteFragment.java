@@ -227,17 +227,18 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
 
     @Override
     protected Single<List<GitComment>> onCreateDataSingle(boolean bypassCache) {
-        List<GitComment> comments = getArguments().getParcelableArrayList("comments");
-        if (comments != null && !comments.isEmpty()) {
-            return Single.just(comments);
-        }
-
         final RepositoryCommentService service =
                 ServiceFactory.get(RepositoryCommentService.class, bypassCache);
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mObjectSha, page))
                 .compose(RxUtils.filter(comment -> comment.position() == null));
+    }
+
+    @Override
+    protected List<GitComment> onGetInitialData() {
+        List<GitComment> comments = getArguments().getParcelableArrayList("comments");
+        return comments != null && !comments.isEmpty() ? comments : null;
     }
 
     @Override
