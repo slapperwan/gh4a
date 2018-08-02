@@ -18,6 +18,7 @@ import org.simpleframework.xml.core.Persister;
 import org.simpleframework.xml.transform.RegistryMatcher;
 import org.simpleframework.xml.transform.Transform;
 
+import java.net.HttpURLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,20 +40,20 @@ public class SingleFactory {
     public static Single<Boolean> isAppUserRepoCollaborator(String repoOwner, String repoName,
             boolean bypassCache) {
         Gh4Application app = Gh4Application.get();
-        RepositoryCollaboratorService service =
-                ServiceFactory.get(RepositoryCollaboratorService.class, bypassCache);
-
         if (!app.isAuthorized()) {
             return Single.just(false);
         }
 
+        RepositoryCollaboratorService service =
+                ServiceFactory.get(RepositoryCollaboratorService.class, bypassCache);
+
         return service.isUserCollaborator(repoOwner, repoName, app.getAuthLogin())
                 .map(ApiHelpers::throwOnFailure)
+                // there's no actual content, result is always null
+                .map(result -> true)
                 // the API returns 403 if the user doesn't have push access,
                 // which in turn means he isn't a collaborator
-                .compose(RxUtils.mapFailureToValue(403, false))
-                // there's no actual content, result is always null
-                .map(result -> true);
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_FORBIDDEN, false));
     }
 
     public static Single<NotificationListLoadResult> getNotifications(boolean all,
