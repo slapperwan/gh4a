@@ -36,8 +36,8 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
-import com.gh4a.widget.PullRequestBranchInfoView;
 import com.gh4a.widget.CommitStatusBox;
+import com.gh4a.widget.PullRequestBranchInfoView;
 
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.GitHubFile;
@@ -298,7 +298,7 @@ public class PullRequestFragment extends IssueFragmentBase {
         }));
 
         Single<List<TimelineItem.TimelineComment>> commitCommentWithoutReviewSingle = Single.zip(
-                prCommentSingle.compose(RxUtils.filter(comment -> comment.pullRequestReviewId() == 0)),
+                prCommentSingle.compose(RxUtils.filter(comment -> comment.pullRequestReviewId() == null)),
                 filesByNameSingle,
                 (comments, files) -> {
                     List<TimelineItem.TimelineComment> items = new ArrayList<>();
