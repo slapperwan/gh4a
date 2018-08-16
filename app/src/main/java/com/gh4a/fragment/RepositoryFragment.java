@@ -324,7 +324,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
 
     private void updateWatcherUi() {
         mWatcherRow.setText(getResources().getQuantityString(R.plurals.watcher,
-                mRepository.watchersCount(), mRepository.watchersCount()));
+                mRepository.subscribersCount(), mRepository.subscribersCount()));
         mWatcherRow.setToggleState(mIsWatching != null && mIsWatching);
     }
 
@@ -491,7 +491,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
                     if (mIsWatching != null) {
                         mIsWatching = !mIsWatching;
                         mRepository = mRepository.toBuilder()
-                                .watchersCount(mRepository.watchersCount() + (mIsWatching ? 1 : -1))
+                                .subscribersCount(mRepository.subscribersCount() + (mIsWatching ? 1 : -1))
                                 .build();
                         updateWatcherUi();
                     }
