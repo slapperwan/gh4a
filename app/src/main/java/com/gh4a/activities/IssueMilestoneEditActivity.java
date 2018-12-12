@@ -56,6 +56,7 @@ import com.gh4a.widget.MarkdownPreviewWebView;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.model.request.issue.CreateMilestone;
+import com.meisolsson.githubsdk.model.request.issue.EditMilestone;
 import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 
 import java.util.Calendar;
@@ -322,9 +323,8 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         }
     }
 
-    private void saveMilestone(String title, String desc) {
-        String errorMessage = getString(R.string.issue_error_create_milestone, title);
-        IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
+    private Single<Response<Milestone>> createMilestone(String title, String desc,
+            IssueMilestoneService service) {
         CreateMilestone request = CreateMilestone.builder()
                 .title(title)
                 .description(desc)
@@ -332,9 +332,28 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 .dueOn(mMilestone.dueOn())
                 .build();
 
+        return service.createMilestone(mRepoOwner, mRepoName, request);
+    }
+
+    private Single<Response<Milestone>> editMilestone(String title, String desc,
+            IssueMilestoneService service) {
+        EditMilestone request = EditMilestone.builder()
+                .title(title)
+                .description(desc)
+                .state(mMilestone.state())
+                .dueOn(mMilestone.dueOn())
+                .build();
+
+        return service.editMilestone(mRepoOwner, mRepoName, mMilestone.id(), request);
+    }
+
+    private void saveMilestone(String title, String desc) {
+        @StringRes int errorMessageResId = isInEditMode()
+                ? R.string.issue_error_edit_milestone : R.string.issue_error_create_milestone;
+        String errorMessage = getString(errorMessageResId, title);
+        IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
         Single<Response<Milestone>> responseSingle = isInEditMode()
-                ? service.editMilestone(mRepoOwner, mRepoName, mMilestone.id(), request)
-                : service.createMilestone(mRepoOwner, mRepoName, request);
+                ? createMilestone(title, desc, service) : editMilestone(title, desc, service);
 
         responseSingle
                 .map(ApiHelpers::throwOnFailure)
@@ -363,7 +382,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 open ? R.string.issue_milestone_reopen_error : R.string.issue_milestone_close_error,
                 mMilestone.title());
         IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
-        CreateMilestone request = CreateMilestone.builder()
+        EditMilestone request = EditMilestone.builder()
                 .state(open ? IssueState.Open : IssueState.Closed)
                 .build();
 

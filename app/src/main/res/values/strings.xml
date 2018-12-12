@@ -386,6 +386,7 @@
     <string name="issue_error_edit_label">Editing label \'%1$s\' failed</string>
     <string name="issue_error_delete_label">Deletion of label \'%1$s\' failed</string>
     <string name="issue_error_create_milestone">Creation of milestone \'%1$s\' failed.</string>
+    <string name="issue_error_edit_milestone">Editing milestone \'%1$s\' failed.</string>
     <string name="issue_error_delete_milestone">Deletion of milestone failed.</string>
     <string name="issue_error_milestone_title">Please enter a title</string>
     <string name="issue_label_new">New Label</string>
