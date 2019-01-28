@@ -93,7 +93,9 @@ public class NotificationHandlingService extends IntentService {
                 break;
             case ACTION_OPEN_NOTIFICATION:
                 if (repoOwner != null && repoName != null) {
-                    startActivity(HomeActivity.makeNotificationsIntent(this, repoOwner, repoName));
+                    Intent notifIntent = HomeActivity.makeNotificationsIntent(this, repoOwner, repoName)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(notifIntent);
                 }
                 break;
         }
