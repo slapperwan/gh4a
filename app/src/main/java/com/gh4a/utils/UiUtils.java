@@ -257,10 +257,12 @@ public class UiUtils {
     private static void enqueueDownload(Context context, Uri uri, String fileName,
             String description, String mimeType, String mediaType, boolean wifiOnly) {
         final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        DownloadManager.Request request = new DownloadManager.Request(uri);
+        DownloadManager.Request request = new DownloadManager.Request(uri)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
+                .setDescription(description)
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setAllowedOverRoaming(false);
 
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-        request.setDescription(description);
         if (mediaType != null) {
             request.addRequestHeader("Accept", mediaType);
         }
@@ -270,7 +272,6 @@ public class UiUtils {
         if (wifiOnly) {
             request.setAllowedOverMetered(false);
         }
-        request.setAllowedOverRoaming(false);
 
         dm.enqueue(request);
     }
