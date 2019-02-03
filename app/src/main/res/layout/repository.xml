@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@id/main_content"
@@ -19,9 +18,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:paddingTop="@dimen/content_padding"
-                android:paddingBottom="@dimen/content_padding"
-                android:orientation="vertical">
+                android:paddingBottom="@dimen/content_padding">
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_repo_name"
@@ -36,8 +35,8 @@
                     android:id="@+id/tv_parent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
                     android:textAppearance="?android:attr/textAppearanceSmall"
@@ -81,30 +80,35 @@
                     android:visibility="gone"
                     tools:visibility="visible" />
 
+
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/language_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    app:rowIcon="@drawable/icon_language" />
+                    app:rowIcon="@drawable/icon_language"
+                    tools:rowText="Written in Java" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/issues_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_issues" />
+                    app:rowIcon="@drawable/icon_issues"
+                    tools:rowText="50 issues" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/pulls_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_pull_request" />
+                    app:rowIcon="@drawable/icon_pull_request"
+                    tools:rowText="9 pull requests" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/forks_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_fork" />
+                    app:rowIcon="@drawable/icon_fork"
+                    tools:rowText="12 forks" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/stars_row"
@@ -112,16 +116,17 @@
                     android:layout_height="wrap_content"
                     app:rowIcon="@drawable/icon_star"
                     app:rowIconActionHintOff="@string/repo_star_action"
-                    app:rowIconActionHintOn="@string/repo_unstar_action" />
+                    app:rowIconActionHintOn="@string/repo_unstar_action"
+                    tools:rowText="5 stars" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/watchers_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowText="54 Watchers"
                     app:rowIcon="@drawable/icon_watch"
                     app:rowIconActionHintOff="@string/repo_watch_action"
-                    app:rowIconActionHintOn="@string/repo_unwatch_action" />
+                    app:rowIconActionHintOn="@string/repo_unwatch_action"
+                    tools:rowText="54 Watchers" />
 
             </LinearLayout>
         </android.support.v7.widget.CardView>
@@ -149,17 +154,17 @@
                 <ProgressBar
                     android:id="@+id/pb_readme"
                     style="@style/LoadingProgress"
-                    android:layout_marginBottom="@dimen/content_padding"
                     android:layout_marginTop="@dimen/content_padding"
+                    android:layout_marginBottom="@dimen/content_padding"
                     android:visibility="gone" />
 
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/readme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/content_padding"
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
+                    android:paddingBottom="@dimen/content_padding"
                     android:textIsSelectable="true"
                     android:visibility="gone"
                     tools:text="Readme text"
