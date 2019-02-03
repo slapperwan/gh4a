@@ -1,9 +1,9 @@
 package com.gh4a.dialogs;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +38,7 @@ public class MilestoneDialog extends BasePagerDialog
     private boolean mShowAnyMilestoneButton;
     private Button mNoMilestoneButton;
     private Button mAnyMilestoneButton;
+    private SelectionCallback mSelectionCallback;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,6 +47,16 @@ public class MilestoneDialog extends BasePagerDialog
         mRepoOwner = args.getString(EXTRA_OWNER);
         mRepoName = args.getString(EXTRA_REPO);
         mShowAnyMilestoneButton = args.getBoolean(EXTRA_SHOW_ANY_MILESTONE);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (!(context instanceof SelectionCallback)) {
+            throw new IllegalStateException("Parent of " + MilestoneDialog.class.getSimpleName()
+                    + " must implement " + SelectionCallback.class.getSimpleName());
+        }
+        mSelectionCallback = (SelectionCallback) context;
     }
 
     @Nullable
@@ -63,9 +74,9 @@ public class MilestoneDialog extends BasePagerDialog
     @Override
     public void onClick(View v) {
         if (v == mNoMilestoneButton) {
-            onMilestoneSelected(Milestone.builder().title("").build());
+            onMilestoneSelected(MilestoneSelection.Type.NO_MILESTONE);
         } else if (v == mAnyMilestoneButton) {
-            onMilestoneSelected(null);
+            onMilestoneSelected(MilestoneSelection.Type.ANY_MILESTONE);
         } else {
             super.onClick(v);
         }
@@ -83,11 +94,35 @@ public class MilestoneDialog extends BasePagerDialog
 
     @Override
     public void onMilestoneSelected(@Nullable Milestone milestone) {
-        FragmentActivity activity = getActivity();
-        if (activity instanceof IssueMilestoneListFragment.SelectionCallback) {
-            ((IssueMilestoneListFragment.SelectionCallback) activity)
-                    .onMilestoneSelected(milestone);
-        }
+        onMilestoneSelected(MilestoneSelection.Type.MILESTONE, milestone);
+    }
+
+    private void onMilestoneSelected(MilestoneSelection.Type type) {
+        onMilestoneSelected(type, null);
+    }
+
+    private void onMilestoneSelected(MilestoneSelection.Type type, Milestone milestone) {
+        mSelectionCallback.onMilestoneSelected(new MilestoneSelection(type, milestone));
         dismiss();
+    }
+
+    public interface SelectionCallback {
+        void onMilestoneSelected(MilestoneSelection milestoneSelection);
+    }
+
+    public static class MilestoneSelection {
+        public final Type type;
+        public final Milestone milestone;
+
+        MilestoneSelection(Type type, Milestone milestone) {
+            this.type = type;
+            this.milestone = milestone;
+        }
+
+        public enum Type {
+            NO_MILESTONE,
+            ANY_MILESTONE,
+            MILESTONE
+        }
     }
 }

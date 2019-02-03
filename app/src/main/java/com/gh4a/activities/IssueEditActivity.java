@@ -42,7 +42,6 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.dialogs.MilestoneDialog;
-import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.Optional;
@@ -74,7 +73,7 @@ import retrofit2.Response;
 
 public class IssueEditActivity extends BasePagerActivity implements
         AppBarLayout.OnOffsetChangedListener, View.OnClickListener,
-        View.OnFocusChangeListener, IssueMilestoneListFragment.SelectionCallback {
+        View.OnFocusChangeListener, MilestoneDialog.SelectionCallback {
     public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
         // can't reuse makeEditIntent here, because even a null extra counts for hasExtra()
         return new Intent(context, IssueEditActivity.class)
@@ -339,7 +338,18 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     @Override
-    public void onMilestoneSelected(@Nullable Milestone milestone) {
+    public void onMilestoneSelected(MilestoneDialog.MilestoneSelection milestoneSelection) {
+        Milestone milestone;
+        switch (milestoneSelection.type) {
+            case NO_MILESTONE:
+                milestone = null;
+                break;
+            case MILESTONE:
+                milestone = milestoneSelection.milestone;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported milestone selection type " + milestoneSelection.type);
+        }
         mEditIssue = mEditIssue.toBuilder()
                 .milestone(milestone)
                 .build();

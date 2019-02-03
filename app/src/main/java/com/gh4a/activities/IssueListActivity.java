@@ -52,7 +52,6 @@ import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.issues.IssueAssigneeService;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
-import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +59,7 @@ import java.util.Locale;
 public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
-        MenuItem.OnActionExpandListener, IssueMilestoneListFragment.SelectionCallback {
+        MenuItem.OnActionExpandListener, MilestoneDialog.SelectionCallback {
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return makeIntent(context, repoOwner, repoName, false);
     }
@@ -468,8 +467,18 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
-    public void onMilestoneSelected(@Nullable Milestone milestone) {
-        mSelectedMilestone = milestone != null ? milestone.title() : null;
+    public void onMilestoneSelected(MilestoneDialog.MilestoneSelection milestoneSelection) {
+        switch (milestoneSelection.type) {
+            case NO_MILESTONE:
+                mSelectedMilestone = "";
+                break;
+            case ANY_MILESTONE:
+                mSelectedMilestone = null;
+                break;
+            case MILESTONE:
+                mSelectedMilestone = milestoneSelection.milestone.title();
+                break;
+        }
         onFilterUpdated();
     }
 
