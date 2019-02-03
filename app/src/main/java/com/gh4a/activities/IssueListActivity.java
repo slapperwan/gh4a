@@ -40,7 +40,6 @@ import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.dialogs.MilestoneDialog;
 import com.gh4a.fragment.IssueListFragment;
-import com.gh4a.fragment.IssueMilestoneListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
@@ -48,7 +47,6 @@ import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.Label;
-import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.issues.IssueAssigneeService;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
@@ -564,7 +562,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void showMilestonesDialog() {
-        MilestoneDialog dialog = MilestoneDialog.newInstance(mRepoOwner, mRepoName, true);
+        MilestoneDialog dialog = MilestoneDialog.newInstance(mRepoOwner, mRepoName, mIsPullRequest, true, false);
         getSupportFragmentManager().beginTransaction()
                 .add(dialog, "dialog_milestone")
                 .commitAllowingStateLoss();

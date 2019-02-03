@@ -357,12 +357,11 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void showMilestonesDialog() {
-        MilestoneDialog dialog = MilestoneDialog.newInstance(mRepoOwner, mRepoName, false);
+        boolean fromPullRequest = mEditIssue.pullRequest() != null;
+        MilestoneDialog dialog = MilestoneDialog.newInstance(mRepoOwner, mRepoName, fromPullRequest, false, true);
         getSupportFragmentManager().beginTransaction()
                 .add(dialog, "dialog_milestone")
                 .commitAllowingStateLoss();
-
-        // TODO: Button to manage milestones
     }
 
     private void showAssigneesDialog() {
