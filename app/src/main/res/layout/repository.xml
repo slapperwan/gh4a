@@ -80,12 +80,14 @@
                     android:visibility="gone"
                     tools:visibility="visible" />
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/language_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     app:rowIcon="@drawable/icon_language"
                     tools:rowText="Written in Java" />
 
