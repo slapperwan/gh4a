@@ -344,7 +344,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 .dueOn(mMilestone.dueOn())
                 .build();
 
-        return service.editMilestone(mRepoOwner, mRepoName, mMilestone.id(), request);
+        return service.editMilestone(mRepoOwner, mRepoName, mMilestone.number(), request);
     }
 
     private void saveMilestone(String title, String desc) {
@@ -353,7 +353,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
         String errorMessage = getString(errorMessageResId, title);
         IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
         Single<Response<Milestone>> responseSingle = isInEditMode()
-                ? createMilestone(title, desc, service) : editMilestone(title, desc, service);
+                ? editMilestone(title, desc, service) : createMilestone(title, desc, service);
 
         responseSingle
                 .map(ApiHelpers::throwOnFailure)
@@ -386,7 +386,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 .state(open ? IssueState.Open : IssueState.Closed)
                 .build();
 
-        service.editMilestone(mRepoOwner, mRepoName, mMilestone.id(), request)
+        service.editMilestone(mRepoOwner, mRepoName, mMilestone.number(), request)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(this, dialogMessageResId, errorMessage))
                 .subscribe(result -> {
