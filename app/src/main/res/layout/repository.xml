@@ -32,19 +32,6 @@
                     tools:text="Username/Repository" />
 
                 <com.gh4a.widget.StyleableTextView
-                    android:id="@+id/tv_parent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:paddingLeft="@dimen/content_padding"
-                    android:paddingRight="@dimen/content_padding"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?android:attr/textColorLink"
-                    app:ghFont="italic"
-                    tools:text="forked from other/repository" />
-
-                <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -69,6 +56,13 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="16dp" />
+
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/fork_parent_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:rowIcon="@drawable/icon_fork"
+                    app:rowText="Forked from other/repository" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/private_row"

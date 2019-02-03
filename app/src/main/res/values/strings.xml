@@ -77,7 +77,7 @@
     <string name="history">History</string>
     <string name="deleted">(deleted)</string>
     <string name="go_to">Go to</string>
-    <string name="forked_from">forked from %1$s</string>
+    <string name="forked_from">Forked from %1$s</string>
     <string name="menu_user">User %1$s</string>
     <string name="menu_repo">Repo %1$s</string>
     <string name="menu_compare">Compare %1$s</string>
