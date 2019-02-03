@@ -41,7 +41,7 @@ public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implem
                 .putExtra("from_pr", fromPullRequest);
     }
 
-    private static final int REQUEST_EDIT_MILESTONE = 1000;
+    private static final int REQUEST_CREATE_MILESTONE = 1000;
 
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
@@ -146,7 +146,7 @@ public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implem
     @Override
     public void onClick(View view) {
         startActivityForResult(IssueMilestoneEditActivity.makeCreateIntent(this,
-                mRepoOwner, mRepoName, mParentIsPullRequest), REQUEST_EDIT_MILESTONE);
+                mRepoOwner, mRepoName, mParentIsPullRequest), REQUEST_CREATE_MILESTONE);
     }
 
     @Override
@@ -157,8 +157,9 @@ public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implem
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT_MILESTONE) {
+        if (requestCode == REQUEST_CREATE_MILESTONE) {
             if (resultCode == RESULT_OK) {
+                onRefresh();
                 setResult(RESULT_OK);
             }
         } else {
