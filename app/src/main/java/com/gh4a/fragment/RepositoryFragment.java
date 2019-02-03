@@ -228,8 +228,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         tvRepoName.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
         fillTextView(R.id.tv_desc, 0, mRepository.description());
-        fillTextView(R.id.tv_url, 0, !StringUtils.isBlank(mRepository.homepage())
-                ? mRepository.homepage() : mRepository.htmlUrl());
+        fillTextView(R.id.tv_url, 0, mRepository.homepage());
 
         final String owner = mRepository.owner().login();
         final String name = mRepository.name();
