@@ -227,24 +227,23 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         tvRepoName.setText(repoName);
         tvRepoName.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
-        TextView tvParentRepo = mContentView.findViewById(R.id.tv_parent);
-        if (mRepository.isFork() && mRepository.parent() != null) {
-            Repository parent = mRepository.parent();
-            tvParentRepo.setVisibility(View.VISIBLE);
-            tvParentRepo.setText(getString(R.string.forked_from,
-                    parent.owner().login() + "/" + parent.name()));
-            tvParentRepo.setOnClickListener(this);
-            tvParentRepo.setTag(parent);
-        } else {
-            tvParentRepo.setVisibility(View.GONE);
-        }
-
         fillTextView(R.id.tv_desc, 0, mRepository.description());
         fillTextView(R.id.tv_url, 0, !StringUtils.isBlank(mRepository.homepage())
                 ? mRepository.homepage() : mRepository.htmlUrl());
 
         final String owner = mRepository.owner().login();
         final String name = mRepository.name();
+
+        OverviewRow forkParentRow = mContentView.findViewById(R.id.fork_parent_row);
+        if (mRepository.isFork() && mRepository.parent() != null) {
+            Repository parent = mRepository.parent();
+            forkParentRow.setVisibility(View.VISIBLE);
+            forkParentRow.setText(getString(R.string.forked_from,
+                    parent.owner().login() + "/" + parent.name()));
+            forkParentRow.setClickIntent(RepositoryActivity.makeIntent(getActivity(), parent));
+        } else {
+            forkParentRow.setVisibility(View.GONE);
+        }
 
         OverviewRow privateRow = mContentView.findViewById(R.id.private_row);
         privateRow.setVisibility(mRepository.isPrivate() ? View.VISIBLE : View.GONE);
