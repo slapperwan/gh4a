@@ -246,6 +246,9 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         final String owner = mRepository.owner().login();
         final String name = mRepository.name();
 
+        OverviewRow privateRow = mContentView.findViewById(R.id.private_row);
+        privateRow.setVisibility(mRepository.isPrivate() ? View.VISIBLE : View.GONE);
+
         OverviewRow languageRow = mContentView.findViewById(R.id.language_row);
         languageRow.setVisibility(StringUtils.isBlank(mRepository.language())
                 ? View.GONE : View.VISIBLE);
@@ -285,10 +288,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         updateClickableLabel(R.id.tv_collaborators_label,
                 permissions != null && permissions.push());
         updateClickableLabel(R.id.tv_wiki_label, mRepository.hasWiki());
-
-        mContentView.findViewById(R.id.tv_private).setVisibility(
-                mRepository.isPrivate() ? View.VISIBLE : View.GONE);
-
     }
 
     private void updateClickableLabel(int id, boolean enable) {

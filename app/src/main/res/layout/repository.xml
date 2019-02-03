@@ -66,23 +66,18 @@
                     android:textColorLink="?android:attr/textColorLink"
                     tools:text="https://example.com" />
 
-                <com.gh4a.widget.StyleableTextView
-                    android:id="@+id/tv_private"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:drawableLeft="?attr/privateSmallIcon"
-                    android:drawablePadding="4dp"
-                    android:paddingLeft="@dimen/content_padding"
-                    android:paddingRight="@dimen/content_padding"
-                    android:text="@string/repo_type_private"
-                    android:textAppearance="@style/TextAppearance.VerySmall.Bold"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
-
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="16dp" />
+
+                <com.gh4a.widget.OverviewRow
+                    android:id="@+id/private_row"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:rowIcon="@drawable/icon_private"
+                    app:rowText="@string/repo_type_private"
+                    tools:visibility="visible" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/language_row"
