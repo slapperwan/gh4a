@@ -83,11 +83,17 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
     public void setClickIntent(Intent intent) {
         mClickIntent = intent;
         if (intent != null) {
-            mRedirectNotice.setVisibility(mDisplayRedirectArrowWhenClickable ? View.VISIBLE : View.GONE);
             setOnClickListener(this);
         } else {
-            mRedirectNotice.setVisibility(View.GONE);
             setClickable(false);
+        }
+    }
+
+    @Override
+    public void setClickable(boolean clickable) {
+        super.setClickable(clickable);
+        if (mDisplayRedirectArrowWhenClickable) {
+            mRedirectNotice.setVisibility(clickable ? VISIBLE : GONE);
         }
     }
 
