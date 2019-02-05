@@ -78,10 +78,10 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
         mProgress.setVisibility(text != null ? View.GONE : View.VISIBLE);
     }
 
-    public void setClickIntent(Intent intent) {
+    public void setClickIntent(Intent intent, Boolean displayRedirectArrow) {
         mClickIntent = intent;
         if (intent != null) {
-            mRedirectNotice.setVisibility(View.VISIBLE);
+            mRedirectNotice.setVisibility(displayRedirectArrow ? View.VISIBLE : View.GONE);
             setOnClickListener(this);
         } else {
             mRedirectNotice.setVisibility(View.GONE);

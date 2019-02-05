@@ -19,8 +19,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -237,9 +241,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         if (mRepository.isFork() && mRepository.parent() != null) {
             Repository parent = mRepository.parent();
             forkParentRow.setVisibility(View.VISIBLE);
-            forkParentRow.setText(getString(R.string.forked_from,
-                    parent.owner().login() + "/" + parent.name()));
-            forkParentRow.setClickIntent(RepositoryActivity.makeIntent(getActivity(), parent));
+            forkParentRow.setText(getForkedFromTextWithHighlight(parent));
+            forkParentRow.setClickIntent(RepositoryActivity.makeIntent(getActivity(), parent), false);
         } else {
             forkParentRow.setVisibility(View.GONE);
         }
@@ -260,23 +263,23 @@ public class RepositoryFragment extends LoadingFragmentBase implements
 
         OverviewRow issuesRow = mContentView.findViewById(R.id.issues_row);
         issuesRow.setVisibility(mRepository.hasIssues() ? View.VISIBLE : View.GONE);
-        issuesRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name));
+        issuesRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name), true);
 
         OverviewRow pullsRow = mContentView.findViewById(R.id.pulls_row);
-        pullsRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name, true));
+        pullsRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name, true), true);
 
         OverviewRow forksRow = mContentView.findViewById(R.id.forks_row);
         forksRow.setText(getResources().getQuantityString(R.plurals.fork,
                 mRepository.forksCount(), mRepository.forksCount()));
-        forksRow.setClickIntent(ForkListActivity.makeIntent(getActivity(), owner, name));
+        forksRow.setClickIntent(ForkListActivity.makeIntent(getActivity(), owner, name), true);
 
         mStarsRow = mContentView.findViewById(R.id.stars_row);
         mStarsRow.setIconClickListener(this);
-        mStarsRow.setClickIntent(StargazerListActivity.makeIntent(getActivity(), owner, name));
+        mStarsRow.setClickIntent(StargazerListActivity.makeIntent(getActivity(), owner, name), true);
 
         mWatcherRow = mContentView.findViewById(R.id.watchers_row);
         mWatcherRow.setIconClickListener(this);
-        mWatcherRow.setClickIntent(WatcherListActivity.makeIntent(getActivity(), owner, name));
+        mWatcherRow.setClickIntent(WatcherListActivity.makeIntent(getActivity(), owner, name), true);
 
         if (!Gh4Application.get().isAuthorized()) {
             updateWatcherUi();
@@ -292,6 +295,15 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         updateClickableLabel(R.id.tv_collaborators_label,
                 permissions != null && permissions.push());
         updateClickableLabel(R.id.tv_wiki_label, mRepository.hasWiki());
+    }
+
+    @NonNull
+    private SpannableString getForkedFromTextWithHighlight(Repository parent) {
+        String forkedFromText = getString(R.string.forked_from, parent.fullName());
+        SpannableString spannableString = new SpannableString(forkedFromText);
+        ForegroundColorSpan colorSpan = new ForegroundColorSpan(UiUtils.resolveColor(getContext(), android.R.attr.textColorLink));
+        spannableString.setSpan(colorSpan, forkedFromText.indexOf(parent.fullName()), forkedFromText.length(), Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+        return spannableString;
     }
 
     private void updateClickableLabel(int id, boolean enable) {
