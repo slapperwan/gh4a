@@ -53,7 +53,7 @@
                     android:textColorLink="?android:attr/textColorLink"
                     tools:text="https://example.com" />
 
-                <View
+                <Space
                     android:layout_width="match_parent"
                     android:layout_height="16dp" />
 
@@ -68,10 +68,8 @@
                     android:id="@+id/private_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     app:rowIcon="@drawable/icon_private"
-                    app:rowText="@string/repo_type_private"
-                    tools:visibility="visible" />
+                    app:rowText="@string/repo_type_private" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/language_row"
@@ -79,6 +77,11 @@
                     android:layout_height="wrap_content"
                     app:rowIcon="@drawable/icon_language"
                     tools:rowText="Written in Java" />
+
+                <Space
+                    android:id="@+id/repository_overview_row_divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/issues_row"

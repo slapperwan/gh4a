@@ -252,6 +252,12 @@ public class RepositoryFragment extends LoadingFragmentBase implements
                 ? View.GONE : View.VISIBLE);
         languageRow.setText(getString(R.string.repo_language, mRepository.language()));
 
+        boolean showOverviewRowDivider = forkParentRow.getVisibility() == View.VISIBLE
+                || privateRow.getVisibility() == View.VISIBLE
+                || languageRow.getVisibility() == View.VISIBLE;
+        mContentView.findViewById(R.id.repository_overview_row_divider)
+                .setVisibility(showOverviewRowDivider ? View.VISIBLE : View.GONE);
+
         OverviewRow issuesRow = mContentView.findViewById(R.id.issues_row);
         issuesRow.setVisibility(mRepository.hasIssues() ? View.VISIBLE : View.GONE);
         issuesRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name));
