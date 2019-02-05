@@ -242,7 +242,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
             Repository parent = mRepository.parent();
             forkParentRow.setVisibility(View.VISIBLE);
             forkParentRow.setText(getForkedFromTextWithHighlight(parent));
-            forkParentRow.setClickIntent(RepositoryActivity.makeIntent(getActivity(), parent), false);
+            forkParentRow.setClickIntent(RepositoryActivity.makeIntent(getActivity(), parent));
         } else {
             forkParentRow.setVisibility(View.GONE);
         }
@@ -263,23 +263,23 @@ public class RepositoryFragment extends LoadingFragmentBase implements
 
         OverviewRow issuesRow = mContentView.findViewById(R.id.issues_row);
         issuesRow.setVisibility(mRepository.hasIssues() ? View.VISIBLE : View.GONE);
-        issuesRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name), true);
+        issuesRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name));
 
         OverviewRow pullsRow = mContentView.findViewById(R.id.pulls_row);
-        pullsRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name, true), true);
+        pullsRow.setClickIntent(IssueListActivity.makeIntent(getActivity(), owner, name, true));
 
         OverviewRow forksRow = mContentView.findViewById(R.id.forks_row);
         forksRow.setText(getResources().getQuantityString(R.plurals.fork,
                 mRepository.forksCount(), mRepository.forksCount()));
-        forksRow.setClickIntent(ForkListActivity.makeIntent(getActivity(), owner, name), true);
+        forksRow.setClickIntent(ForkListActivity.makeIntent(getActivity(), owner, name));
 
         mStarsRow = mContentView.findViewById(R.id.stars_row);
         mStarsRow.setIconClickListener(this);
-        mStarsRow.setClickIntent(StargazerListActivity.makeIntent(getActivity(), owner, name), true);
+        mStarsRow.setClickIntent(StargazerListActivity.makeIntent(getActivity(), owner, name));
 
         mWatcherRow = mContentView.findViewById(R.id.watchers_row);
         mWatcherRow.setIconClickListener(this);
-        mWatcherRow.setClickIntent(WatcherListActivity.makeIntent(getActivity(), owner, name), true);
+        mWatcherRow.setClickIntent(WatcherListActivity.makeIntent(getActivity(), owner, name));
 
         if (!Gh4Application.get().isAuthorized()) {
             updateWatcherUi();

@@ -151,15 +151,15 @@ public class UserFragment extends LoadingFragmentBase implements
         if (isUser) {
             mFollowersRow.setIconClickListener(canFollowUser() ? this : null);
             mFollowersRow.setClickIntent(FollowerFollowingListActivity.makeIntent(
-                    getActivity(), mUser.login(), true), true);
+                    getActivity(), mUser.login(), true));
 
             followingRow.setText(getResources().getQuantityString(R.plurals.following,
                     mUser.following(), mUser.following()));
             followingRow.setClickIntent(FollowerFollowingListActivity.makeIntent(
-                    getActivity(), mUser.login(), false), true);
+                    getActivity(), mUser.login(), false));
         } else {
             membersRow.setClickIntent(OrganizationMemberListActivity.makeIntent(
-                    getActivity(), mUser.login()), true);
+                    getActivity(), mUser.login()));
         }
 
         OverviewRow gistsRow = mContentView.findViewById(R.id.gists_row);
@@ -167,13 +167,13 @@ public class UserFragment extends LoadingFragmentBase implements
         if (isUser) {
             int totalCount = orZero(mUser.publicGists()) + orZero(mUser.privateGists());
             gistsRow.setText(getResources().getQuantityString(R.plurals.gist, totalCount, totalCount));
-            gistsRow.setClickIntent(GistListActivity.makeIntent(getActivity(), mUser.login()), true);
+            gistsRow.setClickIntent(GistListActivity.makeIntent(getActivity(), mUser.login()));
         }
 
         OverviewRow reposRow = mContentView.findViewById(R.id.repos_row);
         int repoCount = orZero(mUser.totalPrivateRepos()) + orZero(mUser.publicRepos());
         reposRow.setText(getResources().getQuantityString(R.plurals.repository, repoCount, repoCount));
-        reposRow.setClickIntent(RepositoryListActivity.makeIntent(getActivity(), mUser.login(), !isUser), true);
+        reposRow.setClickIntent(RepositoryListActivity.makeIntent(getActivity(), mUser.login(), !isUser));
 
         TextView tvName = mContentView.findViewById(R.id.tv_name);
         String name = StringUtils.isBlank(mUser.name()) ? mUser.login() : mUser.name();
