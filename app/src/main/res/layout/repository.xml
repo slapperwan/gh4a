@@ -61,6 +61,7 @@
                     android:id="@+id/fork_parent_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:displayRedirectArrowWhenClickable="false"
                     app:rowIcon="@drawable/icon_fork"
                     app:rowText="Forked from other/repository" />
 

@@ -147,5 +147,6 @@
         <attr name="rowIcon" format="color|reference" />
         <attr name="rowIconActionHintOn" format="string" />
         <attr name="rowIconActionHintOff" format="string" />
+        <attr name="displayRedirectArrowWhenClickable" format="boolean" />
     </declare-styleable>
 </resources>

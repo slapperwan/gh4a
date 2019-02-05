@@ -31,6 +31,7 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
 
     private String mActionHintChecked;
     private String mActionHintUnchecked;
+    private boolean mDisplayRedirectArrowWhenClickable;
 
     public OverviewRow(Context context) {
         this(context, null);
@@ -58,6 +59,7 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
 
         mActionHintChecked = a.getString(R.styleable.OverviewRow_rowIconActionHintOn);
         mActionHintUnchecked = a.getString(R.styleable.OverviewRow_rowIconActionHintOff);
+        mDisplayRedirectArrowWhenClickable = a.getBoolean(R.styleable.OverviewRow_displayRedirectArrowWhenClickable, true);
 
         a.recycle();
     }
@@ -78,10 +80,10 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
         mProgress.setVisibility(text != null ? View.GONE : View.VISIBLE);
     }
 
-    public void setClickIntent(Intent intent, Boolean displayRedirectArrow) {
+    public void setClickIntent(Intent intent) {
         mClickIntent = intent;
         if (intent != null) {
-            mRedirectNotice.setVisibility(displayRedirectArrow ? View.VISIBLE : View.GONE);
+            mRedirectNotice.setVisibility(mDisplayRedirectArrowWhenClickable ? View.VISIBLE : View.GONE);
             setOnClickListener(this);
         } else {
             mRedirectNotice.setVisibility(View.GONE);
