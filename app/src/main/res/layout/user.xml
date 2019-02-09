@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,14 +13,13 @@
         android:orientation="vertical">
 
         <!-- user info section -->
-        <android.support.v7.widget.CardView
-            style="?attr/cardViewTheme">
+        <android.support.v7.widget.CardView style="?attr/cardViewTheme">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:layout_marginTop="@dimen/overview_header_spacing"
+                android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical"
                 android:paddingTop="@dimen/content_padding"
                 android:paddingBottom="@dimen/content_padding">
@@ -100,49 +98,52 @@
                     android:id="@+id/join_date_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_calendar" />
+                    app:rowIcon="@drawable/icon_calendar"
+                    tools:rowText="Member since 09 February 2019" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/members_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_members" />
+                    app:rowIcon="@drawable/icon_members"
+                    tools:rowText="5 members" />
 
-                <!-- FIXME: icon -->
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/followers_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:rowIcon="@drawable/icon_members"
                     app:rowIconActionHintOff="@string/user_follow_action"
-                    app:rowIconActionHintOn="@string/user_unfollow_action" />
+                    app:rowIconActionHintOn="@string/user_unfollow_action"
+                    tools:rowText="Followed by 82 users" />
 
-                <!-- FIXME: icon -->
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/following_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_members" />
+                    app:rowIcon="@drawable/icon_following"
+                    tools:rowText="Following 33 users" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/repos_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_repositories" />
+                    app:rowIcon="@drawable/icon_repositories"
+                    tools:rowText="39 repositories" />
 
                 <com.gh4a.widget.OverviewRow
                     android:id="@+id/gists_row"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:rowIcon="@drawable/icon_gists" />
+                    app:rowIcon="@drawable/icon_gists"
+                    tools:rowText="12 gists" />
 
             </LinearLayout>
 
         </android.support.v7.widget.CardView>
 
         <!-- Repository section -->
-        <android.support.v7.widget.CardView
-            style="?attr/cardViewTheme">
+        <android.support.v7.widget.CardView style="?attr/cardViewTheme">
 
             <LinearLayout
                 android:layout_width="match_parent"
