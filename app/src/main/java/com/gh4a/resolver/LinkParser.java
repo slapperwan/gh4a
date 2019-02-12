@@ -19,6 +19,7 @@ import com.gh4a.activities.OrganizationMemberListActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
+import com.gh4a.activities.SearchActivity;
 import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
@@ -75,6 +76,8 @@ public class LinkParser {
                 return parseBlogLink(activity, parts);
             case "orgs":
                 return parseOrganizationLink(activity, parts);
+            case "search":
+                return parseSearchLink(activity, uri);
         }
 
         //noinspection UnnecessaryLocalVariable
@@ -156,7 +159,6 @@ public class LinkParser {
         return new ParseResult(UserActivity.makeIntent(activity, org));
     }
 
-    @NonNull
     private static ParseResult parseUserLink(FragmentActivity activity, @NonNull Uri uri,
             String user) {
         String tab = uri.getQueryParameter("tab");
@@ -175,6 +177,21 @@ public class LinkParser {
             }
         }
         return new ParseResult(UserActivity.makeIntent(activity, user));
+    }
+
+    private static ParseResult parseSearchLink(FragmentActivity activity, @NonNull Uri uri) {
+        String type = uri.getQueryParameter("type");
+        int typeInt = SearchActivity.SEARCH_TYPE_REPO;
+        if (type != null) {
+            switch (type) {
+                case "Repositories": typeInt = SearchActivity.SEARCH_TYPE_REPO; break;
+                case "Users": typeInt = SearchActivity.SEARCH_TYPE_USER; break;
+                case "Code": typeInt = SearchActivity.SEARCH_TYPE_CODE; break;
+                default: return null;
+            }
+        }
+        String query = uri.getQueryParameter("q");
+        return new ParseResult(SearchActivity.makeIntent(activity, query, typeInt));
     }
 
     @NonNull

@@ -1,11 +1,13 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.FragmentActivity;
 
 import com.gh4a.ApiRequestException;
 import com.gh4a.ServiceFactory;
+import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Commit;
@@ -29,11 +31,16 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
     }
 
     @Override
-    protected Intent getLaunchIntent(String sha, GitHubFile file,
+    protected @NonNull Intent getLaunchIntent(String sha, @NonNull GitHubFile file,
             List<GitComment> comments, DiffHighlightId diffId) {
         return CommitDiffViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                 sha, file.filename(), file.patch(), comments, diffId.startLine,
                 diffId.endLine, diffId.right, null);
+    }
+
+    @Override
+    protected @NonNull Intent getFallbackIntent(String sha) {
+        return CommitActivity.makeIntent(mActivity, mRepoOwner, mRepoName, sha);
     }
 
     @Override
