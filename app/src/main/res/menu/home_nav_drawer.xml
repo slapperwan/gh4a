@@ -40,7 +40,7 @@
             android:icon="@drawable/icon_search"/>
         <item
             android:id="@+id/bookmarks"
-            android:title="@string/stars_and_bookmarks"
+            android:title="@string/bookmarks_and_stars"
             android:icon="@drawable/icon_bookmark" />
     </group>
     <group

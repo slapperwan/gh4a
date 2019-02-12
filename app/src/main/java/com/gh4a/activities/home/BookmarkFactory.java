@@ -22,7 +22,7 @@ public class BookmarkFactory extends FragmentFactory {
     @Override
     @StringRes
     protected int getTitleResId() {
-        return R.string.stars_and_bookmarks;
+        return R.string.bookmarks_and_stars;
     }
 
     @Override
