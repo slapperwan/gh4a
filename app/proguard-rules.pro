@@ -19,6 +19,8 @@
 -keepclassmembers class * {
     @org.simpleframework.xml.** *;
 }
+-keep class com.gh4a.model.GitHubFeed
+
 # Keep attributes for SimpleXML
 -keepattributes ElementList, Root
 
