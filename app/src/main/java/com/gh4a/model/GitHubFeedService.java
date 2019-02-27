@@ -9,6 +9,6 @@ public interface GitHubFeedService {
     @GET("{url}")
     Single<Response<GitHubFeed>> getFeed(@Path(value = "url", encoded = true) String url);
 
-    @GET("https://blog.github.com/blog.atom")
+    @GET("https://github.blog/blog.atom")
     Single<Response<GitHubFeed>> getBlogFeed();
 }
