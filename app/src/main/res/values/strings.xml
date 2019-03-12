@@ -437,6 +437,7 @@
     <string name="pull_merge_status_unstable">Some checks were not successful</string>
     <string name="pull_merge_status_mergable">Pull request can be merged</string>
     <string name="pull_merge_status_dirty">Pull request has conflicts that need to be resolved manually</string>
+    <string name="pull_merge_status_draft">Pull request is still a work in progress</string>
     <string name="pull_merge_status_unknown">The status of the pull request could not be determined</string>
     <string name="pull_merge_method">Merge method</string>
     <string name="pull_merge_method_merge">Create merge commit</string>

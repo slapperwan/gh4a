@@ -81,6 +81,10 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
                 statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
                 statusLabelResId = R.string.pull_merge_status_dirty;
                 break;
+            case Draft:
+                statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
+                statusLabelResId = R.string.pull_merge_status_dirty;
+                break;
             default:
                 if (statuses.isEmpty()) {
                     // Unknown status, no commit statuses -> nothing to display
