@@ -295,8 +295,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
                 return true;
             case R.id.search:
                 String initialSearch = "repo:" + mRepoOwner + "/" + mRepoName + " ";
-                startActivity(SearchActivity.makeIntent(this,
-                        initialSearch, SearchActivity.SEARCH_TYPE_CODE));
+                startActivity(SearchActivity.makeIntent(this, initialSearch,
+                        SearchActivity.SEARCH_TYPE_CODE, false));
                 return true;
             case R.id.bookmark:
                 String bookmarkUrl = getBookmarkUrl();

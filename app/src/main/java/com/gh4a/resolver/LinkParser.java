@@ -191,7 +191,7 @@ public class LinkParser {
             }
         }
         String query = uri.getQueryParameter("q");
-        return new ParseResult(SearchActivity.makeIntent(activity, query, typeInt));
+        return new ParseResult(SearchActivity.makeIntent(activity, query, typeInt, true));
     }
 
     @NonNull

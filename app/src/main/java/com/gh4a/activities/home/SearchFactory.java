@@ -27,6 +27,6 @@ public class SearchFactory extends FragmentFactory {
 
     @Override
     protected Fragment makeFragment(int position) {
-        return SearchFragment.newInstance(SearchFragment.SEARCH_TYPE_REPO, null);
+        return SearchFragment.newInstance(SearchFragment.SEARCH_TYPE_REPO, null, false);
     }
 }

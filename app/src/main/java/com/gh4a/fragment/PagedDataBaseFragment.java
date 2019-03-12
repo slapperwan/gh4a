@@ -52,11 +52,12 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        setContentShown(false);
-
         mRxLoader = new RxLoader(getActivity(), getLoaderManager());
         resetSubject();
-        load(false);
+        if (shouldDoInitialLoad()) {
+            setContentShown(false);
+            load(false);
+        }
     }
 
     @Override
@@ -101,6 +102,10 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         mNextPage = null;
         mPageSubject = BehaviorSubject.createDefault(1);
         mPageSubject.onNext(1);
+    }
+
+    protected boolean shouldDoInitialLoad() {
+        return true;
     }
 
     private void load(boolean force) {

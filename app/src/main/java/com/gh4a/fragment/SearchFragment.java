@@ -54,11 +54,13 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         SearchView.OnQueryTextListener, SearchView.OnCloseListener,
         SearchView.OnSuggestionListener, FilterQueryProvider,
         AdapterView.OnItemSelectedListener, SearchAdapter.Callback {
-    public static SearchFragment newInstance(int initialType, String initialQuery) {
+    public static SearchFragment newInstance(int initialType, String initialQuery,
+            boolean startSearchImmediately) {
         SearchFragment f = new SearchFragment();
         Bundle args = new Bundle();
         args.putInt("search_type", initialType);
         args.putString("initial_search", initialQuery);
+        args.putBoolean("do_initial_load", startSearchImmediately);
         f.setArguments(args);
         return f;
     }
@@ -150,8 +152,13 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
     }
 
     @Override
+    protected boolean shouldDoInitialLoad() {
+        return getArguments().getBoolean("do_initial_load", true);
+    }
+
+    @Override
     protected Single<Response<Page<Object>>> loadPage(int page, boolean bypassCache) {
-        if (TextUtils.isEmpty(mQuery) || mQuery.equals(getArguments().getString("initial_search"))) {
+        if (TextUtils.isEmpty(mQuery)) {
             return Single.just(Response.success(new ApiHelpers.DummyPage<>()));
         }
         switch (mSelectedSearchType) {
