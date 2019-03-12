@@ -523,9 +523,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         }
         StarringService service = ServiceFactory.get(StarringService.class, force);
         service.checkIfRepositoryIsStarred(mRepository.owner().login(), mRepository.name())
-                .map(ApiHelpers::throwOnFailure)
                 // success response means 'starred'
-                .map(result -> true)
+                .map(ApiHelpers::mapToTrueOnSuccess)
                 // 404 means 'not starred'
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, false))
                 .compose(makeLoaderSingle(ID_LOADER_STARRING, force))

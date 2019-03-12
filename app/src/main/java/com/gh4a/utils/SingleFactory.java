@@ -48,9 +48,8 @@ public class SingleFactory {
                 ServiceFactory.get(RepositoryCollaboratorService.class, bypassCache);
 
         return service.isUserCollaborator(repoOwner, repoName, app.getAuthLogin())
-                .map(ApiHelpers::throwOnFailure)
                 // there's no actual content, result is always null
-                .map(result -> true)
+                .map(ApiHelpers::mapToTrueOnSuccess)
                 // the API returns 403 if the user doesn't have push access,
                 // which in turn means he isn't a collaborator
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_FORBIDDEN, false));

@@ -176,6 +176,16 @@ public class ApiHelpers {
         return response.body();
     }
 
+    public static boolean mapToTrueOnSuccess(Response<Void> response) throws ApiRequestException {
+        if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            Gh4Application.get().logout();
+        }
+        if (!response.isSuccessful()) {
+            throw new ApiRequestException(response);
+        }
+        return true;
+    }
+
     public static Boolean mapToBooleanOrThrowOnFailure(Response<Void> response)
             throws ApiRequestException {
         if (response.isSuccessful()) {
