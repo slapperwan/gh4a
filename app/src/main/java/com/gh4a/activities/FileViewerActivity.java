@@ -23,8 +23,10 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.print.PrintHelper;
 import android.support.v7.widget.PopupMenu;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -175,8 +177,9 @@ public class FileViewerActivity extends WebViewerActivity
 
     @Override
     protected String getDocumentTitle() {
-        return getString(R.string.file_print_document_title, FileUtils.getFileName(mPath),
-                mRepoOwner, mRepoName);
+        @StringRes int titleResId = TextUtils.isEmpty(mRef)
+                ? R.string.file_print_document_title : R.string.file_print_document_at_ref_title;
+        return getString(titleResId, FileUtils.getFileName(mPath), mRepoOwner, mRepoName, mRef);
     }
 
     @Override
