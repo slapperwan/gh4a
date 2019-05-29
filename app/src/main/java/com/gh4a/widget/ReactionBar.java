@@ -58,12 +58,14 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
 
     private static final @IdRes int[] VIEW_IDS = {
         R.id.plus_one, R.id.minus_one, R.id.laugh,
-        R.id.hooray, R.id.heart, R.id.confused
+        R.id.hooray, R.id.heart, R.id.confused,
+        R.id.rocket, R.id.eyes
     };
     private static final String[] CONTENTS = {
         Reaction.CONTENT_PLUS_ONE, Reaction.CONTENT_MINUS_ONE,
         Reaction.CONTENT_LAUGH, Reaction.CONTENT_HOORAY,
-        Reaction.CONTENT_HEART, Reaction.CONTENT_CONFUSED
+        Reaction.CONTENT_HEART, Reaction.CONTENT_CONFUSED,
+        Reaction.CONTENT_ROCKET, Reaction.CONTENT_EYES
     };
 
     private final TextView mPlusOneView;
@@ -72,6 +74,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
     private final TextView mHoorayView;
     private final TextView mConfusedView;
     private final TextView mHeartView;
+    private final TextView mRocketView;
+    private final TextView mEyesView;
     private final View mReactButton;
 
     private Callback mCallback;
@@ -109,6 +113,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         mHoorayView = findViewById(R.id.hooray);
         mConfusedView = findViewById(R.id.confused);
         mHeartView = findViewById(R.id.heart);
+        mRocketView = findViewById(R.id.rocket);
+        mEyesView = findViewById(R.id.eyes);
         mReactButton = findViewById(R.id.react);
 
         setReactions(null);
@@ -128,6 +134,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             updateView(mHoorayView, reactions.hooray());
             updateView(mConfusedView, reactions.confused());
             updateView(mHeartView, reactions.heart());
+            updateView(mRocketView, reactions.rocket());
+            updateView(mEyesView, reactions.eyes());
             setVisibility(View.VISIBLE);
         } else {
             setVisibility(View.GONE);
@@ -605,7 +613,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         }
 
         private Reactions buildReactions(List<Reaction> reactions) {
-            int plusOne = 0, minusOne = 0, confused = 0, heart = 0, hooray = 0, laugh = 0;
+            int plusOne = 0, minusOne = 0, confused = 0, heart = 0;
+            int hooray = 0, laugh = 0, rocket = 0, eyes = 0;
             for (Reaction reaction : reactions) {
                 switch (reaction.content()) {
                     case Reaction.CONTENT_PLUS_ONE: ++plusOne; break;
@@ -614,6 +623,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                     case Reaction.CONTENT_HEART: ++heart; break;
                     case Reaction.CONTENT_HOORAY: ++hooray; break;
                     case Reaction.CONTENT_LAUGH: ++laugh; break;
+                    case Reaction.CONTENT_ROCKET: ++rocket; break;
+                    case Reaction.CONTENT_EYES: ++eyes; break;
                 }
             }
             return Reactions.builder()
@@ -623,6 +634,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                     .heart(heart)
                     .hooray(hooray)
                     .laugh(laugh)
+                    .rocket(rocket)
+                    .eyes(eyes)
                     .build();
         }
     }

@@ -31,6 +31,16 @@
         style="@style/ReactionBarButton"
         android:drawableLeft="?attr/reactionHeartIcon" />
 
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/rocket"
+        style="@style/ReactionBarButton"
+        android:drawableLeft="?attr/reactionRocketIcon" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/eyes"
+        style="@style/ReactionBarButton"
+        android:drawableLeft="?attr/reactionEyesIcon" />
+
     <ImageView
         android:id="@+id/react"
         style="@style/SelectableBorderlessItem"

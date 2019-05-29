@@ -40,4 +40,16 @@
         android:title="@string/reaction_heart"
         android:visible="false" />
 
+    <item
+        android:id="@+id/rocket"
+        android:icon="?reactionRocketIcon"
+        android:title="@string/reaction_rocket"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/eyes"
+        android:icon="?reactionEyesIcon"
+        android:title="@string/reaction_eyes"
+        android:visible="false" />
+
 </menu>

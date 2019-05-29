@@ -71,6 +71,8 @@
         <item name="reactionLaughIcon">@drawable/reaction_laugh_dark</item>
         <item name="reactionMinusOneIcon">@drawable/reaction_minus_one_dark</item>
         <item name="reactionPlusOneIcon">@drawable/reaction_plus_one_dark</item>
+        <item name="reactionRocketIcon">@drawable/reaction_rocket_dark</item>
+        <item name="reactionEyesIcon">@drawable/reaction_eyes_dark</item>
         <item name="dragHandleIcon">@drawable/drag_handle_dark</item>
         <item name="timelineEventApproved">@drawable/timeline_event_approved_dark</item>
         <item name="timelineEventRequestedChanges">@drawable/timeline_event_requested_changes_dark</item>
@@ -209,6 +211,8 @@
         <item name="reactionLaughIcon">@drawable/reaction_laugh</item>
         <item name="reactionMinusOneIcon">@drawable/reaction_minus_one</item>
         <item name="reactionPlusOneIcon">@drawable/reaction_plus_one</item>
+        <item name="reactionRocketIcon">@drawable/reaction_rocket</item>
+        <item name="reactionEyesIcon">@drawable/reaction_eyes</item>
         <item name="dragHandleIcon">@drawable/drag_handle</item>
         <item name="timelineEventApproved">@drawable/timeline_event_approved</item>
         <item name="timelineEventRequestedChanges">@drawable/timeline_event_requested_changes</item>

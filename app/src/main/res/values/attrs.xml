@@ -89,6 +89,8 @@
     <attr name="reactionLaughIcon" format="reference" />
     <attr name="reactionMinusOneIcon" format="reference" />
     <attr name="reactionPlusOneIcon" format="reference" />
+    <attr name="reactionRocketIcon" format="reference" />
+    <attr name="reactionEyesIcon" format="reference" />
     <attr name="dragHandleIcon" format="reference" />
     <attr name="timelineEventApproved" format="reference" />
     <attr name="timelineEventRequestedChanges" format="reference" />

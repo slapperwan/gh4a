@@ -155,6 +155,8 @@
     <string name="reaction_confused">Confused</string>
     <string name="reaction_heart">Heart</string>
     <string name="reaction_hooray">Hooray</string>
+    <string name="reaction_rocket">Rocket</string>
+    <string name="reaction_eyes">Eyes</string>
 
     <string name="repo_type_all">All</string>
     <string name="repo_type_owner">Owner</string>
