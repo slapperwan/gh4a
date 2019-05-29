@@ -2,6 +2,7 @@ package com.gh4a.adapter.timeline;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -102,7 +103,7 @@ public class TimelineItemAdapter
 
                 case R.id.share:
                     IntentUtils.share(mContext, mActionCallback.getShareSubject(comment.comment()),
-                            comment.comment().htmlUrl());
+                            Uri.parse(comment.comment().htmlUrl()));
                     return true;
 
                 case R.id.view_in_file:

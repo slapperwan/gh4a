@@ -297,7 +297,7 @@ class ReviewViewHolder
         switch (item.getItemId()) {
             case R.id.share:
                 IntentUtils.share(mContext, "Pull Request #" + mIssueNumber + " - Review",
-                        review.htmlUrl());
+                        Uri.parse(review.htmlUrl()));
                 return true;
 
             case R.id.browser:

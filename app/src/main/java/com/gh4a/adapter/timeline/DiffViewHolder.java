@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
 import android.text.SpannableStringBuilder;
@@ -213,10 +214,14 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         }
     }
 
-    private String createUrl(TimelineItem.Diff diff, int line, boolean isRightLine) {
+    private Uri createUrl(TimelineItem.Diff diff, int line, boolean isRightLine) {
         ReviewComment comment = diff.getInitialComment();
-        return "https://github.com/" + mRepoOwner + "/" + mRepoName + "/pull/" + mIssueNumber +
-                "#discussion-diff-" + comment.id() + (isRightLine ? "R" : "L") + line;
+        String fragment = "discussion-diff-" + comment.id() + (isRightLine ? "R" : "L") + line;
+        return IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
+                .appendPath("pull")
+                .appendPath(String.valueOf(mIssueNumber))
+                .fragment(fragment)
+                .build();
     }
 
     private void showPopupMenu(final TimelineItem.Diff diff, final int line,

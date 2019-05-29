@@ -223,12 +223,17 @@ public class FileViewerActivity extends WebViewerActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String url = String.format(Locale.US, "https://github.com/%s/%s/blob/%s/%s",
-                mRepoOwner, mRepoName, mRef, mPath);
+        Uri.Builder urlBuilder = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
+                .appendPath("blob")
+                .appendPath(mRef);
+        for (String element: mPath.split("\\/")) {
+            urlBuilder.appendPath(element);
+        }
+        Uri url = urlBuilder.build();
 
         switch (item.getItemId()) {
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(url));
+                IntentUtils.launchBrowser(this, url);
                 return true;
             case R.id.share:
                 IntentUtils.share(this, getString(R.string.share_file_subject,
@@ -288,9 +293,15 @@ public class FileViewerActivity extends WebViewerActivity
         return !displayingMarkdown && super.shouldWrapLines();
     }
 
-    private String createUrl() {
-        return "https://github.com/" + mRepoOwner + "/" + mRepoName + "/blob/" + mRef + "/" +
-                mPath + "#L" + mLastTouchedLine;
+    private Uri createUrl() {
+        Uri.Builder builder = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
+                .appendPath("blob")
+                .appendPath(mRef);
+        for (String element: mPath.split("\\/")) {
+            builder.appendPath(element);
+        }
+        builder.fragment("L" + mLastTouchedLine);
+        return builder.build();
     }
 
     private void openUnsuitableFileAndFinish() {

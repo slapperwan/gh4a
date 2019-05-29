@@ -228,7 +228,7 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
             case R.id.share:
                 IntentUtils.share(this, getString(R.string.share_issue_subject,
                         mIssueNumber, mIssue.title(), mRepoOwner + "/" + mRepoName),
-                        mIssue.htmlUrl());
+                        Uri.parse(mIssue.htmlUrl()));
                 return true;
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(mIssue.htmlUrl()));

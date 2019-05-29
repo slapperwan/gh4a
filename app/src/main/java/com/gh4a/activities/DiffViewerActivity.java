@@ -354,11 +354,11 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String url = createUrl("", 0L);
+        Uri url = createUrl("", 0L);
 
         switch (item.getItemId()) {
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(url));
+                IntentUtils.launchBrowser(this, url);
                 return true;
             case R.id.share:
                 IntentUtils.share(this, getString(R.string.share_commit_subject,
@@ -435,7 +435,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             int position, int leftLine, int rightLine, PositionalCommentBase commitComment);
     protected abstract Single<Response<Void>> doDeleteComment(long id);
     protected abstract boolean canReply();
-    protected abstract String createUrl(String lineId, long replyId);
+    protected abstract Uri createUrl(String lineId, long replyId);
     protected abstract PositionalCommentBase onUpdateReactions(PositionalCommentBase comment,
             Reactions reactions);
 
@@ -542,7 +542,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
                     openCommentDialog(0L, 0L, mLineText, mPosition, mLeftLine, mRightLine, null);
                     break;
                 case R.id.share:
-                    String url = createUrl(createLineLinkId(mIsRightLine ? mRightLine : mLeftLine,
+                    Uri url = createUrl(createLineLinkId(mIsRightLine ? mRightLine : mLeftLine,
                             mIsRightLine), mId);
                     String subject = getString(R.string.share_commit_subject, mSha.substring(0, 7),
                             mRepoOwner + "/" + mRepoName);

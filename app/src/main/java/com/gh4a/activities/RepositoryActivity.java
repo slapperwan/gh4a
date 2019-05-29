@@ -282,7 +282,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String url = "https://github.com/" + mRepoOwner + "/" + mRepoName;
+        Uri url = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName).build();
         switch (item.getItemId()) {
             case R.id.ref:
                 loadOrShowRefSelection();
@@ -291,7 +291,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
                 IntentUtils.share(this, mRepoOwner + "/" + mRepoName, url);
                 return true;
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(url));
+                IntentUtils.launchBrowser(this, url);
                 return true;
             case R.id.search:
                 String initialSearch = "repo:" + mRepoOwner + "/" + mRepoName + " ";

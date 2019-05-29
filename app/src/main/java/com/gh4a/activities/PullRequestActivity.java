@@ -211,7 +211,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             case R.id.share:
                 IntentUtils.share(this, getString(R.string.share_pull_subject,
                         mPullRequest.number(), mPullRequest.title(),
-                        mRepoOwner + "/" + mRepoName), mPullRequest.htmlUrl());
+                        mRepoOwner + "/" + mRepoName), Uri.parse(mPullRequest.htmlUrl()));
                 break;
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(mPullRequest.htmlUrl()));

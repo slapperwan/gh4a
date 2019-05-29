@@ -138,7 +138,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String url = "https://github.com/" + mUserLogin;
+        Uri url = IntentUtils.createBaseUriForUser(mUserLogin).build();
         switch (item.getItemId()) {
             case R.id.share: {
                 String userName = mUser != null ? mUser.name() : null;
@@ -148,16 +148,19 @@ public class UserActivity extends BaseFragmentPagerActivity {
                 return true;
             }
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(url));
+                IntentUtils.launchBrowser(this, url);
                 return true;
-            case R.id.bookmark:
-                if (BookmarksProvider.hasBookmarked(this, url)) {
-                    BookmarksProvider.removeBookmark(this, url);
+            case R.id.bookmark: {
+                String urlString = url.toString();
+                if (BookmarksProvider.hasBookmarked(this, urlString)) {
+                    BookmarksProvider.removeBookmark(this, urlString);
                 } else {
                     BookmarksProvider.saveBookmark(this, mUserLogin,
-                            BookmarksProvider.Columns.TYPE_USER, url, mUser.name(), true);
+                            BookmarksProvider.Columns.TYPE_USER,
+                            urlString, mUser.name(), true);
                 }
                 return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

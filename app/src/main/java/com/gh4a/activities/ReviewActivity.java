@@ -68,7 +68,7 @@ public class ReviewActivity extends FragmentContainerActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.share:
-                IntentUtils.share(this, mTitle, mReview.htmlUrl());
+                IntentUtils.share(this, mTitle, Uri.parse(mReview.htmlUrl()));
                 return true;
 
             case R.id.browser:

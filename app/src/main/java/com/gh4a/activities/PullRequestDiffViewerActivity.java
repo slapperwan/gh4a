@@ -17,6 +17,7 @@ package com.gh4a.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.gh4a.ServiceFactory;
@@ -78,15 +79,17 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     }
 
     @Override
-    protected String createUrl(String lineId, long replyId) {
-        String link = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/pull/"
-                + mPullRequestNumber + "/files";
+    protected Uri createUrl(String lineId, long replyId) {
+        Uri.Builder builder = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
+                .appendPath("pull")
+                .appendPath(String.valueOf(mPullRequestNumber))
+                .appendPath("files");
         if (replyId > 0L) {
-            link += "#r" + replyId;
+            builder.fragment("r" + replyId);
         } else {
-            link += "#diff-" + ApiHelpers.md5(mPath) + lineId;
+            builder.fragment("diff-" + ApiHelpers.md5(mPath) + lineId);
         }
-        return link;
+        return builder.build();
     }
 
     @Override

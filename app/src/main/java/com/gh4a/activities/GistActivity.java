@@ -17,6 +17,7 @@ package com.gh4a.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -173,7 +174,7 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
             case R.id.share:
                 String login = ApiHelpers.getUserLogin(this, mGist.owner());
                 IntentUtils.share(this, getString(R.string.share_gist_subject, mGistId, login),
-                        mGist.htmlUrl());
+                        Uri.parse(mGist.htmlUrl()));
                 return true;
             case R.id.star:
                 item.setActionView(R.layout.ab_loading);

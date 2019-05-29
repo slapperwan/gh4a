@@ -18,6 +18,7 @@ package com.gh4a.adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -86,7 +87,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
                 case R.id.share:
                     String subject = mContext.getString(R.string.share_commit_comment_subject,
                             item.id(), mRepoOwner + "/" + mRepoName);
-                    IntentUtils.share(mContext, subject, item.htmlUrl());
+                    IntentUtils.share(mContext, subject, Uri.parse(item.htmlUrl()));
                     return true;
             }
             return false;

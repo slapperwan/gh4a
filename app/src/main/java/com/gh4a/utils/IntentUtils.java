@@ -98,11 +98,23 @@ public class IntentUtils {
         }
     }
 
-    public static void share(Context context, String subject, String url) {
+    public static Uri.Builder createBaseUriForUser(String user) {
+        return new Uri.Builder()
+                .scheme("https")
+                .authority("github.com")
+                .appendPath(user);
+    }
+
+    public static Uri.Builder createBaseUriForRepo(String repoOwner, String repoName) {
+        return createBaseUriForUser(repoOwner)
+                .appendPath(repoName);
+    }
+
+    public static void share(Context context, String subject, Uri url) {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.setType("text/plain");
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, url);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, url.toString());
         context.startActivity(
                 Intent.createChooser(shareIntent, context.getString(R.string.share_title)));
     }

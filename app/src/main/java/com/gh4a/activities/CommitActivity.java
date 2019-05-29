@@ -176,14 +176,18 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String diffUrl = "https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" + mObjectSha;
+        Uri diffUri = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
+                .appendPath("commit")
+                .appendPath(mObjectSha)
+                .build();
+
         switch (item.getItemId()) {
             case R.id.browser:
-                IntentUtils.launchBrowser(this, Uri.parse(diffUrl));
+                IntentUtils.launchBrowser(this, diffUri);
                 return true;
             case R.id.share:
                 IntentUtils.share(this, getString(R.string.share_commit_subject,
-                        mObjectSha.substring(0, 7), mRepoOwner + "/" + mRepoName), diffUrl);
+                        mObjectSha.substring(0, 7), mRepoOwner + "/" + mRepoName), diffUri);
                 return true;
         }
         return super.onOptionsItemSelected(item);
