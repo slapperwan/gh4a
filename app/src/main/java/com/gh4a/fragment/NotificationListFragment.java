@@ -209,7 +209,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         NotificationThread notification = notificationHolder.notification;
         NotificationService service = ServiceFactory.get(NotificationService.class, false);
         SubscriptionRequest request = SubscriptionRequest.builder()
-                .subscribed(false)
+                .ignored(true)
                 .build();
         service.setNotificationThreadSubscription(notification.id(), request)
                 .map(ApiHelpers::throwOnFailure)
