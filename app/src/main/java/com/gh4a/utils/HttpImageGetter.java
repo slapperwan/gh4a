@@ -196,7 +196,7 @@ public class HttpImageGetter {
         }
 
         void encode(Context context, String html) {
-            CharSequence encoded = HtmlUtils.encode(context, html, this);
+            CharSequence encoded = HtmlUtils.encodeHtml(context, html, this);
             synchronized (this) {
                 mHtml = encoded;
             }
