@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.util.Log;
 
-import com.gh4a.utils.CrashReportingHelper;
 import com.gh4a.utils.Optional;
 import com.meisolsson.githubsdk.core.GitHubPaginationInterceptor;
 import com.meisolsson.githubsdk.core.ServiceGenerator;
@@ -186,9 +185,7 @@ public class ServiceFactory {
                                 ? acceptHeader : DEFAULT_HEADER_ACCEPT);
                     }
 
-                    Request request = requestBuilder.build();
-                    CrashReportingHelper.trackVisitedUrl(request.url().toString());
-                    return chain.proceed(request);
+                    return chain.proceed(requestBuilder.build());
                 });
 
         if (BuildConfig.DEBUG) {

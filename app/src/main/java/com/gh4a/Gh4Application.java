@@ -27,7 +27,6 @@ import com.evernote.android.job.JobManager;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.job.Gh4JobCreator;
 import com.gh4a.job.NotificationsJob;
-import com.gh4a.utils.CrashReportingHelper;
 import com.gh4a.utils.DebuggingHelper;
 import com.meisolsson.githubsdk.model.User;
 
@@ -110,7 +109,6 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
 
         prefs.registerOnSharedPreferenceChangeListener(this);
 
-        CrashReportingHelper.onCreate(this);
         DebuggingHelper.onCreate(this);
 
         mPt = new PrettyTime();
