@@ -18,10 +18,10 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +35,7 @@ import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.adapter.IssueLabelAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.fragment.ConfirmationDialogFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
@@ -43,7 +44,8 @@ import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
 
 public class IssueLabelListActivity extends BaseActivity implements
-        RootAdapter.OnItemClickListener<IssueLabelAdapter.EditableLabel>, View.OnClickListener {
+        RootAdapter.OnItemClickListener<IssueLabelAdapter.EditableLabel>,
+        ConfirmationDialogFragment.Callback, View.OnClickListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             boolean fromPullRequest) {
         return new Intent(context, IssueLabelListActivity.class)
@@ -182,6 +184,12 @@ public class IssueLabelListActivity extends BaseActivity implements
         }
     }
 
+    @Override
+    public void onConfirmed(String tag, Parcelable data) {
+        IssueLabelAdapter.EditableLabel label = (IssueLabelAdapter.EditableLabel) data;
+        deleteLabel(label);
+    }
+
     private void startEditing(IssueLabelAdapter.EditableLabel label) {
         mActionMode = new EditActionMode(label);
         mAdapter.notifyDataSetChanged();
@@ -233,11 +241,9 @@ public class IssueLabelListActivity extends BaseActivity implements
                 }
                 break;
             case Menu.FIRST + 1:
-                new AlertDialog.Builder(IssueLabelListActivity.this)
-                        .setMessage(getString(R.string.issue_dialog_delete_message, mLabel.name()))
-                        .setPositiveButton(R.string.delete, (dialog, which) -> deleteLabel(mLabel))
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
+                ConfirmationDialogFragment.show(IssueLabelListActivity.this,
+                        getString(R.string.issue_dialog_delete_message, mLabel.name()),
+                        R.string.delete, mLabel, "deleteconfirm");
                 break;
             default:
                 break;

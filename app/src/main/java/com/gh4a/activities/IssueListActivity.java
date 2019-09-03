@@ -26,7 +26,6 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
@@ -40,12 +39,12 @@ import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
+import com.gh4a.fragment.SingleChoiceDialogFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Issue;
-import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.model.User;
@@ -53,13 +52,15 @@ import com.meisolsson.githubsdk.service.issues.IssueAssigneeService;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
 import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
-        MenuItem.OnActionExpandListener {
+        MenuItem.OnActionExpandListener, SingleChoiceDialogFragment.Callback {
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return makeIntent(context, repoOwner, repoName, false);
     }
@@ -181,6 +182,26 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         updateRightNavigationDrawer();
         loadCollaboratorStatus(true);
         super.onRefresh();
+    }
+
+    @Override
+    public void onItemSelected(String tag, int position, String entry) {
+        switch (tag) {
+            case "labelselect":
+                mSelectedLabel = position == 0 ? null : position == 1 ? "" : entry;
+                break;
+            case "milestoneselect":
+                mSelectedMilestone = position == 0 ? null : position == 1 ? "" : entry;
+                break;
+            case "assigneeselect":
+                mSelectedAssignee = position == 0 ? null
+                        : position == 1 ? "" : mAssignees.get(position - 2).login();
+                break;
+            case "participatingselect":
+                mSelectedParticipatingStatus = position;
+                break;
+        }
+        onFilterUpdated();
     }
 
     @Override
@@ -522,60 +543,39 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void showLabelsDialog() {
-        final String[] labels = new String[mLabels.size() + 2];
+        final ArrayList<String> labels = new ArrayList<>();
         int selected = mSelectedLabel != null && mSelectedLabel.isEmpty() ? 1 : 0;
 
-        labels[0] = getResources().getString(R.string.issue_filter_by_any_label);
-        labels[1] = getResources().getString(R.string.issue_filter_by_no_label);
+        labels.add(getString(R.string.issue_filter_by_any_label));
+        labels.add(getString(R.string.issue_filter_by_no_label));
 
-        for (int i = 0; i < mLabels.size(); i++) {
-            labels[i + 2] = mLabels.get(i).name();
-            if (TextUtils.equals(mSelectedLabel, labels[i + 2])) {
-                selected = i + 2;
+        for (Label label : mLabels) {
+            labels.add(label.name());
+            if (TextUtils.equals(mSelectedLabel, label.name())) {
+                selected = labels.size() - 1;
             }
         }
 
-        DialogInterface.OnClickListener selectCb = (dialog, which) -> {
-            mSelectedLabel = which == 0 ? null : which == 1 ? "" : labels[which];
-            dialog.dismiss();
-            onFilterUpdated();
-        };
-
-        new AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle(R.string.issue_filter_by_labels)
-                .setSingleChoiceItems(labels, selected, selectCb)
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        SingleChoiceDialogFragment.show(this, labels,
+                R.string.issue_filter_by_labels, selected, "labelselect");
     }
 
     private void showMilestonesDialog() {
-        final String[] milestones = new String[mMilestones.size() + 2];
+        final ArrayList<String> milestones = new ArrayList<>();
         int selected = mSelectedMilestone != null && mSelectedMilestone.isEmpty() ? 1 : 0;
 
-        milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
-        milestones[1] = getResources().getString(R.string.issue_filter_by_no_milestone);
+        milestones.add(getString(R.string.issue_filter_by_any_milestone));
+        milestones.add(getString(R.string.issue_filter_by_no_milestone));
 
-        for (int i = 0; i < mMilestones.size(); i++) {
-            milestones[i + 2] = mMilestones.get(i).title();
-            if (TextUtils.equals(mSelectedMilestone, milestones[i + 2])) {
-                selected = i + 2;
+        for (Milestone milestone : mMilestones) {
+            milestones.add(milestone.title());
+            if (TextUtils.equals(mSelectedMilestone, milestone.title())) {
+                selected = milestones.size() - 1;
             }
         }
 
-        DialogInterface.OnClickListener selectCb = (dialog, which) -> {
-            mSelectedMilestone =
-                    which == 0 ? null : which == 1 ? "" : milestones[which];
-            dialog.dismiss();
-            onFilterUpdated();
-        };
-
-        new AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle(R.string.issue_filter_by_milestone)
-                .setSingleChoiceItems(milestones, selected, selectCb)
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        SingleChoiceDialogFragment.show(this, milestones,
+                R.string.issue_filter_by_milestone, selected, "milestoneselect");
     }
 
     private void onFilterUpdated() {
@@ -585,33 +585,21 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void showAssigneesDialog() {
-        final String[] assignees = new String[mAssignees.size() + 2];
+        final ArrayList<String> assignees = new ArrayList<>();
         int selected = mSelectedAssignee != null && mSelectedAssignee.isEmpty() ? 1 : 0;
 
-        assignees[0] = getResources().getString(R.string.issue_filter_by_any_assignee);
-        assignees[1] = getResources().getString(R.string.issue_filter_by_no_assignee);
+        assignees.add(getString(R.string.issue_filter_by_any_assignee));
+        assignees.add(getString(R.string.issue_filter_by_no_assignee));
 
-        for (int i = 0; i < mAssignees.size(); i++) {
-            User u = mAssignees.get(i);
-            assignees[i + 2] = u.login();
-            if (u.login().equalsIgnoreCase(mSelectedAssignee)) {
-                selected = i + 2;
+        for (User user : mAssignees) {
+            assignees.add(user.login());
+            if (user.login().equalsIgnoreCase(mSelectedAssignee)) {
+                selected = assignees.size() - 1;
             }
         }
 
-        DialogInterface.OnClickListener selectCb = (dialog, which) -> {
-            mSelectedAssignee =
-                    which == 0 ? null : which == 1 ? "" : mAssignees.get(which - 2).login();
-            dialog.dismiss();
-            onFilterUpdated();
-        };
-
-        new AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle(R.string.issue_filter_by_assignee)
-                .setSingleChoiceItems(assignees, selected, selectCb)
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        SingleChoiceDialogFragment.show(this, assignees,
+                R.string.issue_filter_by_assignee, selected, "assigneeselect");
     }
 
     private void filterAssignee() {
@@ -663,19 +651,9 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void filterParticipating() {
-        DialogInterface.OnClickListener selectCb = (dialog, which) -> {
-            mSelectedParticipatingStatus = which;
-            dialog.dismiss();
-            onFilterUpdated();
-        };
-
-        new AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle(R.string.issue_filter_by_participating)
-                .setSingleChoiceItems(R.array.filter_participating, mSelectedParticipatingStatus,
-                        selectCb)
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        final List<String> options = Arrays.asList(getResources().getStringArray(R.array.filter_participating));
+        SingleChoiceDialogFragment.show(this, options, R.string.issue_filter_by_participating,
+                mSelectedParticipatingStatus, "participatingselect");
     }
 
     private void loadCollaboratorStatus(boolean force) {

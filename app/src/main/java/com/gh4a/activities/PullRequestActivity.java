@@ -16,15 +16,18 @@
 package com.gh4a.activities;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -43,6 +46,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.CommitCompareFragment;
+import com.gh4a.fragment.ConfirmationDialogFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
 import com.gh4a.fragment.PullRequestFragment;
 import com.gh4a.utils.ApiHelpers;
@@ -72,7 +76,8 @@ import java.util.Locale;
 import io.reactivex.Single;
 
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
-        View.OnClickListener, PullRequestFilesFragment.CommentUpdateListener {
+        View.OnClickListener, ConfirmationDialogFragment.Callback,
+        PullRequestFilesFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
         return makeIntent(context, repoOwner, repoName, number, -1, null);
     }
@@ -199,7 +204,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.pull_merge:
-                showMergeDialog();
+                MergeDialogFragment.newInstance(mPullRequest)
+                        .show(getSupportFragmentManager(), "mergemethod");
                 break;
             case R.id.pull_review:
                 showReviewDialog();
@@ -346,60 +352,21 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
     }
 
+    @Override
+    public void onConfirmed(String tag, Parcelable data) {
+        boolean reopen = ((Bundle) data).getBoolean("reopen");
+        updatePullRequestState(reopen);
+    }
+
     private void showOpenCloseConfirmDialog(final boolean reopen) {
         @StringRes int messageResId = reopen
                 ? R.string.reopen_pull_request_confirm : R.string.close_pull_request_confirm;
         @StringRes int buttonResId = reopen
                 ? R.string.pull_request_reopen : R.string.pull_request_close;
-        new AlertDialog.Builder(this)
-                .setMessage(messageResId)
-                .setIconAttribute(android.R.attr.alertDialogIcon)
-                .setCancelable(false)
-                .setPositiveButton(buttonResId, (dialog, which) -> updatePullRequestState(reopen))
-                .setNegativeButton(R.string.cancel, null)
-                .show();
-    }
+        Bundle data = new Bundle();
+        data.putBoolean("reopen", reopen);
 
-    private void showMergeDialog() {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        String title = getString(R.string.pull_message_dialog_title, mPullRequest.number());
-        View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
-
-        final View editorNotice = view.findViewById(R.id.notice);
-        final EditText editor = view.findViewById(R.id.et_commit_message);
-        editor.setText(mPullRequest.title());
-
-        final ArrayAdapter<MergeMethodDesc> adapter = new ArrayAdapter<>(this,
-                R.layout.spinner_item);
-        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_merge, MergeRequest.Method.Merge));
-        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_squash, MergeRequest.Method.Squash));
-        adapter.add(new MergeMethodDesc(R.string.pull_merge_method_rebase, MergeRequest.Method.Rebase));
-
-        final Spinner mergeMethod = view.findViewById(R.id.merge_method);
-        mergeMethod.setAdapter(adapter);
-        mergeMethod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                int editorVisibility = position == 2 ? View.GONE : View.VISIBLE;
-                editorNotice.setVisibility(editorVisibility);
-                editor.setVisibility(editorVisibility);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setView(view)
-                .setPositiveButton(R.string.pull_request_merge, (dialog, which) -> {
-                    String text = editor.getText() == null ? null : editor.getText().toString();
-                    int methodIndex = mergeMethod.getSelectedItemPosition();
-                    mergePullRequest(text, adapter.getItem(methodIndex).action);
-                })
-                .setNegativeButton(getString(R.string.cancel), null)
-                .show();
+        ConfirmationDialogFragment.show(this, messageResId, buttonResId, true, data, "opencloseconfirm");
     }
 
     private void showReviewDialog() {
@@ -574,18 +541,77 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 }, this::handleLoadFailure);
     }
 
-    private class MergeMethodDesc {
-        final @StringRes int textResId;
+    private static class MergeMethodDesc {
+        final String text;
         final MergeRequest.Method action;
 
-        public MergeMethodDesc(@StringRes int textResId, MergeRequest.Method action) {
-            this.textResId = textResId;
+        public MergeMethodDesc(String text, MergeRequest.Method action) {
+            this.text = text;
             this.action = action;
         }
 
         @Override
         public String toString() {
-            return getString(textResId);
+            return text;
+        }
+    }
+
+    public static class MergeDialogFragment extends DialogFragment {
+        public static MergeDialogFragment newInstance(PullRequest pr) {
+            MergeDialogFragment f = new MergeDialogFragment();
+            Bundle args = new Bundle();
+            args.putParcelable("pr", pr);
+            f.setArguments(args);
+            return f;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            final PullRequest pr = getArguments().getParcelable("pr");
+            String title = getString(R.string.pull_message_dialog_title, pr.number());
+            View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
+
+            final View editorNotice = view.findViewById(R.id.notice);
+            final EditText editor = view.findViewById(R.id.et_commit_message);
+            editor.setText(pr.title());
+
+            final ArrayAdapter<MergeMethodDesc> adapter =
+                    new ArrayAdapter<>(getContext(), R.layout.spinner_item);
+            adapter.add(new MergeMethodDesc(
+                    getString(R.string.pull_merge_method_merge), MergeRequest.Method.Merge));
+            adapter.add(new MergeMethodDesc(
+                    getString(R.string.pull_merge_method_squash), MergeRequest.Method.Squash));
+            adapter.add(new MergeMethodDesc(
+                    getString(R.string.pull_merge_method_rebase), MergeRequest.Method.Rebase));
+
+            final Spinner mergeMethod = view.findViewById(R.id.merge_method);
+            mergeMethod.setAdapter(adapter);
+            mergeMethod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    int editorVisibility = position == 2 ? View.GONE : View.VISIBLE;
+                    editorNotice.setVisibility(editorVisibility);
+                    editor.setVisibility(editorVisibility);
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                }
+            });
+
+            final PullRequestActivity activity = (PullRequestActivity) getContext();
+            return new AlertDialog.Builder(activity)
+                    .setTitle(title)
+                    .setView(view)
+                    .setPositiveButton(R.string.pull_request_merge, (dialog, which) -> {
+                        String text = editor.getText() == null ? null : editor.getText().toString();
+                        int methodIndex = mergeMethod.getSelectedItemPosition();
+
+                        activity.mergePullRequest(text, adapter.getItem(methodIndex).action);
+                    })
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .create();
         }
     }
 }

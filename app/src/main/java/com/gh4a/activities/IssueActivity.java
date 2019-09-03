@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -28,7 +29,6 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +41,7 @@ import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
+import com.gh4a.fragment.ConfirmationDialogFragment;
 import com.gh4a.fragment.IssueFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -56,7 +57,8 @@ import com.meisolsson.githubsdk.service.issues.IssueService;
 
 import java.util.Locale;
 
-public class IssueActivity extends BaseActivity implements View.OnClickListener {
+public class IssueActivity extends BaseActivity implements
+        View.OnClickListener, ConfirmationDialogFragment.Callback {
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
         return makeIntent(context, login, repoName, number, null);
     }
@@ -275,18 +277,21 @@ public class IssueActivity extends BaseActivity implements View.OnClickListener 
         super.onBackPressed();
     }
 
+    @Override
+    public void onConfirmed(String tag, Parcelable data) {
+        boolean reopen = ((Bundle) data).getBoolean("reopen");
+        updateIssueState(reopen);
+    }
+
     private void showOpenCloseConfirmDialog(final boolean reopen) {
         @StringRes int messageResId = reopen
                 ? R.string.reopen_issue_confirm : R.string.close_issue_confirm;
         @StringRes int buttonResId = reopen
                 ? R.string.pull_request_reopen : R.string.pull_request_close;
-        new AlertDialog.Builder(this)
-                .setMessage(messageResId)
-                .setIconAttribute(android.R.attr.alertDialogIcon)
-                .setCancelable(false)
-                .setPositiveButton(buttonResId, (dialog, which) -> updateIssueState(reopen))
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+
+        Bundle data = new Bundle();
+        data.putBoolean("reopen", reopen);
+        ConfirmationDialogFragment.show(this, messageResId, buttonResId, data, "reopenconfirm");
     }
 
     private void updateIssueState(boolean reopen) {

@@ -17,9 +17,10 @@ package com.gh4a.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.AttrRes;
+import android.support.annotation.StringRes;
 import android.support.v4.util.LongSparseArray;
-import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.Menu;
@@ -357,20 +358,28 @@ public class PullRequestFragment extends IssueFragmentBase {
     }
 
     private void showDeleteRestoreBranchConfirmDialog(final boolean restore) {
-        int message = restore ? R.string.restore_branch_question : R.string.delete_branch_question;
-        int buttonText = restore ? R.string.restore : R.string.delete;
-        new AlertDialog.Builder(getContext())
-                .setMessage(message)
-                .setIconAttribute(android.R.attr.alertDialogIcon)
-                .setPositiveButton(buttonText, (dialog, which) -> {
-                    if (restore) {
-                        restorePullRequestBranch();
-                    } else {
-                        deletePullRequestBranch();
-                    }
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        @StringRes int message = restore
+                ? R.string.restore_branch_question : R.string.delete_branch_question;
+        @StringRes int buttonText = restore ? R.string.restore : R.string.delete;
+
+        Bundle data = new Bundle();
+        data.putBoolean("restore", restore);
+        ConfirmationDialogFragment.show(this, message,
+                buttonText, true, data, "prbranchconfirm");
+    }
+
+    @Override
+    public void onConfirmed(String tag, Parcelable data) {
+        if ("prbranchconfirm".equals(tag)) {
+            boolean restore = ((Bundle) data).getBoolean("restore");
+            if (restore) {
+                restorePullRequestBranch();
+            } else {
+                deletePullRequestBranch();
+            }
+        } else {
+            super.onConfirmed(tag, data);
+        }
     }
 
     private void onHeadReferenceUpdated() {

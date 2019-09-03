@@ -1,9 +1,12 @@
 package com.gh4a.activities;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
@@ -317,31 +320,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
     }
 
     private void showRefSelectionDialog() {
-        final BranchAndTagAdapter adapter = new BranchAndTagAdapter();
-        int current = -1, master = -1, count = adapter.getCount();
-
-        for (int i = 0; i < count; i++) {
-            Branch item = adapter.getItem(i);
-            if (item.name().equals(mSelectedRef) || item.commit().sha().equals(mSelectedRef)) {
-                current = i;
-            }
-            if (item.name().equals(mRepository.defaultBranch())) {
-                master = i;
-            }
-        }
-        if (mSelectedRef == null && current == -1) {
-            current = master;
-        }
-
-        new AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle(R.string.repo_select_ref_dialog_title)
-                .setSingleChoiceItems(adapter, current, (dialog, which) -> {
-                    setSelectedRef(adapter.getItem(which).name());
-                    dialog.dismiss();
-                })
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        BranchSelectionDialogFragment.newInstance(mBranches, mTags, mSelectedRef, mRepository.defaultBranch())
+                .show(getSupportFragmentManager(), "branchselection");
     }
 
     private void setSelectedRef(String selectedRef) {
@@ -403,21 +383,74 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         }
     }
 
-    private class BranchAndTagAdapter extends BaseAdapter {
+    public static class BranchSelectionDialogFragment extends DialogFragment {
+        public static BranchSelectionDialogFragment newInstance(List<Branch> branches,
+                List<Branch> tags, String selectedRef, String defaultBranch) {
+            Bundle args = new Bundle();
+            args.putParcelableArrayList("branches", new ArrayList<>(branches));
+            args.putParcelableArrayList("tags", new ArrayList<>(tags));
+            args.putString("selectedRef", selectedRef);
+            args.putString("defaultBranch", defaultBranch);
+
+            BranchSelectionDialogFragment f = new BranchSelectionDialogFragment();
+            f.setArguments(args);
+            return f;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            Bundle args = getArguments();
+            List<Branch> branches = args.getParcelableArrayList("branches");
+            List<Branch> tags = args.getParcelableArrayList("tags");
+            String selectedRef = args.getString("selectedRef");
+            String defaultBranch = args.getString("defaultBranch");
+
+            final BranchAndTagAdapter adapter = new BranchAndTagAdapter(getContext(),
+                    branches, tags);
+            int current = -1, master = -1, count = adapter.getCount();
+
+            for (int i = 0; i < count; i++) {
+                Branch item = adapter.getItem(i);
+                if (item.name().equals(selectedRef) || item.commit().sha().equals(selectedRef)) {
+                    current = i;
+                }
+                if (item.name().equals(defaultBranch)) {
+                    master = i;
+                }
+            }
+            if (selectedRef == null && current == -1) {
+                current = master;
+            }
+
+            final RepositoryActivity activity = (RepositoryActivity) getActivity();
+            return new AlertDialog.Builder(activity)
+                    .setCancelable(true)
+                    .setTitle(R.string.repo_select_ref_dialog_title)
+                    .setSingleChoiceItems(adapter, current, (dialog, which) -> {
+                        activity.setSelectedRef(adapter.getItem(which).name());
+                        dialog.dismiss();
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .create();
+        }
+    }
+
+    private static class BranchAndTagAdapter extends BaseAdapter {
         private final ArrayList<Branch> mItems;
         private final LayoutInflater mInflater;
         private final int mBranchDrawableResId;
         private final int mTagDrawableResId;
         private final int mFirstTagIndex;
 
-        public BranchAndTagAdapter() {
+        public BranchAndTagAdapter(Context context, List<Branch> branches, List<Branch> tags) {
             mItems = new ArrayList<>();
-            mItems.addAll(mBranches);
-            mItems.addAll(mTags);
-            mFirstTagIndex = mBranches.size();
-            mInflater = LayoutInflater.from(RepositoryActivity.this);
-            mBranchDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.branchIcon);
-            mTagDrawableResId = UiUtils.resolveDrawable(RepositoryActivity.this, R.attr.tagIcon);
+            mItems.addAll(branches);
+            mItems.addAll(tags);
+            mFirstTagIndex = branches.size();
+            mInflater = LayoutInflater.from(context);
+            mBranchDrawableResId = UiUtils.resolveDrawable(context, R.attr.branchIcon);
+            mTagDrawableResId = UiUtils.resolveDrawable(context, R.attr.tagIcon);
         }
 
         @Override

@@ -19,8 +19,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
@@ -71,6 +71,7 @@ import retrofit2.Response;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
         View.OnClickListener, TimelineItemAdapter.OnCommentAction,
+        ConfirmationDialogFragment.Callback,
         EditorBottomSheet.Callback, EditorBottomSheet.Listener,
         ReactionBar.Callback, ReactionBar.Item, ReactionBar.ReactionDetailsCache.Listener {
     protected static final int REQUEST_EDIT = 1000;
@@ -542,11 +543,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public void deleteComment(final GitHubCommentBase comment) {
-        new AlertDialog.Builder(getActivity())
-                .setMessage(R.string.delete_comment_message)
-                .setPositiveButton(R.string.delete, (dialog, which) -> handleDeleteComment(comment))
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        ConfirmationDialogFragment.show(this, R.string.delete_comment_message,
+                R.string.delete, comment, "deleteconfirm");
+    }
+
+    @Override
+    public void onConfirmed(String tag, Parcelable data) {
+        GitHubCommentBase comment = (GitHubCommentBase) data;
+        handleDeleteComment(comment);
     }
 
     @Override

@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -31,7 +32,6 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -47,6 +47,7 @@ import com.gh4a.BasePagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
+import com.gh4a.fragment.ConfirmationDialogFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
@@ -66,7 +67,8 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class IssueMilestoneEditActivity extends BasePagerActivity implements
-        View.OnClickListener, View.OnFocusChangeListener, AppBarLayout.OnOffsetChangedListener {
+        View.OnClickListener, View.OnFocusChangeListener,
+        AppBarLayout.OnOffsetChangedListener, ConfirmationDialogFragment.Callback {
     public static Intent makeEditIntent(Context context, String repoOwner, String repoName,
             Milestone milestone, boolean fromPullRequest) {
         return makeCreateIntent(context, repoOwner, repoName, fromPullRequest)
@@ -259,17 +261,29 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             case R.id.milestone_reopen:
                 showOpenCloseConfirmDialog(item.getItemId() == R.id.milestone_reopen);
                 return true;
-            case R.id.delete:
-                new AlertDialog.Builder(this)
-                        .setMessage(getString(R.string.issue_dialog_delete_message,
-                                mMilestone.title()))
-                        .setPositiveButton(R.string.delete, (dialog, which) -> deleteMilestone())
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
+            case R.id.delete: {
+                final String message =
+                        getString(R.string.issue_dialog_delete_message, mMilestone.title());
+                ConfirmationDialogFragment.show(this, message, R.string.delete, null, "deleteconfirm");
                 return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConfirmed(String tag, Parcelable data) {
+        switch (tag) {
+            case "deleteconfirm":
+                deleteMilestone();
+                break;
+            case "opencloseconfirm": {
+                boolean reopen = ((Bundle) data).getBoolean("reopen");
+                setMilestoneState(reopen);
+                break;
+            }
+        }
     }
 
     private void showOpenCloseConfirmDialog(final boolean reopen) {
@@ -277,11 +291,9 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 ? R.string.issue_milestone_reopen_message : R.string.issue_milestone_close_message;
         @StringRes int buttonResId = reopen
                 ? R.string.pull_request_reopen : R.string.pull_request_close;
-        new AlertDialog.Builder(this)
-                .setMessage(messageResId)
-                .setPositiveButton(buttonResId, (dialog, which) -> setMilestoneState(reopen))
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        Bundle data = new Bundle();
+        data.putBoolean("reopen", reopen);
+        ConfirmationDialogFragment.show(this, messageResId, buttonResId, data, "opencloseconfirm");
     }
 
     private void updateHighlightColor() {

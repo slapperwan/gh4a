@@ -18,9 +18,9 @@ package com.gh4a.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.SparseArray;
@@ -31,6 +31,7 @@ import android.view.View;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.fragment.ConfirmationDialogFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
@@ -48,7 +49,8 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public abstract class DiffViewerActivity<C extends PositionalCommentBase> extends WebViewerActivity
-        implements ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
+        implements ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener,
+        ConfirmationDialogFragment.Callback {
     protected static <C extends PositionalCommentBase> Intent fillInIntent(Intent baseIntent,
             String repoOwner, String repoName, String commitSha, String path, String diff,
             List<C> comments, int initialLine, int highlightStartLine, int highlightEndLine,
@@ -372,6 +374,12 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     }
 
     @Override
+    public void onConfirmed(String tag, Parcelable data) {
+        long id = ((Bundle) data).getLong("id");
+        doDeleteComment(id);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_EDIT) {
             if (resultCode == RESULT_OK) {
@@ -523,13 +531,15 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             }
 
             switch (item.getItemId()) {
-                case R.id.delete:
-                    new AlertDialog.Builder(DiffViewerActivity.this)
-                            .setMessage(R.string.delete_comment_message)
-                            .setPositiveButton(R.string.delete, (dialog, which) -> deleteComment(mId))
-                            .setNegativeButton(R.string.cancel, null)
-                            .show();
+                case R.id.delete: {
+                    Bundle data = new Bundle();
+                    data.putLong("id", mId);
+
+                    ConfirmationDialogFragment.show(DiffViewerActivity.this,
+                            R.string.delete_comment_message, R.string.delete, data,
+                            "deleteconfirm");
                     break;
+                }
                 case R.id.reply:
                     openCommentDialog(0L, mId, mLineText, mPosition, mLeftLine, mRightLine, null);
                     break;

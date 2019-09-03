@@ -15,17 +15,20 @@
  */
 package com.gh4a.activities;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.ObjectsCompat;
 import android.support.v4.view.PagerAdapter;
@@ -66,6 +69,7 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -350,39 +354,9 @@ public class IssueEditActivity extends BasePagerActivity implements
         if (mAllMilestone == null) {
             loadMilestones();
         } else {
-            final String[] milestones = new String[mAllMilestone.size() + 1];
-            Milestone selectedMilestone = mEditIssue.milestone();
-            int selected = 0;
-
-            milestones[0] = getResources().getString(R.string.issue_clear_milestone);
-            for (int i = 1; i <= mAllMilestone.size(); i++) {
-                Milestone m = mAllMilestone.get(i - 1);
-                milestones[i] = m.title();
-                if (selectedMilestone != null && m.number().equals(selectedMilestone.number())) {
-                    selected = i;
-                }
-            }
-
-            final DialogInterface.OnClickListener selectCb = (dialog, which) -> {
-                mEditIssue = mEditIssue.toBuilder()
-                        .milestone(which == 0 ? null : mAllMilestone.get(which - 1))
-                        .build();
-                updateOptionViews();
-                dialog.dismiss();
-            };
-
-            new AlertDialog.Builder(this)
-                    .setCancelable(true)
-                    .setTitle(R.string.issue_milestone_hint)
-                    .setSingleChoiceItems(milestones, selected, selectCb)
-                    .setNegativeButton(R.string.cancel, null)
-                    .setNeutralButton(R.string.issue_manage_milestones, (dialog, which) -> {
-                        Intent intent = IssueMilestoneListActivity.makeIntent(
-                                IssueEditActivity.this, mRepoOwner, mRepoName,
-                                mEditIssue.pullRequest() != null);
-                        startActivityForResult(intent, REQUEST_MANAGE_MILESTONES);
-                    })
-                    .show();
+            MilestoneEditDialogFragment
+                    .newInstance(mEditIssue.milestone(), mAllMilestone)
+                    .show(getSupportFragmentManager(), "milestoneedit");
         }
     }
 
@@ -390,44 +364,11 @@ public class IssueEditActivity extends BasePagerActivity implements
         if (mAllAssignee == null) {
             loadPotentialAssignees();
         } else {
-            final String[] assigneeNames = new String[mAllAssignee.size()];
-            final boolean[] selection = new boolean[mAllAssignee.size()];
             final List<User> oldAssigneeList = mEditIssue.assignees() != null
-                    ? mEditIssue.assignees() : new ArrayList<>();
-            List<String> assigneeLogins = new ArrayList<>();
-            for (User assignee : oldAssigneeList) {
-                assigneeLogins.add(assignee.login());
-            }
-
-            for (int i = 0; i < mAllAssignee.size(); i++) {
-                String login = mAllAssignee.get(i).login();
-                assigneeNames[i] = login;
-                selection[i] = assigneeLogins.contains(login);
-            }
-
-            DialogInterface.OnMultiChoiceClickListener selectCb =
-                    (dialogInterface, which, isChecked) -> selection[which] = isChecked;
-            DialogInterface.OnClickListener okCb = (dialog, which) -> {
-                List<User> newAssigneeList = new ArrayList<>();
-                for (int i = 0; i < selection.length; i++) {
-                    if (selection[i]) {
-                        newAssigneeList.add(mAllAssignee.get(i));
-                    }
-                }
-                mEditIssue = mEditIssue.toBuilder()
-                        .assignees(newAssigneeList)
-                        .build();
-                updateOptionViews();
-                dialog.dismiss();
-            };
-
-            new AlertDialog.Builder(this)
-                    .setCancelable(true)
-                    .setTitle(R.string.issue_assignee_hint)
-                    .setMultiChoiceItems(assigneeNames, selection, selectCb)
-                    .setPositiveButton(R.string.ok, okCb)
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
+                    ? mEditIssue.assignees() : Collections.emptyList();
+            AssigneeEditDialogFragment
+                    .newInstance(oldAssigneeList, mAllAssignee)
+                    .show(getSupportFragmentManager(), "assigneeedit");
         }
     }
 
@@ -435,71 +376,45 @@ public class IssueEditActivity extends BasePagerActivity implements
         if (mAllLabels == null) {
             loadLabels();
         } else {
-            LayoutInflater inflater = getLayoutInflater();
             final List<Label> selectedLabels = mEditIssue.labels() != null
-                    ? new ArrayList<>(mEditIssue.labels()) : new ArrayList<>();
-            View labelContainerView = inflater.inflate(R.layout.generic_linear_container, null);
-            ViewGroup container = labelContainerView.findViewById(R.id.container);
-
-            View.OnClickListener clickListener = view -> {
-                Label label = (Label) view.getTag();
-                if (selectedLabels.contains(label)) {
-                    selectedLabels.remove(label);
-                    setLabelSelection((TextView) view, false);
-                } else {
-                    selectedLabels.add(label);
-                    setLabelSelection((TextView) view, true);
-                }
-            };
-
-            for (final Label label : mAllLabels) {
-                final View rowView = inflater.inflate(R.layout.row_issue_create_label, container, false);
-                View viewColor = rowView.findViewById(R.id.view_color);
-                viewColor.setBackgroundColor(ApiHelpers.colorForLabel(label));
-
-                final TextView tvLabel = rowView.findViewById(R.id.tv_title);
-                tvLabel.setText(label.name());
-                tvLabel.setOnClickListener(clickListener);
-                tvLabel.setTag(label);
-
-                setLabelSelection(tvLabel, selectedLabels.contains(label));
-                container.addView(rowView);
-            }
-
-            new AlertDialog.Builder(this)
-                    .setCancelable(true)
-                    .setTitle(R.string.issue_labels)
-                    .setView(labelContainerView)
-                    .setNegativeButton(R.string.cancel, null)
-                    .setPositiveButton(R.string.ok, (dialog, which) -> {
-                        mEditIssue = mEditIssue.toBuilder()
-                                .labels(selectedLabels)
-                                .build();
-                        updateOptionViews();
-                    })
-                    .setNeutralButton(R.string.issue_manage_labels, (dialog, which) -> {
-                        Intent intent = IssueLabelListActivity.makeIntent(
-                                IssueEditActivity.this, mRepoOwner, mRepoName,
-                                mEditIssue.pullRequest() != null);
-                        startActivityForResult(intent, REQUEST_MANAGE_LABELS);
-                    })
-                    .show();
+                    ? mEditIssue.labels() : Collections.emptyList();
+            LabelEditDialogFragment
+                    .newInstance(selectedLabels, mAllLabels)
+                    .show(getSupportFragmentManager(), "labeledit");
         }
     }
 
-    private void setLabelSelection(TextView view, boolean selected) {
-        Label label = (Label) view.getTag();
-        if (selected) {
-            int color = ApiHelpers.colorForLabel(label);
-            view.setTypeface(view.getTypeface(), Typeface.BOLD);
-            view.setBackgroundColor(color);
-            view.setTextColor(UiUtils.textColorForBackground(this, color));
-        } else {
-            view.setTypeface(view.getTypeface(), 0);
-            view.setBackgroundColor(0);
-            view.setTextColor(ContextCompat.getColor(this, Gh4Application.THEME != R.style.LightTheme
-                    ? R.color.label_fg_light : R.color.label_fg_dark));
-        }
+    private void updateMilestone(Milestone newMilestone) {
+        mEditIssue = mEditIssue.toBuilder()
+                .milestone(newMilestone)
+                .build();
+        updateOptionViews();
+    }
+
+    private void updateAssignees(List<User> newAssignees) {
+        mEditIssue = mEditIssue.toBuilder()
+                .assignees(newAssignees)
+                .build();
+        updateOptionViews();
+    }
+
+    private void updateLabels(List<Label> newLabels) {
+        mEditIssue = mEditIssue.toBuilder()
+                .labels(newLabels)
+                .build();
+        updateOptionViews();
+    }
+
+    private void manageMilestones() {
+        Intent intent = IssueMilestoneListActivity.makeIntent(this, mRepoOwner, mRepoName,
+                mEditIssue.pullRequest() != null);
+        startActivityForResult(intent, REQUEST_MANAGE_MILESTONES);
+    }
+
+    private void manageLabels() {
+        Intent intent = IssueLabelListActivity.makeIntent(this, mRepoOwner, mRepoName,
+                mEditIssue.pullRequest() != null);
+        startActivityForResult(intent, REQUEST_MANAGE_LABELS);
     }
 
     private void updateOptionViews() {
@@ -696,6 +611,184 @@ public class IssueEditActivity extends BasePagerActivity implements
         @Override
         public int getCount() {
             return mIsCollaborator ? TITLES.length : TITLES.length - 1;
+        }
+    }
+
+    public static class MilestoneEditDialogFragment extends DialogFragment {
+        public static MilestoneEditDialogFragment newInstance(
+                Milestone selected, List<Milestone> all) {
+            MilestoneEditDialogFragment f = new MilestoneEditDialogFragment();
+            Bundle args = new Bundle();
+            args.putParcelable("selected", selected);
+            args.putParcelableArrayList("all", new ArrayList<>(all));
+            f.setArguments(args);
+            return f;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final ArrayList<Milestone> all = getArguments().getParcelableArrayList("all");
+            final Milestone selectedMilestone = getArguments().getParcelable("selected");
+            final String[] milestones = new String[all.size() + 1];
+            int selected = 0;
+
+            milestones[0] = getString(R.string.issue_clear_milestone);
+            for (int i = 1; i <= all.size(); i++) {
+                Milestone m = all.get(i - 1);
+                milestones[i] = m.title();
+                if (selectedMilestone != null && m.number().equals(selectedMilestone.number())) {
+                    selected = i;
+                }
+            }
+
+            final IssueEditActivity activity = (IssueEditActivity) getContext();
+            final DialogInterface.OnClickListener selectCb = (dialog, which) -> {
+                activity.updateMilestone(which == 0 ? null : all.get(which - 1));
+                dialog.dismiss();
+            };
+
+            return new AlertDialog.Builder(activity)
+                    .setCancelable(true)
+                    .setTitle(R.string.issue_milestone_hint)
+                    .setSingleChoiceItems(milestones, selected, selectCb)
+                    .setNegativeButton(R.string.cancel, null)
+                    .setNeutralButton(R.string.issue_manage_milestones, (dialog, which) -> {
+                        activity.manageMilestones();
+                    })
+                    .create();
+        }
+    }
+
+    public static class AssigneeEditDialogFragment extends DialogFragment {
+        public static AssigneeEditDialogFragment newInstance(
+                List<User> selected, List<User> allPotentialAssignees) {
+            AssigneeEditDialogFragment f = new AssigneeEditDialogFragment();
+            Bundle args = new Bundle();
+            args.putParcelableArrayList("selected", new ArrayList<>(selected));
+            args.putParcelableArrayList("all", new ArrayList<>(allPotentialAssignees));
+            f.setArguments(args);
+            return f;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final ArrayList<User> selected = getArguments().getParcelableArrayList("selected");
+            final ArrayList<User> all = getArguments().getParcelableArrayList("all");
+
+            List<String> assigneeLogins = new ArrayList<>();
+            for (User assignee : selected) {
+                assigneeLogins.add(assignee.login());
+            }
+
+            final String[] assigneeNames = new String[all.size()];
+            final boolean[] selection = new boolean[all.size()];
+
+            for (int i = 0; i < all.size(); i++) {
+                String login = all.get(i).login();
+                assigneeNames[i] = login;
+                selection[i] = assigneeLogins.contains(login);
+            }
+
+            final IssueEditActivity activity = (IssueEditActivity) getContext();
+
+            DialogInterface.OnMultiChoiceClickListener selectCb =
+                    (dialogInterface, which, isChecked) -> selection[which] = isChecked;
+            DialogInterface.OnClickListener okCb = (dialog, which) -> {
+                List<User> newAssigneeList = new ArrayList<>();
+                for (int i = 0; i < selection.length; i++) {
+                    if (selection[i]) {
+                        newAssigneeList.add(all.get(i));
+                    }
+                }
+                activity.updateAssignees(newAssigneeList);
+                dialog.dismiss();
+            };
+
+            return new AlertDialog.Builder(activity)
+                    .setCancelable(true)
+                    .setTitle(R.string.issue_assignee_hint)
+                    .setMultiChoiceItems(assigneeNames, selection, selectCb)
+                    .setPositiveButton(R.string.ok, okCb)
+                    .setNegativeButton(R.string.cancel, null)
+                    .create();
+        }
+    }
+
+    public static class LabelEditDialogFragment extends DialogFragment {
+        public static LabelEditDialogFragment newInstance(
+                List<Label> selectedLabels, List<Label> allLabels) {
+            LabelEditDialogFragment f = new LabelEditDialogFragment();
+            Bundle args = new Bundle();
+            args.putParcelableArrayList("selected", new ArrayList<>(selectedLabels));
+            args.putParcelableArrayList("all", new ArrayList<>(allLabels));
+            f.setArguments(args);
+            return f;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            LayoutInflater inflater = getLayoutInflater();
+            final List<Label> selectedLabels = getArguments().getParcelableArrayList("selected");
+            final List<Label> allLabels = getArguments().getParcelableArrayList("all");
+            View labelContainerView = inflater.inflate(R.layout.generic_linear_container, null);
+            ViewGroup container = labelContainerView.findViewById(R.id.container);
+
+            View.OnClickListener clickListener = view -> {
+                Label label = (Label) view.getTag();
+                if (selectedLabels.contains(label)) {
+                    selectedLabels.remove(label);
+                    setLabelSelection((TextView) view, false);
+                } else {
+                    selectedLabels.add(label);
+                    setLabelSelection((TextView) view, true);
+                }
+            };
+
+            for (final Label label : allLabels) {
+                final View rowView = inflater.inflate(R.layout.row_issue_create_label, container, false);
+                View viewColor = rowView.findViewById(R.id.view_color);
+                viewColor.setBackgroundColor(ApiHelpers.colorForLabel(label));
+
+                final TextView tvLabel = rowView.findViewById(R.id.tv_title);
+                tvLabel.setText(label.name());
+                tvLabel.setOnClickListener(clickListener);
+                tvLabel.setTag(label);
+
+                setLabelSelection(tvLabel, selectedLabels.contains(label));
+                container.addView(rowView);
+            }
+
+            IssueEditActivity activity = (IssueEditActivity) getContext();
+            return new AlertDialog.Builder(activity)
+                    .setCancelable(true)
+                    .setTitle(R.string.issue_labels)
+                    .setView(labelContainerView)
+                    .setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.ok, (dialog, which) -> {
+                        activity.updateLabels(selectedLabels);
+                    })
+                    .setNeutralButton(R.string.issue_manage_labels, (dialog, which) -> {
+                        activity.manageLabels();
+                    })
+                    .create();
+        }
+
+        private void setLabelSelection(TextView view, boolean selected) {
+            Label label = (Label) view.getTag();
+            if (selected) {
+                int color = ApiHelpers.colorForLabel(label);
+                view.setTypeface(view.getTypeface(), Typeface.BOLD);
+                view.setBackgroundColor(color);
+                view.setTextColor(UiUtils.textColorForBackground(getContext(), color));
+            } else {
+                view.setTypeface(view.getTypeface(), 0);
+                view.setBackgroundColor(0);
+                view.setTextColor(ContextCompat.getColor(getContext(),
+                        Gh4Application.THEME != R.style.LightTheme ? R.color.label_fg_light : R.color.label_fg_dark));
+            }
         }
     }
 }

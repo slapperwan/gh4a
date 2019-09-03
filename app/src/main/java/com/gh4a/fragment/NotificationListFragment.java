@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,7 +38,9 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class NotificationListFragment extends LoadingListFragmentBase implements
-        RootAdapter.OnItemClickListener<NotificationHolder>,NotificationAdapter.OnNotificationActionCallback {
+        RootAdapter.OnItemClickListener<NotificationHolder>,
+        ConfirmationDialogFragment.Callback,
+        NotificationAdapter.OnNotificationActionCallback {
     public static final String EXTRA_INITIAL_REPO_OWNER = "initial_notification_repo_owner";
     public static final String EXTRA_INITIAL_REPO_NAME = "initial_notification_repo_name";
 
@@ -157,11 +159,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.mark_all_as_read:
-                new AlertDialog.Builder(getActivity())
-                        .setMessage(R.string.mark_all_as_read_question)
-                        .setPositiveButton(R.string.mark_all_as_read, (dialog, which) -> markAsRead(null, null))
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
+                ConfirmationDialogFragment.show(this, R.string.mark_all_as_read_question,
+                        R.string.mark_all_as_read, null, "markallreadconfirm");
                 return true;
             case R.id.notification_filter_unread:
             case R.id.notification_filter_all:
@@ -194,11 +193,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             String title = getString(R.string.mark_repository_as_read_question,
                     login + "/" + repository.name());
 
-            new AlertDialog.Builder(getActivity())
-                    .setMessage(title)
-                    .setPositiveButton(R.string.mark_as_read, (dialog, which) -> markAsRead(repository, null))
-                    .setNegativeButton(R.string.cancel, null)
-                    .show();
+            ConfirmationDialogFragment.show(this, title,
+                    R.string.mark_as_read, repository, "markreadconfirm");
         } else {
             markAsRead(null, notificationHolder.notification);
         }
@@ -215,6 +211,12 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
                 .map(ApiHelpers::throwOnFailure)
                 .compose(RxUtils::doInBackground)
                 .subscribe(result -> handleMarkAsRead(null, notification));
+    }
+
+    @Override
+    public void onConfirmed(String tag, Parcelable data) {
+        Repository repository = (Repository) data;
+        markAsRead(repository, null);
     }
 
     private void updateMenuItemVisibility() {

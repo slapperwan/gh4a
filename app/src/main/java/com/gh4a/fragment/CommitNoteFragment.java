@@ -3,8 +3,8 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +23,6 @@ import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.EditorBottomSheet;
 import com.meisolsson.githubsdk.model.Commit;
-import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.git.GitComment;
 import com.meisolsson.githubsdk.model.request.repository.CreateCommitComment;
@@ -36,7 +35,7 @@ import java.util.Set;
 import io.reactivex.Single;
 
 public class CommitNoteFragment extends ListDataBaseFragment<GitComment> implements
-        CommitNoteAdapter.OnCommentAction<GitComment>,
+        CommitNoteAdapter.OnCommentAction<GitComment>, ConfirmationDialogFragment.Callback,
         EditorBottomSheet.Callback, EditorBottomSheet.Listener {
 
     public static CommitNoteFragment newInstance(String repoOwner, String repoName,
@@ -261,11 +260,14 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
 
     @Override
     public void deleteComment(final GitComment comment) {
-        new AlertDialog.Builder(getActivity())
-                .setMessage(R.string.delete_comment_message)
-                .setPositiveButton(R.string.delete, (dialog, which) -> deleteComment(comment.id()))
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        ConfirmationDialogFragment.show(this, R.string.delete_comment_message,
+                R.string.delete, comment, "deleteconfirm");
+    }
+
+    @Override
+    public void onConfirmed(String tag, Parcelable data) {
+        GitComment comment = (GitComment) data;
+        deleteComment(comment.id());
     }
 
     @Override

@@ -1,11 +1,13 @@
 package com.gh4a.fragment;
 
+import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialog;
 import android.support.v7.preference.Preference;
@@ -112,13 +114,13 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     @Override
     public boolean onPreferenceClick(Preference pref) {
         if (pref == mAboutPref) {
-            AboutDialog d = new AboutDialog(getActivity(), Gh4Application.get().isAuthorized());
-            d.setTitle(getAppName());
-            d.show();
+            boolean loggedIn = Gh4Application.get().isAuthorized();
+            AboutDialogFragment.newInstance(getAppName(), loggedIn)
+                    .show(getChildFragmentManager(), "about");
             return true;
         } else if (pref == mOpenSourcePref) {
-            OpenSourceComponentListDialog d = new OpenSourceComponentListDialog(getActivity());
-            d.show();
+            new OpenSourceComponentListDialogFragment()
+                    .show(getChildFragmentManager(), "opensource");
             return true;
         }
         return false;
@@ -140,11 +142,31 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
     }
 
+    public static class AboutDialogFragment extends DialogFragment {
+        public static AboutDialogFragment newInstance(String title, boolean loggedIn) {
+            AboutDialogFragment f = new AboutDialogFragment();
+            Bundle args = new Bundle();
+            args.putString("title", title);
+            args.putBoolean("loggedIn", loggedIn);
+            f.setArguments(args);
+            return f;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            String title = getArguments().getString("title");
+            boolean loggedIn = getArguments().getBoolean("loggedIn");
+            return new AboutDialog(getContext(), title, loggedIn);
+        }
+    }
+
     private static class AboutDialog extends AppCompatDialog implements View.OnClickListener {
-        public AboutDialog(Context context, boolean loggedIn) {
+        public AboutDialog(Context context, String title, boolean loggedIn) {
             super(context);
 
             setContentView(R.layout.about_dialog);
+            setTitle(title);
 
             TextView tvCopyright = findViewById(R.id.copyright);
             tvCopyright.setText(R.string.copyright_notice);
@@ -183,18 +205,19 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
     }
 
-    private static class OpenSourceComponentListDialog extends AlertDialog {
-        public OpenSourceComponentListDialog(Context context) {
-            super(context);
-
-            LayoutInflater inflater = LayoutInflater.from(context);
+    public static class OpenSourceComponentListDialogFragment extends DialogFragment {
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            LayoutInflater inflater = LayoutInflater.from(getContext());
             ListView lv = (ListView) inflater.inflate(R.layout.open_source_component_list, null);
-            lv.setAdapter(new OpenSourceComponentAdapter(context));
+            lv.setAdapter(new OpenSourceComponentAdapter(getContext()));
 
-            setView(lv);
-            setTitle(R.string.open_source_components);
-            setButton(DialogInterface.BUTTON_POSITIVE, context.getString(R.string.ok),
-                    (DialogInterface.OnClickListener) null);
+            return new AlertDialog.Builder(getContext())
+                    .setView(lv)
+                    .setTitle(R.string.open_source_components)
+                    .setPositiveButton(R.string.ok, null)
+                    .create();
         }
     }
 
