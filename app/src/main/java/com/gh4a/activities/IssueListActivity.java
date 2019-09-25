@@ -20,8 +20,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -38,6 +38,7 @@ import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
+import com.gh4a.dialogs.MilestoneDialog;
 import com.gh4a.fragment.IssueListFragment;
 import com.gh4a.fragment.LoadingListFragmentBase;
 import com.gh4a.utils.ApiHelpers;
@@ -45,13 +46,10 @@ import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Issue;
-import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.Label;
-import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.issues.IssueAssigneeService;
 import com.meisolsson.githubsdk.service.issues.IssueLabelService;
-import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 
 import java.util.List;
 import java.util.Locale;
@@ -59,7 +57,7 @@ import java.util.Locale;
 public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
-        MenuItem.OnActionExpandListener {
+        MenuItem.OnActionExpandListener, MilestoneDialog.SelectionCallback {
     public static Intent makeIntent(Context context, String repoOwner, String repoName) {
         return makeIntent(context, repoOwner, repoName, false);
     }
@@ -94,7 +92,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private IssueListFragment mOpenFragment;
     private Boolean mIsCollaborator;
     private List<Label> mLabels;
-    private List<Milestone> mMilestones;
     private List<User> mAssignees;
 
     private final IssueListFragment.SortDrawerHelper mSortHelper =
@@ -175,7 +172,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     @Override
     public void onRefresh() {
         mAssignees = null;
-        mMilestones = null;
         mLabels = null;
         mIsCollaborator = null;
         updateRightNavigationDrawer();
@@ -360,7 +356,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                 filterLabel();
                 return true;
             case R.id.filter_by_milestone:
-                filterMilestone();
+                showMilestonesDialog();
                 return true;
             case R.id.filter_by_participating:
                 filterParticipating();
@@ -468,6 +464,22 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName);
     }
 
+    @Override
+    public void onMilestoneSelected(MilestoneDialog.MilestoneSelection milestoneSelection) {
+        switch (milestoneSelection.type) {
+            case NO_MILESTONE:
+                mSelectedMilestone = "";
+                break;
+            case ANY_MILESTONE:
+                mSelectedMilestone = null;
+                break;
+            case MILESTONE:
+                mSelectedMilestone = milestoneSelection.milestone.title();
+                break;
+        }
+        onFilterUpdated();
+    }
+
     private void setSearchMode(boolean enabled) {
         boolean changed = mSearchMode != enabled;
         mSearchMode = enabled;
@@ -550,32 +562,10 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void showMilestonesDialog() {
-        final String[] milestones = new String[mMilestones.size() + 2];
-        int selected = mSelectedMilestone != null && mSelectedMilestone.isEmpty() ? 1 : 0;
-
-        milestones[0] = getResources().getString(R.string.issue_filter_by_any_milestone);
-        milestones[1] = getResources().getString(R.string.issue_filter_by_no_milestone);
-
-        for (int i = 0; i < mMilestones.size(); i++) {
-            milestones[i + 2] = mMilestones.get(i).title();
-            if (TextUtils.equals(mSelectedMilestone, milestones[i + 2])) {
-                selected = i + 2;
-            }
-        }
-
-        DialogInterface.OnClickListener selectCb = (dialog, which) -> {
-            mSelectedMilestone =
-                    which == 0 ? null : which == 1 ? "" : milestones[which];
-            dialog.dismiss();
-            onFilterUpdated();
-        };
-
-        new AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setTitle(R.string.issue_filter_by_milestone)
-                .setSingleChoiceItems(milestones, selected, selectCb)
-                .setNegativeButton(R.string.cancel, null)
-                .show();
+        MilestoneDialog dialog = MilestoneDialog.newInstance(mRepoOwner, mRepoName, mIsPullRequest, true, false);
+        getSupportFragmentManager().beginTransaction()
+                .add(dialog, "dialog_milestone")
+                .commitAllowingStateLoss();
     }
 
     private void onFilterUpdated() {
@@ -626,22 +616,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                     .subscribe(assignees -> {
                         mAssignees = assignees;
                         showAssigneesDialog();
-                    }, this::handleLoadFailure));
-        }
-    }
-
-    private void filterMilestone() {
-        if (mMilestones != null) {
-            showMilestonesDialog();
-        } else {
-            final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
-            registerTemporarySubscription(ApiHelpers.PageIterator
-                    .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
-                    .compose(RxUtils::doInBackground)
-                    .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
-                    .subscribe(milestones -> {
-                        mMilestones = milestones;
-                        showMilestonesDialog();
                     }, this::handleLoadFailure));
         }
     }

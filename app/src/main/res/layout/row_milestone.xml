@@ -40,6 +40,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="8dp"
+        android:gravity="end"
         android:orientation="vertical">
 
         <com.gh4a.widget.StyleableTextView
