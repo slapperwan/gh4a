@@ -48,6 +48,7 @@ public class Gh4Application extends MultiDexApplication implements OnSharedPrefe
 
     private static final int THEME_DARK = 0;
     private static final int THEME_LIGHT = 1;
+    private static final int THEME_SYSTEM = 2;
 
     private static final String KEY_VERSION = "version";
     private static final String KEY_ACTIVE_LOGIN = "active_login";
@@ -66,12 +67,11 @@ public class Gh4Application extends MultiDexApplication implements OnSharedPrefe
         sInstance = this;
 
         SharedPreferences prefs = getPrefs();
-        selectTheme(prefs.getInt(SettingsFragment.KEY_THEME, THEME_LIGHT));
 
         int prefsVersion = prefs.getInt(KEY_VERSION, 0);
-        if (prefsVersion < 3) {
+        if (prefsVersion < 4) {
             SharedPreferences.Editor editor = prefs.edit()
-                    .putInt(KEY_VERSION, 3);
+                    .putInt(KEY_VERSION, 4);
 
             if (prefsVersion < 2) {
                 // convert old-style login/token pref to new-style login list
@@ -103,11 +103,17 @@ public class Gh4Application extends MultiDexApplication implements OnSharedPrefe
                     }
                 }
             }
+            if (prefsVersion < 4) {
+                // Convert old 'LightDark' theme to light one
+                if (prefs.getInt(SettingsFragment.KEY_THEME, THEME_LIGHT) == 2) {
+                    editor.putInt(SettingsFragment.KEY_THEME, THEME_LIGHT);
+                }
+            }
             editor.apply();
         }
 
         prefs.registerOnSharedPreferenceChangeListener(this);
-
+        updateTheme(prefs);
         DebuggingHelper.onCreate(this);
 
         mPt = new PrettyTime();
@@ -126,16 +132,17 @@ public class Gh4Application extends MultiDexApplication implements OnSharedPrefe
         }
     }
 
-    private void selectTheme(int theme) {
+    private void updateTheme(SharedPreferences prefs) {
+        int theme = prefs.getInt(SettingsFragment.KEY_THEME,
+                getResources().getInteger(R.integer.default_theme));
+        final int nightMode;
+
         switch (theme) {
-            case THEME_DARK:
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                break;
-            case THEME_LIGHT:
-            case 2: /* for backwards compat with old settings, was light-dark theme */
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                break;
+            case THEME_DARK: nightMode = AppCompatDelegate.MODE_NIGHT_YES; break;
+            case THEME_SYSTEM: nightMode = AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM; break;
+            default: nightMode = AppCompatDelegate.MODE_NIGHT_NO; break;
         }
+        AppCompatDelegate.setDefaultNightMode(nightMode);
     }
 
     @Override
@@ -248,7 +255,7 @@ public class Gh4Application extends MultiDexApplication implements OnSharedPrefe
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(SettingsFragment.KEY_THEME)) {
-            selectTheme(sharedPreferences.getInt(key, THEME_LIGHT));
+            updateTheme(sharedPreferences);
         }
     }
 }

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="theme_items">
-        <item>Dark</item>
-        <item>Light</item>
+        <item>@string/theme_light</item>
+        <item>@string/theme_dark</item>
     </string-array>
     <string-array name="theme_values" translatable="false">
-        <item>0</item>
         <item>1</item>
+        <item>0</item>
     </string-array>
     <string-array name="start_page_items" translatable="false">
         <item>@string/start_page_last_selected</item>
