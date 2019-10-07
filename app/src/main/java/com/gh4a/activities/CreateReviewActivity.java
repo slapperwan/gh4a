@@ -3,10 +3,10 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.StringRes;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.FragmentActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -21,8 +21,6 @@ import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.request.pull_request.CreateReview;
 import com.meisolsson.githubsdk.model.request.pull_request.SubmitReview;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
-
-import java.io.IOException;
 
 import io.reactivex.Single;
 import retrofit2.Response;

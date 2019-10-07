@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scrollView"
@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <!-- user info section -->
-        <android.support.v7.widget.CardView style="?attr/cardViewTheme">
+        <androidx.cardview.widget.CardView style="?attr/cardViewTheme">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -140,10 +140,10 @@
 
             </LinearLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
         <!-- Repository section -->
-        <android.support.v7.widget.CardView style="?attr/cardViewTheme">
+        <androidx.cardview.widget.CardView style="?attr/cardViewTheme">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -183,10 +183,10 @@
 
             </LinearLayout>
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
         <!-- Organizations section -->
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/ll_orgs"
             style="?attr/cardViewTheme">
 
@@ -210,6 +210,6 @@
                     android:orientation="vertical" />
 
             </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
-</android.support.v4.widget.NestedScrollView>
+</androidx.core.widget.NestedScrollView>

@@ -2,7 +2,7 @@ package com.gh4a.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.AttrRes;
+import androidx.annotation.AttrRes;
 
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;

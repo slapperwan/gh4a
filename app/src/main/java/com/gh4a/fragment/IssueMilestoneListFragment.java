@@ -18,7 +18,7 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
@@ -26,8 +26,6 @@ import com.gh4a.activities.IssueMilestoneEditActivity;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.RxUtils;
-import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 

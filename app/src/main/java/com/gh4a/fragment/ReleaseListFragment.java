@@ -1,8 +1,8 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;

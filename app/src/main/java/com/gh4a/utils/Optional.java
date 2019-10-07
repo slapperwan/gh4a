@@ -1,6 +1,6 @@
 package com.gh4a.utils;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import io.reactivex.Single;
 

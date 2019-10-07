@@ -2,7 +2,7 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.net.Uri;
-import android.support.v7.widget.LinearLayoutCompat;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;

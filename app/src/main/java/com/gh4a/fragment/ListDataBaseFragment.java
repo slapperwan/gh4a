@@ -2,7 +2,7 @@ package com.gh4a.fragment;
 
 import java.util.List;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 
 import com.gh4a.adapter.RootAdapter;

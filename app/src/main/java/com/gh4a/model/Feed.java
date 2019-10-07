@@ -16,7 +16,7 @@
 package com.gh4a.model;
 
 import android.net.Uri;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.gh4a.utils.StringUtils;
 

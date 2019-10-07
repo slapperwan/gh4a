@@ -2,13 +2,12 @@ package com.gh4a.resolver;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
 import android.text.TextUtils;
 
 import com.gh4a.activities.BlogListActivity;
-import com.gh4a.activities.BookmarkListActivity;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CompareActivity;
 import com.gh4a.activities.GistActivity;

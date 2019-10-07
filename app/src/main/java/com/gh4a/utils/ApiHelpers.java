@@ -3,8 +3,8 @@ package com.gh4a.utils;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.gh4a.ApiRequestException;
@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableTransformer;
 import io.reactivex.Single;
 import io.reactivex.subjects.BehaviorSubject;
 import retrofit2.Response;

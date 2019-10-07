@@ -1,7 +1,7 @@
 package com.gh4a.widget;
 
 import android.content.Context;
-import android.support.design.widget.FloatingActionButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import android.util.AttributeSet;
 
 import com.gh4a.R;

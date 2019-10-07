@@ -1,7 +1,7 @@
 package com.gh4a.activities.home;
 
-import android.support.annotation.StringRes;
-import android.support.v4.app.Fragment;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.Fragment;
 
 import com.gh4a.R;
 import com.gh4a.fragment.GistListFragment;

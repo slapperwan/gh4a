@@ -16,8 +16,8 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.StringRes;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.StringRes;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;

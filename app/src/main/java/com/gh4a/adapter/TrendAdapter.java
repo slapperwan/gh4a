@@ -17,8 +17,8 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.support.annotation.StringRes;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.StringRes;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.StyleSpan;

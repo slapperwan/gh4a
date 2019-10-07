@@ -2,11 +2,11 @@ package com.gh4a.utils;
 
 import android.app.Dialog;
 import android.os.Bundle;
-import android.support.annotation.StringRes;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.StringRes;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.gh4a.ApiRequestException;
 import com.gh4a.BaseActivity;
@@ -188,7 +188,7 @@ public class RxUtils {
     }
 
     public static class ProgressDialogFragment extends DialogFragment {
-        @android.support.annotation.NonNull
+        @androidx.annotation.NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             int messageResId = getArguments().getInt("message_res", 0);

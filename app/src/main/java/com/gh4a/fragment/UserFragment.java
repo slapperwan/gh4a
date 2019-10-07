@@ -17,7 +17,7 @@ package com.gh4a.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.PluralsRes;
+import androidx.annotation.PluralsRes;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;

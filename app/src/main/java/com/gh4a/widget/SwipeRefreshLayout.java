@@ -1,14 +1,14 @@
 package com.gh4a.widget;
 
 import android.content.Context;
-import android.support.design.widget.AppBarLayout;
-import android.support.v4.view.NestedScrollingChildHelper;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.core.view.NestedScrollingChildHelper;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
-public class SwipeRefreshLayout extends android.support.v4.widget.SwipeRefreshLayout
+public class SwipeRefreshLayout extends androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         implements AppBarLayout.OnOffsetChangedListener {
     public interface ChildScrollDelegate {
         boolean canChildScrollUp();

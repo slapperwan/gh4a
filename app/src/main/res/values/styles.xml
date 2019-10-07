@@ -26,7 +26,7 @@
         <item name="android:textColor">@color/abc_primary_text_material_dark</item>
     </style>
 
-    <style name="TextAppearance.NotificationEmphasized" parent="TextAppearance.AppCompat.Notification">
+    <style name="TextAppearance.NotificationEmphasized" parent="TextAppearance.Compat.Notification">
         <item name="android:textColor">#cccccc</item>
     </style>
 

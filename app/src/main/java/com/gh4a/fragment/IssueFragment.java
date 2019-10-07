@@ -1,7 +1,7 @@
 package com.gh4a.fragment;
 
 import android.content.Intent;
-import android.support.annotation.AttrRes;
+import androidx.annotation.AttrRes;
 import android.view.View;
 import android.widget.TextView;
 

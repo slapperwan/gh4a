@@ -1,9 +1,9 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
-import android.support.annotation.VisibleForTesting;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.util.Pair;
+import androidx.annotation.VisibleForTesting;
+import androidx.fragment.app.FragmentActivity;
+import androidx.core.util.Pair;
 
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.PullRequestActivity;

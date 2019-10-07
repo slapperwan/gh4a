@@ -2,7 +2,7 @@ package com.gh4a.resolver;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.FragmentActivity;
 
 import com.gh4a.BuildConfig;
 import com.gh4a.activities.BlogListActivity;

@@ -2,8 +2,8 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.v4.widget.DrawerLayout;
+import androidx.annotation.NonNull;
+import androidx.drawerlayout.widget.DrawerLayout;
 import android.util.AttributeSet;
 
 public class InvalidatingDrawerLayout extends DrawerLayout {

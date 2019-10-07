@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <android.support.v4.widget.NestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/editor_scroller"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -23,7 +23,7 @@
             android:inputType="textMultiLine|textCapSentences"
             tools:text="Enter comment" />
 
-    </android.support.v4.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <LinearLayout
         android:layout_width="wrap_content"
