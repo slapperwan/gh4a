@@ -159,7 +159,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".job.NotificationHandlingService" />
+        <service android:name=".worker.NotificationHandlingService" />
 
         <provider
             android:name=".db.BookmarksProvider"

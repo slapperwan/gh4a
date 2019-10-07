@@ -1,4 +1,4 @@
-package com.gh4a.job;
+package com.gh4a.worker;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -72,11 +72,11 @@ public class NotificationHandlingService extends IntentService {
 
         switch (intent.getAction()) {
             case ACTION_MARK_SEEN:
-                NotificationsJob.markNotificationsAsSeen(this);
+                NotificationsWorker.markNotificationsAsSeen(this);
                 break;
             case ACTION_HANDLE_NOTIFICATION_DISMISS:
                 if (notificationId > 0) {
-                    NotificationsJob.handleNotificationDismiss(this, notificationId);
+                    NotificationsWorker.handleNotificationDismiss(this, notificationId);
                 }
                 break;
             case ACTION_MARK_READ:
@@ -87,7 +87,7 @@ public class NotificationHandlingService extends IntentService {
                 if (notificationId > 0) {
                     NotificationManager notificationManager =
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                    NotificationsJob.handleNotificationDismiss(this, notificationId);
+                    NotificationsWorker.handleNotificationDismiss(this, notificationId);
                     notificationManager.cancel(notificationId);
                 }
                 break;

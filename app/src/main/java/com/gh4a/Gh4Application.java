@@ -23,10 +23,8 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.util.LongSparseArray;
 
-import com.evernote.android.job.JobManager;
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.job.Gh4JobCreator;
-import com.gh4a.job.NotificationsJob;
+import com.gh4a.worker.NotificationsWorker;
 import com.gh4a.utils.DebuggingHelper;
 import com.meisolsson.githubsdk.model.User;
 
@@ -115,16 +113,15 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
         JodaTimeAndroid.init(this);
         ServiceFactory.initClient(this);
 
-        JobManager.create(this).addJobCreator(new Gh4JobCreator());
-        updateNotificationJob(prefs);
+        updateNotificationWorker(prefs);
     }
 
-    private void updateNotificationJob(SharedPreferences prefs) {
+    private void updateNotificationWorker(SharedPreferences prefs) {
         if (isAuthorized() && prefs.getBoolean(SettingsFragment.KEY_NOTIFICATIONS, false)) {
             int intervalMinutes = prefs.getInt(SettingsFragment.KEY_NOTIFICATION_INTERVAL, 15);
-            NotificationsJob.scheduleJob(intervalMinutes);
+            NotificationsWorker.schedule(this, intervalMinutes);
         } else {
-            NotificationsJob.cancelJob();
+            NotificationsWorker.cancel(this);
         }
     }
 
@@ -196,7 +193,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 .putLong(KEY_PREFIX_USER_ID + login, user.id())
                 .apply();
 
-        updateNotificationJob(prefs);
+        updateNotificationWorker(prefs);
     }
 
     public User getCurrentAccountInfoForAvatar() {
@@ -232,7 +229,7 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
                 .remove(KEY_PREFIX_USER_ID + login)
                 .apply();
 
-        NotificationsJob.cancelJob();
+        NotificationsWorker.cancel(this);
     }
 
     private SharedPreferences getPrefs() {

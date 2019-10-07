@@ -23,7 +23,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueListActivity;
-import com.gh4a.job.NotificationsJob;
+import com.gh4a.worker.NotificationsWorker;
 import com.gh4a.widget.IntegerListPreference;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements
@@ -95,16 +95,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
         if (pref == mNotificationsPref) {
             if ((boolean) newValue) {
-                NotificationsJob.createNotificationChannels(getActivity());
-                NotificationsJob.scheduleJob(Integer.valueOf(mNotificationIntervalPref.getValue()));
+                NotificationsWorker.createNotificationChannels(getActivity());
+                NotificationsWorker.schedule(getContext(),
+                        Integer.valueOf(mNotificationIntervalPref.getValue()));
             } else {
-                NotificationsJob.cancelJob();
+                NotificationsWorker.cancel(getContext());
             }
             return true;
         }
         if (pref == mNotificationIntervalPref) {
             if (mNotificationsPref.isChecked()) {
-                NotificationsJob.scheduleJob(Integer.parseInt((String) newValue));
+                NotificationsWorker.schedule(getContext(), Integer.parseInt((String) newValue));
             }
             return true;
         }

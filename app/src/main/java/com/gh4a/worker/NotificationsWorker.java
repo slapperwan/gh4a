@@ -1,4 +1,4 @@
-package com.gh4a.job;
+package com.gh4a.worker;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -21,12 +21,17 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.work.Constraints;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
+
 import android.text.SpannableStringBuilder;
 import android.text.style.TextAppearanceSpan;
 
-import com.evernote.android.job.Job;
-import com.evernote.android.job.JobManager;
-import com.evernote.android.job.JobRequest;
 import com.gh4a.R;
 import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.adapter.NotificationAdapter;
@@ -45,7 +50,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class NotificationsJob extends Job {
+public class NotificationsWorker extends Worker {
     private static final String CHANNEL_GITHUB_NOTIFICATIONS = "channel_notifications";
     private static final String GROUP_ID_GITHUB = "github_notifications";
     public static final String TAG = "job_notifications";
@@ -56,19 +61,19 @@ public class NotificationsJob extends Job {
 
     private static final Object sPrefsLock = new Object();
 
-    public static void scheduleJob(int intervalMinutes) {
-        new JobRequest.Builder(TAG)
-                .setPeriodic(TimeUnit.MINUTES.toMillis(intervalMinutes),
-                        TimeUnit.MINUTES.toMillis(5))
-                .setRequiredNetworkType(JobRequest.NetworkType.CONNECTED)
-                .setRequirementsEnforced(true)
-                .setUpdateCurrent(true)
-                .build()
-                .schedule();
+    public static void schedule(Context context, int intervalMinutes) {
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+        WorkRequest request = new PeriodicWorkRequest.Builder(NotificationsWorker.class, intervalMinutes, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .addTag(TAG)
+                .build();
+        WorkManager.getInstance(context).enqueue(request);
     }
 
-    public static void cancelJob() {
-        JobManager.instance().cancelAllForTag(NotificationsJob.TAG);
+    public static void cancel(Context context) {
+        WorkManager.getInstance(context).cancelAllWorkByTag(TAG);
     }
 
     public static void createNotificationChannels(Context context) {
@@ -121,9 +126,13 @@ public class NotificationsJob extends Job {
         }
     }
 
+    public NotificationsWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+        super(context, workerParams);
+    }
+
     @NonNull
     @Override
-    protected Result onRunJob(Params params) {
+    public Result doWork() {
         List<List<NotificationThread>> notifsGroupedByRepo = new ArrayList<>();
         try {
             NotificationListLoadResult result =
@@ -138,12 +147,12 @@ public class NotificationsJob extends Job {
                 }
             }
         } catch (Exception e) {
-            return Result.FAILURE;
+            return Result.failure();
         }
 
         synchronized (sPrefsLock) {
-            SharedPreferences prefs = getContext().getSharedPreferences(SettingsFragment.PREF_NAME,
-                    Context.MODE_PRIVATE);
+            SharedPreferences prefs = getApplicationContext().getSharedPreferences(
+                    SettingsFragment.PREF_NAME, Context.MODE_PRIVATE);
             long lastCheck = prefs.getLong(KEY_LAST_NOTIFICATION_CHECK, 0);
             long lastSeen = prefs.getLong(KEY_LAST_NOTIFICATION_SEEN, 0);
             Set<String> lastShownRepoIds = prefs.getStringSet(KEY_LAST_SHOWN_REPO_IDS, null);
@@ -161,11 +170,11 @@ public class NotificationsJob extends Job {
             if (!hasUnseenNotification) {
                 // seen timestamp is only updated when notifications are canceled by us,
                 // so everything is canceled at this point and we have nothing to notify of
-                return Result.SUCCESS;
+                return Result.success();
             }
 
             NotificationManagerCompat nm =
-                    NotificationManagerCompat.from(getContext());
+                    NotificationManagerCompat.from(getApplicationContext());
 
             showSummaryNotification(nm, notifsGroupedByRepo, hasNewNotification);
             for (List<NotificationThread> list : notifsGroupedByRepo) {
@@ -190,40 +199,41 @@ public class NotificationsJob extends Job {
                     .apply();
         }
 
-        return Result.SUCCESS;
+        return Result.success();
     }
 
     private void showRepoNotification(NotificationManagerCompat nm,
             List<NotificationThread> notifications, long lastCheck) {
+        final Context context = getApplicationContext();
         Repository repository = notifications.get(0).repository();
         final int id = repository.id().intValue();
         String title = repository.owner().login() + "/" + repository.name();
         // notifications are sorted by time descending
         long when = notifications.get(0).updatedAt().getTime();
-        String text = getContext().getResources()
-                .getQuantityString(R.plurals.unread_notifications_summary_text,
-                        notifications.size(), notifications.size());
+        String text = context.getResources().getQuantityString(
+                R.plurals.unread_notifications_summary_text,
+                notifications.size(), notifications.size());
 
         Intent intent = NotificationHandlingService.makeOpenNotificationActionIntent(
-                getContext(), repository.owner().login(), repository.name());
-        PendingIntent contentIntent = PendingIntent.getService(getContext(), id, intent,
+                context, repository.owner().login(), repository.name());
+        PendingIntent contentIntent = PendingIntent.getService(context, id, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent deleteIntent = PendingIntent.getService(getContext(), id,
-                NotificationHandlingService.makeHandleDismissIntent(getContext(), id),
+        PendingIntent deleteIntent = PendingIntent.getService(context, id,
+                NotificationHandlingService.makeHandleDismissIntent(context, id),
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         Intent markReadIntent =
                 NotificationHandlingService.makeMarkReposNotificationsAsReadActionIntent(
-                        getContext(), id, repository.owner().login(), repository.name());
-        PendingIntent markReadPendingIntent = PendingIntent.getService(getContext(), id,
+                        context, id, repository.owner().login(), repository.name());
+        PendingIntent markReadPendingIntent = PendingIntent.getService(context, id,
                 markReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Action markReadAction = new NotificationCompat.Action(
-                R.drawable.mark_read, getContext().getString(R.string.mark_as_read),
+                R.drawable.mark_read, context.getString(R.string.mark_as_read),
                 markReadPendingIntent);
 
         android.app.Notification publicVersion = makeBaseBuilder()
-                .setContentTitle(getContext().getString(R.string.unread_notifications_summary_title))
+                .setContentTitle(context.getString(R.string.unread_notifications_summary_title))
                 .setContentText(text)
                 .setNumber(notifications.size())
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
@@ -267,15 +277,15 @@ public class NotificationsJob extends Job {
 
     private void showSummaryNotification(NotificationManagerCompat nm,
             List<List<NotificationThread>> notificationsPerRepo, boolean hasNewNotification) {
+        final Context context = getApplicationContext();
         int totalCount = 0;
         for (List<NotificationThread> list : notificationsPerRepo) {
             totalCount += list.size();
         }
 
-        String title = getContext().getString(R.string.unread_notifications_summary_title);
-        String text = getContext().getResources()
-                .getQuantityString(R.plurals.unread_notifications_summary_text, totalCount,
-                        totalCount);
+        String title = context.getString(R.string.unread_notifications_summary_title);
+        String text = context.getResources().getQuantityString(
+                R.plurals.unread_notifications_summary_text, totalCount, totalCount);
 
         Notification publicVersion = makeBaseBuilder()
                 .setContentTitle(title)
@@ -284,10 +294,10 @@ public class NotificationsJob extends Job {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .build();
 
-        PendingIntent contentIntent = PendingIntent.getActivity(getContext(), 0,
-                HomeActivity.makeIntent(getContext(), R.id.notifications), 0);
-        PendingIntent deleteIntent = PendingIntent.getService(getContext(), 0,
-                NotificationHandlingService.makeMarkNotificationsSeenIntent(getContext()), 0);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
+                HomeActivity.makeIntent(context, R.id.notifications), 0);
+        PendingIntent deleteIntent = PendingIntent.getService(context, 0,
+                NotificationHandlingService.makeMarkNotificationsSeenIntent(context), 0);
         NotificationCompat.Builder builder = makeBaseBuilder()
                 .setGroup(GROUP_ID_GITHUB)
                 .setGroupSummary(true)
@@ -307,8 +317,7 @@ public class NotificationsJob extends Job {
             Repository repository = list.get(0).repository();
             String repoName = repository.owner().login() + "/" + repository.name();
             final TextAppearanceSpan notificationPrimarySpan =
-                    new TextAppearanceSpan(getContext(),
-                            R.style.TextAppearance_NotificationEmphasized);
+                    new TextAppearanceSpan(context, R.style.TextAppearance_NotificationEmphasized);
             final int emphasisEnd;
 
             SpannableStringBuilder line = new SpannableStringBuilder(repoName).append(" ");
@@ -319,7 +328,7 @@ public class NotificationsJob extends Job {
                 line.append(" ").append(n.subject().title());
             } else {
                 emphasisEnd = line.length();
-                line.append(getContext().getResources().getQuantityString(R.plurals.notification,
+                line.append(context.getResources().getQuantityString(R.plurals.notification,
                         list.size(), list.size()));
             }
 
@@ -337,7 +346,7 @@ public class NotificationsJob extends Job {
     }
 
     private String determineNotificationTypeLabel(NotificationThread n) {
-        final Resources res = getContext().getResources();
+        final Resources res = getApplicationContext().getResources();
         switch (n.subject().type()) {
             case NotificationAdapter.SUBJECT_COMMIT:
                 return res.getString(R.string.notification_subject_commit);
@@ -352,13 +361,13 @@ public class NotificationsJob extends Job {
     }
 
     private NotificationCompat.Builder makeBaseBuilder() {
-        return new NotificationCompat.Builder(getContext(), CHANNEL_GITHUB_NOTIFICATIONS)
+        return new NotificationCompat.Builder(getApplicationContext(), CHANNEL_GITHUB_NOTIFICATIONS)
                 .setSmallIcon(R.drawable.notification)
-                .setColor(ContextCompat.getColor(getContext(), R.color.octodroid));
+                .setColor(ContextCompat.getColor(getApplicationContext(), R.color.octodroid));
     }
 
     private Bitmap loadRoundUserAvatar(User user) {
-        Bitmap avatar = AvatarHandler.loadUserAvatarSynchronously(getContext(), user);
+        Bitmap avatar = AvatarHandler.loadUserAvatarSynchronously(getApplicationContext(), user);
         if (avatar == null) {
             return null;
         }
