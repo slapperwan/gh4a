@@ -213,12 +213,12 @@ public class IssueLabelListActivity extends BaseActivity implements
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.save)
-                    .setIcon(R.drawable.content_save)
+                    .setIcon(R.drawable.menu_save)
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
             if (mLabel != mAddedLabel) {
                 menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
-                        .setIcon(R.drawable.content_discard)
+                        .setIcon(R.drawable.menu_delete)
                         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
             }
 

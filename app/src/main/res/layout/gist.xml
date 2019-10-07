@@ -40,7 +40,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:drawableLeft="?attr/privateSmallIcon"
+                    android:drawableLeft="@drawable/private_small"
                     android:drawablePadding="4dp"
                     android:text="@string/repo_type_private"
                     android:textAppearance="@style/TextAppearance.VerySmall.Bold"

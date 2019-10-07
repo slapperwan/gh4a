@@ -244,7 +244,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                         String sha = commit.sha().substring(0, 7);
 
                         ssb.append(sha);
-                        ssb.setSpan(new TextAppearanceSpan(mContext, R.style.small_highlighted_sha),
+                        ssb.setSpan(new TextAppearanceSpan(mContext, R.style.TextAppearance_SmallUrl_Sha),
                                 ssb.length() - sha.length(), ssb.length(), 0);
 
                         ssb.append(" ");

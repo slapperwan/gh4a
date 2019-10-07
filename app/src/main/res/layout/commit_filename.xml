@@ -17,7 +17,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="4dp"
-        android:drawableLeft="?attr/commentsIcon"
+        android:drawableLeft="@drawable/comments"
         android:drawablePadding="4dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:visibility="gone"

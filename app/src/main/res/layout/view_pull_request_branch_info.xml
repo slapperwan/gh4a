@@ -13,7 +13,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginRight="10dp"
-        android:src="?attr/pullRequestIcon" />
+        android:src="@drawable/pull_request" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_pr_from"

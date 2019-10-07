@@ -11,13 +11,8 @@
     <item
         android:id="@+id/search"
         android:title="@string/search"
-        android:icon="@drawable/action_search"
+        android:icon="@drawable/menu_search"
         app:showAsAction="always"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
-<!--    <item
-        android:id="@+id/search"
-        android:title="@string/search"
-        app:showAsAction="always"
-        app:actionLayout="@layout/search_action_bar" />-->
 
 </menu>

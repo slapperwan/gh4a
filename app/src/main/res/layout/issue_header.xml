@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    tools:background="@color/issue_open_light"
-    tools:theme="@style/Theme.Header.Light">
+    tools:background="@color/issue_open"
+    tools:theme="@style/HeaderTheme">
 
     <com.gh4a.widget.VerticalTextView
         android:id="@+id/tv_state"

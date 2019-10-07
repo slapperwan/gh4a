@@ -9,8 +9,8 @@
         android:pathData="M0,0 H100 V100 H-100 Z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:startColor="@color/light_primary"
-                android:endColor="@color/light_primary"
+                android:startColor="@color/primary"
+                android:endColor="@color/primary"
                 android:startY="0"
                 android:endY="100"
                 android:type="linear" />

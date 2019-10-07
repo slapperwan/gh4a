@@ -32,7 +32,7 @@
         <ImageView
             android:id="@+id/iv_advanced_editor_toggle"
             style="@style/ImageButton"
-            android:src="?expandIcon" />
+            android:src="@drawable/expand" />
 
         <com.gh4a.widget.HeightLimitedNestedScrollView
             android:id="@+id/basic_editor_scroll"
@@ -69,7 +69,7 @@
         <ImageView
             android:id="@+id/send_button"
             style="@style/ImageButton"
-            android:src="?sendIcon" />
+            android:src="@drawable/send_button" />
 
     </LinearLayout>
 

@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="16dp"
-                android:drawableLeft="?attr/privateSmallIcon"
+                android:drawableLeft="@drawable/private_small"
                 android:drawablePadding="4dp"
                 android:text="@string/repo_type_private"
                 android:textAppearance="@style/TextAppearance.VerySmall.Bold"
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="16dp"
-                android:drawableLeft="?attr/forkSmallBoldIcon"
+                android:drawableLeft="@drawable/fork_small_bold"
                 android:drawablePadding="4dp"
                 android:text="@string/fork"
                 android:textAppearance="@style/TextAppearance.VerySmall.Bold"
@@ -67,7 +67,7 @@
                 android:id="@+id/tv_language"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableLeft="?attr/languageSmallIcon"
+                android:drawableLeft="@drawable/language_small"
                 android:drawablePadding="4dp"
                 android:textAppearance="@style/TextAppearance.VerySmall"
                 tools:text="Language" />
@@ -77,7 +77,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:drawableLeft="?attr/forkSmallIcon"
+                android:drawableLeft="@drawable/fork_small"
                 android:drawablePadding="4dp"
                 android:textAppearance="@style/TextAppearance.VerySmall"
                 tools:text="0" />
@@ -87,7 +87,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:drawableLeft="?attr/starSmallIcon"
+                android:drawableLeft="@drawable/star_small"
                 android:drawablePadding="4dp"
                 android:textAppearance="@style/TextAppearance.VerySmall"
                 tools:text="0" />
@@ -97,7 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
-                android:drawableLeft="?attr/sizeSmallIcon"
+                android:drawableLeft="@drawable/size_small"
                 android:drawablePadding="4dp"
                 android:textAppearance="@style/TextAppearance.VerySmall"
                 tools:text="0" />

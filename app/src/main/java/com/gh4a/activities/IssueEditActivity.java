@@ -24,7 +24,10 @@ import android.os.Bundle;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.google.android.material.appbar.AppBarLayout;
+
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputLayout;
@@ -33,6 +36,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.util.ObjectsCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.appcompat.app.AlertDialog;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -142,7 +146,8 @@ public class IssueEditActivity extends BasePagerActivity implements
             return;
         }
 
-        LayoutInflater headerInflater = LayoutInflater.from(UiUtils.makeHeaderThemedContext(this));
+        LayoutInflater headerInflater =
+                LayoutInflater.from(new ContextThemeWrapper(this, R.style.HeaderTheme));
         View header = headerInflater.inflate(R.layout.issue_create_header, null);
         addHeaderView(header, false);
 
@@ -785,8 +790,7 @@ public class IssueEditActivity extends BasePagerActivity implements
             } else {
                 view.setTypeface(view.getTypeface(), 0);
                 view.setBackgroundColor(0);
-                view.setTextColor(ContextCompat.getColor(getContext(),
-                        Gh4Application.THEME != R.style.LightTheme ? R.color.label_fg_light : R.color.label_fg_dark));
+                view.setTextColor(ContextCompat.getColor(getContext(), R.color.label_fg));
             }
         }
     }

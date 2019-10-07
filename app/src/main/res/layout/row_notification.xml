@@ -7,9 +7,9 @@
     android:orientation="vertical">
 
     <FrameLayout
+        style="@style/CardContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?cardBackground">
+        android:layout_height="wrap_content">
 
         <RelativeLayout
             android:id="@+id/v_notification_content"
@@ -38,7 +38,7 @@
                 android:background="?selectableItemBackgroundBorderless"
                 android:paddingLeft="@dimen/content_padding"
                 android:paddingRight="@dimen/content_padding"
-                android:src="?overflowIcon"
+                android:src="@drawable/overflow"
                 tools:layout_alignParentBottom="false"
                 tools:layout_alignParentTop="false" />
 

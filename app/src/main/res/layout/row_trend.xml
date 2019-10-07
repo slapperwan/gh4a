@@ -36,7 +36,7 @@
             android:id="@+id/tv_lang"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="?attr/languageSmallIcon"
+            android:drawableLeft="@drawable/language_small"
             android:drawablePadding="4dp"
             android:layout_marginRight="16dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="16dp"
-            android:drawableLeft="?attr/starSmallIcon"
+            android:drawableLeft="@drawable/star_small"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
             tools:text="1000 this month, 3468 total" />
@@ -56,7 +56,7 @@
             android:id="@+id/tv_forks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="?attr/forkSmallIcon"
+            android:drawableLeft="@drawable/fork_small"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
             tools:text="2" />

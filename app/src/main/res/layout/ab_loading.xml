@@ -13,5 +13,5 @@
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
         android:indeterminate="true"
-        android:theme="@style/Theme.Header" />
+        android:theme="@style/HeaderTheme" />
 </FrameLayout>

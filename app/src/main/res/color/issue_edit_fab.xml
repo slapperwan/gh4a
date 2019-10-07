@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item app:state_merged="true" android:state_pressed="true" android:color="@color/pr_merged"/>
+    <item app:state_merged="true" android:color="@color/pr_merged_button"/>
+    <item app:state_closed="true" android:state_pressed="true" android:color="@color/issue_closed"/>
+    <item app:state_closed="true" android:color="@color/issue_closed_button"/>
+    <item android:state_pressed="true" android:color="@color/issue_open"/>
+    <item android:color="@color/issue_open_button"/>
+</selector>

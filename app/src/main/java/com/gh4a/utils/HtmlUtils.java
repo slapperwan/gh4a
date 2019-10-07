@@ -23,7 +23,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.AttrRes;
 import androidx.core.content.ContextCompat;
 import android.text.Editable;
 import android.text.Html.ImageGetter;
@@ -360,11 +359,10 @@ public class HtmlUtils {
                 startLi(mSpannableStringBuilder, attributes);
             } else if (tag.equalsIgnoreCase("input")) {
                 if ("checkbox".equalsIgnoreCase(attributes.getValue("", "type"))) {
-                    @AttrRes int drawableAttrResId = attributes.getIndex("", "checked") >= 0
-                            ? R.attr.checkboxCheckedSmallIcon
-                            : R.attr.checkboxUncheckedSmallIcon;
-                    Drawable d = ContextCompat.getDrawable(mContext,
-                            UiUtils.resolveDrawable(mContext, drawableAttrResId));
+                    boolean checked = attributes.getIndex("", "checked") >= 0;
+                    Drawable d = ContextCompat.getDrawable(mContext, checked
+                            ? R.drawable.checkbox_checked_small
+                            : R.drawable.checkbox_unchecked_small);
                     d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
                     ImageSpan span = new ImageSpan(d, ImageSpan.ALIGN_BOTTOM);
 

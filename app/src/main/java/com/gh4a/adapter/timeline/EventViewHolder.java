@@ -42,23 +42,23 @@ class EventViewHolder
     private static final HashMap<IssueEventType, Integer> EVENT_ICONS = new HashMap<>();
 
     static {
-        EVENT_ICONS.put(IssueEventType.Closed, R.attr.issueEventClosedIcon);
-        EVENT_ICONS.put(IssueEventType.Reopened, R.attr.issueEventReopenedIcon);
-        EVENT_ICONS.put(IssueEventType.Merged, R.attr.issueEventMergedIcon);
-        EVENT_ICONS.put(IssueEventType.Referenced, R.attr.issueEventReferencedIcon);
-        EVENT_ICONS.put(IssueEventType.Assigned, R.attr.issueEventAssignedIcon);
-        EVENT_ICONS.put(IssueEventType.Unassigned, R.attr.issueEventUnassignedIcon);
-        EVENT_ICONS.put(IssueEventType.Labeled, R.attr.issueEventLabeledIcon);
-        EVENT_ICONS.put(IssueEventType.Unlabeled, R.attr.issueEventUnlabeledIcon);
-        EVENT_ICONS.put(IssueEventType.Locked, R.attr.issueEventLockedIcon);
-        EVENT_ICONS.put(IssueEventType.Unlocked, R.attr.issueEventUnlockedIcon);
-        EVENT_ICONS.put(IssueEventType.Milestoned, R.attr.issueEventMilestonedIcon);
-        EVENT_ICONS.put(IssueEventType.Demilestoned, R.attr.issueEventDemilestonedIcon);
-        EVENT_ICONS.put(IssueEventType.Renamed, R.attr.issueEventRenamedIcon);
-        EVENT_ICONS.put(IssueEventType.HeadRefDeleted, R.attr.timelineEventBranchIcon);
-        EVENT_ICONS.put(IssueEventType.HeadRefRestored, R.attr.timelineEventBranchIcon);
-        EVENT_ICONS.put(IssueEventType.ReviewRequested, R.attr.timelineEventReviewRequested);
-        EVENT_ICONS.put(IssueEventType.ReviewRequestRemoved, R.attr.timelineEventReviewRequestRemoved);
+        EVENT_ICONS.put(IssueEventType.Closed, R.drawable.issue_event_closed);
+        EVENT_ICONS.put(IssueEventType.Reopened, R.drawable.issue_event_reopened);
+        EVENT_ICONS.put(IssueEventType.Merged, R.drawable.issue_event_merged);
+        EVENT_ICONS.put(IssueEventType.Referenced, R.drawable.issue_event_referenced);
+        EVENT_ICONS.put(IssueEventType.Assigned, R.drawable.issue_event_person);
+        EVENT_ICONS.put(IssueEventType.Unassigned, R.drawable.issue_event_person);
+        EVENT_ICONS.put(IssueEventType.Labeled, R.drawable.issue_event_label);
+        EVENT_ICONS.put(IssueEventType.Unlabeled, R.drawable.issue_event_label);
+        EVENT_ICONS.put(IssueEventType.Locked, R.drawable.issue_event_locked);
+        EVENT_ICONS.put(IssueEventType.Unlocked, R.drawable.issue_event_unlocked);
+        EVENT_ICONS.put(IssueEventType.Milestoned, R.drawable.issue_event_milestone);
+        EVENT_ICONS.put(IssueEventType.Demilestoned, R.drawable.issue_event_milestone);
+        EVENT_ICONS.put(IssueEventType.Renamed, R.drawable.issue_event_renamed);
+        EVENT_ICONS.put(IssueEventType.HeadRefDeleted, R.drawable.timeline_event_branch);
+        EVENT_ICONS.put(IssueEventType.HeadRefRestored, R.drawable.timeline_event_branch);
+        EVENT_ICONS.put(IssueEventType.ReviewRequested, R.drawable.timeline_event_review_requested);
+        EVENT_ICONS.put(IssueEventType.ReviewRequestRemoved, R.drawable.timeline_event_review_request_removed);
     }
 
     private final Context mContext;
@@ -95,9 +95,9 @@ class EventViewHolder
         AvatarHandler.assignAvatar(mAvatarView, user);
         mAvatarContainer.setTag(user);
 
-        Integer eventIconAttr = EVENT_ICONS.get(item.event.event());
-        if (eventIconAttr != null) {
-            mEventIconView.setImageResource(UiUtils.resolveDrawable(mContext, eventIconAttr));
+        Integer eventIconResId = EVENT_ICONS.get(item.event.event());
+        if (eventIconResId != null) {
+            mEventIconView.setImageResource(eventIconResId);
             mEventIconView.setVisibility(View.VISIBLE);
         } else {
             mEventIconView.setVisibility(View.GONE);

@@ -1,61 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="dark_primary">#396426</color>
-    <color name="light_primary">#65b345</color>
-
-    <color name="dark_primary_dark">#2d501e</color>
-    <color name="light_primary_dark">#5aa03d</color>
-    <color name="dark_accent">#559639</color>
-    <color name="light_accent">@color/light_primary_dark</color>
+    <color name="primary">#65b345</color>
+    <color name="primary_dark">#5aa03d</color>
+    <color name="accent">@color/primary_dark</color>
 
     <color name="label_fg_dark">#ff000000</color>
     <color name="label_fg_light">#fff3f3f3</color>
+    <color name="label_fg">@color/label_fg_light</color>
 
-    <color name="issue_open_light">#65b345</color>
-    <color name="issue_closed_light">#b34545</color>
-    <color name="pr_merged_light">#6945b3</color>
-    <color name="issue_open_light_dark">#5ba03d</color>
-    <color name="issue_closed_light_dark">#a03d3d</color>
-    <color name="pr_merged_light_dark">#5e3da0</color>
-    <color name="issue_open_light_button">#83e658</color>
-    <color name="issue_closed_light_button">#e65858</color>
-    <color name="pr_merged_light_button">#8558e6</color>
+    <color name="issue_open">#65b345</color>
+    <color name="issue_closed">#b34545</color>
+    <color name="pr_merged">#6945b3</color>
+    <color name="issue_open_dark">#5ba03d</color>
+    <color name="issue_closed_dark">#a03d3d</color>
+    <color name="pr_merged_dark">#5e3da0</color>
+    <color name="issue_open_button">#83e658</color>
+    <color name="issue_closed_button">#e65858</color>
+    <color name="pr_merged_button">#8558e6</color>
 
-    <color name="issue_open_dark">#396426</color>
-    <color name="issue_closed_dark">#642626</color>
-    <color name="pr_merged_dark">#3a2664</color>
-    <color name="issue_open_dark_dark">#2e501e</color>
-    <color name="issue_closed_dark_dark">#501e1e</color>
-    <color name="pr_merged_dark_dark">#2e1e50</color>
-    <color name="issue_open_dark_button">#569639</color>
-    <color name="issue_closed_dark_button">#963939</color>
-    <color name="pr_merged_dark_button">#563996</color>
-
-    <color name="fab_light">#89f05c</color>
-    <color name="fab_pressed_light">#5aa03d</color>
-
-    <color name="fab_dark">#569639</color>
-    <color name="fab_pressed_dark">#2d501e</color>
+    <color name="fab">#89f05c</color>
+    <color name="fab_pressed">#5aa03d</color>
 
     <color name="tab_indicator_color">#fff</color>
     <color name="drawer_scrim">#60000000</color>
 
-    <color name="scrollbar_thumb_dark">#5dffffff</color>
-    <color name="scrollbar_thumb_light">#5d000000</color>
+    <color name="scrollbar_thumb">#5d000000</color>
 
     <color name="nav_header_primary_text">#ffffffff</color>
     <color name="nav_header_secondary_text">#b3ffffff</color>
 
-    <color name="diff_add_light">#eaffea</color>
-    <color name="diff_remove_light">#ffecec</color>
-    <color name="diff_add_line_number_light">#dbffdb</color>
-    <color name="diff_remove_line_number_light">#ffdddd</color>
-    <color name="diff_add_dark">#103810</color>
-    <color name="diff_remove_dark">#481010</color>
-    <color name="diff_add_line_number_dark">#244224</color>
-    <color name="diff_remove_line_number_dark">#581616</color>
+    <color name="diff_add">#eaffea</color>
+    <color name="diff_remove">#ffecec</color>
+    <color name="diff_add_line_number">#dbffdb</color>
+    <color name="diff_remove_line_number">#ffdddd</color>
     <color name="diff_default_background">#14aaaaaa</color>
     <color name="diff_default_line_number_background">#30aaaaaa</color>
+
+    <color name="commit_addition">#65b345</color>
+    <color name="commit_deletion">#b34545</color>
+
+    <color name="drawer_background">@color/background_floating_material_light</color>
+    <color name="webview_background">#f7f7f9</color>
+    <color name="list_background">@android:color/white</color>
+    <color name="icon_foreground">#99343434</color>
+    <color name="breadcrumb_background">#7baa67</color>
 
     <color name="octodroid">#97C03E</color>
 </resources>

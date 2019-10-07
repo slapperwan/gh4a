@@ -85,7 +85,7 @@ public class IssueListFactory extends FragmentFactory {
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 
         menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.actions)
-                .setIcon(R.drawable.overflow_horizontal)
+                .setIcon(R.drawable.menu_overflow_horizontal)
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
         return super.onCreateOptionsMenu(menu);

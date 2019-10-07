@@ -35,6 +35,8 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.appbar.AppBarLayout;
+
+import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -136,7 +138,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME);
         onInitExtras(getIntent().getExtras());
         super.onCreate(savedInstanceState);
 
@@ -456,7 +457,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     public MenuInflater getMenuInflater() {
         if (mMenuInflater == null) {
-            mMenuInflater = new SupportMenuInflater(UiUtils.makeHeaderThemedContext(this));
+            mMenuInflater = new SupportMenuInflater(
+                    new ContextThemeWrapper(this, R.style.HeaderTheme));
         }
         return mMenuInflater;
     }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TextAppearance.VerySmall.Bold">
+        <item name="ghFont">bold</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="CardContainer">
+        <item name="android:background">@color/cardview_dark_background</item>
+    </style>
+</resources>

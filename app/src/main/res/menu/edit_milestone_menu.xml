@@ -12,7 +12,7 @@
         app:showAsAction="ifRoom|withText" />
 
     <item android:id="@+id/delete"
-        android:icon="@drawable/content_discard"
+        android:icon="@drawable/menu_delete"
         android:title="@string/delete"
         app:showAsAction="always" />
 </menu>

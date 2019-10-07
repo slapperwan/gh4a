@@ -177,19 +177,16 @@ public class NotificationAdapter extends
 
     private int getIconResId(String subjectType) {
         if (SUBJECT_ISSUE.equals(subjectType)) {
-            return UiUtils.resolveDrawable(mContext, R.attr.issueIcon);
+            return R.drawable.issue;
+        } else if (SUBJECT_PULL_REQUEST.equals(subjectType)) {
+            return R.drawable.pull_request;
+        } else if (SUBJECT_COMMIT.equals(subjectType)) {
+            return R.drawable.commit;
+        } else if (SUBJECT_RELEASE.equals(subjectType)) {
+            return R.drawable.release;
+        } else {
+            return 0;
         }
-        if (SUBJECT_PULL_REQUEST.equals(subjectType)) {
-            return UiUtils.resolveDrawable(mContext, R.attr.pullRequestIcon);
-        }
-        if (SUBJECT_COMMIT.equals(subjectType)) {
-            return UiUtils.resolveDrawable(mContext, R.attr.commitIcon);
-        }
-        if (SUBJECT_RELEASE.equals(subjectType)) {
-            return UiUtils.resolveDrawable(mContext, R.attr.releaseIcon);
-        }
-
-        return -1;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,

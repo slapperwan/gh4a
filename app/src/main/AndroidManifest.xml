@@ -18,7 +18,7 @@
         android:allowBackup="true"
         android:icon="@drawable/launcher_icon"
         android:label="@string/app_name"
-        android:theme="@style/LightTheme"
+        android:theme="@style/AppTheme"
         android:fullBackupContent="@xml/backup_descriptor">
         <activity
             android:name=".activities.Github4AndroidActivity"
@@ -59,34 +59,34 @@
         <activity
             android:name=".activities.EditCommitCommentActivity"
             android:exported="false"
-            android:theme="@style/BottomSheetLightTheme"
+            android:theme="@style/BottomSheetTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.EditIssueCommentActivity"
             android:exported="false"
-            android:theme="@style/BottomSheetLightTheme"
+            android:theme="@style/BottomSheetTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.EditPullRequestCommentActivity"
             android:exported="false"
-            android:theme="@style/BottomSheetLightTheme"
+            android:theme="@style/BottomSheetTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.EditDiffCommentActivity"
             android:exported="false"
-            android:theme="@style/BottomSheetLightTheme"
+            android:theme="@style/BottomSheetTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".activities.EditPullRequestDiffCommentActivity"
             android:exported="false"
-            android:theme="@style/BottomSheetLightTheme"
+            android:theme="@style/BottomSheetTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".activities.FileViewerActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize" />
         <activity android:name=".activities.CreateReviewActivity"
             android:exported="false"
-            android:theme="@style/BottomSheetLightTheme"
+            android:theme="@style/BottomSheetTheme"
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".activities.ForkListActivity" android:exported="false" />
         <activity android:name=".activities.FollowerFollowingListActivity" android:exported="false" />
@@ -130,7 +130,7 @@
         <activity android:name=".resolver.BrowseFilter"
             android:excludeFromRecents="true"
             android:taskAffinity=""
-            android:theme="@style/TransparentLightTheme">
+            android:theme="@style/TransparentTheme">
             <intent-filter>
                 <action
                     android:name="android.intent.action.VIEW" />

@@ -53,8 +53,7 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
             mRecyclerView.addItemDecoration(new DividerItemDecoration(view.getContext()));
         }
         if (!hasCards()) {
-            mRecyclerView.setBackgroundResource(
-                    UiUtils.resolveDrawable(getActivity(), R.attr.listBackground));
+            mRecyclerView.setBackgroundResource(R.color.list_background);
         }
 
         mFastScroller = view.findViewById(R.id.fast_scroller);

@@ -6,7 +6,7 @@
 
     <style name="TextAppearance.VerySmall.Bold">
         <item name="ghFont">bold</item>
-        <item name="android:textColor">?attr/colorPrimaryTextEmphasized</item>
+        <item name="android:textColor">@android:color/black</item>
     </style>
 
     <style name="TextAppearance.ItemTitle" parent="TextAppearance.AppCompat.Medium">
@@ -30,11 +30,11 @@
         <item name="android:textColor">#cccccc</item>
     </style>
 
-    <style name="default_text_small_url" parent="@android:style/TextAppearance.Small">
+    <style name="TextAppearance.SmallUrl" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">?android:attr/textColorLink</item>
     </style>
 
-    <style name="small_highlighted_sha" parent="default_text_small_url">
+    <style name="TextAppearance.SmallUrl.Sha">
         <item name="android:typeface">monospace</item>
     </style>
 
@@ -92,10 +92,13 @@
         <item name="android:paddingRight">@dimen/content_padding</item>
     </style>
 
+    <style name="CardContainer">
+        <item name="android:background">@color/cardview_light_background</item>
+    </style>
+
     <style name="Widget.ActionBar.TabView" parent="Widget.AppCompat.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator</item>
     </style>
-
 
     <style name="Widget.Spinner.ActionBar.Light" parent="Widget.AppCompat.Spinner">
         <item name="android:popupBackground">@drawable/abc_popup_background_mtrl_mult</item>
@@ -104,26 +107,6 @@
     <style name="TextAppearance.Widget.ActionBar.Menu" parent="TextAppearance.AppCompat.Widget.ActionBar.Menu">
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="Theme.CardView.Light" parent="CardView.Light">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">@dimen/card_margin</item>
-        <item name="android:layout_marginRight">@dimen/card_margin</item>
-        <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
-        <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
-        <item name="android:foreground">?android:attr/selectableItemBackground</item>
-    </style>
-
-    <style name="Theme.CardView.Dark" parent="CardView.Dark">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">@dimen/card_margin</item>
-        <item name="android:layout_marginRight">@dimen/card_margin</item>
-        <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
-        <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
-        <item name="android:foreground">?android:attr/selectableItemBackground</item>
     </style>
 
     <style name="ImageButton" parent="SelectableBorderlessItem">

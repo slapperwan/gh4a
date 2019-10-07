@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/sort_order"
-        android:icon="@drawable/sort_order"
+        android:icon="@drawable/menu_sort_order"
         android:title="@string/repo_sort"
         app:showAsAction="always">
 

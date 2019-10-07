@@ -353,8 +353,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             mBasicEditor.setSelection(mBasicEditor.getText().length());
         }
 
-        mAdvancedEditorToggle.setImageResource(UiUtils.resolveDrawable(getContext(),
-                visible ? R.attr.collapseIcon : R.attr.expandIcon));
+        mAdvancedEditorToggle.setImageResource(visible ? R.drawable.collapse : R.drawable.expand);
 
         if (mListener != null) {
             mListener.onToggleAdvancedMode(visible);

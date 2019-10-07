@@ -4,21 +4,21 @@
 
     <item
         android:id="@+id/search"
-        android:icon="@drawable/action_search"
+        android:icon="@drawable/menu_search"
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
 
     <item
         android:id="@+id/remove_filter"
-        android:icon="@drawable/filter_remove"
+        android:icon="@drawable/menu_filter_remove"
         android:title="@string/issue_filter_remove"
         android:visible="false"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/overflow"
-        android:icon="@drawable/overflow_horizontal"
+        android:icon="@drawable/menu_overflow_horizontal"
         android:title="@string/actions"
         app:showAsAction="always" />
 

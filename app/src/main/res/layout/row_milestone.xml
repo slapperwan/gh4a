@@ -62,7 +62,7 @@
             android:id="@+id/tv_due"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="?attr/dueSmallIcon"
+            android:drawableLeft="@drawable/due_small"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
             tools:text="in 2 days" />

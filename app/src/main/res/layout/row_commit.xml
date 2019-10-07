@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitStart"
-            android:src="?descriptionIcon"
+            android:src="@drawable/description"
             android:visibility="gone"
             tools:visibility="visible" />
 
@@ -39,7 +39,7 @@
             android:id="@+id/tv_comments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="?attr/commentsIcon"
+            android:drawableLeft="@drawable/comments"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
             tools:text="324" />

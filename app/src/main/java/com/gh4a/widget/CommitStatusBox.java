@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.model.Status;
 
@@ -56,33 +55,33 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
     }
 
     public void fillStatus(List<Status> statuses, PullRequest.MergeableState mergableState) {
-        final int statusIconDrawableAttrId;
+        final int statusIconDrawableResId;
         final int statusLabelResId;
         switch (mergableState) {
             case Behind:
-                statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
+                statusIconDrawableResId = R.drawable.pull_request_merge_dirty;
                 statusLabelResId = R.string.pull_merge_status_behind;
                 break;
             case Blocked:
-                statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
+                statusIconDrawableResId = R.drawable.pull_request_merge_dirty;
                 statusLabelResId = R.string.pull_merge_status_blocked;
                 break;
             case Clean:
-                statusIconDrawableAttrId = R.attr.pullRequestMergeOkIcon;
+                statusIconDrawableResId = R.drawable.pull_request_merge_ok;
                 statusLabelResId = statuses.isEmpty()
                         ? R.string.pull_merge_status_mergable
                         : R.string.pull_merge_status_clean;
                 break;
             case Unstable:
-                statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
+                statusIconDrawableResId = R.drawable.pull_request_merge_dirty;
                 statusLabelResId = R.string.pull_merge_status_unstable;
                 break;
             case Dirty:
-                statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
+                statusIconDrawableResId = R.drawable.pull_request_merge_dirty;
                 statusLabelResId = R.string.pull_merge_status_dirty;
                 break;
             case Draft:
-                statusIconDrawableAttrId = R.attr.pullRequestMergeDirtyIcon;
+                statusIconDrawableResId = R.drawable.pull_request_merge_dirty;
                 statusLabelResId = R.string.pull_merge_status_dirty;
                 break;
             default:
@@ -91,15 +90,14 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
                     setVisibility(View.GONE);
                     return;
                 }
-                statusIconDrawableAttrId = R.attr.pullRequestMergeUnknownIcon;
+                statusIconDrawableResId = R.drawable.pull_request_merge_unknown;
                 statusLabelResId = R.string.pull_merge_status_unknown;
                 break;
         }
 
         setVisibility(View.VISIBLE);
 
-        int statusIconResId = UiUtils.resolveDrawable(getContext(), statusIconDrawableAttrId);
-        mStatusIcon.setImageResource(statusIconResId);
+        mStatusIcon.setImageResource(statusIconDrawableResId);
         mStatusLabel.setText(statusLabelResId);
 
         mStatusContainer.removeAllViews();
@@ -127,25 +125,25 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
                 statusRow.setOnClickListener(this);
             }
 
-            final int iconDrawableAttrId;
+            final int iconDrawableResId;
             switch (status.state()) {
                 case Error:
                 case Failure:
-                    iconDrawableAttrId = R.attr.commitStatusFailIcon;
+                    iconDrawableResId = R.drawable.commit_status_fail;
                     failingCount += 1;
                     break;
                 case Success:
-                    iconDrawableAttrId = R.attr.commitStatusOkIcon;
+                    iconDrawableResId = R.drawable.commit_status_ok;
                     successCount += 1;
                     break;
                 default:
-                    iconDrawableAttrId = R.attr.commitStatusUnknownIcon;
+                    iconDrawableResId = R.drawable.commit_status_unknown;
                     pendingCount += 1;
                     break;
             }
             ImageView icon = statusRow.findViewById(R.id.iv_status_icon);
             icon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-            icon.setImageResource(UiUtils.resolveDrawable(getContext(), iconDrawableAttrId));
+            icon.setImageResource(iconDrawableResId);
 
             TextView context = statusRow.findViewById(R.id.tv_context);
             context.setText(status.context());
@@ -157,8 +155,7 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
         }
 
         if (mergableState == PullRequest.MergeableState.Unstable && pendingCount > 0) {
-            int resId = UiUtils.resolveDrawable(getContext(), R.attr.pullRequestMergeUnknownIcon);
-            mStatusIcon.setImageResource(resId);
+            mStatusIcon.setImageResource(R.drawable.pull_request_merge_unknown);
             mStatusLabel.setText(R.string.pull_merge_status_pending);
         }
 
@@ -199,8 +196,7 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
 
     private void setStatusesExpanded(boolean expanded) {
         mStatusContainer.setVisibility(expanded ? View.VISIBLE : View.GONE);
-        int drawableAttr = expanded ? R.attr.dropUpArrowIcon : R.attr.dropDownArrowIcon;
-        int drawableRes = UiUtils.resolveDrawable(getContext(), drawableAttr);
-        mDropDownIcon.setImageResource(drawableRes);
+        mDropDownIcon.setImageResource(expanded
+                ? R.drawable.drop_up_arrow : R.drawable.drop_down_arrow);
     }
 }

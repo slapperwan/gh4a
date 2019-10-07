@@ -349,13 +349,11 @@ public class HttpImageGetter {
         mWidth = size.x;
         mHeight = size.y;
 
-        mLoadingDrawable = ContextCompat.getDrawable(context,
-                UiUtils.resolveDrawable(context, R.attr.loadingPictureIcon));
+        mLoadingDrawable = ContextCompat.getDrawable(context, R.drawable.image_loading);
         mLoadingDrawable.setBounds(0, 0,
                 mLoadingDrawable.getIntrinsicWidth(), mLoadingDrawable.getIntrinsicHeight());
 
-        mErrorDrawable = ContextCompat.getDrawable(context,
-                UiUtils.resolveDrawable(context, R.attr.contentPictureIcon));
+        mErrorDrawable = ContextCompat.getDrawable(context, R.drawable.content_picture);
         mErrorDrawable.setBounds(0, 0,
                 mErrorDrawable.getIntrinsicWidth(), mErrorDrawable.getIntrinsicHeight());
     }

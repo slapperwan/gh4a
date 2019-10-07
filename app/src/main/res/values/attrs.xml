@@ -2,8 +2,7 @@
 <resources>
     <attr name="headerTheme" format="reference" />
     <attr name="cardViewTheme" format="reference" />
-    <attr name="listBackground" format="reference" />
-    <attr name="cardBackground" format="reference" />
+    <attr name="inlineButtonStyle" format="reference" />
     <attr name="drawerBackground" format="reference" />
     <attr name="colorIssueOpen" format="color" />
     <attr name="colorIssueClosed" format="color" />
@@ -15,7 +14,6 @@
     <attr name="colorCommitAddition" format="color" />
     <attr name="colorCommitDeletion" format="color" />
     <attr name="colorFab" format="color" />
-    <attr name="colorPrimaryTextEmphasized" format="color" />
     <attr name="colorBreadcrumbBackground" format="color" />
     <attr name="colorWebViewBackground" format="color" />
     <attr name="colorScrollbarThumb" format="color" />
@@ -24,86 +22,6 @@
     <attr name="colorDiffAddLineNumberBackground" format="color" />
     <attr name="colorDiffRemoveLineNumberBackground" format="color" />
     <attr name="colorIconForeground" format="color" />
-
-    <attr name="sendIcon" format="reference" />
-    <attr name="commentEditIcon" format="reference" />
-    <attr name="sortIcon" format="reference" />
-    <attr name="contentPictureIcon" format="reference" />
-    <attr name="loadingPictureIcon" format="reference" />
-    <attr name="searchUserIcon" format="reference" />
-    <attr name="searchRepoIcon" format="reference" />
-    <attr name="searchCodeIcon" format="reference" />
-    <attr name="userBookmarkIcon" format="reference" />
-    <attr name="repoBookmarkIcon" format="reference" />
-    <attr name="submoduleIcon" format="reference" />
-    <attr name="dirIcon" format="reference" />
-    <attr name="fileIcon" format="reference" />
-    <attr name="commentsIcon" format="reference" />
-    <attr name="languageSmallIcon" format="reference" />
-    <attr name="forkSmallIcon" format="reference" />
-    <attr name="forkSmallBoldIcon" format="reference" />
-    <attr name="starSmallIcon" format="reference" />
-    <attr name="sizeSmallIcon" format="reference" />
-    <attr name="dueSmallIcon" format="reference" />
-    <attr name="milestoneSmallIcon" format="reference" />
-    <attr name="downloadSmallIcon" format="reference" />
-    <attr name="filesSmallIcon" format="reference" />
-    <attr name="privateSmallIcon" format="reference" />
-    <attr name="milestoneIcon" format="reference" />
-    <attr name="assigneeIcon" format="reference" />
-    <attr name="labelsIcon" format="reference" />
-    <attr name="branchIcon" format="reference" />
-    <attr name="tagIcon" format="reference" />
-    <attr name="pullRequestIcon" format="reference" />
-    <attr name="pullRequestMergeOkIcon" format="reference" />
-    <attr name="pullRequestMergeDirtyIcon" format="reference" />
-    <attr name="pullRequestMergeUnknownIcon" format="reference" />
-    <attr name="commitStatusOkIcon" format="reference" />
-    <attr name="commitStatusUnknownIcon" format="reference" />
-    <attr name="commitStatusFailIcon" format="reference" />
-    <attr name="issueEventClosedIcon" format="reference" />
-    <attr name="issueEventReopenedIcon" format="reference" />
-    <attr name="issueEventMergedIcon" format="reference" />
-    <attr name="issueEventReferencedIcon" format="reference" />
-    <attr name="issueEventAssignedIcon" format="reference" />
-    <attr name="issueEventUnassignedIcon" format="reference" />
-    <attr name="issueEventLabeledIcon" format="reference" />
-    <attr name="issueEventUnlabeledIcon" format="reference" />
-    <attr name="issueEventLockedIcon" format="reference" />
-    <attr name="issueEventUnlockedIcon" format="reference" />
-    <attr name="issueEventMilestonedIcon" format="reference" />
-    <attr name="issueEventDemilestonedIcon" format="reference" />
-    <attr name="issueEventRenamedIcon" format="reference" />
-    <attr name="overflowIcon" format="reference" />
-    <attr name="mergedIcon" format="reference" />
-    <attr name="issueIcon" format="reference" />
-    <attr name="markAllAsReadIcon" format="reference" />
-    <attr name="commitIcon" format="reference" />
-    <attr name="descriptionIcon" format="reference" />
-    <attr name="releaseIcon" format="reference" />
-    <attr name="checkboxCheckedSmallIcon" format="reference" />
-    <attr name="checkboxUncheckedSmallIcon" format="reference" />
-    <attr name="reactionConfusedIcon" format="reference" />
-    <attr name="reactionHeartIcon" format="reference" />
-    <attr name="reactionHoorayIcon" format="reference" />
-    <attr name="reactionLaughIcon" format="reference" />
-    <attr name="reactionMinusOneIcon" format="reference" />
-    <attr name="reactionPlusOneIcon" format="reference" />
-    <attr name="reactionRocketIcon" format="reference" />
-    <attr name="reactionEyesIcon" format="reference" />
-    <attr name="dragHandleIcon" format="reference" />
-    <attr name="timelineEventApproved" format="reference" />
-    <attr name="timelineEventRequestedChanges" format="reference" />
-    <attr name="timelineEventReviewed" format="reference" />
-    <attr name="timelineEventReviewRequested" format="reference" />
-    <attr name="timelineEventReviewRequestRemoved" format="reference" />
-    <attr name="timelineEventBranchIcon" format="reference" />
-    <attr name="expandIcon" format="reference" />
-    <attr name="collapseIcon" format="reference" />
-    <attr name="saveIcon" format="reference" />
-    <attr name="dropDownArrowIcon" format="reference" />
-    <attr name="dropUpArrowIcon" format="reference" />
-    <attr name="arrowRightIcon" format="reference" />
 
     <attr name="maxHeight" format="dimension" />
 

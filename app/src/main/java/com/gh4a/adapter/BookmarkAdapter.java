@@ -17,7 +17,6 @@ import com.gh4a.R;
 import com.gh4a.db.BookmarksProvider;
 import com.gh4a.db.BookmarksProvider.Columns;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +29,6 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     }
 
     private final OnItemInteractListener mItemInteractListener;
-    private final int mRepoIconResId;
-    private final int mUserIconResId;
     private final LayoutInflater mInflater;
     private Cursor mCursor;
 
@@ -47,8 +44,6 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         super();
         setHasStableIds(true);
         mInflater = LayoutInflater.from(context);
-        mRepoIconResId = UiUtils.resolveDrawable(context, R.attr.repoBookmarkIcon);
-        mUserIconResId = UiUtils.resolveDrawable(context, R.attr.userBookmarkIcon);
         mItemInteractListener = listener;
     }
 
@@ -111,8 +106,8 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
         String extraData = mCursor.getString(mExtraColumnIndex);
 
         switch (type) {
-            case Columns.TYPE_REPO: holder.mIcon.setImageResource(mRepoIconResId); break;
-            case Columns.TYPE_USER: holder.mIcon.setImageResource(mUserIconResId); break;
+            case Columns.TYPE_REPO: holder.mIcon.setImageResource(R.drawable.repo_bookmark); break;
+            case Columns.TYPE_USER: holder.mIcon.setImageResource(R.drawable.user_bookmark); break;
             default: holder.mIcon.setImageDrawable(null); break;
         }
 

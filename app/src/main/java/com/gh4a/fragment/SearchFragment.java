@@ -350,18 +350,15 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         private final LayoutInflater mPopupInflater;
 
         private final int[][] mResources = new int[][] {
-            { R.string.search_type_repo, R.drawable.icon_repositories_dark, R.attr.searchRepoIcon, 0 },
-            { R.string.search_type_user, R.drawable.search_users_dark, R.attr.searchUserIcon, 0 },
-            { R.string.search_type_code, R.drawable.search_code_dark, R.attr.searchCodeIcon, 0 }
+            { R.string.search_type_repo, R.drawable.menu_search_repos, R.drawable.icon_repositories },
+            { R.string.search_type_user, R.drawable.menu_search_users, R.drawable.search_users },
+            { R.string.search_type_code, R.drawable.menu_search_code, R.drawable.search_code }
         };
 
         private SearchTypeAdapter(Context context, Context popupContext) {
             mContext = context;
             mInflater = LayoutInflater.from(context);
             mPopupInflater = LayoutInflater.from(popupContext);
-            for (int i = 0; i < mResources.length; i++) {
-                mResources[i][3] = UiUtils.resolveDrawable(popupContext, mResources[i][2]);
-            }
         }
 
         @Override
@@ -398,7 +395,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
             }
 
             ImageView icon = convertView.findViewById(R.id.icon);
-            icon.setImageResource(mResources[position][3]);
+            icon.setImageResource(mResources[position][2]);
 
             TextView label = convertView.findViewById(R.id.label);
             label.setText(mResources[position][0]);

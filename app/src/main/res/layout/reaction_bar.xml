@@ -4,42 +4,42 @@
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/plus_one"
         style="@style/ReactionBarButton"
-        android:drawableLeft="?attr/reactionPlusOneIcon" />
+        android:drawableLeft="@drawable/reaction_plus_one" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/minus_one"
         style="@style/ReactionBarButton"
-        android:drawableLeft="?attr/reactionMinusOneIcon" />
+        android:drawableLeft="@drawable/reaction_minus_one" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/laugh"
         style="@style/ReactionBarButton"
-        android:drawableLeft="?attr/reactionLaughIcon" />
+        android:drawableLeft="@drawable/reaction_laugh" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/hooray"
         style="@style/ReactionBarButton"
-        android:drawableLeft="?attr/reactionHoorayIcon" />
+        android:drawableLeft="@drawable/reaction_hooray" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/confused"
         style="@style/ReactionBarButton"
-        android:drawableLeft="?attr/reactionConfusedIcon" />
+        android:drawableLeft="@drawable/reaction_confused" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/heart"
         style="@style/ReactionBarButton"
-        android:drawableLeft="?attr/reactionHeartIcon" />
+        android:drawableLeft="@drawable/reaction_heart" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/rocket"
         style="@style/ReactionBarButton"
-        android:drawableLeft="?attr/reactionRocketIcon" />
+        android:drawableLeft="@drawable/reaction_rocket" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/eyes"
         style="@style/ReactionBarButton"
-        android:drawableLeft="?attr/reactionEyesIcon" />
+        android:drawableLeft="@drawable/reaction_eyes" />
 
     <ImageView
         android:id="@+id/react"
@@ -48,6 +48,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:padding="8dp"
-        android:src="?attr/overflowIcon" />
+        android:src="@drawable/overflow" />
 
 </merge>

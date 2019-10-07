@@ -154,10 +154,10 @@ public class GistActivity extends BaseActivity implements View.OnClickListener {
                 starAction.expandActionView();
             } else if (mIsStarred) {
                 starAction.setTitle(R.string.repo_unstar_action);
-                starAction.setIcon(R.drawable.unstar);
+                starAction.setIcon(R.drawable.menu_unstar);
             } else {
                 starAction.setTitle(R.string.repo_star_action);
-                starAction.setIcon(R.drawable.star);
+                starAction.setIcon(R.drawable.menu_star);
             }
         }
 

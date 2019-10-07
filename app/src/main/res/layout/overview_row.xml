@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="8dp"
-        android:src="?attr/arrowRightIcon"
+        android:src="@drawable/arrow_right"
         android:visibility="gone" />
 
 </merge>

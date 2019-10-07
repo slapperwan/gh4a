@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:drawableLeft="?attr/privateSmallIcon"
+            android:drawableLeft="@drawable/private_small"
             android:drawablePadding="4dp"
             android:text="@string/repo_type_private"
             android:textAppearance="@style/TextAppearance.VerySmall.Bold"
@@ -33,7 +33,7 @@
             android:id="@+id/tv_files"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableLeft="?attr/filesSmallIcon"
+            android:drawableLeft="@drawable/files_small"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
             tools:text="2" />

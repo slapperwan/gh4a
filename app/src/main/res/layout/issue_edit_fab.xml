@@ -6,7 +6,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginRight="16dp"
-    android:src="@drawable/content_edit_white"
+    android:src="@drawable/menu_edit"
     app:backgroundTint="?attr/colorIssueEditFab"
     app:fabSize="mini"
     app:layout_anchor="@id/header"

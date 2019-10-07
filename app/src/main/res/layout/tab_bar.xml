@@ -5,6 +5,7 @@
     android:id="@+id/tabs"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
     app:tabGravity="fill"
     app:tabIndicatorColor="@color/tab_indicator_color"
     app:tabMaxWidth="-1dp"

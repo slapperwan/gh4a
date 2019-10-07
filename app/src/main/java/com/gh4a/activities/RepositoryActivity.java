@@ -439,8 +439,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
     private static class BranchAndTagAdapter extends BaseAdapter {
         private final ArrayList<Branch> mItems;
         private final LayoutInflater mInflater;
-        private final int mBranchDrawableResId;
-        private final int mTagDrawableResId;
         private final int mFirstTagIndex;
 
         public BranchAndTagAdapter(Context context, List<Branch> branches, List<Branch> tags) {
@@ -449,8 +447,6 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
             mItems.addAll(tags);
             mFirstTagIndex = branches.size();
             mInflater = LayoutInflater.from(context);
-            mBranchDrawableResId = UiUtils.resolveDrawable(context, R.attr.branchIcon);
-            mTagDrawableResId = UiUtils.resolveDrawable(context, R.attr.tagIcon);
         }
 
         @Override
@@ -476,8 +472,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
             ImageView icon = convertView.findViewById(R.id.icon);
             TextView title = convertView.findViewById(R.id.title);
 
-            icon.setImageResource(position >= mFirstTagIndex
-                    ? mTagDrawableResId : mBranchDrawableResId);
+            icon.setImageResource(position >= mFirstTagIndex ? R.drawable.tag : R.drawable.branch);
             title.setText(mItems.get(position).name());
 
             return convertView;

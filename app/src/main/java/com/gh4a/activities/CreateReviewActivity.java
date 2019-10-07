@@ -53,8 +53,7 @@ public class CreateReviewActivity extends AppCompatActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME == R.style.DarkTheme
-                ? R.style.BottomSheetDarkTheme : R.style.BottomSheetLightTheme);
+        setTheme(R.style.BottomSheetTheme);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.comment_editor);

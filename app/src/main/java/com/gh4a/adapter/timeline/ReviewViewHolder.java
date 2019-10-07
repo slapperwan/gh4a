@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.net.Uri;
-import androidx.annotation.AttrRes;
 import androidx.annotation.DrawableRes;
 import androidx.appcompat.widget.PopupMenu;
 import android.text.SpannableStringBuilder;
@@ -210,16 +209,11 @@ class ReviewViewHolder
 
     @DrawableRes
     private int getEventIconResId(Review review) {
-        @AttrRes int iconResAttr = R.attr.timelineEventReviewed;
         switch (review.state()) {
-            case Approved:
-                iconResAttr = R.attr.timelineEventApproved;
-                break;
-            case ChangesRequested:
-                iconResAttr = R.attr.timelineEventRequestedChanges;
-                break;
+            case Approved: return R.drawable.timeline_event_approved;
+            case ChangesRequested: return R.drawable.timeline_event_requested_changes;
+            default: return R.drawable.timeline_event_reviewed;
         }
-        return UiUtils.resolveDrawable(mContext, iconResAttr);
     }
 
     private void formatTitle(final Review review) {

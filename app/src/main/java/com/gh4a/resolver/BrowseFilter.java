@@ -22,8 +22,7 @@ public class BrowseFilter extends AppCompatActivity {
     }
 
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME == R.style.DarkTheme
-                ? R.style.TransparentDarkTheme : R.style.TransparentLightTheme);
+        setTheme(R.style.TransparentTheme);
 
         super.onCreate(savedInstanceState);
 

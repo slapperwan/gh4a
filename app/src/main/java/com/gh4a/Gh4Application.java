@@ -16,7 +16,6 @@
 
 package com.gh4a;
 
-import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
@@ -35,12 +34,14 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.multidex.MultiDexApplication;
+
 /**
  * The Class Gh4Application.
  */
-public class Gh4Application extends Application implements OnSharedPreferenceChangeListener {
+public class Gh4Application extends MultiDexApplication implements OnSharedPreferenceChangeListener {
     public static final String LOG_TAG = "Gh4a";
-    public static int THEME = R.style.LightTheme;
 
     private static Gh4Application sInstance;
     private PrettyTime mPt;
@@ -128,11 +129,11 @@ public class Gh4Application extends Application implements OnSharedPreferenceCha
     private void selectTheme(int theme) {
         switch (theme) {
             case THEME_DARK:
-                THEME = R.style.DarkTheme;
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 break;
             case THEME_LIGHT:
             case 2: /* for backwards compat with old settings, was light-dark theme */
-                THEME = R.style.LightTheme;
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 break;
         }
     }

@@ -8,9 +8,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.appcompat.app.AppCompatActivity;
 import android.widget.ImageView;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.EditorBottomSheet;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 
@@ -34,8 +32,7 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setTheme(Gh4Application.THEME == R.style.DarkTheme
-                ? R.style.BottomSheetDarkTheme : R.style.BottomSheetLightTheme);
+        setTheme(R.style.BottomSheetTheme);
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.comment_editor);
@@ -45,7 +42,7 @@ public abstract class EditCommentActivity extends AppCompatActivity implements
 
         if (getIntent().getLongExtra("id", 0L) != 0L) {
             ImageView saveButton = mEditorSheet.findViewById(R.id.send_button);
-            saveButton.setImageResource(UiUtils.resolveDrawable(this, R.attr.saveIcon));
+            saveButton.setImageResource(R.drawable.save);
         }
 
         mEditorSheet.setCallback(this);

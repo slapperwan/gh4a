@@ -1,132 +1,48 @@
 <resources>
-
-    <style name="DarkThemeBase" parent="Theme.AppCompat">
+    <style name="AppThemeBase" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="headerTheme">@style/Theme.Header</item>
-        <item name="alertDialogTheme">@style/DarkAlertDialogTheme</item>
-        <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
-        <item name="sendIcon">@drawable/social_send_dark</item>
-        <item name="commentEditIcon">@drawable/comment_edit_dark</item>
-        <item name="contentPictureIcon">@drawable/content_picture_dark</item>
-        <item name="loadingPictureIcon">@drawable/image_loading_dark</item>
-        <item name="searchUserIcon">@drawable/search_users_dark</item>
-        <item name="searchRepoIcon">@drawable/icon_repositories_dark</item>
-        <item name="searchCodeIcon">@drawable/search_code_dark</item>
-        <item name="userBookmarkIcon">@drawable/user_bookmark_dark</item>
-        <item name="repoBookmarkIcon">@drawable/repo_bookmark_dark</item>
-        <item name="submoduleIcon">@drawable/submodule_dark</item>
-        <item name="dirIcon">@drawable/folder_dark</item>
-        <item name="fileIcon">@drawable/file_dark</item>
-        <item name="commentsIcon">@drawable/comments_dark</item>
-        <item name="languageSmallIcon">@drawable/language_small_dark</item>
-        <item name="forkSmallIcon">@drawable/fork_small_dark</item>
-        <item name="forkSmallBoldIcon">@drawable/fork_small_bold_dark</item>
-        <item name="starSmallIcon">@drawable/star_small_dark</item>
-        <item name="sizeSmallIcon">@drawable/size_small_dark</item>
-        <item name="dueSmallIcon">@drawable/due_small_dark</item>
-        <item name="milestoneSmallIcon">@drawable/milestone_small_dark</item>
-        <item name="downloadSmallIcon">@drawable/download_small_dark</item>
-        <item name="filesSmallIcon">@drawable/files_small_dark</item>
-        <item name="privateSmallIcon">@drawable/private_small_dark</item>
-        <item name="milestoneIcon">@drawable/milestone_dark</item>
-        <item name="assigneeIcon">@drawable/assignee_dark</item>
-        <item name="labelsIcon">@drawable/labels_dark</item>
-        <item name="branchIcon">@drawable/branch_dark</item>
-        <item name="tagIcon">@drawable/label_dark</item>
-        <item name="commitStatusOkIcon">@drawable/commit_status_ok_dark</item>
-        <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown_dark</item>
-        <item name="commitStatusFailIcon">@drawable/commit_status_fail_dark</item>
-        <item name="pullRequestIcon">@drawable/pull_request_dark</item>
-        <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok_dark</item>
-        <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty_dark</item>
-        <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown_dark</item>
-        <item name="issueEventClosedIcon">@drawable/issue_event_closed_dark</item>
-        <item name="issueEventReopenedIcon">@drawable/issue_event_reopened_dark</item>
-        <item name="issueEventMergedIcon">@drawable/issue_event_merged_dark</item>
-        <item name="issueEventReferencedIcon">@drawable/issue_event_referenced_dark</item>
-        <item name="issueEventAssignedIcon">@drawable/issue_event_person_dark</item>
-        <item name="issueEventUnassignedIcon">@drawable/issue_event_person_dark</item>
-        <item name="issueEventLabeledIcon">@drawable/issue_event_label_dark</item>
-        <item name="issueEventUnlabeledIcon">@drawable/issue_event_label_dark</item>
-        <item name="issueEventLockedIcon">@drawable/issue_event_locked_dark</item>
-        <item name="issueEventUnlockedIcon">@drawable/issue_event_unlocked_dark</item>
-        <item name="issueEventMilestonedIcon">@drawable/issue_event_milestone_dark</item>
-        <item name="issueEventDemilestonedIcon">@drawable/issue_event_milestone_dark</item>
-        <item name="issueEventRenamedIcon">@drawable/issue_event_renamed_dark</item>
-        <item name="overflowIcon">@drawable/overflow_dark</item>
-        <item name="mergedIcon">@drawable/merged_dark</item>
-        <item name="issueIcon">@drawable/issue_dark</item>
-        <item name="markAllAsReadIcon">@drawable/mark_read_all_dark</item>
-        <item name="commitIcon">@drawable/commit_dark</item>
-        <item name="descriptionIcon">@drawable/description_dark</item>
-        <item name="releaseIcon">@drawable/release_dark</item>
-        <item name="checkboxCheckedSmallIcon">@drawable/checkbox_checked_small_dark</item>
-        <item name="checkboxUncheckedSmallIcon">@drawable/checkbox_unchecked_small_dark</item>
-        <item name="reactionConfusedIcon">@drawable/reaction_confused_dark</item>
-        <item name="reactionHeartIcon">@drawable/reaction_heart_dark</item>
-        <item name="reactionHoorayIcon">@drawable/reaction_hooray_dark</item>
-        <item name="reactionLaughIcon">@drawable/reaction_laugh_dark</item>
-        <item name="reactionMinusOneIcon">@drawable/reaction_minus_one_dark</item>
-        <item name="reactionPlusOneIcon">@drawable/reaction_plus_one_dark</item>
-        <item name="reactionRocketIcon">@drawable/reaction_rocket_dark</item>
-        <item name="reactionEyesIcon">@drawable/reaction_eyes_dark</item>
-        <item name="dragHandleIcon">@drawable/drag_handle_dark</item>
-        <item name="timelineEventApproved">@drawable/timeline_event_approved_dark</item>
-        <item name="timelineEventRequestedChanges">@drawable/timeline_event_requested_changes_dark</item>
-        <item name="timelineEventReviewed">@drawable/timeline_event_reviewed_dark</item>
-        <item name="timelineEventReviewRequested">@drawable/timeline_event_review_requested_dark</item>
-        <item name="timelineEventReviewRequestRemoved">@drawable/timeline_event_review_request_removed_dark</item>
-        <item name="expandIcon">@drawable/expand_dark</item>
-        <item name="collapseIcon">@drawable/collapse_dark</item>
-        <item name="saveIcon">@drawable/save_dark</item>
-        <item name="timelineEventBranchIcon">@drawable/timeline_event_branch_dark</item>
-        <item name="dropDownArrowIcon">@drawable/drop_down_arrow_dark</item>
-        <item name="dropUpArrowIcon">@drawable/drop_up_arrow_dark</item>
-        <item name="arrowRightIcon">@drawable/arrow_right_dark</item>
 
-        <item name="cardViewTheme">@style/Theme.CardView.Dark</item>
         <item name="preferenceTheme">@style/PreferenceTheme</item>
-        <item name="colorAccent">@color/dark_accent</item>
-        <item name="colorPrimary">@color/dark_primary</item>
-        <item name="colorPrimaryDark">@color/dark_primary_dark</item>
-        <item name="colorBreadcrumbBackground">#587849</item>
-        <item name="android:textColorLink">@color/dark_accent</item>
+        <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="overviewRowStyle">@style/OverviewRow</item>
-        <item name="listBackground">@android:color/transparent</item>
-        <item name="drawerBackground">@color/background_floating_material_dark</item>
-        <item name="cardBackground">@color/cardview_dark_background</item>
-        <item name="colorIssueOpen">@color/issue_open_dark</item>
-        <item name="colorIssueClosed">@color/issue_closed_dark</item>
-        <item name="colorPullRequestMerged">@color/pr_merged_dark</item>
-        <item name="colorIssueOpenDark">@color/issue_open_dark_dark</item>
-        <item name="colorIssueClosedDark">@color/issue_closed_dark_dark</item>
-        <item name="colorPullRequestMergedDark">@color/pr_merged_dark_dark</item>
-        <item name="colorIssueEditFab">@color/issue_edit_fab_dark</item>
-        <item name="colorCommitAddition">#79d242</item>
-        <item name="colorCommitDeletion">#d25151</item>
-        <item name="colorFab">@color/default_fab_dark</item>
-        <item name="colorPrimaryTextEmphasized">@android:color/white</item>
-        <item name="colorWebViewBackground">#111111</item>
-        <item name="colorScrollbarThumb">@color/scrollbar_thumb_dark</item>
-        <item name="colorDiffAddBackground">@color/diff_add_dark</item>
-        <item name="colorDiffRemoveBackground">@color/diff_remove_dark</item>
-        <item name="colorDiffAddLineNumberBackground">@color/diff_add_line_number_dark</item>
-        <item name="colorDiffRemoveLineNumberBackground">@color/diff_remove_line_number_dark</item>
-        <item name="colorIconForeground">#ccffffff</item>
+        <item name="cardViewTheme">@style/CardView.DayNight</item>
+        <item name="inlineButtonStyle">@style/Widget.MaterialComponents.Button.TextButton</item>
+
+        <item name="android:textColorLink">@color/accent</item>
+
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorSecondary">@color/primary</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="colorIssueOpen">@color/issue_open</item>
+        <item name="colorIssueClosed">@color/issue_closed</item>
+        <item name="colorPullRequestMerged">@color/pr_merged</item>
+        <item name="colorIssueOpenDark">@color/issue_open_dark</item>
+        <item name="colorIssueClosedDark">@color/issue_closed_dark</item>
+        <item name="colorPullRequestMergedDark">@color/pr_merged_dark</item>
+        <item name="colorFab">@color/default_fab</item>
+        <item name="colorIssueEditFab">@color/issue_edit_fab</item>
+        <item name="colorScrollbarThumb">@color/scrollbar_thumb</item>
+        <item name="colorDiffAddBackground">@color/diff_add</item>
+        <item name="colorDiffRemoveBackground">@color/diff_remove</item>
+        <item name="colorDiffAddLineNumberBackground">@color/diff_add_line_number</item>
+        <item name="colorDiffRemoveLineNumberBackground">@color/diff_remove_line_number</item>
+        <item name="colorCommitAddition">@color/commit_addition</item>
+        <item name="colorCommitDeletion">@color/commit_deletion</item>
+        <item name="colorWebViewBackground">@color/webview_background</item>
+        <item name="colorBreadcrumbBackground">@color/breadcrumb_background</item>
+        <item name="colorIconForeground">@color/icon_foreground</item>
+        <item name="drawerBackground">@color/drawer_background</item>
     </style>
 
-    <style name="DarkTheme" parent="DarkThemeBase" />
+    <style name="AppTheme" parent="AppThemeBase" />
 
-    <style name="DarkAlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="colorPrimary">@color/dark_primary</item>
-        <item name="colorAccent">@color/dark_accent</item>
-    </style>
-
-    <style name="TransparentDarkThemeBase" parent="DarkThemeBase">
+    <style name="TransparentThemeBase" parent="AppTheme">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -134,163 +50,33 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="TransparentDarkTheme" parent="TransparentDarkThemeBase" />
+    <style name="TransparentTheme" parent="TransparentThemeBase" />
 
-    <style name="BottomSheetDarkTheme" parent="TransparentDarkTheme">
+    <style name="BottomSheetTheme" parent="TransparentTheme">
         <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
     </style>
 
-    <style name="LightThemeBase" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:windowSoftInputMode">adjustResize</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="windowActionModeOverlay">true</item>
-        <item name="headerTheme">@style/Theme.Header.Light</item>
-        <item name="alertDialogTheme">@style/LightAlertDialogTheme</item>
-        <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
-        <item name="sendIcon">@drawable/social_send</item>
-        <item name="commentEditIcon">@drawable/comment_edit</item>
-        <item name="contentPictureIcon">@drawable/content_picture</item>
-        <item name="loadingPictureIcon">@drawable/image_loading</item>
-        <item name="searchUserIcon">@drawable/search_users</item>
-        <item name="searchRepoIcon">@drawable/icon_repositories</item>
-        <item name="searchCodeIcon">@drawable/search_code</item>
-        <item name="userBookmarkIcon">@drawable/user_bookmark</item>
-        <item name="repoBookmarkIcon">@drawable/repo_bookmark</item>
-        <item name="submoduleIcon">@drawable/submodule</item>
-        <item name="dirIcon">@drawable/folder</item>
-        <item name="fileIcon">@drawable/file</item>
-        <item name="commentsIcon">@drawable/comments</item>
-        <item name="languageSmallIcon">@drawable/language_small</item>
-        <item name="forkSmallIcon">@drawable/fork_small</item>
-        <item name="forkSmallBoldIcon">@drawable/fork_small_bold</item>
-        <item name="starSmallIcon">@drawable/star_small</item>
-        <item name="sizeSmallIcon">@drawable/size_small</item>
-        <item name="dueSmallIcon">@drawable/due_small</item>
-        <item name="milestoneSmallIcon">@drawable/milestone_small</item>
-        <item name="downloadSmallIcon">@drawable/download_small</item>
-        <item name="filesSmallIcon">@drawable/files_small</item>
-        <item name="privateSmallIcon">@drawable/private_small</item>
-        <item name="milestoneIcon">@drawable/milestone</item>
-        <item name="assigneeIcon">@drawable/assignee</item>
-        <item name="labelsIcon">@drawable/labels</item>
-        <item name="branchIcon">@drawable/branch</item>
-        <item name="tagIcon">@drawable/label</item>
-        <item name="commitStatusOkIcon">@drawable/commit_status_ok</item>
-        <item name="commitStatusUnknownIcon">@drawable/commit_status_unknown</item>
-        <item name="commitStatusFailIcon">@drawable/commit_status_fail</item>
-        <item name="pullRequestIcon">@drawable/pull_request</item>
-        <item name="pullRequestMergeOkIcon">@drawable/pull_request_merge_ok</item>
-        <item name="pullRequestMergeDirtyIcon">@drawable/pull_request_merge_dirty</item>
-        <item name="pullRequestMergeUnknownIcon">@drawable/pull_request_merge_unknown</item>
-        <item name="issueEventClosedIcon">@drawable/issue_event_closed</item>
-        <item name="issueEventReopenedIcon">@drawable/issue_event_reopened</item>
-        <item name="issueEventMergedIcon">@drawable/issue_event_merged</item>
-        <item name="issueEventReferencedIcon">@drawable/issue_event_referenced</item>
-        <item name="issueEventAssignedIcon">@drawable/issue_event_person</item>
-        <item name="issueEventUnassignedIcon">@drawable/issue_event_person</item>
-        <item name="issueEventLabeledIcon">@drawable/issue_event_label</item>
-        <item name="issueEventUnlabeledIcon">@drawable/issue_event_label</item>
-        <item name="issueEventLockedIcon">@drawable/issue_event_locked</item>
-        <item name="issueEventUnlockedIcon">@drawable/issue_event_unlocked</item>
-        <item name="issueEventMilestonedIcon">@drawable/issue_event_milestone</item>
-        <item name="issueEventDemilestonedIcon">@drawable/issue_event_milestone</item>
-        <item name="issueEventRenamedIcon">@drawable/issue_event_renamed</item>
-        <item name="overflowIcon">@drawable/overflow</item>
-        <item name="mergedIcon">@drawable/merged</item>
-        <item name="issueIcon">@drawable/issue</item>
-        <item name="markAllAsReadIcon">@drawable/mark_read_all</item>
-        <item name="commitIcon">@drawable/commit</item>
-        <item name="descriptionIcon">@drawable/description</item>
-        <item name="releaseIcon">@drawable/release</item>
-        <item name="checkboxCheckedSmallIcon">@drawable/checkbox_checked_small</item>
-        <item name="checkboxUncheckedSmallIcon">@drawable/checkbox_unchecked_small</item>
-        <item name="reactionConfusedIcon">@drawable/reaction_confused</item>
-        <item name="reactionHeartIcon">@drawable/reaction_heart</item>
-        <item name="reactionHoorayIcon">@drawable/reaction_hooray</item>
-        <item name="reactionLaughIcon">@drawable/reaction_laugh</item>
-        <item name="reactionMinusOneIcon">@drawable/reaction_minus_one</item>
-        <item name="reactionPlusOneIcon">@drawable/reaction_plus_one</item>
-        <item name="reactionRocketIcon">@drawable/reaction_rocket</item>
-        <item name="reactionEyesIcon">@drawable/reaction_eyes</item>
-        <item name="dragHandleIcon">@drawable/drag_handle</item>
-        <item name="timelineEventApproved">@drawable/timeline_event_approved</item>
-        <item name="timelineEventRequestedChanges">@drawable/timeline_event_requested_changes</item>
-        <item name="timelineEventReviewed">@drawable/timeline_event_reviewed</item>
-        <item name="timelineEventReviewRequested">@drawable/timeline_event_review_requested</item>
-        <item name="timelineEventReviewRequestRemoved">@drawable/timeline_event_review_request_removed</item>
-        <item name="expandIcon">@drawable/expand</item>
-        <item name="collapseIcon">@drawable/collapse</item>
-        <item name="saveIcon">@drawable/save</item>
-        <item name="timelineEventBranchIcon">@drawable/timeline_event_branch</item>
-        <item name="dropDownArrowIcon">@drawable/drop_down_arrow</item>
-        <item name="dropUpArrowIcon">@drawable/drop_up_arrow</item>
-        <item name="arrowRightIcon">@drawable/arrow_right</item>
-
-        <item name="listPopupWindowStyle">@style/Widget.AppCompat.Light.ListPopupWindow</item>
-        <item name="cardViewTheme">@style/Theme.CardView.Light</item>
-        <item name="preferenceTheme">@style/PreferenceTheme</item>
-        <item name="colorAccent">@color/light_accent</item>
-        <item name="colorPrimary">@color/light_primary</item>
-        <item name="colorPrimaryDark">@color/light_primary_dark</item>
-        <item name="colorBreadcrumbBackground">#7baa67</item>
-        <item name="android:textColorLink">@color/light_accent</item>
-        <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
-        <item name="overviewRowStyle">@style/OverviewRow</item>
-        <item name="listBackground">@android:color/white</item>
-        <item name="drawerBackground">@color/background_floating_material_light</item>
-        <item name="cardBackground">@color/cardview_light_background</item>
-        <item name="colorIssueOpen">@color/issue_open_light</item>
-        <item name="colorIssueClosed">@color/issue_closed_light</item>
-        <item name="colorPullRequestMerged">@color/pr_merged_light</item>
-        <item name="colorIssueOpenDark">@color/issue_open_light_dark</item>
-        <item name="colorIssueClosedDark">@color/issue_closed_light_dark</item>
-        <item name="colorPullRequestMergedDark">@color/pr_merged_light_dark</item>
-        <item name="colorIssueEditFab">@color/issue_edit_fab_light</item>
-        <item name="colorCommitAddition">#65b345</item>
-        <item name="colorCommitDeletion">#b34545</item>
-        <item name="colorFab">@color/default_fab_light</item>
-        <item name="colorPrimaryTextEmphasized">@android:color/black</item>
-        <item name="colorWebViewBackground">#f7f7f9</item>
-        <item name="colorScrollbarThumb">@color/scrollbar_thumb_light</item>
-        <item name="colorDiffAddBackground">@color/diff_add_light</item>
-        <item name="colorDiffRemoveBackground">@color/diff_remove_light</item>
-        <item name="colorDiffAddLineNumberBackground">@color/diff_add_line_number_light</item>
-        <item name="colorDiffRemoveLineNumberBackground">@color/diff_remove_line_number_light</item>
-        <item name="colorIconForeground">#99343434</item>
-    </style>
-
-    <style name="LightTheme" parent="LightThemeBase" />
-
-    <style name="LightAlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorPrimary">@color/light_primary</item>
-        <item name="colorAccent">@color/light_primary</item>
-    </style>
-
-    <style name="TransparentLightThemeBase" parent="LightThemeBase">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorBackgroundCacheHint">@null</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
-
-    <style name="TransparentLightTheme" parent="TransparentLightThemeBase" />
-
-    <style name="BottomSheetLightTheme" parent="TransparentLightTheme">
-        <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
-    </style>
-
-    <style name="Theme.Header" parent="Theme.AppCompat">
-        <item name="colorAccent">#ffffff</item>
+    <style name="HeaderTheme" parent="Theme.MaterialComponents">
+        <item name="colorPrimary">#ffffff</item>
+        <item name="colorSecondary">#ffffff</item>
         <item name="colorControlActivated">#ffffff</item>
-    </style>
-
-    <style name="Theme.Header.Light">
+        <item name="colorSurface">@android:color/transparent</item>
+        <item name="colorOnSurface">#ffffffff</item>
         <item name="android:spinnerStyle">@style/Widget.Spinner.ActionBar.Light</item>
         <!-- used by appcompat to tint the spinner background drawable -->
         <item name="android:colorBackground">#ffffff</item>
     </style>
 
     <style name="PreferenceTheme" parent="PreferenceThemeOverlay.v14.Material" />
+
+    <style name="CardView.DayNight" parent="CardView.Light">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">@dimen/card_margin</item>
+        <item name="android:layout_marginRight">@dimen/card_margin</item>
+        <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
+        <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
+        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+    </style>
+
 </resources>

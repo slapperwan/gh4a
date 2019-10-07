@@ -52,7 +52,7 @@
             android:id="@+id/tv_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="?attr/sizeSmallIcon"
+            android:drawableLeft="@drawable/size_small"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
             tools:text="4.75 MB" />
@@ -62,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:drawableLeft="?attr/downloadSmallIcon"
+            android:drawableLeft="@drawable/download_small"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
             tools:text="34" />

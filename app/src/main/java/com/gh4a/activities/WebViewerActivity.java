@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
@@ -32,7 +33,6 @@ import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
 import android.text.TextUtils;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,7 +45,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.gh4a.BaseActivity;
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
@@ -54,6 +53,8 @@ import com.gh4a.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import androidx.appcompat.view.ContextThemeWrapper;
 
 public abstract class WebViewerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, View.OnTouchListener {
@@ -115,9 +116,14 @@ public abstract class WebViewerActivity extends BaseActivity implements
             }
         }
 
-        // We also use the dark CAB for the light theme, so we have to inflate
-        // the WebView using a dark theme
-        Context inflateContext = new ContextThemeWrapper(this, R.style.DarkTheme);
+        // We also use the dark CAB for the light theme, so we have to force the
+        // dark (night) version of the theme for inflating the WebView
+        ContextThemeWrapper inflateContext = new ContextThemeWrapper(this, R.style.AppTheme);
+        Configuration config = new Configuration();
+        config.fontScale = 0F;
+        config.uiMode = Configuration.UI_MODE_NIGHT_YES | (config.uiMode & ~Configuration.UI_MODE_NIGHT_MASK);
+        inflateContext.applyOverrideConfiguration(config);
+
         setContentView(LayoutInflater.from(inflateContext).inflate(R.layout.web_viewer, null));
 
         setContentShown(false);
@@ -339,7 +345,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
     @SuppressLint("AddJavascriptInterface")
     protected void onDataReady() {
-        final String cssTheme = Gh4Application.THEME == R.style.DarkTheme
+        final String cssTheme = getResources().getBoolean(R.bool.is_dark_theme)
                 ? DARK_CSS_THEME : LIGHT_CSS_THEME;
         final String html = generateHtml(cssTheme, false);
         if (mRequiresJsInterface) {

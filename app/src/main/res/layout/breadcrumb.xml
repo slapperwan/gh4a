@@ -24,7 +24,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/breadcrumb_arrow_margin"
         android:scaleType="fitXY"
-        android:src="@drawable/ic_right_arrow"
+        android:src="@drawable/right_arrow_white"
         android:visibility="gone"
         tools:visibility="visible" />
 

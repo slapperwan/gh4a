@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
-            android:drawableLeft="?attr/milestoneSmallIcon"
+            android:drawableLeft="@drawable/milestone_small"
             android:drawablePadding="4dp"
             android:ellipsize="end"
             android:maxLines="1"
@@ -36,7 +36,7 @@
             android:id="@+id/tv_comments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawableLeft="?attr/commentsIcon"
+            android:drawableLeft="@drawable/comments"
             android:drawablePadding="4dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
             tools:text="324" />

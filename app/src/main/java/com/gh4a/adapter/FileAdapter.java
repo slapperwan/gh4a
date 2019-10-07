@@ -26,7 +26,6 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.utils.FileUtils;
-import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.ContentType;
 
@@ -69,16 +68,14 @@ public class FileAdapter extends RootAdapter<Content, FileAdapter.ViewHolder> {
     private int getIconId(ContentType type, String fileName) {
         int iconId;
         if (mSubModuleNames != null && mSubModuleNames.contains(fileName)) {
-            iconId = R.attr.submoduleIcon;
+            return R.drawable.submodule;
         } else if (type == ContentType.Directory) {
-            iconId = R.attr.dirIcon;
+            return R.drawable.folder;
         } else if (type == ContentType.File && FileUtils.isImage(fileName)) {
-            iconId = R.attr.contentPictureIcon;
+            return R.drawable.content_picture;
         } else {
-            iconId = R.attr.fileIcon;
+            return R.drawable.file;
         }
-
-        return UiUtils.resolveDrawable(mContext, iconId);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

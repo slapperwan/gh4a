@@ -18,7 +18,6 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.annotation.StyleRes;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
@@ -30,7 +29,6 @@ import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.view.ActionMode;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -218,14 +216,6 @@ public class UiUtils {
         return view.canScrollVertically(-1);
     }
 
-    public static Context makeHeaderThemedContext(Context context) {
-        @StyleRes int themeResId = resolveDrawable(context, R.attr.headerTheme);
-        if (themeResId != 0) {
-            return new ContextThemeWrapper(context, themeResId);
-        }
-        return context;
-    }
-
     public static Dialog createProgressDialog(Context context, @StringRes int messageResId) {
         View content = LayoutInflater.from(context).inflate(R.layout.progress_dialog, null);
         TextView message = content.findViewById(R.id.message);
@@ -234,15 +224,6 @@ public class UiUtils {
         return new AlertDialog.Builder(context)
                 .setView(content)
                 .create();
-    }
-
-    public static int resolveDrawable(Context context, @AttrRes int styledAttributeId) {
-        TypedArray a = context.obtainStyledAttributes(new int[] {
-            styledAttributeId
-        });
-        int resource = a.getResourceId(0, 0);
-        a.recycle();
-        return resource;
     }
 
     public static @ColorInt int resolveColor(Context context, @AttrRes int styledAttributeId) {

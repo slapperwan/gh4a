@@ -4,14 +4,14 @@
 
     <item
         android:id="@+id/search"
-        android:icon="@drawable/action_search"
+        android:icon="@drawable/menu_search"
         android:title="@string/search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="always|collapseActionView" />
 
     <item
         android:id="@+id/filter"
-        android:icon="@drawable/overflow_horizontal"
+        android:icon="@drawable/menu_overflow_horizontal"
         android:title="@string/filter_and_sort"
         app:showAsAction="ifRoom" />
 

@@ -83,7 +83,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginRight="10dp"
-            android:src="?attr/labelsIcon" />
+            android:src="@drawable/labels" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_labels_label"
@@ -119,7 +119,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginRight="10dp"
-            android:src="?attr/assigneeIcon" />
+            android:src="@drawable/assignee" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_assignee_label"
@@ -155,7 +155,7 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginRight="10dp"
-            android:src="?attr/milestoneIcon" />
+            android:src="@drawable/milestone" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/tv_milestone_label"

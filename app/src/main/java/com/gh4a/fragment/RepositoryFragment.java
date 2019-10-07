@@ -399,8 +399,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         mLoadingView.setVisibility(
                 mIsReadmeExpanded && !mIsReadmeLoaded ? View.VISIBLE : View.GONE);
 
-        int drawableAttr = mIsReadmeExpanded ? R.attr.dropUpArrowIcon : R.attr.dropDownArrowIcon;
-        int drawableRes = UiUtils.resolveDrawable(getContext(), drawableAttr);
+        int drawableRes = mIsReadmeExpanded ? R.drawable.drop_up_arrow : R.drawable.drop_down_arrow;
         mReadmeTitleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableRes, 0);
     }
 

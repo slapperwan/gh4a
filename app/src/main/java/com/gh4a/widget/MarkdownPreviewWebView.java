@@ -13,7 +13,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.EditText;
 
-import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.WebViewerActivity;
 import com.gh4a.utils.StringUtils;
@@ -40,7 +39,7 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
         mChildHelper = new NestedScrollingChildHelper(this);
         setNestedScrollingEnabled(true);
 
-        mCssTheme = Gh4Application.THEME == R.style.DarkTheme
+        mCssTheme = getResources().getBoolean(R.bool.is_dark_theme)
                 ? WebViewerActivity.DARK_CSS_THEME : WebViewerActivity.LIGHT_CSS_THEME;
 
         if (!isInEditMode()) {
