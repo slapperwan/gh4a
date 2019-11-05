@@ -37,9 +37,13 @@ import androidx.core.util.ObjectsCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.appcompat.app.AlertDialog;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -72,10 +76,14 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 import retrofit2.Response;
 
@@ -97,6 +105,16 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .putExtra("issue", issue);
     }
 
+    private interface OnAssigneesLoaded {
+        void handleLoad(List<User> assignees);
+    }
+    private interface OnLabelsLoaded {
+        void handleLoad(List<Label> labels);
+    }
+    private interface OnMilestonesLoaded {
+        void handleLoad(List<Milestone> milestones);
+    }
+
     private static final int REQUEST_MANAGE_LABELS = 1000;
     private static final int REQUEST_MANAGE_MILESTONES = 1001;
 
@@ -110,9 +128,11 @@ public class IssueEditActivity extends BasePagerActivity implements
     private String mRepoName;
 
     private boolean mIsCollaborator;
-    private List<Milestone> mAllMilestone;
-    private List<User> mAllAssignee;
-    private List<Label> mAllLabels;
+
+    private Single<List<User>> mAssigneeSingle;
+    private Single<List<Label>> mLabelSingle;
+    private Single<List<Milestone>> mMilestoneSingle;
+
     private Issue mEditIssue;
     private Issue mOriginalIssue;
 
@@ -188,7 +208,8 @@ public class IssueEditActivity extends BasePagerActivity implements
         loadCollaboratorStatus(false);
 
         if (savedInstanceState == null && !isInEditMode()) {
-            loadIssueTemplate();
+            loadIssueTemplates();
+            mTitleView.setEnabled(false);
             mDescView.setEnabled(false);
             mDescView.setHint(getString(R.string.issue_loading_template_hint));
         }
@@ -273,9 +294,9 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     @Override
     public void onRefresh() {
-        mAllAssignee = null;
-        mAllMilestone = null;
-        mAllLabels = null;
+        mAssigneeSingle = null;
+        mLabelSingle = null;
+        mMilestoneSingle = null;
         mIsCollaborator = false;
         loadCollaboratorStatus(true);
         super.onRefresh();
@@ -342,12 +363,12 @@ public class IssueEditActivity extends BasePagerActivity implements
         if (requestCode == REQUEST_MANAGE_LABELS) {
             if (resultCode == RESULT_OK) {
                 // Require reload of labels
-                mAllLabels = null;
+                mLabelSingle = null;
             }
         } else if (requestCode == REQUEST_MANAGE_MILESTONES) {
             if (resultCode == RESULT_OK) {
                 // Require reload of milestones
-                mAllMilestone = null;
+                mMilestoneSingle = null;
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -355,37 +376,31 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void showMilestonesDialog() {
-        if (mAllMilestone == null) {
-            loadMilestones();
-        } else {
+        loadMilestones(milestones -> {
             MilestoneEditDialogFragment
-                    .newInstance(mEditIssue.milestone(), mAllMilestone)
+                    .newInstance(mEditIssue.milestone(), milestones)
                     .show(getSupportFragmentManager(), "milestoneedit");
-        }
+        });
     }
 
     private void showAssigneesDialog() {
-        if (mAllAssignee == null) {
-            loadPotentialAssignees();
-        } else {
+        loadPotentialAssignees(assignees -> {
             final List<User> oldAssigneeList = mEditIssue.assignees() != null
                     ? mEditIssue.assignees() : Collections.emptyList();
             AssigneeEditDialogFragment
-                    .newInstance(oldAssigneeList, mAllAssignee)
+                    .newInstance(oldAssigneeList, assignees)
                     .show(getSupportFragmentManager(), "assigneeedit");
-        }
+        });
     }
 
     private void showLabelDialog() {
-        if (mAllLabels == null) {
-            loadLabels();
-        } else {
+        loadLabels(labels -> {
             final List<Label> selectedLabels = mEditIssue.labels() != null
                     ? mEditIssue.labels() : Collections.emptyList();
             LabelEditDialogFragment
-                    .newInstance(selectedLabels, mAllLabels)
+                    .newInstance(selectedLabels, labels)
                     .show(getSupportFragmentManager(), "labeledit");
-        }
+        });
     }
 
     private void updateMilestone(Milestone newMilestone) {
@@ -518,76 +533,319 @@ public class IssueEditActivity extends BasePagerActivity implements
                 }, this::handleLoadFailure);
     }
 
-    private void loadLabels() {
+    private void loadLabels(OnLabelsLoaded callback) {
         final IssueLabelService service = ServiceFactory.get(IssueLabelService.class, false);
-        registerTemporarySubscription(ApiHelpers.PageIterator
-                .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
-                .compose(RxUtils::doInBackground)
-                .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
-                .subscribe(result -> {
-                    mAllLabels = result;
-                    showLabelDialog();
-                }, this::handleLoadFailure));
+        if (mLabelSingle == null) {
+            mLabelSingle = ApiHelpers.PageIterator
+                    .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
+                    .compose(RxUtils::doInBackground)
+                    .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
+                    .cache();
+        }
+        registerTemporarySubscription(
+                mLabelSingle.subscribe(result -> callback.handleLoad(result), this::handleLoadFailure));
     }
 
-    private void loadMilestones() {
+    private void loadMilestones(OnMilestonesLoaded callback) {
         final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
-        registerTemporarySubscription(ApiHelpers.PageIterator
-                .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
-                .compose(RxUtils::doInBackground)
-                .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
-                .subscribe(result -> {
-                    mAllMilestone = result;
-                    showMilestonesDialog();
-                }, this::handleLoadFailure));
+        if (mMilestoneSingle == null) {
+            mMilestoneSingle = ApiHelpers.PageIterator
+                    .toSingle(page -> service
+                            .getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
+                    .compose(RxUtils::doInBackground)
+                    .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
+                    .cache();
+        }
+        registerTemporarySubscription(
+                mMilestoneSingle.subscribe(result -> callback.handleLoad(result), this::handleLoadFailure));
     }
 
-    private void loadPotentialAssignees() {
+    private void loadPotentialAssignees(OnAssigneesLoaded callback) {
         final RepositoryCollaboratorService service =
                 ServiceFactory.get(RepositoryCollaboratorService.class, false);
-        registerTemporarySubscription(ApiHelpers.PageIterator
-                .toSingle(page -> service.getCollaborators(mRepoOwner, mRepoName, page))
-                .compose(RxUtils::doInBackground)
+
+        if (mAssigneeSingle == null) {
+            mAssigneeSingle = ApiHelpers.PageIterator
+                    .toSingle(page -> service.getCollaborators(mRepoOwner, mRepoName, page))
+                    .compose(RxUtils::doInBackground)
+                    .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
+                    .map(assignees -> {
+                        User creator = mEditIssue.user();
+                        if (creator != null && !assignees.contains(creator)) {
+                            assignees.add(creator);
+                        }
+                        return assignees;
+                    })
+                    .cache();
+        }
+
+        registerTemporarySubscription(
+                mAssigneeSingle.subscribe(result -> callback.handleLoad(result), this::handleLoadFailure));
+    }
+
+    private void loadIssueTemplates() {
+        registerTemporarySubscription(getIssueTemplatesSingle("/.github")
+                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplatesSingle("")))
+                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplatesSingle("/docs")))
                 .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                 .subscribe(result -> {
-                    mAllAssignee = result;
-                    User creator = mEditIssue.user();
-                    if (creator != null && !mAllAssignee.contains(creator)) {
-                        mAllAssignee.add(creator);
+                    if (result.isPresent() && !result.get().isEmpty()) {
+                        List<IssueTemplate> templates = result.get();
+                        if (templates.size() == 1) {
+                            handleIssueTemplateSelected(templates.get(0));
+                        } else {
+                            IssueTemplateSelectionDialogFragment f =
+                                    IssueTemplateSelectionDialogFragment.newInstance(templates);
+                            f.show(getSupportFragmentManager(), "template-selection");
+                        }
+                    } else {
+                        handleIssueTemplateSelected(null);
                     }
-                    showAssigneesDialog();
                 }, this::handleLoadFailure));
     }
 
-    private void loadIssueTemplate() {
-        RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, false);
+    private void handleIssueTemplateSelected(IssueTemplate template) {
+        mTitleView.setEnabled(true);
+        mDescView.setHint(null);
+        mDescView.setEnabled(true);
+        if (template == null) {
+            return;
+        }
 
-        registerTemporarySubscription(getIssueTemplateContentSingle("/.github")
-                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplateContentSingle("")))
-                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplateContentSingle("/docs")))
-                .flatMap(opt -> opt.flatMap(c -> {
-                    //noinspection CodeBlock2Expr
-                    return service.getContents(mRepoOwner, mRepoName, c.path(), null)
-                            .map(ApiHelpers::throwOnFailure)
-                            .compose(RxUtils::doInBackground);
-                }))
-                .map(opt -> opt.map(c -> StringUtils.fromBase64(c.content())))
-                .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
-                .subscribe(result -> {
-                    mDescView.setHint(null);
-                    mDescView.setEnabled(true);
-                    mDescView.setText(result.orNull());
-                }, this::handleLoadFailure));
+        mTitleView.setText(template.title);
+        mDescView.setText(template.content);
+        if (!template.defaultAssignees.isEmpty()) {
+            loadPotentialAssignees(assignees -> {
+                final List<User> validAssignees = new ArrayList<>();
+                for (User potentialAssignee : assignees) {
+                    if (template.defaultAssignees.contains(potentialAssignee.login())) {
+                        validAssignees.add(potentialAssignee);
+                    }
+                }
+                if (!validAssignees.isEmpty()) {
+                    mEditIssue = mEditIssue.toBuilder()
+                            .assignees(validAssignees)
+                            .build();
+                }
+            });
+        }
+        if (!template.defaultLabels.isEmpty()) {
+            loadLabels(labels -> {
+                final List<Label> validLabels = new ArrayList<>();
+                for (Label label : labels) {
+                    if (template.defaultLabels.contains(label.name())) {
+                        validLabels.add(label);
+                    }
+                }
+                if (!validLabels.isEmpty()) {
+                    mEditIssue = mEditIssue.toBuilder()
+                            .labels(validLabels)
+                            .build();
+                }
+            });
+        }
     }
 
-    private Single<Optional<Content>> getIssueTemplateContentSingle(String path) {
+    private Single<Optional<List<IssueTemplate>>> getIssueTemplatesSingle(String path) {
         RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, false);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page))
+                .compose(RxUtils.filterAndMapToFirst(c -> c.name().toLowerCase(Locale.US).startsWith("issue_template")))
+                .flatMap(contentOpt -> contentOpt.flatMap(content -> {
+                    if (content.type() == ContentType.Directory) {
+                        return ApiHelpers.PageIterator
+                                .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, content.path(), null, page));
+                    } else {
+                        return Single.just(Arrays.asList(content));
+                    }
+                }))
+                .map(contentsOpt -> contentsOpt.map(contents -> {
+                    List<Content> files = new ArrayList<>();
+                    for (Content c : contents) {
+                        if (c.type() == ContentType.File && c.name().endsWith(".md")) {
+                            files.add(c);
+                        }
+                    }
+                    return files;
+                }))
+                .flatMap(contentsOpt -> contentsOpt.flatMap(contents -> {
+                    List<Single<IssueTemplate>> result = new ArrayList<>();
+                    for (Content c : contents) {
+                        result.add(parseTemplate(service, c));
+                    }
+                    return Flowable.fromIterable(result)
+                            .flatMap(flowable -> flowable.toFlowable())
+                            .filter(template -> template != null)
+                            .toList();
+                }))
                 .compose(RxUtils::doInBackground)
-                .compose(RxUtils.filterAndMapToFirst(
-                        c -> c.type() == ContentType.File && c.name().toLowerCase(Locale.US).startsWith("issue_template")))
                 .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.absent()));
+    }
+
+    private Single<IssueTemplate> parseTemplate(RepositoryContentService service, Content content) {
+        return service.getContents(mRepoOwner, mRepoName, content.path(), null)
+            .map(ApiHelpers::throwOnFailure)
+            .map(fileContent -> StringUtils.fromBase64(fileContent.content()))
+            .map(contentString -> IssueTemplate.parse(contentString))
+            .compose(RxUtils::doInBackground);
+    }
+
+    private static class IssueTemplate implements Parcelable {
+        private static final Pattern FRONT_MATTER_PATTERN =
+                Pattern.compile("(---\n)(.*?\n)((---)|(\\.\\.\\.))\n?(.*)", Pattern.DOTALL);
+
+        String content;
+        String name;
+        String description;
+        String title;
+        final List<String> defaultLabels = new ArrayList<>();
+        final List<String> defaultAssignees = new ArrayList<>();
+
+        public static IssueTemplate parse(String contentString) {
+            IssueTemplate t = new IssueTemplate(contentString);
+            return t.name != null ? t : null;
+        }
+
+        private IssueTemplate(String contentString) {
+            Matcher matcher = FRONT_MATTER_PATTERN.matcher(contentString);
+            if (matcher.matches()) {
+                content = matcher.group(6);
+                for (String line : matcher.group(2).split("\n")) {
+                    int colonPos = line.indexOf(": ");
+                    if (colonPos > 0) {
+                        String key = line.substring(0, colonPos);
+                        boolean isQuoted = line.charAt(colonPos + 2) == '"'
+                                || line.charAt(colonPos + 2) == '\'';
+                        String value = isQuoted
+                                ? line.substring(colonPos + 3, line.length() - 1)
+                                : line.substring(colonPos + 2);
+                        switch (key) {
+                            case "name": name = value; break;
+                            case "about": description = value; break;
+                            case "title": title = value; break;
+                            case "labels": splitAndFillList(value, defaultLabels); break;
+                            case "assignees": splitAndFillList(value, defaultAssignees); break;
+                        }
+                    }
+                }
+            } else {
+                content = contentString;
+            }
+        }
+
+        private IssueTemplate(Parcel parcel) {
+            content = parcel.readString();
+            name = parcel.readString();
+            description = parcel.readString();
+            title = parcel.readString();
+            parcel.readStringList(defaultLabels);
+            parcel.readStringList(defaultAssignees);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel parcel, int flags) {
+            parcel.writeString(content);
+            parcel.writeString(name);
+            parcel.writeString(description);
+            parcel.writeString(title);
+            parcel.writeStringList(defaultLabels);
+            parcel.writeStringList(defaultAssignees);
+        }
+
+        public static Parcelable.Creator CREATOR = new Parcelable.Creator<IssueTemplate>() {
+            @Override
+            public IssueTemplate createFromParcel(Parcel parcel) {
+                return new IssueTemplate(parcel);
+            }
+
+            @Override
+            public IssueTemplate[] newArray(int count) {
+                return new IssueTemplate[count];
+            }
+        };
+
+        private static void splitAndFillList(String input, List<String> list) {
+            for (String part : input.split(",")) {
+                String trimmed = part.trim();
+                if (!trimmed.isEmpty()) {
+                    list.add(trimmed);
+                }
+            }
+        }
+    }
+
+    public static class IssueTemplateSelectionDialogFragment extends DialogFragment
+            implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
+        private List<IssueTemplate> mTemplates;
+
+        public static IssueTemplateSelectionDialogFragment newInstance(List<IssueTemplate> templates) {
+            IssueTemplateSelectionDialogFragment f = new IssueTemplateSelectionDialogFragment();
+            Bundle args = new Bundle();
+            args.putParcelableArrayList("templates", new ArrayList<>(templates));
+            f.setArguments(args);
+            return f;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            Bundle args = getArguments();
+            mTemplates = args.getParcelableArrayList("templates");
+
+            return new AlertDialog.Builder(getContext())
+                    .setTitle(R.string.issue_template_dialog_title)
+                    .setSingleChoiceItems(new Adapter(getContext(), mTemplates), -1, this)
+                    .setOnCancelListener(this)
+                    .setNegativeButton(R.string.cancel, null)
+                    .create();
+        }
+
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            ((IssueEditActivity) getActivity()).handleIssueTemplateSelected(mTemplates.get(which));
+            dialog.dismiss();
+        }
+
+        @Override
+        public void onCancel(@NonNull DialogInterface dialog) {
+            super.onCancel(dialog);
+            ((IssueEditActivity) getActivity()).handleIssueTemplateSelected(null);
+        }
+
+        private static class Adapter extends ArrayAdapter<IssueTemplate> {
+            private LayoutInflater mInflater;
+
+            public Adapter(Context context, List<IssueTemplate> templates) {
+                super(context, R.layout.row_issue_template, templates);
+                mInflater = LayoutInflater.from(context);
+            }
+
+            @NonNull
+            @Override
+            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                final View view;
+                if (convertView == null) {
+                    view = mInflater.inflate(R.layout.row_issue_template, parent, false);
+                } else {
+                    view = convertView;
+                }
+
+                TextView title = view.findViewById(R.id.title);
+                TextView description = view.findViewById(R.id.description);
+                IssueTemplate template = getItem(position);
+
+                title.setText(template.name);
+                description.setText(template.description);
+                description.setVisibility(TextUtils.isEmpty(template.description) ? View.GONE : View.VISIBLE);
+
+                return view;
+            }
+        }
     }
 
     private class EditPagerAdapter extends PagerAdapter {
