@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.gh4a"
     android:installLocation="auto">
 
     <!-- see http://stackoverflow.com/questions/32070670/preferencefragmentcompat-requires-preferencetheme-to-be-set -->
-    <uses-sdk xmlns:tools="http://schemas.android.com/tools"
-        tools:overrideLibrary="android.support.v14.preference" />
+    <uses-sdk tools:overrideLibrary="android.support.v14.preference" />
 
     <uses-permission
         android:name="android.permission.INTERNET" />
@@ -160,6 +160,11 @@
         </activity>
 
         <service android:name=".worker.NotificationHandlingService" />
+
+        <provider
+            android:name="androidx.work.impl.WorkManagerInitializer"
+            android:authorities="${applicationId}.workmanager-init"
+            tools:node="remove" />
 
         <provider
             android:name=".db.BookmarksProvider"
