@@ -23,8 +23,8 @@ import android.os.Build;
 import android.util.LongSparseArray;
 
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.worker.NotificationsWorker;
 import com.gh4a.utils.DebuggingHelper;
+import com.gh4a.worker.NotificationsWorker;
 import com.meisolsson.githubsdk.model.User;
 
 import net.danlew.android.joda.JodaTimeAndroid;
@@ -34,13 +34,16 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDexApplication;
 
 /**
  * The Class Gh4Application.
  */
-public class Gh4Application extends MultiDexApplication implements OnSharedPreferenceChangeListener {
+public class Gh4Application extends MultiDexApplication implements
+        androidx.work.Configuration.Provider,
+        OnSharedPreferenceChangeListener {
     public static final String LOG_TAG = "Gh4a";
 
     private static Gh4Application sInstance;
@@ -257,5 +260,11 @@ public class Gh4Application extends MultiDexApplication implements OnSharedPrefe
         if (key.equals(SettingsFragment.KEY_THEME)) {
             updateTheme(sharedPreferences);
         }
+    }
+
+    @NonNull
+    @Override
+    public androidx.work.Configuration getWorkManagerConfiguration() {
+        return new androidx.work.Configuration.Builder().build();
     }
 }
