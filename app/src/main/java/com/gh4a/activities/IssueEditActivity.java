@@ -1046,7 +1046,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 view.setBackgroundColor(color);
                 view.setTextColor(UiUtils.textColorForBackground(getContext(), color));
             } else {
-                view.setTypeface(view.getTypeface(), 0);
+                view.setTypeface(view.getTypeface(), Typeface.NORMAL);
                 view.setBackgroundColor(0);
                 view.setTextColor(ContextCompat.getColor(getContext(), R.color.label_fg));
             }

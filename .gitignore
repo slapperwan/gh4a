@@ -4,7 +4,7 @@ build
 
 # Android Studio stuff
 .idea
-*.properties
+local.properties
 *.iml
 
 # Crashlytics generated files
