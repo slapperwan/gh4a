@@ -418,7 +418,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
                 MatrixCursor clearRowCursor = new MatrixCursor(SUGGESTION_PROJECTION);
                 clearRowCursor.addRow(new Object[] {
                         Long.MAX_VALUE,
-                        mContext.getString(R.string.clear_suggestions)
+                        mInflater.getContext().getString(R.string.clear_suggestions)
                 });
                 newCursor = new MergeCursor(new Cursor[] { newCursor, clearRowCursor });
             }

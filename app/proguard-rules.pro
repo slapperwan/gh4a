@@ -12,7 +12,7 @@
 -keep @com.squareup.moshi.JsonQualifier interface *
 
 # Keep SearchView (used in menu XML)
--keep class android.support.v7.widget.SearchView { *; }
+-keep class androidx.appcompat.widget.SearchView { *; }
 
 # Keep SimpleXML
 -keep class org.simpleframework.xml.**{ *; }
