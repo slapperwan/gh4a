@@ -16,6 +16,22 @@ repositories {
 
 apply plugin: 'com.android.application'
 
+def clientProps = new Properties()
+def clientPropFile = new File('client.properties')
+if (clientPropFile.canRead()) {
+    clientProps.load(new FileInputStream(clientPropFile))
+}
+
+ext {
+    if (clientProps.containsKey('ClientId')
+            && clientProps.containsKey('ClientSecret')) {
+        ClientId = clientProps['ClientId']
+        ClientSecret = clientProps['ClientSecret']
+    } else {
+        println 'client.properties not found or incomplete'
+    }
+}
+
 android {
     signingConfigs {
         playStore

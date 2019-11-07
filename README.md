@@ -63,7 +63,7 @@ How to Build Octodroid
 - Register an application for your OctoDroid usage under your [GitHub settings](https://github.com/settings/developers)
   * naming is up to you
   * callback URL must be gh4a://oauth
-- Create a gradle.properties file with the following content:
+- Create a client.properties file with the following content:
 ```
 ClientId="<CLIENT ID DISPLAYED IN APPLICATION SETTINGS>"
 ClientSecret="<CLIENT SECRET DISPLAYED IN APPLICATION SETTINGS>"
@@ -72,7 +72,7 @@ ClientSecret="<CLIENT SECRET DISPLAYED IN APPLICATION SETTINGS>"
 - Build using Gradle
 
 ```bash
-./gradlew assembleFossDebug
+./gradlew assembleDebug
 ```
 
 - To get a full list of available tasks
