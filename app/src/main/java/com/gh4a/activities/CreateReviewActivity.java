@@ -69,6 +69,7 @@ public class CreateReviewActivity extends AppCompatActivity implements
 
         View header = getLayoutInflater().inflate(R.layout.create_review_header, null);
         mEditorSheet.addHeaderView(header);
+        mEditorSheet.setAllowEmpty(true);
 
         mReviewEventAdapter = new ArrayAdapter<>(this, R.layout.spinner_item);
         mReviewEventAdapter.add(new ReviewEventDesc(R.string.pull_request_review_event_comment,

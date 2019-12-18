@@ -147,7 +147,6 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
             mMilestone = Milestone.builder().state(IssueState.Open).build();
         }
 
-        mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, mSaveFab));
         mTitleView.addTextChangedListener(new UiUtils.EmptinessWatchingTextWatcher(mTitleView) {
             @Override
             public void onIsEmpty(boolean isEmpty) {
@@ -156,6 +155,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
                 } else {
                     mTitleWrapper.setErrorEnabled(false);
                 }
+                mSaveFab.setEnabled(!isEmpty);
             }
         });
 

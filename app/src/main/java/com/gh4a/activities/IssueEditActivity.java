@@ -217,7 +217,6 @@ public class IssueEditActivity extends BasePagerActivity implements
         mTitleView.setText(mEditIssue.title());
         mDescView.setText(mEditIssue.body());
 
-        mTitleView.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mTitleView, mFab));
         mTitleView.addTextChangedListener(new UiUtils.EmptinessWatchingTextWatcher(mTitleView) {
             @Override
             public void onIsEmpty(boolean isEmpty) {

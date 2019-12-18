@@ -20,12 +20,15 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.core.widget.NestedScrollView;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -67,16 +70,29 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     private Listener mListener;
     private NestedScrollView mBasicEditorScrollView;
     private ViewGroup mContainer;
+    private View mSendButton;
 
     private Callback mCallback;
     private View mResizingView;
     private @ColorInt int mHighlightColor = Color.TRANSPARENT;
     private boolean mIsCollapsible;
+    private boolean mAllowEmptyText;
 
     private int mBasicPeekHeight;
     private int mAdvancedPeekHeight;
     private int mLatestOffset;
     private int mTopShadowHeight;
+
+    private final TextWatcher mButtonEnableTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) { }
+        @Override
+        public void afterTextChanged(Editable s) {
+            updateSendButtonState();
+        }
+    };
 
     private final BottomSheetBehavior.BottomSheetCallback mBehaviorCallback =
             new BottomSheetBehavior.BottomSheetCallback() {
@@ -118,9 +134,11 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         if (attrs != null) {
             TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.EditorBottomSheet);
             mIsCollapsible = a.getBoolean(R.styleable.EditorBottomSheet_collapsible, true);
+            mAllowEmptyText = a.getBoolean(R.styleable.EditorBottomSheet_allowEmpty, false);
             a.recycle();
         } else {
             mIsCollapsible = true;
+            mAllowEmptyText = false;
         }
 
         View view = View.inflate(getContext(), R.layout.editor_bottom_sheet, this);
@@ -131,12 +149,11 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
             mAdvancedEditorToggle.setVisibility(View.GONE);
         }
 
-        View sendButton = view.findViewById(R.id.send_button);
-        sendButton.setOnClickListener(this);
+        mSendButton = view.findViewById(R.id.send_button);
+        mSendButton.setOnClickListener(this);
 
         mBasicEditor = view.findViewById(R.id.et_basic_editor);
-        mBasicEditor.addTextChangedListener(
-                new UiUtils.ButtonEnableTextWatcher(mBasicEditor, sendButton));
+        mBasicEditor.addTextChangedListener(mButtonEnableTextWatcher);
         mBasicEditor.setOnTouchListener(this);
 
         mBasicEditorScrollView = view.findViewById(R.id.basic_editor_scroll);
@@ -147,6 +164,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         post(() -> {
             getBehavior().setBottomSheetCallback(mBehaviorCallback);
             resetPeekHeight(0);
+            updateSendButtonState();
 
             if (!mIsCollapsible && !isInAdvancedMode()) {
                 setAdvancedMode(true);
@@ -167,6 +185,11 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
     public void setCallback(Callback callback) {
         mCallback = callback;
         updateHint();
+    }
+
+    public void setAllowEmpty(boolean allowEmpty) {
+        mAllowEmptyText = allowEmpty;
+        updateSendButtonState();
     }
 
     public void updateHint() {
@@ -331,6 +354,13 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         }
     }
 
+    private void updateSendButtonState() {
+        EditText view = isInAdvancedMode() ? mAdvancedEditor : mBasicEditor;
+        Editable text = view.getEditableText();
+        boolean empty = text == null || text.length() == 0;
+        mSendButton.setEnabled(mAllowEmptyText || !empty);
+    }
+
     private Editable getCommentText() {
         if (isInAdvancedMode()) {
             return mAdvancedEditor.getText();
@@ -354,6 +384,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         }
 
         mAdvancedEditorToggle.setImageResource(visible ? R.drawable.collapse : R.drawable.expand);
+        updateSendButtonState();
 
         if (mListener != null) {
             mListener.onToggleAdvancedMode(visible);
@@ -380,8 +411,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         }
 
         mAdvancedEditor = mAdvancedEditorContainer.findViewById(R.id.editor);
-        mAdvancedEditor.addTextChangedListener(new UiUtils.ButtonEnableTextWatcher(mAdvancedEditor,
-                findViewById(R.id.send_button)));
+        mAdvancedEditor.addTextChangedListener(mButtonEnableTextWatcher);
 
         updateHint();
         mAdvancedEditor.setLocked(mBasicEditor.isLocked(), mBasicEditor.getLockedHintResId());

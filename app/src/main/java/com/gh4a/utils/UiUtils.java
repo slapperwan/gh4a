@@ -324,23 +324,6 @@ public class UiUtils {
         public abstract void onIsEmpty(boolean isEmpty);
     }
 
-    public static class ButtonEnableTextWatcher extends EmptinessWatchingTextWatcher {
-        private final View mView;
-
-        public ButtonEnableTextWatcher(EditText editor, View view) {
-            super(editor);
-            mView = view;
-            afterTextChanged(editor.getText());
-        }
-
-        @Override
-        public void onIsEmpty(boolean isEmpty) {
-            if (mView != null) {
-                mView.setEnabled(!isEmpty);
-            }
-        }
-    }
-
     public static CharSequence getSelectedText(TextView view) {
         int min = 0;
         int max = view.length();
