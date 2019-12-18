@@ -52,6 +52,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         Object getCacheKey();
     }
     public interface Callback {
+        boolean canAddReaction();
         Single<List<Reaction>> loadReactionDetails(Item item, boolean bypassCache);
         Single<Reaction> addReaction(Item item, String content);
     }
@@ -153,7 +154,8 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         for (int id : VIEW_IDS) {
             findViewById(id).setOnClickListener(callback != null ? this : null);
         }
-        mReactButton.setVisibility(callback != null ? View.VISIBLE : View.GONE);
+        mReactButton.setVisibility(callback != null && callback.canAddReaction()
+                ? View.VISIBLE : View.GONE);
         mReactButton.setOnClickListener(callback != null ? this : null);
     }
 
@@ -273,6 +275,10 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                     });
         }
 
+        public boolean canAddReaction() {
+            return mCallback.canAddReaction();
+        }
+
         private void populateAdapter(List<Reaction> details) {
             List<Reaction> reactions = new ArrayList<>();
             for (Reaction reaction : details) {
@@ -313,8 +319,12 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                     }
                 }
                 if (ownUser != null) {
-                    mUsers.add(null);
-                    mUsers.add(ownUser);
+                    if (mParent.canAddReaction()) {
+                        mUsers.add(null);
+                        mUsers.add(ownUser);
+                    } else if (mOwnReaction != null) {
+                        mUsers.add(0, ownUser);
+                    }
                 }
             } else {
                 mUsers = null;
@@ -372,7 +382,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 AvatarHandler.assignAvatar(avatar, user);
                 convertView.setOnClickListener(this);
 
-                if (ApiHelpers.loginEquals(user, ownLogin)) {
+                if (ApiHelpers.loginEquals(user, ownLogin) && mParent.canAddReaction()) {
                     avatar.setAlpha(mOwnReaction != null ? 1.0f : 0.4f);
                     name.setText(mOwnReaction != null
                             ? R.string.remove_reaction : R.string.add_reaction);

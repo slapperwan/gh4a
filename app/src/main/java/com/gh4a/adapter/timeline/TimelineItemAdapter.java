@@ -76,6 +76,11 @@ public class TimelineItemAdapter
 
     private final CommentViewHolder.Callback mCommentCallback = new CommentViewHolder.Callback() {
         @Override
+        public boolean canAddReaction() {
+            return !mLocked;
+        }
+
+        @Override
         public boolean canQuote() {
             return !mLocked;
         }

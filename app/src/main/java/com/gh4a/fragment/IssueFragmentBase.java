@@ -241,14 +241,18 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         inflater.inflate(R.menu.issue_fragment_menu, menu);
 
         MenuItem reactItem = menu.findItem(R.id.react);
-        inflater.inflate(R.menu.reaction_menu, reactItem.getSubMenu());
-        if (mReactionMenuHelper == null) {
-            mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(getActivity(),
-                    reactItem.getSubMenu(), this, this, mReactionDetailsCache);
+        if (isLocked()) {
+            reactItem.setVisible(false);
         } else {
-            mReactionMenuHelper.updateFromMenu(reactItem.getSubMenu());
+            inflater.inflate(R.menu.reaction_menu, reactItem.getSubMenu());
+            if (mReactionMenuHelper == null) {
+                mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(getActivity(),
+                        reactItem.getSubMenu(), this, this, mReactionDetailsCache);
+            } else {
+                mReactionMenuHelper.updateFromMenu(reactItem.getSubMenu());
+            }
+            mReactionMenuHelper.startLoadingIfNeeded();
         }
-        mReactionMenuHelper.startLoadingIfNeeded();
     }
 
     @Override
@@ -445,6 +449,11 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getIssueReactions(mRepoOwner, mRepoName, mIssue.number(), page));
+    }
+
+    @Override
+    public boolean canAddReaction() {
+        return !isLocked();
     }
 
     @Override

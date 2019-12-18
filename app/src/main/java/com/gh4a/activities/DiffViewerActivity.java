@@ -426,6 +426,11 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         p.show();
     }
 
+    @Override
+    public boolean canAddReaction() {
+        return true;
+    }
+
     private void refresh() {
         // Make sure we load the comments from remote, as we now know they've changed
         getIntent().removeExtra("comments");

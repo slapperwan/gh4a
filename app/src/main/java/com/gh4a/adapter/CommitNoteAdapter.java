@@ -215,6 +215,11 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     }
 
     @Override
+    public boolean canAddReaction() {
+        return true;
+    }
+
+    @Override
     public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
         GitComment comment = ((ViewHolder) item).mBoundItem;
         ReactionService service = ServiceFactory.get(ReactionService.class, false);

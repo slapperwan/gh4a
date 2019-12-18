@@ -61,6 +61,7 @@ class CommentViewHolder
     private final UiUtils.QuoteActionModeCallback mQuoteActionModeCallback;
 
     public interface Callback {
+        boolean canAddReaction();
         boolean canQuote();
         void quoteText(CharSequence text);
         void addText(CharSequence text);
@@ -97,10 +98,15 @@ class CommentViewHolder
         mPopupMenu.setOnMenuItemClickListener(this);
 
         MenuItem reactItem = mPopupMenu.getMenu().findItem(R.id.react);
-        mPopupMenu.getMenuInflater().inflate(R.menu.reaction_menu, reactItem.getSubMenu());
+        if (callback.canAddReaction()) {
+            mPopupMenu.getMenuInflater().inflate(R.menu.reaction_menu, reactItem.getSubMenu());
+            mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(view.getContext(),
+                    reactItem.getSubMenu(), this, this, reactionDetailsCache);
+        } else {
+            reactItem.setVisible(false);
+            mReactionMenuHelper = null;
+        }
 
-        mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(view.getContext(),
-                reactItem.getSubMenu(), this, this, reactionDetailsCache);
         mQuoteActionModeCallback = new UiUtils.QuoteActionModeCallback(tvDesc) {
             @Override
             public void onTextQuoted(CharSequence text) {
@@ -205,7 +211,9 @@ class CommentViewHolder
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.iv_menu:
-                mReactionMenuHelper.startLoadingIfNeeded();
+                if (mReactionMenuHelper != null) {
+                    mReactionMenuHelper.startLoadingIfNeeded();
+                }
                 mPopupMenu.show();
                 break;
             case R.id.iv_gravatar: {
@@ -227,7 +235,7 @@ class CommentViewHolder
     @Override
     public boolean onMenuItemClick(MenuItem menuItem) {
         TimelineItem.TimelineComment comment = (TimelineItem.TimelineComment) ivMenu.getTag();
-        if (mReactionMenuHelper.onItemClick(menuItem)) {
+        if (mReactionMenuHelper != null && mReactionMenuHelper.onItemClick(menuItem)) {
             return true;
         }
         return mCallback.onMenItemClick(comment, menuItem);
@@ -243,9 +251,15 @@ class CommentViewHolder
             mBoundItem.setReactions(reactions);
         }
         this.reactions.setReactions(reactions);
-        mReactionMenuHelper.update();
+        if (mReactionMenuHelper != null) {
+            mReactionMenuHelper.update();
+        }
     }
 
+    @Override
+    public boolean canAddReaction() {
+        return mCallback.canAddReaction();
+    }
 
     @Override
     public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
