@@ -17,16 +17,26 @@ package com.gh4a.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.activity.StarringService;
+
+import java.net.HttpURLConnection;
 
 import io.reactivex.Single;
 import retrofit2.Response;
@@ -45,12 +55,15 @@ public class StargazerListFragment extends PagedDataBaseFragment<User> {
 
     private String mRepoOwner;
     private String mRepoName;
+    private Boolean mIsStarring;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
         mRepoOwner = getArguments().getString("owner");
         mRepoName = getArguments().getString("repo");
+        loadStarringState(false);
     }
 
     @Override
@@ -72,8 +85,76 @@ public class StargazerListFragment extends PagedDataBaseFragment<User> {
     }
 
     @Override
+    public void onRefresh() {
+        mIsStarring = null;
+        loadStarringState(true);
+        super.onRefresh();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (Gh4Application.get().isAuthorized()) {
+            MenuItem starItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "")
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            if (mIsStarring == null) {
+                starItem.setActionView(R.layout.ab_loading);
+                starItem.expandActionView();
+            } else if (mIsStarring) {
+                starItem.setTitle(R.string.repo_unstar_action);
+            } else {
+                starItem.setTitle(R.string.repo_star_action);
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == Menu.FIRST) {
+            toggleStarringState();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected Single<Response<Page<User>>> loadPage(int page, boolean bypassCache) {
         final StarringService service = ServiceFactory.get(StarringService.class, bypassCache);
         return service.getStargazers(mRepoOwner, mRepoName, page);
+    }
+
+    private void loadStarringState(boolean force) {
+        if (!Gh4Application.get().isAuthorized()) {
+            return;
+        }
+        StarringService service = ServiceFactory.get(StarringService.class, force);
+        service.checkIfRepositoryIsStarred(mRepoOwner, mRepoName)
+                .map(ApiHelpers::throwOnFailure)
+                // success response means 'starred'
+                .map(result -> true)
+                // 404 means 'not starred'
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, false))
+                .compose(makeLoaderSingle(1, force))
+                .subscribe(result -> {
+                    mIsStarring = result;
+                    getActivity().invalidateOptionsMenu();
+                }, this::handleLoadFailure);
+    }
+
+    private void toggleStarringState() {
+        StarringService service = ServiceFactory.get(StarringService.class, false);
+        Single<Response<Void>> responseSingle = mIsStarring
+                ? service.unstarRepository(mRepoOwner, mRepoName)
+                : service.starRepository(mRepoOwner, mRepoName);
+        responseSingle.map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .compose(RxUtils::doInBackground)
+                .subscribe(result -> {
+                    if (mIsStarring != null) {
+                        mIsStarring = !mIsStarring;
+                        getActivity().invalidateOptionsMenu();
+                    }
+                }, error -> {
+                    handleActionFailure("Updating repo starring state failed", error);
+                });
     }
 }
