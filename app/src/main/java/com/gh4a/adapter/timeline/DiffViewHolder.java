@@ -72,7 +72,6 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mPadding = context.getResources().getDimensionPixelSize(R.dimen.code_diff_padding);
 
         mDiffHunkTextView = itemView.findViewById(R.id.diff_hunk);
-        mDiffHunkTextView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         mInitialDiffTextSize = mDiffHunkTextView.getTextSize();
         mFileTextView = itemView.findViewById(R.id.tv_file);
         mFileTextView.setOnClickListener(this);

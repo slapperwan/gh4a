@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.app.DownloadManager;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -23,16 +22,13 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
-import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
@@ -40,7 +36,6 @@ import android.widget.EdgeEffect;
 import android.widget.EditText;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
@@ -54,25 +49,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 public class UiUtils {
-    public static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
-        @Override
-        public boolean onTouchEvent(@NonNull TextView widget,
-                @NonNull Spannable buffer, @NonNull MotionEvent event) {
-            try {
-                return super.onTouchEvent(widget, buffer, event);
-            } catch (ActivityNotFoundException e) {
-                Toast.makeText(widget.getContext(), R.string.link_not_openable, Toast.LENGTH_LONG)
-                        .show();
-                return true;
-            } catch (SecurityException e) {
-                // some apps have intent filters set for the VIEW action for
-                // internal, non-exported activities
-                // -> ignore
-                return true;
-            }
-        }
-    };
-
     public static void hideImeForView(View view) {
         if (view == null) {
             return;

@@ -98,6 +98,7 @@
                     android:autoLink="web|email"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textIsSelectable="true"
+                    app:needsLinkHandling="true"
                     tools:text="Commit message" />
 
                 <com.gh4a.widget.StyleableTextView

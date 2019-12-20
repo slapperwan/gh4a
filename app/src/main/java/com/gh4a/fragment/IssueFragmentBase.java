@@ -366,7 +366,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
         String body = mIssue.bodyHtml();
         TextView descriptionView = mListHeaderView.findViewById(R.id.tv_desc);
-        descriptionView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         if (!StringUtils.isBlank(body)) {
             mImageGetter.bind(descriptionView, body, mIssue.id());
 

@@ -230,7 +230,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
         if (bodyHtmlOpt.isPresent()) {
             mImageGetter.bind(body, bodyHtmlOpt.get(), mRelease.id());
-            body.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         } else {
             body.setText(R.string.release_no_releasenotes);
         }

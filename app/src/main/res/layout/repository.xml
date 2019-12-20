@@ -29,6 +29,7 @@
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
                     android:textAppearance="@style/TextAppearance.HeaderTitle"
+                    app:needsLinkHandling="true"
                     tools:text="Username/Repository" />
 
                 <com.gh4a.widget.StyleableTextView
@@ -162,6 +163,7 @@
                     android:paddingBottom="@dimen/content_padding"
                     android:textIsSelectable="true"
                     android:visibility="gone"
+                    app:needsLinkHandling="true"
                     tools:text="Readme text"
                     tools:visibility="visible" />
 

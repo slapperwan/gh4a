@@ -254,7 +254,6 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
 
             ivGravatar = view.findViewById(R.id.iv_gravatar);
             tvDesc = view.findViewById(R.id.tv_desc);
-            tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
             tvDesc.setCustomSelectionActionModeCallback(new UiUtils.QuoteActionModeCallback(tvDesc) {
                 @Override
                 public void onTextQuoted(CharSequence text) {

@@ -16,7 +16,6 @@ import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.StyleableTextView;
@@ -83,7 +82,6 @@ class EventViewHolder
         mAvatarView = itemView.findViewById(R.id.iv_gravatar);
         mEventIconView = itemView.findViewById(R.id.iv_event_icon);
         mMessageView = itemView.findViewById(R.id.tv_message);
-        mMessageView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         mAvatarContainer = itemView.findViewById(R.id.avatar_container);
         mAvatarContainer.setOnClickListener(this);
     }

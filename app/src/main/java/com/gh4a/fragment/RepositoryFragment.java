@@ -229,7 +229,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         repoName.append(mRepository.name());
         repoName.setSpan(repoSpan, 0, mRepository.owner().login().length(), 0);
         tvRepoName.setText(repoName);
-        tvRepoName.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
 
         fillTextView(R.id.tv_desc, 0, mRepository.description());
         fillTextView(R.id.tv_url, 0, mRepository.homepage());
@@ -431,7 +430,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements
                 })
                 .subscribe(readmeOpt -> {
                     if (readmeOpt.isPresent()) {
-                        mReadmeView.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
                         mImageGetter.bind(mReadmeView, readmeOpt.get(), id);
                     } else {
                         mReadmeView.setText(R.string.repo_no_readme);

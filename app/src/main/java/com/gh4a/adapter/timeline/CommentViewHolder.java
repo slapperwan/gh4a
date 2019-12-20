@@ -82,7 +82,6 @@ class CommentViewHolder
         ivGravatar = view.findViewById(R.id.iv_gravatar);
         ivGravatar.setOnClickListener(this);
         tvDesc = view.findViewById(R.id.tv_desc);
-        tvDesc.setMovementMethod(UiUtils.CHECKING_LINK_METHOD);
         tvExtra = view.findViewById(R.id.tv_extra);
         tvExtra.setOnClickListener(this);
         tvTimestamp = view.findViewById(R.id.tv_timestamp);
