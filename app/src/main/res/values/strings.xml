@@ -75,6 +75,7 @@
     <string name="wrap_lines">Wrap lines</string>
     <string name="unknown">unknown</string>
     <string name="history">History</string>
+    <string name="download">Download</string>
     <string name="deleted">(deleted)</string>
     <string name="go_to">Go to</string>
     <string name="forked_from">Forked from %1$s</string>

@@ -32,8 +32,11 @@ import com.gh4a.activities.CommitHistoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.Content;
@@ -52,6 +55,7 @@ import io.reactivex.Single;
 public class ContentListFragment extends ListDataBaseFragment<Content> implements
         RootAdapter.OnItemClickListener<Content> {
     private static final int MENU_HISTORY = Menu.FIRST + 1;
+    private static final int MENU_DOWNLOAD = Menu.FIRST + 2;
     private static final int REQUEST_FILE_HISTORY = 1000;
 
     private static final Comparator<Content> COMPARATOR = (lhs, rhs) -> {
@@ -153,6 +157,9 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
         if (subModules == null || !subModules.contains(contents.name())) {
             menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history);
         }
+        if (contents.type() == ContentType.File) {
+            menu.add(Menu.NONE, MENU_DOWNLOAD, Menu.NONE, R.string.download);
+        }
     }
 
     @Override
@@ -163,14 +170,22 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
             return false;
         }
 
-        int id = item.getItemId();
-        if (id == MENU_HISTORY) {
-            Content contents = mAdapter.getItemFromAdapterPosition(info.position);
-            Intent intent = CommitHistoryActivity.makeIntent(getActivity(),
-                    mRepository.owner().login(), mRepository.name(),
-                    mRef, contents.path(), true);
-            startActivityForResult(intent, REQUEST_FILE_HISTORY);
-            return true;
+        Content contents = mAdapter.getItemFromAdapterPosition(info.position);
+
+        switch (item.getItemId()) {
+            case MENU_HISTORY:
+                Intent intent = CommitHistoryActivity.makeIntent(getActivity(),
+                        mRepository.owner().login(), mRepository.name(),
+                        mRef, contents.path(), true);
+                startActivityForResult(intent, REQUEST_FILE_HISTORY);
+                return true;
+            case MENU_DOWNLOAD:
+                String url = IntentUtils.createRawFileUrl(mRepository.owner().login(),
+                        mRepository.name(), mRef, contents.path());
+                UiUtils.enqueueDownloadWithPermissionCheck(getBaseActivity(),
+                        url, FileUtils.getMimeTypeFor(contents.name()),
+                        contents.name(), null, null);
+                return true;
         }
 
         return super.onContextItemSelected(item);

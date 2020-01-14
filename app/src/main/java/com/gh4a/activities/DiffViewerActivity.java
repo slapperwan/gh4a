@@ -204,6 +204,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         String viewAtTitle = getString(R.string.object_view_file_at, mSha.substring(0, 7));
         menu.add(0, MENU_ITEM_VIEW, Menu.NONE, viewAtTitle)
                 .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_NEVER);
+        menu.removeItem(R.id.download);
 
         return super.onCreateOptionsMenu(menu);
     }

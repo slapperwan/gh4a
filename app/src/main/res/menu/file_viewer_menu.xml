@@ -17,6 +17,11 @@
         android:title="@string/share"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/download"
+        android:icon="@drawable/menu_download"
+        android:title="@string/download"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/wrap"
         android:checkable="true"
         android:title="@string/wrap_lines"

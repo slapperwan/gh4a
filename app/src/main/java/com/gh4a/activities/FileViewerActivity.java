@@ -41,13 +41,13 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.ClientErrorResponse;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.TextMatch;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
 import java.util.List;
-import java.util.Locale;
 
 import io.reactivex.Single;
 
@@ -94,7 +94,6 @@ public class FileViewerActivity extends WebViewerActivity
 
     private static final int ID_LOADER_FILE = 0;
     private static final int MENU_ITEM_HISTORY = 10;
-    private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -235,6 +234,11 @@ public class FileViewerActivity extends WebViewerActivity
             case R.id.browser:
                 IntentUtils.launchBrowser(this, url);
                 return true;
+            case R.id.download:
+                UiUtils.enqueueDownloadWithPermissionCheck(this, buildRawFileUrl(),
+                        FileUtils.getMimeTypeFor(mPath), FileUtils.getFileName(mPath), null, null);
+
+                return true;
             case R.id.share:
                 IntentUtils.share(this, getString(R.string.share_file_subject,
                         FileUtils.getFileName(mPath), mRepoOwner + "/" + mRepoName), url);
@@ -304,10 +308,14 @@ public class FileViewerActivity extends WebViewerActivity
         return builder.build();
     }
 
+    private String buildRawFileUrl() {
+        return IntentUtils.createRawFileUrl(mRepoOwner, mRepoName, mRef, mPath);
+    }
+
     private void openUnsuitableFileAndFinish() {
-        String url = String.format(Locale.US, RAW_URL_FORMAT, mRepoOwner, mRepoName, mRef, mPath);
+        Uri uri = Uri.parse(buildRawFileUrl());
         String mime = FileUtils.getMimeTypeFor(FileUtils.getFileName(mPath));
-        Intent intent = IntentUtils.createViewerOrBrowserIntent(this, Uri.parse(url), mime);
+        Intent intent = IntentUtils.createViewerOrBrowserIntent(this, uri, mime);
         if (intent == null) {
             handleLoadFailure(new ActivityNotFoundException());
             findViewById(R.id.retry_button).setVisibility(View.GONE);

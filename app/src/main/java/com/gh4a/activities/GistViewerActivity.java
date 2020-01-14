@@ -30,6 +30,7 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
+import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.GistFile;
 import com.meisolsson.githubsdk.service.gists.GistService;
 
@@ -119,6 +120,9 @@ public class GistViewerActivity extends WebViewerActivity {
             case R.id.browser:
                 IntentUtils.launchBrowser(this, Uri.parse(mGistFile.rawUrl()));
                 return true;
+            case R.id.download:
+                UiUtils.enqueueDownloadWithPermissionCheck(this, mGistFile.rawUrl(),
+                        mGistFile.type(), mGistFile.filename(), null, null);
         }
         return super.onOptionsItemSelected(item);
     }

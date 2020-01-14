@@ -29,11 +29,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class IntentUtils {
     private static final String EXTRA_NEW_TASK = "IntentUtils.new_task";
+    private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
 
     private IntentUtils() {
     }
@@ -108,6 +110,10 @@ public class IntentUtils {
     public static Uri.Builder createBaseUriForRepo(String repoOwner, String repoName) {
         return createBaseUriForUser(repoOwner)
                 .appendPath(repoName);
+    }
+
+    public static String createRawFileUrl(String repoOwner, String repoName, String ref, String path) {
+        return String.format(Locale.US, RAW_URL_FORMAT, repoOwner, repoName, ref, path);
     }
 
     public static void share(Context context, String subject, Uri url) {
