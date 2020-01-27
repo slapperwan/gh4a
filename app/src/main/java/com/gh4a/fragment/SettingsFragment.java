@@ -13,11 +13,12 @@ import androidx.appcompat.app.AppCompatDialog;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
@@ -211,18 +212,19 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            ListView lv = (ListView) inflater.inflate(R.layout.open_source_component_list, null);
-            lv.setAdapter(new OpenSourceComponentAdapter(getContext()));
+            RecyclerView rv = (RecyclerView) inflater.inflate(R.layout.open_source_component_list, null);
+            rv.setLayoutManager(new LinearLayoutManager(getContext()));
+            rv.setAdapter(new OpenSourceComponentAdapter(getContext()));
 
             return new AlertDialog.Builder(getContext())
-                    .setView(lv)
+                    .setView(rv)
                     .setTitle(R.string.open_source_components)
                     .setPositiveButton(R.string.ok, null)
                     .create();
         }
     }
 
-    private static class OpenSourceComponentAdapter extends BaseAdapter {
+    private static class OpenSourceComponentAdapter extends RecyclerView.Adapter<OpenSourceComponentViewHolder> {
         private static final String[][] COMPONENTS = new String[][] {
             { "android-gif-drawable", "https://github.com/koral--/android-gif-drawable" },
             { "Android-Job", "https://github.com/evernote/android-job" },
@@ -247,34 +249,39 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             mInflater = LayoutInflater.from(context);
         }
 
+        @NonNull
         @Override
-        public int getCount() {
+        public OpenSourceComponentViewHolder onCreateViewHolder(
+                @NonNull ViewGroup parent, int viewType) {
+            View itemView = mInflater.inflate(R.layout.open_source_component_item, parent, false);
+            return new OpenSourceComponentViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull OpenSourceComponentViewHolder holder, int position) {
+            final String[] item = COMPONENTS[position];
+            holder.bind(item[0], item[1]);
+        }
+
+        @Override
+        public int getItemCount() {
             return COMPONENTS.length;
         }
+    }
 
-        @Override
-        public Object getItem(int position) {
-            return COMPONENTS[position];
+    private static class OpenSourceComponentViewHolder extends RecyclerView.ViewHolder {
+        private final TextView mTitleView;
+        private final TextView mUrlView;
+
+        public OpenSourceComponentViewHolder(@NonNull View itemView) {
+            super(itemView);
+            mTitleView = itemView.findViewById(R.id.title);
+            mUrlView = itemView.findViewById(R.id.url);
         }
 
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.open_source_component_item, parent, false);
-            }
-
-            TextView title = convertView.findViewById(R.id.title);
-            TextView url = convertView.findViewById(R.id.url);
-
-            title.setText(COMPONENTS[position][0]);
-            url.setText(COMPONENTS[position][1]);
-
-            return convertView;
+        public void bind(String title, String url) {
+            mTitleView.setText(title);
+            mUrlView.setText(url);
         }
     }
 }
