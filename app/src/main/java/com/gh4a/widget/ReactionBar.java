@@ -320,7 +320,9 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                 }
                 if (ownUser != null) {
                     if (mParent.canAddReaction()) {
-                        mUsers.add(null);
+                        if (!mUsers.isEmpty()) {
+                            mUsers.add(null);
+                        }
                         mUsers.add(ownUser);
                     } else if (mOwnReaction != null) {
                         mUsers.add(0, ownUser);
