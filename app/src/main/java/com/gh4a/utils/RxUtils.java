@@ -14,6 +14,8 @@ import com.gh4a.R;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.SearchPage;
 
+import org.reactivestreams.Publisher;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -148,15 +150,14 @@ public class RxUtils {
     public static <T> SingleTransformer<T, T> wrapWithRetrySnackbar(
             final CoordinatorLayout rootLayout, final String errorMessage) {
         return new SingleTransformer<T, T>() {
-            private final PublishProcessor<Integer> mRetryProcessor = PublishProcessor.create();
             @Override
             public SingleSource<T> apply(Single<T> upstream) {
                 return upstream
-                        .doOnError(error -> showSnackbar(error))
-                        .retryWhen(handler -> handler.flatMap(error -> mRetryProcessor));
+                        .retryWhen(errorFlow -> errorFlow.flatMap(error -> showSnackbar(error)));
             }
 
-            private void showSnackbar(Throwable error) {
+            private Publisher<Integer> showSnackbar(Throwable error) {
+                final PublishProcessor<Integer> retryProcessor = PublishProcessor.create();
                 Snackbar.make(rootLayout, errorMessage, Snackbar.LENGTH_LONG)
                         .addCallback(new Snackbar.BaseCallback<Snackbar>() {
                             @Override
@@ -164,12 +165,13 @@ public class RxUtils {
                                 // Propagate error if opportunity to retry isn't used, either
                                 // by dismissing the Snackbar or letting it time out
                                 if (event == DISMISS_EVENT_SWIPE || event == DISMISS_EVENT_TIMEOUT) {
-                                    mRetryProcessor.onError(error);
+                                    retryProcessor.onError(error);
                                 }
                             }
                         })
-                        .setAction(R.string.retry, view -> mRetryProcessor.onNext(0))
+                        .setAction(R.string.retry, view -> retryProcessor.onNext(0))
                         .show();
+                return retryProcessor;
             }
         };
     }
