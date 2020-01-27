@@ -96,7 +96,7 @@ dependencies {
         exclude group: 'org.json', module : 'json'
     }
     implementation 'com.github.Tunous:MarkdownEdit:1.0.0'
-    debugImplementation 'com.github.qoqa:traceur:2.2.12'
+    implementation 'com.github.qoqa:traceur:2.2.12'
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.robolectric:robolectric:3.4.2'
 }

@@ -23,9 +23,9 @@ import android.os.Build;
 import android.util.LongSparseArray;
 
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.utils.DebuggingHelper;
 import com.gh4a.worker.NotificationsWorker;
 import com.meisolsson.githubsdk.model.User;
+import com.tspoon.traceur.Traceur;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -117,7 +117,9 @@ public class Gh4Application extends MultiDexApplication implements
 
         prefs.registerOnSharedPreferenceChangeListener(this);
         updateTheme(prefs);
-        DebuggingHelper.onCreate(this);
+        if (true || BuildConfig.DEBUG) {
+            Traceur.enableLogging();
+        }
 
         mPt = new PrettyTime();
         JodaTimeAndroid.init(this);
