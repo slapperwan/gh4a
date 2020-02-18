@@ -19,6 +19,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.text.TextUtils;
+import android.util.SparseArray;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -136,16 +140,17 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     }
 
     public static class SortDrawerHelper {
-        private String mSortMode;
-        private boolean mSortAscending;
+        private String mSortMode = "created";
+        private boolean mSortAscending = false;
 
-        private static final String SORT_MODE_CREATED = "created";
-        private static final String SORT_MODE_UPDATED = "updated";
-        private static final String SORT_MODE_COMMENTS = "comments";
-
-        public SortDrawerHelper() {
-            mSortMode = SORT_MODE_CREATED;
-            mSortAscending = false;
+        private static final SparseArray<String[]> SORT_LOOKUP = new SparseArray<>();
+        static {
+            SORT_LOOKUP.put(R.id.sort_created_asc, new String[] { "created", "asc" });
+            SORT_LOOKUP.put(R.id.sort_created_desc, new String[] { "created", "desc" });
+            SORT_LOOKUP.put(R.id.sort_updated_asc, new String[] { "updated", "asc" });
+            SORT_LOOKUP.put(R.id.sort_updated_desc, new String[] { "updated", "desc" });
+            SORT_LOOKUP.put(R.id.sort_comments_asc, new String[] { "full_name", "asc" });
+            SORT_LOOKUP.put(R.id.sort_comments_desc, new String[] { "full_name", "desc" });
         }
 
         public static int getMenuResId() {
@@ -160,34 +165,42 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
             return mSortAscending ? "asc" : "desc";
         }
 
+        public void setSortMode(String mode, String order) {
+            if (findEntryIndex(mode, order) >= 0) {
+                updateSortMode(mode, TextUtils.equals(order, "asc"));
+            }
+        }
+
+        public void updateMenuCheckState(Menu menu) {
+            int index = findEntryIndex(getSortMode(), getSortOrder());
+            if (index >= 0) {
+                menu.findItem(SORT_LOOKUP.keyAt(index)).setChecked(true);
+            }
+        }
+
         public boolean handleItemSelection(MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.sort_created_asc:
-                    updateSortMode(SORT_MODE_CREATED, true);
-                    return true;
-                case R.id.sort_created_desc:
-                    updateSortMode(SORT_MODE_CREATED, false);
-                    return true;
-                case R.id.sort_updated_asc:
-                    updateSortMode(SORT_MODE_UPDATED, true);
-                    return true;
-                case R.id.sort_updated_desc:
-                    updateSortMode(SORT_MODE_UPDATED, false);
-                    return true;
-                case R.id.sort_comments_asc:
-                    updateSortMode(SORT_MODE_COMMENTS, true);
-                    return true;
-                case R.id.sort_comments_desc:
-                    updateSortMode(SORT_MODE_COMMENTS, false);
-                    return true;
+            String[] value = SORT_LOOKUP.get(item.getItemId());
+            if (value == null) {
+                return false;
             }
 
-            return false;
+            updateSortMode(value[0], TextUtils.equals(value[1], "asc"));
+            return true;
         }
 
         protected void updateSortMode(String sortMode, boolean ascending) {
             mSortAscending = ascending;
             mSortMode = sortMode;
+        }
+
+        private int findEntryIndex(String mode, String order) {
+            for (int i = 0; i < SORT_LOOKUP.size(); i++) {
+                String[] value = SORT_LOOKUP.valueAt(i);
+                if (TextUtils.equals(mode, value[0]) && TextUtils.equals(order, value[1])) {
+                    return i;
+                }
+            }
+            return -1;
         }
     }
 }

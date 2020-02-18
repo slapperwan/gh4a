@@ -1,5 +1,6 @@
 package com.gh4a.activities.home;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.IdRes;
 import androidx.annotation.StringRes;
@@ -26,12 +27,21 @@ public class IssueListFactory extends FragmentFactory {
     private final IssueListFragment.SortDrawerHelper mDrawerHelper =
             new IssueListFragment.SortDrawerHelper();
     private int[] mHeaderColorAttrs;
+    private SharedPreferences mPrefs;
 
-    public IssueListFactory(HomeActivity activity, String userLogin, boolean pr) {
+    public IssueListFactory(HomeActivity activity, String userLogin, boolean pr,
+            SharedPreferences prefs) {
         super(activity);
         mLogin = userLogin;
         mShowingClosed = false;
         mIsPullRequest = pr;
+        mPrefs = prefs;
+
+        String lastOrder = mPrefs.getString(getSortOrderPrefKey(), null);
+        String lastDir = mPrefs.getString(getSortDirPrefKey(), null);
+        if (lastOrder != null && lastDir != null) {
+            mDrawerHelper.setSortMode(lastOrder, lastDir);
+        }
     }
 
     @Override
@@ -110,13 +120,18 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     @Override
-    protected @IdRes int getInitialToolDrawerSelection() {
-        return R.id.sort_created_desc;
+    protected void prepareToolDrawerMenu(Menu menu) {
+        super.prepareToolDrawerMenu(menu);
+        mDrawerHelper.updateMenuCheckState(menu);
     }
 
     @Override
     protected boolean onDrawerItemSelected(MenuItem item) {
         if (mDrawerHelper.handleItemSelection(item)) {
+            mPrefs.edit()
+                    .putString(getSortOrderPrefKey(), mDrawerHelper.getSortMode())
+                    .putString(getSortDirPrefKey(), mDrawerHelper.getSortOrder())
+                    .apply();
             reloadIssueList();
             return true;
         }
@@ -159,5 +174,13 @@ public class IssueListFactory extends FragmentFactory {
             mShowingClosed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark
         };
         mActivity.invalidateTabs();
+    }
+
+    private String getSortOrderPrefKey() {
+        return mIsPullRequest ? "home_pr_list_sort_order" : "home_issue_list_sort_order";
+    }
+
+    private String getSortDirPrefKey() {
+        return mIsPullRequest ? "home_pr_list_sort_dir" : "home_issue_list_sort_dir";
     }
 }

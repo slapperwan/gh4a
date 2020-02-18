@@ -304,9 +304,9 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
             case R.id.my_repos:
                 return new RepositoryFactory(this, mUserLogin, getPrefs());
             case R.id.my_issues:
-                return new IssueListFactory(this, mUserLogin, false);
+                return new IssueListFactory(this, mUserLogin, false, getPrefs());
             case R.id.my_prs:
-                return new IssueListFactory(this, mUserLogin, true);
+                return new IssueListFactory(this, mUserLogin, true, getPrefs());
             case R.id.my_gists:
                 return new GistFactory(this, mUserLogin);
             case R.id.search:
