@@ -1,5 +1,8 @@
 package com.gh4a.activities.home;
 
+import android.content.SharedPreferences;
+import android.os.Bundle;
+
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 
@@ -12,11 +15,17 @@ public class BookmarkFactory extends FragmentFactory {
             R.string.bookmarks, R.string.starred
     };
 
-    private final String mUserLogin;
+    private static final String PREF_KEY_SORT_ORDER = "home_starred_list_sort_order";
+    private static final String PREF_KEY_SORT_DIR = "home_starred_list_sort_dir";
 
-    public BookmarkFactory(HomeActivity activity, String userLogin) {
+    private final String mUserLogin;
+    private StarredRepositoryListFragment mStarredRepoFragment;
+    private SharedPreferences mPrefs;
+
+    public BookmarkFactory(HomeActivity activity, String userLogin, SharedPreferences prefs) {
         super(activity);
         mUserLogin = userLogin;
+        mPrefs = prefs;
     }
 
     @Override
@@ -36,5 +45,47 @@ public class BookmarkFactory extends FragmentFactory {
             return StarredRepositoryListFragment.newInstance(mUserLogin);
         }
         return BookmarkListFragment.newInstance();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        saveLastSortOrder();
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onFragmentInstantiated(Fragment f, int position) {
+        if (position == 1) {
+            mStarredRepoFragment = (StarredRepositoryListFragment) f;
+            loadLastSortOrder();
+        }
+        super.onFragmentInstantiated(f, position);
+    }
+
+    @Override
+    protected void onFragmentDestroyed(Fragment f) {
+        if (f == mStarredRepoFragment) {
+            saveLastSortOrder();
+            mStarredRepoFragment = null;
+        }
+        super.onFragmentDestroyed(f);
+    }
+
+    private void loadLastSortOrder() {
+        String order = mPrefs.getString(PREF_KEY_SORT_ORDER, null);
+        String dir = mPrefs.getString(PREF_KEY_SORT_DIR, null);
+        if (order != null && dir != null) {
+            mStarredRepoFragment.setSortOrderAndDirection(order, dir);
+        }
+    }
+
+    private void saveLastSortOrder() {
+        if (mStarredRepoFragment == null) {
+            return;
+        }
+        mPrefs.edit()
+                .putString(PREF_KEY_SORT_ORDER, mStarredRepoFragment.getSortOrder())
+                .putString(PREF_KEY_SORT_DIR, mStarredRepoFragment.getSortDirection())
+                .apply();
     }
 }

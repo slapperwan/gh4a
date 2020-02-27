@@ -17,6 +17,8 @@ package com.gh4a.fragment;
 
 import android.os.Bundle;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -66,6 +68,25 @@ public class StarredRepositoryListFragment extends PagedDataBaseFragment<Reposit
             mSortDirection = savedInstanceState.getString(STATE_KEY_SORT_DIRECTION);
         }
         setHasOptionsMenu(true);
+    }
+
+    public void setSortOrderAndDirection(String sortOrder, String direction) {
+        if (!TextUtils.equals(sortOrder, mSortOrder) || !TextUtils.equals(mSortDirection, direction)) {
+            mSortOrder = sortOrder;
+            mSortDirection = direction;
+            if (isAdded()) {
+                getActivity().invalidateOptionsMenu();
+            }
+            onRefresh();
+        }
+    }
+
+    public String getSortOrder() {
+        return mSortOrder;
+    }
+
+    public String getSortDirection() {
+        return mSortDirection;
     }
 
     @Override

@@ -312,7 +312,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
             case R.id.search:
                 return new SearchFactory(this);
             case R.id.bookmarks:
-                return new BookmarkFactory(this, mUserLogin);
+                return new BookmarkFactory(this, mUserLogin, getPrefs());
             case R.id.pub_timeline:
                 return new TimelineFactory(this);
             case R.id.blog:
