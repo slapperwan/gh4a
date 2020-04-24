@@ -167,8 +167,10 @@ public class IntentUtils {
         }
 
         Intent chooserIntent = Intent.createChooser(lastIntent, null);
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS,
-                chooserIntents.toArray(new Intent[chooserIntents.size()]));
+        String extraName = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                ? Intent.EXTRA_ALTERNATE_INTENTS
+                : Intent.EXTRA_INITIAL_INTENTS;
+        chooserIntent.putExtra(extraName, chooserIntents.toArray(new Intent[chooserIntents.size()]));
         return chooserIntent;
     }
 
