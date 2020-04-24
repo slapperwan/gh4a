@@ -84,7 +84,7 @@ dependencies {
         exclude group: 'xpp3', module: 'xpp3'
     }
     implementation 'com.github.maniac103:rxloader:master-SNAPSHOT'
-    implementation 'com.github.maniac103:githubsdk:0.5.1.12'
+    implementation 'com.github.maniac103:githubsdk:0.5.1.13'
     implementation 'com.larswerkman:HoloColorPicker:1.5@aar'
     implementation 'com.caverock:androidsvg-aar:1.4'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.18'
