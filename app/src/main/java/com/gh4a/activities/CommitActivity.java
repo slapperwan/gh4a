@@ -154,7 +154,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
-    public boolean displayDetachAction() {
+    protected boolean displayDetachAction() {
         return true;
     }
 

@@ -130,7 +130,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         @TargetApi(21)
         @Override
         public void run() {
-            String label = IntentUtils.isNewTaskIntent(getIntent()) ? getActionBarTitle() : null;
+            String label = wasStartedAsNewTask() ? getActionBarTitle() : null;
             setTaskDescription(new ActivityManager.TaskDescription(label, null,
                     mProgressColors[0]));
         }
@@ -152,7 +152,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getActionBarTitle());
         actionBar.setSubtitle(getActionBarSubtitle());
-        actionBar.setDisplayHomeAsUpEnabled(!IntentUtils.isNewTaskIntent(getIntent()));
+        actionBar.setDisplayHomeAsUpEnabled(!wasStartedAsNewTask());
 
         scheduleTaskDescriptionUpdate();
     }
@@ -467,7 +467,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @CallSuper
     public boolean onCreateOptionsMenu(Menu menu) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && !IntentUtils.isNewTaskIntent(getIntent())
+                && !wasStartedAsNewTask()
                 && displayDetachAction()) {
             menu.add(Menu.NONE, R.id.detach, Menu.NONE, R.string.detach);
         }
@@ -475,7 +475,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return super.onCreateOptionsMenu(menu);
     }
 
-    public boolean displayDetachAction() {
+    protected boolean wasStartedAsNewTask() {
+        return (getIntent().getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK) != 0;
+    }
+
+    protected boolean displayDetachAction() {
         return false;
     }
 

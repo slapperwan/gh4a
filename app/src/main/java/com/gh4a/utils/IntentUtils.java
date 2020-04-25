@@ -34,7 +34,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class IntentUtils {
-    private static final String EXTRA_NEW_TASK = "IntentUtils.new_task";
     private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
 
     private IntentUtils() {
@@ -182,12 +181,7 @@ public class IntentUtils {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             intent.addFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT);
         }
-        intent.putExtra(EXTRA_NEW_TASK, true);
         context.startActivity(intent);
-    }
-
-    public static boolean isNewTaskIntent(@Nullable Intent intent) {
-        return intent != null && intent.getBooleanExtra(EXTRA_NEW_TASK, false);
     }
 
     public static void putParcelableToBundleCompressed(Bundle bundle,
