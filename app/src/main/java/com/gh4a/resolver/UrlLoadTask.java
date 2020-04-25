@@ -20,10 +20,15 @@ import io.reactivex.Single;
 public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>> {
     protected final FragmentActivity mActivity;
     private ProgressDialogFragment mProgressDialog;
+    private int mIntentFlags;
 
     public UrlLoadTask(FragmentActivity activity) {
         super();
         mActivity = activity;
+    }
+
+    public void setIntentFlags(int flags) {
+        mIntentFlags = flags;
     }
 
     @Override
@@ -50,9 +55,9 @@ public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>
         }
 
         if (result.isPresent()) {
-            mActivity.startActivity(result.get());
+            mActivity.startActivity(result.get().setFlags(mIntentFlags));
         } else {
-            IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData());
+            IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData(), mIntentFlags);
         }
 
         if (mProgressDialog != null && mProgressDialog.isAdded()) {
