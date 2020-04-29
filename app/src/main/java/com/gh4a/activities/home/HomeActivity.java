@@ -36,13 +36,12 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.activities.Github4AndroidActivity;
 import com.gh4a.activities.SettingsActivity;
 import com.gh4a.activities.UserActivity;
+import com.gh4a.fragment.LoginModeChooserFragment;
 import com.gh4a.fragment.NotificationListFragment;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.fragment.UserPasswordLoginDialogFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.activity.NotificationService;
@@ -52,7 +51,7 @@ import java.util.HashMap;
 
 public class HomeActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, RepositoryListContainerFragment.Callback,
-        NotificationListFragment.ParentCallback, UserPasswordLoginDialogFragment.ParentCallback {
+        NotificationListFragment.ParentCallback, LoginModeChooserFragment.ParentCallback {
     public static Intent makeIntent(Context context, @IdRes int initialPageId) {
         String initialPage = START_PAGE_MAPPING.get(initialPageId);
         Intent intent = new Intent(context, HomeActivity.class);
@@ -262,7 +261,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 finish();
                 return true;
             case R.id.add_account:
-                new LoginModeChooserFragment().show(getSupportFragmentManager(), "loginmode");
+                LoginModeChooserFragment.newInstance().show(getSupportFragmentManager(), "loginmode");
                 return true;
             case R.id.settings:
                 startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
@@ -349,6 +348,11 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
+    public void onLoginStartOauth() {
+        Github4AndroidActivity.launchOauthLogin(this);
+    }
+
+    @Override
     public void onLoginFinished(String token, User user) {
         Gh4Application.get().addAccount(user, token);
         switchActiveUser(user.login());
@@ -357,6 +361,11 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     @Override
     public void onLoginFailed(Throwable error) {
         // TODO
+    }
+
+    @Override
+    public void onLoginCanceled() {
+        // Nothing to do
     }
 
     @Override
@@ -568,72 +577,5 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 .map(result -> !result.items().isEmpty())
                 .compose(makeLoaderSingle(ID_LOADER_NOTIFICATIONS_INDICATOR, force))
                 .subscribe(this::setNotificationsIndicatorVisible, this::handleLoadFailure);
-    }
-
-    public static class LoginModeChooserFragment extends DialogFragment implements
-            DialogInterface.OnClickListener {
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return new AlertDialog.Builder(getActivity())
-                    .setMessage(R.string.login_mode_dialog_text)
-                    .setPositiveButton(R.string.login_mode_button_oauth, this)
-                    .setNegativeButton(R.string.login_mode_button_user_pw, this)
-                    .setNeutralButton(R.string.cancel, null)
-                    .create();
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            if (which == DialogInterface.BUTTON_POSITIVE) {
-                new BrowserLogoutDialogFragment().show(getFragmentManager(), "browserlogout");
-            } else {
-                UserPasswordLoginDialogFragment.newInstance(Github4AndroidActivity.SCOPES)
-                        .show(getFragmentManager(), "login");
-            }
-        }
-    }
-
-    public static class BrowserLogoutDialogFragment extends DialogFragment implements
-            DialogInterface.OnClickListener {
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.browser_logout_dialog_title)
-                    .setMessage(R.string.browser_logout_dialog_text)
-                    .setPositiveButton(R.string.go_to_logout_page, this)
-                    .setNeutralButton(R.string.continue_login, this)
-                    .create();
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            if (which == DialogInterface.BUTTON_NEUTRAL) {
-                Github4AndroidActivity.launchOauthLogin(getActivity());
-            } else if (which == DialogInterface.BUTTON_POSITIVE) {
-                Uri uri = Uri.parse("https://github.com/logout");
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                IntentUtils.openInCustomTabOrBrowser(getActivity(), uri);
-                new BrowserLogoutCompletedDialogFragment().show(fm, "browserlogoutcomplete");
-            }
-        }
-    }
-
-    public static class BrowserLogoutCompletedDialogFragment extends DialogFragment implements
-            DialogInterface.OnClickListener {
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return new AlertDialog.Builder(getActivity())
-                    .setMessage(R.string.browser_logout_completed_dialog_text)
-                    .setPositiveButton(R.string.continue_login, this)
-                    .create();
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            Github4AndroidActivity.launchOauthLogin(getActivity());
-        }
     }
 }

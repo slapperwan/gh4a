@@ -44,22 +44,12 @@
                 android:textColor="@android:color/white" />
 
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/oauth_login_button"
+                android:id="@+id/login_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="4dp"
                 android:padding="8dp"
-                android:text="@string/login_oauth"
-                android:textColor="?attr/colorPrimary"
-                app:backgroundTint="@android:color/white" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/user_pw_login_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:padding="8dp"
-                android:text="@string/login_user_pw"
+                android:text="@string/login"
                 android:textColor="?attr/colorPrimary"
                 app:backgroundTint="@android:color/white" />
 

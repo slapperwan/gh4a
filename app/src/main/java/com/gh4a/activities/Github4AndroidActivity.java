@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+
 import com.google.android.material.appbar.AppBarLayout;
 import android.util.Pair;
 import android.view.Menu;
@@ -33,7 +34,7 @@ import com.gh4a.BuildConfig;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
-import com.gh4a.fragment.UserPasswordLoginDialogFragment;
+import com.gh4a.fragment.LoginModeChooserFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -49,7 +50,7 @@ import io.reactivex.Single;
  * The Github4Android activity.
  */
 public class Github4AndroidActivity extends BaseActivity implements
-        View.OnClickListener, UserPasswordLoginDialogFragment.ParentCallback {
+        View.OnClickListener, LoginModeChooserFragment.ParentCallback {
     private static final String OAUTH_URL = "https://github.com/login/oauth/authorize";
     private static final String PARAM_CLIENT_ID = "client_id";
     private static final String PARAM_CODE = "code";
@@ -57,7 +58,6 @@ public class Github4AndroidActivity extends BaseActivity implements
     private static final String PARAM_CALLBACK_URI = "redirect_uri";
 
     private static final Uri CALLBACK_URI = Uri.parse("gh4a://oauth");
-    public static final String SCOPES = "user,repo,gist";
 
     private static final int REQUEST_SETTINGS = 10000;
 
@@ -83,8 +83,7 @@ public class Github4AndroidActivity extends BaseActivity implements
             FrameLayout contentContainer = (FrameLayout) findViewById(R.id.content).getParent();
             contentContainer.setForeground(null);
 
-            findViewById(R.id.oauth_login_button).setOnClickListener(this);
-            findViewById(R.id.user_pw_login_button).setOnClickListener(this);
+            findViewById(R.id.login_button).setOnClickListener(this);
             mContent = findViewById(R.id.welcome_container);
             mProgress = findViewById(R.id.login_progress_container);
 
@@ -198,14 +197,24 @@ public class Github4AndroidActivity extends BaseActivity implements
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.oauth_login_button) {
-            launchOauthLogin(this);
-            mContent.setVisibility(View.GONE);
-            mProgress.setVisibility(View.VISIBLE);
-        } else if (view.getId() == R.id.user_pw_login_button) {
-            UserPasswordLoginDialogFragment.newInstance(SCOPES)
-                    .show(getSupportFragmentManager(), "foo");
+        if (view.getId() == R.id.login_button) {
+            LoginModeChooserFragment.newInstance().show(getSupportFragmentManager(), "login");
+            setProgressShown(true);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mProgress.getVisibility() == View.VISIBLE) {
+            setProgressShown(false);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onLoginStartOauth() {
+        launchOauthLogin(this);
     }
 
     @Override
@@ -218,13 +227,24 @@ public class Github4AndroidActivity extends BaseActivity implements
     @Override
     public void onLoginFailed(Throwable error) {
         handleLoadFailure(error);
+        setProgressShown(false);
+    }
+
+    @Override
+    public void onLoginCanceled() {
+        setProgressShown(false);
+    }
+
+    private void setProgressShown(boolean show) {
+        mContent.setVisibility(show ? View.GONE : View.VISIBLE);
+        mProgress.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     public static void launchOauthLogin(Activity activity) {
         Uri uri = Uri.parse(OAUTH_URL)
                 .buildUpon()
                 .appendQueryParameter(PARAM_CLIENT_ID, BuildConfig.CLIENT_ID)
-                .appendQueryParameter(PARAM_SCOPE, SCOPES)
+                .appendQueryParameter(PARAM_SCOPE, LoginModeChooserFragment.SCOPES)
                 .appendQueryParameter(PARAM_CALLBACK_URI, CALLBACK_URI.toString())
                 .build();
         IntentUtils.openInCustomTabOrBrowser(activity, uri);

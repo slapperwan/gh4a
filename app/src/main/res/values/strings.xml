@@ -3,7 +3,7 @@
     <string name="app_name">OctoDroid</string>
 
     <!-- Common -->
-    <string name="introduction">To be able to use the app to its full potential, please log in to GitHub using one of the buttons below.\n\nAlternatively, you can explore some parts of GitHub using the swipe-out menu on the left.</string>
+    <string name="introduction">To be able to use the app to its full potential, please log in to GitHub using the button below.\n\nAlternatively, you can explore some parts of GitHub using the swipe-out menu on the left.</string>
     <string name="repo_not_found_toast">Repository was not found</string>
     <string name="loading_msg">Loading\u2026</string>
     <string name="saving_msg">Saving\u2026</string>
@@ -19,14 +19,14 @@
     <string name="login">Login</string>
     <string name="login_user_pw">Login with user name and password</string>
     <string name="login_oauth">Login via OAuth</string>
+    <string name="login_token">Login using access token</string>
+    <string name="login_summary_oauth">Log in to Github using the OAuth web login flow.\nAs the login process is done in your browser and only one account can be active at a time there, you need to make sure to be logged out from Github in your browser before being able to log in to a new account.\n\nPlease visit <a href="https://github.com/logout">Github\'s logout page</a>, finish the logout process, then close the browser window, come back to the app and continue the login process.\nIf you\'re sure you\'re not logged in, you can also continue to the login process right away.</string>
     <string name="credentials_username">User name</string>
     <string name="credentials_password">Password</string>
     <string name="credentials_error_empty">This field must not be empty.</string>
     <string name="credentials_otp">OTP code</string>
     <string name="credentials_otp_prompt">Please enter the two-factor confirmation code you got via SMS.</string>
-    <string name="login_mode_dialog_text">Do you want to add the new account using OAuth or user/password login?</string>
-    <string name="login_mode_button_oauth">OAuth</string>
-    <string name="login_mode_button_user_pw">User/password</string>
+    <string name="credentials_token">Access token</string>
     <string name="try_again">Try again</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -130,11 +130,6 @@
     <string name="unsubscribe">Unsubscribe</string>
     <string name="mark_repository_as_read_question">Mark all notifications from %1$s as read?</string>
     <string name="mark_all_as_read_question">Mark all notifications as read?</string>
-    <string name="browser_logout_dialog_title">Logout in browser required</string>
-    <string name="browser_logout_dialog_text">As the login process is done in your browser and only one account can be active at a time there, you need to make sure to be logged out from Github in your browser before being able to log in to a new account.\n\nPlease visit Github\'s logout page, finish the logout process, then close the browser window, come back to the app and continue the login process.\nIf you\'re sure you\'re not logged in, you can also continue to the login process right away.</string>
-    <string name="browser_logout_completed_dialog_text">You can now proceed in the login process for the new account.</string>
-    <string name="go_to_logout_page">Go to logout page</string>
-    <string name="continue_login">Continue new login</string>
     <string name="unread">Unread</string>
     <string name="undo">Undo</string>
     <string name="raw">Raw</string>
