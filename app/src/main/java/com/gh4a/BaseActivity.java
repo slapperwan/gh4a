@@ -582,7 +582,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        if (!closeDrawers()) {
+        if (closeDrawers()) {
+            return;
+        }
+        if (wasStartedAsNewTask() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            finishAndRemoveTask();
+        } else {
             super.onBackPressed();
         }
     }
