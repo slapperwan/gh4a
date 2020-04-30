@@ -59,7 +59,7 @@ public class LoginModeChooserFragment extends DialogFragment implements
         return new LoginModeChooserFragment();
     }
 
-    public static final String SCOPES = "user,repo,gist";
+    public static final String SCOPES = "user,repo,gist,read:org,notifications";
 
     private RadioGroup mModeGroup;
     private View mOauthContainer;
