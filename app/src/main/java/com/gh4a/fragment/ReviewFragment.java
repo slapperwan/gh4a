@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -213,14 +214,19 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
 
                 if (commentsOpt.isPresent()) {
                     for (ReviewComment commitComment : commentsOpt.get()) {
-                        if (reviewComments.contains(commitComment)) {
-                            continue;
+                        boolean alreadyPresent = false;
+                        for (ReviewComment reviewComment : reviewComments) {
+                            if (commitComment.id().equals(reviewComment.id())) {
+                                alreadyPresent = true;
+                                break;
+                            }
                         }
-
-                        // Rest of the comments should be added only if they are under the same
-                        // diff hunks as the original review comments.
-                        GitHubFile file = filesByName.get(commitComment.path());
-                        reviewItem.addComment(commitComment, file, false);
+                        if (!alreadyPresent) {
+                            // Rest of the comments should be added only if they are under the same
+                            // diff hunks as the original review comments.
+                            GitHubFile file = filesByName.get(commitComment.path());
+                            reviewItem.addComment(commitComment, file, false);
+                        }
                     }
                 }
             }
