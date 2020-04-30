@@ -2,6 +2,7 @@ package com.gh4a.activities.home;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
@@ -48,9 +49,15 @@ public class BookmarkFactory extends FragmentFactory {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        saveLastSortOrder();
-        super.onSaveInstanceState(outState);
+    protected boolean onOptionsItemSelected(MenuItem item) {
+        if (mStarredRepoFragment != null) {
+            boolean handled = mStarredRepoFragment.onOptionsItemSelected(item);
+            if (handled) {
+                saveLastSortOrder();
+                return true;
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -65,7 +72,6 @@ public class BookmarkFactory extends FragmentFactory {
     @Override
     protected void onFragmentDestroyed(Fragment f) {
         if (f == mStarredRepoFragment) {
-            saveLastSortOrder();
             mStarredRepoFragment = null;
         }
         super.onFragmentDestroyed(f);
