@@ -486,6 +486,12 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             return true;
         }
 
+        Intent intent = item.getIntent();
+        if (intent != null) {
+            getActivity().startActivity(intent);
+            return true;
+        }
+
         return false;
     }
 }
