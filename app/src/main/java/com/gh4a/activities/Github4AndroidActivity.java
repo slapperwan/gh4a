@@ -98,13 +98,6 @@ public class Github4AndroidActivity extends BaseActivity implements
         }
     }
 
-    @Override
-    protected boolean wasStartedAsNewTask() {
-        // As this is the entry point activity, it's normal to be started as new task,
-        // so pretend it wasn't started as new task to avoid BaseActivity's special handling.
-        return false;
-    }
-
     private boolean handleIntent(Intent intent) {
         Uri data = intent.getData();
         if (data != null

@@ -132,7 +132,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     @Override
-    protected boolean displayDetachAction() {
+    public boolean displayDetachAction() {
         return true;
     }
 

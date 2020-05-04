@@ -130,7 +130,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         @TargetApi(21)
         @Override
         public void run() {
-            String label = wasStartedAsNewTask() ? getActionBarTitle() : null;
+            String label = IntentUtils.isNewTaskIntent(getIntent()) ? getActionBarTitle() : null;
             setTaskDescription(new ActivityManager.TaskDescription(label, null,
                     mProgressColors[0]));
         }
@@ -152,7 +152,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getActionBarTitle());
         actionBar.setSubtitle(getActionBarSubtitle());
-        actionBar.setDisplayHomeAsUpEnabled(!wasStartedAsNewTask());
+        actionBar.setDisplayHomeAsUpEnabled(!IntentUtils.isNewTaskIntent(getIntent()));
 
         scheduleTaskDescriptionUpdate();
     }
@@ -467,7 +467,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @CallSuper
     public boolean onCreateOptionsMenu(Menu menu) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && !wasStartedAsNewTask()
+                && !IntentUtils.isNewTaskIntent(getIntent())
                 && displayDetachAction()) {
             menu.add(Menu.NONE, R.id.detach, Menu.NONE, R.string.detach);
         }
@@ -475,11 +475,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return super.onCreateOptionsMenu(menu);
     }
 
-    protected boolean wasStartedAsNewTask() {
-        return (getIntent().getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK) != 0;
-    }
-
-    protected boolean displayDetachAction() {
+    public boolean displayDetachAction() {
         return false;
     }
 
@@ -585,7 +581,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (closeDrawers()) {
             return;
         }
-        if (wasStartedAsNewTask() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        boolean wasStartedAsNewTask = (getIntent().getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK) != 0;
+        if (wasStartedAsNewTask && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             finishAndRemoveTask();
         } else {
             super.onBackPressed();

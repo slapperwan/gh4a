@@ -211,7 +211,7 @@ public class IssueActivity extends BaseActivity implements
     }
 
     @Override
-    protected boolean displayDetachAction() {
+    public boolean displayDetachAction() {
         return true;
     }
 

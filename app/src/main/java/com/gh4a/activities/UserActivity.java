@@ -106,7 +106,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
     }
 
     @Override
-    protected boolean displayDetachAction() {
+    public boolean displayDetachAction() {
         return true;
     }
 
