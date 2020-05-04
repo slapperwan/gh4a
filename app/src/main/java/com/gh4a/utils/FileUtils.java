@@ -27,6 +27,9 @@ public class FileUtils {
         MIME_TYPE_OVERRIDES.put("ts", "text/x-typescript");
         // there is no general MIME type mapping for Java properties files, but they're text
         MIME_TYPE_OVERRIDES.put("properties", "text/x-java-properties");
+        // JavaScript can be resolved to both text/javascript and application/javascript,
+        // for our purposes it's text in any case
+        MIME_TYPE_OVERRIDES.put("js", "text/javascript");
     }
 
     public static boolean save(File file, InputStream inputStream) {
