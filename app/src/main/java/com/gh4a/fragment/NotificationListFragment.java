@@ -210,7 +210,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         service.setNotificationThreadSubscription(notification.id(), request)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(RxUtils::doInBackground)
-                .subscribe(result -> handleMarkAsRead(null, notification));
+                .subscribe(result -> handleMarkAsRead(null, notification),
+                        error -> handleActionFailure("Unsubscribing notification failed", error));
     }
 
     @Override
