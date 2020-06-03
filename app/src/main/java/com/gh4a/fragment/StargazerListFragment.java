@@ -129,11 +129,7 @@ public class StargazerListFragment extends PagedDataBaseFragment<User> {
         }
         StarringService service = ServiceFactory.get(StarringService.class, force);
         service.checkIfRepositoryIsStarred(mRepoOwner, mRepoName)
-                .map(ApiHelpers::throwOnFailure)
-                // success response means 'starred'
-                .map(result -> true)
-                // 404 means 'not starred'
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, false))
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(makeLoaderSingle(1, force))
                 .subscribe(result -> {
                     mIsStarring = result;
