@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
@@ -33,7 +32,6 @@ import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -49,12 +47,11 @@ import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.FindActionModeCallback;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import androidx.appcompat.view.ContextThemeWrapper;
 
 public abstract class WebViewerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, View.OnTouchListener {
@@ -116,15 +113,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
             }
         }
 
-        // We also use the dark CAB for the light theme, so we have to force the
-        // dark (night) version of the theme for inflating the WebView
-        ContextThemeWrapper inflateContext = new ContextThemeWrapper(this, R.style.AppTheme);
-        Configuration config = new Configuration();
-        config.fontScale = 0F;
-        config.uiMode = Configuration.UI_MODE_NIGHT_YES | (config.uiMode & ~Configuration.UI_MODE_NIGHT_MASK);
-        inflateContext.applyOverrideConfiguration(config);
-
-        setContentView(LayoutInflater.from(inflateContext).inflate(R.layout.web_viewer, null));
+        setContentView(R.layout.web_viewer);
 
         setContentShown(false);
         setupWebView();
@@ -171,7 +160,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         mWebView.setOnTouchListener(this);
     }
 
-    @SuppressWarnings("deprecation")
+    //@SuppressWarnings("deprecation")
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebViewSettings(WebSettings s) {
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
@@ -237,12 +226,14 @@ public abstract class WebViewerActivity extends BaseActivity implements
         return false;
     }
 
-    @SuppressWarnings("deprecation")
-    @TargetApi(11)
     private void doSearch() {
-        if (mWebView != null) {
-            mWebView.showFindDialog(null, true);
+        if (mWebView == null) {
+            return;
         }
+        FindActionModeCallback findAction = new FindActionModeCallback(mWebView.getContext());
+        mWebView.startActionMode(findAction);
+        findAction.setWebView(mWebView);
+        findAction.showSoftInput();
     }
 
     @SuppressLint("AddJavascriptInterface")

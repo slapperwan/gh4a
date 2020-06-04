@@ -66,6 +66,8 @@
     <string name="load_failure_explanation">Loading the data from Github failed. Please verify you have a working network connection and try again.</string>
     <string name="load_failure_explanation_dmca">This repository was taken down for legal reasons.\nPlease see %1$s for details.</string>
     <string name="load_failure_explanation_with_reason">Loading the data from Github failed. Github told us the following reason:\n%1$s</string>
+    <string name="find_next">Find next</string>
+    <string name="find_previous">Find previous</string>
     <string name="share">Share</string>
     <string name="print">Print</string>
     <string name="downloads">Downloads</string>
