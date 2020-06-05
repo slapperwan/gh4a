@@ -30,6 +30,9 @@ public class FileUtils {
         // JavaScript can be resolved to both text/javascript and application/javascript,
         // for our purposes it's text in any case
         MIME_TYPE_OVERRIDES.put("js", "text/javascript");
+        // Same for Ruby and LaTeX
+        MIME_TYPE_OVERRIDES.put("rb", "text/x-ruby");
+        MIME_TYPE_OVERRIDES.put("latex", "text/x-latex");
     }
 
     public static boolean save(File file, InputStream inputStream) {
@@ -90,7 +93,7 @@ public class FileUtils {
         String mime = getMimeTypeFor(filename);
         return mime != null && !mime.startsWith("text/")
                 // cover cases like application/xhtml+xml or image/svg+xml
-                && !mime.endsWith("+xml");
+                && !mime.endsWith("xml");
     }
 
     public static boolean isMarkdown(String filename) {
