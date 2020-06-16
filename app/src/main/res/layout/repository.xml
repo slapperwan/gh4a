@@ -52,6 +52,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColorLink="?android:attr/textColorLink"
+                    app:needsLinkHandling="true"
                     tools:text="https://example.com" />
 
                 <Space
