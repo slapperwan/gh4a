@@ -253,7 +253,6 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         switch (id) {
             case R.id.profile:
                 startActivity(UserActivity.makeIntent(this, mUserLogin));
-                updateDrawerMode(false);
                 return true;
             case R.id.logout:
                 Gh4Application.get().logout();
