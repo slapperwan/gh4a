@@ -30,9 +30,10 @@ public class FileUtils {
         // JavaScript can be resolved to both text/javascript and application/javascript,
         // for our purposes it's text in any case
         MIME_TYPE_OVERRIDES.put("js", "text/javascript");
-        // Same for Ruby and LaTeX
+        // Same for Ruby, LaTeX and SQL
         MIME_TYPE_OVERRIDES.put("rb", "text/x-ruby");
         MIME_TYPE_OVERRIDES.put("latex", "text/x-latex");
+        MIME_TYPE_OVERRIDES.put("sql", "text/x-sql");
     }
 
     public static boolean save(File file, InputStream inputStream) {
