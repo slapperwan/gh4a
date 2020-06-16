@@ -231,7 +231,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
             return;
         }
         FindActionModeCallback findAction = new FindActionModeCallback(mWebView.getContext());
-        mWebView.startActionMode(findAction);
+        startSupportActionMode(findAction);
         findAction.setWebView(mWebView);
         findAction.showSoftInput();
     }

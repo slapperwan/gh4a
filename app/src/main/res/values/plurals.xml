@@ -64,9 +64,4 @@
         <item quantity="one">%1$d contribution</item>
         <item quantity="other">%1$d contributions</item>
     </plurals>
-
-    <plurals name="matches_found">
-        <item quantity="one">1 match</item>
-        <item quantity="other">%1$d of %2$d</item>
-    </plurals>
 </resources>

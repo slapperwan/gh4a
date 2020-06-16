@@ -17,11 +17,12 @@
 package com.gh4a.widget;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
 import android.text.TextWatcher;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +32,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.view.ActionMode;
+import androidx.core.view.MenuItemCompat;
 
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
@@ -40,6 +43,8 @@ public class FindActionModeCallback implements ActionMode.Callback, TextWatcher,
     private EditText mEditText;
     private TextView mMatches;
     private WebView mWebView;
+    private MenuItem mPrevItem;
+    private MenuItem mNextItem;
     private boolean mHasStartedSearch;
     private int mNumberOfMatches;
 
@@ -88,14 +93,12 @@ public class FindActionModeCallback implements ActionMode.Callback, TextWatcher,
     @Override
     public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches, boolean isDoneCounting) {
         if (isDoneCounting) {
+            int activeMatch = numberOfMatches > 0 ? activeMatchOrdinal + 1 : 0;
             mNumberOfMatches = numberOfMatches;
-            if (numberOfMatches > 0) {
-                mMatches.setText(mMatches.getResources().getQuantityString(
-                        R.plurals.matches_found, mNumberOfMatches, activeMatchOrdinal + 1, mNumberOfMatches));
-                mMatches.setVisibility(View.VISIBLE);
-            } else {
-                mMatches.setVisibility(View.GONE);
-            }
+            mMatches.setSelected(numberOfMatches == 0);
+            mMatches.setText(String.format("%d/%d", activeMatch, numberOfMatches));
+            mMatches.setVisibility(View.VISIBLE);
+            updatePrevNextItemState();
         }
     }
 
@@ -127,13 +130,16 @@ public class FindActionModeCallback implements ActionMode.Callback, TextWatcher,
                     "No WebView for FindActionModeCallback::findAll");
         }
         String find = mEditText.getText().toString();
+        mNumberOfMatches = 0;
         if (find.isEmpty()) {
             mWebView.clearMatches();
+            mMatches.setVisibility(View.GONE);
+        } else {
+            mWebView.findAllAsync(find);
+            mMatches.setVisibility(View.INVISIBLE);
+            mHasStartedSearch = true;
         }
-        mNumberOfMatches = 0;
-        mMatches.setVisibility(find.isEmpty() ? View.GONE : View.INVISIBLE);
-        mWebView.findAllAsync(find);
-        mHasStartedSearch = true;
+        updatePrevNextItemState();
     }
 
     public void showSoftInput() {
@@ -148,9 +154,18 @@ public class FindActionModeCallback implements ActionMode.Callback, TextWatcher,
         mode.getMenuInflater().inflate(R.menu.webview_find, menu);
         Editable edit = mEditText.getText();
         Selection.setSelection(edit, edit.length());
+
+        final Resources res = mCustomView.getContext().getResources();
+        final ColorStateList iconTintList = res.getColorStateList(R.color.webview_find_icon);
+
+        mPrevItem = menu.findItem(R.id.find_prev);
+        MenuItemCompat.setIconTintList(mPrevItem, iconTintList);
+        mNextItem = menu.findItem(R.id.find_next);
+        MenuItemCompat.setIconTintList(mNextItem, iconTintList);
+
         mMatches.setVisibility(View.GONE);
+        updatePrevNextItemState();
         mHasStartedSearch = false;
-        mMatches.setText("0");
         mEditText.requestFocus();
         return true;
     }
@@ -199,5 +214,10 @@ public class FindActionModeCallback implements ActionMode.Callback, TextWatcher,
     @Override
     public void afterTextChanged(Editable s) {
         findAll();
+    }
+
+    private void updatePrevNextItemState() {
+        mPrevItem.setEnabled(mNumberOfMatches > 0);
+        mNextItem.setEnabled(mNumberOfMatches > 0);
     }
 }

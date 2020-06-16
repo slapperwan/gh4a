@@ -29,15 +29,16 @@
         android:inputType="text"
         android:hint="@string/abc_search_hint"
         android:imeOptions="actionDone|flagNoExtractUi|flagNoFullscreen"
-        android:background="@drawable/abc_textfield_search_material"
-        android:layout_marginEnd="8dp" />
+        android:background="@drawable/abc_textfield_search_material" />
 
     <TextView
         android:id="@+id/matches"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorPrimary" />
+        android:textColor="@color/webview_find_matches" />
 
 </LinearLayout>
