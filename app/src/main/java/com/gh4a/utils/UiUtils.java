@@ -213,9 +213,8 @@ public class UiUtils {
 
     private static void enqueueDownload(Context context, Uri uri, String fileName,
             String description, String mimeType, String mediaType, boolean wifiOnly) {
-        final String token = Gh4Application.get().getAuthToken();
         final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        final DownloadManager.Request request = new DownloadManager.Request(uri)
+        DownloadManager.Request request = new DownloadManager.Request(uri)
                 .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
                 .setDescription(description)
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -223,9 +222,6 @@ public class UiUtils {
 
         if (mediaType != null) {
             request.addRequestHeader("Accept", mediaType);
-        }
-        if (token != null) {
-            request.addRequestHeader("Authorization", "Token " + token);
         }
         if (mimeType != null) {
             request.setMimeType(mimeType);
@@ -256,7 +252,10 @@ public class UiUtils {
             return;
         }
 
-        final Uri uri = Uri.parse(url);
+        final Uri uri = Uri.parse(url).buildUpon()
+                .appendQueryParameter("access_token", Gh4Application.get().getAuthToken())
+                .build();
+
         if (!downloadNeedsWarning(context)) {
             enqueueDownload(context, uri, fileName, description, mimeType, mediaType, false);
             return;
