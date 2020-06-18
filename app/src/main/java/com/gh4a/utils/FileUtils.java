@@ -30,10 +30,14 @@ public class FileUtils {
         // JavaScript can be resolved to both text/javascript and application/javascript,
         // for our purposes it's text in any case
         MIME_TYPE_OVERRIDES.put("js", "text/javascript");
-        // Same for Ruby, LaTeX and SQL
+        // Same for Ruby, LaTeX, SQL, JSON
         MIME_TYPE_OVERRIDES.put("rb", "text/x-ruby");
         MIME_TYPE_OVERRIDES.put("latex", "text/x-latex");
         MIME_TYPE_OVERRIDES.put("sql", "text/x-sql");
+        MIME_TYPE_OVERRIDES.put("json", "text/x-json");
+        // Also treat batch files as plain text (we want to open them in our text viewer,
+        // and they can't be run within Android anyway)
+        MIME_TYPE_OVERRIDES.put("bat", "text/plain");
     }
 
     public static boolean save(File file, InputStream inputStream) {
