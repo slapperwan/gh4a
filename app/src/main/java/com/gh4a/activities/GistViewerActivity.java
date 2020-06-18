@@ -122,7 +122,8 @@ public class GistViewerActivity extends WebViewerActivity {
                 return true;
             case R.id.download:
                 UiUtils.enqueueDownloadWithPermissionCheck(this, mGistFile.rawUrl(),
-                        mGistFile.type(), mGistFile.filename(), null, null);
+                        mGistFile.type(), mGistFile.filename(), null, null,
+                        UiUtils.DownloadTokenHandling.None);
         }
         return super.onOptionsItemSelected(item);
     }

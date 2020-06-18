@@ -212,7 +212,8 @@ public class UiUtils {
     }
 
     private static void enqueueDownload(Context context, Uri uri, String fileName,
-            String description, String mimeType, String mediaType, boolean wifiOnly) {
+            String description, String mimeType, String mediaType,
+            boolean wifiOnly, boolean addAuthHeader) {
         final DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(uri)
                 .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName)
@@ -222,6 +223,10 @@ public class UiUtils {
 
         if (mediaType != null) {
             request.addRequestHeader("Accept", mediaType);
+        }
+        final String token = Gh4Application.get().getAuthToken();
+        if (addAuthHeader && token != null) {
+            request.addRequestHeader("Authorization", "Token " + token);
         }
         if (mimeType != null) {
             request.setMimeType(mimeType);
@@ -233,13 +238,21 @@ public class UiUtils {
         dm.enqueue(request);
     }
 
+    public enum DownloadTokenHandling {
+        None,
+        AppendToUri,
+        UseAuthHeader
+    }
+
     public static void enqueueDownloadWithPermissionCheck(final BaseActivity activity,
             final String url, final String mimeType, final String fileName,
-            final String description, final String mediaType) {
+            final String description, final String mediaType,
+            final DownloadTokenHandling tokenHandling) {
         final ActivityCompat.OnRequestPermissionsResultCallback cb =
                 (requestCode, permissions, grantResults) -> {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        enqueueDownload(activity, url, mimeType, fileName, description, mediaType);
+                        enqueueDownload(activity, url, mimeType, fileName,
+                                description, mediaType, tokenHandling);
                     }
                 };
         activity.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, cb,
@@ -247,24 +260,33 @@ public class UiUtils {
     }
 
     private static void enqueueDownload(final Context context, String url, final String mimeType,
-            final String fileName, final String description, final String mediaType) {
+            final String fileName, final String description,
+            final String mediaType, final DownloadTokenHandling tokenHandling) {
         if (url == null) {
             return;
         }
 
-        final Uri uri = Uri.parse(url).buildUpon()
-                .appendQueryParameter("access_token", Gh4Application.get().getAuthToken())
-                .build();
+        final Uri baseUri = Uri.parse(url);
+        final Uri uri;
+        if (tokenHandling == DownloadTokenHandling.AppendToUri) {
+            uri = baseUri.buildUpon()
+                    .appendQueryParameter("access_token", Gh4Application.get().getAuthToken())
+                    .build();
+        } else {
+            uri = baseUri;
+        }
+        final boolean addAuthHeader = tokenHandling == DownloadTokenHandling.UseAuthHeader;
 
         if (!downloadNeedsWarning(context)) {
-            enqueueDownload(context, uri, fileName, description, mimeType, mediaType, false);
+            enqueueDownload(context, uri, fileName, description, mimeType,
+                    mediaType, false, addAuthHeader);
             return;
         }
 
         DialogInterface.OnClickListener buttonListener = (dialog, which) -> {
             boolean wifiOnly = which == DialogInterface.BUTTON_NEUTRAL;
             enqueueDownload(context, uri, fileName, description,
-                    mimeType, mediaType, wifiOnly);
+                    mimeType, mediaType, wifiOnly, addAuthHeader);
         };
 
         new AlertDialog.Builder(context)

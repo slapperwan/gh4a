@@ -241,7 +241,8 @@ public class ReleaseInfoActivity extends BaseActivity implements
     @Override
     public void onItemClick(ReleaseAsset item) {
         UiUtils.enqueueDownloadWithPermissionCheck(this, item.url(),
-                item.contentType(), item.name(), item.label(), "application/octet-stream");
+                item.contentType(), item.name(), item.label(),
+                "application/octet-stream", UiUtils.DownloadTokenHandling.AppendToUri);
     }
 
     @Override

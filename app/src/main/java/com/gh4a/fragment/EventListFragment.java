@@ -170,7 +170,8 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
                 Download download = payload.download();
                 UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(),
                         download.htmlUrl(), download.contentType(),
-                        download.name(), download.description(), null);
+                        download.name(), download.description(), null,
+                        UiUtils.DownloadTokenHandling.None);
                 break;
             }
 
@@ -475,13 +476,15 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
                 ReleaseAsset asset = payload.release().assets().get(id - MENU_DOWNLOAD_START);
                 UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(),
                         asset.url(), asset.contentType(),
-                        asset.name(), asset.label(), null);
+                        asset.name(), asset.label(), "application/octet-stream",
+                        UiUtils.DownloadTokenHandling.AppendToUri);
             } else if (event.type() == GitHubEventType.DownloadEvent) {
                 DownloadPayload payload = (DownloadPayload) event.payload();
                 Download download = payload.download();
                 UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(),
                         download.htmlUrl(), download.contentType(),
-                        download.name(), download.description(), null);
+                        download.name(), download.description(), null,
+                        UiUtils.DownloadTokenHandling.None);
             }
             return true;
         }

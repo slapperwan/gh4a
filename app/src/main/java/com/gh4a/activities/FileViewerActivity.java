@@ -236,8 +236,8 @@ public class FileViewerActivity extends WebViewerActivity
                 return true;
             case R.id.download:
                 UiUtils.enqueueDownloadWithPermissionCheck(this, buildRawFileUrl(),
-                        FileUtils.getMimeTypeFor(mPath), FileUtils.getFileName(mPath), null, null);
-
+                        FileUtils.getMimeTypeFor(mPath), FileUtils.getFileName(mPath), null, null,
+                        UiUtils.DownloadTokenHandling.UseAuthHeader);
                 return true;
             case R.id.share:
                 IntentUtils.share(this, getString(R.string.share_file_subject,

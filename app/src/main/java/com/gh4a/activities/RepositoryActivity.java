@@ -310,11 +310,17 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
                             BookmarksProvider.Columns.TYPE_REPO, bookmarkUrl, getCurrentRef(), true);
                 }
                 return true;
-            case R.id.zip_download:
-                String zipUrl = url + "/archive/" + getCurrentRef() + ".zip";
+            case R.id.zip_download: {
+                final String zipUrl = Uri.parse(mRepository.url())
+                        .buildUpon()
+                        .appendPath("zipball")
+                        .appendPath(getCurrentRef())
+                        .toString();
                 UiUtils.enqueueDownloadWithPermissionCheck(this, zipUrl, "application/zip",
-                        mRepoName + "-" + getCurrentRef() + ".zip", null, null);
+                        mRepoName + "-" + getCurrentRef() + ".zip", null, null,
+                        UiUtils.DownloadTokenHandling.UseAuthHeader);
                 return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
