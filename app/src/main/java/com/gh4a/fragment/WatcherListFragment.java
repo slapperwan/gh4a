@@ -138,23 +138,25 @@ public class WatcherListFragment extends PagedDataBaseFragment<User> {
 
     private void toggleWatchingState() {
         WatchingService service = ServiceFactory.get(WatchingService.class, false);
-        final Single<?> responseSingle;
+        final Single<Boolean> responseSingle;
 
         if (mIsWatching) {
             responseSingle = service.deleteRepositorySubscription(mRepoOwner, mRepoName)
-                    .map(ApiHelpers::throwOnFailure);
+                    .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                    .map(result -> false);
         } else {
             SubscriptionRequest request = SubscriptionRequest.builder()
                     .subscribed(true)
                     .build();
             responseSingle = service.setRepositorySubscription(mRepoOwner, mRepoName, request)
-                    .map(ApiHelpers::throwOnFailure);
+                    .map(ApiHelpers::throwOnFailure)
+                    .map(sub -> sub.subscribed());
         }
 
         responseSingle.compose(RxUtils::doInBackground)
                 .subscribe(result -> {
                     if (mIsWatching != null) {
-                        mIsWatching = !mIsWatching;
+                        mIsWatching = result;
                     }
                     getActivity().invalidateOptionsMenu();
                 }, error -> {

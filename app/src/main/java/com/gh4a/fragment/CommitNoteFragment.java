@@ -312,7 +312,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
     private void deleteComment(long id) {
         RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class, false);
         service.deleteCommitComment(mRepoOwner, mRepoName, id)
-                .map(ApiHelpers::throwOnFailure)
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
                         R.string.deleting_msg, R.string.error_delete_comment))
                 .subscribe(result -> refreshComments(),

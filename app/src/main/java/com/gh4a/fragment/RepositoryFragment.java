@@ -485,23 +485,25 @@ public class RepositoryFragment extends LoadingFragmentBase implements
     private void toggleWatchingState() {
         WatchingService service = ServiceFactory.get(WatchingService.class, false);
         final String repoOwner = mRepository.owner().login(), repoName = mRepository.name();
-        final Single<?> responseSingle;
+        final Single<Boolean> responseSingle;
 
         if (mIsWatching) {
             responseSingle = service.deleteRepositorySubscription(repoOwner, repoName)
-                    .map(ApiHelpers::throwOnFailure);
+                    .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                    .map(result -> false);
         } else {
             SubscriptionRequest request = SubscriptionRequest.builder()
                     .subscribed(true)
                     .build();
             responseSingle = service.setRepositorySubscription(repoOwner, repoName, request)
-                    .map(ApiHelpers::throwOnFailure);
+                    .map(ApiHelpers::throwOnFailure)
+                    .map(sub -> sub.subscribed());
         }
 
         responseSingle.compose(RxUtils::doInBackground)
                 .subscribe(result -> {
                     if (mIsWatching != null) {
-                        mIsWatching = !mIsWatching;
+                        mIsWatching = result;
                         mRepository = mRepository.toBuilder()
                                 .subscribersCount(mRepository.subscribersCount() + (mIsWatching ? 1 : -1))
                                 .build();

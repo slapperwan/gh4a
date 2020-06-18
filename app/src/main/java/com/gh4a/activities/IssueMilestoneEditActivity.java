@@ -383,7 +383,7 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
     private void deleteMilestone() {
         IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
         service.deleteMilestone(mRepoOwner, mRepoName, mMilestone.number())
-                .map(ApiHelpers::throwOnFailure)
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg, R.string.issue_error_delete_milestone))
                 .subscribe(result -> {
                     setResult(RESULT_OK);

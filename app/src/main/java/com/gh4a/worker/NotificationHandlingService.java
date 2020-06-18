@@ -10,6 +10,7 @@ import android.util.Log;
 import com.gh4a.Gh4Application;
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.home.HomeActivity;
+import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.request.NotificationReadRequest;
 import com.meisolsson.githubsdk.service.activity.NotificationService;
 
@@ -107,7 +108,9 @@ public class NotificationHandlingService extends IntentService {
                 .lastReadAt(new Date(timestamp))
                 .build();
         try {
-            service.markAllRepositoryNotificationsRead(repoOwner, repoName, request).blockingGet();
+            service.markAllRepositoryNotificationsRead(repoOwner, repoName, request)
+                    .map(ApiHelpers::mapToTrueOnSuccess)
+                    .blockingGet();
         } catch (Exception e) {
             Log.w(Gh4Application.LOG_TAG,
                     "Could not mark repo \"" + repoOwner + "/" + repoName + "\" as read", e);
