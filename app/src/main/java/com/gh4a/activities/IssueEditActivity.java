@@ -593,8 +593,14 @@ public class IssueEditActivity extends BasePagerActivity implements
                         if (templates.size() == 1) {
                             handleIssueTemplateSelected(templates.get(0));
                         } else {
+                            List<IssueTemplate> namedTemplates = new ArrayList<>();
+                            for (IssueTemplate t : templates) {
+                                if (t.name != null) {
+                                    namedTemplates.add(t);
+                                }
+                            }
                             IssueTemplateSelectionDialogFragment f =
-                                    IssueTemplateSelectionDialogFragment.newInstance(templates);
+                                    IssueTemplateSelectionDialogFragment.newInstance(namedTemplates);
                             f.show(getSupportFragmentManager(), "template-selection");
                         }
                     } else {
@@ -674,7 +680,6 @@ public class IssueEditActivity extends BasePagerActivity implements
                     }
                     return Flowable.fromIterable(result)
                             .flatMap(flowable -> flowable.toFlowable())
-                            .filter(template -> template != null)
                             .toList();
                 }))
                 .compose(RxUtils::doInBackground)
@@ -685,7 +690,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         return service.getContents(mRepoOwner, mRepoName, content.path(), null)
             .map(ApiHelpers::throwOnFailure)
             .map(fileContent -> StringUtils.fromBase64(fileContent.content()))
-            .map(contentString -> IssueTemplate.parse(contentString))
+            .map(contentString -> new IssueTemplate(contentString))
             .compose(RxUtils::doInBackground);
     }
 
@@ -700,12 +705,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         final List<String> defaultLabels = new ArrayList<>();
         final List<String> defaultAssignees = new ArrayList<>();
 
-        public static IssueTemplate parse(String contentString) {
-            IssueTemplate t = new IssueTemplate(contentString);
-            return t.name != null ? t : null;
-        }
-
-        private IssueTemplate(String contentString) {
+        IssueTemplate(String contentString) {
             Matcher matcher = FRONT_MATTER_PATTERN.matcher(contentString);
             if (matcher.matches()) {
                 content = matcher.group(6);
