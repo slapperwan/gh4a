@@ -51,7 +51,6 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
     }
 
     private static final int REQUEST_COMMIT = 2000;
-    private static final int MENU_SELECT_AS_BASE = Menu.FIRST + 2;
 
     private String mRepoOwner;
     private String mRepoName;
@@ -126,7 +125,7 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        menu.add(Menu.NONE, MENU_SELECT_AS_BASE, Menu.NONE, R.string.commit_use_as_ref);
+        menu.add(Menu.NONE, R.id.select_as_branch_ref, Menu.NONE, R.string.commit_use_as_ref);
     }
 
     @Override
@@ -137,7 +136,7 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
             return false;
         }
 
-        if (item.getItemId() == MENU_SELECT_AS_BASE) {
+        if (item.getItemId() == R.id.select_as_branch_ref) {
             Commit commit = mAdapter.getItemFromAdapterPosition(info.position);
             mCallback.onCommitSelectedAsBase(commit);
             return true;

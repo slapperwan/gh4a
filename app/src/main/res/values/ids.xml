@@ -3,4 +3,9 @@
     <item name="search_match_index" type="id" />
     <item name="review_comment_id" type="id" />
     <item name="detach" type="id" />
+
+    <!-- context menu items -->
+    <item name="select_as_branch_ref" type="id" />
+    <item name="history" type="id" />
+    <item name="download" type="id" />
 </resources>

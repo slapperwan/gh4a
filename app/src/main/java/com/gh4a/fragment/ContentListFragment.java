@@ -54,8 +54,6 @@ import io.reactivex.Single;
 
 public class ContentListFragment extends ListDataBaseFragment<Content> implements
         RootAdapter.OnItemClickListener<Content> {
-    private static final int MENU_HISTORY = Menu.FIRST + 1;
-    private static final int MENU_DOWNLOAD = Menu.FIRST + 2;
     private static final int REQUEST_FILE_HISTORY = 1000;
 
     private static final Comparator<Content> COMPARATOR = (lhs, rhs) -> {
@@ -155,10 +153,10 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
         Set<String> subModules = mCallback.getSubModuleNames(this);
 
         if (subModules == null || !subModules.contains(contents.name())) {
-            menu.add(Menu.NONE, MENU_HISTORY, Menu.NONE, R.string.history);
+            menu.add(Menu.NONE, R.id.history, Menu.NONE, R.string.history);
         }
         if (contents.type() == ContentType.File) {
-            menu.add(Menu.NONE, MENU_DOWNLOAD, Menu.NONE, R.string.download);
+            menu.add(Menu.NONE, R.id.download, Menu.NONE, R.string.download);
         }
     }
 
@@ -173,13 +171,13 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
         Content contents = mAdapter.getItemFromAdapterPosition(info.position);
 
         switch (item.getItemId()) {
-            case MENU_HISTORY:
+            case R.id.history:
                 Intent intent = CommitHistoryActivity.makeIntent(getActivity(),
                         mRepository.owner().login(), mRepository.name(),
                         mRef, contents.path(), true);
                 startActivityForResult(intent, REQUEST_FILE_HISTORY);
                 return true;
-            case MENU_DOWNLOAD:
+            case R.id.download:
                 String url = IntentUtils.createRawFileUrl(mRepository.owner().login(),
                         mRepository.name(), mRef, contents.path());
                 UiUtils.enqueueDownloadWithPermissionCheck(getBaseActivity(),
