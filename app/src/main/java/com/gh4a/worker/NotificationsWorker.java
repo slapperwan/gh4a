@@ -40,6 +40,7 @@ import com.gh4a.model.NotificationHolder;
 import com.gh4a.model.NotificationListLoadResult;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.SingleFactory;
+import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.NotificationThread;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.User;
@@ -109,7 +110,7 @@ public class NotificationsWorker extends Worker {
         String idString = String.valueOf(id);
 
         synchronized (sPrefsLock) {
-            Set<String> lastShownRepoIds = prefs.getStringSet(KEY_LAST_SHOWN_REPO_IDS, null);
+            Set<String> lastShownRepoIds = StringUtils.getEditableStringSetFromPrefs(prefs, KEY_LAST_SHOWN_REPO_IDS);
             if (lastShownRepoIds != null && lastShownRepoIds.contains(idString)) {
                 lastShownRepoIds.remove(idString);
                 if (lastShownRepoIds.isEmpty()) {
@@ -155,7 +156,8 @@ public class NotificationsWorker extends Worker {
                     SettingsFragment.PREF_NAME, Context.MODE_PRIVATE);
             long lastCheck = prefs.getLong(KEY_LAST_NOTIFICATION_CHECK, 0);
             long lastSeen = prefs.getLong(KEY_LAST_NOTIFICATION_SEEN, 0);
-            Set<String> lastShownRepoIds = prefs.getStringSet(KEY_LAST_SHOWN_REPO_IDS, null);
+            Set<String> lastShownRepoIds =
+                    StringUtils.getEditableStringSetFromPrefs(prefs, KEY_LAST_SHOWN_REPO_IDS);
             Set<String> newShownRepoIds = new HashSet<>();
             boolean hasUnseenNotification = false, hasNewNotification = false;
 

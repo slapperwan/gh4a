@@ -16,6 +16,7 @@
 package com.gh4a.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +30,8 @@ import com.gh4a.widget.StyleableTextView;
 import com.meisolsson.githubsdk.model.User;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -177,5 +180,10 @@ public class StringUtils {
 
     public static String fromBase64(String encoded) {
         return new String(Base64.decode(encoded, Base64.DEFAULT));
+    }
+
+    public static Set<String> getEditableStringSetFromPrefs(SharedPreferences prefs, String key) {
+        final Set<String> value = prefs.getStringSet(key, null);
+        return value != null ? new HashSet<>(value) : new HashSet<>();
     }
 }

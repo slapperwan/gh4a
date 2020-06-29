@@ -23,6 +23,7 @@ import android.os.Build;
 import android.util.LongSparseArray;
 
 import com.gh4a.fragment.SettingsFragment;
+import com.gh4a.utils.StringUtils;
 import com.gh4a.worker.NotificationsWorker;
 import com.meisolsson.githubsdk.model.User;
 import com.tspoon.traceur.Traceur;
@@ -196,7 +197,7 @@ public class Gh4Application extends MultiDexApplication implements
     public void addAccount(User user, String token) {
         SharedPreferences prefs = getPrefs();
         String login = user.login();
-        Set<String> logins = prefs.getStringSet(KEY_ALL_LOGINS, null);
+        final Set<String> logins = StringUtils.getEditableStringSetFromPrefs(prefs, KEY_ALL_LOGINS);
         logins.add(login);
 
         prefs.edit()
@@ -232,7 +233,7 @@ public class Gh4Application extends MultiDexApplication implements
             return;
         }
 
-        Set<String> logins = getPrefs().getStringSet(KEY_ALL_LOGINS, null);
+        Set<String> logins = StringUtils.getEditableStringSetFromPrefs(getPrefs(), KEY_ALL_LOGINS);
         logins.remove(login);
 
         getPrefs().edit()
