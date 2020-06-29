@@ -60,12 +60,11 @@ public class IssueLabelListActivity extends BaseActivity implements
     private String mRepoName;
     private boolean mParentIsPullRequest;
     private EditActionMode mActionMode;
-    private IssueLabelAdapter.EditableLabel mAddedLabel;
+    private IssueLabelAdapter.EditableLabel mPendingEditingLabel;
 
     private FloatingActionButton mFab;
     private IssueLabelAdapter mAdapter;
 
-    private static final String STATE_KEY_ADDED_LABEL = "added_label";
     private static final String STATE_KEY_EDITING_LABEL = "editing_label";
 
     @Override
@@ -94,24 +93,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         loadLabels(false);
 
         if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(STATE_KEY_ADDED_LABEL)) {
-                mAddedLabel = savedInstanceState.getParcelable(STATE_KEY_EDITING_LABEL);
-                mAdapter.add(mAddedLabel);
-                startEditing(mAddedLabel);
-            } else if (savedInstanceState.containsKey(STATE_KEY_EDITING_LABEL)) {
-                IssueLabelAdapter.EditableLabel label =
-                        savedInstanceState.getParcelable(STATE_KEY_EDITING_LABEL);
-                int count = mAdapter.getCount();
-                for (int i = 0; i < count; i++) {
-                    IssueLabelAdapter.EditableLabel item = mAdapter.getItem(i);
-                    if (item.name().equals(label.name())) {
-                        item.editedName = label.editedName;
-                        item.editedColor = label.editedColor;
-                        startEditing(item);
-                        break;
-                    }
-                }
-            }
+            mPendingEditingLabel = savedInstanceState.getParcelable(STATE_KEY_EDITING_LABEL);
         }
     }
 
@@ -154,11 +136,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mActionMode != null) {
-            if (mAddedLabel != null) {
-                outState.putParcelable(STATE_KEY_ADDED_LABEL, mAddedLabel);
-            } else {
-                outState.putParcelable(STATE_KEY_EDITING_LABEL, mActionMode.mLabel);
-            }
+            outState.putParcelable(STATE_KEY_EDITING_LABEL, mActionMode.mLabel);
         }
     }
 
@@ -177,10 +155,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     @Override
     public void onClick(View view) {
         if (mActionMode == null) {
-            mAddedLabel = new IssueLabelAdapter.EditableLabel("dddddd");
-            mAdapter.add(mAddedLabel);
-            mAdapter.notifyDataSetChanged();
-            startEditing(mAddedLabel);
+            startEditing(addOrGetNewLabelItem());
         }
     }
 
@@ -189,6 +164,21 @@ public class IssueLabelListActivity extends BaseActivity implements
         IssueLabelAdapter.EditableLabel label = (IssueLabelAdapter.EditableLabel) data;
         deleteLabel(label);
     }
+
+    public IssueLabelAdapter.EditableLabel addOrGetNewLabelItem() {
+        int size = mAdapter.getCount();
+        for (int i = 0; i < size; i++) {
+            IssueLabelAdapter.EditableLabel label = mAdapter.getItem(i);
+            if (label.newlyAdded) {
+                return label;
+            }
+        }
+        IssueLabelAdapter.EditableLabel newLabel = new IssueLabelAdapter.EditableLabel("dddddd");
+        mAdapter.add(newLabel);
+        mAdapter.notifyDataSetChanged();
+        return newLabel;
+    }
+
 
     private void startEditing(IssueLabelAdapter.EditableLabel label) {
         mActionMode = new EditActionMode(label);
@@ -216,7 +206,7 @@ public class IssueLabelListActivity extends BaseActivity implements
                     .setIcon(R.drawable.menu_save)
                     .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
 
-            if (mLabel != mAddedLabel) {
+            if (!mLabel.newlyAdded) {
                 menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, R.string.delete)
                         .setIcon(R.drawable.menu_delete)
                         .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -234,7 +224,7 @@ public class IssueLabelListActivity extends BaseActivity implements
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
             case Menu.FIRST:
-                if (mLabel == mAddedLabel) {
+                if (mLabel.newlyAdded) {
                     addLabel(mLabel);
                 } else {
                     editLabel(mLabel);
@@ -257,15 +247,39 @@ public class IssueLabelListActivity extends BaseActivity implements
         public void onDestroyActionMode(ActionMode mode) {
             mActionMode = null;
             mLabel.isEditing = false;
-            if (mLabel == mAddedLabel) {
+            if (mLabel.newlyAdded) {
                 mAdapter.remove(mLabel);
-                mAddedLabel = null;
             } else {
                 mLabel.restoreOriginalProperties();
             }
             mAdapter.notifyDataSetChanged();
             updateFabVisibility();
         }
+    }
+
+    private void applyPendingEditedLabel() {
+        if (mPendingEditingLabel == null) {
+            return;
+        }
+        IssueLabelAdapter.EditableLabel label = null;
+        if (mPendingEditingLabel.newlyAdded) {
+            label = addOrGetNewLabelItem();
+        } else {
+            int count = mAdapter.getCount();
+            for (int i = 0; i < count; i++) {
+                IssueLabelAdapter.EditableLabel item = mAdapter.getItem(i);
+                if (item.name().equals(mPendingEditingLabel.name())) {
+                    label = item;
+                    break;
+                }
+            }
+        }
+        if (label != null) {
+            label.editedColor = mPendingEditingLabel.editedColor;
+            label.editedName = mPendingEditingLabel.editedName;
+            startEditing(label);
+        }
+        mPendingEditingLabel = null;
     }
 
     private void deleteLabel(IssueLabelAdapter.EditableLabel label) {
@@ -310,7 +324,6 @@ public class IssueLabelListActivity extends BaseActivity implements
                 .map(ApiHelpers::throwOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(this, R.string.saving_msg, errorMessage))
                 .subscribe(result -> {
-                    mAddedLabel = null;
                     loadLabels(true);
                     setResult(RESULT_OK);
                 }, error -> handleActionFailure("Adding label failed", error));
@@ -326,6 +339,7 @@ public class IssueLabelListActivity extends BaseActivity implements
                     UiUtils.hideImeForView(getCurrentFocus());
                     mAdapter.clear();
                     mAdapter.addAll(result);
+                    applyPendingEditedLabel();
                     setContentShown(true);
                 }, this::handleLoadFailure);
     }
