@@ -79,11 +79,15 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setContentShown(false);
-        loadNotifications(false);
-        NotificationsWorker.markNotificationsAsSeen(getActivity());
+    public void onStart() {
+        super.onStart();
+        long lastCheck = NotificationsWorker.getLastCheckTimestamp(getActivity());
+        long lastFetch = mNotificationsLoadTime != null ? mNotificationsLoadTime.getTime() : 0;
+        if (lastFetch == 0 || (lastCheck != 0 && lastCheck > lastFetch)) {
+            setContentShown(false);
+            loadNotifications(false);
+            NotificationsWorker.markNotificationsAsSeen(getActivity());
+        }
     }
 
     @Override

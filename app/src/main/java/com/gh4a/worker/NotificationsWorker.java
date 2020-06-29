@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat;
 import androidx.work.Constraints;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 import androidx.work.Worker;
@@ -97,16 +98,25 @@ public class NotificationsWorker extends Worker {
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
 
-        context.getSharedPreferences(SettingsFragment.PREF_NAME, Context.MODE_PRIVATE)
-                .edit()
-                .putLong(KEY_LAST_NOTIFICATION_SEEN, System.currentTimeMillis())
-                .putStringSet(KEY_LAST_SHOWN_REPO_IDS, null)
-                .apply();
+        synchronized (sPrefsLock) {
+            getPrefs(context)
+                    .edit()
+                    .putLong(KEY_LAST_NOTIFICATION_SEEN, System.currentTimeMillis())
+                    .putStringSet(KEY_LAST_SHOWN_REPO_IDS, null)
+                    .apply();
+        }
+    }
+
+    public static long getLastCheckTimestamp(Context context) {
+        SharedPreferences prefs = getPrefs(context);
+        if (!prefs.getBoolean(SettingsFragment.KEY_NOTIFICATIONS, false)) {
+            return 0;
+        }
+        return prefs.getLong(KEY_LAST_NOTIFICATION_CHECK, 0);
     }
 
     public static void handleNotificationDismiss(Context context, int id) {
-        SharedPreferences prefs =
-                context.getSharedPreferences(SettingsFragment.PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = getPrefs(context);
         String idString = String.valueOf(id);
 
         synchronized (sPrefsLock) {
@@ -152,8 +162,7 @@ public class NotificationsWorker extends Worker {
         }
 
         synchronized (sPrefsLock) {
-            SharedPreferences prefs = getApplicationContext().getSharedPreferences(
-                    SettingsFragment.PREF_NAME, Context.MODE_PRIVATE);
+            SharedPreferences prefs = getPrefs(getApplicationContext());
             long lastCheck = prefs.getLong(KEY_LAST_NOTIFICATION_CHECK, 0);
             long lastSeen = prefs.getLong(KEY_LAST_NOTIFICATION_SEEN, 0);
             Set<String> lastShownRepoIds =
@@ -390,5 +399,9 @@ public class NotificationsWorker extends Worker {
         canvas.drawBitmap(avatar, rect, rect, paint);
 
         return output;
+    }
+
+    private static SharedPreferences getPrefs(Context context) {
+        return context.getSharedPreferences(SettingsFragment.PREF_NAME, Context.MODE_PRIVATE);
     }
 }
