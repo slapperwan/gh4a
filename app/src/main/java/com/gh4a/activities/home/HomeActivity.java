@@ -424,7 +424,12 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
         if (!closeDrawers() && fm.getBackStackEntryCount() > 0) {
             fm.popBackStack();
         } else {
-            super.onBackPressed();
+            int initialPage = determineInitialPage();
+            if (mSelectedFactoryId != initialPage) {
+                switchTo(initialPage, getFactoryForItem(initialPage));
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
