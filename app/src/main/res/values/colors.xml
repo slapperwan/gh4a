@@ -6,7 +6,7 @@
 
     <color name="label_fg_dark">#ff000000</color>
     <color name="label_fg_light">#fff3f3f3</color>
-    <color name="label_fg">@color/label_fg_light</color>
+    <color name="label_fg">@color/label_fg_dark</color>
 
     <color name="issue_open">#65b345</color>
     <color name="issue_closed">#b34545</color>

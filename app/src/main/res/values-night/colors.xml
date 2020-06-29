@@ -4,7 +4,7 @@
     <color name="primary_dark">#2d501e</color>
     <color name="accent">#559639</color>
 
-    <color name="label_fg">@color/label_fg_dark</color>
+    <color name="label_fg">@color/label_fg_light</color>
 
     <color name="issue_open">#396426</color>
     <color name="issue_closed">#642626</color>
