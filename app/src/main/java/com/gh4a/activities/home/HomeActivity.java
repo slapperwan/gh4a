@@ -549,6 +549,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 .putString("last_selected_home_page", START_PAGE_MAPPING.get(mSelectedFactoryId))
                 .apply();
 
+        setErrorViewVisibility(false, null);
         updateRightNavigationDrawer();
         super.supportInvalidateOptionsMenu();
         getSupportFragmentManager().popBackStackImmediate(null,
