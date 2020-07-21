@@ -18,6 +18,8 @@ package com.gh4a.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.PluralsRes;
+import androidx.core.content.ContextCompat;
+
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -146,7 +148,7 @@ public class UserFragment extends LoadingFragmentBase implements
 
         mFollowersRow.setVisibility(isUser ? View.VISIBLE : View.GONE);
         followingRow.setVisibility(isUser ? View.VISIBLE : View.GONE);
-        membersRow.setVisibility(isUser ? View.GONE : View.VISIBLE);
+        membersRow.setVisibility(mUser.type() == UserType.Organization ? View.VISIBLE : View.GONE);
 
         if (isUser) {
             mFollowersRow.setIconClickListener(canFollowUser() ? this : null);
@@ -175,12 +177,28 @@ public class UserFragment extends LoadingFragmentBase implements
         reposRow.setText(getResources().getQuantityString(R.plurals.repository, repoCount, repoCount));
         reposRow.setClickIntent(RepositoryListActivity.makeIntent(getActivity(), mUser.login(), !isUser));
 
+        OverviewRow typeRow = mContentView.findViewById(R.id.type_row);
+        switch (mUser.type()) {
+            case User:
+                typeRow.setVisibility(View.GONE);
+                break;
+            case Organization:
+                typeRow.setText(getString(R.string.user_type_org));
+                typeRow.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.icon_user_org));
+                typeRow.setVisibility(View.VISIBLE);
+                break;
+            case Bot:
+                typeRow.setText(getString(R.string.user_type_bot));
+                typeRow.setIcon(ContextCompat.getDrawable(getActivity(), R.drawable.icon_user_bot));
+                typeRow.setVisibility(View.VISIBLE);
+                break;
+        }
+
         TextView tvName = mContentView.findViewById(R.id.tv_name);
-        String name = StringUtils.isBlank(mUser.name()) ? mUser.login() : mUser.name();
-        if (mUser.type() == UserType.Organization) {
-            tvName.setText(getString(R.string.org_user_template, name));
+        if (StringUtils.isBlank(mUser.name())) {
+            tvName.setText(ApiHelpers.getUserLogin(getActivity(), mUser));
         } else {
-            tvName.setText(name);
+            tvName.setText(mUser.name());
         }
 
         fillTextView(R.id.tv_email, mUser.email());

@@ -356,7 +356,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         ivGravatar.setOnClickListener(this);
 
         TextView tvExtra = mListHeaderView.findViewById(R.id.tv_extra);
-        tvExtra.setText(ApiHelpers.getUserLogin(getActivity(), mIssue.user()));
+        tvExtra.setText(ApiHelpers.getUserLoginWithType(getActivity(), mIssue.user()));
         tvExtra.setOnClickListener(this);
         tvExtra.setTag(mIssue.user());
 

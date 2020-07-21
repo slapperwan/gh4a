@@ -53,7 +53,7 @@ public class IssueAdapter extends RootAdapter<Issue, IssueAdapter.ViewHolder> {
         holder.lvLabels.setLabels(issue.labels());
         holder.tvNumber.setText("#" + issue.number());
         holder.tvDesc.setText(issue.title());
-        holder.tvCreator.setText(ApiHelpers.getUserLogin(mContext, issue.user()));
+        holder.tvCreator.setText(ApiHelpers.getUserLoginWithType(mContext, issue.user()));
         holder.tvTimestamp.setText(StringUtils.formatRelativeTime(mContext,
                 issue.createdAt(), true));
 

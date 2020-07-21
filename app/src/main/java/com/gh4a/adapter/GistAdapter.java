@@ -51,7 +51,7 @@ public class GistAdapter extends RootAdapter<Gist, GistAdapter.ViewHolder> {
         if (isSelf) {
             holder.tvCreator.setVisibility(View.GONE);
         } else {
-            holder.tvCreator.setText(ApiHelpers.getUserLogin(mContext, user));
+            holder.tvCreator.setText(ApiHelpers.getUserLoginWithType(mContext, user));
             holder.tvCreator.setVisibility(View.VISIBLE);
         }
 

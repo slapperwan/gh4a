@@ -193,9 +193,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         if (notificationHolder.notification == null) {
             final Repository repository = notificationHolder.repository;
 
-            String login = ApiHelpers.getUserLogin(getActivity(), repository.owner());
             String title = getString(R.string.mark_repository_as_read_question,
-                    login + "/" + repository.name());
+                    ApiHelpers.formatRepoName(getActivity(), repository));
 
             ConfirmationDialogFragment.show(this, title,
                     R.string.mark_as_read, repository, "markreadconfirm");

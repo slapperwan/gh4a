@@ -2,10 +2,17 @@ package com.gh4a.utils;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 
 import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
@@ -17,6 +24,7 @@ import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.SearchPage;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.UserType;
 import com.meisolsson.githubsdk.model.git.GitUser;
 
 import java.net.HttpURLConnection;
@@ -94,9 +102,31 @@ public class ApiHelpers {
 
     public static String getUserLogin(Context context, User user) {
         if (user != null && user.login() != null) {
+            if (user.type() == UserType.Bot && user.login().endsWith("[bot]")) {
+                return user.login().substring(0, user.login().length() - 5);
+            }
             return user.login();
         }
         return context.getString(R.string.deleted);
+    }
+
+    public static SpannableStringBuilder getUserLoginWithType(Context context, User user) {
+        return getUserLoginWithType(context, user, false);
+    }
+
+    public static SpannableStringBuilder getUserLoginWithType(Context context, User user, boolean boldifyLogin) {
+        final SpannableStringBuilder builder = new SpannableStringBuilder(getUserLogin(context, user));
+        if (boldifyLogin) {
+            builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(), 0);
+        }
+        if (user != null && user.type() == UserType.Bot) {
+            int pos = builder.length();
+            builder.append(" (").append(context.getString(R.string.user_type_bot)).append(")");
+            builder.setSpan(new RelativeSizeSpan(0.85f), pos, builder.length(), 0);
+            int color = UiUtils.resolveColor(context, android.R.attr.textColorSecondary);
+            builder.setSpan(new ForegroundColorSpan(color), pos, builder.length(), 0);
+        }
+        return builder;
     }
 
     public static String formatRepoName(Context context, Repository repository) {

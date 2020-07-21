@@ -391,7 +391,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
                     convertView.setTag(mOwnReaction);
                 } else {
                     avatar.setAlpha(1.0f);
-                    name.setText(ApiHelpers.getUserLogin(mContext, user));
+                    name.setText(ApiHelpers.getUserLoginWithType(mContext, user));
                     convertView.setTag(user);
                 }
             }

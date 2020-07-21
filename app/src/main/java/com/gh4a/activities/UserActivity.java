@@ -58,6 +58,9 @@ public class UserActivity extends BaseFragmentPagerActivity {
     @Nullable
     @Override
     protected String getActionBarTitle() {
+        if (mUserLogin != null && mUserLogin.endsWith("[bot]")) {
+            return mUserLogin.substring(0, mUserLogin.length() - 5);
+        }
         return mUserLogin;
     }
 

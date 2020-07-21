@@ -17,12 +17,10 @@ package com.gh4a.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.net.Uri;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
-import android.text.SpannableString;
-import android.text.style.StyleSpan;
+import android.text.SpannableStringBuilder;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -167,7 +165,6 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     @Override
     public void onBindViewHolder(ViewHolder holder, GitComment item) {
         final User user = item.user();
-        final String login = ApiHelpers.getUserLogin(mContext, user);
         final Date createdAt = item.createdAt();
         final Date updatedAt = item.updatedAt();
 
@@ -186,9 +183,8 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
 
         mImageGetter.bind(holder.tvDesc, item.bodyHtml(), item.id());
 
-        SpannableString userName = new SpannableString(login);
-        userName.setSpan(new StyleSpan(Typeface.BOLD), 0, userName.length(), 0);
-        holder.tvExtra.setText(userName);
+        final SpannableStringBuilder login = ApiHelpers.getUserLoginWithType(mContext, user, true);
+        holder.tvExtra.setText(login);
         holder.tvExtra.setTag(user);
 
         holder.reactions.setReactions(item.reactions());

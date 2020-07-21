@@ -110,7 +110,7 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
         TooltipCompat.setTooltipText(mIcon, active ? mActionHintChecked : mActionHintUnchecked);
     }
 
-    private void setIcon(Drawable icon) {
+    public void setIcon(Drawable icon) {
         if (icon == null) {
             mIcon.setVisibility(View.GONE);
         } else {

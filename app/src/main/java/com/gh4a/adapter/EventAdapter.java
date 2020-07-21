@@ -93,7 +93,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
         AvatarHandler.assignAvatar(holder.ivGravatar, actor);
         holder.ivGravatar.setTag(actor);
 
-        holder.tvActor.setText(ApiHelpers.getUserLogin(mContext, actor));
+        holder.tvActor.setText(ApiHelpers.getUserLoginWithType(mContext, actor));
 
         StringUtils.applyBoldTagsAndSetText(holder.tvTitle, formatTitle(event));
         holder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
