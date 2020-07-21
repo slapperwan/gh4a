@@ -199,7 +199,7 @@ public class ContentListContainerFragment extends Fragment implements
             return;
         }
         mCacheFragment.addToCache(fragment.getPath(), contents);
-        if (fragment.getPath() == null) {
+        if (TextUtils.isEmpty(fragment.getPath())) {
             for (Content content : contents) {
                 if (content.type() == ContentType.File && content.name().equals(".gitmodules")) {
                     loadModuleMap();
@@ -255,7 +255,7 @@ public class ContentListContainerFragment extends Fragment implements
             return null;
         }
 
-        String prefix = fragment.getPath() == null ? null : (fragment.getPath() + "/");
+        String prefix = TextUtils.isEmpty(fragment.getPath()) ? null : fragment.getPath() + "/";
         Set<String> names = new HashSet<>();
         for (String name : mGitModuleMap.keySet()) {
             if (prefix == null && !name.contains("/")) {

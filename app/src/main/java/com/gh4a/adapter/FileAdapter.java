@@ -66,7 +66,6 @@ public class FileAdapter extends RootAdapter<Content, FileAdapter.ViewHolder> {
     }
 
     private int getIconId(ContentType type, String fileName) {
-        int iconId;
         if (mSubModuleNames != null && mSubModuleNames.contains(fileName)) {
             return R.drawable.submodule;
         } else if (type == ContentType.Directory) {
