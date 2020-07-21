@@ -14,6 +14,7 @@ import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Page;
+import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.SearchPage;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.git.GitUser;
@@ -95,7 +96,14 @@ public class ApiHelpers {
         if (user != null && user.login() != null) {
             return user.login();
         }
-        return context.getString(R.string.unknown);
+        return context.getString(R.string.deleted);
+    }
+
+    public static String formatRepoName(Context context, Repository repository) {
+        if (repository == null || TextUtils.isEmpty(repository.name())) {
+            return context.getString(R.string.deleted);
+        }
+        return getUserLogin(context, repository.owner()) + "/" + repository.name();
     }
 
     public static int colorForLabel(Label label) {

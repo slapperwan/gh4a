@@ -39,6 +39,7 @@ import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.model.NotificationHolder;
 import com.gh4a.model.NotificationListLoadResult;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.StringUtils;
@@ -218,7 +219,7 @@ public class NotificationsWorker extends Worker {
         final Context context = getApplicationContext();
         Repository repository = notifications.get(0).repository();
         final int id = repository.id().intValue();
-        String title = repository.owner().login() + "/" + repository.name();
+        String title = ApiHelpers.formatRepoName(getApplicationContext(), repository);
         // notifications are sorted by time descending
         long when = notifications.get(0).updatedAt().getTime();
         String text = context.getResources().getQuantityString(
@@ -325,8 +326,7 @@ public class NotificationsWorker extends Worker {
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle(builder)
                 .setBigContentTitle(text);
         for (List<NotificationThread> list : notificationsPerRepo) {
-            Repository repository = list.get(0).repository();
-            String repoName = repository.owner().login() + "/" + repository.name();
+            String repoName = ApiHelpers.formatRepoName(getApplicationContext(), list.get(0).repository());
             final TextAppearanceSpan notificationPrimarySpan =
                     new TextAppearanceSpan(context, R.style.TextAppearance_NotificationEmphasized);
             final int emphasisEnd;

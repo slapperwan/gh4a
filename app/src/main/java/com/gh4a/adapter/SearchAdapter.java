@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.fragment.SearchFragment;
+import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.SearchCode;
 import com.meisolsson.githubsdk.model.TextMatch;
@@ -93,7 +94,7 @@ public class SearchAdapter extends RootAdapter<Object, RecyclerView.ViewHolder> 
         public void onBindViewHolder(ViewHolder holder, SearchCode result) {
             Repository repo = result.repository();
             holder.tvTitle.setText(result.name());
-            holder.tvRepo.setText(repo.owner().login() + "/" + repo.name());
+            holder.tvRepo.setText(ApiHelpers.formatRepoName(mContext, repo));
 
             List<TextMatch> matches = result.textMatches();
             if (matches != null && !matches.isEmpty()) {

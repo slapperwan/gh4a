@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.model.NotificationHolder;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -137,9 +138,7 @@ public class NotificationAdapter extends
 
         if (item.notification == null) {
             holder.ivAction.setVisibility(item.isRead() ? View.GONE : View.VISIBLE);
-
-            Repository repository = item.repository;
-            holder.tvTitle.setText(repository.owner().login() + "/" + repository.name());
+            holder.tvTitle.setText(ApiHelpers.formatRepoName(mContext, item.repository));
 
             User owner = item.repository.owner();
             AvatarHandler.assignAvatar(holder.ivAvatar, owner);

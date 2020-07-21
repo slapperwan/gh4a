@@ -170,7 +170,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
 
             case ForkEvent: {
                 ForkPayload payload = (ForkPayload) event.payload();
-                return res.getString(R.string.event_fork_desc, formatToRepoName(payload.forkee()));
+                return res.getString(R.string.event_fork_desc, ApiHelpers.formatRepoName(mContext, payload.forkee()));
             }
 
             case GollumEvent: {
@@ -482,7 +482,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                     Repository repo = payload.repository();
                     if (repo != null) {
                         return res.getString(R.string.event_team_repo_add,
-                                formatToRepoName(repo), team.name());
+                                ApiHelpers.formatRepoName(mContext, repo), team.name());
                     }
                 }
                 break;
@@ -509,13 +509,6 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
     private String formatFromRepoIdentifier(GitHubEvent.RepoIdentifier repository) {
         if (repository != null) {
             return repository.repoWithUserName();
-        }
-        return mContext.getString(R.string.deleted);
-    }
-
-    private String formatToRepoName(Repository repository) {
-        if (repository != null && repository.owner() != null) {
-            return repository.owner().login() + "/" + repository.name();
         }
         return mContext.getString(R.string.deleted);
     }

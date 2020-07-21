@@ -250,7 +250,7 @@ public class UserFragment extends LoadingFragmentBase implements
                 rowView.setTag(repo);
 
                 TextView tvTitle = rowView.findViewById(R.id.tv_title);
-                tvTitle.setText(repo.owner().login() + "/" + repo.name());
+                tvTitle.setText(ApiHelpers.formatRepoName(getActivity(), repo));
 
                 TextView tvDesc = rowView.findViewById(R.id.tv_desc);
                 if (!StringUtils.isBlank(repo.description())) {

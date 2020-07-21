@@ -44,6 +44,7 @@ import com.gh4a.adapter.EventAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.resolver.CommitCommentLoadTask;
 import com.gh4a.resolver.PullRequestReviewCommentLoadTask;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
@@ -381,7 +382,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
                 ForkPayload payload = (ForkPayload) event.payload();
                 Repository forkee = payload.forkee();
                 if (forkee != null) {
-                    menu.add(getString(R.string.menu_fork, forkee.owner().login() + "/" + forkee.name()))
+                    menu.add(getString(R.string.menu_fork, ApiHelpers.formatRepoName(getActivity(), forkee)))
                             .setIntent(RepositoryActivity.makeIntent(getActivity(), forkee));
                 }
                 break;
