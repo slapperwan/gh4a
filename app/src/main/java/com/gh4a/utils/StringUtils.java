@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Base64;
 
 import com.gh4a.Gh4Application;
@@ -140,6 +142,15 @@ public class StringUtils {
             }
         }
         return ssb;
+    }
+
+    public static void addUserTypeSpan(Context context, SpannableStringBuilder builder,
+                                       int pos, String userType) {
+        builder.insert(pos, " (" + userType + ")");
+        int typeLength = userType.length() + 3;
+        builder.setSpan(new RelativeSizeSpan(0.85f), pos, pos + typeLength, 0);
+        int color = UiUtils.resolveColor(context, android.R.attr.textColorSecondary);
+        builder.setSpan(new ForegroundColorSpan(color), pos, pos + typeLength, 0);
     }
 
     @Nullable

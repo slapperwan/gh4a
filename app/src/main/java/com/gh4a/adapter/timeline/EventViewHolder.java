@@ -161,8 +161,8 @@ class EventViewHolder
                             ? R.string.issue_event_assigned
                             : R.string.issue_event_unassigned;
                     textBase = mContext.getString(textResId,
-                            ApiHelpers.getUserLogin(mContext, user),
-                            ApiHelpers.getUserLogin(mContext, event.assignee()));
+                            getUserLoginWithBotSuffix(user),
+                            getUserLoginWithBotSuffix(event.assignee()));
                 }
                 break;
             }
@@ -183,13 +183,13 @@ class EventViewHolder
                 textResId = event.event() == IssueEventType.Milestoned
                         ? R.string.issue_event_milestoned
                         : R.string.issue_event_demilestoned;
-                textBase = mContext.getString(textResId, ApiHelpers.getUserLogin(mContext, user),
-                        event.milestone().title());
+                textBase = mContext.getString(textResId,
+                        getUserLoginWithBotSuffix(user), event.milestone().title());
                 break;
             case Renamed: {
                 Rename rename = event.rename();
                 textBase = mContext.getString(R.string.issue_event_renamed,
-                        ApiHelpers.getUserLogin(mContext, user), rename.from(), rename.to());
+                        getUserLoginWithBotSuffix(user), rename.from(), rename.to());
                 break;
             }
             case ReviewRequested:
@@ -208,7 +208,7 @@ class EventViewHolder
                         ? R.string.pull_request_event_review_requested
                         : R.string.pull_request_event_review_request_removed;
                 textBase = mContext.getString(stringResId,
-                        ApiHelpers.getUserLogin(mContext, event.reviewRequester()), reviewerNames);
+                        getUserLoginWithBotSuffix(event.reviewRequester()), reviewerNames);
                 break;
             }
             case HeadRefDeleted:
@@ -222,7 +222,7 @@ class EventViewHolder
         }
 
         if (textBase == null) {
-            textBase = mContext.getString(textResId, ApiHelpers.getUserLogin(mContext, user));
+            textBase = mContext.getString(textResId, getUserLoginWithBotSuffix(user));
         }
         SpannableStringBuilder text = StringUtils.applyBoldTags(textBase, typefaceValue);
 
@@ -256,6 +256,12 @@ class EventViewHolder
             text.setSpan(new IssueLabelSpan(mContext, label, false), pos, pos + length, 0);
         }
 
+        pos = text.toString().indexOf("[bot]");
+        if (pos >= 0) {
+            text.delete(pos, pos + 5);
+            StringUtils.addUserTypeSpan(mContext, text, pos, mContext.getString(R.string.user_type_bot));
+        }
+
         CharSequence time = event.createdAt() != null
                 ? StringUtils.formatRelativeTime(mContext, event.createdAt(), true) : "";
 
@@ -280,5 +286,12 @@ class EventViewHolder
                 mContext.startActivity(intent);
             }
         }
+    }
+
+    private String getUserLoginWithBotSuffix(User user) {
+        if (user != null && user.login() != null) {
+            return user.login();
+        }
+        return mContext.getString(R.string.deleted);
     }
 }

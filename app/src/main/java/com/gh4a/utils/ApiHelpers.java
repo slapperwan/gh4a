@@ -7,11 +7,8 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.text.style.StyleSpan;
 
 import com.gh4a.ApiRequestException;
@@ -120,11 +117,8 @@ public class ApiHelpers {
             builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(), 0);
         }
         if (user != null && user.type() == UserType.Bot) {
-            int pos = builder.length();
-            builder.append(" (").append(context.getString(R.string.user_type_bot)).append(")");
-            builder.setSpan(new RelativeSizeSpan(0.85f), pos, builder.length(), 0);
-            int color = UiUtils.resolveColor(context, android.R.attr.textColorSecondary);
-            builder.setSpan(new ForegroundColorSpan(color), pos, builder.length(), 0);
+            StringUtils.addUserTypeSpan(context, builder, builder.length(),
+                    context.getString(R.string.user_type_bot));
         }
         return builder;
     }

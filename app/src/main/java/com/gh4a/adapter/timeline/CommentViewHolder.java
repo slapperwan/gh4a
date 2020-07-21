@@ -5,8 +5,6 @@ import android.content.Intent;
 import androidx.annotation.Nullable;
 
 import android.text.SpannableStringBuilder;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.RelativeSizeSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -146,11 +144,7 @@ class CommentViewHolder
 
         String association = getAuthorAssociation(item);
         if (association != null) {
-            int start = userName.length();
-            userName.append(" (").append(association).append(")");
-            userName.setSpan(new RelativeSizeSpan(0.85f), start, userName.length(), 0);
-            int color = UiUtils.resolveColor(mContext, android.R.attr.textColorSecondary);
-            userName.setSpan(new ForegroundColorSpan(color), start, userName.length(), 0);
+            StringUtils.addUserTypeSpan(mContext, userName, userName.length(), association);
         }
 
         tvExtra.setText(userName);
