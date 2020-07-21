@@ -427,6 +427,9 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
             int initialPage = determineInitialPage();
             if (mSelectedFactoryId != initialPage) {
                 switchTo(initialPage, getFactoryForItem(initialPage));
+                if (mLeftDrawerMenu != null) {
+                    mLeftDrawerMenu.findItem(initialPage).setChecked(true);
+                }
             } else {
                 super.onBackPressed();
             }
@@ -467,11 +470,16 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     }
 
     private int determineInitialPage() {
-        String initialPage = getIntent().hasExtra("initial_page")
-                ? getIntent().getStringExtra("initial_page")
-                : getPrefs().getString(SettingsFragment.KEY_START_PAGE, "newsfeed");
-        if (TextUtils.equals(initialPage, "last")) {
-            initialPage = getPrefs().getString("last_selected_home_page", "newsfeed");
+        final String initialPage;
+        if (getIntent().hasExtra("initial_page")) {
+            initialPage = getIntent().getStringExtra("initial_page");
+            // consider initial page passed via intent only once
+            getIntent().removeExtra("initial_page");
+        } else {
+            final String prefPage = getPrefs().getString(SettingsFragment.KEY_START_PAGE, "newsfeed");
+            initialPage = TextUtils.equals(prefPage, "last")
+                    ? getPrefs().getString("last_selected_home_page", "newsfeed")
+                    : prefPage;
         }
         for (int i = 0; i < START_PAGE_MAPPING.size(); i++) {
             if (TextUtils.equals(initialPage, START_PAGE_MAPPING.valueAt(i))) {
