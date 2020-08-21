@@ -38,6 +38,7 @@ import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.activities.RepositoryActivity;
+import com.gh4a.activities.ReviewActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
 import com.gh4a.adapter.EventAdapter;
@@ -75,6 +76,7 @@ import com.meisolsson.githubsdk.model.payload.IssueCommentPayload;
 import com.meisolsson.githubsdk.model.payload.IssuesPayload;
 import com.meisolsson.githubsdk.model.payload.PullRequestPayload;
 import com.meisolsson.githubsdk.model.payload.PullRequestReviewCommentPayload;
+import com.meisolsson.githubsdk.model.payload.PullRequestReviewPayload;
 import com.meisolsson.githubsdk.model.payload.PushPayload;
 import com.meisolsson.githubsdk.model.payload.ReleasePayload;
 
@@ -249,6 +251,13 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
                 PullRequestPayload payload = (PullRequestPayload) event.payload();
                 intent = PullRequestActivity.makeIntent(getActivity(),
                         repoOwner, repoName, payload.number());
+                break;
+            }
+
+            case PullRequestReviewEvent: {
+                PullRequestReviewPayload payload = (PullRequestReviewPayload) event.payload();
+                intent = ReviewActivity.makeIntent(getActivity(), repoOwner, repoName,
+                        payload.pullRequest().number(), payload.review(), null);
                 break;
             }
 
