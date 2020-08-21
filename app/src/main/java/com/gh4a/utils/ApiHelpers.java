@@ -98,11 +98,9 @@ public class ApiHelpers {
     }
 
     public static String getUserLogin(Context context, User user) {
-        if (user != null && user.login() != null) {
-            if (user.type() == UserType.Bot && user.login().endsWith("[bot]")) {
-                return user.login().substring(0, user.login().length() - 5);
-            }
-            return user.login();
+        User actualUser = adjustUserForBotSuffix(user);
+        if (actualUser.login() != null) {
+            return actualUser.login();
         }
         return context.getString(R.string.deleted);
     }
@@ -116,11 +114,26 @@ public class ApiHelpers {
         if (boldifyLogin) {
             builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(), 0);
         }
-        if (user != null && user.type() == UserType.Bot) {
+        final User actualUser = adjustUserForBotSuffix(user);
+        if (actualUser != null && actualUser.type() == UserType.Bot) {
             StringUtils.addUserTypeSpan(context, builder, builder.length(),
                     context.getString(R.string.user_type_bot));
         }
         return builder;
+    }
+
+    private static User adjustUserForBotSuffix(User user) {
+        final String login = user != null ? user.login() : null;
+        if (login != null && login.endsWith("[bot]")) {
+            UserType type = user.type();
+            if (type == null || type == UserType.Bot) {
+                return user.toBuilder()
+                        .login(login.substring(0, login.length() - 5))
+                        .type(UserType.Bot)
+                        .build();
+            }
+        }
+        return user;
     }
 
     public static String formatRepoName(Context context, Repository repository) {
