@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <com.gh4a.widget.IntegerListPreference
+        app:iconSpaceReserved="false"
         android:defaultValue="@integer/default_theme"
         android:entries="@array/theme_items"
         android:entryValues="@array/theme_values"
@@ -10,6 +12,7 @@
         android:title="@string/theme" />
 
     <ListPreference
+        app:iconSpaceReserved="false"
         android:defaultValue="newsfeed"
         android:entries="@array/start_page_items"
         android:entryValues="@array/start_page_values"
@@ -18,6 +21,7 @@
         android:title="@string/start_page" />
 
     <com.gh4a.widget.IntegerListPreference
+        app:iconSpaceReserved="false"
         android:defaultValue="2"
         android:entries="@array/text_size_items"
         android:entryValues="@array/text_size_values"
@@ -26,6 +30,7 @@
         android:title="@string/menu_text_size" />
 
     <com.gh4a.widget.IntegerListPreference
+        app:iconSpaceReserved="false"
         android:defaultValue="1"
         android:entries="@array/load_gif_mode_items"
         android:entryValues="@array/load_gif_mode_values"
@@ -34,11 +39,13 @@
         android:title="@string/menu_gif_load_mode" />
 
     <SwitchPreference
+        app:iconSpaceReserved="false"
         android:defaultValue="false"
         android:key="notifications"
         android:title="@string/notifications" />
 
     <com.gh4a.widget.IntegerListPreference
+        app:iconSpaceReserved="false"
         android:defaultValue="15"
         android:dependency="notifications"
         android:entries="@array/notification_interval_items"
@@ -48,10 +55,12 @@
         android:title="@string/notification_interval" />
 
     <Preference
+        app:iconSpaceReserved="false"
         android:key="about"
         android:title="@string/about" />
 
     <Preference
+        app:iconSpaceReserved="false"
         android:key="open_source_components"
         android:title="@string/open_source_components" />
 
