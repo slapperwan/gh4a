@@ -45,4 +45,11 @@
         android:layout_height="wrap_content"
         android:text="@string/feedback_by_gh4a"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <Button
+        android:id="@+id/btn_gh4a"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/source_code"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 </LinearLayout>

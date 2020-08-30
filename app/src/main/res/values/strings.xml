@@ -41,6 +41,7 @@
     <string name="my_web">http://slapperwan.github.com/gh4a</string>
     <string name="my_username">slapperwan</string>
     <string name="my_repo">gh4a</string>
+    <string name="source_code">Source Code</string>
     <string name="feedback_text">If you have any issues or suggestions, please contact me.  Any kind of feedback is greatly appreciated.</string>
     <string name="feedback_by_email">By Email</string>
     <string name="feedback_by_gh4a">By OctoDroid</string>
