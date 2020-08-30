@@ -461,12 +461,13 @@ public class HttpImageGetter {
                         bitmap = renderSvgToBitmap(mContext.getResources(), is, mWidth, mHeight);
                     } else {
                         boolean isGif = mime != null && mime.startsWith("image/gif");
-                        if (!isGif || canLoadGif()) {
+                        if ((isGif && canLoadGif()) || (!isGif && canLoadImage())) {
                             output = File.createTempFile("image", ".tmp", mCacheDir);
                             if (FileUtils.save(output, is)) {
                                 if (isGif) {
                                     GifDrawable d = new GifDrawable(output);
-                                    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                                    d.setBounds(0, 0, d.getIntrinsicWidth(),
+                                            d.getIntrinsicHeight());
                                     return d;
                                 } else {
                                     bitmap = getBitmap(output, mWidth, mHeight);
@@ -511,6 +512,20 @@ public class HttpImageGetter {
         SharedPreferences prefs = mContext.getSharedPreferences(SettingsFragment.PREF_NAME,
                 Context.MODE_PRIVATE);
         int mode = prefs.getInt(SettingsFragment.KEY_GIF_LOADING, 1);
+        switch (mode) {
+            case 1: // load via Wifi
+                return !UiUtils.downloadNeedsWarning(mContext);
+            case 2: // always load
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private boolean canLoadImage() {
+        SharedPreferences prefs = mContext.getSharedPreferences(SettingsFragment.PREF_NAME,
+                Context.MODE_PRIVATE);
+        int mode = prefs.getInt(SettingsFragment.KEY_IMAGE_LOADING, 2);
         switch (mode) {
             case 1: // load via Wifi
                 return !UiUtils.downloadNeedsWarning(mContext);

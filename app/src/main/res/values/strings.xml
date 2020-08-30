@@ -524,6 +524,7 @@
     <!-- Webview text size -->
     <string name="menu_text_size">Code view text size</string>
     <string name="menu_gif_load_mode">Animated GIF loading</string>
+    <string name="menu_image_load_mode">Image loading</string>
 
     <!-- Print document titles -->
     <string name="diff_print_document_title">Diff of file %1$s in commit %2$s in %3$s/%4$s</string>

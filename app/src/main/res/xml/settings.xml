@@ -26,9 +26,17 @@
         android:title="@string/menu_text_size" />
 
     <com.gh4a.widget.IntegerListPreference
+        android:defaultValue="2"
+        android:entries="@array/load_gif_images_mode_items"
+        android:entryValues="@array/load_gif_images_mode_values"
+        android:key="http_image_load_mode"
+        android:summary="%s"
+        android:title="@string/menu_image_load_mode" />
+
+    <com.gh4a.widget.IntegerListPreference
         android:defaultValue="1"
-        android:entries="@array/load_gif_mode_items"
-        android:entryValues="@array/load_gif_mode_values"
+        android:entries="@array/load_gif_images_mode_items"
+        android:entryValues="@array/load_gif_images_mode_values"
         android:key="http_gif_load_mode"
         android:summary="%s"
         android:title="@string/menu_gif_load_mode" />
