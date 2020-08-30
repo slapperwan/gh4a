@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.IssueListActivity;
+import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.worker.NotificationsWorker;
 import com.gh4a.widget.IntegerListPreference;
 
@@ -181,6 +182,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             } else {
                 newIssueButton.setVisibility(View.GONE);
             }
+
+            findViewById(R.id.btn_gh4a).setOnClickListener(this);
         }
 
         @Override
@@ -200,6 +203,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 context.startActivity(chooserIntent);
             } else if (id == R.id.btn_by_gh4a) {
                 Intent intent = IssueListActivity.makeIntent(context,
+                        context.getString(R.string.my_username),
+                        context.getString(R.string.my_repo));
+                context.startActivity(intent);
+            } else if (id == R.id.btn_gh4a) {
+                Intent intent = RepositoryActivity.makeIntent(context,
                         context.getString(R.string.my_username),
                         context.getString(R.string.my_repo));
                 context.startActivity(intent);
