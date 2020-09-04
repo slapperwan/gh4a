@@ -8,6 +8,7 @@ import com.gh4a.utils.Optional;
 import com.meisolsson.githubsdk.core.GitHubPaginationInterceptor;
 import com.meisolsson.githubsdk.core.ServiceGenerator;
 import com.meisolsson.githubsdk.core.StringResponseConverterFactory;
+import com.meisolsson.githubsdk.service.checks.ChecksService;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +52,9 @@ import retrofit2.http.Path;
 public class ServiceFactory {
     private static final String DEFAULT_HEADER_ACCEPT =
             "application/vnd.github.squirrel-girl-preview," // reactions API preview
-            + "application/vnd.github.antiope-preview+json" // checks API preview
+            + "application/vnd.github.v3.full+json";
+    private static final String CHECKS_API_HEADER_ACCEPT =
+            "application/vnd.github.antiope-preview," // checks API preview
             + "application/vnd.github.v3.full+json";
 
     private final static HttpLoggingInterceptor LOGGING_INTERCEPTOR = new HttpLoggingInterceptor()
@@ -183,8 +186,15 @@ public class ServiceFactory {
                                 .build());
                     }
                     if (original.header("Accept") == null) {
-                        requestBuilder.addHeader("Accept", acceptHeader != null
-                                ? acceptHeader : DEFAULT_HEADER_ACCEPT);
+                        final String header;
+                        if (acceptHeader != null) {
+                            header = acceptHeader;
+                        } else if (serviceClass == ChecksService.class) {
+                            header = CHECKS_API_HEADER_ACCEPT;
+                        } else {
+                            header = DEFAULT_HEADER_ACCEPT;
+                        }
+                        requestBuilder.addHeader("Accept", header);
                     }
 
                     return chain.proceed(requestBuilder.build());
