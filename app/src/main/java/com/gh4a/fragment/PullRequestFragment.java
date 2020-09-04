@@ -32,6 +32,7 @@ import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.EditIssueCommentActivity;
 import com.gh4a.activities.EditPullRequestCommentActivity;
+import com.gh4a.model.StatusWrapper;
 import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -40,6 +41,7 @@ import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.CommitStatusBox;
 import com.gh4a.widget.PullRequestBranchInfoView;
 
+import com.meisolsson.githubsdk.model.CheckRun;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.Issue;
@@ -53,6 +55,7 @@ import com.meisolsson.githubsdk.model.ReviewState;
 import com.meisolsson.githubsdk.model.Status;
 import com.meisolsson.githubsdk.model.git.GitReference;
 import com.meisolsson.githubsdk.model.request.git.CreateGitReference;
+import com.meisolsson.githubsdk.service.checks.ChecksService;
 import com.meisolsson.githubsdk.service.git.GitService;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 import com.meisolsson.githubsdk.service.issues.IssueEventService;
@@ -184,7 +187,7 @@ public class PullRequestFragment extends IssueFragmentBase {
         }
     }
 
-   private void fillStatus(List<Status> statuses) {
+   private void fillStatus(List<StatusWrapper> statuses) {
        CommitStatusBox commitStatusBox = mListHeaderView.findViewById(R.id.commit_status_box);
        commitStatusBox.fillStatus(statuses, mPullRequest.mergeableState());
    }
@@ -457,31 +460,49 @@ public class PullRequestFragment extends IssueFragmentBase {
             return;
         }
 
-        RepositoryStatusService service = ServiceFactory.get(RepositoryStatusService.class, force);
+        RepositoryStatusService repoService = ServiceFactory.get(RepositoryStatusService.class, force);
         String sha = mPullRequest.head().sha();
 
-        ApiHelpers.PageIterator
-                    .toSingle(page -> service.getStatuses(mRepoOwner, mRepoName, sha, page))
-                    // Sort by timestamps first, so the removal logic below keeps the newest status
-                    .compose(RxUtils.sortList(STATUS_TIMESTAMP_COMPARATOR))
-                    // Filter out outdated statuses, only keep the newest status per context
-                    .map(statuses -> {
-                        Set<String> seenContexts = new HashSet<>();
-                        Iterator<Status> iter = statuses.iterator();
-                        while (iter.hasNext()) {
-                            Status status = iter.next();
-                            if (seenContexts.contains(status.context())) {
-                                iter.remove();
-                            } else {
-                                seenContexts.add(status.context());
-                            }
+        Single<List<Status>> statusSingle = ApiHelpers.PageIterator
+                .toSingle(page -> repoService.getStatuses(mRepoOwner, mRepoName, sha, page))
+                // Sort by timestamps first, so the removal logic below keeps the newest status
+                .compose(RxUtils.sortList(STATUS_TIMESTAMP_COMPARATOR))
+                // Filter out outdated statuses, only keep the newest status per context
+                .map(statuses -> {
+                    Set<String> seenContexts = new HashSet<>();
+                    Iterator<Status> iter = statuses.iterator();
+                    while (iter.hasNext()) {
+                        Status status = iter.next();
+                        if (seenContexts.contains(status.context())) {
+                            iter.remove();
+                        } else {
+                            seenContexts.add(status.context());
                         }
-                        return statuses;
-                    })
-                    // sort by status, then context
-                    .compose(RxUtils.sortList(STATUS_AND_CONTEXT_COMPARATOR))
-                    .compose(makeLoaderSingle(ID_LOADER_STATUS, force))
-                    .subscribe(this::fillStatus, this::handleLoadFailure);
+                    }
+                    return statuses;
+                })
+                // sort by status, then context
+                .compose(RxUtils.sortList(STATUS_AND_CONTEXT_COMPARATOR));
+
+        ChecksService checksService = ServiceFactory.get(ChecksService.class, force);
+        Single<List<CheckRun>> checksSingle = checksService.getCheckRunsForRef(mRepoOwner, mRepoName, sha)
+                .map(ApiHelpers::throwOnFailure)
+                .map(response -> response.checkRuns());
+
+        Single<List<StatusWrapper>> allResultsSingle = Single.zip(statusSingle, checksSingle, (statuses, checks) -> {
+            List<StatusWrapper> wrappers = new ArrayList<>();
+            for (CheckRun check : checks) {
+                wrappers.add(new StatusWrapper(check));
+            }
+            for (Status status : statuses) {
+                wrappers.add(new StatusWrapper(status));
+            }
+            return wrappers;
+        });
+
+        allResultsSingle
+                .compose(makeLoaderSingle(ID_LOADER_STATUS, force))
+                .subscribe(this::fillStatus, this::handleLoadFailure);
     }
 
     private void loadHeadReference(boolean force) {
