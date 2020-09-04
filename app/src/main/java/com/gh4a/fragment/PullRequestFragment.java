@@ -492,7 +492,7 @@ public class PullRequestFragment extends IssueFragmentBase {
         Single<List<StatusWrapper>> allResultsSingle = Single.zip(statusSingle, checksSingle, (statuses, checks) -> {
             List<StatusWrapper> wrappers = new ArrayList<>();
             for (CheckRun check : checks) {
-                wrappers.add(new StatusWrapper(check));
+                wrappers.add(new StatusWrapper(getContext(), check));
             }
             for (Status status : statuses) {
                 wrappers.add(new StatusWrapper(status));

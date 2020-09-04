@@ -543,6 +543,10 @@
     <string name="check_failing">%1$d failing</string>
     <string name="check_pending">%1$d pending</string>
     <string name="check_successful">%1$d successful</string>
+    <string name="check_runtime_description">Finished after %1$s</string>
+    <string name="check_runtime_format_seconds">%3$d s</string>
+    <string name="check_runtime_format_minutes">%2$d min %3$d s</string>
+    <string name="check_runtime_format_hours">%1$d h %2$d min</string>
 
     <plurals name="checks_summary">
         <item quantity="one">%1$s check</item>
