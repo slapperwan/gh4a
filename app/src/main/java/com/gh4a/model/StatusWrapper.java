@@ -40,33 +40,42 @@ public class StatusWrapper {
 
     public StatusWrapper(Context context, CheckRun checkRun) {
         mLabel = checkRun.name();
-
-        String title = checkRun.output() != null ? checkRun.output().title() : null;
-        if (checkRun.startedAt() != null && checkRun.completedAt() != null) {
-            String runtime = formatTimeDelta(context, checkRun.startedAt(), checkRun.completedAt());
-            String runtimeDesc = context.getString(R.string.check_runtime_description, runtime);
-            if (title != null) {
-                mDescription = title + " — " + runtimeDesc;
-            } else {
-                mDescription = runtimeDesc;
-            }
-        } else {
-            mDescription = title;
-        }
-
         mTargetUrl = checkRun.detailsUrl();
-        switch (checkRun.conclusion()) {
-            case Failure:
-            case TimedOut:
-            case Cancelled:
-                mState = State.Failed;
-                break;
-            case Success:
-                mState = State.Success;
-                break;
-            default:
+
+        switch (checkRun.state()) {
+            case Requested:
+            case Queued:
                 mState = State.Unknown;
+                mDescription = context.getString(R.string.check_pending_description);
                 break;
+            case InProgress:
+                mState = State.Unknown;
+                mDescription = context.getString(R.string.check_running_description);
+                break;
+            case Completed: {
+                String runtime = formatTimeDelta(context, checkRun.startedAt(), checkRun.completedAt());
+                String runtimeDesc = context.getString(R.string.check_runtime_description, runtime);
+                String title = checkRun.output() != null ? checkRun.output().title() : null;
+                if (title != null) {
+                    mDescription = title + " — " + runtimeDesc;
+                } else {
+                    mDescription = runtimeDesc;
+                }
+                switch (checkRun.conclusion()) {
+                    case Failure:
+                    case TimedOut:
+                    case Cancelled:
+                        mState = State.Failed;
+                        break;
+                    case Success:
+                        mState = State.Success;
+                        break;
+                    default:
+                        mState = State.Unknown;
+                        break;
+                }
+                break;
+            }
         }
     }
 
