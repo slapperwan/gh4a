@@ -487,7 +487,19 @@ public class PullRequestFragment extends IssueFragmentBase {
         ChecksService checksService = ServiceFactory.get(ChecksService.class, force);
         Single<List<CheckRun>> checksSingle = checksService.getCheckRunsForRef(mRepoOwner, mRepoName, sha)
                 .map(ApiHelpers::throwOnFailure)
-                .map(response -> response.checkRuns());
+                .map(response -> response.checkRuns())
+                .map(checkRuns -> {
+                    HashMap<String, CheckRun> filteredRuns = new HashMap<>();
+                    for (CheckRun run : checkRuns) {
+                        CheckRun existing = filteredRuns.get(run.name());
+                        if (existing == null
+                                || run.startedAt() == null
+                                || run.startedAt().after(existing.startedAt())) {
+                            filteredRuns.put(run.name(), run);
+                        }
+                    }
+                    return new ArrayList<>(filteredRuns.values());
+                });
 
         Single<List<StatusWrapper>> allResultsSingle = Single.zip(statusSingle, checksSingle, (statuses, checks) -> {
             List<StatusWrapper> wrappers = new ArrayList<>();
