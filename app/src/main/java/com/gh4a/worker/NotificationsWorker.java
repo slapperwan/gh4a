@@ -22,6 +22,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
@@ -32,6 +33,7 @@ import androidx.work.WorkerParameters;
 
 import android.text.SpannableStringBuilder;
 import android.text.style.TextAppearanceSpan;
+import android.util.Log;
 
 import com.gh4a.R;
 import com.gh4a.activities.home.HomeActivity;
@@ -48,15 +50,18 @@ import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.User;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class NotificationsWorker extends Worker {
+    private static final String TAG = "NotificationsWorker";
+
     private static final String CHANNEL_GITHUB_NOTIFICATIONS = "channel_notifications";
     private static final String GROUP_ID_GITHUB = "github_notifications";
-    public static final String TAG = "job_notifications";
+    private static final String WORK_TAG = "job_notifications";
 
     private static final String KEY_LAST_NOTIFICATION_CHECK = "last_notification_check";
     private static final String KEY_LAST_NOTIFICATION_SEEN = "last_notification_seen";
@@ -68,15 +73,20 @@ public class NotificationsWorker extends Worker {
         Constraints constraints = new Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build();
-        WorkRequest request = new PeriodicWorkRequest.Builder(NotificationsWorker.class, intervalMinutes, TimeUnit.MINUTES)
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(NotificationsWorker.class, intervalMinutes, TimeUnit.MINUTES)
                 .setConstraints(constraints)
-                .addTag(TAG)
+                .addTag(WORK_TAG)
                 .build();
-        WorkManager.getInstance(context).enqueue(request);
+        Log.d(TAG, "Scheduling notification fetch to happen every " + intervalMinutes + " min");
+        WorkManager.getInstance(context).cancelAllWorkByTag(WORK_TAG);
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(WORK_TAG,
+                ExistingPeriodicWorkPolicy.REPLACE, request);
     }
 
     public static void cancel(Context context) {
-        WorkManager.getInstance(context).cancelAllWorkByTag(TAG);
+        Log.d(TAG, "Canceling notification fetch");
+        WorkManager.getInstance(context).cancelAllWorkByTag(WORK_TAG);
+        WorkManager.getInstance(context).cancelUniqueWork(WORK_TAG);
     }
 
     public static void createNotificationChannels(Context context) {
@@ -147,6 +157,7 @@ public class NotificationsWorker extends Worker {
     public Result doWork() {
         List<List<NotificationThread>> notifsGroupedByRepo = new ArrayList<>();
         try {
+            Log.d(TAG, "Starting notification fetch in background");
             NotificationListLoadResult result =
                     SingleFactory.getNotifications(false, false, false).blockingGet();
             for (NotificationHolder holder : result.notifications) {
@@ -159,6 +170,7 @@ public class NotificationsWorker extends Worker {
                 }
             }
         } catch (Exception e) {
+            Log.d(TAG, "Failed fetching notifications", e);
             return Result.failure();
         }
 
@@ -179,9 +191,14 @@ public class NotificationsWorker extends Worker {
                 }
             }
 
+            Log.d(TAG, "Last check was " + new Date(lastCheck) + ", last seen " + new Date(lastSeen)
+                    + " -> has new " + hasNewNotification + ", has unseen " + hasUnseenNotification);
+
             if (!hasUnseenNotification) {
-                // seen timestamp is only updated when notifications are canceled by us,
-                // so everything is canceled at this point and we have nothing to notify of
+                // Seen timestamp is only updated when notifications are canceled by us,
+                // so everything is canceled at this point and we have nothing to notify of.
+                // We don't update the last check timestamp here, since it's fine for the UI
+                // to _not_ discard the already seen notifications in the list.
                 return Result.success();
             }
 
@@ -194,6 +211,7 @@ public class NotificationsWorker extends Worker {
                 String repoId = String.valueOf(list.get(0).repository().id());
                 if (lastShownRepoIds != null) {
                     lastShownRepoIds.remove(repoId);
+
                 }
                 newShownRepoIds.add(repoId);
             }
