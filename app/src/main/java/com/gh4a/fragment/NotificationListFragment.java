@@ -85,7 +85,9 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         long lastFetch = mNotificationsLoadTime != null ? mNotificationsLoadTime.getTime() : 0;
         if (lastFetch == 0 || (lastCheck != 0 && lastCheck > lastFetch)) {
             setContentShown(false);
-            loadNotifications(false);
+            // If we know our last fetch is stale, force the reload to make to to not get
+            // outdated notifications
+            loadNotifications(lastFetch != 0);
             NotificationsWorker.markNotificationsAsSeen(getActivity());
         }
     }
@@ -172,20 +174,11 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
                 mAll = itemId == R.id.notification_filter_all;
                 mParticipating = itemId == R.id.notification_filter_participating;
                 item.setChecked(true);
-                reloadNotification();
+                onRefresh();
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void reloadNotification() {
-        if (mAdapter != null) {
-            mAdapter.clear();
-        }
-        setContentShown(false);
-        updateMenuItemVisibility();
-        loadNotifications(true);
     }
 
     @Override
@@ -299,8 +292,8 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
                     mNotificationsLoadTime = result.loadTime;
                     mAdapter.clear();
                     mAdapter.addAll(result.notifications);
-                    setContentShown(true);
                     mAdapter.notifyDataSetChanged();
+                    setContentShown(true);
                     updateEmptyState();
                     updateMenuItemVisibility();
                     if (!mAll && !mParticipating) {
