@@ -17,15 +17,24 @@ package com.gh4a.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.UserAdapter;
+import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.service.activity.StarringService;
 import com.meisolsson.githubsdk.service.users.UserFollowerService;
 
 import io.reactivex.Single;
@@ -45,12 +54,17 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
 
     private String mLogin;
     private boolean mShowFollowers;
+    private Boolean mIsFollowing;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         super.onCreate(savedInstanceState);
         mLogin = getArguments().getString("user");
         mShowFollowers = getArguments().getBoolean("show_followers");
+        if (mShowFollowers) {
+            loadFollowingState(false);
+        }
     }
 
     @Override
@@ -72,10 +86,76 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
     }
 
     @Override
+    public void onRefresh() {
+        mIsFollowing = null;
+        if (mShowFollowers) {
+            loadFollowingState(true);
+        }
+        super.onRefresh();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (mShowFollowers && Gh4Application.get().isAuthorized()) {
+            MenuItem followItem = menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "")
+                    .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            if (mIsFollowing == null) {
+                followItem.setActionView(R.layout.ab_loading);
+                followItem.expandActionView();
+            } else if (mIsFollowing) {
+                followItem.setTitle(R.string.user_follow_action);
+            } else {
+                followItem.setTitle(R.string.user_unfollow_action);
+            }
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == Menu.FIRST) {
+            toggleFollowingState();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     protected Single<Response<Page<User>>> loadPage(int page, boolean bypassCache) {
         final UserFollowerService service = ServiceFactory.get(UserFollowerService.class, bypassCache);
         return mShowFollowers
                 ? service.getFollowers(mLogin, page)
                 : service.getFollowing(mLogin, page);
+    }
+
+    private void loadFollowingState(boolean force) {
+        if (!Gh4Application.get().isAuthorized()) {
+            return;
+        }
+        UserFollowerService service = ServiceFactory.get(UserFollowerService.class, force);
+        service.isFollowing(mLogin)
+                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .compose(makeLoaderSingle(1, force))
+                .subscribe(result -> {
+                    mIsFollowing = result;
+                    getActivity().invalidateOptionsMenu();
+                }, this::handleLoadFailure);
+    }
+
+    private void toggleFollowingState() {
+        UserFollowerService service = ServiceFactory.get(UserFollowerService.class, false);
+        Single<Response<Void>> responseSingle = mIsFollowing
+                ? service.unfollowUser(mLogin)
+                : service.followUser(mLogin);
+        responseSingle.map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .compose(RxUtils::doInBackground)
+                .subscribe(result -> {
+                    if (mIsFollowing != null) {
+                        mIsFollowing = !mIsFollowing;
+                        getActivity().invalidateOptionsMenu();
+                    }
+                }, error -> {
+                    handleActionFailure("Updating user following state failed", error);
+                });
     }
 }
