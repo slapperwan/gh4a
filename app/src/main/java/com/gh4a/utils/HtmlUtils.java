@@ -279,7 +279,6 @@ public class HtmlUtils {
 
         public Spanned convert() {
             mReader.setContentHandler(this);
-            //noinspection TryWithIdenticalCatches
             try {
                 mReader.parse(new InputSource(new StringReader(mSource)));
             } catch (IOException e) {

@@ -13,7 +13,7 @@
         android:id="@+id/view_color"
         android:layout_width="20dp"
         android:layout_height="match_parent"
-        tools:background="@color/light_primary" />
+        tools:background="#f00" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_title"

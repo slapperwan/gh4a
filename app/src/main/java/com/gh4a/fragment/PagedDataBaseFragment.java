@@ -16,6 +16,8 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+
+import androidx.loader.app.LoaderManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -52,7 +54,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mRxLoader = new RxLoader(getActivity(), getLoaderManager());
+        mRxLoader = new RxLoader(getActivity(), LoaderManager.getInstance(this));
         resetSubject();
         if (shouldDoInitialLoad()) {
             setContentShown(false);

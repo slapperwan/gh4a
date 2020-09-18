@@ -162,7 +162,7 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         mContainer = view.findViewById(R.id.bottom_sheet_header_container);
 
         post(() -> {
-            getBehavior().setBottomSheetCallback(mBehaviorCallback);
+            getBehavior().addBottomSheetCallback(mBehaviorCallback);
             resetPeekHeight(0);
             updateSendButtonState();
 

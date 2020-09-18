@@ -152,7 +152,6 @@ public class Gh4Application extends MultiDexApplication implements
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {

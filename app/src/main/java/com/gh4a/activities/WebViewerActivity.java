@@ -94,7 +94,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
 
         @Override
-        @SuppressWarnings("deprecation")
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             if (mStarted) {
                 handleUrlLoad(Uri.parse(url));
@@ -318,7 +317,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
             // Opening that URL will trigger a FileUriExposedException in API 24+
             return;
         }
-        //noinspection TryWithIdenticalCatches
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
@@ -483,7 +481,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
     protected abstract String generateHtml(String cssTheme, boolean addTitleHeader);
     protected abstract String getDocumentTitle();
 
-    @SuppressWarnings("unused")
     private class DisplayJavascriptInterface {
         @JavascriptInterface
         public void onLineTouched(final int line) {
@@ -499,7 +496,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    @SuppressWarnings("unused")
     private class PrintJavascriptInterface {
         @JavascriptInterface
         public void onLineTouched(int line) {

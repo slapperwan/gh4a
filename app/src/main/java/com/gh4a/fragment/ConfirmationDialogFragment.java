@@ -44,7 +44,7 @@ public class ConfirmationDialogFragment extends DialogFragment implements
         ConfirmationDialogFragment f = new ConfirmationDialogFragment();
         f.setArguments(buildArgs(dialogText, confirmButtonTextResId, showWarning, data));
         f.setTargetFragment(parent, 0);
-        f.show(parent.getFragmentManager(), tag);
+        f.show(parent.getParentFragmentManager(), tag);
     }
 
     public static <C extends FragmentActivity & Callback> void show(C parent,

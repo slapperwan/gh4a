@@ -49,6 +49,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.graphics.drawable.DrawerArrowDrawable;
 import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.widget.Toolbar;
+import androidx.loader.app.LoaderManager;
+
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -141,7 +143,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         onInitExtras(getIntent().getExtras());
         super.onCreate(savedInstanceState);
 
-        mRxLoader = new RxLoader(this, getSupportLoaderManager());
+        mRxLoader = new RxLoader(this, LoaderManager.getInstance(this));
 
         super.setContentView(R.layout.base_activity);
 
@@ -676,7 +678,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return animation;
     }
 
-    @SuppressWarnings("deprecation")
     private void assignBackground(View view, int color) {
         if (view == null) {
             return;

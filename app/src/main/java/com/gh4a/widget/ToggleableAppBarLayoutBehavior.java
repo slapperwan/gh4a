@@ -32,11 +32,12 @@ public class ToggleableAppBarLayoutBehavior extends AppBarLayout.Behavior {
 
     @Override
     public void onNestedScroll(@NonNull CoordinatorLayout coordinatorLayout,
-            @NonNull AppBarLayout child, @NonNull View target,
-            int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int type) {
+            @NonNull AppBarLayout child, View target,
+            int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed,
+            int type, int[] consumed) {
         if (mEnabled) {
-            super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed,
-                    dxUnconsumed, dyUnconsumed, type);
+            super.onNestedScroll(coordinatorLayout, child, target,
+                    dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type, consumed);
         }
     }
 

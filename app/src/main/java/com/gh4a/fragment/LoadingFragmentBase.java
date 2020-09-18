@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +36,7 @@ public abstract class LoadingFragmentBase extends Fragment implements
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mRxLoader = new RxLoader(context, getLoaderManager());
+        mRxLoader = new RxLoader(context, LoaderManager.getInstance(this));
     }
 
     @Override

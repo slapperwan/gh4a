@@ -87,7 +87,7 @@ public class AvatarHandler {
                     applyAvatarToView(view, bitmap);
                 }
             }
-            sRequests.delete(requestId);
+            sRequests.remove(requestId);
         }
     };
 
@@ -252,7 +252,7 @@ public class AvatarHandler {
                     if (sWorkerHandler != null) {
                         sWorkerHandler.removeMessages(MSG_LOAD, request.url);
                     }
-                    sRequests.delete(sRequests.keyAt(i));
+                    sRequests.removeAt(i);
                 }
                 return;
             }

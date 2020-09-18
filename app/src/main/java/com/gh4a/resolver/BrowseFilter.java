@@ -50,7 +50,6 @@ public class BrowseFilter extends AppCompatActivity {
         }
 
         result.loadTask.setIntentFlags(flags);
-        //noinspection ConstantConditions
         result.loadTask.execute();
 
         // Avoid finish() for now

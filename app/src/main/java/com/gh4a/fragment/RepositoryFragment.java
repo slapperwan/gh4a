@@ -20,7 +20,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
-import androidx.loader.app.LoaderManager;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -173,7 +172,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements
             mIsReadmeLoaded = savedInstanceState.getBoolean(STATE_KEY_IS_README_LOADED, false);
         }
 
-        LoaderManager lm = getLoaderManager();
         if (mIsReadmeExpanded || mIsReadmeLoaded) {
             loadReadme(false);
         }

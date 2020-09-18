@@ -2,6 +2,8 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
+import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -31,24 +33,27 @@ public class ToggleableBottomSheetBehavior<V extends View> extends BottomSheetBe
     }
 
     @Override
-    public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout,
-            V child, View directTargetChild, View target, int nestedScrollAxes) {
+    public boolean onStartNestedScroll(@NonNull CoordinatorLayout coordinatorLayout,
+            @NonNull V child, @NonNull View directTargetChild,
+            @NonNull View target, int axes, int type) {
         return mEnabled && super.onStartNestedScroll(coordinatorLayout,
-                child, directTargetChild, target, nestedScrollAxes);
+                child, directTargetChild, target, axes, type);
     }
 
     @Override
-    public void onNestedPreScroll(CoordinatorLayout coordinatorLayout,
-            V child, View target, int dx, int dy, int[] consumed) {
+    public void onNestedPreScroll(@NonNull CoordinatorLayout coordinatorLayout,
+            @NonNull V child, @NonNull View target, int dx, int dy,
+            @NonNull int[] consumed, int type) {
         if (mEnabled) {
-            super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed);
+            super.onNestedPreScroll(coordinatorLayout, child, target, dx, dy, consumed, type);
         }
     }
 
     @Override
-    public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, V child, View target) {
+    public void onStopNestedScroll(@NonNull CoordinatorLayout coordinatorLayout,
+            @NonNull V child, @NonNull View target, int type) {
         if (mEnabled) {
-            super.onStopNestedScroll(coordinatorLayout, child, target);
+            super.onStopNestedScroll(coordinatorLayout, child, target, type);
         }
     }
 

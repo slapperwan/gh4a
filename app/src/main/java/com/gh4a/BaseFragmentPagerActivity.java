@@ -76,7 +76,7 @@ public abstract class BaseFragmentPagerActivity extends BasePagerActivity implem
         private Fragment mCurrentFragment;
 
         public FragmentAdapter() {
-            super(getSupportFragmentManager());
+            super(getSupportFragmentManager(), BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         }
 
         @Override

@@ -559,7 +559,6 @@ public class HttpImageGetter {
 
     private static Bitmap renderSvgToBitmap(Resources res, InputStream is,
             int maxWidth, int maxHeight) {
-        //noinspection TryWithIdenticalCatches
         try {
             SVG svg = SVG.getFromInputStream(is);
             if (svg != null) {

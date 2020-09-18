@@ -32,7 +32,7 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setContentShown(false);
-        getLoaderManager().initLoader(0, null, this);
+        LoaderManager.getInstance(this).initLoader(0, null, this);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
     @Override
     public void onRefresh() {
         setContentShown(false);
-        Loader loader = getLoaderManager().getLoader(0);
+        Loader loader = LoaderManager.getInstance(this).getLoader(0);
         if (loader != null) {
             loader.onContentChanged();
         }

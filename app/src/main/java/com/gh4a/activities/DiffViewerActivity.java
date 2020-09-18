@@ -142,7 +142,6 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     private static final int MENU_ITEM_VIEW = 10;
 
     @Override
-    @SuppressWarnings("unchecked")
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

@@ -101,7 +101,6 @@ public class CreateReviewActivity extends AppCompatActivity implements
     @Override
     public Single<?> onEditorDoSend(String body) {
         int position = mReviewEventSpinner.getSelectedItemPosition();
-        @SuppressWarnings("ConstantConditions")
         ReviewEventDesc desc = mReviewEventAdapter.getItem(position);
 
         PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class, false);
