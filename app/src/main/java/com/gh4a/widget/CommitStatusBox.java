@@ -82,7 +82,7 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
                 break;
             case Draft:
                 statusIconDrawableResId = R.drawable.pull_request_merge_dirty;
-                statusLabelResId = R.string.pull_merge_status_dirty;
+                statusLabelResId = R.string.pull_merge_status_draft;
                 break;
             default:
                 if (statuses.isEmpty()) {
