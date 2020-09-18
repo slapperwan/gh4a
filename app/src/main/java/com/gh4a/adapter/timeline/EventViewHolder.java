@@ -194,21 +194,30 @@ class EventViewHolder
             }
             case ReviewRequested:
             case ReviewRequestRemoved: {
-                final String reviewerNames;
-                if (event.requestedReviewers() != null) {
-                    ArrayList<String> reviewers = new ArrayList<>();
-                    for (User reviewer : event.requestedReviewers()) {
-                        reviewers.add(ApiHelpers.getUserLogin(mContext, reviewer));
-                    }
-                    reviewerNames = TextUtils.join(", ", reviewers);
+                if (event.requestedTeam() != null) {
+                    @StringRes int stringResId = event.event() == IssueEventType.ReviewRequested
+                            ? R.string.pull_request_event_team_review_requested
+                            : R.string.pull_request_event_team_review_request_removed;
+                    textBase = mContext.getString(stringResId,
+                            getUserLoginWithBotSuffix(event.reviewRequester()),
+                            mRepoOwner + "/" + event.requestedTeam().name());
                 } else {
-                    reviewerNames = ApiHelpers.getUserLogin(mContext, event.requestedReviewer());
+                    final String reviewerNames;
+                    if (event.requestedReviewers() != null) {
+                        ArrayList<String> reviewers = new ArrayList<>();
+                        for (User reviewer : event.requestedReviewers()) {
+                            reviewers.add(ApiHelpers.getUserLogin(mContext, reviewer));
+                        }
+                        reviewerNames = TextUtils.join(", ", reviewers);
+                    } else {
+                        reviewerNames = ApiHelpers.getUserLogin(mContext, event.requestedReviewer());
+                    }
+                    @StringRes int stringResId = event.event() == IssueEventType.ReviewRequested
+                            ? R.string.pull_request_event_review_requested
+                            : R.string.pull_request_event_review_request_removed;
+                    textBase = mContext.getString(stringResId,
+                            getUserLoginWithBotSuffix(event.reviewRequester()), reviewerNames);
                 }
-                @StringRes int stringResId = event.event() == IssueEventType.ReviewRequested
-                        ? R.string.pull_request_event_review_requested
-                        : R.string.pull_request_event_review_request_removed;
-                textBase = mContext.getString(stringResId,
-                        getUserLoginWithBotSuffix(event.reviewRequester()), reviewerNames);
                 break;
             }
             case HeadRefDeleted:
