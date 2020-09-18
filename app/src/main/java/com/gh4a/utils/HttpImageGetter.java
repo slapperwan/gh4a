@@ -186,7 +186,7 @@ public class HttpImageGetter {
                     }
                     mTask = new ImageGetterAsyncTask(HttpImageGetter.this, this);
                     mTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                            imagesToLoad.toArray(new PlaceholderDrawable[imagesToLoad.size()]));
+                            imagesToLoad.toArray(new PlaceholderDrawable[0]));
                 }
                 mHasStartedImageLoad = true;
             }

@@ -41,7 +41,7 @@ public class SingleChoiceDialogFragment extends DialogFragment
 
         mEntries = args.getStringArrayList("entries");
 
-        String[] entryArray = mEntries.toArray(new String[mEntries.size()]);
+        String[] entryArray = mEntries.toArray(new String[0]);
         int selectedPosition = args.getInt("selectedPosition");
 
         return new AlertDialog.Builder(getContext())

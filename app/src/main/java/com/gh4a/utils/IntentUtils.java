@@ -170,7 +170,7 @@ public class IntentUtils {
         String extraName = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                 ? Intent.EXTRA_ALTERNATE_INTENTS
                 : Intent.EXTRA_INITIAL_INTENTS;
-        chooserIntent.putExtra(extraName, chooserIntents.toArray(new Intent[chooserIntents.size()]));
+        chooserIntent.putExtra(extraName, chooserIntents.toArray(new Intent[0]));
         return chooserIntent;
     }
 

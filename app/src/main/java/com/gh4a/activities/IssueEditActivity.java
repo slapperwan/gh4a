@@ -76,7 +76,6 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -661,7 +660,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                         return ApiHelpers.PageIterator
                                 .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, content.path(), null, page));
                     } else {
-                        return Single.just(Arrays.asList(content));
+                        return Single.just(Collections.singletonList(content));
                     }
                 }))
                 .map(contentsOpt -> contentsOpt.map(contents -> {

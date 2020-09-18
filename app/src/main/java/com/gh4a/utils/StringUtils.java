@@ -137,7 +137,7 @@ public class StringUtils {
 
                 pos = end + 4;
             } else {
-                ssb.append(input.substring(pos, input.length()));
+                ssb.append(input.substring(pos));
                 pos = -1;
             }
         }

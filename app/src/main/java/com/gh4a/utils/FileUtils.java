@@ -75,7 +75,7 @@ public class FileUtils {
             return "";
         }
 
-        return filename.substring(mid + 1, filename.length());
+        return filename.substring(mid + 1);
     }
 
     public static String getFileName(String path) {
@@ -86,7 +86,7 @@ public class FileUtils {
         if (mid == -1) {
             return path;
         }
-        return path.substring(mid + 1, path.length());
+        return path.substring(mid + 1);
     }
 
     public static boolean isImage(String filename) {

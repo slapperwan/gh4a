@@ -34,7 +34,6 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
-import com.meisolsson.githubsdk.service.activity.StarringService;
 import com.meisolsson.githubsdk.service.users.UserFollowerService;
 
 import io.reactivex.Single;

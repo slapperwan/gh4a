@@ -2,7 +2,7 @@ package com.gh4a.activities.home;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import androidx.annotation.IdRes;
+
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import android.view.Menu;

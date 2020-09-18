@@ -36,8 +36,6 @@ import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.activity.StarringService;
 
-import java.net.HttpURLConnection;
-
 import io.reactivex.Single;
 import retrofit2.Response;
 

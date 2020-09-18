@@ -39,7 +39,6 @@ import com.gh4a.db.SuggestionsProvider;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.model.SearchCode;
@@ -333,7 +332,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
     private Single<Response<Page<Object>>> makeUserSearchSingle(long page, boolean bypassCache) {
         final SearchService service = ServiceFactory.get(SearchService.class, bypassCache);
         return service.searchUsers(mQuery, null, null, page)
-                .compose(result -> RxUtils.<User, Object>searchPageAdapter(result, item -> item));
+                .compose(result -> RxUtils.searchPageAdapter(result, item -> item));
     }
 
     private Single<Response<Page<Object>>> makeCodeSearchSingle(long page, boolean bypassCache) {
@@ -341,7 +340,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
                 "application/vnd.github.v3.text-match+json", null, null);
 
         return service.searchCode(mQuery, null, null, page)
-                .compose(result -> RxUtils.<SearchCode, Object>searchPageAdapter(result, item -> item));
+                .compose(result -> RxUtils.searchPageAdapter(result, item -> item));
     }
 
     private static class SearchTypeAdapter extends BaseAdapter implements SpinnerAdapter {

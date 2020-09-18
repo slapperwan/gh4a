@@ -18,7 +18,6 @@ import com.gh4a.model.NotificationHolder;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.NotificationSubject;
 import com.meisolsson.githubsdk.model.NotificationThread;
 import com.meisolsson.githubsdk.model.Repository;

@@ -283,7 +283,7 @@ public class AvatarHandler {
 
         final int widthRatio = options.outWidth / sMaxImageSizePx;
         final int heightRatio = options.outHeight / sMaxImageSizePx;
-        options.inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+        options.inSampleSize = Math.min(heightRatio, widthRatio);
 
         Bitmap unscaled = BitmapFactory.decodeByteArray(data, 0, data.length, options);
         if (unscaled == null) {

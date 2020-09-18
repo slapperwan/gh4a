@@ -111,7 +111,7 @@ public class Feed {
         if (url == null) {
             return null;
         }
-        return url.substring(url.lastIndexOf("/") + 1, url.length()).replaceAll("-", " ");
+        return url.substring(url.lastIndexOf("/") + 1).replaceAll("-", " ");
     }
 
     public String getId() {
