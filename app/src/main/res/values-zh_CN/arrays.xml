@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="text_size_items">
+        <item>最小</item>
+        <item>较小</item>
+        <item>一般</item>
+        <item>较大</item>
+        <item>最大</item>
+    </string-array>
+    <string-array name="load_gif_mode_items">
+        <item>从不加载</item>
+        <item>仅Wifi加载</item>
+        <item>总是加载</item>
+    </string-array>
+    <string-array name="filter_participating">
+        <item>任何</item>
+        <item>参加的</item>
+        <item>未参加的</item>
+    </string-array>
+    <string-array name="notification_interval_items">
+        <item>15分钟</item>
+        <item>20分钟</item>
+        <item>30分钟</item>
+        <item>1小时</item>
+        <item>2小时</item>
+        <item>3小时</item>
+        <item>6小时</item>
+    </string-array>
+</resources>
