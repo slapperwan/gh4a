@@ -182,8 +182,7 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
                         mRepository.name(), mRef, contents.path());
                 UiUtils.enqueueDownloadWithPermissionCheck(getBaseActivity(),
                         url, FileUtils.getMimeTypeFor(contents.name()),
-                        contents.name(), null, null,
-                        UiUtils.DownloadTokenHandling.UseAuthHeader);
+                        contents.name(), null);
                 return true;
         }
 

@@ -40,13 +40,23 @@ import android.widget.TextView;
 import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
+import com.gh4a.ServiceFactory;
 import com.gh4a.widget.IssueLabelSpan;
+import com.meisolsson.githubsdk.model.Download;
 import com.meisolsson.githubsdk.model.Label;
+import com.meisolsson.githubsdk.model.ReleaseAsset;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class UiUtils {
     public static void hideImeForView(View view) {
@@ -238,55 +248,93 @@ public class UiUtils {
         dm.enqueue(request);
     }
 
-    public enum DownloadTokenHandling {
-        None,
-        AppendToUri,
-        UseAuthHeader
+    public static void enqueueDownloadWithPermissionCheck(final BaseActivity activity,
+            final Download download) {
+        enqueueDownloadWithPermissionCheck(activity, download.htmlUrl(), download.contentType(),
+                download.name(), download.description());
     }
 
     public static void enqueueDownloadWithPermissionCheck(final BaseActivity activity,
-            final String url, final String mimeType, final String fileName,
-            final String description, final String mediaType,
-            final DownloadTokenHandling tokenHandling) {
+            final ReleaseAsset asset) {
         final ActivityCompat.OnRequestPermissionsResultCallback cb =
                 (requestCode, permissions, grantResults) -> {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        enqueueDownload(activity, url, mimeType, fileName,
-                                description, mediaType, tokenHandling);
+                        enqueueDownload(activity, asset);
                     }
                 };
         activity.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, cb,
                 R.string.download_permission_rationale);
     }
 
-    private static void enqueueDownload(final Context context, String url, final String mimeType,
-            final String fileName, final String description,
-            final String mediaType, final DownloadTokenHandling tokenHandling) {
+    public static void enqueueDownloadWithPermissionCheck(final BaseActivity activity,
+            final String url, final String mimeType, final String fileName, final String description) {
+        final ActivityCompat.OnRequestPermissionsResultCallback cb =
+                (requestCode, permissions, grantResults) -> {
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        enqueueDownload(activity, url, fileName, description, mimeType, null, false);
+                    }
+                };
+        activity.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, cb,
+                R.string.download_permission_rationale);
+    }
+
+    private static void enqueueDownload(final Context context, final ReleaseAsset asset) {
+        // Ugly workaround for #972 (see #976 for analysis), suggested by GH support:
+        // "First, you make an API call to the endpoint for fetching an asset and you pass in the
+        //  token via the Authorization header. You make this call using an HTTP library (not via
+        //  the Android Download Manager) and you disable automatic following of redirects when you
+        //  make that call (in case that's enabled by default). The result of that call will be a
+        //  redirect response with a Location header.
+        //  Second, you use the Android Download Manager to download the asset from the URL that's
+        //  provided in the Location header from the response of the first step. You would not
+        //  provide an Authorization header here since the required authorization is already a
+        //  part of the URL."
+        final OkHttpClient client = ServiceFactory.getHttpClientBuilder()
+                .followRedirects(false)
+                .build();
+        final Request.Builder requestBuilder = new Request.Builder()
+                .url(asset.url())
+                .header("Accept", "application/octet-stream");
+        final String token = Gh4Application.get().getAuthToken();
+        if (token != null) {
+            requestBuilder.addHeader("Authorization", "Token " + token);
+        }
+
+        client.newCall(requestBuilder.build()).enqueue(new Callback() {
+            private void completeDownload(final String url) {
+                enqueueDownload(context, url, asset.name(), asset.label(), asset.contentType(),
+                        "application/octet-stream", false);
+            }
+            @Override
+            public void onFailure(Call call, IOException e) {
+                completeDownload(asset.url());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) {
+                completeDownload(response.isRedirect()
+                        ? response.header("Location")
+                        : call.request().url().toString());
+            }
+        });
+    }
+
+    private static void enqueueDownload(final Context context, String url, final String fileName,
+            final String description, final String mimeType,
+            final String mediaType, final boolean addAuthHeader) {
         if (url == null) {
             return;
         }
 
-        final Uri baseUri = Uri.parse(url);
-        final Uri uri;
-        if (tokenHandling == DownloadTokenHandling.AppendToUri) {
-            uri = baseUri.buildUpon()
-                    .appendQueryParameter("access_token", Gh4Application.get().getAuthToken())
-                    .build();
-        } else {
-            uri = baseUri;
-        }
-        final boolean addAuthHeader = tokenHandling == DownloadTokenHandling.UseAuthHeader;
-
+        final Uri uri = Uri.parse(url);
         if (!downloadNeedsWarning(context)) {
-            enqueueDownload(context, uri, fileName, description, mimeType,
-                    mediaType, false, addAuthHeader);
+            enqueueDownload(context, uri, fileName, description, mimeType, mediaType, false, addAuthHeader);
             return;
         }
 
         DialogInterface.OnClickListener buttonListener = (dialog, which) -> {
             boolean wifiOnly = which == DialogInterface.BUTTON_NEUTRAL;
-            enqueueDownload(context, uri, fileName, description,
-                    mimeType, mediaType, wifiOnly, addAuthHeader);
+            enqueueDownload(context, uri, fileName, description, mimeType, mediaType, wifiOnly, addAuthHeader);
         };
 
         new AlertDialog.Builder(context)
