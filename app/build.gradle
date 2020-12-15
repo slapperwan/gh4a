@@ -84,17 +84,17 @@ dependencies {
     implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
     implementation 'com.squareup.retrofit2:converter-moshi:2.5.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
-    implementation('com.squareup.retrofit2:converter-simplexml:2.2.0') {
+    implementation('com.squareup.retrofit2:converter-simplexml:2.5.0') {
         exclude group: 'stax', module: 'stax-api'
         exclude group: 'stax', module: 'stax'
         exclude group: 'xpp3', module: 'xpp3'
     }
     implementation 'com.github.maniac103:rxloader:master-SNAPSHOT'
-    implementation 'com.github.maniac103:githubsdk:0.7.0.1'
+    implementation 'com.github.maniac103:githubsdk:0.7.0.2'
     implementation 'com.larswerkman:HoloColorPicker:1.5@aar'
     implementation 'com.caverock:androidsvg-aar:1.4'
-    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.19'
-    implementation 'org.ocpsoft.prettytime:prettytime:4.0.5.Final'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.21'
+    implementation 'org.ocpsoft.prettytime:prettytime:4.0.6.Final'
     implementation 'com.github.castorflex.smoothprogressbar:library:1.1.0'
     implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
     implementation 'com.github.pluscubed:recycler-fast-scroll:3de76812553a77bfd25d3aea0a0af4d96516c3e3@aar'
@@ -103,8 +103,8 @@ dependencies {
     }
     implementation 'com.github.Tunous:MarkdownEdit:1.0.0'
     implementation 'com.github.qoqa:traceur:2.2.12'
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'org.robolectric:robolectric:3.4.2'
+    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'org.robolectric:robolectric:4.4'
 }
 
 def props = new Properties()
