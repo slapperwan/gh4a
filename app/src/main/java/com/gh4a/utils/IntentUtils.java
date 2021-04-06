@@ -2,6 +2,7 @@ package com.gh4a.utils;
 
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -50,11 +51,15 @@ public class IntentUtils {
         }
         Intent intent = createBrowserIntent(context, uri);
         if (intent != null) {
-            intent.addFlags(flags);
-            context.startActivity(intent);
-        } else {
-            Toast.makeText(context, R.string.no_browser_found, Toast.LENGTH_LONG).show();
+            try {
+                intent.addFlags(flags);
+                context.startActivity(intent);
+                return;
+            } catch (ActivityNotFoundException e) {
+                // just show toast
+            }
         }
+        Toast.makeText(context, R.string.no_browser_found, Toast.LENGTH_LONG).show();
     }
 
     // We want to forward the URI to a browser, but our own intent filter matches
