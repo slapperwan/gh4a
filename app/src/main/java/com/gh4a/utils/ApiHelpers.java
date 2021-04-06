@@ -99,7 +99,7 @@ public class ApiHelpers {
 
     public static String getUserLogin(Context context, User user) {
         User actualUser = adjustUserForBotSuffix(user);
-        if (actualUser.login() != null) {
+        if (actualUser != null && actualUser.login() != null) {
             return actualUser.login();
         }
         return context.getString(R.string.deleted);

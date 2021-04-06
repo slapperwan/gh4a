@@ -140,7 +140,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        onInitExtras(getIntent().getExtras());
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            onInitExtras(extras);
+        }
         super.onCreate(savedInstanceState);
 
         mRxLoader = new RxLoader(this, LoaderManager.getInstance(this));
