@@ -189,7 +189,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (are == null && e instanceof RuntimeException) {
             // If this happens, it means Rx catched a programming error of us. Crash the app
             // in that case, as that's what would have happened without Rx as well.
-            throw (RuntimeException) e;
+            // In doing so, don't just throw the exception (but instead delegate it right to the
+            // uncaught exception handler) to make sure RX doesn't add its composite exception
+            // which obscures the actual stack trace.
+            Thread currentThread = Thread.currentThread();
+            Thread.UncaughtExceptionHandler handler = currentThread.getUncaughtExceptionHandler();
+            handler.uncaughtException(currentThread, e);
         }
         Log.d(Gh4Application.LOG_TAG, text, e);
     }
