@@ -21,6 +21,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
@@ -300,10 +303,14 @@ public class UiUtils {
             requestBuilder.addHeader("Authorization", "Token " + token);
         }
 
+        final Handler handler = new Handler(Looper.getMainLooper());
+
         client.newCall(requestBuilder.build()).enqueue(new Callback() {
             private void completeDownload(final String url) {
-                enqueueDownload(context, url, asset.name(), asset.label(), asset.contentType(),
-                        "application/octet-stream", false);
+                handler.post(() -> {
+                    enqueueDownload(context, url, asset.name(), asset.label(), asset.contentType(),
+                            "application/octet-stream", false);
+                });
             }
             @Override
             public void onFailure(Call call, IOException e) {
