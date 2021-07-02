@@ -339,7 +339,7 @@ public class PullRequestFragment extends IssueFragmentBase {
                 mPullRequest.number(), comment.id(), 0L, comment.body(), highlightColorAttr)
                 : EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
                         mIssue.number(), comment.id(), comment.body(), highlightColorAttr);
-        startActivityForResult(intent, REQUEST_EDIT);
+        mEditLauncher.launch(intent);
     }
 
 

@@ -1,9 +1,11 @@
 package com.gh4a.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +20,7 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.activities.EditCommitCommentActivity;
 import com.gh4a.adapter.CommitNoteAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -68,8 +71,6 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
         void onCommentsUpdated();
     }
 
-    private static final int REQUEST_EDIT = 1000;
-
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
@@ -79,6 +80,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
 
     private CommitNoteAdapter mAdapter;
     private EditorBottomSheet mBottomSheet;
+
+    private final ActivityResultLauncher<Intent> mEditLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> refreshComments())
+    );
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -241,21 +247,10 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT) {
-            if (resultCode == Activity.RESULT_OK) {
-                refreshComments();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
     public void editComment(GitComment comment) {
         Intent intent = EditCommitCommentActivity.makeIntent(getActivity(),
                 mRepoOwner, mRepoName, mObjectSha, comment.id(), comment.body());
-        startActivityForResult(intent, REQUEST_EDIT);
+        mEditLauncher.launch(intent);
     }
 
     @Override

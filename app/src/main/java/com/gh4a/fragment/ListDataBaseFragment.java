@@ -4,6 +4,7 @@ import java.util.List;
 import android.os.Bundle;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import com.gh4a.adapter.RootAdapter;
 
@@ -15,8 +16,8 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
     private Disposable mSubscription;
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         setContentShown(false);
         loadData(false);

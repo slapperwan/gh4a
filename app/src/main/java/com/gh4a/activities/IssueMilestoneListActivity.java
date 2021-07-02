@@ -18,8 +18,13 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.gh4a.utils.ActivityResultHelpers;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,8 +46,6 @@ public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implem
                 .putExtra("from_pr", fromPullRequest);
     }
 
-    private static final int REQUEST_CREATE_MILESTONE = 1000;
-
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
     };
@@ -50,6 +53,14 @@ public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implem
         { R.attr.colorIssueOpen, R.attr.colorIssueOpenDark },
         { R.attr.colorIssueClosed, R.attr.colorIssueClosedDark }
     };
+
+    private final ActivityResultLauncher<Intent> mCreateMilestoneLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
+                onRefresh();
+                setResult(RESULT_OK);
+            })
+    );
 
     private String mRepoOwner;
     private String mRepoName;
@@ -145,25 +156,14 @@ public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implem
 
     @Override
     public void onClick(View view) {
-        startActivityForResult(IssueMilestoneEditActivity.makeCreateIntent(this,
-                mRepoOwner, mRepoName, mParentIsPullRequest), REQUEST_CREATE_MILESTONE);
+        Intent intent = IssueMilestoneEditActivity.makeCreateIntent(this,
+                mRepoOwner, mRepoName, mParentIsPullRequest);
+        mCreateMilestoneLauncher.launch(intent);
     }
 
     @Override
     protected void invalidateFragments() {
         mOpenFragment = null;
         super.invalidateFragments();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CREATE_MILESTONE) {
-            if (resultCode == RESULT_OK) {
-                onRefresh();
-                setResult(RESULT_OK);
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 }

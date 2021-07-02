@@ -20,6 +20,9 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Parcelable;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableString;
@@ -41,6 +44,7 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
 import com.gh4a.model.TimelineItem;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
@@ -74,8 +78,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         ConfirmationDialogFragment.Callback,
         EditorBottomSheet.Callback, EditorBottomSheet.Listener,
         ReactionBar.Callback, ReactionBar.Item, ReactionBar.ReactionDetailsCache.Listener {
-    protected static final int REQUEST_EDIT = 1000;
-
     protected static final List<IssueEventType> INTERESTING_EVENTS = Arrays.asList(
             IssueEventType.Closed, IssueEventType.Reopened, IssueEventType.Merged,
             IssueEventType.Referenced, IssueEventType.Assigned, IssueEventType.Unassigned,
@@ -98,6 +100,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     private TimelineItemAdapter mAdapter;
     private HttpImageGetter mImageGetter;
     private EditorBottomSheet mBottomSheet;
+
+    protected final ActivityResultLauncher<Intent> mEditLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
+                reloadEvents(true);
+                getActivity().setResult(Activity.RESULT_OK);
+            }));
 
     protected static Bundle buildArgs(String repoOwner, String repoName,
             Issue issue, boolean isCollaborator, IntentUtils.InitialCommentMarker initialComment) {
@@ -502,18 +511,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         Intent intent = UserActivity.makeIntent(getActivity(), (User) v.getTag());
         if (intent != null) {
             startActivity(intent);
-        }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT) {
-            if (resultCode == Activity.RESULT_OK) {
-                reloadEvents(true);
-                getActivity().setResult(Activity.RESULT_OK);
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 

@@ -19,6 +19,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.collection.LongSparseArray;
 import androidx.appcompat.widget.PopupMenu;
@@ -32,6 +35,7 @@ import android.view.View;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.fragment.ConfirmationDialogFragment;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
@@ -107,7 +111,10 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             + "A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2"
             + "C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z";
 
-    protected static final int REQUEST_EDIT = 0;
+    protected final ActivityResultLauncher<Intent> mEditLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> refresh())
+    );
 
     private static final int ID_LOADER_COMMENTS = 0;
 
@@ -377,17 +384,6 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     public void onConfirmed(String tag, Parcelable data) {
         long id = ((Bundle) data).getLong("id");
         doDeleteComment(id);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT) {
-            if (resultCode == RESULT_OK) {
-                refresh();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     private void addCommentsToMap(List<C> comments) {

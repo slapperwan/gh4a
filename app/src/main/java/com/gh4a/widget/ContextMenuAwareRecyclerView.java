@@ -31,7 +31,7 @@ public class ContextMenuAwareRecyclerView extends RecyclerView {
     public boolean showContextMenuForChild(View view) {
         if (view.getLayoutParams() instanceof RecyclerView.LayoutParams) {
             RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) view.getLayoutParams();
-            final int position = params.getViewAdapterPosition();
+            final int position = params.getBindingAdapterPosition();
             if (position == NO_POSITION) {
                 return false;
             }

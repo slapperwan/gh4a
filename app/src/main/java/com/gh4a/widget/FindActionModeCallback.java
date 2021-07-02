@@ -18,7 +18,6 @@ package com.gh4a.widget;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.text.Editable;
 import android.text.Selection;
 import android.text.Spannable;
@@ -32,6 +31,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.view.MenuItemCompat;
 
@@ -155,8 +155,8 @@ public class FindActionModeCallback implements ActionMode.Callback, TextWatcher,
         Editable edit = mEditText.getText();
         Selection.setSelection(edit, edit.length());
 
-        final Resources res = mCustomView.getContext().getResources();
-        final ColorStateList iconTintList = res.getColorStateList(R.color.webview_find_icon);
+        final ColorStateList iconTintList = AppCompatResources.getColorStateList(
+                mCustomView.getContext(), R.color.webview_find_icon);
 
         mPrevItem = menu.findItem(R.id.find_prev);
         MenuItemCompat.setIconTintList(mPrevItem, iconTintList);

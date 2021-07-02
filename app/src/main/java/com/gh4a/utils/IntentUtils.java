@@ -18,6 +18,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsIntent;
 import android.widget.Toast;
 
@@ -93,9 +94,11 @@ public class IntentUtils {
     public static void openInCustomTabOrBrowser(Activity activity, Uri uri) {
         String pkg = CustomTabsHelper.getPackageNameToUse(activity);
         if (pkg != null) {
-            int color = UiUtils.resolveColor(activity, R.attr.colorPrimary);
+            CustomTabColorSchemeParams colorParams = new CustomTabColorSchemeParams.Builder()
+                    .setToolbarColor(UiUtils.resolveColor(activity, R.attr.colorPrimary))
+                    .build();
             CustomTabsIntent i = new CustomTabsIntent.Builder()
-                    .setToolbarColor(color)
+                    .setDefaultColorSchemeParams(colorParams)
                     .build();
             i.intent.setPackage(pkg);
             i.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

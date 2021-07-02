@@ -19,9 +19,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 
+import com.gh4a.utils.ActivityResultHelpers;
 import com.google.android.material.appbar.AppBarLayout;
 import android.util.Pair;
 import android.view.Menu;
@@ -59,10 +62,19 @@ public class Github4AndroidActivity extends BaseActivity implements
 
     private static final Uri CALLBACK_URI = Uri.parse("gh4a://oauth");
 
-    private static final int REQUEST_SETTINGS = 10000;
-
     private View mContent;
     private View mProgress;
+
+    private final ActivityResultLauncher<Void> mSettingsLauncher = registerForActivityResult(
+            new ActivityResultHelpers.StartSettingsContract(),
+            themeChange -> {
+                if (themeChange) {
+                    Intent intent = new Intent(getIntent());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
+                }
+            });
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -152,7 +164,7 @@ public class Github4AndroidActivity extends BaseActivity implements
         super.onNavigationItemSelected(item);
         switch (item.getItemId()) {
             case R.id.settings:
-                startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
+                mSettingsLauncher.launch(null);
                 return true;
             case R.id.search:
                 startActivity(SearchActivity.makeIntent(this));
@@ -176,22 +188,6 @@ public class Github4AndroidActivity extends BaseActivity implements
     @Override
     protected boolean canSwipeToRefresh() {
         return false;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SETTINGS) {
-            boolean themeChange = data != null
-                    && data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false);
-            if (themeChange) {
-                Intent intent = new Intent(getIntent());
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     @Override

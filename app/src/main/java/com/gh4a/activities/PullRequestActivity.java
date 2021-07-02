@@ -22,9 +22,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+
+import com.gh4a.utils.ActivityResultHelpers;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -96,8 +101,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     public static final int PAGE_COMMITS = 1;
     public static final int PAGE_FILES = 2;
 
-    private static final int REQUEST_EDIT_ISSUE = 1001;
-    private static final int REQUEST_CREATE_REVIEW = 1002;
+    private final ActivityResultLauncher<Intent> mEditIssueLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
+                setResult(Activity.RESULT_OK);
+                onRefresh();
+            })
+    );
 
     private String mRepoOwner;
     private String mRepoName;
@@ -115,6 +125,16 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private ViewGroup mHeader;
     private int[] mHeaderColorAttrs;
+
+    private final ActivityResultLauncher<Intent> mCreateReviewLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
+                if (mPullRequestFragment != null) {
+                    mPullRequestFragment.reloadEvents(false);
+                }
+                loadPendingReview(true);
+            })
+    );
 
     private static final int[] TITLES = new int[]{
             R.string.pull_request_conversation, R.string.commits, R.string.pull_request_files
@@ -233,25 +253,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT_ISSUE) {
-            if (resultCode == Activity.RESULT_OK) {
-                setResult(Activity.RESULT_OK);
-                onRefresh();
-            }
-        } else if (requestCode == REQUEST_CREATE_REVIEW) {
-            if (resultCode == Activity.RESULT_OK) {
-                if (mPullRequestFragment != null) {
-                    mPullRequestFragment.reloadEvents(false);
-                }
-                loadPendingReview(true);
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
-    @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
@@ -345,7 +346,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     public void onClick(View v) {
         if (v == mEditFab) {
             Intent editIntent = IssueEditActivity.makeEditIntent(this, mRepoOwner, mRepoName, mIssue);
-            startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
+            mEditIssueLauncher.launch(editIntent);
         } else if (v.getId() == R.id.iv_gravatar) {
             Intent intent = UserActivity.makeIntent(this, (User) v.getTag());
             if (intent != null) {
@@ -374,7 +375,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private void showReviewDialog() {
         Intent intent = CreateReviewActivity.makeIntent(this, mRepoOwner, mRepoName,
                 mPullRequestNumber, mPendingReview);
-        startActivityForResult(intent, REQUEST_CREATE_REVIEW);
+        mCreateReviewLauncher.launch(intent);
     }
 
     private void updateFabVisibility() {

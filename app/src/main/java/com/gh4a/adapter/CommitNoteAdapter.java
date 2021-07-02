@@ -232,7 +232,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
         if (holder.mReactionMenuHelper != null) {
             holder.mReactionMenuHelper.update();
         }
-        notifyItemChanged(holder.getAdapterPosition());
+        notifyItemChanged(holder.getBindingAdapterPosition());
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements

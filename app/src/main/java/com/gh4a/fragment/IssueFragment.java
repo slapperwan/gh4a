@@ -100,7 +100,7 @@ public class IssueFragment extends IssueFragmentBase {
                 ? R.attr.colorIssueClosed : R.attr.colorIssueOpen;
         Intent intent = EditIssueCommentActivity.makeIntent(getActivity(), mRepoOwner, mRepoName,
                 mIssue.number(), comment.id(), comment.body(), highlightColorAttr);
-        startActivityForResult(intent, REQUEST_EDIT);
+        mEditLauncher.launch(intent);
     }
 
     @Override

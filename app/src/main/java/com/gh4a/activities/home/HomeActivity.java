@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.IdRes;
@@ -29,12 +31,12 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.Github4AndroidActivity;
-import com.gh4a.activities.SettingsActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.fragment.LoginModeChooserFragment;
 import com.gh4a.fragment.NotificationListFragment;
 import com.gh4a.fragment.RepositoryListContainerFragment;
 import com.gh4a.fragment.SettingsFragment;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.UiUtils;
@@ -63,8 +65,6 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 .putExtra(NotificationListFragment.EXTRA_INITIAL_REPO_NAME, repoName);
     }
 
-    private static final int REQUEST_SETTINGS = 10000;
-
     private FragmentFactory mFactory;
     private ImageView mAvatarView;
     private TextView mUserExtraView;
@@ -77,6 +77,15 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     private ImageView mNotificationsIndicator;
     private MenuItem mNotificationsMenuItem;
     private Drawable mNotificationsIndicatorIcon;
+
+    private final ActivityResultLauncher<Void> mSettingsLauncher = registerForActivityResult(
+            new ActivityResultHelpers.StartSettingsContract(),
+            themeChanged -> {
+                if (themeChanged) {
+                    goToToplevelActivity();
+                    finish();
+                }
+            });
 
     private static final String STATE_KEY_FACTORY_ITEM = "factoryItem";
 
@@ -258,7 +267,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
                 LoginModeChooserFragment.newInstance().show(getSupportFragmentManager(), "loginmode");
                 return true;
             case R.id.settings:
-                startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_SETTINGS);
+                mSettingsLauncher.launch(null);
                 return true;
         }
 
@@ -376,18 +385,6 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SETTINGS) {
-            if (data.getBooleanExtra(SettingsActivity.RESULT_EXTRA_THEME_CHANGED, false)) {
-                goToToplevelActivity();
-                finish();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 
     @Override

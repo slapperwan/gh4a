@@ -65,13 +65,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         getPreferenceManager().setSharedPreferencesName(PREF_NAME);
         addPreferencesFromResource(R.xml.settings);
-    }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        mThemePref = (IntegerListPreference) findPreference(KEY_THEME);
+        mThemePref = findPreference(KEY_THEME);
         mThemePref.setOnPreferenceChangeListener(this);
 
         mAboutPref = findPreference(KEY_ABOUT);
@@ -81,11 +76,10 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         mOpenSourcePref = findPreference(KEY_OPEN_SOURCE_COMPONENTS);
         mOpenSourcePref.setOnPreferenceClickListener(this);
 
-        mNotificationsPref = (TwoStatePreference) findPreference(KEY_NOTIFICATIONS);
+        mNotificationsPref = findPreference(KEY_NOTIFICATIONS);
         mNotificationsPref.setOnPreferenceChangeListener(this);
 
-        mNotificationIntervalPref =
-                (IntegerListPreference) findPreference(KEY_NOTIFICATION_INTERVAL);
+        mNotificationIntervalPref = findPreference(KEY_NOTIFICATION_INTERVAL);
         mNotificationIntervalPref.setOnPreferenceChangeListener(this);
     }
 

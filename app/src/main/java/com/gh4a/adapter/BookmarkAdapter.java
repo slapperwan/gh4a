@@ -133,7 +133,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     @Override
     public void onClick(View view) {
         ViewHolder vh = (ViewHolder) view.getTag();
-        int position = vh.getAdapterPosition();
+        int position = vh.getBindingAdapterPosition();
         if (position != RecyclerView.NO_POSITION && moveCursorToPosition(position)) {
             mItemInteractListener.onItemClick(mCursor.getLong(mIdColumnIndex),
                     mCursor.getString(mUrlColumnIndex));
@@ -146,7 +146,7 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.ViewHo
     }
 
     public void onItemSwiped(RecyclerView.ViewHolder viewHolder) {
-        int position = viewHolder.getAdapterPosition();
+        int position = viewHolder.getBindingAdapterPosition();
         if (position == RecyclerView.NO_POSITION || !moveCursorToPosition(position)) {
             return;
         }

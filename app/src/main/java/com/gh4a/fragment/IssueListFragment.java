@@ -18,6 +18,9 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.TextUtils;
@@ -33,6 +36,7 @@ import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.adapter.IssueAdapter;
 import com.gh4a.adapter.RepositoryIssueAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Issue;
@@ -43,14 +47,17 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class IssueListFragment extends PagedDataBaseFragment<Issue> {
-    private static final int REQUEST_ISSUE = 1000;
-
     private String mQuery;
     private String mSortMode;
     private String mOrder;
     private int mEmptyTextResId;
     private boolean mShowRepository;
     private String mIssueState;
+
+    private final ActivityResultLauncher<Intent> mIssueLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> super.onRefresh())
+    );
 
     public static IssueListFragment newInstance(String query, String sortMode, String order,
             String state, int emptyTextResId, boolean showRepository) {
@@ -105,20 +112,8 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
         Intent intent = issue.pullRequest() != null
                 ? PullRequestActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.number())
                 : IssueActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.number());
-        startActivityForResult(intent, REQUEST_ISSUE);
+        mIssueLauncher.launch(intent);
     }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_ISSUE) {
-            if (resultCode == Activity.RESULT_OK) {
-                super.onRefresh();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
 
     @Override
     protected RootAdapter<Issue, ? extends RecyclerView.ViewHolder> onCreateAdapter() {

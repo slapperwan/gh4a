@@ -19,9 +19,11 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gh4a.ApiRequestException;
@@ -30,6 +32,7 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.adapter.CommitAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Commit;
@@ -62,8 +65,6 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
         return f;
     }
 
-    private static final int REQUEST_COMMIT = 2000;
-
     private String mRepoOwner;
     private String mRepoName;
     private String mBase;
@@ -71,6 +72,11 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
     private String mHead;
     private String mHeadLabel;
     private int mPullRequestNumber;
+
+    private final ActivityResultLauncher<Intent> mCommitLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> onRefresh())
+    );
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,19 +108,7 @@ public class CommitCompareFragment extends ListDataBaseFragment<Commit> implemen
     public void onItemClick(Commit commit) {
         Intent intent = CommitActivity.makeIntent(getActivity(),
                 mRepoOwner, mRepoName, mPullRequestNumber, commit.sha());
-        startActivityForResult(intent, REQUEST_COMMIT);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_COMMIT) {
-            if (resultCode == Activity.RESULT_OK) {
-                // comments were updated
-                onRefresh();
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+        mCommitLauncher.launch(intent);
     }
 
     @Override
