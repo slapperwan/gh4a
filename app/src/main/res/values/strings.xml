@@ -24,6 +24,7 @@
     <string name="credentials_username">User name</string>
     <string name="credentials_password">Password</string>
     <string name="credentials_error_empty">This field must not be empty.</string>
+    <string name="credentials_error_invalid_token">The entered text does not look like a valid access token.</string>
     <string name="credentials_otp">OTP code</string>
     <string name="credentials_otp_prompt">Please enter the two-factor confirmation code you got via SMS.</string>
     <string name="credentials_token">Access token</string>

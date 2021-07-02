@@ -42,6 +42,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import io.reactivex.Single;
 import io.reactivex.processors.PublishProcessor;
@@ -107,7 +108,17 @@ public class LoginModeChooserFragment extends DialogFragment implements
         mUserName = new WrappedEditor(view, R.id.user_name, R.id.user_wrapper);
         mPassword = new WrappedEditor(view, R.id.password, R.id.password_wrapper);
         mOtpCodeEditor = new WrappedEditor(view, R.id.otp_code, R.id.otp_wrapper);
-        mToken = new WrappedEditor(view, R.id.token, R.id.token_wrapper);
+        mToken = new WrappedEditor(view, R.id.token, R.id.token_wrapper) {
+            private Pattern TOKEN_PATTERN = Pattern.compile("[A-Za-z0-9_]{8,255}");
+            @Override
+            protected int getTextErrorResId(Editable s) {
+                int resId = super.getTextErrorResId(s);
+                if (resId == 0 && !TOKEN_PATTERN.matcher(s).matches()) {
+                    resId = R.string.credentials_error_invalid_token;
+                }
+                return resId;
+            }
+        };
 
         mModeGroup.check(R.id.oauth_button);
 
@@ -360,12 +371,20 @@ public class LoginModeChooserFragment extends DialogFragment implements
 
         @Override
         public void afterTextChanged(Editable s) {
-            if (TextUtils.isEmpty(s)) {
-                mWrapper.setError(getString(R.string.credentials_error_empty));
+            int errorResId = getTextErrorResId(s);
+            if (errorResId != 0) {
+                mWrapper.setError(getString(errorResId));
             } else {
                 mWrapper.setErrorEnabled(false);
             }
             updateOkButtonState();
+        }
+
+        protected int getTextErrorResId(Editable s) {
+            if (TextUtils.isEmpty(s)) {
+                return R.string.credentials_error_empty;
+            }
+            return 0;
         }
     }
 }
