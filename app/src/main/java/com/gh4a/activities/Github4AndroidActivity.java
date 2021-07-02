@@ -103,11 +103,17 @@ public class Github4AndroidActivity extends BaseActivity implements
         if (data != null
                 && data.getScheme().equals(CALLBACK_URI.getScheme())
                 && data.getHost().equals(CALLBACK_URI.getHost())) {
+            final String code = data.getQueryParameter(PARAM_CODE);
+            if (code == null) {
+                onLoginCanceled();
+                return true;
+            }
+
             OAuthService service = ServiceGenerator.createAuthService();
             RequestToken request = RequestToken.builder()
                     .clientId(BuildConfig.CLIENT_ID)
                     .clientSecret(BuildConfig.CLIENT_SECRET)
-                    .code(data.getQueryParameter(PARAM_CODE))
+                    .code(code)
                     .build();
 
             service.getToken(request)
