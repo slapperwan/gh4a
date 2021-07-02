@@ -605,7 +605,7 @@ public class HttpImageGetter {
                 svg.renderToCanvas(canvas);
                 return bitmap;
             }
-        } catch (SVGParseException e) {
+        } catch (Exception e) {
             // fall through
         }
         return null;
