@@ -31,8 +31,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 30
-        versionCode 68
-        versionName "4.6.5"
+        versionCode 69
+        versionName "4.6.6"
         applicationId "com.gh4a"
         multiDexEnabled true
 
