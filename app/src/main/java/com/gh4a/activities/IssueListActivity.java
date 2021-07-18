@@ -18,6 +18,7 @@ package com.gh4a.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -666,5 +667,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                         }
                     }
                 }, this::handleLoadFailure);
+    }
+
+    @Nullable
+    @Override
+    protected Uri getActivityUri() {
+        return Uri.parse("https://github.com/" + mRepoOwner + "/" + mRepoName + "/issues");
     }
 }

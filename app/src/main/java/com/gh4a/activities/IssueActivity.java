@@ -394,4 +394,11 @@ public class IssueActivity extends BaseActivity implements
                     supportInvalidateOptionsMenu();
                 }, this::handleLoadFailure);
     }
+
+    @Nullable
+    @Override
+    protected Uri getActivityUri() {
+        return Uri.parse("https://github.com/" + mRepoOwner + "/" + mRepoName + "/issues/" +
+                mIssueNumber);
+    }
 }
