@@ -617,4 +617,11 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     .create();
         }
     }
+
+    @Nullable
+    @Override
+    protected Uri getActivityUri() {
+        return Uri.parse("https://github.com/" + mRepoOwner + "/" + mRepoName + "/pull/" +
+                mPullRequestNumber);
+    }
 }

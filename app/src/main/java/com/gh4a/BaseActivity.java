@@ -22,11 +22,13 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.app.assist.AssistContent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -870,5 +872,20 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mSwipeLayout.setAppBarLayout(mHeader);
 
         mContentShown = true;
+    }
+
+    @Override
+    public void onProvideAssistContent(AssistContent outContent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Uri activityUri = getActivityUri();
+
+            if (activityUri != null) {
+                outContent.setWebUri(activityUri);
+            }
+        }
+    }
+
+    protected @Nullable Uri getActivityUri() {
+        return null;
     }
 }

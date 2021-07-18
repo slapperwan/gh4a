@@ -237,4 +237,15 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
                     showContentIfReady();
                 }, this::handleLoadFailure);
     }
+
+    @Nullable
+    @Override
+    protected Uri getActivityUri() {
+        if (mPullRequestNumber > 0)
+        return Uri.parse("https://github.com/" + mRepoOwner + "/" + mRepoName + "pull/" +
+                mPullRequestNumber + "/commit/" + mObjectSha);
+        else
+            return Uri.parse("https://github.com/" + mRepoOwner + "/" + mRepoName + "/commit/" +
+                    mObjectSha);
+    }
 }
