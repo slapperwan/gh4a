@@ -1,7 +1,6 @@
 package com.gh4a;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.Log;
 
 import com.gh4a.utils.Optional;
@@ -11,34 +10,19 @@ import com.meisolsson.githubsdk.core.StringResponseConverterFactory;
 import com.meisolsson.githubsdk.service.checks.ChecksService;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.security.KeyStore;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
-
 import io.reactivex.Single;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
-import okhttp3.ConnectionSpec;
 import okhttp3.Credentials;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.TlsVersion;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -60,7 +44,7 @@ public class ServiceFactory {
     private final static HttpLoggingInterceptor LOGGING_INTERCEPTOR = new HttpLoggingInterceptor()
             .setLevel(HttpLoggingInterceptor.Level.BASIC);
 
-    private final static Interceptor PAGINATION_INTRCEPTOR = new GitHubPaginationInterceptor();
+    private final static Interceptor PAGINATION_INTERCEPTOR = new GitHubPaginationInterceptor();
 
     private final static Interceptor CACHE_STATUS_INTERCEPTOR = chain -> {
         Response response = chain.proceed(chain.request());
@@ -166,7 +150,7 @@ public class ServiceFactory {
     private static <S> S createService(Class<S> serviceClass, final boolean bypassCache,
             final String acceptHeader, final String token, final Integer pageSize) {
         OkHttpClient.Builder clientBuilder = sApiHttpClient.newBuilder()
-                .addInterceptor(PAGINATION_INTRCEPTOR)
+                .addInterceptor(PAGINATION_INTERCEPTOR)
                 .addNetworkInterceptor(ETAG_WORKAROUND_INTERCEPTOR)
                 .addNetworkInterceptor(CACHE_MAX_AGE_INTERCEPTOR)
                 .addInterceptor(chain -> {
@@ -259,46 +243,13 @@ public class ServiceFactory {
     }
 
     static void initClient(Context context) {
-        sApiHttpClient = enableTls12IfNeeded(new OkHttpClient.Builder())
-                .cache(new Cache(new File(context.getCacheDir(), "api-http"), 20 * 1024 * 1024))
+        int twentyMB = 20 * 1024 * 1024;
+        sApiHttpClient = new OkHttpClient.Builder()
+                .cache(new Cache(new File(context.getCacheDir(), "api-http"), twentyMB))
                 .build();
-        sImageHttpClient = new OkHttpClient.Builder()
-                .cache(new Cache(new File(context.getCacheDir(), "image-http"), 20 * 1024 * 1024))
+        sImageHttpClient = sApiHttpClient.newBuilder()
+                .cache(new Cache(new File(context.getCacheDir(), "image-http"), twentyMB))
                 .build();
-    }
-
-    private static OkHttpClient.Builder enableTls12IfNeeded(OkHttpClient.Builder builder) {
-        if (Build.VERSION.SDK_INT < 22) {
-            try {
-                SSLContext sc = SSLContext.getInstance("TLSv1.2");
-                sc.init(null, null, null);
-
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(
-                        TrustManagerFactory.getDefaultAlgorithm());
-                tmf.init((KeyStore) null);
-                TrustManager[] trustManagers = tmf.getTrustManagers();
-                if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
-                    throw new IllegalStateException("Unexpected default trust managers:"
-                            + Arrays.toString(trustManagers));
-                }
-                X509TrustManager tm = (X509TrustManager) trustManagers[0];
-
-                ConnectionSpec cs = new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                        .tlsVersions(TlsVersion.TLS_1_2)
-                        .build();
-
-                List<ConnectionSpec> specs = new ArrayList<>();
-                specs.add(cs);
-                specs.add(ConnectionSpec.COMPATIBLE_TLS);
-                specs.add(ConnectionSpec.CLEARTEXT);
-
-                builder.sslSocketFactory(new Tls12SocketFactory(sc.getSocketFactory()), tm);
-                builder.connectionSpecs(specs);
-            } catch (Exception exc) {
-                Log.e("OkHttpTLSCompat", "Error while setting TLS 1.2", exc);
-            }
-        }
-        return builder;
     }
 
     public interface LoginService {
@@ -340,61 +291,6 @@ public class ServiceFactory {
             public String fingerprint() {
                 return fingerprint;
             }
-        }
-    }
-
-    private static class Tls12SocketFactory extends SSLSocketFactory {
-        private static final String[] TLS_V12_ONLY = {"TLSv1.2"};
-
-        final SSLSocketFactory delegate;
-
-        public Tls12SocketFactory(SSLSocketFactory base) {
-            this.delegate = base;
-        }
-
-        @Override
-        public String[] getDefaultCipherSuites() {
-            return delegate.getDefaultCipherSuites();
-        }
-
-        @Override
-        public String[] getSupportedCipherSuites() {
-            return delegate.getSupportedCipherSuites();
-        }
-
-        @Override
-        public Socket createSocket(Socket s, String host, int port, boolean autoClose)
-                throws IOException {
-            return patch(delegate.createSocket(s, host, port, autoClose));
-        }
-
-        @Override
-        public Socket createSocket(String host, int port) throws IOException {
-            return patch(delegate.createSocket(host, port));
-        }
-
-        @Override
-        public Socket createSocket(String host, int port, InetAddress localHost, int localPort)
-                throws IOException {
-            return patch(delegate.createSocket(host, port, localHost, localPort));
-        }
-
-        @Override
-        public Socket createSocket(InetAddress host, int port) throws IOException {
-            return patch(delegate.createSocket(host, port));
-        }
-
-        @Override
-        public Socket createSocket(InetAddress address, int port,
-                InetAddress localAddress, int localPort) throws IOException {
-            return patch(delegate.createSocket(address, port, localAddress, localPort));
-        }
-
-        private Socket patch(Socket s) {
-            if (s instanceof SSLSocket) {
-                ((SSLSocket) s).setEnabledProtocols(TLS_V12_ONLY);
-            }
-            return s;
         }
     }
 }
