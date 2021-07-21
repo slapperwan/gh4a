@@ -21,10 +21,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.gh4a.utils.ActivityResultHelpers;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -114,14 +118,20 @@ public class IssueEditActivity extends BasePagerActivity implements
         void handleLoad(List<Milestone> milestones);
     }
 
-    private static final int REQUEST_MANAGE_LABELS = 1000;
-    private static final int REQUEST_MANAGE_MILESTONES = 1001;
-
     private static final int ID_LOADER_COLLABORATOR_STATUS = 0;
 
     private static final int[] TITLES = {
         R.string.issue_body, R.string.preview, R.string.settings
     };
+
+    private final ActivityResultLauncher<Intent> mLabelManagerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> mLabelSingle = null)
+    );
+    private final ActivityResultLauncher<Intent> mMilestoneManagerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> mMilestoneSingle = null)
+    );
 
     private String mRepoOwner;
     private String mRepoName;
@@ -356,23 +366,6 @@ public class IssueEditActivity extends BasePagerActivity implements
         return IssueActivity.makeIntent(this, mRepoOwner, mRepoName, mEditIssue.number());
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_MANAGE_LABELS) {
-            if (resultCode == RESULT_OK) {
-                // Require reload of labels
-                mLabelSingle = null;
-            }
-        } else if (requestCode == REQUEST_MANAGE_MILESTONES) {
-            if (resultCode == RESULT_OK) {
-                // Require reload of milestones
-                mMilestoneSingle = null;
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
     private void showMilestonesDialog() {
         loadMilestones(milestones -> {
             MilestoneEditDialogFragment
@@ -425,13 +418,13 @@ public class IssueEditActivity extends BasePagerActivity implements
     private void manageMilestones() {
         Intent intent = IssueMilestoneListActivity.makeIntent(this, mRepoOwner, mRepoName,
                 mEditIssue.pullRequest() != null);
-        startActivityForResult(intent, REQUEST_MANAGE_MILESTONES);
+        mMilestoneManagerLauncher.launch(intent);
     }
 
     private void manageLabels() {
         Intent intent = IssueLabelListActivity.makeIntent(this, mRepoOwner, mRepoName,
                 mEditIssue.pullRequest() != null);
-        startActivityForResult(intent, REQUEST_MANAGE_LABELS);
+        mLabelManagerLauncher.launch(intent);
     }
 
     private void updateOptionViews() {

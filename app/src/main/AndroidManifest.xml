@@ -162,6 +162,11 @@
         <service android:name=".worker.NotificationHandlingService" />
 
         <provider
+            android:name="androidx.work.impl.WorkManagerInitializer"
+            android:authorities="${applicationId}.workmanager-init"
+            tools:node="remove" />
+
+        <provider
             android:name=".db.BookmarksProvider"
             android:authorities="${applicationId}"
             android:exported="false" />

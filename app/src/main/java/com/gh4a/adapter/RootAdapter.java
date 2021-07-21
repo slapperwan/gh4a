@@ -251,7 +251,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     @Override
     public void onClick(View view) {
         VH holder = (VH) view.getTag();
-        int position = holder.getAdapterPosition();
+        int position = holder.getBindingAdapterPosition();
         if (position != RecyclerView.NO_POSITION) {
             mItemClickListener.onItemClick(getItemFromAdapterPosition(position));
         }

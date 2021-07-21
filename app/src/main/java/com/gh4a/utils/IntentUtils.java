@@ -2,6 +2,7 @@ package com.gh4a.utils;
 
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -17,6 +18,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsIntent;
 import android.widget.Toast;
 
@@ -50,11 +52,15 @@ public class IntentUtils {
         }
         Intent intent = createBrowserIntent(context, uri);
         if (intent != null) {
-            intent.addFlags(flags);
-            context.startActivity(intent);
-        } else {
-            Toast.makeText(context, R.string.no_browser_found, Toast.LENGTH_LONG).show();
+            try {
+                intent.addFlags(flags);
+                context.startActivity(intent);
+                return;
+            } catch (ActivityNotFoundException e) {
+                // just show toast
+            }
         }
+        Toast.makeText(context, R.string.no_browser_found, Toast.LENGTH_LONG).show();
     }
 
     // We want to forward the URI to a browser, but our own intent filter matches
@@ -88,9 +94,11 @@ public class IntentUtils {
     public static void openInCustomTabOrBrowser(Activity activity, Uri uri) {
         String pkg = CustomTabsHelper.getPackageNameToUse(activity);
         if (pkg != null) {
-            int color = UiUtils.resolveColor(activity, R.attr.colorPrimary);
+            CustomTabColorSchemeParams colorParams = new CustomTabColorSchemeParams.Builder()
+                    .setToolbarColor(UiUtils.resolveColor(activity, R.attr.colorPrimary))
+                    .build();
             CustomTabsIntent i = new CustomTabsIntent.Builder()
-                    .setToolbarColor(color)
+                    .setDefaultColorSchemeParams(colorParams)
                     .build();
             i.intent.setPackage(pkg);
             i.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

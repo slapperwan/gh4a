@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -21,6 +24,7 @@ import com.gh4a.activities.EditPullRequestCommentActivity;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.adapter.timeline.TimelineItemAdapter;
 import com.gh4a.model.TimelineItem;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
@@ -52,12 +56,16 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
         TimelineItemAdapter.OnCommentAction, ConfirmationDialogFragment.Callback,
         EditorBottomSheet.Callback, EditorBottomSheet.Listener {
 
-    private static final int REQUEST_EDIT = 1000;
     private static final String EXTRA_SELECTED_REPLY_COMMENT_ID = "selected_reply_comment_id";
 
     @Nullable
     private TimelineItemAdapter mAdapter;
     private EditorBottomSheet mBottomSheet;
+
+    private final ActivityResultLauncher<Intent> mEditLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> reloadComments(true))
+    );
 
     public static ReviewFragment newInstance(String repoOwner, String repoName, int issueNumber,
             Review review, IntentUtils.InitialCommentMarker mInitialComment) {
@@ -324,17 +332,6 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
         mInitialComment = null;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT) {
-            if (resultCode == Activity.RESULT_OK) {
-                reloadComments(true);
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
-
     private void reloadComments( boolean alsoClearCaches) {
         if (mAdapter != null && !alsoClearCaches) {
             // Don't clear adapter's cache, we're only interested in the new event
@@ -360,7 +357,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
                     mIssueNumber, comment.id(), comment.body(), 0);
         }
 
-        startActivityForResult(intent, REQUEST_EDIT);
+        mEditLauncher.launch(intent);
     }
 
     @Override

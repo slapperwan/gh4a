@@ -99,6 +99,9 @@ public class StringUtils {
     }
 
     public static CharSequence formatRelativeTime(Context context, Date date, boolean showDateIfLongAgo) {
+        if (date == null) {
+            return null;
+        }
         long now = System.currentTimeMillis();
         long time = date.getTime();
         long duration = Math.abs(now - time);

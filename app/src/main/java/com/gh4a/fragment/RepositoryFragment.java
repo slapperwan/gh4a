@@ -160,8 +160,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mImageGetter = new HttpImageGetter(getActivity());
         fillData();

@@ -51,8 +51,8 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     private Disposable mSubscription;
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mRxLoader = new RxLoader(getActivity(), LoaderManager.getInstance(this));
         resetSubject();

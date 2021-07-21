@@ -59,7 +59,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
         Intent intent = EditPullRequestDiffCommentActivity.makeIntent(this,
                 mRepoOwner, mRepoName, mSha, mPath, line, leftLine, rightLine,
                 position, id, body, mPullRequestNumber, replyToId);
-        startActivityForResult(intent, REQUEST_EDIT);
+        mEditLauncher.launch(intent);
     }
 
     @Override

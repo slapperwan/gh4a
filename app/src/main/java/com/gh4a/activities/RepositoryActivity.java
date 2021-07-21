@@ -317,8 +317,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
                         .appendPath(getCurrentRef())
                         .toString();
                 UiUtils.enqueueDownloadWithPermissionCheck(this, zipUrl, "application/zip",
-                        mRepoName + "-" + getCurrentRef() + ".zip", null, null,
-                        UiUtils.DownloadTokenHandling.UseAuthHeader);
+                        mRepoName + "-" + getCurrentRef() + ".zip", null);
                 return true;
             }
         }

@@ -18,6 +18,9 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.gh4a.R;
@@ -25,6 +28,7 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.activities.IssueMilestoneEditActivity;
 import com.gh4a.adapter.MilestoneAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Milestone;
 import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
@@ -40,6 +44,14 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     private boolean mShowClosed;
     private boolean mFromPullRequest;
 
+    private final ActivityResultLauncher<Intent> mEditMilestoneLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
+                onRefresh();
+                getActivity().setResult(Activity.RESULT_OK);
+            })
+    );
+
     public static IssueMilestoneListFragment newInstance(String repoOwner, String repoName,
             boolean showClosed, boolean fromPullRequest) {
         IssueMilestoneListFragment f = new IssueMilestoneListFragment();
@@ -53,8 +65,6 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
         return f;
     }
-
-    private static final int REQUEST_EDIT_MILESTONE = 2000;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,9 +92,9 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
     @Override
     public void onItemClick(Milestone milestone) {
-        startActivityForResult(IssueMilestoneEditActivity.makeEditIntent(
-                getActivity(), mRepoOwner, mRepoName, milestone, mFromPullRequest),
-                REQUEST_EDIT_MILESTONE);
+        Intent intent = IssueMilestoneEditActivity.makeEditIntent(
+                getActivity(), mRepoOwner, mRepoName, milestone, mFromPullRequest);
+        mEditMilestoneLauncher.launch(intent);
     }
 
     @Override
@@ -95,17 +105,5 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, targetState, page));
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT_MILESTONE) {
-            if (resultCode == Activity.RESULT_OK) {
-                onRefresh();
-                getActivity().setResult(Activity.RESULT_OK);
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
     }
 }

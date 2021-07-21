@@ -22,9 +22,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+
+import com.gh4a.utils.ActivityResultHelpers;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -75,7 +80,12 @@ public class IssueActivity extends BaseActivity implements
     private static final int ID_LOADER_ISSUE = 0;
     private static final int ID_LOADER_COLLABORATOR_STATUS = 1;
 
-    private static final int REQUEST_EDIT_ISSUE = 1000;
+    private final ActivityResultLauncher<Intent> mEditIssueLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
+                loadIssue(true);
+                setResult(RESULT_OK);
+            }));
 
     private Issue mIssue;
     private String mRepoOwner;
@@ -359,19 +369,7 @@ public class IssueActivity extends BaseActivity implements
         if (v.getId() == R.id.edit_fab && checkForAuthOrExit()) {
             Intent editIntent = IssueEditActivity.makeEditIntent(this,
                     mRepoOwner, mRepoName, mIssue);
-            startActivityForResult(editIntent, REQUEST_EDIT_ISSUE);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_EDIT_ISSUE) {
-            if (resultCode == Activity.RESULT_OK) {
-                loadIssue(true);
-                setResult(RESULT_OK);
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
+            mEditIssueLauncher.launch(editIntent);
         }
     }
 

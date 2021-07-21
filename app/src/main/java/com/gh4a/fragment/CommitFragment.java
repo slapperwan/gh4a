@@ -14,11 +14,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.UserActivity;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.FileUtils;
@@ -60,14 +64,21 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         void onCommentsUpdated();
     }
 
-    private static final int REQUEST_DIFF_VIEWER = 1000;
-
     private String mRepoOwner;
     private String mRepoName;
     private String mObjectSha;
     private Commit mCommit;
     private List<GitComment> mComments;
     protected View mContentView;
+
+    private final ActivityResultLauncher<Intent> mDiffViewerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
+                // reload comments
+                if (getActivity() instanceof CommentUpdateListener) {
+                    ((CommentUpdateListener) getActivity()).onCommentsUpdated();
+                }
+            }));
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -297,21 +308,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
                     mObjectSha, file.filename(), file.patch(),
                     commentsForFile(file), -1, -1, false, null);
         }
-        startActivityForResult(intent, REQUEST_DIFF_VIEWER);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_DIFF_VIEWER) {
-            if (resultCode == Activity.RESULT_OK) {
-                // reload comments
-                if (getActivity() instanceof CommentUpdateListener) {
-                    ((CommentUpdateListener) getActivity()).onCommentsUpdated();
-                }
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+        mDiffViewerLauncher.launch(intent);
     }
 
     private ArrayList<GitComment> commentsForFile(GitHubFile file) {

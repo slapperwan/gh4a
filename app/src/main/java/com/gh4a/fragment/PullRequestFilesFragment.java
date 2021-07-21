@@ -3,6 +3,9 @@ package com.gh4a.fragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import android.view.View;
 
@@ -10,6 +13,7 @@ import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.RxUtils;
@@ -36,7 +40,6 @@ public class PullRequestFilesFragment extends CommitFragment {
 
     private static final int ID_LOADER_FILES = 0;
     private static final int ID_LOADER_COMMENTS = 1;
-    private static final int REQUEST_DIFF_VIEWER = 1000;
 
     public interface CommentUpdateListener {
         void onCommentsUpdated();
@@ -48,6 +51,19 @@ public class PullRequestFilesFragment extends CommitFragment {
     private String mHeadSha;
     private List<GitHubFile> mFiles;
     private List<ReviewComment> mComments;
+
+    private final ActivityResultLauncher<Intent> mDiffViewerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
+                // reload comments
+                loadComments(true);
+
+                if (getActivity() instanceof CommentUpdateListener) {
+                    CommentUpdateListener l = (CommentUpdateListener) getActivity();
+                    l.onCommentsUpdated();
+                }
+            })
+    );
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,11 +85,7 @@ public class PullRequestFilesFragment extends CommitFragment {
         mContentView.findViewById(R.id.iv_commit_gravatar).setVisibility(View.GONE);
         mContentView.findViewById(R.id.tv_commit_extra).setVisibility(View.GONE);
         mContentView.findViewById(R.id.tv_message).setVisibility(View.GONE);
-    }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         setContentShown(false);
         loadFiles(false);
         loadComments(false);
@@ -106,25 +118,7 @@ public class PullRequestFilesFragment extends CommitFragment {
                     mRepoOwner, mRepoName, mPullRequestNumber, mHeadSha, file.filename(),
                     file.patch(), mComments, -1, -1, -1, false, null);
         }
-
-        startActivityForResult(intent, REQUEST_DIFF_VIEWER);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_DIFF_VIEWER) {
-            if (resultCode == Activity.RESULT_OK) {
-                // reload comments
-                loadComments(true);
-
-                if (getActivity() instanceof CommentUpdateListener) {
-                    CommentUpdateListener l = (CommentUpdateListener) getActivity();
-                    l.onCommentsUpdated();
-                }
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
+        mDiffViewerLauncher.launch(intent);
     }
 
     private void loadFiles(boolean force) {

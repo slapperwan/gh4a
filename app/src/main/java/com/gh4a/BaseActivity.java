@@ -30,10 +30,12 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -140,7 +142,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        onInitExtras(getIntent().getExtras());
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            onInitExtras(extras);
+        }
         super.onCreate(savedInstanceState);
 
         mRxLoader = new RxLoader(this, LoaderManager.getInstance(this));
@@ -189,7 +194,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (are == null && e instanceof RuntimeException) {
             // If this happens, it means Rx catched a programming error of us. Crash the app
             // in that case, as that's what would have happened without Rx as well.
-            throw (RuntimeException) e;
+            // In doing so, don't just throw the exception (but instead delegate it right to the
+            // uncaught exception handler) to make sure RX doesn't add its composite exception
+            // which obscures the actual stack trace.
+            Thread currentThread = Thread.currentThread();
+            Thread.UncaughtExceptionHandler handler = currentThread.getUncaughtExceptionHandler();
+            handler.uncaughtException(currentThread, e);
         }
         Log.d(Gh4Application.LOG_TAG, text, e);
     }
@@ -572,6 +582,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     public void onRequestPermissionsResult(int requestCode,
             @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (mPendingPermissionCb != null) {
             mPendingPermissionCb.onRequestPermissionsResult(0, permissions, grantResults);
             mPendingPermissionCb = null;

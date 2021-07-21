@@ -84,7 +84,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
         String body = commitComment == null ? "" : commitComment.body();
         Intent intent = EditDiffCommentActivity.makeIntent(this, mRepoOwner, mRepoName,
                 mSha, mPath, line, leftLine, rightLine, position, id, body);
-        startActivityForResult(intent, REQUEST_EDIT);
+        mEditLauncher.launch(intent);
     }
 
     @Override

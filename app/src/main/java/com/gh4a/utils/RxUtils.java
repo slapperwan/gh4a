@@ -1,5 +1,6 @@
 package com.gh4a.utils;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.os.Bundle;
 import androidx.annotation.StringRes;
@@ -156,6 +157,7 @@ public class RxUtils {
                         .retryWhen(errorFlow -> errorFlow.flatMap(error -> showSnackbar(error)));
             }
 
+            @SuppressLint("ShowToast")
             private Publisher<Integer> showSnackbar(Throwable error) {
                 final PublishProcessor<Integer> retryProcessor = PublishProcessor.create();
                 Snackbar.make(rootLayout, errorMessage, Snackbar.LENGTH_LONG)

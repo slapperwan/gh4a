@@ -171,10 +171,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             case DownloadEvent: {
                 DownloadPayload payload = (DownloadPayload) event.payload();
                 Download download = payload.download();
-                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(),
-                        download.htmlUrl(), download.contentType(),
-                        download.name(), download.description(), null,
-                        UiUtils.DownloadTokenHandling.None);
+                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(), download);
                 break;
             }
 
@@ -484,18 +481,12 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             if (event.type() == GitHubEventType.ReleaseEvent) {
                 ReleasePayload payload = (ReleasePayload) event.payload();
                 ReleaseAsset asset = payload.release().assets().get(id - MENU_DOWNLOAD_START);
-                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(),
-                        asset.url(), asset.contentType(),
-                        asset.name(), asset.label(), "application/octet-stream",
-                        UiUtils.DownloadTokenHandling.AppendToUri);
+                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(), asset);
             } else if (event.type() == GitHubEventType.DownloadEvent) {
                 DownloadPayload payload = (DownloadPayload) event.payload();
                 Download download = payload.download();
-                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(),
-                        download.htmlUrl(), download.contentType(),
-                        download.name(), download.description(), null,
-                        UiUtils.DownloadTokenHandling.None);
-            }
+                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(), download);
+                }
             return true;
         }
 

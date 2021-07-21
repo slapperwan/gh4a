@@ -10,6 +10,7 @@ import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
@@ -29,8 +30,8 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
     private BookmarkAdapter mAdapter;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         setContentShown(false);
         LoaderManager.getInstance(this).initLoader(0, null, this);
     }
@@ -114,8 +115,8 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                 RecyclerView.ViewHolder target) {
-            int fromPos = viewHolder.getAdapterPosition();
-            int toPos = target.getAdapterPosition();
+            int fromPos = viewHolder.getBindingAdapterPosition();
+            int toPos = target.getBindingAdapterPosition();
 
             mAdapter.onItemMoved(fromPos, toPos);
             return false;

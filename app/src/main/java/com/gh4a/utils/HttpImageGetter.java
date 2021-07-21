@@ -39,7 +39,6 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.caverock.androidsvg.SVG;
-import com.caverock.androidsvg.SVGParseException;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.SettingsFragment;
@@ -605,7 +604,7 @@ public class HttpImageGetter {
                 svg.renderToCanvas(canvas);
                 return bitmap;
             }
-        } catch (SVGParseException e) {
+        } catch (Exception e) {
             // fall through
         }
         return null;
