@@ -57,6 +57,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import static com.gh4a.utils.IntentUtils.createBaseUriForRepo;
+
 public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
         SearchView.OnCloseListener, SearchView.OnQueryTextListener,
@@ -671,7 +673,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     @Nullable
     @Override
-    protected Uri getActivityUri() {
-        return Uri.parse("https://github.com/" + mRepoOwner + "/" + mRepoName + "/issues");
+    protected Uri.Builder getActivityUri() {
+        return createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("issues");
     }
 }

@@ -81,6 +81,8 @@ import java.util.Locale;
 
 import io.reactivex.Single;
 
+import static com.gh4a.utils.IntentUtils.createBaseUriForRepo;
+
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, ConfirmationDialogFragment.Callback,
         PullRequestFilesFragment.CommentUpdateListener {
@@ -620,8 +622,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     @Nullable
     @Override
-    protected Uri getActivityUri() {
-        return Uri.parse("https://github.com/" + mRepoOwner + "/" + mRepoName + "/pull/" +
-                mPullRequestNumber);
+    protected Uri.Builder getActivityUri() {
+        return createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("pull")
+                .appendPath(String.valueOf(mPullRequestNumber));
     }
 }

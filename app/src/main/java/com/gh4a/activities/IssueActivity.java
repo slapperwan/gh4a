@@ -15,7 +15,6 @@
  */
 package com.gh4a.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -62,6 +61,8 @@ import com.meisolsson.githubsdk.model.request.issue.IssueRequest;
 import com.meisolsson.githubsdk.service.issues.IssueService;
 
 import java.util.Locale;
+
+import static com.gh4a.utils.IntentUtils.createBaseUriForRepo;
 
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, ConfirmationDialogFragment.Callback {
@@ -397,8 +398,8 @@ public class IssueActivity extends BaseActivity implements
 
     @Nullable
     @Override
-    protected Uri getActivityUri() {
-        return Uri.parse("https://github.com/" + mRepoOwner + "/" + mRepoName + "/issues/" +
-                mIssueNumber);
+    protected Uri.Builder getActivityUri() {
+        return createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("issues")
+                .appendPath(String.valueOf(mIssueNumber));
     }
 }
