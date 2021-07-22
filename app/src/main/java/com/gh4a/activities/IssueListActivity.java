@@ -673,7 +673,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     @Nullable
     @Override
-    protected Uri.Builder getActivityUri() {
-        return createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("issues");
+    protected Uri getActivityUri() {
+        return createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("issues").build();
     }
 }
