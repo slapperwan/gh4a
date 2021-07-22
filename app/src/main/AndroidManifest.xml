@@ -13,6 +13,7 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <application
         android:name="com.gh4a.Gh4Application"
         android:allowBackup="true"
