@@ -617,4 +617,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     .create();
         }
     }
+
+    @Nullable
+    @Override
+    protected Uri getActivityUri() {
+        return IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
+                .appendPath("pull")
+                .appendPath(String.valueOf(mPullRequestNumber))
+                .build();
+    }
 }

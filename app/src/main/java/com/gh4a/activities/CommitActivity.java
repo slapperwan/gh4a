@@ -237,4 +237,17 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
                     showContentIfReady();
                 }, this::handleLoadFailure);
     }
+
+    @Nullable
+    @Override
+    protected Uri getActivityUri() {
+        Uri.Builder builder = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName);
+        if (mPullRequestNumber > 0) {
+            builder.appendPath("pull")
+                    .appendPath(String.valueOf(mPullRequestNumber));
+        }
+        return builder.appendPath("commit")
+                .appendPath(mObjectSha)
+                .build();
+    }
 }

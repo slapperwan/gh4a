@@ -18,11 +18,14 @@ package com.gh4a.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.gh4a.utils.IntentUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -666,5 +669,13 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                         }
                     }
                 }, this::handleLoadFailure);
+    }
+
+    @Nullable
+    @Override
+    protected Uri getActivityUri() {
+        return IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
+                .appendPath("issues")
+                .build();
     }
 }

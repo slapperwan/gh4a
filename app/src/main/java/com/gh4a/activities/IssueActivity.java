@@ -15,7 +15,6 @@
  */
 package com.gh4a.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -393,5 +392,14 @@ public class IssueActivity extends BaseActivity implements
                     showUiIfDone();
                     supportInvalidateOptionsMenu();
                 }, this::handleLoadFailure);
+    }
+
+    @Nullable
+    @Override
+    protected Uri getActivityUri() {
+        return IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
+                .appendPath("issues")
+                .appendPath(String.valueOf(mIssueNumber))
+                .build();
     }
 }
