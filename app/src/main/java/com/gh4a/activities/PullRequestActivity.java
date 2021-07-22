@@ -81,8 +81,6 @@ import java.util.Locale;
 
 import io.reactivex.Single;
 
-import static com.gh4a.utils.IntentUtils.createBaseUriForRepo;
-
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, ConfirmationDialogFragment.Callback,
         PullRequestFilesFragment.CommentUpdateListener {
