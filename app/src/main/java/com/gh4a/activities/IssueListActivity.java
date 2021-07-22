@@ -24,6 +24,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.gh4a.utils.IntentUtils;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -56,8 +58,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-
-import static com.gh4a.utils.IntentUtils.createBaseUriForRepo;
 
 public class IssueListActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, LoadingListFragmentBase.OnRecyclerViewCreatedListener,
@@ -674,6 +674,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     @Nullable
     @Override
     protected Uri getActivityUri() {
-        return createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("issues").build();
+        return IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("issues").build();
     }
 }

@@ -41,8 +41,6 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
 import java.util.List;
 
-import static com.gh4a.utils.IntentUtils.createBaseUriForRepo;
-
 public class CommitActivity extends BaseFragmentPagerActivity implements
         CommitFragment.CommentUpdateListener, CommitNoteFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
@@ -178,7 +176,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Uri diffUri = createBaseUriForRepo(mRepoOwner, mRepoName)
+        Uri diffUri = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
                 .appendPath("commit")
                 .appendPath(mObjectSha)
                 .build();
@@ -243,7 +241,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     @Nullable
     @Override
     protected Uri getActivityUri() {
-        Uri.Builder builder = createBaseUriForRepo(mRepoOwner, mRepoName);
+        Uri.Builder builder = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName);
         if (mPullRequestNumber > 0) {
             builder.appendPath("pull").appendPath(String.valueOf(mPullRequestNumber));
         }

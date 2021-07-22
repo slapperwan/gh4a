@@ -62,8 +62,6 @@ import com.meisolsson.githubsdk.service.issues.IssueService;
 
 import java.util.Locale;
 
-import static com.gh4a.utils.IntentUtils.createBaseUriForRepo;
-
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, ConfirmationDialogFragment.Callback {
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
@@ -399,7 +397,7 @@ public class IssueActivity extends BaseActivity implements
     @Nullable
     @Override
     protected Uri getActivityUri() {
-        return createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("issues")
+        return IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("issues")
                 .appendPath(String.valueOf(mIssueNumber)).build();
     }
 }

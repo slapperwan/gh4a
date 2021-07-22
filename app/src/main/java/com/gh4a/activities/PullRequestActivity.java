@@ -623,7 +623,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     @Nullable
     @Override
     protected Uri getActivityUri() {
-        return createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("pull")
+        return IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("pull")
                 .appendPath(String.valueOf(mPullRequestNumber)).build();
     }
 }
