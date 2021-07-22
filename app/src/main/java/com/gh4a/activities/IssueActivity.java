@@ -397,7 +397,9 @@ public class IssueActivity extends BaseActivity implements
     @Nullable
     @Override
     protected Uri getActivityUri() {
-        return IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName).appendPath("issues")
-                .appendPath(String.valueOf(mIssueNumber)).build();
+        return IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName)
+                .appendPath("issues")
+                .appendPath(String.valueOf(mIssueNumber))
+                .build();
     }
 }

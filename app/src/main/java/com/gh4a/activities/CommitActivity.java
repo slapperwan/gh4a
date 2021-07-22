@@ -243,8 +243,11 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     protected Uri getActivityUri() {
         Uri.Builder builder = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName);
         if (mPullRequestNumber > 0) {
-            builder.appendPath("pull").appendPath(String.valueOf(mPullRequestNumber));
+            builder.appendPath("pull")
+                    .appendPath(String.valueOf(mPullRequestNumber));
         }
-        return builder.appendPath("commit").appendPath(mObjectSha).build();
+        return builder.appendPath("commit")
+                .appendPath(mObjectSha)
+                .build();
     }
 }
