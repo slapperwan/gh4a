@@ -1,0 +1,78 @@
+Access to GitHub and stay connected to your networks. Follow Git repositories and top users in GitHub. View all users' activities, source codes and manage your issues with OctoDroid.
+
+FEATURES
+
+Authentication/authorization
+* OAuth2 web application flow.
+* Support Two factor authentication.
+
+General
+* Notification support
+* Multi account support
+* Printing support on codes, commits etc
+* Search repository, user or code.
+
+Github repository
+* List repositories
+* watch/unwatch github repository
+* View git branches and tags
+* View pull requests
+* View collaborators/contributors
+* View watchers/networks
+* View issues
+
+User
+* View basic informations
+* Activity feeds
+* Follow/unfollow user
+* View public/watched repositories
+* View followers/following
+* View organizations (if type is user)
+* View members (if type is organization)
+
+Issue
+* List issues
+* Filter by label, assignee or milestone
+* Create/edit/close/reopen issue
+* Comment on issue
+* Manage labels
+* Manage milestones
+
+Git Commit
+* View git commit
+* Diff viewer with colorized HTML
+* View commit history on each file
+
+Tree/File browser
+* Browse source codes
+* File viewer with code syntax highlighted
+
+Gist
+* List gists
+* View gist content
+
+Explore Github
+* Public timeline
+* Trending repos (today, week, month)
+* GitHub blog
+
+Share function on:
+* user
+* repo
+* commit
+* diff
+* file
+* issue
+
+Github download source code.
+
+..and many more
+
+Full credit to maniac103 (https://github.com/maniac103) for the major improvements, bug fixing and testing.
+
+OctoDroid branding by Steven Mautone: https://stevenmautone.com
+
+** NOTE **
+Please report any issues at Github (https://github.com/slapperwan/gh4a/issues) or email me the issues.
+
+Formerly known as Gh4a Android Github.
