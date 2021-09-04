@@ -92,7 +92,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
     @Override
     protected boolean hasDividers() {
-        return !mAdapter.isCardStyle();
+        return mAdapter.hasDividers() && !mAdapter.isCardStyle();
     }
 
     @Override
