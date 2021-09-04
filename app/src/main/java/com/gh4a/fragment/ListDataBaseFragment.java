@@ -37,7 +37,7 @@ public abstract class ListDataBaseFragment<T> extends LoadingListFragmentBase {
 
     @Override
     protected boolean hasDividers() {
-        return !mAdapter.isCardStyle();
+        return mAdapter.hasDividers() && !mAdapter.isCardStyle();
     }
 
     protected void onAddData(RootAdapter<T, ?> adapter, List<T> data) {
