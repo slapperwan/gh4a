@@ -20,6 +20,7 @@ import com.gh4a.R;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.model.TimelineItem;
+import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
@@ -235,7 +236,7 @@ class ReviewViewHolder
                 break;
         }
 
-        String login = review.user().login();
+        String login = ApiHelpers.getUserLogin(mContext, review.user());
         String textBase = mContext.getString(textResId, login);
         SpannableStringBuilder text = StringUtils.applyBoldTags(textBase,
                 mMessageView.getTypefaceValue());
