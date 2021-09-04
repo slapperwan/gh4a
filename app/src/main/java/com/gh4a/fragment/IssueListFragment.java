@@ -144,8 +144,8 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
             SORT_LOOKUP.put(R.id.sort_created_desc, new String[] { "created", "desc" });
             SORT_LOOKUP.put(R.id.sort_updated_asc, new String[] { "updated", "asc" });
             SORT_LOOKUP.put(R.id.sort_updated_desc, new String[] { "updated", "desc" });
-            SORT_LOOKUP.put(R.id.sort_comments_asc, new String[] { "full_name", "asc" });
-            SORT_LOOKUP.put(R.id.sort_comments_desc, new String[] { "full_name", "desc" });
+            SORT_LOOKUP.put(R.id.sort_comments_asc, new String[] { "comments", "asc" });
+            SORT_LOOKUP.put(R.id.sort_comments_desc, new String[] { "comments", "desc" });
         }
 
         public static int getMenuResId() {
