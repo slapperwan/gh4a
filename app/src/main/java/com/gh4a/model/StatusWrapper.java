@@ -8,6 +8,8 @@ import com.meisolsson.githubsdk.model.Status;
 
 import java.util.Date;
 
+import androidx.annotation.Nullable;
+
 public class StatusWrapper {
     public enum State {
         Success,
@@ -54,11 +56,13 @@ public class StatusWrapper {
                 break;
             case Completed: {
                 String runtime = formatTimeDelta(context, checkRun.startedAt(), checkRun.completedAt());
-                String runtimeDesc = context.getString(R.string.check_runtime_description, runtime);
+                String runtimeDesc = runtime != null ? context.getString(R.string.check_runtime_description, runtime) : null;
                 String title = checkRun.output() != null ? checkRun.output().title() : null;
-                if (title != null) {
+                if (title != null && runtimeDesc != null) {
                     mDescription = title + " — " + runtimeDesc;
-                } else {
+                } else if (title != null) {
+                    mDescription = title;
+                } else if (runtimeDesc != null) {
                     mDescription = runtimeDesc;
                 }
                 switch (checkRun.conclusion()) {
@@ -95,7 +99,12 @@ public class StatusWrapper {
         return mTargetUrl;
     }
 
-    private static String formatTimeDelta(Context context, Date start, Date end) {
+    @Nullable
+    private static String formatTimeDelta(Context context, @Nullable Date start, @Nullable Date end) {
+        if (start == null || end == null) {
+            return null;
+        }
+
         long deltaSeconds = (end.getTime() - start.getTime()) / 1000;
         long seconds = deltaSeconds % 60;
         long minutes = (deltaSeconds % 3600) / 60;
