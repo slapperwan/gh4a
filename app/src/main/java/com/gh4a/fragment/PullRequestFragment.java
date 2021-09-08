@@ -314,10 +314,10 @@ public class PullRequestFragment extends IssueFragmentBase {
                 });
 
         return Single.zip(
-                issueCommentItemSingle.subscribeOn(Schedulers.newThread()),
-                eventItemSingle.subscribeOn(Schedulers.newThread()),
-                reviewTimelineSingle.subscribeOn(Schedulers.newThread()),
-                commitCommentWithoutReviewSingle.subscribeOn(Schedulers.newThread()),
+                issueCommentItemSingle.subscribeOn(Schedulers.io()),
+                eventItemSingle.subscribeOn(Schedulers.io()),
+                reviewTimelineSingle.subscribeOn(Schedulers.io()),
+                commitCommentWithoutReviewSingle.subscribeOn(Schedulers.io()),
                 (comments, events, reviewItems, commentsWithoutReview) -> {
             ArrayList<TimelineItem> result = new ArrayList<>();
             result.addAll(comments);
