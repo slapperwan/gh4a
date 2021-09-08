@@ -77,6 +77,7 @@ import java.util.Set;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 
 public class PullRequestFragment extends IssueFragmentBase {
@@ -313,10 +314,10 @@ public class PullRequestFragment extends IssueFragmentBase {
                 });
 
         return Single.zip(
-                issueCommentItemSingle,
-                eventItemSingle,
-                reviewTimelineSingle,
-                commitCommentWithoutReviewSingle,
+                issueCommentItemSingle.subscribeOn(Schedulers.newThread()),
+                eventItemSingle.subscribeOn(Schedulers.newThread()),
+                reviewTimelineSingle.subscribeOn(Schedulers.newThread()),
+                commitCommentWithoutReviewSingle.subscribeOn(Schedulers.newThread()),
                 (comments, events, reviewItems, commentsWithoutReview) -> {
             ArrayList<TimelineItem> result = new ArrayList<>();
             result.addAll(comments);
