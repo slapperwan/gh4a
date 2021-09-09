@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 
 public class IssueFragment extends IssueFragmentBase {
@@ -77,13 +78,15 @@ public class IssueFragment extends IssueFragmentBase {
         final IssueCommentService commentService =
                 ServiceFactory.get(IssueCommentService.class, bypassCache);
 
-        Single<List<TimelineItem>> commentSingle = ApiHelpers.PageIterator
+        Single<List<TimelineItem.TimelineComment>> commentSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
-                .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
-        Single<List<TimelineItem>> eventSingle = ApiHelpers.PageIterator
+                .compose(RxUtils.mapList(TimelineItem.TimelineComment::new))
+                .subscribeOn(Schedulers.io());
+        Single<List<TimelineItem.TimelineEvent>> eventSingle = ApiHelpers.PageIterator
                 .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
-                .compose((RxUtils.mapList(TimelineItem.TimelineEvent::new)));
+                .compose((RxUtils.mapList(TimelineItem.TimelineEvent::new)))
+                .subscribeOn(Schedulers.io());
 
         return Single.zip(commentSingle, eventSingle, (comments, events) -> {
             ArrayList<TimelineItem> result = new ArrayList<>();
