@@ -55,7 +55,7 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.ConfirmationDialogFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
-import com.gh4a.fragment.PullRequestFragment;
+import com.gh4a.fragment.PullRequestConversationFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
@@ -118,7 +118,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private Issue mIssue;
     private PullRequest mPullRequest;
-    private PullRequestFragment mPullRequestFragment;
+    private PullRequestConversationFragment mConversationFragment;
     private IssueStateTrackingFloatingActionButton mEditFab;
     private Review mPendingReview;
     private boolean mPendingReviewLoaded;
@@ -129,8 +129,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private final ActivityResultLauncher<Intent> mCreateReviewLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
-                if (mPullRequestFragment != null) {
-                    mPullRequestFragment.reloadEvents(false);
+                if (mConversationFragment != null) {
+                    mConversationFragment.reloadEvents(false);
                 }
                 loadPendingReview(true);
             })
@@ -295,16 +295,16 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     @Override
     protected Fragment makeFragment(int position) {
-        if (position == 1) {
+        if (position == PAGE_COMMITS) {
             PullRequestMarker base = mPullRequest.base();
             PullRequestMarker head = mPullRequest.head();
             return CommitCompareFragment.newInstance(mRepoOwner, mRepoName, mPullRequestNumber,
                     base.label(), base.sha(), head.label(), head.sha());
-        } else if (position == 2) {
+        } else if (position == PAGE_FILES) {
             return PullRequestFilesFragment.newInstance(mRepoOwner, mRepoName,
                     mPullRequestNumber, mPullRequest.head().sha());
         } else {
-            Fragment f = PullRequestFragment.newInstance(mPullRequest,
+            Fragment f = PullRequestConversationFragment.newInstance(mPullRequest,
                     mIssue, mIsCollaborator, mInitialComment);
             mInitialComment = null;
             return f;
@@ -313,15 +313,15 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     @Override
     protected void onFragmentInstantiated(Fragment f, int position) {
-        if (position == 0) {
-            mPullRequestFragment = (PullRequestFragment) f;
+        if (position == PAGE_CONVERSATION) {
+            mConversationFragment = (PullRequestConversationFragment) f;
         }
     }
 
     @Override
     protected void onFragmentDestroyed(Fragment f) {
-        if (f == mPullRequestFragment) {
-            mPullRequestFragment = null;
+        if (f == mConversationFragment) {
+            mConversationFragment = null;
         }
     }
 
@@ -337,8 +337,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     @Override
     public void onCommentsUpdated() {
-        if (mPullRequestFragment != null) {
-            mPullRequestFragment.reloadEvents(true);
+        if (mConversationFragment != null) {
+            mConversationFragment.reloadEvents(true);
         }
     }
 
@@ -433,8 +433,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     private void handlePullRequestUpdate() {
-        if (mPullRequestFragment != null) {
-            mPullRequestFragment.updateState(mPullRequest);
+        if (mConversationFragment != null) {
+            mConversationFragment.updateState(mPullRequest);
         }
         if (mIssue != null) {
             Issue.Builder builder = mIssue.toBuilder().state(mPullRequest.state());
