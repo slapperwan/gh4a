@@ -11,6 +11,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import android.text.Spannable;
 import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.TextView;
@@ -140,8 +141,9 @@ public class StyleableTextView extends AppCompatTextView {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         if (isTextSelectable() && isEnabled()) {
-            setEnabled(false);
-            setEnabled(true);
+            MovementMethod method = getMovementMethod();
+            setMovementMethod(null);
+            setMovementMethod(method);
         }
     }
 
