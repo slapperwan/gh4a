@@ -82,10 +82,6 @@
                     android:layout_height="wrap_content"
                     android:text="@string/release_notes" />
 
-                <ProgressBar
-                    android:id="@+id/pb_releasenotes"
-                    style="@style/LoadingProgress" />
-
                 <com.gh4a.widget.StyleableTextView
                     android:id="@+id/tv_release_notes"
                     android:layout_width="match_parent"
@@ -94,10 +90,8 @@
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
                     android:textIsSelectable="true"
-                    android:visibility="gone"
                     app:needsLinkHandling="true"
-                    tools:text="Release notes text"
-                    tools:visibility="visible" />
+                    tools:text="Release notes text" />
 
             </LinearLayout>
 
