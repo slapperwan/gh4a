@@ -3,16 +3,19 @@ package com.gh4a.resolver;
 import android.content.Intent;
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
-import android.text.TextUtils;
 
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
+import com.meisolsson.githubsdk.model.Release;
 import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
+import java.net.HttpURLConnection;
+
 import io.reactivex.Single;
+import retrofit2.Response;
 
 public class ReleaseLoadTask extends UrlLoadTask {
     @VisibleForTesting
@@ -44,12 +47,15 @@ public class ReleaseLoadTask extends UrlLoadTask {
     @Override
     protected Single<Optional<Intent>> getSingle() {
         RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class, false);
-        return ApiHelpers.PageIterator
-                .toSingle(page -> service.getReleases(mRepoOwner, mRepoName, page))
-                .compose(RxUtils.filterAndMapToFirst(r -> {
-                    return mId >= 0 ? mId == r.id() : TextUtils.equals(r.tagName(), mTagName);
-                }))
-                .map(releaseOpt -> releaseOpt.map(r -> ReleaseInfoActivity.makeIntent(mActivity,
-                        mRepoOwner, mRepoName, r)));
+        final Single<Response<Release>> releaseSingle;
+        if (mId >= 0) {
+            releaseSingle = service.getRelease(mRepoOwner, mRepoName, mId);
+        } else {
+            releaseSingle = service.getRelaseByTagName(mRepoOwner, mRepoName, mTagName);
+        }
+        return releaseSingle
+                .map(ApiHelpers::throwOnFailure)
+                .map(r -> Optional.of(ReleaseInfoActivity.makeIntent(mActivity, mRepoOwner, mRepoName, r)))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.absent()));
     }
 }
