@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.StyleSpan;
+import android.util.Pair;
 
 import com.gh4a.ApiRequestException;
 import com.gh4a.Gh4Application;
@@ -33,6 +34,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.functions.Predicate;
 import io.reactivex.subjects.BehaviorSubject;
 import retrofit2.Response;
 
@@ -329,24 +331,20 @@ public class ApiHelpers {
             Single<Response<Page<T>>> getPage(long page);
         }
 
-        public static <T> Observable<List<T>> toObservable(PageProducer<T> producer) {
+        public static <T> Single<List<T>> toSingle(PageProducer<T> producer) {
             BehaviorSubject<Optional<Integer>> pageControl =
                     BehaviorSubject.createDefault(Optional.of(1));
-            return pageControl.concatMap(page -> {
-                if (page.isPresent()) {
-                    return producer.getPage(page.get())
-                            .toObservable()
-                            .compose(PageIterator::evaluateError)
-                            .doOnNext(resultPage -> pageControl.onNext(Optional.ofWithNull(resultPage.next())))
-                            .map(responsePage -> responsePage.items());
-                } else {
-                    return Observable.<List<T>>empty().doOnComplete(() -> pageControl.onComplete());
-                }
-            });
-        }
-
-        public static <T> Single<List<T>> toSingle(PageProducer<T> producer) {
-            return toObservable(producer)
+            return pageControl
+                    .concatMap(page -> {
+                        if (!page.isPresent()) {
+                            return Observable.<List<T>>empty().doOnComplete(() -> pageControl.onComplete());
+                        }
+                        return producer.getPage(page.get())
+                                .toObservable()
+                                .compose(PageIterator::evaluateError)
+                                .doOnNext(resultPage -> pageControl.onNext(Optional.ofWithNull(resultPage.next())))
+                                .map(responsePage -> responsePage.items());
+                    })
                     .toList()
                     .map(lists -> {
                         List<T> result = new ArrayList<>();
@@ -355,6 +353,32 @@ public class ApiHelpers {
                         }
                         return result;
                     });
+        }
+
+        public static <T> Single<Optional<T>> first(PageProducer<T> producer, Predicate<T> predicate) {
+            BehaviorSubject<Optional<Integer>> pageControl =
+                    BehaviorSubject.createDefault(Optional.of(1));
+            return pageControl
+                    .concatMap(page -> {
+                        if (!page.isPresent()) {
+                            return Observable.<Optional<T>>empty().doOnComplete(() -> pageControl.onComplete());
+                        }
+                        return producer.getPage(page.get())
+                                .toObservable()
+                                .compose(PageIterator::evaluateError)
+                                .map(resultPage -> {
+                                    for (T item : resultPage.items()) {
+                                        if (predicate.test(item)) {
+                                            return Pair.create(item, (Integer) null);
+                                        }
+                                    }
+                                    return Pair.create((T) null, resultPage.next());
+                                })
+                                .doOnNext(resultOrNextPage -> pageControl.onNext(Optional.ofWithNull(resultOrNextPage.second)))
+                                .map(resultOrNextPage -> Optional.ofWithNull(resultOrNextPage.first));
+                    })
+                    .filter(opt -> opt.isPresent())
+                    .first(Optional.absent());
         }
 
         private static <T> Observable<Page<T>> evaluateError(Observable<Response<Page<T>>> upstream) {

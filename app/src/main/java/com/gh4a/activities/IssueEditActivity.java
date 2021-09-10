@@ -646,8 +646,8 @@ public class IssueEditActivity extends BasePagerActivity implements
     private Single<Optional<List<IssueTemplate>>> getIssueTemplatesSingle(String path) {
         RepositoryContentService service = ServiceFactory.get(RepositoryContentService.class, false);
         return ApiHelpers.PageIterator
-                .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page))
-                .compose(RxUtils.filterAndMapToFirst(c -> c.name().toLowerCase(Locale.US).startsWith("issue_template")))
+                .first(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page),
+                        c -> c.name().toLowerCase(Locale.US).startsWith("issue_template"))
                 .flatMap(contentOpt -> contentOpt.flatMap(content -> {
                     if (content.type() == ContentType.Directory) {
                         return ApiHelpers.PageIterator

@@ -527,11 +527,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class, force);
 
         ApiHelpers.PageIterator
-                .toSingle(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(RxUtils.filterAndMapToFirst(r -> {
-                    return r.state() == ReviewState.Pending
-                            && ApiHelpers.loginEquals(r.user(), ownLogin);
-                }))
+                .first(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page),
+                        r -> r.state() == ReviewState.Pending && ApiHelpers.loginEquals(r.user(), ownLogin))
                 .compose(makeLoaderSingle(1, force))
                 .doOnSubscribe(disposable -> {
                     mPendingReviewLoaded = false;

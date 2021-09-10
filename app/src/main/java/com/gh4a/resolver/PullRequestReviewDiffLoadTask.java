@@ -43,9 +43,8 @@ public class PullRequestReviewDiffLoadTask extends UrlLoadTask {
         long diffCommentId = Long.parseLong(mDiffId.fileHash);
 
         return ApiHelpers.PageIterator
-                .toSingle(page -> service.getPullRequestComments(
-                        mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(RxUtils.filterAndMapToFirst(c -> c.id() == diffCommentId))
+                .first(page -> service.getPullRequestComments(mRepoOwner, mRepoName, mPullRequestNumber, page),
+                        c -> c.id() == diffCommentId)
                 .flatMap(commentOpt -> commentOpt.flatMap(comment -> {
                     long reviewId = comment.pullRequestReviewId();
                     return reviewService.getReview(mRepoOwner, mRepoName, mPullRequestNumber, reviewId)
