@@ -49,6 +49,8 @@ import com.meisolsson.githubsdk.model.request.RequestMarkdown;
 import com.meisolsson.githubsdk.service.misc.MarkdownService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
+import java.util.Date;
+
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 
@@ -192,9 +194,10 @@ public class ReleaseInfoActivity extends BaseActivity implements
         gravatar.setOnClickListener(this);
 
         StyleableTextView details = findViewById(R.id.tv_releaseinfo);
+        Date releaseDateToShow = mRelease.publishedAt() != null ? mRelease.publishedAt() : mRelease.createdAt();
         String detailsText = getString(R.string.release_details,
                 ApiHelpers.getUserLogin(this, mRelease.author()),
-                StringUtils.formatRelativeTime(this, mRelease.createdAt(), true));
+                StringUtils.formatRelativeTime(this, releaseDateToShow, true));
         StringUtils.applyBoldTagsAndSetText(details, detailsText);
 
         TextView releaseType = findViewById(R.id.tv_releasetype);
