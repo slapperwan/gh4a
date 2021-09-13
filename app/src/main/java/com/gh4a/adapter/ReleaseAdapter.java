@@ -12,6 +12,8 @@ import com.gh4a.R;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.Release;
 
+import java.util.Date;
+
 public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHolder> {
     public ReleaseAdapter(Context context) {
         super(context);
@@ -31,8 +33,20 @@ public class ReleaseAdapter extends RootAdapter<Release, ReleaseAdapter.ViewHold
         }
         holder.tvTitle.setText(name);
         holder.tvType.setText(formatReleaseType(release));
-        holder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
-                StringUtils.formatRelativeTime(mContext, release.createdAt(), true)));
+        holder.tvCreatedAt.setText(formatReleaseDate(release));
+    }
+
+    private String formatReleaseDate(Release release) {
+        Date dateToShow;
+        int dateStringResId;
+        if (release.publishedAt() != null) {
+            dateToShow = release.publishedAt();
+            dateStringResId = R.string.released_at;
+        } else {
+            dateToShow = release.createdAt();
+            dateStringResId = R.string.download_created;
+        }
+        return mContext.getString(dateStringResId, StringUtils.formatRelativeTime(mContext, dateToShow, true));
     }
 
     private String formatReleaseType(Release release) {
