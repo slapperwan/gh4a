@@ -103,9 +103,9 @@ public class FollowersFollowingListFragment extends PagedDataBaseFragment<User> 
                 followItem.setActionView(R.layout.ab_loading);
                 followItem.expandActionView();
             } else if (mIsFollowing) {
-                followItem.setTitle(R.string.user_follow_action);
-            } else {
                 followItem.setTitle(R.string.user_unfollow_action);
+            } else {
+                followItem.setTitle(R.string.user_follow_action);
             }
         }
     }
