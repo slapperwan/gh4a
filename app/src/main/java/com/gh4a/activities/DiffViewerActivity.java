@@ -59,17 +59,23 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             String repoOwner, String repoName, String commitSha, String path, String diff,
             List<C> comments, int initialLine, int highlightStartLine, int highlightEndLine,
             boolean highlightisRight, IntentUtils.InitialCommentMarker initialComment) {
-        return baseIntent.putExtra("owner", repoOwner)
+        Intent intent = baseIntent.putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("sha", commitSha)
                 .putExtra("path", path)
                 .putExtra("diff", diff)
-                .putExtra("comments", comments != null ? new ArrayList<>(comments) : null)
                 .putExtra("initial_line", initialLine)
                 .putExtra("highlight_start", highlightStartLine)
                 .putExtra("highlight_end", highlightEndLine)
                 .putExtra("highlight_right", highlightisRight)
                 .putExtra("initial_comment", initialComment);
+        if (comments != null) {
+            // When there are lots of comments containing a huge amount of text, the extras bundle may
+            // become too large, causing a TransactionTooLargeException when launching the activity.
+            // In order to avoid this problem, we store the data in compressed form
+            IntentUtils.putCompressedArrayListExtra(intent, "comments", new ArrayList<>(comments), 500_000);
+        }
+        return intent;
     }
 
     private static final String COMMENT_ADD_URI_FORMAT =
@@ -192,7 +198,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     @Override
     protected boolean canSwipeToRefresh() {
         // no need for pull-to-refresh if everything was passed in the intent extras
-        return !getIntent().hasExtra("comments");
+        return !IntentUtils.hasCompressedExtra(getIntent(), "comments");
     }
 
     @Override
@@ -429,7 +435,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     private void refresh() {
         // Make sure we load the comments from remote, as we now know they've changed
-        getIntent().removeExtra("comments");
+        IntentUtils.removeCompressedExtra(getIntent(), "comments");
 
         // Make sure our callers are aware of the change
         setResult(RESULT_OK);
@@ -463,7 +469,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     private void loadComments(boolean useIntentExtraIfPresent, boolean force) {
         List<C> intentComments = useIntentExtraIfPresent
-                ? getIntent().getParcelableArrayListExtra("comments") : null;
+                ? IntentUtils.getCompressedArrayListExtra(getIntent(), "comments") : null;
         Single<List<C>> commentSingle = intentComments != null
                 ? Single.just(intentComments)
                 : createCommentSingle(force).compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));
