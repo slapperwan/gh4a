@@ -45,10 +45,10 @@ import android.text.style.StyleSpan;
 import android.text.style.SubscriptSpan;
 import android.text.style.SuperscriptSpan;
 import android.text.style.TypefaceSpan;
-import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 
 import com.gh4a.R;
+import com.gh4a.widget.LinkSpan;
 
 import org.ccil.cowan.tagsoup.HTMLSchema;
 import org.ccil.cowan.tagsoup.Parser;
@@ -783,7 +783,7 @@ public class HtmlUtils {
             Href h = getLast(text, Href.class);
             if (h != null) {
                 if (h.mHref != null) {
-                    setSpanFromMark(text, h, new URLSpan((h.mHref)));
+                    setSpanFromMark(text, h, new LinkSpan(h.mHref));
                 }
             }
         }
