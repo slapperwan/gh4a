@@ -49,8 +49,7 @@ public class BrowseFilter extends AppCompatActivity {
         }
 
         result.loadTask.setIntentFlags(flags);
+        result.loadTask.setCompletionCallback(this::finish);
         result.loadTask.execute();
-
-        // Avoid finish() for now
     }
 }
