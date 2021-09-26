@@ -101,10 +101,9 @@ public class IntentUtils {
                     .setDefaultColorSchemeParams(colorParams)
                     .build();
             i.intent.setPackage(pkg);
-            i.intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             i.launchUrl(activity, uri);
         } else {
-            launchBrowser(activity, uri, Intent.FLAG_ACTIVITY_NEW_TASK);
+            launchBrowser(activity, uri);
         }
     }
 
