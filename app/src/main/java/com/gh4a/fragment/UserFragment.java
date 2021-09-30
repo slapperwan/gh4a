@@ -205,6 +205,7 @@ public class UserFragment extends LoadingFragmentBase implements
         fillTextView(R.id.tv_website, mUser.blog());
         fillTextView(R.id.tv_company, mUser.company());
         fillTextView(R.id.tv_location, mUser.location());
+        fillTextView(R.id.tv_bio, mUser.bio());
     }
 
     private static int orZero(Integer count) {
