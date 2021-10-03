@@ -244,7 +244,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
                 }.start();
             } else {
                 mQuery = cursor.getString(1);
-                mSearch.setQuery(mQuery, false);
+                mSearch.setQuery(mQuery, true);
             }
         }
         return true;
@@ -403,7 +403,7 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
         }
     }
 
-    private static class SuggestionAdapter extends CursorAdapter {
+    private class SuggestionAdapter extends CursorAdapter {
         private final LayoutInflater mInflater;
 
         public SuggestionAdapter(Context context) {
@@ -443,9 +443,27 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            TextView textView = (TextView) view;
             int columnIndex = cursor.getColumnIndexOrThrow(SuggestionsProvider.Columns.SUGGESTION);
-            textView.setText(cursor.getString(columnIndex));
+            String suggestionText = cursor.getString(columnIndex);
+            if (isClearRow(cursor.getPosition())) {
+                bindClearSuggestionsRow(view, suggestionText);
+            } else {
+                bindSuggestionRow(view, suggestionText);
+            }
+        }
+
+        private void bindSuggestionRow(View view, String suggestionText) {
+            TextView textView = (TextView) view.findViewById(R.id.suggestion_text);
+            textView.setText(suggestionText);
+            view.findViewById(R.id.select_suggestion_button).setOnClickListener(btn -> {
+                mQuery = suggestionText;
+                mSearch.setQuery(mQuery, false);
+            });
+        }
+
+        private void bindClearSuggestionsRow(View view, String suggestionText) {
+            TextView textView = (TextView) view;
+            textView.setText(suggestionText);
         }
 
         private boolean isClearRow(int position) {
