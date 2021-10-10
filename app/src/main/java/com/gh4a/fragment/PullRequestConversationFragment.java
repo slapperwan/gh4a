@@ -183,6 +183,8 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
             setHighlightColors(R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark);
         } else if (mPullRequest.state() == IssueState.Closed) {
             setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
+        } else if (mPullRequest.draft()) {
+            setHighlightColors(R.attr.colorPullRequestDraft, R.attr.colorPullRequestDraftDark);
         } else {
             setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
         }

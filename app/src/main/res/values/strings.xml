@@ -63,6 +63,7 @@
     <string name="open">Open</string>
     <string name="closed">Closed</string>
     <string name="merged">Merged</string>
+    <string name="draft">Draft</string>
     <string name="theme">Theme</string>
     <string name="pub_timeline">Public Timeline</string>
     <string name="load_failure_explanation">Loading the data from Github failed. Please verify you have a working network connection and try again.</string>

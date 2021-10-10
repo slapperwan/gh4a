@@ -21,9 +21,11 @@
         <item name="colorIssueOpen">@color/issue_open</item>
         <item name="colorIssueClosed">@color/issue_closed</item>
         <item name="colorPullRequestMerged">@color/pr_merged</item>
+        <item name="colorPullRequestDraft">@color/pr_draft</item>
         <item name="colorIssueOpenDark">@color/issue_open_dark</item>
         <item name="colorIssueClosedDark">@color/issue_closed_dark</item>
         <item name="colorPullRequestMergedDark">@color/pr_merged_dark</item>
+        <item name="colorPullRequestDraftDark">@color/pr_draft_dark</item>
         <item name="colorFab">@color/default_fab</item>
         <item name="colorIssueEditFab">@color/issue_edit_fab</item>
         <item name="colorScrollbarThumb">@color/scrollbar_thumb</item>

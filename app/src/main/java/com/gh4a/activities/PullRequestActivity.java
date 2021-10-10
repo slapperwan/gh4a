@@ -401,6 +401,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         if (mEditFab != null) {
             mEditFab.setState(mPullRequest.state());
             mEditFab.setMerged(mPullRequest.merged());
+            mEditFab.setDraft(mPullRequest.draft());
         }
     }
 
@@ -416,6 +417,11 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             stateTextResId = R.string.closed;
             mHeaderColorAttrs = new int[] {
                 R.attr.colorIssueClosed, R.attr.colorIssueClosedDark
+            };
+        } else if (mPullRequest.draft()) {
+            stateTextResId = R.string.draft;
+            mHeaderColorAttrs = new int[] {
+                R.attr.colorPullRequestDraft, R.attr.colorPullRequestDraftDark
             };
         } else {
             stateTextResId = R.string.open;
