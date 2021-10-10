@@ -187,7 +187,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 && ApiHelpers.userEquals(mIssue.user(), mIssue.closedBy());
         boolean canClose = mPullRequest != null && authorized && (isCreator || isCollaborator);
         boolean canOpen = canClose && (isCollaborator || closerIsCreator);
-        boolean canMerge = canClose && isCollaborator;
+        boolean canMerge = canClose && isCollaborator && !mPullRequest.draft();
 
         if (!canClose || isClosed) {
             menu.removeItem(R.id.pull_close);
