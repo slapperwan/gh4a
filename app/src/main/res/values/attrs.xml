@@ -7,9 +7,11 @@
     <attr name="colorIssueOpen" format="color" />
     <attr name="colorIssueClosed" format="color" />
     <attr name="colorPullRequestMerged" format="color" />
+    <attr name="colorPullRequestDraft" format="color" />
     <attr name="colorIssueOpenDark" format="color" />
     <attr name="colorIssueClosedDark" format="color" />
     <attr name="colorPullRequestMergedDark" format="color" />
+    <attr name="colorPullRequestDraftDark" format="color" />
     <attr name="colorIssueEditFab" format="reference" />
     <attr name="colorCommitAddition" format="color" />
     <attr name="colorCommitDeletion" format="color" />
@@ -45,6 +47,7 @@
     <declare-styleable name="IssueStateTrackingFloatingActionButton">
         <attr name="state_closed" format="boolean" />
         <attr name="state_merged" format="boolean" />
+        <attr name="state_draft" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="HeightLimitedLinearLayout">

@@ -10,9 +10,11 @@ import com.meisolsson.githubsdk.model.IssueState;
 public class IssueStateTrackingFloatingActionButton extends FloatingActionButton {
     private IssueState mState;
     private boolean mMerged;
+    private boolean mDraft;
 
     private static final int[] STATE_CLOSED = { R.attr.state_closed };
     private static final int[] STATE_MERGED = { R.attr.state_merged };
+    private static final int[] STATE_DRAFT = { R.attr.state_draft };
 
     public IssueStateTrackingFloatingActionButton(Context context) {
         super(context);
@@ -36,14 +38,20 @@ public class IssueStateTrackingFloatingActionButton extends FloatingActionButton
         refreshDrawableState();
     }
 
+    public void setDraft(boolean draft) {
+        mDraft = draft;
+        refreshDrawableState();
+    }
+
     @Override
     public int[] onCreateDrawableState(int extraSpace) {
         final int[] drawableState = super.onCreateDrawableState(extraSpace + 2);
-        if (mState == IssueState.Closed) {
-            mergeDrawableStates(drawableState, STATE_CLOSED);
-        }
         if (mMerged) {
             mergeDrawableStates(drawableState, STATE_MERGED);
+        } else if (mState == IssueState.Closed) {
+            mergeDrawableStates(drawableState, STATE_CLOSED);
+        } else if (mDraft) {
+            mergeDrawableStates(drawableState, STATE_DRAFT);
         }
         return drawableState;
     }
