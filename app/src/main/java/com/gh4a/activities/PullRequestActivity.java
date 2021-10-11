@@ -375,7 +375,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private void showReviewDialog() {
         Intent intent = CreateReviewActivity.makeIntent(this, mRepoOwner, mRepoName,
-                mPullRequestNumber, mPendingReview);
+                mPullRequestNumber, mPullRequest.draft(), mPendingReview);
         mCreateReviewLauncher.launch(intent);
     }
 
