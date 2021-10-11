@@ -56,10 +56,10 @@ class EventViewHolder
         EVENT_ICONS.put(IssueEventType.Renamed, R.drawable.issue_event_renamed);
         EVENT_ICONS.put(IssueEventType.HeadRefDeleted, R.drawable.timeline_event_branch);
         EVENT_ICONS.put(IssueEventType.HeadRefRestored, R.drawable.timeline_event_branch);
-        EVENT_ICONS.put(IssueEventType.ReviewRequested, R.drawable.timeline_event_review_requested);
+        EVENT_ICONS.put(IssueEventType.ReviewRequested, R.drawable.timeline_event_review);
         EVENT_ICONS.put(IssueEventType.ReviewRequestRemoved, R.drawable.timeline_event_review_request_removed);
         EVENT_ICONS.put(IssueEventType.ConvertToDraft, R.drawable.timeline_event_branch);
-        EVENT_ICONS.put(IssueEventType.ReadyForReview, R.drawable.timeline_event_reviewed);
+        EVENT_ICONS.put(IssueEventType.ReadyForReview, R.drawable.timeline_event_review);
     }
 
     private final Context mContext;

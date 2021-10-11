@@ -213,7 +213,7 @@ class ReviewViewHolder
         switch (review.state()) {
             case Approved: return R.drawable.timeline_event_approved;
             case ChangesRequested: return R.drawable.timeline_event_requested_changes;
-            default: return R.drawable.timeline_event_reviewed;
+            default: return R.drawable.timeline_event_review;
         }
     }
 
