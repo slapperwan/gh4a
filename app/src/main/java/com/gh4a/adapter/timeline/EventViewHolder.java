@@ -58,6 +58,8 @@ class EventViewHolder
         EVENT_ICONS.put(IssueEventType.HeadRefRestored, R.drawable.timeline_event_branch);
         EVENT_ICONS.put(IssueEventType.ReviewRequested, R.drawable.timeline_event_review_requested);
         EVENT_ICONS.put(IssueEventType.ReviewRequestRemoved, R.drawable.timeline_event_review_request_removed);
+        EVENT_ICONS.put(IssueEventType.ConvertToDraft, R.drawable.timeline_event_branch);
+        EVENT_ICONS.put(IssueEventType.ReadyForReview, R.drawable.timeline_event_reviewed);
     }
 
     private final Context mContext;
@@ -225,6 +227,12 @@ class EventViewHolder
                 break;
             case HeadRefRestored:
                 textResId = R.string.pull_request_event_ref_restored;
+                break;
+            case ConvertToDraft:
+                textResId = R.string.pull_request_event_convert_to_draft;
+                break;
+            case ReadyForReview:
+                textResId = R.string.pull_request_event_ready_for_review;
                 break;
             default:
                 return null;
