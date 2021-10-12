@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Response;
 
 public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implements
@@ -204,7 +205,11 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
                             .map(Optional::of);
                 });
 
-        return Single.zip(reviewItemSingle, reviewCommentsSingle, filesSingle, commentsSingle,
+        return Single.zip(
+                reviewItemSingle.subscribeOn(Schedulers.io()),
+                reviewCommentsSingle.subscribeOn(Schedulers.io()),
+                filesSingle.subscribeOn(Schedulers.io()),
+                commentsSingle.subscribeOn(Schedulers.io()),
                 (reviewItem, reviewComments, filesOpt, commentsOpt) -> {
             if (!reviewComments.isEmpty()) {
                 HashMap<String, GitHubFile> filesByName = new HashMap<>();
