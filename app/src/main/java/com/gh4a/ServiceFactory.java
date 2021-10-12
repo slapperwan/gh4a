@@ -78,38 +78,6 @@ public class ServiceFactory {
         return response;
     };
 
-    private final static Interceptor CACHE_MAX_AGE_INTERCEPTOR = chain -> {
-        Response response = chain.proceed(chain.request());
-        CacheControl origCacheControl = CacheControl.parse(response.headers());
-        // Github sends max-age=60, which leads to problems when we modify stuff and
-        // reload data afterwards. Make sure to constrain max age to 2 seconds to only avoid
-        // network calls in cases where the exact same data is loaded from multiple places
-        // at the same time, and use ETags to avoid useless data transfers otherwise.
-        if (origCacheControl.maxAgeSeconds() <= 2) {
-            return response;
-        }
-        CacheControl.Builder newBuilder = new CacheControl.Builder()
-                .maxAge(2, TimeUnit.SECONDS);
-        if (origCacheControl.maxStaleSeconds() >= 0) {
-            newBuilder.maxStale(origCacheControl.maxStaleSeconds(), TimeUnit.SECONDS);
-        }
-        if (origCacheControl.minFreshSeconds() >= 0) {
-            newBuilder.minFresh(origCacheControl.minFreshSeconds(), TimeUnit.SECONDS);
-        }
-        if (origCacheControl.noCache()) {
-            newBuilder.noCache();
-        }
-        if (origCacheControl.noStore()) {
-            newBuilder.noStore();
-        }
-        if (origCacheControl.noTransform()) {
-            newBuilder.noTransform();
-        }
-        return response.newBuilder()
-                .header("Cache-Control", newBuilder.build().toString())
-                .build();
-    };
-
     private final static Retrofit.Builder RETROFIT_BUILDER = new Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(new StringResponseConverterFactory())
@@ -148,7 +116,6 @@ public class ServiceFactory {
         OkHttpClient.Builder clientBuilder = sApiHttpClient.newBuilder()
                 .addInterceptor(PAGINATION_INTERCEPTOR)
                 .addNetworkInterceptor(ETAG_WORKAROUND_INTERCEPTOR)
-                .addNetworkInterceptor(CACHE_MAX_AGE_INTERCEPTOR)
                 .addInterceptor(chain -> {
                     Request original = chain.request();
 
