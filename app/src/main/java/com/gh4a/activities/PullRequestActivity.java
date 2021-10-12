@@ -80,6 +80,7 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 import java.util.Locale;
 
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, ConfirmationDialogFragment.Callback,
@@ -497,11 +498,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         IssueService issueService = ServiceFactory.get(IssueService.class, force);
 
         Single<PullRequest> prSingle = prService.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
-                .map(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::throwOnFailure)
+                .subscribeOn(Schedulers.io());
         Single<Issue> issueSingle = issueService.getIssue(mRepoOwner, mRepoName, mPullRequestNumber)
-                .map(ApiHelpers::throwOnFailure);
-        Single<Boolean> isCollaboratorSingle =
-                SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName, force);
+                .map(ApiHelpers::throwOnFailure)
+                .subscribeOn(Schedulers.io());
+        Single<Boolean> isCollaboratorSingle = SingleFactory.isAppUserRepoCollaborator(mRepoOwner, mRepoName, force)
+                .subscribeOn(Schedulers.io());
 
         Single.zip(issueSingle, prSingle, isCollaboratorSingle, Triplet::create)
                 .compose(makeLoaderSingle(0, force))
