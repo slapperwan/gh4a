@@ -56,6 +56,8 @@ class EventViewHolder
         EVENT_ICONS.put(IssueEventType.Renamed, R.drawable.issue_event_renamed);
         EVENT_ICONS.put(IssueEventType.HeadRefDeleted, R.drawable.timeline_event_branch);
         EVENT_ICONS.put(IssueEventType.HeadRefRestored, R.drawable.timeline_event_branch);
+        EVENT_ICONS.put(IssueEventType.HeadRefForcePushed, R.drawable.timeline_event_branch);
+        EVENT_ICONS.put(IssueEventType.CommentDeleted, R.drawable.timeline_event_comment_deleted);
         EVENT_ICONS.put(IssueEventType.ReviewRequested, R.drawable.timeline_event_review);
         EVENT_ICONS.put(IssueEventType.ReviewRequestRemoved, R.drawable.timeline_event_review_request_removed);
         EVENT_ICONS.put(IssueEventType.ConvertToDraft, R.drawable.timeline_event_branch);
@@ -227,6 +229,12 @@ class EventViewHolder
                 break;
             case HeadRefRestored:
                 textResId = R.string.pull_request_event_ref_restored;
+                break;
+            case HeadRefForcePushed:
+                textResId = R.string.pull_request_event_ref_force_pushed;
+                break;
+            case CommentDeleted:
+                textResId = R.string.pull_request_event_comment_deleted;
                 break;
             case ConvertToDraft:
                 textResId = R.string.pull_request_event_convert_to_draft;
