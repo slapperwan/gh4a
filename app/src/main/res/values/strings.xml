@@ -322,6 +322,8 @@
     <string name="pull_request_event_team_review_request_removed">[b]%1$s[/b] removed their review request for team [b]%2$s[/b] [time]</string>
     <string name="pull_request_event_ref_deleted">[b]%1$s[/b] deleted the pull request branch [time]</string>
     <string name="pull_request_event_ref_restored">[b]%1$s[/b] restored the pull request branch [time]</string>
+    <string name="pull_request_event_ref_force_pushed">[b]%1$s[/b] force-pushed the pull request branch [time]</string>
+    <string name="pull_request_event_comment_deleted">[b]%1$s[/b] deleted a comment [time]</string>
     <string name="pull_request_event_convert_to_draft">[b]%1$s[/b] marked this pull request as draft [time]</string>
     <string name="pull_request_event_ready_for_review">[b]%1$s[/b] marked this pull request as ready for review [time]</string>
 
