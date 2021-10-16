@@ -30,6 +30,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import com.gh4a.utils.ActivityResultHelpers;
+import com.gh4a.utils.UiUtils;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -658,6 +659,9 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             titleLabel.setVisibility(fieldsVisibility);
             detailsField.setVisibility(fieldsVisibility);
             detailsLabel.setVisibility(fieldsVisibility);
+            if (fieldsVisibility == View.GONE) {
+                UiUtils.hideImeForView(titleField);
+            }
         }
     }
 
