@@ -477,11 +477,12 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 }, error -> handleActionFailure("Updating pull request failed", error));
     }
 
-    private void mergePullRequest(String commitMessage, MergeRequest.Method mergeMethod) {
+    private void mergePullRequest(String commitTitle, String commitDetails, MergeRequest.Method mergeMethod) {
         String errorMessage = getString(R.string.pull_error_merge, mPullRequest.number());
         PullRequestService service = ServiceFactory.get(PullRequestService.class, false);
         MergeRequest request = MergeRequest.builder()
-                .commitMessage(commitMessage)
+                .commitTitle(commitTitle)
+                .commitMessage(commitDetails)
                 .method(mergeMethod)
                 .build();
 
@@ -582,10 +583,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             String title = getString(R.string.pull_message_dialog_title, pr.number());
             View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
 
-            final View editorNotice = view.findViewById(R.id.notice);
-            final EditText editor = view.findViewById(R.id.et_commit_message);
-            editor.setText(pr.title());
-
             final ArrayAdapter<MergeMethodDesc> adapter =
                     new ArrayAdapter<>(getContext(), R.layout.spinner_item);
             adapter.add(new MergeMethodDesc(
@@ -595,14 +592,25 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             adapter.add(new MergeMethodDesc(
                     getString(R.string.pull_merge_method_rebase), MergeRequest.Method.Rebase));
 
+            final View detailsLabel = view.findViewById(R.id.details_label);
+            final EditText detailsField = view.findViewById(R.id.et_commit_message);
+            final View titleLabel = view.findViewById(R.id.title_label);
+            final EditText titleField = view.findViewById(R.id.et_commit_title);
+            titleField.setHorizontallyScrolling(false);
+            titleField.setMaxLines(3);
+
             final Spinner mergeMethod = view.findViewById(R.id.merge_method);
             mergeMethod.setAdapter(adapter);
             mergeMethod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                final int REBASE_AND_MERGE_POSITION = 2;
+
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    int editorVisibility = position == 2 ? View.GONE : View.VISIBLE;
-                    editorNotice.setVisibility(editorVisibility);
-                    editor.setVisibility(editorVisibility);
+                    int fieldsVisibility = position == REBASE_AND_MERGE_POSITION ? View.GONE : View.VISIBLE;
+                    titleField.setVisibility(fieldsVisibility);
+                    titleLabel.setVisibility(fieldsVisibility);
+                    detailsField.setVisibility(fieldsVisibility);
+                    detailsLabel.setVisibility(fieldsVisibility);
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> adapterView) {
@@ -614,10 +622,11 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     .setTitle(title)
                     .setView(view)
                     .setPositiveButton(R.string.pull_request_merge, (dialog, which) -> {
-                        String text = editor.getText() == null ? null : editor.getText().toString();
+                        String commitTitle = titleField.getText() == null ? null : titleField.getText().toString();
+                        String commitDetails = detailsField.getText() == null ? null : detailsField.getText().toString();
                         int methodIndex = mergeMethod.getSelectedItemPosition();
 
-                        activity.mergePullRequest(text, adapter.getItem(methodIndex).action);
+                        activity.mergePullRequest(commitTitle, commitDetails, adapter.getItem(methodIndex).action);
                     })
                     .setNegativeButton(getString(R.string.cancel), null)
                     .create();

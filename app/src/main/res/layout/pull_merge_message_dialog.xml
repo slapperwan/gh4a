@@ -17,10 +17,28 @@
         android:layout_height="wrap_content" />
 
     <com.gh4a.widget.StyleableTextView
-        android:id="@+id/notice"
+        android:id="@+id/title_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:labelFor="@+id/et_commit_title"
+        android:text="@string/pull_merge_title_description"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <EditText
+        android:id="@+id/et_commit_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:cursorVisible="true"
+        android:imeOptions="flagNoFullscreen|actionNext"
+        android:inputType="textCapSentences" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/details_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:labelFor="@+id/et_commit_message"
         android:text="@string/pull_merge_message_description"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -29,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:cursorVisible="true"
-        android:imeOptions="flagNoFullscreen|actionNext"
+        android:imeOptions="flagNoFullscreen"
         android:inputType="textMultiLine|textCapSentences"
         android:maxLines="5" />
 

@@ -440,6 +440,7 @@
     <string name="pull_request_merged">Merged</string>
     <string name="pull_error_merge">Merging pull request #%1$d failed.</string>
     <string name="pull_message_dialog_title">Merge pull request #%1$d</string>
+    <string name="pull_merge_title_description">Merge commit title</string>
     <string name="pull_merge_message_description">If you want to add additional details to the merge commit message, please enter them below.</string>
     <string name="pull_merge_status_behind">This branch is out-of-date with the base branch</string>
     <string name="pull_merge_status_blocked">Merging is blocked</string>
