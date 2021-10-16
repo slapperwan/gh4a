@@ -573,6 +573,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         private View titleLabel;
         private EditText titleField;
         private Spinner mergeMethodSelector;
+        private PullRequest pr;
 
         public static MergeDialogFragment newInstance(PullRequest pr) {
             MergeDialogFragment f = new MergeDialogFragment();
@@ -586,7 +587,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            final PullRequest pr = getArguments().getParcelable("pr");
+            pr = getArguments().getParcelable("pr");
 
             View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
             detailsLabel = view.findViewById(R.id.details_label);
@@ -627,20 +628,36 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
             mergeMethodSelector.setAdapter(adapter);
             mergeMethodSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                final int REBASE_AND_MERGE_POSITION = 2;
-
                 @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    int fieldsVisibility = position == REBASE_AND_MERGE_POSITION ? View.GONE : View.VISIBLE;
-                    titleField.setVisibility(fieldsVisibility);
-                    titleLabel.setVisibility(fieldsVisibility);
-                    detailsField.setVisibility(fieldsVisibility);
-                    detailsLabel.setVisibility(fieldsVisibility);
+                public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
+                    MergeMethodDesc selectedItem = (MergeMethodDesc) adapter.getItemAtPosition(position);
+                    toggleFieldsVisibility(selectedItem.action);
+                    setCommitTitleHint(selectedItem.action);
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> adapterView) {
                 }
             });
+        }
+
+        private void setCommitTitleHint(MergeRequest.Method mergeMethod) {
+            switch (mergeMethod) {
+                case Merge:
+                    String username = ApiHelpers.getUserLogin(getContext(), pr.head().user());
+                    titleField.setHint("Merge pull request #" + pr.number() + " from " + username + "/" + pr.head().ref());
+                    break;
+                case Squash:
+                    titleField.setHint(pr.title() + " (#" + pr.number() + ")");
+                    break;
+            }
+        }
+
+        private void toggleFieldsVisibility(MergeRequest.Method mergeMethod) {
+            int fieldsVisibility = mergeMethod == MergeRequest.Method.Rebase ? View.GONE : View.VISIBLE;
+            titleField.setVisibility(fieldsVisibility);
+            titleLabel.setVisibility(fieldsVisibility);
+            detailsField.setVisibility(fieldsVisibility);
+            detailsLabel.setVisibility(fieldsVisibility);
         }
     }
 
