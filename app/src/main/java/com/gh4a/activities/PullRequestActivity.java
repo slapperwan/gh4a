@@ -65,6 +65,7 @@ import com.gh4a.utils.Triplet;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.PullRequest;
@@ -569,10 +570,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     public static class MergeDialogFragment extends DialogFragment {
 
-        private View detailsLabel;
-        private EditText detailsField;
-        private View titleLabel;
-        private EditText titleField;
+        private TextInputLayout detailsField;
+        private TextInputLayout titleField;
         private Spinner mergeMethodSelector;
         private PullRequest pr;
 
@@ -591,14 +590,12 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             pr = getArguments().getParcelable("pr");
 
             View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
-            detailsLabel = view.findViewById(R.id.details_label);
-            detailsField = view.findViewById(R.id.et_commit_message);
-            titleLabel = view.findViewById(R.id.title_label);
-            titleField = view.findViewById(R.id.et_commit_title);
+            detailsField = view.findViewById(R.id.details_field);
+            titleField = view.findViewById(R.id.title_field);
             // This is needed to make the text field single-line but with line wrapping.
             // Setting these properties in the XML does not produce the wanted effect.
-            titleField.setHorizontallyScrolling(false);
-            titleField.setMaxLines(3);
+            titleField.getEditText().setHorizontallyScrolling(false);
+            titleField.getEditText().setMaxLines(3);
 
             mergeMethodSelector = view.findViewById(R.id.merge_method);
             setupMergeMethodSpinner();
@@ -608,8 +605,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     .setTitle(getString(R.string.pull_message_dialog_title, pr.number()))
                     .setView(view)
                     .setPositiveButton(R.string.pull_request_merge, (dialog, which) -> {
-                        String commitTitle = titleField.getText() == null ? null : titleField.getText().toString();
-                        String commitDetails = detailsField.getText() == null ? null : detailsField.getText().toString();
+                        String commitTitle = titleField.getEditText().getText().toString();
+                        String commitDetails = detailsField.getEditText().getText().toString();
                         MergeMethodDesc selectedMethod = (MergeMethodDesc) mergeMethodSelector.getSelectedItem();
 
                         activity.mergePullRequest(commitTitle, commitDetails, selectedMethod.action);
@@ -645,10 +642,10 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             switch (mergeMethod) {
                 case Merge:
                     String username = ApiHelpers.getUserLogin(getContext(), pr.head().user());
-                    titleField.setHint("Merge pull request #" + pr.number() + " from " + username + "/" + pr.head().ref());
+                    titleField.setPlaceholderText("Merge pull request #" + pr.number() + " from " + username + "/" + pr.head().ref());
                     break;
                 case Squash:
-                    titleField.setHint(pr.title() + " (#" + pr.number() + ")");
+                    titleField.setPlaceholderText(pr.title() + " (#" + pr.number() + ")");
                     break;
             }
         }
@@ -656,9 +653,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         private void toggleFieldsVisibility(MergeRequest.Method mergeMethod) {
             int fieldsVisibility = mergeMethod == MergeRequest.Method.Rebase ? View.GONE : View.VISIBLE;
             titleField.setVisibility(fieldsVisibility);
-            titleLabel.setVisibility(fieldsVisibility);
             detailsField.setVisibility(fieldsVisibility);
-            detailsLabel.setVisibility(fieldsVisibility);
             if (fieldsVisibility == View.GONE) {
                 UiUtils.hideImeForView(titleField);
             }
