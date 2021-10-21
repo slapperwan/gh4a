@@ -168,10 +168,6 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
 
     @Override
     protected void bindSpecialViews(View headerView) {
-        if (!mHasLoadedHeadReference) {
-            return;
-        }
-
         PullRequestBranchInfoView branchContainer = headerView.findViewById(R.id.branch_container);
         branchContainer.bind(mPullRequest.head(), mPullRequest.base(), mHeadReference);
         branchContainer.setVisibility(View.VISIBLE);
