@@ -48,7 +48,7 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
         mIcon = findViewById(R.id.icon);
         mLabel = findViewById(R.id.label);
         mRedirectNotice = findViewById(R.id.forward_notice);
-        mProgress = findViewById(R.id.progress);
+        mProgress = findViewById(R.id.progress_indicator);
 
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.OverviewRow, defStyle, 0);
