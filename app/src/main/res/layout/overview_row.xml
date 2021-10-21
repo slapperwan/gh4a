@@ -15,7 +15,7 @@
         tools:src="@drawable/icon_watch" />
 
     <ProgressBar
-        android:id="@+id/progress"
+        android:id="@+id/progress_indicator"
         style="@style/Widget.AppCompat.ProgressBar"
         android:layout_width="24dp"
         android:layout_height="24dp"
