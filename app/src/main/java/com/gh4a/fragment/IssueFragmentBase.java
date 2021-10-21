@@ -193,6 +193,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
         mListHeaderView = inflater.inflate(R.layout.issue_comment_list_header, view, false);
         mAdapter.setHeaderView(mListHeaderView);
+        View loadingView = inflater.inflate(R.layout.list_loading_view, view, false);
+        showLoadingIndicator(loadingView);
     }
 
     @Override
@@ -325,6 +327,16 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         }
 
         updateMentionUsers();
+        removeLoadingIndicator(adapter);
+    }
+
+    private void showLoadingIndicator(View loadingView) {
+        loadingView.setVisibility(View.VISIBLE);
+        mAdapter.setFooterView(loadingView, null);
+    }
+
+    private void removeLoadingIndicator(RootAdapter<TimelineItem, ?> adapter) {
+        adapter.setFooterView(null, null);
     }
 
     @Override
