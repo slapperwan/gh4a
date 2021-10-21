@@ -67,7 +67,6 @@ public abstract class LoadingFragmentBase extends Fragment implements
         super.onDestroyView();
         mContentContainer = null;
         mProgress = null;
-        mProgress = null;
     }
 
     @Override
@@ -129,7 +128,10 @@ public abstract class LoadingFragmentBase extends Fragment implements
         View in = mContentShown ? mContentContainer : mProgress;
         if (isResumed()) {
             out.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-            in.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+            // Prevent UI "flashes" by not unnecessarily animating an element when it's already visible
+            if (in.getVisibility() != View.VISIBLE) {
+                in.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
+            }
         } else {
             in.clearAnimation();
             out.clearAnimation();

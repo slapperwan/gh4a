@@ -37,6 +37,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
@@ -160,7 +161,16 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        getBaseActivity().addAppBarOffsetListener(mBottomSheet);
+        // We make the content container visible so that the issue/PR can be read while the rest
+        // of the conversation is still loading
+        view.findViewById(R.id.content_container).setVisibility(View.VISIBLE);
+
+        BaseActivity activity = getBaseActivity();
+        activity.addAppBarOffsetListener(mBottomSheet);
+        mBottomSheet.post(() -> {
+            // Fix an issue where the bottom sheet is initially located outside of the visible screen area
+            mBottomSheet.resetPeekHeight(activity.getAppBarTotalScrollRange());
+        });
     }
 
     @Override
