@@ -46,10 +46,10 @@ import com.gh4a.adapter.RootAdapter;
 import com.gh4a.resolver.CommitCommentLoadTask;
 import com.gh4a.resolver.PullRequestReviewCommentLoadTask;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
-import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
 import com.meisolsson.githubsdk.model.Download;
 import com.meisolsson.githubsdk.model.GitHubEvent;
@@ -171,7 +171,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             case DownloadEvent: {
                 DownloadPayload payload = (DownloadPayload) event.payload();
                 Download download = payload.download();
-                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(), download);
+                DownloadUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(), download);
                 break;
             }
 
@@ -481,11 +481,11 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             if (event.type() == GitHubEventType.ReleaseEvent) {
                 ReleasePayload payload = (ReleasePayload) event.payload();
                 ReleaseAsset asset = payload.release().assets().get(id - MENU_DOWNLOAD_START);
-                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(), asset);
+                DownloadUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(), asset);
             } else if (event.type() == GitHubEventType.DownloadEvent) {
                 DownloadPayload payload = (DownloadPayload) event.payload();
                 Download download = payload.download();
-                UiUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(), download);
+                DownloadUtils.enqueueDownloadWithPermissionCheck((BaseActivity) getActivity(), download);
                 }
             return true;
         }

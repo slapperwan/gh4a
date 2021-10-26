@@ -512,7 +512,7 @@ public class HttpImageGetter {
         int mode = prefs.getInt(SettingsFragment.KEY_GIF_LOADING, 1);
         switch (mode) {
             case 1: // load via Wifi
-                return !UiUtils.downloadNeedsWarning(mContext);
+                return !DownloadUtils.downloadNeedsWarning(mContext);
             case 2: // always load
                 return true;
             default:

@@ -31,9 +31,9 @@ import com.gh4a.fragment.ContentListContainerFragment;
 import com.gh4a.fragment.RepositoryEventListFragment;
 import com.gh4a.fragment.RepositoryFragment;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
-import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Branch;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.Repository;
@@ -316,7 +316,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
                         .appendPath("zipball")
                         .appendPath(getCurrentRef())
                         .toString();
-                UiUtils.enqueueDownloadWithPermissionCheck(this, zipUrl, "application/zip",
+                DownloadUtils.enqueueDownloadWithPermissionCheck(this, zipUrl, "application/zip",
                         mRepoName + "-" + getCurrentRef() + ".zip", null);
                 return true;
             }
