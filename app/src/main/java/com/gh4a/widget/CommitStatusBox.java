@@ -160,7 +160,7 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
         }
 
         setSummaryText(failingCount, pendingCount, successCount);
-        setStatusesExpanded(failingCount + pendingCount > 0);
+        setStatusesExpanded(false);
     }
 
     @Override
