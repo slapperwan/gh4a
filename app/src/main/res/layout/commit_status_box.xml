@@ -13,6 +13,15 @@
         android:layout_height="wrap_content"
         android:background="?selectableItemBackground">
 
+        <ProgressBar
+            android:id="@+id/status_progress"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginLeft="@dimen/content_padding"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="@dimen/content_padding"
+            android:indeterminate="true" />
+
         <ImageView
             android:id="@+id/iv_merge_status_icon"
             android:layout_width="30dp"
@@ -21,6 +30,7 @@
             android:layout_marginLeft="@dimen/content_padding"
             android:layout_marginRight="10dp"
             android:layout_marginTop="@dimen/content_padding"
+            android:visibility="invisible"
             tools:src="@drawable/pull_request_merge_ok" />
 
         <com.gh4a.widget.StyleableTextView
@@ -30,8 +40,8 @@
             android:layout_marginTop="@dimen/content_padding"
             android:layout_toLeftOf="@+id/drop_down_icon"
             android:layout_toRightOf="@id/iv_merge_status_icon"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-            tools:text="All checks have passed" />
+            android:text="@string/pull_merge_status_loading"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
         <com.gh4a.widget.StyleableTextView
             android:id="@+id/merge_commit_summary"
@@ -56,7 +66,9 @@
             android:layout_marginRight="@dimen/content_padding"
             android:layout_marginTop="@dimen/content_padding"
             android:scaleType="center"
-            android:src="@drawable/drop_up_arrow" />
+            android:visibility="gone"
+            android:src="@drawable/drop_up_arrow"
+            tools:visibility="visible"/>
 
     </RelativeLayout>
 
