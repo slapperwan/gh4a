@@ -35,11 +35,11 @@ import com.gh4a.activities.CommitHistoryActivity;
 import com.gh4a.adapter.FileAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.Content;
@@ -190,7 +190,7 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
             case R.id.download:
                 String url = IntentUtils.createRawFileUrl(mRepository.owner().login(),
                         mRepository.name(), mRef, contents.path());
-                UiUtils.enqueueDownloadWithPermissionCheck(getBaseActivity(),
+                DownloadUtils.enqueueDownloadWithPermissionCheck(getBaseActivity(),
                         url, FileUtils.getMimeTypeFor(contents.name()),
                         contents.name(), null);
                 return true;

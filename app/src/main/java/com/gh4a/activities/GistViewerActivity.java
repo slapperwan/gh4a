@@ -27,10 +27,10 @@ import android.view.MenuItem;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.GistFile;
 import com.meisolsson.githubsdk.service.gists.GistService;
 
@@ -121,7 +121,7 @@ public class GistViewerActivity extends WebViewerActivity {
                 IntentUtils.launchBrowser(this, Uri.parse(mGistFile.rawUrl()));
                 return true;
             case R.id.download:
-                UiUtils.enqueueDownloadWithPermissionCheck(this, mGistFile.rawUrl(),
+                DownloadUtils.enqueueDownloadWithPermissionCheck(this, mGistFile.rawUrl(),
                         mGistFile.type(), mGistFile.filename(), null);
         }
         return super.onOptionsItemSelected(item);

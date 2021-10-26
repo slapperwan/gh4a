@@ -36,22 +36,19 @@ import com.gh4a.adapter.ReleaseAssetAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
+import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.meisolsson.githubsdk.model.Release;
 import com.meisolsson.githubsdk.model.ReleaseAsset;
-import com.meisolsson.githubsdk.model.request.RequestMarkdown;
-import com.meisolsson.githubsdk.service.misc.MarkdownService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
 import java.util.Date;
 
-import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
 
 public class ReleaseInfoActivity extends BaseActivity implements
@@ -235,7 +232,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     public void onItemClick(ReleaseAsset item) {
-        UiUtils.enqueueDownloadWithPermissionCheck(this, item);
+        DownloadUtils.enqueueDownloadWithPermissionCheck(this, item);
     }
 
     @Override

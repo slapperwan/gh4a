@@ -37,11 +37,11 @@ import com.gh4a.ApiRequestException;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
+import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.ClientErrorResponse;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.TextMatch;
@@ -235,7 +235,7 @@ public class FileViewerActivity extends WebViewerActivity
                 IntentUtils.launchBrowser(this, url);
                 return true;
             case R.id.download:
-                UiUtils.enqueueDownloadWithPermissionCheck(this, buildRawFileUrl(),
+                DownloadUtils.enqueueDownloadWithPermissionCheck(this, buildRawFileUrl(),
                         FileUtils.getMimeTypeFor(mPath), FileUtils.getFileName(mPath), null);
                 return true;
             case R.id.share:
