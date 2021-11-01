@@ -553,6 +553,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return false;
     }
 
+    public boolean hasRightDrawer() {
+        return getRightNavigationDrawerMenuResources() != null;
+    }
+
     public void setRightDrawerLockedClosed(boolean locked) {
         mDrawerLayout.setDrawerLockMode(
                 locked ? DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED,

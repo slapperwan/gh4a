@@ -59,20 +59,25 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
         mFastScroller = view.findViewById(R.id.fast_scroller);
         mFastScroller.attachRecyclerView(mRecyclerView);
         mFastScroller.setVisibility(View.VISIBLE);
-        mFastScroller.setOnHandleTouchListener((v, event) -> {
-            switch (event.getActionMasked()) {
-                case MotionEvent.ACTION_DOWN:
-                    getBaseActivity().setRightDrawerLockedClosed(true);
-                    break;
 
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    getBaseActivity().setRightDrawerLockedClosed(false);
-                    break;
-            }
+        BaseActivity activity = getBaseActivity();
+        if (activity.hasRightDrawer()) {
+            // Prevent the right drawer from being accidentally opened while fast scrolling
+            mFastScroller.setOnHandleTouchListener((v, event) -> {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        activity.setRightDrawerLockedClosed(true);
+                        break;
 
-            return false;
-        });
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        activity.setRightDrawerLockedClosed(false);
+                        break;
+                }
+
+                return false;
+            });
+        }
 
         return view;
     }
