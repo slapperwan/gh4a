@@ -168,9 +168,6 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
 
     @Override
     protected void bindSpecialViews(View headerView) {
-        CommitStatusBox commitStatusBox = mListHeaderView.findViewById(R.id.commit_status_box);
-        commitStatusBox.setVisibility(View.VISIBLE);
-
         PullRequestBranchInfoView branchContainer = headerView.findViewById(R.id.branch_container);
         branchContainer.bind(mPullRequest.head(), mPullRequest.base(), mHeadReference);
         branchContainer.setVisibility(View.VISIBLE);
@@ -461,6 +458,10 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
         if (mPullRequest.state() != IssueState.Open) {
             return;
         }
+
+        // At this point the status box will display a loading placeholder
+        CommitStatusBox commitStatusBox = mListHeaderView.findViewById(R.id.commit_status_box);
+        commitStatusBox.setVisibility(View.VISIBLE);
 
         RepositoryStatusService repoService = ServiceFactory.get(RepositoryStatusService.class, force);
         String sha = mPullRequest.head().sha();
