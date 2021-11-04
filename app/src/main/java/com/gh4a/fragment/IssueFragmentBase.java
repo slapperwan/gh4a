@@ -161,9 +161,10 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // We make the content container visible so that the issue/PR can be read while the rest
-        // of the conversation is still loading
-        view.findViewById(R.id.content_container).setVisibility(View.VISIBLE);
+        // We want to make the user able to read the issue/PR while the rest of the conversation is still loading
+        if (mInitialComment == null) {
+            view.findViewById(R.id.content_container).setVisibility(View.VISIBLE);
+        }
 
         BaseActivity activity = getBaseActivity();
         activity.addAppBarOffsetListener(mBottomSheet);
