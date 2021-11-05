@@ -740,11 +740,6 @@ public class LinkParserTest {
     }
 
     @Test
-    public void compareLink__redirectsToCompareView() {
-
-    }
-
-    @Test
     public void compareLink_withoutRefs__opensBrowser() {
         LinkParser.ParseResult result =
                 (parseLink("https://github.com/slapperwan/gh4a/compare/v4.2.0...v4.2.1"));
@@ -766,6 +761,11 @@ public class LinkParserTest {
     @Test
     public void unknownRepositoryLink__opensBrowser() {
         assertRedirectsToBrowser(parseLink("https://github.com/slapperwan/gh4a/unknown"));
+    }
+
+    @Test
+    public void nonGitHubDotComLink__opensBrowser() {
+        assertRedirectsToBrowser(parseLink("https://user-images.githubusercontent.com/30041551/an_image.png"));
     }
 
     private LinkParser.ParseResult parseLink(String uriString) {

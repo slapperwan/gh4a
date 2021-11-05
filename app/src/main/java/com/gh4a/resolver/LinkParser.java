@@ -59,6 +59,10 @@ public class LinkParser {
             return parseNewBlogLink(activity, parts);
         }
 
+        if (!"github.com".equals(uri.getHost())) {
+            return null;
+        }
+
         if (parts.isEmpty()) {
             return null;
         }
