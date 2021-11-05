@@ -39,6 +39,11 @@ public class LinkSpan extends ClickableSpan {
 
     private void openWebPage(Uri clickedUri, FragmentActivity activity) {
         String hostname = clickedUri.getHost();
+        if (hostname == null) {
+            // The user clicked on a relative or partial URL, there's nothing we can do
+            return;
+        }
+
         if (hostname.endsWith("github.com") || hostname.endsWith("githubusercontent.com")) {
             IntentUtils.openInCustomTabOrBrowser(activity, clickedUri);
         } else {
