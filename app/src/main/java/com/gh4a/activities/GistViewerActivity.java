@@ -84,7 +84,7 @@ public class GistViewerActivity extends WebViewerActivity {
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         if (FileUtils.isMarkdown(mGistFile.filename())) {
             String base64Data = StringUtils.toBase64(mGistFile.content());
-            return generateMarkdownHtml(base64Data, null, null, null, cssTheme, addTitleHeader);
+            return generateMarkdownHtml(base64Data, null, null, null, null, cssTheme, addTitleHeader);
         } else {
             return generateCodeHtml(mGistFile.content(), mFileName,
                     -1, -1, cssTheme, addTitleHeader);

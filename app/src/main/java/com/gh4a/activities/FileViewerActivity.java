@@ -152,8 +152,9 @@ public class FileViewerActivity extends WebViewerActivity
                     ";base64," + base64Data;
             return highlightImage(imageUrl, cssTheme, title);
         } else if (base64Data != null && FileUtils.isMarkdown(mPath) && !mViewRawText) {
+            String folderPath = FileUtils.getFolderPath(mPath);
             return generateMarkdownHtml(base64Data,
-                    mRepoOwner, mRepoName, mRef, cssTheme, addTitleHeader);
+                    mRepoOwner, mRepoName, mRef, folderPath, cssTheme, addTitleHeader);
         } else {
             String data = base64Data != null ? StringUtils.fromBase64(base64Data) : "";
             findMatchingLines(data);

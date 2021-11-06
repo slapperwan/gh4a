@@ -46,12 +46,15 @@ import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.FindActionModeCallback;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static java.lang.String.format;
 
 public abstract class WebViewerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, View.OnTouchListener {
@@ -159,7 +162,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         mWebView.setOnTouchListener(this);
     }
 
-    //@SuppressWarnings("deprecation")
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebViewSettings(WebSettings s) {
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
@@ -368,7 +370,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     protected String generateMarkdownHtml(String base64Data,
-            String repoOwner, String repoName, String ref,
+            String repoOwner, String repoName, String ref, String folderPath,
             String cssTheme, boolean addTitleHeader) {
         String title = addTitleHeader ? getDocumentTitle() : null;
         StringBuilder content = new StringBuilder();
@@ -394,14 +396,13 @@ public abstract class WebViewerActivity extends BaseActivity implements
         content.append("');\n");
         content.append("var converter = new showdown.Converter();\n");
         content.append("converter.setFlavor('github');\n");
-        if (repoOwner != null && repoName != null) {
-            String urlPrefix = "https://raw.github.com/"
-                    + repoOwner + "/" + repoName + "/" + (ref != null ? ref : "master");
-            content.append("converter.setOption('fixupRelativeUrls', true);\n");
-            content.append("converter.setOption('relativeUrlFixupPrefix','");
-            content.append(urlPrefix).append("');\n");
-        }
         content.append("var html = converter.makeHtml(text);\n");
+        if (repoOwner != null && repoName != null) {
+            mWebView.addJavascriptInterface(new HtmlUtilsJavascriptInterface(), "HtmlUtils");
+            String actualRef = ref == null ? "master" : ref;
+            content.append(format("html = HtmlUtils.rewriteRelativeUrls(html, '%s', '%s', '%s', '%s');\n",
+                    repoOwner, repoName, actualRef, folderPath));
+        }
         content.append("document.getElementById('content').innerHTML = html;");
         content.append("</script>");
 
@@ -480,6 +481,14 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
     protected abstract String generateHtml(String cssTheme, boolean addTitleHeader);
     protected abstract String getDocumentTitle();
+
+    private static class HtmlUtilsJavascriptInterface {
+        @JavascriptInterface
+        public String rewriteRelativeUrls(final String html, final String repoUser,
+                final String repoName, final String branch, final String folderPath) {
+            return HtmlUtils.rewriteRelativeUrls(html, repoUser, repoName, branch, folderPath);
+        }
+    }
 
     private class DisplayJavascriptInterface {
         @JavascriptInterface

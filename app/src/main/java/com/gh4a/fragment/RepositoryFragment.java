@@ -415,7 +415,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
                 .map(htmlOpt -> {
                     if (htmlOpt.isPresent()) {
                         String html = HtmlUtils.rewriteRelativeUrls(htmlOpt.get(),
-                                repoOwner, repoName, mRef != null ? mRef : mRepository.defaultBranch());
+                                repoOwner, repoName, mRef != null ? mRef : mRepository.defaultBranch(), "");
                         mImageGetter.encode(context, id, html);
                         return Optional.of(html);
                     }
