@@ -3,6 +3,8 @@ package com.gh4a.resolver;
 import android.content.Intent;
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
+
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Pair;
 
@@ -37,9 +39,9 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
     @VisibleForTesting
     protected final boolean mGoToFileViewer;
 
-    public RefPathDisambiguationTask(FragmentActivity activity, String repoOwner,
-            String repoName, String refAndPath, int initialPage) {
-        super(activity);
+    public RefPathDisambiguationTask(FragmentActivity activity, Uri urlToResolve,
+            String repoOwner, String repoName, String refAndPath, int initialPage) {
+        super(activity, urlToResolve);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mRefAndPath = refAndPath;
@@ -48,9 +50,9 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
         mGoToFileViewer = false;
     }
 
-    public RefPathDisambiguationTask(FragmentActivity activity, String repoOwner,
-            String repoName, String refAndPath, String fragment) {
-        super(activity);
+    public RefPathDisambiguationTask(FragmentActivity activity, Uri urlToResolve,
+            String repoOwner, String repoName, String refAndPath, String fragment) {
+        super(activity, urlToResolve);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mRefAndPath = refAndPath;

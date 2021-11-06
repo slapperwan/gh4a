@@ -1,6 +1,8 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
 
@@ -13,9 +15,9 @@ public class UserFollowersLoadTask extends UserLoadTask {
     @VisibleForTesting
     protected final boolean mShowFollowers;
 
-    public UserFollowersLoadTask(FragmentActivity activity, String userLogin,
-            boolean showFollowers) {
-        super(activity, userLogin);
+    public UserFollowersLoadTask(FragmentActivity activity, Uri urlToResolve,
+            String userLogin, boolean showFollowers) {
+        super(activity, urlToResolve, userLogin);
         mShowFollowers = showFollowers;
     }
 

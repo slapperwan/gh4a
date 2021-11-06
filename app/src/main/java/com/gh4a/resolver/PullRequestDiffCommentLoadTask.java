@@ -1,6 +1,8 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
 import androidx.core.util.Pair;
@@ -35,10 +37,10 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
     @VisibleForTesting
     protected final int mPage;
 
-    public PullRequestDiffCommentLoadTask(FragmentActivity activity, String repoOwner,
-            String repoName, int pullRequestNumber, IntentUtils.InitialCommentMarker marker,
-            int page) {
-        super(activity);
+    public PullRequestDiffCommentLoadTask(FragmentActivity activity, Uri urlToResolve,
+            String repoOwner, String repoName, int pullRequestNumber,
+            IntentUtils.InitialCommentMarker marker, int page) {
+        super(activity, urlToResolve);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mPullRequestNumber = pullRequestNumber;

@@ -99,10 +99,10 @@ public class LinkParser {
 
         switch (action) {
             case "releases":
-                return parseReleaseLink(activity, parts, user, repo, id);
+                return parseReleaseLink(activity, uri, parts, user, repo, id);
             case "tree":
             case "commits":
-                return parseCommitsLink(activity, parts, user, repo, action);
+                return parseCommitsLink(activity, uri, parts, user, repo, action);
             case "issues":
                 return parseIssuesLink(activity, uri, user, repo, id, initialCommentFallback);
             case "pulls":
@@ -168,13 +168,13 @@ public class LinkParser {
         if (tab != null) {
             switch (tab) {
                 case "repositories":
-                    return new ParseResult(new UserReposLoadTask(activity, user, false));
+                    return new ParseResult(new UserReposLoadTask(activity, uri, user, false));
                 case "stars":
-                    return new ParseResult(new UserReposLoadTask(activity, user, true));
+                    return new ParseResult(new UserReposLoadTask(activity, uri, user, true));
                 case "followers":
-                    return new ParseResult(new UserFollowersLoadTask(activity, user, true));
+                    return new ParseResult(new UserFollowersLoadTask(activity, uri, user, true));
                 case "following":
-                    return new ParseResult(new UserFollowersLoadTask(activity, user, false));
+                    return new ParseResult(new UserFollowersLoadTask(activity, uri, user, false));
                 default:
                     return new ParseResult(UserActivity.makeIntent(activity, user));
             }
@@ -198,17 +198,17 @@ public class LinkParser {
     }
 
     @NonNull
-    private static ParseResult parseReleaseLink(FragmentActivity activity, List<String> parts,
-            String user, String repo, String id) {
+    private static ParseResult parseReleaseLink(FragmentActivity activity, Uri uri,
+            List<String> parts, String user, String repo, String id) {
         if ("tag".equals(id)) {
             final String release = parts.size() >= 5 ? parts.get(4) : null;
             if (release != null) {
-                return new ParseResult(new ReleaseLoadTask(activity, user, repo, release));
+                return new ParseResult(new ReleaseLoadTask(activity, uri, user, repo, release));
             }
         } else if (!TextUtils.isEmpty(id)) {
             try {
                 long numericId = Long.parseLong(id);
-                return new ParseResult(new ReleaseLoadTask(activity, user, repo, numericId));
+                return new ParseResult(new ReleaseLoadTask(activity, uri, user, repo, numericId));
             } catch (NumberFormatException e) {
                 // fall through to release list
             }
@@ -217,8 +217,8 @@ public class LinkParser {
     }
 
     @NonNull
-    private static ParseResult parseCommitsLink(FragmentActivity activity, List<String> parts,
-            String user, String repo, String action) {
+    private static ParseResult parseCommitsLink(FragmentActivity activity, Uri uri,
+            List<String> parts, String user, String repo, String action) {
         int page = "tree".equals(action)
                 ? RepositoryActivity.PAGE_FILES
                 : RepositoryActivity.PAGE_COMMITS;
@@ -230,7 +230,7 @@ public class LinkParser {
             refStart = 5;
         }
         String refAndPath = TextUtils.join("/", parts.subList(refStart, parts.size()));
-        return new ParseResult(new RefPathDisambiguationTask(activity, user, repo, refAndPath,
+        return new ParseResult(new RefPathDisambiguationTask(activity, uri, user, repo, refAndPath,
                 page));
     }
 
@@ -277,7 +277,7 @@ public class LinkParser {
                 extractDiffId(uri.getFragment(), "diff-", true);
 
         if (diffId != null) {
-            return new ParseResult(new PullRequestDiffLoadTask(activity, user, repo, diffId,
+            return new ParseResult(new PullRequestDiffLoadTask(activity, uri, user, repo, diffId,
                     pullRequestNumber));
         }
 
@@ -287,7 +287,7 @@ public class LinkParser {
         IntentUtils.InitialCommentMarker initialDiffComment =
                 generateInitialCommentMarkerWithoutFallback(uri.getFragment(), "r");
         if (initialDiffComment != null) {
-            return new ParseResult(new PullRequestDiffCommentLoadTask(activity, user, repo,
+            return new ParseResult(new PullRequestDiffCommentLoadTask(activity, uri, user, repo,
                     pullRequestNumber, initialDiffComment, page));
         }
 
@@ -295,7 +295,7 @@ public class LinkParser {
                 generateInitialCommentMarkerWithoutFallback(uri.getFragment(),
                         "pullrequestreview-");
         if (reviewMarker != null) {
-            return new ParseResult(new PullRequestReviewLoadTask(activity, user, repo,
+            return new ParseResult(new PullRequestReviewLoadTask(activity, uri, user, repo,
                     pullRequestNumber, reviewMarker));
         }
 
@@ -303,14 +303,14 @@ public class LinkParser {
                 generateInitialCommentMarkerWithoutFallback(uri.getFragment(),
                         "discussion_r");
         if (reviewCommentMarker != null) {
-            return new ParseResult(new PullRequestReviewCommentLoadTask(activity, user, repo,
+            return new ParseResult(new PullRequestReviewCommentLoadTask(activity, uri, user, repo,
                     pullRequestNumber, reviewCommentMarker));
         }
 
         DiffHighlightId reviewDiffHunkId =
                 extractDiffId(uri.getFragment(), "discussion-diff-", false);
         if (reviewDiffHunkId != null) {
-            return new ParseResult(new PullRequestReviewDiffLoadTask(activity, user, repo,
+            return new ParseResult(new PullRequestReviewDiffLoadTask(activity, uri, user, repo,
                     reviewDiffHunkId, pullRequestNumber));
         }
 
@@ -343,13 +343,13 @@ public class LinkParser {
         DiffHighlightId diffId =
                 extractDiffId(uri.getFragment(), "diff-", true);
         if (diffId != null) {
-            return new ParseResult(new CommitDiffLoadTask(activity, user, repo, diffId, id));
+            return new ParseResult(new CommitDiffLoadTask(activity, uri, user, repo, diffId, id));
         }
 
         IntentUtils.InitialCommentMarker initialComment = generateInitialCommentMarker(
                 uri.getFragment(), "commitcomment-", initialCommentFallback);
         if (initialComment != null) {
-            return new ParseResult(new CommitCommentLoadTask(activity, user, repo, id, initialComment));
+            return new ParseResult(new CommitCommentLoadTask(activity, uri, user, repo, id, initialComment));
         }
         return new ParseResult(CommitActivity.makeIntent(activity, user, repo, id, null));
     }
@@ -361,7 +361,7 @@ public class LinkParser {
             return null;
         }
         String refAndPath = TextUtils.join("/", parts.subList(3, parts.size()));
-        return new ParseResult(new RefPathDisambiguationTask(activity, user, repo, refAndPath,
+        return new ParseResult(new RefPathDisambiguationTask(activity, uri, user, repo, refAndPath,
                 uri.getFragment()));
     }
 

@@ -1,6 +1,8 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
 
@@ -23,9 +25,9 @@ public class PullRequestReviewLoadTask extends UrlLoadTask {
     @VisibleForTesting
     protected final IntentUtils.InitialCommentMarker mMarker;
 
-    public PullRequestReviewLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            int pullRequestNumber, IntentUtils.InitialCommentMarker marker) {
-        super(activity);
+    public PullRequestReviewLoadTask(FragmentActivity activity, Uri urlToResolve,
+            String repoOwner, String repoName, int pullRequestNumber, IntentUtils.InitialCommentMarker marker) {
+        super(activity, urlToResolve);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mPullRequestNumber = pullRequestNumber;

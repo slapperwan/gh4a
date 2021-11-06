@@ -1,6 +1,8 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
 
@@ -16,8 +18,8 @@ public abstract class UserLoadTask extends UrlLoadTask {
     @VisibleForTesting
     protected final String mUserLogin;
 
-    public UserLoadTask(FragmentActivity activity, String userLogin) {
-        super(activity);
+    public UserLoadTask(FragmentActivity activity, Uri urlToResolve, String userLogin) {
+        super(activity, urlToResolve);
         this.mUserLogin = userLogin;
     }
 
