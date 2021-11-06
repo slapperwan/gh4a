@@ -139,11 +139,11 @@ public class HtmlUtils {
      * Rewrite relative URLs in HTML fetched e.g. from markdown files.
      */
     public static String rewriteRelativeUrls(final String html, final String repoUser,
-            final String repoName, final String branch) {
-        final String baseUrl = "https://github.com/" + repoUser + "/" + repoName + "/blob/" + branch;
+            final String repoName, final String ref, final String folderPath) {
+        final String baseUrl = "https://github.com/" + repoUser + "/" + repoName + "/blob/" + ref + "/" + folderPath;
         String rewrittenHtml = rewriteUrlsInAttribute("href", html, baseUrl);
 
-        final String baseUrlForImages = "https://raw.github.com/" + repoUser + "/" + repoName + "/" + branch;
+        final String baseUrlForImages = "https://raw.github.com/" + repoUser + "/" + repoName + "/" + ref + "/" + folderPath;
         return rewriteUrlsInAttribute("src", rewrittenHtml, baseUrlForImages);
     }
 
