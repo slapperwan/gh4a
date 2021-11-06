@@ -1,6 +1,6 @@
 body {
     font-family: Helvetica,arial,sans-serif;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.4;
     background-color: #F7F7F9;
     color: #48484C;
@@ -45,7 +45,6 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 h1:hover a.anchor,h2:hover a.anchor,h3:hover a.anchor,h4:hover a.anchor,h5:hover a.anchor,h6:hover a.anchor {
-    background: url(../../images/modules/styleguide/para.png) no-repeat 10px center;
     text-decoration: none;
 }
 
@@ -60,7 +59,6 @@ h1 {
 
 h2 {
     font-size: 24px;
-    border-bottom: 1px solid #7A7A7A;
     color: #48484C;
 }
 
@@ -82,13 +80,12 @@ h6 {
 }
 
 blockquote,dl,li,ol,p,pre,table,ul {
-    margin: 3px 0;
+    margin: 8px 0;
 }
 
 hr {
-    background: transparent url(../../images/modules/pulls/dirty-shade.png) repeat-x 0 0;
-    border: 0 none;
-    color: #7A7A7A;
+    border: none;
+    border-bottom: 1px solid #7A7A7A;
     height: 4px;
     padding: 0;
 }
