@@ -1,6 +1,8 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
@@ -21,9 +23,9 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
     protected final String mRepoName;
     protected final DiffHighlightId mDiffId;
 
-    public DiffLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            DiffHighlightId diffId) {
-        super(activity);
+    public DiffLoadTask(FragmentActivity activity, Uri urlToResolve, String repoOwner,
+            String repoName, DiffHighlightId diffId) {
+        super(activity, urlToResolve);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mDiffId = diffId;

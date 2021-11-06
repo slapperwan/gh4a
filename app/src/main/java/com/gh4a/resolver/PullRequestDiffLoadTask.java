@@ -1,6 +1,8 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
@@ -23,9 +25,9 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
     @VisibleForTesting
     protected final int mPullRequestNumber;
 
-    public PullRequestDiffLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            DiffHighlightId diffId, int pullRequestNumber) {
-        super(activity, repoOwner, repoName, diffId);
+    public PullRequestDiffLoadTask(FragmentActivity activity, Uri urlToResolve,
+            String repoOwner, String repoName, DiffHighlightId diffId, int pullRequestNumber) {
+        super(activity, urlToResolve, repoOwner, repoName, diffId);
         mPullRequestNumber = pullRequestNumber;
     }
 

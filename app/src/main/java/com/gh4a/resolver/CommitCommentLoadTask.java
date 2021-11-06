@@ -2,6 +2,8 @@ package com.gh4a.resolver;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
 
@@ -33,9 +35,9 @@ public class CommitCommentLoadTask extends UrlLoadTask {
     @VisibleForTesting
     protected final IntentUtils.InitialCommentMarker mMarker;
 
-    public CommitCommentLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            String commitSha, IntentUtils.InitialCommentMarker marker) {
-        super(activity);
+    public CommitCommentLoadTask(FragmentActivity activity, Uri urlToResolve, String repoOwner,
+            String repoName, String commitSha, IntentUtils.InitialCommentMarker marker) {
+        super(activity, urlToResolve);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mCommitSha = commitSha;

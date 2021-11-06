@@ -2,6 +2,7 @@ package com.gh4a.resolver;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -20,12 +21,14 @@ import io.reactivex.Single;
 public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>> {
     protected final FragmentActivity mActivity;
     private ProgressDialogFragment mProgressDialog;
+    private final Uri mUrlToResolve;
     private int mIntentFlags;
-    private Runnable completionCallback;
+    private Runnable mCompletionCallback;
 
-    public UrlLoadTask(FragmentActivity activity) {
+    public UrlLoadTask(FragmentActivity activity, Uri urlToResolve) {
         super();
         mActivity = activity;
+        mUrlToResolve = urlToResolve;
     }
 
     public void setIntentFlags(int flags) {
@@ -36,7 +39,7 @@ public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>
      * Must be called BEFORE executing the task, otherwise the callback might not get executed.
      */
     public void setCompletionCallback(Runnable callback) {
-        completionCallback = callback;
+        mCompletionCallback = callback;
     }
 
     @Override
@@ -65,15 +68,15 @@ public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>
         if (result.isPresent()) {
             mActivity.startActivity(result.get().setFlags(mIntentFlags));
         } else {
-            IntentUtils.launchBrowser(mActivity, mActivity.getIntent().getData(), mIntentFlags);
+            IntentUtils.launchBrowser(mActivity, mUrlToResolve, mIntentFlags);
         }
 
         if (mProgressDialog != null && mProgressDialog.isAdded()) {
             mProgressDialog.dismissAllowingStateLoss();
         }
 
-        if (completionCallback != null) {
-            completionCallback.run();
+        if (mCompletionCallback != null) {
+            mCompletionCallback.run();
         }
     }
 

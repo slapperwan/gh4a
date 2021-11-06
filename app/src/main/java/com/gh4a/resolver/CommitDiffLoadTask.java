@@ -1,6 +1,8 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
@@ -24,9 +26,9 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
     @VisibleForTesting
     protected final String mSha;
 
-    public CommitDiffLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            DiffHighlightId diffId, String sha) {
-        super(activity, repoOwner, repoName, diffId);
+    public CommitDiffLoadTask(FragmentActivity activity, Uri urlToResolve,
+            String repoOwner, String repoName, DiffHighlightId diffId, String sha) {
+        super(activity, urlToResolve, repoOwner, repoName, diffId);
         mSha = sha;
     }
 

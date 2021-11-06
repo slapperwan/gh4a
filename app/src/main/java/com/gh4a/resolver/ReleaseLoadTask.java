@@ -1,6 +1,8 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
 
@@ -27,17 +29,18 @@ public class ReleaseLoadTask extends UrlLoadTask {
     @VisibleForTesting
     protected final long mId;
 
-    public ReleaseLoadTask(FragmentActivity activity, String repoOwner, String repoName,
-            String tagName) {
-        super(activity);
+    public ReleaseLoadTask(FragmentActivity activity, Uri urlToResolve,
+            String repoOwner, String repoName, String tagName) {
+        super(activity, urlToResolve);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mTagName = tagName;
         mId = -1;
     }
 
-    public ReleaseLoadTask(FragmentActivity activity, String repoOwner, String repoName, long id) {
-        super(activity);
+    public ReleaseLoadTask(FragmentActivity activity, Uri urlToResolve,
+            String repoOwner, String repoName, long id) {
+        super(activity, urlToResolve);
         mRepoOwner = repoOwner;
         mRepoName = repoName;
         mId = id;

@@ -1,6 +1,8 @@
 package com.gh4a.resolver;
 
 import android.content.Intent;
+import android.net.Uri;
+
 import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
 
@@ -13,8 +15,9 @@ public class UserReposLoadTask extends UserLoadTask {
     @VisibleForTesting
     protected final boolean mShowStars;
 
-    public UserReposLoadTask(FragmentActivity activity, String userLogin, boolean showStars) {
-        super(activity, userLogin);
+    public UserReposLoadTask(FragmentActivity activity, Uri urlToResolve,
+            String userLogin, boolean showStars) {
+        super(activity, urlToResolve, userLogin);
         mShowStars = showStars;
     }
 
