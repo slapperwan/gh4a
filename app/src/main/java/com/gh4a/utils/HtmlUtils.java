@@ -137,22 +137,21 @@ public class HtmlUtils {
 
     /**
      * Rewrite relative URLs in HTML fetched e.g. from markdown files.
-     *
-     * @param html
-     * @param repoUser
-     * @param repoName
-     * @param branch
-     * @return
      */
     public static String rewriteRelativeUrls(final String html, final String repoUser,
             final String repoName, final String branch) {
-        final String baseUrl = "https://raw.github.com/" + repoUser + "/" + repoName + "/" + branch;
-        final StringBuffer sb = new StringBuffer();
-        final Pattern p = Pattern.compile("(href|src)=\"(\\S+)\"");
-        final Matcher m = p.matcher(html);
+        final String baseUrl = "https://github.com/" + repoUser + "/" + repoName + "/blob/" + branch;
+        String rewrittenHtml = rewriteUrlsInAttribute("href", html, baseUrl);
 
-        while (m.find()) {
-            String url = m.group(2);
+        final String baseUrlForImages = "https://raw.github.com/" + repoUser + "/" + repoName + "/" + branch;
+        return rewriteUrlsInAttribute("src", rewrittenHtml, baseUrlForImages);
+    }
+
+    private static String rewriteUrlsInAttribute(String attribute, String html, String baseUrl) {
+        final Matcher matcher = Pattern.compile("(" + attribute + ")=\"(\\S+)\"").matcher(html);
+        final StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String url = matcher.group(2);
             if (!url.contains("://") && !url.startsWith("#")) {
                 if (url.startsWith("/")) {
                     url = baseUrl + url;
@@ -160,10 +159,9 @@ public class HtmlUtils {
                     url = baseUrl + "/" + url;
                 }
             }
-            m.appendReplacement(sb, Matcher.quoteReplacement(m.group(1) + "=\"" + url + "\""));
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(1) + "=\"" + url + "\""));
         }
-        m.appendTail(sb);
-
+        matcher.appendTail(sb);
         return sb.toString();
     }
 
