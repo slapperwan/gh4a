@@ -442,6 +442,8 @@ public class HtmlUtils {
                 startHeading(mSpannableStringBuilder, attributes, tag.charAt(1) - '1');
             } else if (tag.equalsIgnoreCase("img")) {
                 startImg(mSpannableStringBuilder, attributes, mImageGetter);
+            } else if (tag.equalsIgnoreCase("th")) {
+                start(mSpannableStringBuilder, new Bold());
             }
         }
 
@@ -524,6 +526,13 @@ public class HtmlUtils {
                     Character.toLowerCase(tag.charAt(0)) == 'h' &&
                     tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
                 endHeading(mSpannableStringBuilder);
+            } else if (tag.equalsIgnoreCase("tr")) {
+                mSpannableStringBuilder.append('\n');
+            } else if (tag.equalsIgnoreCase("td")) {
+                mSpannableStringBuilder.append('\u2003');
+            } else if (tag.equalsIgnoreCase("th")) {
+                end(mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
+                mSpannableStringBuilder.append('\u2003');
             }
         }
 
