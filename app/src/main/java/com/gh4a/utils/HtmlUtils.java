@@ -214,6 +214,7 @@ public class HtmlUtils {
         private static final float[] HEADING_SIZES = {
             1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,
         };
+        private static final int DEFAULT_CODE_BACKGROUND_COLOR = 0x30aaaaaa;
 
         private final float mDividerHeight;
         private final int mBulletMargin;
@@ -444,6 +445,11 @@ public class HtmlUtils {
                 startImg(mSpannableStringBuilder, attributes, mImageGetter);
             } else if (tag.equalsIgnoreCase("th")) {
                 start(mSpannableStringBuilder, new Bold());
+            } else if (tag.equalsIgnoreCase("td")) {
+                String cssClass = attributes.getValue("class");
+                if (cssClass != null) {
+                    startCodeSnippetLineIfAppropriate(cssClass);
+                }
             }
         }
 
@@ -528,6 +534,10 @@ public class HtmlUtils {
                 endHeading(mSpannableStringBuilder);
             } else if (tag.equalsIgnoreCase("tr")) {
                 mSpannableStringBuilder.append('\n');
+                Code codeMark = getLast(mSpannableStringBuilder, Code.class);
+                if (codeMark != null) {
+                    endCodeSnippetLine(codeMark);
+                }
             } else if (tag.equalsIgnoreCase("td")) {
                 mSpannableStringBuilder.append('\u2003');
             } else if (tag.equalsIgnoreCase("th")) {
@@ -642,6 +652,40 @@ public class HtmlUtils {
             }
 
             endBlockElement(text);
+        }
+
+        /*
+         * Embedded code snippets in comments (which include suggested changes) are rendered in an HTML table
+         * in which every <tr> maps to a line of code, as you can see in the following example
+         * taken from a suggested change snippet:
+         * <tbody>
+         *   <tr class="border-0">
+         *     <td class="blob-num blob-num-deletion [...]" data-line-number=""></td>
+         *     <td class="blob-code-deletion js-blob-code-deletion [...]"> [line of code] </td>
+         *   </tr>
+         *   <tr class="border-0">
+         *     <td class="blob-num blob-num-addition [...]" data-line-number=""></td>
+         *     <td class="blob-code-addition js-blob-code-addition [...]"> [line of code] </td>
+         *   </tr>
+         * </tbody>
+         */
+        private void startCodeSnippetLineIfAppropriate(String tdCssClass) {
+            if (tdCssClass.contains("blob-num-addition")) {
+                int color = UiUtils.resolveColor(mContext, R.attr.colorDiffAddBackground);
+                start(mSpannableStringBuilder, new Code(color));
+                mSpannableStringBuilder.append('+');
+            } else if (tdCssClass.contains("blob-num-deletion")) {
+                int color = UiUtils.resolveColor(mContext, R.attr.colorDiffRemoveBackground);
+                start(mSpannableStringBuilder, new Code(color));
+                mSpannableStringBuilder.append('-');
+            } else if (tdCssClass.contains("blob-num")) {
+                start(mSpannableStringBuilder, new Code(DEFAULT_CODE_BACKGROUND_COLOR));
+            }
+        }
+
+        private void endCodeSnippetLine(Code codeMark) {
+            setSpanFromMark(mSpannableStringBuilder, codeMark,
+                    new TypefaceSpan("monospace"), new CodeBlockSpan(codeMark.mColor));
         }
 
         private static <T> T getLast(Spanned text, Class<T> kind) {
@@ -911,10 +955,17 @@ public class HtmlUtils {
         }
 
         private static class Code {
-            public final boolean mInPre;
+            private final boolean mInPre;
+            private final int mColor;
 
             public Code(boolean inPre) {
                 mInPre = inPre;
+                mColor = 0;
+            }
+
+            public Code(int color) {
+                mColor = color;
+                mInPre = false;
             }
         }
 
