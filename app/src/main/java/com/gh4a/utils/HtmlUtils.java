@@ -24,7 +24,6 @@ import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import androidx.core.content.ContextCompat;
-import android.text.Editable;
 import android.text.Html.ImageGetter;
 import android.text.Layout;
 import android.text.Spannable;
@@ -347,16 +346,16 @@ public class HtmlUtils {
                 // We don't need to handle this. TagSoup will ensure that there's a </br> for each <br>
                 // so we can safely emit the linebreaks when we handle the close tag.
             } else if (tag.equalsIgnoreCase("p")) {
-                startBlockElement(mSpannableStringBuilder, attributes);
-                startCssStyle(mSpannableStringBuilder, attributes);
+                startBlockElement(attributes);
+                startCssStyle(attributes);
             } else if (tag.equalsIgnoreCase("ul")) {
-                startBlockElement(mSpannableStringBuilder, attributes);
-                start(mSpannableStringBuilder, new List());
+                startBlockElement(attributes);
+                start(new List());
             } else if (tag.equalsIgnoreCase("ol")) {
-                startBlockElement(mSpannableStringBuilder, attributes);
-                start(mSpannableStringBuilder, new List(parseIntAttribute(attributes, "start", 1)));
+                startBlockElement(attributes);
+                start(new List(parseIntAttribute(attributes, "start", 1)));
             } else if (tag.equalsIgnoreCase("li")) {
-                startLi(mSpannableStringBuilder, attributes);
+                startLi(attributes);
             } else if (tag.equalsIgnoreCase("input")) {
                 if ("checkbox".equalsIgnoreCase(attributes.getValue("", "type"))) {
                     boolean checked = attributes.getIndex("", "checked") >= 0;
@@ -371,80 +370,80 @@ public class HtmlUtils {
                             mSpannableStringBuilder.length() - 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             } else if (tag.equalsIgnoreCase("div")) {
-                startBlockElement(mSpannableStringBuilder, attributes);
+                startBlockElement(attributes);
                 String cssClass = attributes.getValue("", "class");
                 if (cssClass != null && cssClass.indexOf("highlight") == 0) {
-                    start(mSpannableStringBuilder, new CodeDiv());
+                    start(new CodeDiv());
                 }
-                CodeDiv code = getLast(mSpannableStringBuilder, CodeDiv.class);
+                CodeDiv code = getLast(CodeDiv.class);
                 if (code != null) {
                     code.mLevel++;
                 }
             } else if (tag.equalsIgnoreCase("span")) {
-                startCssStyle(mSpannableStringBuilder, attributes);
+                startCssStyle(attributes);
             } else if (tag.equalsIgnoreCase("hr")) {
                 HorizontalLineSpan span = new HorizontalLineSpan(mDividerHeight, 0x60aaaaaa);
                 // enforce the following newlines to be written
                 mSpannableStringBuilder.append(' ');
-                appendNewlines(mSpannableStringBuilder, 2);
+                appendNewlines(2);
                 int len = mSpannableStringBuilder.length();
                 mSpannableStringBuilder.setSpan(span, len - 1, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
             } else if (tag.equalsIgnoreCase("strong")) {
-                start(mSpannableStringBuilder, new Bold());
+                start(new Bold());
             } else if (tag.equalsIgnoreCase("b")) {
-                start(mSpannableStringBuilder, new Bold());
+                start(new Bold());
             } else if (tag.equalsIgnoreCase("em")) {
-                start(mSpannableStringBuilder, new Italic());
+                start(new Italic());
             } else if (tag.equalsIgnoreCase("cite")) {
-                start(mSpannableStringBuilder, new Italic());
+                start(new Italic());
             } else if (tag.equalsIgnoreCase("dfn")) {
-                start(mSpannableStringBuilder, new Italic());
+                start(new Italic());
             } else if (tag.equalsIgnoreCase("i")) {
-                start(mSpannableStringBuilder, new Italic());
+                start(new Italic());
             } else if (tag.equalsIgnoreCase("big")) {
-                start(mSpannableStringBuilder, new Big());
+                start(new Big());
             } else if (tag.equalsIgnoreCase("small")) {
-                start(mSpannableStringBuilder, new Small());
+                start(new Small());
             } else if (tag.equalsIgnoreCase("font")) {
-                startFont(mSpannableStringBuilder, attributes);
+                startFont(attributes);
             } else if (tag.equalsIgnoreCase("blockquote")) {
-                startBlockquote(mSpannableStringBuilder, attributes);
+                startBlockquote(attributes);
             } else if (tag.equalsIgnoreCase("tt")) {
-                start(mSpannableStringBuilder, new Monospace());
+                start(new Monospace());
             } else if (tag.equalsIgnoreCase("pre")) {
-                start(mSpannableStringBuilder, new Pre());
-                CodeDiv div = getLast(mSpannableStringBuilder, CodeDiv.class);
+                start(new Pre());
+                CodeDiv div = getLast(CodeDiv.class);
                 if (div != null) {
                     div.mHasPre = true;
                 }
             } else if (tag.equalsIgnoreCase("a")) {
-                startA(mSpannableStringBuilder, attributes);
+                startA(attributes);
             } else if (tag.equalsIgnoreCase("u")) {
-                start(mSpannableStringBuilder, new Underline());
+                start(new Underline());
             } else if (tag.equalsIgnoreCase("del")) {
-                start(mSpannableStringBuilder, new Strikethrough());
+                start(new Strikethrough());
             } else if (tag.equalsIgnoreCase("s")) {
-                start(mSpannableStringBuilder, new Strikethrough());
+                start(new Strikethrough());
             } else if (tag.equalsIgnoreCase("strike")) {
-                start(mSpannableStringBuilder, new Strikethrough());
+                start(new Strikethrough());
             } else if (tag.equalsIgnoreCase("sup")) {
-                start(mSpannableStringBuilder, new Super());
+                start(new Super());
             } else if (tag.equalsIgnoreCase("sub")) {
-                start(mSpannableStringBuilder, new Sub());
+                start(new Sub());
             } else if (tag.equalsIgnoreCase("code")) {
-                boolean inPre = getLast(mSpannableStringBuilder, Pre.class) != null;
+                boolean inPre = getLast(Pre.class) != null;
                 if (inPre) {
-                    appendNewlines(mSpannableStringBuilder, 1);
+                    appendNewlines(1);
                 }
-                start(mSpannableStringBuilder, new Code(inPre));
+                start(new Code(inPre));
             } else if (tag.length() == 2 &&
                     Character.toLowerCase(tag.charAt(0)) == 'h' &&
                     tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
-                startHeading(mSpannableStringBuilder, attributes, tag.charAt(1) - '1');
+                startHeading(attributes, tag.charAt(1) - '1');
             } else if (tag.equalsIgnoreCase("img")) {
-                startImg(mSpannableStringBuilder, attributes, mImageGetter);
+                startImg(attributes, mImageGetter);
             } else if (tag.equalsIgnoreCase("th")) {
-                start(mSpannableStringBuilder, new Bold());
+                start(new Bold());
             } else if (tag.equalsIgnoreCase("td")) {
                 String cssClass = attributes.getValue("class");
                 if (cssClass != null) {
@@ -455,121 +454,120 @@ public class HtmlUtils {
 
         private void handleEndTag(String tag) {
             if (tag.equalsIgnoreCase("br")) {
-                handleBr(mSpannableStringBuilder);
+                handleBr();
             } else if (tag.equalsIgnoreCase("p")) {
-                endCssStyle(mSpannableStringBuilder);
-                endBlockElement(mSpannableStringBuilder);
+                endCssStyle();
+                endBlockElement();
             } else if (tag.equalsIgnoreCase("ul")) {
-                endBlockElement(mSpannableStringBuilder);
-                end(mSpannableStringBuilder, List.class, null);
+                endBlockElement();
+                end(List.class, null);
             } else if (tag.equalsIgnoreCase("ol")) {
-                endBlockElement(mSpannableStringBuilder);
-                end(mSpannableStringBuilder, List.class, null);
+                endBlockElement();
+                end(List.class, null);
             } else if (tag.equalsIgnoreCase("li")) {
-                endLi(mSpannableStringBuilder);
+                endLi();
             } else if (tag.equalsIgnoreCase("div")) {
-                endBlockElement(mSpannableStringBuilder);
-                CodeDiv code = getLast(mSpannableStringBuilder, CodeDiv.class);
+                endBlockElement();
+                CodeDiv code = getLast(CodeDiv.class);
                 if (code != null && --code.mLevel == 0) {
                     if (code.mHasPre) {
-                        setSpanFromMark(mSpannableStringBuilder, code, new CodeBlockSpan(0x30aaaaaa));
+                        setSpanFromMark(code, new CodeBlockSpan(0x30aaaaaa));
                     } else {
                         mSpannableStringBuilder.removeSpan(code);
                     }
                 }
             } else if (tag.equalsIgnoreCase("span")) {
-                endCssStyle(mSpannableStringBuilder);
+                endCssStyle();
             } else if (tag.equalsIgnoreCase("strong")) {
-                end(mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
+                end(Bold.class, new StyleSpan(Typeface.BOLD));
             } else if (tag.equalsIgnoreCase("b")) {
-                end(mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
+                end(Bold.class, new StyleSpan(Typeface.BOLD));
             } else if (tag.equalsIgnoreCase("em")) {
-                end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+                end(Italic.class, new StyleSpan(Typeface.ITALIC));
             } else if (tag.equalsIgnoreCase("cite")) {
-                end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+                end(Italic.class, new StyleSpan(Typeface.ITALIC));
             } else if (tag.equalsIgnoreCase("dfn")) {
-                end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+                end(Italic.class, new StyleSpan(Typeface.ITALIC));
             } else if (tag.equalsIgnoreCase("i")) {
-                end(mSpannableStringBuilder, Italic.class, new StyleSpan(Typeface.ITALIC));
+                end(Italic.class, new StyleSpan(Typeface.ITALIC));
             } else if (tag.equalsIgnoreCase("big")) {
-                end(mSpannableStringBuilder, Big.class, new RelativeSizeSpan(1.25f));
+                end(Big.class, new RelativeSizeSpan(1.25f));
             } else if (tag.equalsIgnoreCase("small")) {
-                end(mSpannableStringBuilder, Small.class, new RelativeSizeSpan(0.8f));
+                end(Small.class, new RelativeSizeSpan(0.8f));
             } else if (tag.equalsIgnoreCase("font")) {
-                endFont(mSpannableStringBuilder);
+                endFont();
             } else if (tag.equalsIgnoreCase("blockquote")) {
-                endBlockquote(mSpannableStringBuilder);
+                endBlockquote();
             } else if (tag.equalsIgnoreCase("tt")) {
-                end(mSpannableStringBuilder, Monospace.class, new TypefaceSpan("monospace"));
+                end(Monospace.class, new TypefaceSpan("monospace"));
             } else if (tag.equalsIgnoreCase("pre")) {
-                end(mSpannableStringBuilder, Pre.class, new TypefaceSpan("monospace"));
+                end(Pre.class, new TypefaceSpan("monospace"));
             } else if (tag.equalsIgnoreCase("a")) {
-                endA(mSpannableStringBuilder);
+                endA();
             } else if (tag.equalsIgnoreCase("u")) {
-                end(mSpannableStringBuilder, Underline.class, new UnderlineSpan());
+                end(Underline.class, new UnderlineSpan());
             } else if (tag.equalsIgnoreCase("del")) {
-                end(mSpannableStringBuilder, Strikethrough.class, new StrikethroughSpan());
+                end(Strikethrough.class, new StrikethroughSpan());
             } else if (tag.equalsIgnoreCase("s")) {
-                end(mSpannableStringBuilder, Strikethrough.class, new StrikethroughSpan());
+                end(Strikethrough.class, new StrikethroughSpan());
             } else if (tag.equalsIgnoreCase("strike")) {
-                end(mSpannableStringBuilder, Strikethrough.class, new StrikethroughSpan());
+                end(Strikethrough.class, new StrikethroughSpan());
             } else if (tag.equalsIgnoreCase("sup")) {
-                end(mSpannableStringBuilder, Super.class, new SuperscriptSpan());
+                end(Super.class, new SuperscriptSpan());
             } else if (tag.equalsIgnoreCase("sub")) {
-                end(mSpannableStringBuilder, Sub.class, new SubscriptSpan());
+                end(Sub.class, new SubscriptSpan());
             } else if (tag.equalsIgnoreCase("code")) {
-                Code code = getLast(mSpannableStringBuilder, Code.class);
+                Code code = getLast(Code.class);
                 if (code != null) {
                     Object backgroundSpan = code.mInPre
                             ? new CodeBlockSpan(0x30aaaaaa) : new BackgroundColorSpan(0x30aaaaaa);
                     if (code.mInPre) {
-                        appendNewlines(mSpannableStringBuilder, 1);
+                        appendNewlines(1);
                     }
-                    setSpanFromMark(mSpannableStringBuilder, code,
-                            new TypefaceSpan("monospace"), backgroundSpan);
+                    setSpanFromMark(code, new TypefaceSpan("monospace"), backgroundSpan);
                 }
             } else if (tag.length() == 2 &&
                     Character.toLowerCase(tag.charAt(0)) == 'h' &&
                     tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
-                endHeading(mSpannableStringBuilder);
+                endHeading();
             } else if (tag.equalsIgnoreCase("tr")) {
                 mSpannableStringBuilder.append('\n');
-                Code codeMark = getLast(mSpannableStringBuilder, Code.class);
+                Code codeMark = getLast(Code.class);
                 if (codeMark != null) {
                     endCodeSnippetLine(codeMark);
                 }
             } else if (tag.equalsIgnoreCase("td")) {
                 mSpannableStringBuilder.append('\u2003');
             } else if (tag.equalsIgnoreCase("th")) {
-                end(mSpannableStringBuilder, Bold.class, new StyleSpan(Typeface.BOLD));
+                end(Bold.class, new StyleSpan(Typeface.BOLD));
                 mSpannableStringBuilder.append('\u2003');
             }
         }
 
-        private static void appendNewlines(Editable text, int minNewline) {
-            final int len = text.length();
+        private void appendNewlines(int minNewline) {
+            final int len = mSpannableStringBuilder.length();
 
             if (len == 0) {
                 return;
             }
 
             int existingNewlines = 0;
-            for (int i = len - 1; i >= 0 && text.charAt(i) == '\n'; i--) {
+            for (int i = len - 1; i >= 0 && mSpannableStringBuilder.charAt(i) == '\n'; i--) {
                 existingNewlines++;
             }
 
             for (int j = existingNewlines; j < minNewline; j++) {
-                text.append("\n");
+                mSpannableStringBuilder.append("\n");
             }
         }
 
-        private static void startBlockElement(Editable text, Attributes attributes) {
-            startBlockElement(text, attributes, 2);
+        private void startBlockElement(Attributes attributes) {
+            startBlockElement(attributes, 2);
         }
 
-        private static void startBlockElement(Editable text, Attributes attributes, int newlines) {
-            appendNewlines(text, newlines);
-            start(text, new Newline(newlines));
+        private void startBlockElement(Attributes attributes, int newlines) {
+            appendNewlines(newlines);
+            start(new Newline(newlines));
 
             String style = attributes.getValue("", "style");
             if (style != null) {
@@ -577,81 +575,81 @@ public class HtmlUtils {
                 if (m.find()) {
                     String alignment = m.group(1);
                     if (alignment.equalsIgnoreCase("start")) {
-                        start(text, new Alignment(Layout.Alignment.ALIGN_NORMAL));
+                        start(new Alignment(Layout.Alignment.ALIGN_NORMAL));
                     } else if (alignment.equalsIgnoreCase("center")) {
-                        start(text, new Alignment(Layout.Alignment.ALIGN_CENTER));
+                        start(new Alignment(Layout.Alignment.ALIGN_CENTER));
                     } else if (alignment.equalsIgnoreCase("end")) {
-                        start(text, new Alignment(Layout.Alignment.ALIGN_OPPOSITE));
+                        start(new Alignment(Layout.Alignment.ALIGN_OPPOSITE));
                     }
                 }
             }
         }
 
-        private static void endBlockElement(Editable text) {
-            Newline n = getLast(text, Newline.class);
+        private void endBlockElement() {
+            Newline n = getLast(Newline.class);
             if (n != null) {
-                appendNewlines(text, n.mNumNewlines);
-                text.removeSpan(n);
+                appendNewlines(n.mNumNewlines);
+                mSpannableStringBuilder.removeSpan(n);
             }
 
-            Alignment a = getLast(text, Alignment.class);
+            Alignment a = getLast(Alignment.class);
             if (a != null) {
-                setSpanFromMark(text, a, new AlignmentSpan.Standard(a.mAlignment));
+                setSpanFromMark(a, new AlignmentSpan.Standard(a.mAlignment));
             }
         }
 
-        private static void handleBr(Editable text) {
-            text.append('\n');
+        private void handleBr() {
+            mSpannableStringBuilder.append('\n');
         }
 
-        private void startLi(Editable text, Attributes attributes) {
-            ListItem item = new ListItem(getLast(text, List.class), attributes);
-            startBlockElement(text, attributes, 1);
-            start(text, item);
+        private void startLi(Attributes attributes) {
+            ListItem item = new ListItem(getLast(List.class), attributes);
+            startBlockElement(attributes, 1);
+            start(item);
             if (item.mOrdered) {
-                text.insert(text.length(), "" + item.mPosition + ". ");
+                mSpannableStringBuilder.insert(mSpannableStringBuilder.length(), "" + item.mPosition + ". ");
             }
-            startCssStyle(text, attributes);
+            startCssStyle(attributes);
         }
 
-        private void endLi(Editable text) {
-            endCssStyle(text);
-            endBlockElement(text);
-            ListItem item = getLast(text, ListItem.class);
+        private void endLi() {
+            endCssStyle();
+            endBlockElement();
+            ListItem item = getLast(ListItem.class);
             if (item != null) {
                 if (item.mOrdered) {
-                    text.removeSpan(item);
+                    mSpannableStringBuilder.removeSpan(item);
                 } else {
-                    setSpanFromMark(text, item, new BulletSpan(mBulletMargin));
+                    setSpanFromMark(item, new BulletSpan(mBulletMargin));
                 }
             }
         }
 
-        private void startBlockquote(Editable text, Attributes attributes) {
-            startBlockElement(text, attributes);
-            start(text, new Blockquote());
+        private void startBlockquote(Attributes attributes) {
+            startBlockElement(attributes);
+            start(new Blockquote());
         }
 
-        private void endBlockquote(Editable text) {
-            endBlockElement(text);
-            end(text, Blockquote.class, new ReplySpan(mReplyMargin, mReplyMarkerSize, 0xffdddddd));
+        private void endBlockquote() {
+            endBlockElement();
+            end(Blockquote.class, new ReplySpan(mReplyMargin, mReplyMarkerSize, 0xffdddddd));
         }
 
-        private void startHeading(Editable text, Attributes attributes, int level) {
-            startBlockElement(text, attributes);
-            start(text, new Heading(level));
+        private void startHeading(Attributes attributes, int level) {
+            startBlockElement(attributes);
+            start(new Heading(level));
         }
 
-        private static void endHeading(Editable text) {
+        private void endHeading() {
             // RelativeSizeSpan and StyleSpan are CharacterStyles
             // Their ranges should not include the newlines at the end
-            Heading h = getLast(text, Heading.class);
+            Heading h = getLast(Heading.class);
             if (h != null) {
-                setSpanFromMark(text, h, new RelativeSizeSpan(HEADING_SIZES[h.mLevel]),
+                setSpanFromMark(h, new RelativeSizeSpan(HEADING_SIZES[h.mLevel]),
                         new StyleSpan(Typeface.BOLD));
             }
 
-            endBlockElement(text);
+            endBlockElement();
         }
 
         /*
@@ -672,28 +670,27 @@ public class HtmlUtils {
         private void startCodeSnippetLineIfAppropriate(String tdCssClass) {
             if (tdCssClass.contains("blob-num-addition")) {
                 int color = UiUtils.resolveColor(mContext, R.attr.colorDiffAddBackground);
-                start(mSpannableStringBuilder, new Code(color));
+                start(new Code(color));
                 mSpannableStringBuilder.append('+');
             } else if (tdCssClass.contains("blob-num-deletion")) {
                 int color = UiUtils.resolveColor(mContext, R.attr.colorDiffRemoveBackground);
-                start(mSpannableStringBuilder, new Code(color));
+                start(new Code(color));
                 mSpannableStringBuilder.append('-');
             } else if (tdCssClass.contains("blob-num")) {
-                start(mSpannableStringBuilder, new Code(DEFAULT_CODE_BACKGROUND_COLOR));
+                start(new Code(DEFAULT_CODE_BACKGROUND_COLOR));
             }
         }
 
         private void endCodeSnippetLine(Code codeMark) {
-            setSpanFromMark(mSpannableStringBuilder, codeMark,
-                    new TypefaceSpan("monospace"), new CodeBlockSpan(codeMark.mColor));
+            setSpanFromMark(codeMark, new TypefaceSpan("monospace"), new CodeBlockSpan(codeMark.mColor));
         }
 
-        private static <T> T getLast(Spanned text, Class<T> kind) {
+        private <T> T getLast(Class<T> kind) {
         /*
          * This knows that the last returned object from getSpans()
          * will be the most recently added.
          */
-            T[] objs = text.getSpans(0, text.length(), kind);
+            T[] objs = mSpannableStringBuilder.getSpans(0, mSpannableStringBuilder.length(), kind);
 
             if (objs.length == 0) {
                 return null;
@@ -702,40 +699,40 @@ public class HtmlUtils {
             }
         }
 
-        private static void setSpanFromMark(Spannable text, Object mark, Object... spans) {
-            int where = text.getSpanStart(mark);
-            text.removeSpan(mark);
-            int len = text.length();
+        private void setSpanFromMark(Object mark, Object... spans) {
+            int where = mSpannableStringBuilder.getSpanStart(mark);
+            mSpannableStringBuilder.removeSpan(mark);
+            int len = mSpannableStringBuilder.length();
             if (where != len) {
                 for (Object span : spans) {
                     if (span instanceof LeadingMarginSpan) {
                         span = new NeedsReversingSpan(span);
                     }
-                    text.setSpan(span, where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    mSpannableStringBuilder.setSpan(span, where, len, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }
         }
 
-        private static void start(Editable text, Object mark) {
-            int len = text.length();
-            text.setSpan(mark, len, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        private void start(Object mark) {
+            int len = mSpannableStringBuilder.length();
+            mSpannableStringBuilder.setSpan(mark, len, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         }
 
-        private static void end(Editable text, Class<?> kind, Object repl) {
-            Object obj = getLast(text, kind);
+        private void end(Class<?> kind, Object repl) {
+            Object obj = getLast(kind);
             if (obj != null) {
-                setSpanFromMark(text, obj, repl);
+                setSpanFromMark(obj, repl);
             }
         }
 
-        private void startCssStyle(Editable text, Attributes attributes) {
+        private void startCssStyle(Attributes attributes) {
             String style = attributes.getValue("", "style");
             if (style != null) {
                 Matcher m = getForegroundColorPattern().matcher(style);
                 if (m.find()) {
                     Integer c = parseColor(m.group(1));
                     if (c != null) {
-                        start(text, new Foreground(c));
+                        start(new Foreground(c));
                     }
                 }
 
@@ -743,7 +740,7 @@ public class HtmlUtils {
                 if (m.find()) {
                     Integer c = parseColor(m.group(1));
                     if (c != null) {
-                        start(text, new Background(c));
+                        start(new Background(c));
                     }
                 }
 
@@ -751,26 +748,26 @@ public class HtmlUtils {
                 if (m.find()) {
                     String textDecoration = m.group(1);
                     if (textDecoration.equalsIgnoreCase("line-through")) {
-                        start(text, new Strikethrough());
+                        start(new Strikethrough());
                     }
                 }
             }
         }
 
-        private static void endCssStyle(Editable text) {
-            Strikethrough s = getLast(text, Strikethrough.class);
+        private void endCssStyle() {
+            Strikethrough s = getLast(Strikethrough.class);
             if (s != null) {
-                setSpanFromMark(text, s, new StrikethroughSpan());
+                setSpanFromMark(s, new StrikethroughSpan());
             }
 
-            Background b = getLast(text, Background.class);
+            Background b = getLast(Background.class);
             if (b != null) {
-                setSpanFromMark(text, b, new BackgroundColorSpan(b.mBackgroundColor));
+                setSpanFromMark(b, new BackgroundColorSpan(b.mBackgroundColor));
             }
 
-            Foreground f = getLast(text, Foreground.class);
+            Foreground f = getLast(Foreground.class);
             if (f != null) {
-                setSpanFromMark(text, f, new ForegroundColorSpan(f.mForegroundColor));
+                setSpanFromMark(f, new ForegroundColorSpan(f.mForegroundColor));
             }
         }
 
@@ -786,57 +783,55 @@ public class HtmlUtils {
             }
         }
 
-        private static void startImg(Editable text, Attributes attributes,
-                android.text.Html.ImageGetter img) {
+        private void startImg(Attributes attributes, ImageGetter img) {
             String src = attributes.getValue("", "src");
             Drawable d = img.getDrawable(src);
 
-            int len = text.length();
-            text.append("\uFFFC");
+            int len = mSpannableStringBuilder.length();
+            mSpannableStringBuilder.append("\uFFFC");
 
-            text.setSpan(new ImageSpan(d, src), len, text.length(),
+            mSpannableStringBuilder.setSpan(new ImageSpan(d, src), len, mSpannableStringBuilder.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
 
-        private void startFont(Editable text, Attributes attributes) {
+        private void startFont(Attributes attributes) {
             String color = attributes.getValue("", "color");
             String face = attributes.getValue("", "face");
 
             if (!TextUtils.isEmpty(color)) {
                 Integer c = parseColor(color);
                 if (c != null) {
-                    start(text, new Foreground(c));
+                    start(new Foreground(c));
                 }
             }
 
             if (!TextUtils.isEmpty(face)) {
-                start(text, new Font(face));
+                start(new Font(face));
             }
         }
 
-        private static void endFont(Editable text) {
-            Font font = getLast(text, Font.class);
+        private void endFont() {
+            Font font = getLast(Font.class);
             if (font != null) {
-                setSpanFromMark(text, font, new TypefaceSpan(font.mFace));
+                setSpanFromMark(font, new TypefaceSpan(font.mFace));
             }
 
-            Foreground foreground = getLast(text, Foreground.class);
+            Foreground foreground = getLast(Foreground.class);
             if (foreground != null) {
-                setSpanFromMark(text, foreground,
-                        new ForegroundColorSpan(foreground.mForegroundColor));
+                setSpanFromMark(foreground, new ForegroundColorSpan(foreground.mForegroundColor));
             }
         }
 
-        private static void startA(Editable text, Attributes attributes) {
+        private void startA(Attributes attributes) {
             String href = attributes.getValue("", "href");
-            start(text, new Href(href));
+            start(new Href(href));
         }
 
-        private static void endA(Editable text) {
-            Href h = getLast(text, Href.class);
+        private void endA() {
+            Href h = getLast(Href.class);
             if (h != null) {
                 if (h.mHref != null) {
-                    setSpanFromMark(text, h, new LinkSpan(h.mHref));
+                    setSpanFromMark(h, new LinkSpan(h.mHref));
                 }
             }
         }
@@ -866,7 +861,7 @@ public class HtmlUtils {
         }
 
         public void characters(char[] ch, int start, int length) throws SAXException {
-            if (getLast(mSpannableStringBuilder, Pre.class) != null) {
+            if (getLast(Pre.class) != null) {
                 /* We're in a pre block, so keep whitespace intact. */
                 for (int i = 0; i < length; i++) {
                     mSpannableStringBuilder.append(ch[i + start]);
