@@ -32,7 +32,7 @@ import com.meisolsson.githubsdk.model.ReviewComment;
 class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Diff>
         implements View.OnClickListener {
     private static final float[] DIFF_SIZE_MULTIPLIERS = new float[] {
-            0.667F, 0.833F, 1F, 1.5F, 2F
+            0.8F, 0.9F, 1F, 1.25F, 1.5F
     };
 
     private final int mAddedLineBackgroundColor;
