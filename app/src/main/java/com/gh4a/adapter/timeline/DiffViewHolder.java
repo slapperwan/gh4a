@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.net.Uri;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.PopupMenu;
@@ -14,6 +15,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.LineBackgroundSpan;
+import android.text.style.TypefaceSpan;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
@@ -156,7 +158,12 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
             DiffLineSpan span = new DiffLineSpan(backgroundColor, lineNumberBackgroundColor, mPadding, i == start,
                     i == lines.length - 1, lineNumberLength);
             builder.setSpan(span, spanStart, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            // We want to make only the line numbers monospaced, and the rest of the line normal for compactness reasons
+            builder.setSpan(new TypefaceSpan("normal"),
+                    spanStart + lineNumberLength, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
+        mDiffHunkTextView.setTypeface(Typeface.MONOSPACE);
         mDiffHunkTextView.setText(builder);
         mDiffHunkTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 mInitialDiffTextSize * getDiffSizeMultiplier());
