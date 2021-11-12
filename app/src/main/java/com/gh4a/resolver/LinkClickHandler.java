@@ -1,8 +1,12 @@
 package com.gh4a.resolver;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.net.Uri;
+import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.R;
 import com.gh4a.utils.IntentUtils;
 
 public class LinkClickHandler {
@@ -20,6 +24,11 @@ public class LinkClickHandler {
             return;
         }
 
+        if (uriScheme.equals("mailto")) {
+            tryStartViewIntent(clickedUri);
+            return;
+        }
+
         LinkParser.ParseResult result = LinkParser.parseUri(mActivity, clickedUri, null);
         if (result == null) {
             IntentUtils.openInCustomTabOrBrowser(mActivity, clickedUri, mActivity.getCurrentHeaderColor());
@@ -28,6 +37,15 @@ public class LinkClickHandler {
         } else if (result.loadTask != null) {
             result.loadTask.setOpenUnresolvedUriInCustomTab(mActivity.getCurrentHeaderColor());
             result.loadTask.execute();
+        }
+    }
+
+    private void tryStartViewIntent(Uri clickedUri) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, clickedUri);
+            mActivity.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mActivity, R.string.link_not_openable, Toast.LENGTH_SHORT).show();
         }
     }
 }
