@@ -30,6 +30,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import com.gh4a.utils.ActivityResultHelpers;
+import com.gh4a.utils.UiUtils;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -44,7 +45,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -64,6 +64,7 @@ import com.gh4a.utils.Triplet;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.PullRequest;
@@ -477,11 +478,12 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                 }, error -> handleActionFailure("Updating pull request failed", error));
     }
 
-    private void mergePullRequest(String commitMessage, MergeRequest.Method mergeMethod) {
+    private void mergePullRequest(String commitTitle, String commitDetails, MergeRequest.Method mergeMethod) {
         String errorMessage = getString(R.string.pull_error_merge, mPullRequest.number());
         PullRequestService service = ServiceFactory.get(PullRequestService.class, false);
         MergeRequest request = MergeRequest.builder()
-                .commitMessage(commitMessage)
+                .commitTitle(commitTitle)
+                .commitMessage(commitDetails)
                 .method(mergeMethod)
                 .build();
 
@@ -566,6 +568,12 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     }
 
     public static class MergeDialogFragment extends DialogFragment {
+
+        private TextInputLayout mDetailsField;
+        private TextInputLayout mTitleField;
+        private Spinner mMergeMethodSelector;
+        private PullRequest mPr;
+
         public static MergeDialogFragment newInstance(PullRequest pr) {
             MergeDialogFragment f = new MergeDialogFragment();
             Bundle args = new Bundle();
@@ -578,16 +586,36 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            final PullRequest pr = getArguments().getParcelable("pr");
-            String title = getString(R.string.pull_message_dialog_title, pr.number());
+            mPr = getArguments().getParcelable("pr");
+
             View view = inflater.inflate(R.layout.pull_merge_message_dialog, null);
+            mDetailsField = view.findViewById(R.id.details_field);
+            mTitleField = view.findViewById(R.id.title_field);
+            // This is needed to make the text field single-line but with line wrapping.
+            // Setting these properties in the XML does not produce the wanted effect.
+            mTitleField.getEditText().setHorizontallyScrolling(false);
+            mTitleField.getEditText().setMaxLines(3);
 
-            final View editorNotice = view.findViewById(R.id.notice);
-            final EditText editor = view.findViewById(R.id.et_commit_message);
-            editor.setText(pr.title());
+            mMergeMethodSelector = view.findViewById(R.id.merge_method);
+            setupMergeMethodSpinner();
 
-            final ArrayAdapter<MergeMethodDesc> adapter =
-                    new ArrayAdapter<>(getContext(), R.layout.spinner_item);
+            final PullRequestActivity activity = (PullRequestActivity) getContext();
+            return new AlertDialog.Builder(activity)
+                    .setTitle(getString(R.string.pull_message_dialog_title, mPr.number()))
+                    .setView(view)
+                    .setPositiveButton(R.string.pull_request_merge, (dialog, which) -> {
+                        String commitTitle = mTitleField.getEditText().getText().toString();
+                        String commitDetails = mDetailsField.getEditText().getText().toString();
+                        MergeMethodDesc selectedMethod = (MergeMethodDesc) mMergeMethodSelector.getSelectedItem();
+
+                        activity.mergePullRequest(commitTitle, commitDetails, selectedMethod.action);
+                    })
+                    .setNegativeButton(getString(R.string.cancel), null)
+                    .create();
+        }
+
+        private void setupMergeMethodSpinner() {
+            final ArrayAdapter<MergeMethodDesc> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item);
             adapter.add(new MergeMethodDesc(
                     getString(R.string.pull_merge_method_merge), MergeRequest.Method.Merge));
             adapter.add(new MergeMethodDesc(
@@ -595,32 +623,40 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             adapter.add(new MergeMethodDesc(
                     getString(R.string.pull_merge_method_rebase), MergeRequest.Method.Rebase));
 
-            final Spinner mergeMethod = view.findViewById(R.id.merge_method);
-            mergeMethod.setAdapter(adapter);
-            mergeMethod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            mMergeMethodSelector.setAdapter(adapter);
+            mMergeMethodSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    int editorVisibility = position == 2 ? View.GONE : View.VISIBLE;
-                    editorNotice.setVisibility(editorVisibility);
-                    editor.setVisibility(editorVisibility);
+                    MergeMethodDesc selectedItem = (MergeMethodDesc) parent.getItemAtPosition(position);
+                    toggleFieldsVisibility(selectedItem.action);
+                    setCommitTitleHint(selectedItem.action);
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> adapterView) {
                 }
             });
+        }
 
-            final PullRequestActivity activity = (PullRequestActivity) getContext();
-            return new AlertDialog.Builder(activity)
-                    .setTitle(title)
-                    .setView(view)
-                    .setPositiveButton(R.string.pull_request_merge, (dialog, which) -> {
-                        String text = editor.getText() == null ? null : editor.getText().toString();
-                        int methodIndex = mergeMethod.getSelectedItemPosition();
+        private void setCommitTitleHint(MergeRequest.Method mergeMethod) {
+            switch (mergeMethod) {
+                case Merge:
+                    String username = ApiHelpers.getUserLogin(getContext(), mPr.head().user());
+                    mTitleField.setPlaceholderText(
+                            "Merge pull request #" + mPr.number() + " from " + username + "/" + mPr.head().ref());
+                    break;
+                case Squash:
+                    mTitleField.setPlaceholderText(mPr.title() + " (#" + mPr.number() + ")");
+                    break;
+            }
+        }
 
-                        activity.mergePullRequest(text, adapter.getItem(methodIndex).action);
-                    })
-                    .setNegativeButton(getString(R.string.cancel), null)
-                    .create();
+        private void toggleFieldsVisibility(MergeRequest.Method mergeMethod) {
+            int fieldsVisibility = mergeMethod == MergeRequest.Method.Rebase ? View.GONE : View.VISIBLE;
+            mTitleField.setVisibility(fieldsVisibility);
+            mDetailsField.setVisibility(fieldsVisibility);
+            if (fieldsVisibility == View.GONE) {
+                UiUtils.hideImeForView(mTitleField);
+            }
         }
     }
 
