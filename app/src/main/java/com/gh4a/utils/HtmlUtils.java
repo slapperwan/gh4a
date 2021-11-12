@@ -152,7 +152,9 @@ public class HtmlUtils {
         final StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             String url = matcher.group(2);
-            if (!url.contains("://") && !url.startsWith("#")) {
+            boolean isAbsoluteUrl = url.contains(":");
+            boolean isAnchorUrl = url.startsWith("#");
+            if (!isAbsoluteUrl && !isAnchorUrl) {
                 if (url.startsWith("/")) {
                     url = baseUrl + url;
                 } else {
