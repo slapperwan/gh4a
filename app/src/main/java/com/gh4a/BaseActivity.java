@@ -359,9 +359,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     protected void updateRightNavigationDrawer() {
+        mRightDrawer.getMenu().clear();
         int[] drawerMenuResIds = getRightNavigationDrawerMenuResources();
         if (drawerMenuResIds != null) {
-            mRightDrawer.getMenu().clear();
             for (int id : drawerMenuResIds) {
                 mRightDrawer.inflateMenu(id);
             }
@@ -554,6 +554,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     public void setRightDrawerLockedClosed(boolean locked) {
+        if (!mRightDrawer.getMenu().hasVisibleItems()) {
+            // right drawer isn't populated, so keep locked in any case
+            locked = true;
+        }
         mDrawerLayout.setDrawerLockMode(
                 locked ? DrawerLayout.LOCK_MODE_LOCKED_CLOSED : DrawerLayout.LOCK_MODE_UNLOCKED,
                 Gravity.RIGHT);
