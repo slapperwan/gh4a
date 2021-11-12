@@ -23,6 +23,9 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -84,6 +87,7 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
     private String mPath;
     private String mRef;
 
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private ParentCallback mCallback;
     private FileAdapter mAdapter;
 
@@ -91,8 +95,12 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-                    Commit commit = result.getData().getParcelableExtra("commit");
-                    mCallback.onCommitSelected(commit);
+                    final Commit commit = result.getData().getParcelableExtra("commit");
+                    // This function is invoked while the fragment is transitioned to the STARTED
+                    // state, which means the fragment manager is busy at that point. Since the
+                    // callback ultimately ends up doing fragment transactions as well, defer it
+                    // to a later point.
+                    mHandler.post(() -> mCallback.onCommitSelected(commit));
                 }
             });
 
