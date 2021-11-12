@@ -117,6 +117,9 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
                             if (response.code() == HttpURLConnection.HTTP_NO_CONTENT) {
                                 return Response.success(new ApiHelpers.DummyPage<T>());
                             }
+                            if (page == 1) {
+                                resetScroll();
+                            }
                             return response;
                         })
                         .map(ApiHelpers::throwOnFailure)

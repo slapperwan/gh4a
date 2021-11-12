@@ -132,5 +132,11 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
         mFastScroller.setHandlePressedColor(getHighlightColor());
     }
 
+    protected void resetScroll() {
+        if (mLayoutManager != null) {
+            mLayoutManager.scrollToPositionWithOffset(0, 0);
+        }
+    }
+
     protected abstract int getEmptyTextResId();
 }
