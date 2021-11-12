@@ -14,8 +14,8 @@
     </string-array>
     <string-array name="filter_participating">
         <item>任何</item>
-        <item>参加的</item>
-        <item>未参加的</item>
+        <item>参加</item>
+        <item>未参加</item>
     </string-array>
     <string-array name="notification_interval_items">
         <item>15分钟</item>
