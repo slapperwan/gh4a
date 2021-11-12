@@ -35,6 +35,7 @@
         <item name="colorDiffRemoveLineNumberBackground">@color/diff_remove_line_number</item>
         <item name="colorCommitAddition">@color/commit_addition</item>
         <item name="colorCommitDeletion">@color/commit_deletion</item>
+        <item name="colorCodeBackground">@color/code_background</item>
         <item name="colorWebViewBackground">@color/webview_background</item>
         <item name="colorBreadcrumbBackground">@color/breadcrumb_background</item>
         <item name="colorIconForeground">@color/icon_foreground</item>

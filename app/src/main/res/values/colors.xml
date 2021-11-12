@@ -41,6 +41,7 @@
 
     <color name="commit_addition">#65b345</color>
     <color name="commit_deletion">#b34545</color>
+    <color name="code_background">#30aaaaaa</color>
 
     <color name="drawer_background">@color/background_floating_material_light</color>
     <color name="webview_background">#f7f7f9</color>

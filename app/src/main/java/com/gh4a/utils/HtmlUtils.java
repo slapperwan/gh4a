@@ -213,12 +213,12 @@ public class HtmlUtils {
         private static final float[] HEADING_SIZES = {
             1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,
         };
-        private static final int DEFAULT_CODE_BACKGROUND_COLOR = 0x30aaaaaa;
 
         private final float mDividerHeight;
         private final int mBulletMargin;
         private final int mReplyMargin;
         private final int mReplyMarkerSize;
+        private final int mCodeBlockBackgroundColor;
 
         private final Context mContext;
         private final String mSource;
@@ -269,6 +269,7 @@ public class HtmlUtils {
             mBulletMargin = res.getDimensionPixelSize(R.dimen.bullet_span_margin);
             mReplyMargin = res.getDimensionPixelSize(R.dimen.reply_span_margin);
             mReplyMarkerSize = res.getDimensionPixelSize(R.dimen.reply_span_size);
+            mCodeBlockBackgroundColor = UiUtils.resolveColor(context, R.attr.colorCodeBackground);
 
             mContext = context;
             mSource = source;
@@ -471,7 +472,7 @@ public class HtmlUtils {
                 CodeDiv code = getLast(CodeDiv.class);
                 if (code != null && --code.mLevel == 0) {
                     if (code.mHasPre) {
-                        setSpanFromMark(code, new CodeBlockSpan(0x30aaaaaa));
+                        setSpanFromMark(code, new CodeBlockSpan(mCodeBlockBackgroundColor));
                     } else {
                         mSpannableStringBuilder.removeSpan(code);
                     }
@@ -520,7 +521,8 @@ public class HtmlUtils {
                 Code code = getLast(Code.class);
                 if (code != null) {
                     Object backgroundSpan = code.mInPre
-                            ? new CodeBlockSpan(0x30aaaaaa) : new BackgroundColorSpan(0x30aaaaaa);
+                            ? new CodeBlockSpan(mCodeBlockBackgroundColor)
+                            : new BackgroundColorSpan(mCodeBlockBackgroundColor);
                     if (code.mInPre) {
                         appendNewlines(1);
                     }
@@ -677,7 +679,7 @@ public class HtmlUtils {
                 start(new Code(color));
                 mSpannableStringBuilder.append('-');
             } else if (tdCssClass.contains("blob-num")) {
-                start(new Code(DEFAULT_CODE_BACKGROUND_COLOR));
+                start(new Code(mCodeBlockBackgroundColor));
             }
         }
 
