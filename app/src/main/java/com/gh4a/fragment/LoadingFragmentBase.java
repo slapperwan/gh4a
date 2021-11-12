@@ -127,8 +127,11 @@ public abstract class LoadingFragmentBase extends Fragment implements
         View out = mContentShown ? mProgress : mContentContainer;
         View in = mContentShown ? mContentContainer : mProgress;
         if (isResumed()) {
-            out.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-            // Prevent UI "flashes" by not unnecessarily animating an element when it's already visible
+            // Only animate views if they aren't in target state already, otherwise we'll
+            // show (out) / hide (in) them for a short time
+            if (out.getVisibility() != View.GONE) {
+                out.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
+            }
             if (in.getVisibility() != View.VISIBLE) {
                 in.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
             }
