@@ -626,8 +626,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             mMergeMethodSelector.setAdapter(adapter);
             mMergeMethodSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
-                public void onItemSelected(AdapterView<?> adapter, View view, int position, long id) {
-                    MergeMethodDesc selectedItem = (MergeMethodDesc) adapter.getItemAtPosition(position);
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    MergeMethodDesc selectedItem = (MergeMethodDesc) parent.getItemAtPosition(position);
                     toggleFieldsVisibility(selectedItem.action);
                     setCommitTitleHint(selectedItem.action);
                 }
