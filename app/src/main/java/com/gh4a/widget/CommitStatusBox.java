@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.model.StatusWrapper;
 import com.gh4a.utils.IntentUtils;
@@ -167,7 +168,9 @@ public class CommitStatusBox extends LinearLayoutCompat implements View.OnClickL
         switch (v.getId()) {
             case R.id.row_commit_status:
                 StatusWrapper status = (StatusWrapper) v.getTag();
-                IntentUtils.launchBrowser(getContext(), Uri.parse(status.targetUrl()));
+                BaseActivity activity = (BaseActivity) getContext();
+                IntentUtils.openInCustomTabOrBrowser(activity,
+                        Uri.parse(status.targetUrl()), activity.getCurrentHeaderColor());
                 break;
             case R.id.commit_status_header:
                 setStatusesExpanded(mStatusContainer.getVisibility() != View.VISIBLE);

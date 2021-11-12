@@ -294,6 +294,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     }
 
+    public int getCurrentHeaderColor() {
+        return mProgressColors[0];
+    }
+
     protected void setHeaderColor(int color, int statusBarColor) {
         cancelHeaderTransition();
 

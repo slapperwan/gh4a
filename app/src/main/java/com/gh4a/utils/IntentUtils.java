@@ -92,10 +92,17 @@ public class IntentUtils {
     }
 
     public static void openInCustomTabOrBrowser(Activity activity, Uri uri) {
+        openInCustomTabOrBrowser(activity, uri, 0);
+    }
+
+    public static void openInCustomTabOrBrowser(Activity activity, Uri uri, int headerColor) {
         String pkg = CustomTabsHelper.getPackageNameToUse(activity);
         if (pkg != null) {
+            if (headerColor == 0) {
+                headerColor = UiUtils.resolveColor(activity, R.attr.colorPrimary);
+            }
             CustomTabColorSchemeParams colorParams = new CustomTabColorSchemeParams.Builder()
-                    .setToolbarColor(UiUtils.resolveColor(activity, R.attr.colorPrimary))
+                    .setToolbarColor(headerColor)
                     .build();
             CustomTabsIntent i = new CustomTabsIntent.Builder()
                     .setDefaultColorSchemeParams(colorParams)
