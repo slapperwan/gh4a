@@ -45,6 +45,7 @@ import android.webkit.WebViewClient;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
+import com.gh4a.resolver.LinkClickHandler;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.UiUtils;
@@ -315,20 +316,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     protected void handleUrlLoad(Uri uri) {
-        if ("file".equals(uri.getScheme())) {
-            // Opening that URL will trigger a FileUriExposedException in API 24+
-            return;
-        }
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // ignore
-        } catch (SecurityException e) {
-            // some apps (namely the Wikipedia one) have intent filters set
-            // for the VIEW action for internal, non-exported activities
-            // -> ignore
-        }
+        new LinkClickHandler(this).handleClick(uri);
     }
 
     protected void onLineTouched(int line, int x, int y) {
