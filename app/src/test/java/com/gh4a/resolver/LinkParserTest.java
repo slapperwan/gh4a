@@ -74,15 +74,8 @@ public class LinkParserTest {
     }
 
     @Test
-    public void reservedPaths__openBrowser() {
-        String[] reservedPaths = {
-                "apps", "integrations", "login", "logout", "marketplace", "sessions", "settings",
-                "updates", "support", "contact", "about", "personal", "open-source", "business",
-                "site", "security", "features"
-        };
-        for (String reservedPath : reservedPaths) {
-            assertRedirectsToBrowser(parseLink("https://github.com/" + reservedPath));
-        }
+    public void linkToReservedPath__opensBrowser() {
+        assertRedirectsToBrowser(parseLink("https://github.com/settings"));
     }
 
     @Test

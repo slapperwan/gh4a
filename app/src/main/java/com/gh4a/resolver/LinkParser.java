@@ -34,9 +34,13 @@ import java.util.List;
 
 public class LinkParser {
     private static final List<String> RESERVED_NAMES = Arrays.asList(
-            "about", "apps", "business", "contact", "explore", "features", "integrations", "login",
-            "logout", "marketplace", "open-source", "personal", "security", "sessions", "settings",
-            "site", "support", "updates", "topics"
+            "about", "account", "advisories", "apps", "business", "careers", "codespaces",
+            "collections", "contact", "customer-stories", "discussions", "enterprise", "events",
+            "explore", "features", "git-guides", "guides", "home", "integrations", "join", "learn",
+            "login", "logout", "maintenance", "marketplace", "mobile", "new", "nonprofit", "open-source",
+            "organizations", "pages", "personal", "plans", "press", "pricing", "readme", "resources",
+            "security", "services", "sessions", "settings", "shop", "site", "site-map", "sponsors",
+            "status", "support", "team", "terms", "topics", "updates"
     );
 
     private LinkParser() {
