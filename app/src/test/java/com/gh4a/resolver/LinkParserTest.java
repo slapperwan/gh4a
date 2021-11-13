@@ -69,7 +69,7 @@ public class LinkParserTest {
     }
 
     @Test
-    public void githubLink__opensMainActivity() {
+    public void githubDotComLink__opensBrowser() {
         assertRedirectsToBrowser(parseLink("https://github.com"));
     }
 
