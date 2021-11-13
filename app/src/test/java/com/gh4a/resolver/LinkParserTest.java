@@ -14,9 +14,11 @@ import com.gh4a.activities.OrganizationMemberListActivity;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
+import com.gh4a.activities.TimelineActivity;
 import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
+import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.utils.IntentUtils;
 
 import org.junit.Before;
@@ -84,8 +86,66 @@ public class LinkParserTest {
     }
 
     @Test
-    public void exploreLink__opensTrendingActivity() {
-        assertRedirectsTo(parseLink("https://github.com/explore"), TrendingActivity.class);
+    public void timelineLink__opensTimelineActivity() {
+        assertRedirectsTo(parseLink("https://github.com/timeline"), TimelineActivity.class);
+    }
+
+    @Test
+    public void trendingLink__opensTrendingActivity() {
+        assertRedirectsTo(parseLink("https://github.com/trending"), TrendingActivity.class);
+    }
+
+    @Test
+    public void repositoriesLink__opensTrendingActivity() {
+        assertRedirectsTo(parseLink("https://github.com/repositories"), TrendingActivity.class);
+    }
+
+    @Test
+    public void starsLink__opensHomeActivity_onBookmarksAndStarsSection() {
+        LinkParser.ParseResult result = parseLink("https://github.com/stars");
+        assertRedirectsTo(result, HomeActivity.class);
+        Bundle extras = result.intent.getExtras();
+        assertThat("Redirected to wrong HomeActivity section", extras.getString("initial_page"), is("bookmarks"));
+    }
+
+    @Test
+    public void gistsLink__opensHomeActivity_onGistsSection() {
+        LinkParser.ParseResult result = parseLink("https://github.com/gists");
+        assertRedirectsTo(result, HomeActivity.class);
+        Bundle extras = result.intent.getExtras();
+        assertThat("Redirected to wrong HomeActivity section", extras.getString("initial_page"), is("gists"));
+    }
+
+    @Test
+    public void notificationsLink__opensHomeActivity_onNotificationsSection() {
+        LinkParser.ParseResult result = parseLink("https://github.com/notifications");
+        assertRedirectsTo(result, HomeActivity.class);
+        Bundle extras = result.intent.getExtras();
+        assertThat("Redirected to wrong HomeActivity section", extras.getString("initial_page"), is("notifications"));
+    }
+
+    @Test
+    public void issuesLink__opensHomeActivity_onMyIssuesSection() {
+        LinkParser.ParseResult result = parseLink("https://github.com/issues");
+        assertRedirectsTo(result, HomeActivity.class);
+        Bundle extras = result.intent.getExtras();
+        assertThat("Redirected to wrong HomeActivity section", extras.getString("initial_page"), is("issues"));
+    }
+
+    @Test
+    public void pullsLink__opensHomeActivity_onMyPullRequestsSection() {
+        LinkParser.ParseResult result = parseLink("https://github.com/pulls");
+        assertRedirectsTo(result, HomeActivity.class);
+        Bundle extras = result.intent.getExtras();
+        assertThat("Redirected to wrong HomeActivity section", extras.getString("initial_page"), is("prs"));
+    }
+
+    @Test
+    public void dashboardLink__opensHomeActivity_onNewsFeedSection() {
+        LinkParser.ParseResult result = parseLink("https://github.com/dashboard");
+        assertRedirectsTo(result, HomeActivity.class);
+        Bundle extras = result.intent.getExtras();
+        assertThat("Redirected to wrong HomeActivity section", extras.getString("initial_page"), is("newsfeed"));
     }
 
     @Test
