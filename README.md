@@ -85,6 +85,7 @@ Open Source Libraries
 ---------------------
 * [android-gif-drawable](https://github.com/koral--/android-gif-drawable)
 * [AndroidSVG](https://github.com/BigBadaboom/androidsvg)
+* [AndroidX](https://github.com/androidx/androidx)
 * [emoji-java](https://github.com/vdurmont/emoji-java)
 * [GitHubSdk](https://github.com/maniac103/GitHubSdk)
 * [HoloColorPicker](https://github.com/LarsWerkman/HoloColorPicker)
