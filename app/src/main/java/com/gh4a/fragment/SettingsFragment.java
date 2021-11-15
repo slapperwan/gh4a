@@ -229,7 +229,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     private static class OpenSourceComponentAdapter extends RecyclerView.Adapter<OpenSourceComponentViewHolder> {
         private static final String[][] COMPONENTS = new String[][] {
             { "android-gif-drawable", "https://github.com/koral--/android-gif-drawable" },
-            { "Android-Job", "https://github.com/evernote/android-job" },
             { "AndroidSVG", "https://github.com/BigBadaboom/androidsvg" },
             { "emoji-java", "https://github.com/vdurmont/emoji-java" },
             { "GitHubSdk", "https://github.com/maniac103/GitHubSdk" },
