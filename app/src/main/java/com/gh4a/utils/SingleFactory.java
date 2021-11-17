@@ -52,7 +52,7 @@ public class SingleFactory {
                 .map(ApiHelpers::mapToTrueOnSuccess)
                 // the API returns 403 if the user doesn't have push access,
                 // which in turn means he isn't a collaborator
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_FORBIDDEN, false));
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, false));
     }
 
     public static Single<NotificationListLoadResult> getNotifications(boolean all,
