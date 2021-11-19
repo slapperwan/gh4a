@@ -17,9 +17,7 @@ package com.gh4a.activities;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
@@ -45,11 +43,11 @@ import android.webkit.WebViewClient;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
-import com.gh4a.resolver.LinkClickHandler;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.FindActionModeCallback;
+import com.gh4a.widget.LinkSpan;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
@@ -316,7 +314,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     protected void handleUrlLoad(Uri uri) {
-        new LinkClickHandler(this).handleClick(uri);
+        LinkSpan.handleClick(uri, this);
     }
 
     protected void onLineTouched(int line, int x, int y) {
