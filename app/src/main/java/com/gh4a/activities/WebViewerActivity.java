@@ -53,8 +53,6 @@ import com.gh4a.widget.SwipeRefreshLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static java.lang.String.format;
-
 public abstract class WebViewerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, View.OnTouchListener {
 
@@ -386,7 +384,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         if (repoOwner != null && repoName != null) {
             mWebView.addJavascriptInterface(new HtmlUtilsJavascriptInterface(), "HtmlUtils");
             String actualRef = ref == null ? "master" : ref;
-            content.append(format("html = HtmlUtils.rewriteRelativeUrls(html, '%s', '%s', '%s', '%s');\n",
+            content.append(String.format("html = HtmlUtils.rewriteRelativeUrls(html, '%s', '%s', '%s', '%s');\n",
                     repoOwner, repoName, actualRef, folderPath));
         }
         content.append("document.getElementById('content').innerHTML = html;");
