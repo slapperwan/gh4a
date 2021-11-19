@@ -50,9 +50,12 @@ public class SingleFactory {
         return service.isUserCollaborator(repoOwner, repoName, app.getAuthLogin())
                 // there's no actual content, result is always null
                 .map(ApiHelpers::mapToTrueOnSuccess)
-                // the API returns 404 if the user doesn't have push access,
+                // the API returns 403 if the user doesn't have push access,
                 // which in turn means he isn't a collaborator
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, false));
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_FORBIDDEN, false))
+                // the API returns 404 if the user is in the member list,
+                // but visibility is set to private
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, true));
     }
 
     public static Single<NotificationListLoadResult> getNotifications(boolean all,
