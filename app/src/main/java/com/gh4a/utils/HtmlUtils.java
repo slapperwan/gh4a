@@ -149,7 +149,7 @@ public class HtmlUtils {
 
     private static String rewriteUrlsInAttribute(String attribute, String html, String baseUrl) {
         final Matcher matcher = Pattern.compile("(" + attribute + ")=\"(\\S+)\"").matcher(html);
-        final StringBuffer sb = new StringBuffer();
+        final StringBuffer sb = new StringBuffer(html.length());
         while (matcher.find()) {
             String url = matcher.group(2);
             boolean isAbsoluteUrl = url.contains(":");
