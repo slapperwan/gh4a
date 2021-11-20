@@ -298,18 +298,22 @@ span.float-right>span {
 
 code,tt {
     margin: 0 2px;
-    padding: 0 5px;
-    white-space: nowrap;
-    border: 1px solid #757575;
+    padding: 1px 5px;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
     background-color: #D6D6D6;
     border-radius: 3px;
+    font-size: 13px;
 }
 
-pre code {
+pre code,pre tt {
     margin: 0;
     padding: 0;
     white-space: pre;
     background: 0 0;
+    background-color: transparent;
+    border: none;
+    font-size: 13px;
 }
 
 .highlight pre,pre {
@@ -320,9 +324,4 @@ pre code {
     overflow: auto;
     padding: 4px 10px;
     border-radius: 3px;
-}
-
-pre code,pre tt {
-    background-color: transparent;
-    border: none;
 }
