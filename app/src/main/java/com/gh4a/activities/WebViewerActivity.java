@@ -45,6 +45,7 @@ import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.HtmlUtils;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.FindActionModeCallback;
 import com.gh4a.widget.LinkSpan;
@@ -312,7 +313,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     protected void handleUrlLoad(Uri uri) {
-        LinkSpan.handleClick(uri, this);
+        IntentUtils.openLinkInternallyOrExternally(this, uri);
     }
 
     protected void onLineTouched(int line, int x, int y) {
