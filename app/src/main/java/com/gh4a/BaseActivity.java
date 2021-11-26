@@ -158,10 +158,17 @@ public abstract class BaseActivity extends AppCompatActivity implements
         setupNavigationDrawer();
         setupHeaderDrawable();
 
+        boolean showHomeAsUp =
+                // if NO_HISTORY is set, we can't navigate up, since launching a new activity
+                // will kill our activity. Hide the icon in that case.
+                (getIntent().getFlags() & Intent.FLAG_ACTIVITY_NO_HISTORY) == 0
+                // new task intents we started ourselves also should not show home as up
+                && !IntentUtils.isNewTaskIntent(getIntent());
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getActionBarTitle());
         actionBar.setSubtitle(getActionBarSubtitle());
-        actionBar.setDisplayHomeAsUpEnabled(!IntentUtils.isNewTaskIntent(getIntent()));
+        actionBar.setDisplayHomeAsUpEnabled(showHomeAsUp);
 
         scheduleTaskDescriptionUpdate();
     }
