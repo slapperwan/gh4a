@@ -149,7 +149,7 @@ public class HtmlUtils {
 
     private static String rewriteUrlsInAttribute(String attribute, String html, String baseUrl) {
         final Matcher matcher = Pattern.compile("(" + attribute + ")=\"(\\S+)\"").matcher(html);
-        final StringBuffer sb = new StringBuffer(html.length());
+        StringBuffer sb = null; // lazy initialized only if there's any match
         while (matcher.find()) {
             String url = matcher.group(2);
             boolean isAbsoluteUrl = url.contains(":");
@@ -161,7 +161,14 @@ public class HtmlUtils {
                     url = baseUrl + "/" + url;
                 }
             }
+            if (sb == null) {
+                sb = new StringBuffer(html.length());
+            }
             matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(1) + "=\"" + url + "\""));
+        }
+        if (sb == null) {
+            // No match was found
+            return html;
         }
         matcher.appendTail(sb);
         return sb.toString();
