@@ -34,6 +34,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EdgeEffect;
 import android.widget.EditText;
@@ -90,6 +92,22 @@ public class UiUtils {
             return ContextCompat.getColor(context, R.color.label_fg_dark);
         }
         return ContextCompat.getColor(context, R.color.label_fg_light);
+    }
+
+    public static void updateViewVisibility(View view, boolean animate, boolean show) {
+        int visibility = show ? View.VISIBLE : View.GONE;
+        if (view.getVisibility() == visibility) {
+            return;
+        }
+
+        if (animate) {
+            Animation anim = AnimationUtils.loadAnimation(view.getContext(),
+                    show ? android.R.anim.fade_in : android.R.anim.fade_out);
+            view.startAnimation(anim);
+        } else {
+            view.clearAnimation();
+        }
+        view.setVisibility(visibility);
     }
 
     public static void trySetListOverscrollColor(RecyclerView view, int color) {
