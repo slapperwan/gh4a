@@ -161,9 +161,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // We want to make the user able to read the issue/PR while the rest of the conversation is still loading
         if (mInitialComment == null) {
-            view.findViewById(R.id.content_container).setVisibility(View.VISIBLE);
+            // We want to make the user able to read the issue/PR while the rest of the conversation is still loading,
+            // but at the same time we want to avoid item pop-in when the conversation loads quickly
+            View contentContainer = view.findViewById(R.id.content_container);
+            contentContainer.postDelayed(
+                    () -> UiUtils.updateViewVisibility(contentContainer, isResumed(), true),
+                    800);
         }
 
         BaseActivity activity = getBaseActivity();
