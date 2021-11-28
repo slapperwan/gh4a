@@ -65,8 +65,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.gh4a.activities.Github4AndroidActivity;
@@ -842,25 +840,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void updateViewVisibility(boolean animate) {
         ensureContent();
-        updateViewVisibility(mProgress, animate, !mContentShown);
-        updateViewVisibility(mEmptyView, animate, mContentEmpty && mContentShown);
-        updateViewVisibility(mContentContainer, animate, !mContentEmpty && mContentShown);
-    }
-
-    private void updateViewVisibility(View view, boolean animate, boolean show) {
-        int visibility = show ? View.VISIBLE : View.GONE;
-        if (view.getVisibility() == visibility) {
-            return;
-        }
-
-        if (animate) {
-            Animation anim = AnimationUtils.loadAnimation(view.getContext(),
-                    show ? android.R.anim.fade_in : android.R.anim.fade_out);
-            view.startAnimation(anim);
-        } else {
-            view.clearAnimation();
-        }
-        view.setVisibility(visibility);
+        UiUtils.updateViewVisibility(mProgress, animate, !mContentShown);
+        UiUtils.updateViewVisibility(mEmptyView, animate, mContentEmpty && mContentShown);
+        UiUtils.updateViewVisibility(mContentContainer, animate, !mContentEmpty && mContentShown);
     }
 
     private void ensureContent() {
