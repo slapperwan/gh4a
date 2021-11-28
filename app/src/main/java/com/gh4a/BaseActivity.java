@@ -270,11 +270,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
         mSwipeLayout.setChildScrollDelegate(delegate);
     }
 
-    protected void setEmptyText(CharSequence text) {
-        ensureContent();
-        mEmptyView.setText(text);
-    }
-
     protected void setContentShown(boolean shown) {
         mContentShown = shown;
         updateSwipeToRefreshState();
