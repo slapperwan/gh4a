@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.EditText;
@@ -177,7 +178,6 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
         StringBuilder content = new StringBuilder();
         content.append("<html><head>");
         writeScriptInclude(content, "showdown");
-        writeScriptInclude(content, "base64");
         writeCssInclude(content, "markdown", cssTheme);
         writeCssInclude(content, "mdpreview", cssTheme);
         content.append("</head>");
@@ -185,6 +185,7 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
         content.append("<body>");
         content.append("<div id='content'></div>");
 
+        addJavascriptInterface(new Base64JavascriptInterface(), "Base64");
         content.append("<script>");
         content.append("var text = Base64.decode('");
         content.append(base64Data);
@@ -212,5 +213,12 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
         builder.append("-");
         builder.append(cssTheme);
         builder.append(".css' rel='stylesheet' type='text/css'/>");
+    }
+
+    private static class Base64JavascriptInterface {
+        @JavascriptInterface
+        public String decode(String base64) {
+            return StringUtils.fromBase64(base64);
+        }
     }
 }
