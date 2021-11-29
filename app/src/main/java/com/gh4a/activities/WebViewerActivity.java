@@ -46,9 +46,9 @@ import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.FindActionModeCallback;
-import com.gh4a.widget.LinkSpan;
 import com.gh4a.widget.SwipeRefreshLayout;
 
 import java.io.IOException;
@@ -365,7 +365,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
         content.append("</title>");
         writeScriptInclude(content, "showdown");
-        writeScriptInclude(content, "base64");
         writeCssInclude(content, "markdown", cssTheme);
         content.append("</head>");
 
@@ -375,6 +374,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
         content.append("<div id='content'></div>");
 
+        mWebView.addJavascriptInterface(new Base64JavascriptInterface(), "Base64");
         content.append("<script>");
         content.append("var text = Base64.decode('");
         content.append(base64Data.replaceAll("\\n", ""));
@@ -466,6 +466,13 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
     protected abstract String generateHtml(String cssTheme, boolean addTitleHeader);
     protected abstract String getDocumentTitle();
+
+    private static class Base64JavascriptInterface {
+        @JavascriptInterface
+        public String decode(String base64) {
+            return StringUtils.fromBase64(base64);
+        }
+    }
 
     private static class HtmlUtilsJavascriptInterface {
         @JavascriptInterface
