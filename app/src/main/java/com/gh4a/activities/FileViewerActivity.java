@@ -38,6 +38,7 @@ import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.StringUtils;
@@ -328,7 +329,7 @@ public class FileViewerActivity extends WebViewerActivity
     private static String highlightImage(String imageUrl, String cssTheme, String title) {
         StringBuilder content = new StringBuilder();
         content.append("<html><head>");
-        writeCssInclude(content, "text", cssTheme);
+        HtmlUtils.writeCssInclude(content, "text", cssTheme);
         content.append("</head><body>");
         if (title != null) {
             content.append("<h2>").append(title).append("</h2>");
