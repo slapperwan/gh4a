@@ -364,8 +364,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
             content.append(title);
         }
         content.append("</title>");
-        writeScriptInclude(content, "showdown");
-        writeCssInclude(content, "markdown", cssTheme);
+        HtmlUtils.writeScriptInclude(content, "showdown");
+        HtmlUtils.writeCssInclude(content, "markdown", cssTheme);
         content.append("</head>");
 
         content.append("<body>");
@@ -408,13 +408,13 @@ public abstract class WebViewerActivity extends BaseActivity implements
             content.append(title);
         }
         content.append("</title>");
-        writeScriptInclude(content, "codeutils");
+        HtmlUtils.writeScriptInclude(content, "codeutils");
 
-        writeCssInclude(content, "prettify", cssTheme);
-        writeScriptInclude(content, "prettify");
+        HtmlUtils.writeCssInclude(content, "prettify", cssTheme);
+        HtmlUtils.writeScriptInclude(content, "prettify");
         loadLanguagePluginListIfNeeded();
         for (String plugin : sLanguagePlugins) {
-            writeScriptInclude(content, plugin);
+            HtmlUtils.writeScriptInclude(content, plugin);
         }
         content.append("</head>");
         content.append("<body onload='prettyPrint(function() { highlightLines(");
@@ -442,20 +442,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
                 : "";
         String titleHeader = title != null ? "<h2>" + title + "</h2>" : "";
         return style + "<body>" + titleHeader + html + "</body>";
-    }
-
-    protected static void writeScriptInclude(StringBuilder builder, String scriptName) {
-        builder.append("<script src='file:///android_asset/");
-        builder.append(scriptName);
-        builder.append(".js' type='text/javascript'></script>");
-    }
-
-    protected static void writeCssInclude(StringBuilder builder, String cssType, String cssTheme) {
-        builder.append("<link href='file:///android_asset/");
-        builder.append(cssType);
-        builder.append("-");
-        builder.append(cssTheme);
-        builder.append(".css' rel='stylesheet' type='text/css'/>");
     }
 
     @Override

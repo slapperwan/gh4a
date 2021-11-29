@@ -66,6 +66,20 @@ import java.util.regex.Pattern;
 import static android.graphics.Paint.Style.FILL;
 
 public class HtmlUtils {
+    public static void writeScriptInclude(StringBuilder builder, String scriptName) {
+        builder.append("<script src='file:///android_asset/");
+        builder.append(scriptName);
+        builder.append(".js' type='text/javascript'></script>");
+    }
+
+    public static void writeCssInclude(StringBuilder builder, String cssType, String cssTheme) {
+        builder.append("<link href='file:///android_asset/");
+        builder.append(cssType);
+        builder.append("-");
+        builder.append(cssTheme);
+        builder.append(".css' rel='stylesheet' type='text/css'/>");
+    }
+
     private static class ReplySpan implements LeadingMarginSpan {
         private final int mColor;
         private final int mMargin;
