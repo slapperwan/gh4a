@@ -366,6 +366,12 @@ public class LinkParserTest {
     }
 
     @Test
+    public void wikiLink_toSpecificPage__opensBrowser() {
+        LinkParser.ParseResult result = parseLink("https://github.com/slapperwan/gh4a/wiki/Information-hierarchy");
+        assertRedirectsToBrowser(result);
+    }
+
+    @Test
     public void pullRequestLink_withoutId__opensBrowser() {
         assertRedirectsToBrowser(parseLink("https://github.com/slapperwan/gh4a/pull"));
     }
