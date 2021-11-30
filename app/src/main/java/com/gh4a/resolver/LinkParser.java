@@ -130,10 +130,9 @@ public class LinkParser {
             case "pulls":
                 return new ParseResult(IssueListActivity.makeIntent(activity, user, repo, true));
             case "wiki":
-                return new ParseResult(WikiListActivity.makeIntent(activity, user, repo, null));
+                return parseWikiLink(activity, parts, user, repo);
             case "pull":
-                return parsePullRequestLink(activity, uri, parts, user,
-                        repo, id, initialCommentFallback);
+                return parsePullRequestLink(activity, uri, parts, user, repo, id, initialCommentFallback);
             case "commit":
                 return parseCommitLink(activity, uri, user, repo, id, initialCommentFallback);
             case "blob":
@@ -275,6 +274,16 @@ public class LinkParser {
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    @Nullable
+    private static ParseResult parseWikiLink(FragmentActivity activity, List<String> parts, String user, String repo) {
+        // In this case we can't open links to specific wiki pages in a WikiActivity,
+        // since there are no APIs to fetch the content of a single wiki page
+        if (parts.size() > 3) {
+            return null;
+        }
+        return new ParseResult(WikiListActivity.makeIntent(activity, user, repo, null));
     }
 
     @Nullable
