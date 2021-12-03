@@ -266,6 +266,19 @@ public class IntentUtils {
         return result;
     }
 
+    public static void putCompressedParcelableExtra(Intent intent, String key, Parcelable parcelable, int thresholdBytes) {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeParcelable(parcelable, 0);
+        byte[] compressedData = compressDataIfNeeded(parcel.marshall(), thresholdBytes);
+        parcel.recycle();
+
+        if (compressedData != null) {
+            intent.putExtra(compressedDataKey(key), compressedData);
+        } else {
+            intent.putExtra(key, parcelable);
+        }
+    }
+
     public static void putParcelableToBundleCompressed(Bundle bundle,
             String key, Parcelable parcelable, int thresholdBytes) {
         Parcel parcel = Parcel.obtain();
