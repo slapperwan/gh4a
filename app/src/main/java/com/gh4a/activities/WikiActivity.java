@@ -22,18 +22,21 @@ import androidx.annotation.Nullable;
 
 import com.gh4a.R;
 import com.gh4a.model.Feed;
+import com.gh4a.utils.IntentUtils;
 
 public class WikiActivity extends WebViewerActivity {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, Feed feed) {
-        return new Intent(context, WikiActivity.class)
+        Intent intent = new Intent(context, WikiActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("title", feed.getTitle())
-                .putExtra("content", feed.getContent());
+                .putExtra("repo", repoName);
+        // Avoid TransactionTooLargeExceptions on activity launch when page content is too big
+        IntentUtils.putCompressedParcelableExtra(intent, "page_feed", feed, 800_000);
+        return intent;
     }
 
     private String mUserLogin;
     private String mRepoName;
+    private Feed mWikiPageFeed;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,7 @@ public class WikiActivity extends WebViewerActivity {
     @Nullable
     @Override
     protected String getActionBarTitle() {
-        return getIntent().getStringExtra("title");
+        return mWikiPageFeed.getTitle();
     }
 
     @Nullable
@@ -59,18 +62,18 @@ public class WikiActivity extends WebViewerActivity {
         super.onInitExtras(extras);
         mUserLogin = extras.getString("owner");
         mRepoName = extras.getString("repo");
+        mWikiPageFeed = IntentUtils.readCompressedParcelableFromBundle(extras, "page_feed");
     }
 
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         String title = addTitleHeader ? getDocumentTitle() : null;
-        return wrapUnthemedHtml(getIntent().getStringExtra("content"), cssTheme, title);
+        return wrapUnthemedHtml(mWikiPageFeed.getContent(), cssTheme, title);
     }
 
     @Override
     protected String getDocumentTitle() {
-        return getString(R.string.wiki_print_document_title,
-                getIntent().getStringExtra("title"), mUserLogin, mRepoName);
+        return getString(R.string.wiki_print_document_title, mWikiPageFeed.getTitle(), mUserLogin, mRepoName);
     }
 
     @Override
