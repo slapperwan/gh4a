@@ -259,19 +259,16 @@ public class IntentUtils {
 
     public static <T extends Parcelable> ArrayList<T> getCompressedArrayListExtra(Intent intent, String key) {
         Bundle extras = intent.getExtras();
-        ArrayList<T> result = readCompressedDataIfPresent(extras, key, ((parcel, loader) -> parcel.readArrayList(loader)));
+        ArrayList<T> result = readCompressedDataIfPresent(extras, key, Parcel::readArrayList);
         if (result == null) {
             result = extras.getParcelableArrayList(key);
         }
         return result;
     }
 
-    public static void putCompressedParcelableExtra(Intent intent, String key, Parcelable parcelable, int thresholdBytes) {
-        Parcel parcel = Parcel.obtain();
-        parcel.writeParcelable(parcelable, 0);
-        byte[] compressedData = compressDataIfNeeded(parcel.marshall(), thresholdBytes);
-        parcel.recycle();
-
+    public static void putCompressedParcelableExtra(Intent intent, String key,
+            Parcelable parcelable, int thresholdBytes) {
+        byte[] compressedData = compressParcelableIfNeeded(parcelable, thresholdBytes);
         if (compressedData != null) {
             intent.putExtra(compressedDataKey(key), compressedData);
         } else {
@@ -279,13 +276,9 @@ public class IntentUtils {
         }
     }
 
-    public static void putParcelableToBundleCompressed(Bundle bundle,
-            String key, Parcelable parcelable, int thresholdBytes) {
-        Parcel parcel = Parcel.obtain();
-        parcel.writeParcelable(parcelable, 0);
-        byte[] compressedData = compressDataIfNeeded(parcel.marshall(), thresholdBytes);
-        parcel.recycle();
-
+    public static void putParcelableToBundleCompressed(Bundle bundle, String key,
+            Parcelable parcelable, int thresholdBytes) {
+        byte[] compressedData = compressParcelableIfNeeded(parcelable, thresholdBytes);
         if (compressedData != null) {
             bundle.putByteArray(compressedDataKey(key), compressedData);
         } else {
@@ -294,11 +287,19 @@ public class IntentUtils {
     }
 
     public static <T extends Parcelable> T readCompressedParcelableFromBundle(Bundle bundle, String key) {
-        T result = readCompressedDataIfPresent(bundle, key, ((parcel, loader) -> parcel.readParcelable(loader)));
+        T result = readCompressedDataIfPresent(bundle, key, Parcel::readParcelable);
         if (result == null) {
             result = bundle.getParcelable(key);
         }
         return result;
+    }
+
+    private static byte[] compressParcelableIfNeeded(Parcelable parcelable, int thresholdBytes) {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeParcelable(parcelable, 0);
+        byte[] compressedData = compressDataIfNeeded(parcel.marshall(), thresholdBytes);
+        parcel.recycle();
+        return compressedData;
     }
 
     private static byte[] compressDataIfNeeded(byte[] dataToCompress, int thresholdBytes) {
