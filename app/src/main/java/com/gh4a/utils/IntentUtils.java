@@ -22,7 +22,9 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsIntent;
 import android.widget.Toast;
 
+import com.gh4a.BaseActivity;
 import com.gh4a.R;
+import com.gh4a.resolver.LinkParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -40,6 +42,35 @@ public class IntentUtils {
     private static final String RAW_URL_FORMAT = "https://raw.githubusercontent.com/%s/%s/%s/%s";
 
     private IntentUtils() {
+    }
+
+    public static void openLinkInternallyOrExternally(BaseActivity activity, Uri uri) {
+        String uriScheme = uri.getScheme();
+        if (uriScheme == null || uriScheme.equals("file") || uriScheme.equals("content")) {
+            // We can't do anything about relative or anchor URLs here, and there are no good reasons to
+            // try to open file or content provider URIs (the former ones would raise an exception on API 24+)
+            return;
+        }
+
+        if (uriScheme.equals("mailto")) {
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                activity.startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                Toast.makeText(activity, R.string.link_not_openable, Toast.LENGTH_SHORT).show();
+            }
+            return;
+        }
+
+        LinkParser.ParseResult result = LinkParser.parseUri(activity, uri, null);
+        if (result == null) {
+            openInCustomTabOrBrowser(activity, uri, activity.getCurrentHeaderColor());
+        } else if (result.intent != null) {
+            activity.startActivity(result.intent);
+        } else if (result.loadTask != null) {
+            result.loadTask.setOpenUnresolvedUriInCustomTab(activity.getCurrentHeaderColor());
+            result.loadTask.execute();
+        }
     }
 
     public static void launchBrowser(Context context, Uri uri) {

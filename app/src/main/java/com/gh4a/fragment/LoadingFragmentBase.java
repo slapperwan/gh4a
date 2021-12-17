@@ -126,21 +126,8 @@ public abstract class LoadingFragmentBase extends Fragment implements
     private void updateContentVisibility() {
         View out = mContentShown ? mProgress : mContentContainer;
         View in = mContentShown ? mContentContainer : mProgress;
-        if (isResumed()) {
-            // Only animate views if they aren't in target state already, otherwise we'll
-            // show (out) / hide (in) them for a short time
-            if (out.getVisibility() != View.GONE) {
-                out.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_out));
-            }
-            if (in.getVisibility() != View.VISIBLE) {
-                in.startAnimation(AnimationUtils.loadAnimation(getActivity(), android.R.anim.fade_in));
-            }
-        } else {
-            in.clearAnimation();
-            out.clearAnimation();
-        }
-        out.setVisibility(View.GONE);
-        in.setVisibility(View.VISIBLE);
+        UiUtils.updateViewVisibility(out, isResumed(), false);
+        UiUtils.updateViewVisibility(in, isResumed(), true);
     }
 
     protected abstract View onCreateContentView(LayoutInflater inflater, ViewGroup parent);

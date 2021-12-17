@@ -65,8 +65,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.gh4a.activities.Github4AndroidActivity;
@@ -158,10 +156,17 @@ public abstract class BaseActivity extends AppCompatActivity implements
         setupNavigationDrawer();
         setupHeaderDrawable();
 
+        boolean showHomeAsUp =
+                // if NO_HISTORY is set, we can't navigate up, since launching a new activity
+                // will kill our activity. Hide the icon in that case.
+                (getIntent().getFlags() & Intent.FLAG_ACTIVITY_NO_HISTORY) == 0
+                // new task intents we started ourselves also should not show home as up
+                && !IntentUtils.isNewTaskIntent(getIntent());
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setTitle(getActionBarTitle());
         actionBar.setSubtitle(getActionBarSubtitle());
-        actionBar.setDisplayHomeAsUpEnabled(!IntentUtils.isNewTaskIntent(getIntent()));
+        actionBar.setDisplayHomeAsUpEnabled(showHomeAsUp);
 
         scheduleTaskDescriptionUpdate();
     }
@@ -263,11 +268,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected void setChildScrollDelegate(SwipeRefreshLayout.ChildScrollDelegate delegate) {
         mSwipeLayout.setChildScrollDelegate(delegate);
-    }
-
-    protected void setEmptyText(CharSequence text) {
-        ensureContent();
-        mEmptyView.setText(text);
     }
 
     protected void setContentShown(boolean shown) {
@@ -835,25 +835,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void updateViewVisibility(boolean animate) {
         ensureContent();
-        updateViewVisibility(mProgress, animate, !mContentShown);
-        updateViewVisibility(mEmptyView, animate, mContentEmpty && mContentShown);
-        updateViewVisibility(mContentContainer, animate, !mContentEmpty && mContentShown);
-    }
-
-    private void updateViewVisibility(View view, boolean animate, boolean show) {
-        int visibility = show ? View.VISIBLE : View.GONE;
-        if (view.getVisibility() == visibility) {
-            return;
-        }
-
-        if (animate) {
-            Animation anim = AnimationUtils.loadAnimation(view.getContext(),
-                    show ? android.R.anim.fade_in : android.R.anim.fade_out);
-            view.startAnimation(anim);
-        } else {
-            view.clearAnimation();
-        }
-        view.setVisibility(visibility);
+        UiUtils.updateViewVisibility(mProgress, animate, !mContentShown);
+        UiUtils.updateViewVisibility(mEmptyView, animate, mContentEmpty && mContentShown);
+        UiUtils.updateViewVisibility(mContentContainer, animate, !mContentEmpty && mContentShown);
     }
 
     private void ensureContent() {

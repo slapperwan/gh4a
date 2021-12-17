@@ -38,6 +38,7 @@ import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.StringUtils;
@@ -152,8 +153,9 @@ public class FileViewerActivity extends WebViewerActivity
                     ";base64," + base64Data;
             return highlightImage(imageUrl, cssTheme, title);
         } else if (base64Data != null && FileUtils.isMarkdown(mPath) && !mViewRawText) {
+            String folderPath = FileUtils.getFolderPath(mPath);
             return generateMarkdownHtml(base64Data,
-                    mRepoOwner, mRepoName, mRef, cssTheme, addTitleHeader);
+                    mRepoOwner, mRepoName, mRef, folderPath, cssTheme, addTitleHeader);
         } else {
             String data = base64Data != null ? StringUtils.fromBase64(base64Data) : "";
             findMatchingLines(data);
@@ -327,7 +329,7 @@ public class FileViewerActivity extends WebViewerActivity
     private static String highlightImage(String imageUrl, String cssTheme, String title) {
         StringBuilder content = new StringBuilder();
         content.append("<html><head>");
-        writeCssInclude(content, "text", cssTheme);
+        HtmlUtils.writeCssInclude(content, "text", cssTheme);
         content.append("</head><body>");
         if (title != null) {
             content.append("<h2>").append(title).append("</h2>");

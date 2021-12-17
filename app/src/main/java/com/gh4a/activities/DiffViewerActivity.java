@@ -38,6 +38,7 @@ import com.gh4a.fragment.ConfirmationDialogFragment;
 import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
@@ -239,8 +240,8 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             content.append(title);
         }
         content.append("</title>");
-        writeCssInclude(content, "text", cssTheme);
-        writeScriptInclude(content, "codeutils");
+        HtmlUtils.writeCssInclude(content, "text", cssTheme);
+        HtmlUtils.writeScriptInclude(content, "codeutils");
         content.append("</head><body");
 
         int highlightInsertPos = content.length();

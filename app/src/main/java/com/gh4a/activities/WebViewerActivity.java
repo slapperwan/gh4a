@@ -17,9 +17,7 @@ package com.gh4a.activities;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
@@ -46,6 +44,9 @@ import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
+import com.gh4a.utils.HtmlUtils;
+import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.FindActionModeCallback;
 import com.gh4a.widget.SwipeRefreshLayout;
@@ -159,7 +160,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         mWebView.setOnTouchListener(this);
     }
 
-    //@SuppressWarnings("deprecation")
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebViewSettings(WebSettings s) {
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
@@ -313,20 +313,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     protected void handleUrlLoad(Uri uri) {
-        if ("file".equals(uri.getScheme())) {
-            // Opening that URL will trigger a FileUriExposedException in API 24+
-            return;
-        }
-        try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-            startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            // ignore
-        } catch (SecurityException e) {
-            // some apps (namely the Wikipedia one) have intent filters set
-            // for the VIEW action for internal, non-exported activities
-            // -> ignore
-        }
+        IntentUtils.openLinkInternallyOrExternally(this, uri);
     }
 
     protected void onLineTouched(int line, int x, int y) {
@@ -368,7 +355,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     protected String generateMarkdownHtml(String base64Data,
-            String repoOwner, String repoName, String ref,
+            String repoOwner, String repoName, String ref, String folderPath,
             String cssTheme, boolean addTitleHeader) {
         String title = addTitleHeader ? getDocumentTitle() : null;
         StringBuilder content = new StringBuilder();
@@ -377,9 +364,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
             content.append(title);
         }
         content.append("</title>");
-        writeScriptInclude(content, "showdown");
-        writeScriptInclude(content, "base64");
-        writeCssInclude(content, "markdown", cssTheme);
+        HtmlUtils.writeScriptInclude(content, "showdown");
+        HtmlUtils.writeCssInclude(content, "markdown", cssTheme);
         content.append("</head>");
 
         content.append("<body>");
@@ -388,20 +374,20 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
         content.append("<div id='content'></div>");
 
+        mWebView.addJavascriptInterface(new Base64JavascriptInterface(), "Base64");
         content.append("<script>");
         content.append("var text = Base64.decode('");
         content.append(base64Data.replaceAll("\\n", ""));
         content.append("');\n");
         content.append("var converter = new showdown.Converter();\n");
         content.append("converter.setFlavor('github');\n");
-        if (repoOwner != null && repoName != null) {
-            String urlPrefix = "https://raw.github.com/"
-                    + repoOwner + "/" + repoName + "/" + (ref != null ? ref : "master");
-            content.append("converter.setOption('fixupRelativeUrls', true);\n");
-            content.append("converter.setOption('relativeUrlFixupPrefix','");
-            content.append(urlPrefix).append("');\n");
-        }
         content.append("var html = converter.makeHtml(text);\n");
+        if (repoOwner != null && repoName != null) {
+            mWebView.addJavascriptInterface(new HtmlUtilsJavascriptInterface(), "HtmlUtils");
+            String actualRef = ref == null ? "master" : ref;
+            content.append(String.format("html = HtmlUtils.rewriteRelativeUrls(html, '%s', '%s', '%s', '%s');\n",
+                    repoOwner, repoName, actualRef, folderPath));
+        }
         content.append("document.getElementById('content').innerHTML = html;");
         content.append("</script>");
 
@@ -422,13 +408,13 @@ public abstract class WebViewerActivity extends BaseActivity implements
             content.append(title);
         }
         content.append("</title>");
-        writeScriptInclude(content, "codeutils");
+        HtmlUtils.writeScriptInclude(content, "codeutils");
 
-        writeCssInclude(content, "prettify", cssTheme);
-        writeScriptInclude(content, "prettify");
+        HtmlUtils.writeCssInclude(content, "prettify", cssTheme);
+        HtmlUtils.writeScriptInclude(content, "prettify");
         loadLanguagePluginListIfNeeded();
         for (String plugin : sLanguagePlugins) {
-            writeScriptInclude(content, plugin);
+            HtmlUtils.writeScriptInclude(content, plugin);
         }
         content.append("</head>");
         content.append("<body onload='prettyPrint(function() { highlightLines(");
@@ -458,20 +444,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         return style + "<body>" + titleHeader + html + "</body>";
     }
 
-    protected static void writeScriptInclude(StringBuilder builder, String scriptName) {
-        builder.append("<script src='file:///android_asset/");
-        builder.append(scriptName);
-        builder.append(".js' type='text/javascript'></script>");
-    }
-
-    protected static void writeCssInclude(StringBuilder builder, String cssType, String cssTheme) {
-        builder.append("<link href='file:///android_asset/");
-        builder.append(cssType);
-        builder.append("-");
-        builder.append(cssTheme);
-        builder.append(".css' rel='stylesheet' type='text/css'/>");
-    }
-
     @Override
     protected abstract boolean canSwipeToRefresh();
 
@@ -480,6 +452,21 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
     protected abstract String generateHtml(String cssTheme, boolean addTitleHeader);
     protected abstract String getDocumentTitle();
+
+    private static class Base64JavascriptInterface {
+        @JavascriptInterface
+        public String decode(String base64) {
+            return StringUtils.fromBase64(base64);
+        }
+    }
+
+    private static class HtmlUtilsJavascriptInterface {
+        @JavascriptInterface
+        public String rewriteRelativeUrls(final String html, final String repoUser,
+                final String repoName, final String branch, final String folderPath) {
+            return HtmlUtils.rewriteRelativeUrls(html, repoUser, repoName, branch, folderPath);
+        }
+    }
 
     private class DisplayJavascriptInterface {
         @JavascriptInterface

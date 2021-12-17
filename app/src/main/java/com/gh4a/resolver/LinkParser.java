@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import android.text.TextUtils;
 
+import com.gh4a.R;
 import com.gh4a.activities.BlogListActivity;
 import com.gh4a.activities.CommitActivity;
 import com.gh4a.activities.CompareActivity;
@@ -19,9 +20,11 @@ import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.SearchActivity;
+import com.gh4a.activities.TimelineActivity;
 import com.gh4a.activities.TrendingActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.activities.WikiListActivity;
+import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
@@ -31,9 +34,13 @@ import java.util.List;
 
 public class LinkParser {
     private static final List<String> RESERVED_NAMES = Arrays.asList(
-            "apps", "integrations", "login", "logout", "marketplace", "sessions", "settings",
-            "updates", "support", "contact", "about", "personal", "open-source",
-            "business", "site", "security", "features", "topics"
+            "about", "account", "advisories", "apps", "business", "careers", "codespaces",
+            "collections", "contact", "customer-stories", "discussions", "enterprise", "events",
+            "explore", "features", "git-guides", "guides", "home", "integrations", "join", "learn",
+            "login", "logout", "maintenance", "marketplace", "mobile", "new", "nonprofit", "open-source",
+            "organizations", "pages", "personal", "plans", "press", "pricing", "readme", "resources",
+            "security", "services", "sessions", "settings", "shop", "site", "site-map", "sponsors",
+            "status", "support", "team", "terms", "topics", "updates"
     );
 
     private LinkParser() {
@@ -73,8 +80,23 @@ public class LinkParser {
         }
 
         switch (first) {
-            case "explore":
+            case "notifications":
+                return new ParseResult(HomeActivity.makeIntent(activity, R.id.notifications));
+            case "stars":
+                return new ParseResult(HomeActivity.makeIntent(activity, R.id.bookmarks));
+            case "issues":
+                return new ParseResult(HomeActivity.makeIntent(activity, R.id.my_issues));
+            case "pulls":
+                return new ParseResult(HomeActivity.makeIntent(activity, R.id.my_prs));
+            case "gists":
+                return new ParseResult(HomeActivity.makeIntent(activity, R.id.my_gists));
+            case "dashboard":
+                return new ParseResult(HomeActivity.makeIntent(activity, R.id.news_feed));
+            case "repositories":
+            case "trending":
                 return new ParseResult(new Intent(activity, TrendingActivity.class));
+            case "timeline":
+                return new ParseResult(new Intent(activity, TimelineActivity.class));
             case "blog":
                 return parseBlogLink(activity, parts);
             case "orgs":

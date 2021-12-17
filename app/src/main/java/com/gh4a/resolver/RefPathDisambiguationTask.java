@@ -63,7 +63,7 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        return resolve()
+        return resolveRefAndPath()
                 .map(refAndPathOpt -> {
                     if (!refAndPathOpt.isPresent()) {
                         return Optional.absent();
@@ -116,11 +116,18 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
     }
 
     // returns ref, path
-    private Single<Optional<Pair<String, String>>> resolve() throws ApiRequestException {
+    private Single<Optional<Pair<String, String>>> resolveRefAndPath() throws ApiRequestException {
         // first check whether the path redirects to HEAD
         if (mRefAndPath.startsWith("HEAD")) {
             return Single.just(Optional.of(Pair.create("HEAD",
                     mRefAndPath.startsWith("HEAD/") ? mRefAndPath.substring(5) : null)));
+        }
+        // or whether the ref is a commit SHA-1
+        int slashPos = mRefAndPath.indexOf('/');
+        String potentialSha = slashPos > 0 ? mRefAndPath.substring(0, slashPos) : mRefAndPath;
+        if (SHA1_PATTERN.matcher(potentialSha).matches()) {
+            return Single.just(Optional.of(Pair.create(potentialSha,
+                    slashPos > 0 ? mRefAndPath.substring(slashPos + 1) : "")));
         }
 
         final RepositoryBranchService branchService =
@@ -134,18 +141,6 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
                 // and tags after that
                 .flatMap(result -> result.orOptionalSingle(() -> ApiHelpers.PageIterator
                         .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page))
-                        .compose(this::matchBranch))
-                )
-                .map(resultOpt -> resultOpt.orOptional(() -> {
-                    // at this point, the first item may still be a SHA1 - check with a simple regex
-                    int slashPos = mRefAndPath.indexOf('/');
-                    String potentialSha = slashPos > 0
-                            ? mRefAndPath.substring(0, slashPos) : mRefAndPath;
-                    if (SHA1_PATTERN.matcher(potentialSha).matches()) {
-                        return Optional.of(Pair.create(potentialSha,
-                                slashPos > 0 ? mRefAndPath.substring(slashPos + 1) : ""));
-                    }
-                    return Optional.absent();
-                }));
+                        .compose(this::matchBranch)));
     }
 }

@@ -66,6 +66,20 @@ import java.util.regex.Pattern;
 import static android.graphics.Paint.Style.FILL;
 
 public class HtmlUtils {
+    public static void writeScriptInclude(StringBuilder builder, String scriptName) {
+        builder.append("<script src='file:///android_asset/");
+        builder.append(scriptName);
+        builder.append(".js' type='text/javascript'></script>");
+    }
+
+    public static void writeCssInclude(StringBuilder builder, String cssType, String cssTheme) {
+        builder.append("<link href='file:///android_asset/");
+        builder.append(cssType);
+        builder.append("-");
+        builder.append(cssTheme);
+        builder.append(".css' rel='stylesheet' type='text/css'/>");
+    }
+
     private static class ReplySpan implements LeadingMarginSpan {
         private final int mColor;
         private final int mMargin;
@@ -137,33 +151,40 @@ public class HtmlUtils {
 
     /**
      * Rewrite relative URLs in HTML fetched e.g. from markdown files.
-     *
-     * @param html
-     * @param repoUser
-     * @param repoName
-     * @param branch
-     * @return
      */
     public static String rewriteRelativeUrls(final String html, final String repoUser,
-            final String repoName, final String branch) {
-        final String baseUrl = "https://raw.github.com/" + repoUser + "/" + repoName + "/" + branch;
-        final StringBuffer sb = new StringBuffer();
-        final Pattern p = Pattern.compile("(href|src)=\"(\\S+)\"");
-        final Matcher m = p.matcher(html);
+            final String repoName, final String ref, final String folderPath) {
+        final String baseUrl = "https://github.com/" + repoUser + "/" + repoName + "/blob/" + ref + "/" + folderPath;
+        String rewrittenHtml = rewriteUrlsInAttribute("href", html, baseUrl);
 
-        while (m.find()) {
-            String url = m.group(2);
-            if (!url.contains("://") && !url.startsWith("#")) {
+        final String baseUrlForImages = "https://raw.github.com/" + repoUser + "/" + repoName + "/" + ref + "/" + folderPath;
+        return rewriteUrlsInAttribute("src", rewrittenHtml, baseUrlForImages);
+    }
+
+    private static String rewriteUrlsInAttribute(String attribute, String html, String baseUrl) {
+        final Matcher matcher = Pattern.compile("(" + attribute + ")=\"(\\S+)\"").matcher(html);
+        StringBuffer sb = null; // lazy initialized only if there's any match
+        while (matcher.find()) {
+            String url = matcher.group(2);
+            boolean isAbsoluteUrl = url.contains(":");
+            boolean isAnchorUrl = url.startsWith("#");
+            if (!isAbsoluteUrl && !isAnchorUrl) {
                 if (url.startsWith("/")) {
                     url = baseUrl + url;
                 } else {
                     url = baseUrl + "/" + url;
                 }
             }
-            m.appendReplacement(sb, Matcher.quoteReplacement(m.group(1) + "=\"" + url + "\""));
+            if (sb == null) {
+                sb = new StringBuffer(html.length());
+            }
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(matcher.group(1) + "=\"" + url + "\""));
         }
-        m.appendTail(sb);
-
+        if (sb == null) {
+            // No match was found
+            return html;
+        }
+        matcher.appendTail(sb);
         return sb.toString();
     }
 

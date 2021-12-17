@@ -9,12 +9,14 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.EditText;
 
 import com.gh4a.R;
 import com.gh4a.activities.WebViewerActivity;
+import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.StringUtils;
 
 public class MarkdownPreviewWebView extends WebView implements NestedScrollingChild2 {
@@ -176,15 +178,15 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
     private String generateMarkdownHtml(String base64Data, String cssTheme) {
         StringBuilder content = new StringBuilder();
         content.append("<html><head>");
-        writeScriptInclude(content, "showdown");
-        writeScriptInclude(content, "base64");
-        writeCssInclude(content, "markdown", cssTheme);
-        writeCssInclude(content, "mdpreview", cssTheme);
+        HtmlUtils.writeScriptInclude(content, "showdown");
+        HtmlUtils.writeCssInclude(content, "markdown", cssTheme);
+        HtmlUtils.writeCssInclude(content, "mdpreview", cssTheme);
         content.append("</head>");
 
         content.append("<body>");
         content.append("<div id='content'></div>");
 
+        addJavascriptInterface(new Base64JavascriptInterface(), "Base64");
         content.append("<script>");
         content.append("var text = Base64.decode('");
         content.append(base64Data);
@@ -200,17 +202,10 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
         return content.toString();
     }
 
-    private static void writeScriptInclude(StringBuilder builder, String scriptName) {
-        builder.append("<script src='file:///android_asset/");
-        builder.append(scriptName);
-        builder.append(".js' type='text/javascript'></script>");
-    }
-
-    private static void writeCssInclude(StringBuilder builder, String cssType, String cssTheme) {
-        builder.append("<link href='file:///android_asset/");
-        builder.append(cssType);
-        builder.append("-");
-        builder.append(cssTheme);
-        builder.append(".css' rel='stylesheet' type='text/css'/>");
+    private static class Base64JavascriptInterface {
+        @JavascriptInterface
+        public String decode(String base64) {
+            return StringUtils.fromBase64(base64);
+        }
     }
 }

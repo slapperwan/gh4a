@@ -31,7 +31,6 @@
         android:layout_alignParentLeft="true"
         android:layout_alignWithParentIfMissing="true"
         android:layout_toLeftOf="@id/comments"
-        android:typeface="monospace"
         tools:text="some/file/in/directories.txt" />
 
     <com.gh4a.widget.StyleableTextView

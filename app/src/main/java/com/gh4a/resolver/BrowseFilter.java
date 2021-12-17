@@ -32,6 +32,9 @@ public class BrowseFilter extends AppCompatActivity {
         }
 
         int flags = getIntent().getFlags() & ~Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS;
+        if ((flags & (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NEW_DOCUMENT)) != 0) {
+            flags |= Intent.FLAG_ACTIVITY_MULTIPLE_TASK;
+        }
         IntentUtils.InitialCommentMarker initialComment =
                 getIntent().getParcelableExtra(EXTRA_INITIAL_COMMENT);
 
