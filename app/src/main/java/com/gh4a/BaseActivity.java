@@ -78,6 +78,7 @@ import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
 import com.meisolsson.githubsdk.model.ClientErrorResponse;
 import com.philosophicalhacker.lib.RxLoader;
+import com.squareup.moshi.JsonDataException;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -197,8 +198,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
             Snackbar.make(mCoordinatorLayout, R.string.load_auth_failure_notice, Snackbar.LENGTH_INDEFINITE)
                     .setAction(R.string.login, v -> goToToplevelActivity())
                     .show();
+            Log.d(Gh4Application.LOG_TAG, text, e);
+            return;
         }
-        if (are == null && e instanceof RuntimeException) {
+
+        boolean exceptionMustBeHandled = e instanceof ApiRequestException || e instanceof JsonDataException;
+        if (!exceptionMustBeHandled && e instanceof RuntimeException) {
             // If this happens, it means Rx catched a programming error of us. Crash the app
             // in that case, as that's what would have happened without Rx as well.
             // In doing so, don't just throw the exception (but instead delegate it right to the
@@ -208,7 +213,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
             Thread.UncaughtExceptionHandler handler = currentThread.getUncaughtExceptionHandler();
             handler.uncaughtException(currentThread, e);
         }
-        Log.d(Gh4Application.LOG_TAG, text, e);
+        Log.e(Gh4Application.LOG_TAG, text, e);
     }
 
     protected void registerTemporarySubscription(Disposable disposable) {
@@ -657,6 +662,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 messageView.setText(
                         getString(R.string.load_failure_explanation_with_reason, re.getMessage()));
                 retryButton.setVisibility(View.VISIBLE);
+            } else if (e instanceof JsonDataException) {
+                messageView.setText(getString(R.string.load_failure_explanation_parsing));
+                retryButton.setVisibility(View.GONE);
             } else {
                 messageView.setText(R.string.load_failure_explanation);
                 retryButton.setVisibility(View.VISIBLE);
