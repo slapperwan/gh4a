@@ -33,7 +33,9 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public class ServiceFactory {
-    private static final String DEFAULT_HEADER_ACCEPT = "application/vnd.github.v3.full+json";
+    private static final String DEFAULT_HEADER_ACCEPT = "application/vnd.github.v3+json," +
+            "application/vnd.github.v3.raw+json," +
+            "application/vnd.github.v3.html+json";
 
     private final static HttpLoggingInterceptor LOGGING_INTERCEPTOR = new HttpLoggingInterceptor()
             .setLevel(HttpLoggingInterceptor.Level.BASIC);
