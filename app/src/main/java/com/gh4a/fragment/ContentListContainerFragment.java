@@ -315,11 +315,10 @@ public class ContentListContainerFragment extends Fragment implements
         String repoOwner = mRepository.owner().login();
         String repoName = mRepository.name();
 
-        service.getContents(repoOwner, repoName, ".gitmodules", mSelectedRef)
+        service.getContentsRaw(repoOwner, repoName, ".gitmodules", mSelectedRef)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Optional::of)
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<Content>absent()))
-                .map(contentOpt -> contentOpt.map(content -> StringUtils.fromBase64(content.content())))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<String>absent()))
                 .map(this::parseModuleMap)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
