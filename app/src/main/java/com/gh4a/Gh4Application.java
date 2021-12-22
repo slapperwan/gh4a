@@ -28,8 +28,6 @@ import com.gh4a.worker.NotificationsWorker;
 import com.meisolsson.githubsdk.model.User;
 import com.tspoon.traceur.Traceur;
 
-import net.danlew.android.joda.JodaTimeAndroid;
-
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.HashSet;
@@ -123,7 +121,6 @@ public class Gh4Application extends MultiDexApplication implements
         }
 
         mPt = new PrettyTime();
-        JodaTimeAndroid.init(this);
         ServiceFactory.initClient(this);
 
         updateNotificationWorker(prefs);
