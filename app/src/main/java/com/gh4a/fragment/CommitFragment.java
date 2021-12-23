@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.StrikethroughSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -239,7 +240,14 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
             ViewGroup fileView = (ViewGroup) inflater.inflate(R.layout.commit_filename, parent, false);
             TextView fileNameView = fileView.findViewById(R.id.filename);
-            fileNameView.setText(file.filename());
+            if (file.previousFilename() != null) {
+                SpannableStringBuilder fileNames = new SpannableStringBuilder();
+                fileNames.append(file.previousFilename()).append('\n').append(file.filename());
+                fileNames.setSpan(new StrikethroughSpan(), 0, file.previousFilename().length(), 0);
+                fileNameView.setText(fileNames);
+            } else {
+                fileNameView.setText(file.filename());
+            }
 
             TextView statsView = fileView.findViewById(R.id.stats);
             if (file.patch() != null) {
