@@ -188,80 +188,54 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         LinearLayout llAdded = mContentView.findViewById(R.id.ll_added);
         LinearLayout llRenamed = mContentView.findViewById(R.id.ll_renamed);
         LinearLayout llDeleted = mContentView.findViewById(R.id.ll_deleted);
-        final LayoutInflater inflater = getLayoutInflater();
-        int added = 0, changed = 0, renamed = 0, deleted = 0;
-        int additions = 0, deletions = 0;
-        int count = files != null ? files.size() : 0;
-        int highlightColor = UiUtils.resolveColor(getActivity(), android.R.attr.textColorPrimary);
-        ForegroundColorSpan addSpan = new ForegroundColorSpan(
-                UiUtils.resolveColor(getActivity(), R.attr.colorCommitAddition));
-        ForegroundColorSpan deleteSpan = new ForegroundColorSpan(
-                UiUtils.resolveColor(getActivity(), R.attr.colorCommitDeletion));
-
         llChanged.removeAllViews();
         llAdded.removeAllViews();
         llRenamed.removeAllViews();
         llDeleted.removeAllViews();
 
-        for (int i = 0; i < count; i++) {
+        int addedFiles = 0, changedFiles = 0, renamedFiles = 0, deletedFiles = 0;
+        int totalAdditions = 0, totalDeletions = 0;
+        int filesCount = files != null ? files.size() : 0;
+        int highlightColor = UiUtils.resolveColor(getActivity(), android.R.attr.textColorPrimary);
+        ForegroundColorSpan additionsSpan = new ForegroundColorSpan(
+                UiUtils.resolveColor(getActivity(), R.attr.colorCommitAddition));
+        ForegroundColorSpan deletionsSpan = new ForegroundColorSpan(
+                UiUtils.resolveColor(getActivity(), R.attr.colorCommitDeletion));
+
+        for (int i = 0; i < filesCount; i++) {
             GitHubFile file = files.get(i);
             final LinearLayout parent;
 
             switch (file.status()) {
                 case "added":
                     parent = llAdded;
-                    added++;
+                    addedFiles++;
                     break;
                 case "modified":
                     parent = llChanged;
-                    changed++;
+                    changedFiles++;
                     break;
                 case "renamed":
                     parent = llRenamed;
-                    renamed++;
+                    renamedFiles++;
                     break;
                 case "removed":
                     parent = llDeleted;
-                    deleted++;
+                    deletedFiles++;
                     break;
                 default:
                     continue;
             }
 
-            additions += file.additions();
-            deletions += file.deletions();
+            totalAdditions += file.additions();
+            totalDeletions += file.deletions();
 
-            int commentCount = 0;
-            for (PositionalCommentBase comment : comments) {
-                if (TextUtils.equals(file.filename(), comment.path())) {
-                    commentCount++;
-                }
-            }
-
-            ViewGroup fileView = (ViewGroup) inflater.inflate(R.layout.commit_filename, parent, false);
+            View fileView = getLayoutInflater().inflate(R.layout.commit_filename, parent, false);
             TextView fileNameView = fileView.findViewById(R.id.filename);
-            if (file.previousFilename() != null) {
-                SpannableStringBuilder fileNames = new SpannableStringBuilder();
-                fileNames.append(file.previousFilename()).append('\n').append(file.filename());
-                fileNames.setSpan(new StrikethroughSpan(), 0, file.previousFilename().length(), 0);
-                fileNameView.setText(fileNames);
-            } else {
-                fileNameView.setText(file.filename());
-            }
 
-            TextView statsView = fileView.findViewById(R.id.stats);
-            if (file.patch() != null) {
-                SpannableStringBuilder stats = new SpannableStringBuilder();
-                stats.append("+").append(String.valueOf(file.additions()));
-                int addLength = stats.length();
-                stats.setSpan(addSpan, 0, addLength, 0);
-                stats.append("\u00a0\u00a0\u00a0-").append(String.valueOf(file.deletions()));
-                stats.setSpan(deleteSpan, addLength, stats.length(), 0);
-                statsView.setText(stats);
-                statsView.setVisibility(View.VISIBLE);
-            } else {
-                statsView.setVisibility(View.GONE);
-            }
+            fillFileName(fileNameView, file);
+            fillFileStats(fileView, file, additionsSpan, deletionsSpan);
+            fillFileCommentsCount(fileView, file, comments);
 
             if (file.patch() != null ||
                     (parent != llDeleted && FileUtils.isImage(file.filename()))) {
@@ -269,23 +243,62 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
                 fileView.setOnClickListener(this);
                 fileView.setTag(file);
             }
-            if (commentCount > 0) {
-                TextView commentView = fileView.findViewById(R.id.comments);
-                commentView.setText(String.valueOf(commentCount));
-                commentView.setVisibility(View.VISIBLE);
-            }
 
             parent.addView(fileView);
         }
 
-        adjustVisibility(R.id.card_added, added);
-        adjustVisibility(R.id.card_changed, changed);
-        adjustVisibility(R.id.card_renamed, renamed);
-        adjustVisibility(R.id.card_deleted, deleted);
+        adjustVisibility(R.id.card_added, addedFiles);
+        adjustVisibility(R.id.card_changed, changedFiles);
+        adjustVisibility(R.id.card_renamed, renamedFiles);
+        adjustVisibility(R.id.card_deleted, deletedFiles);
 
         TextView tvSummary = mContentView.findViewById(R.id.tv_desc);
-        tvSummary.setText(getString(R.string.commit_summary, added + changed + renamed + deleted,
-                additions, deletions));
+        tvSummary.setText(getString(R.string.commit_summary,
+                addedFiles + changedFiles + renamedFiles + deletedFiles,
+                totalAdditions, totalDeletions));
+    }
+
+    private void fillFileName(TextView fileNameView, GitHubFile file) {
+        if (file.previousFilename() != null) {
+            SpannableStringBuilder fileNames = new SpannableStringBuilder();
+            fileNames.append(file.previousFilename()).append('\n').append(file.filename());
+            fileNames.setSpan(new StrikethroughSpan(), 0, file.previousFilename().length(), 0);
+            fileNameView.setText(fileNames);
+        } else {
+            fileNameView.setText(file.filename());
+        }
+    }
+
+    private void fillFileStats(View fileView, GitHubFile file, ForegroundColorSpan additionsSpan,
+            ForegroundColorSpan deletionsSpan) {
+        TextView statsView = fileView.findViewById(R.id.stats);
+        if (file.patch() != null) {
+            SpannableStringBuilder stats = new SpannableStringBuilder();
+            stats.append("+").append(String.valueOf(file.additions()));
+            int addLength = stats.length();
+            stats.setSpan(additionsSpan, 0, addLength, 0);
+            stats.append("\u00a0\u00a0\u00a0-").append(String.valueOf(file.deletions()));
+            stats.setSpan(deletionsSpan, addLength, stats.length(), 0);
+            statsView.setText(stats);
+            statsView.setVisibility(View.VISIBLE);
+        } else {
+            statsView.setVisibility(View.GONE);
+        }
+    }
+
+    private void fillFileCommentsCount(View fileView, GitHubFile file,
+            List<? extends PositionalCommentBase> comments) {
+        int commentCount = 0;
+        for (PositionalCommentBase comment : comments) {
+            if (TextUtils.equals(file.filename(), comment.path())) {
+                commentCount++;
+            }
+        }
+        if (commentCount > 0) {
+            TextView commentView = fileView.findViewById(R.id.comments);
+            commentView.setText(String.valueOf(commentCount));
+            commentView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void adjustVisibility(int containerResId, int count) {
