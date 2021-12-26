@@ -339,13 +339,11 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
         AssetManager am = getAssets();
         try {
-            String[] files = am.list("");
-            for (String f : files) {
-                if (f.startsWith("lang-")) {
-                    int pos = f.lastIndexOf('.');
-                    if (pos > 0 && TextUtils.equals(f.substring(pos + 1), "js")) {
-                        sLanguagePlugins.add(f.substring(0, pos));
-                    }
+            String[] files = am.list("prettify-plugins");
+            for (String filename : files) {
+                if (filename.endsWith(".js")) {
+                    int dotPosition = filename.lastIndexOf('.');
+                    sLanguagePlugins.add("prettify-plugins/" + filename.substring(0, dotPosition));
                 }
             }
         } catch (IOException e) {
