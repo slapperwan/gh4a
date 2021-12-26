@@ -78,4 +78,4 @@ PR['registerLangHandler'](
 		// Anything else (which is probably illegal, as all the legal stuff should have been covered) can be plain
 		[PR['PR_PLAIN'], /./]
 		]),
-    ['rust']);
+    ['rust', 'rs']);
