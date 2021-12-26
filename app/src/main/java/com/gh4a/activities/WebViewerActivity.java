@@ -398,7 +398,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
     protected String generateCodeHtml(String data, String fileName,
                 int highlightStart, int highlightEnd,
                 String cssTheme, boolean addTitleHeader) {
-        String ext = FileUtils.getFileExtension(fileName);
         String title = addTitleHeader ? getDocumentTitle() : null;
         StringBuilder content = new StringBuilder();
         content.append("<html><head><title>");
@@ -423,13 +422,22 @@ public abstract class WebViewerActivity extends BaseActivity implements
             content.append("<h2>").append(title).append("</h2>");
         }
         content.append("<pre id='content' class='prettyprint linenums lang-");
-        content.append(ext).append("'>");
+        content.append(prettifyLanguageCodeFor(fileName)).append("'>");
 
         content.append(TextUtils.htmlEncode(data));
         content.append("</pre></body></html>");
 
         mRequiresJsInterface = true;
         return content.toString();
+    }
+
+    private String prettifyLanguageCodeFor(String fileName) {
+        if (FileUtils.isMarkdown(fileName)) {
+            // Markdown files can have HTML code in them, so this is the best compromise we can do
+            // to overcome the absence of Markdown syntax highlighting in Prettify library
+            return "html";
+        }
+        return FileUtils.getFileExtension(fileName);
     }
 
     protected static String wrapUnthemedHtml(String html, String cssTheme, String title) {
