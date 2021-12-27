@@ -83,6 +83,17 @@ public class StringUtils {
         return text;
     }
 
+    public static String getFirstLine(String input) {
+        if (input == null) {
+            return null;
+        }
+        int pos = input.indexOf('\n');
+        if (pos < 0) {
+            return input;
+        }
+        return input.substring(0, pos);
+    }
+
     /**
      * Format name.
      *

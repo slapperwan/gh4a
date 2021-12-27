@@ -73,10 +73,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     public static final String PRINT_CSS_THEME = "print";
 
     private static final ArrayList<String> sLanguagePlugins = new ArrayList<>();
-
-    private final int[] ZOOM_SIZES = new int[] {
-        50, 75, 100, 150, 200
-    };
+    private static final int[] ZOOM_SIZES = { 50, 75, 100, 150, 200 };
 
     private final WebViewClient mWebViewClient = new WebViewClient() {
         @Override
@@ -422,7 +419,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
             content.append("<h2>").append(title).append("</h2>");
         }
         content.append("<pre id='content' class='prettyprint linenums lang-");
-        content.append(prettifyLanguageCodeFor(fileName)).append("'>");
+        content.append(prettifyLanguageCodeFor(fileName, data)).append("'>");
 
         content.append(TextUtils.htmlEncode(data));
         content.append("</pre></body></html>");
@@ -431,13 +428,22 @@ public abstract class WebViewerActivity extends BaseActivity implements
         return content.toString();
     }
 
-    private String prettifyLanguageCodeFor(String fileName) {
+    private String prettifyLanguageCodeFor(String fileName, String fileContent) {
         if (FileUtils.isMarkdown(fileName)) {
             // Markdown files can have HTML code in them, so this is the best compromise we can do
             // to overcome the absence of Markdown syntax highlighting in Prettify library
             return "html";
         }
-        return FileUtils.getFileExtension(fileName);
+
+        String extension = FileUtils.getFileExtension(fileName);
+        if (!StringUtils.isBlank(extension)) {
+            return extension;
+        }
+
+        boolean hasShebangLine = fileContent.startsWith("#!");
+        return hasShebangLine
+                ? ""      // default prettify code highlighting
+                : "txt";  // plain text, no highlighting
     }
 
     protected static String wrapUnthemedHtml(String html, String cssTheme, String title) {

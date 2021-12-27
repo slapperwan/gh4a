@@ -259,7 +259,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                                 ssb.length() - sha.length(), ssb.length(), 0);
 
                         ssb.append(" ");
-                        ssb.append(getFirstLine(EmojiParser.parseToUnicode(commit.message())));
+                        ssb.append(StringUtils.getFirstLine(EmojiParser.parseToUnicode(commit.message())));
                         ssb.setSpan(new EllipsizeLineSpan(i == (count - 1) ? 0 : bottomMargin),
                                 lastLength, ssb.length(), 0);
                     }
@@ -301,17 +301,6 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
         }
 
         return null;
-    }
-
-    private String getFirstLine(String input) {
-        if (input == null) {
-            return null;
-        }
-        int pos = input.indexOf('\n');
-        if (pos < 0) {
-            return input;
-        }
-        return input.substring(0, pos);
     }
 
     private String formatTitle(GitHubEvent event) {
