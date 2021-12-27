@@ -100,6 +100,7 @@
     <string name="saving_comment">Saving comment\u2026</string>
     <string name="ellipse" translatable="false">\u2026</string>
     <string name="view_more">View more\u2026</string>
+    <string name="view_video">View video</string>
     <string name="pulls">Pulls</string>
     <string name="issue_milestone_hint">Milestone</string>
     <string name="issue_assignee_hint">Assignees</string>

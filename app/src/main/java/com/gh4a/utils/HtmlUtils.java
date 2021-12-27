@@ -464,6 +464,8 @@ public class HtmlUtils {
                 startHeading(attributes, tag.charAt(1) - '1');
             } else if (tag.equalsIgnoreCase("img")) {
                 startImg(attributes, mImageGetter);
+            } else if (tag.equalsIgnoreCase("video")) {
+                appendVideoLink(attributes.getValue("src"));
             } else if (tag.equalsIgnoreCase("th")) {
                 start(new Bold());
             } else if (tag.equalsIgnoreCase("td")) {
@@ -582,6 +584,16 @@ public class HtmlUtils {
             for (int j = existingNewlines; j < minNewline; j++) {
                 mSpannableStringBuilder.append("\n");
             }
+        }
+
+        private void appendVideoLink(String videoUrl) {
+            mSpannableStringBuilder.append("\uD83C\uDFA5 "); // movie camera emoji
+            String videoLinkText = mContext.getString(R.string.view_video);
+            mSpannableStringBuilder.append(videoLinkText);
+            mSpannableStringBuilder.setSpan(new LinkSpan(videoUrl),
+                    mSpannableStringBuilder.length() - videoLinkText.length(),
+                    mSpannableStringBuilder.length(),
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         }
 
         private void startBlockElement(Attributes attributes) {
