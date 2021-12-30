@@ -38,6 +38,7 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.gh4a.activities.IssueEditActivity;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -665,6 +666,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
             } else if (e instanceof JsonDataException) {
                 messageView.setText(getString(R.string.load_failure_explanation_parsing));
                 retryButton.setVisibility(View.GONE);
+                View reportIssueButton = error.findViewById(R.id.report_button);
+                reportIssueButton.setVisibility(View.VISIBLE);
+                reportIssueButton.setOnClickListener(v -> {
+                    Intent newIssueIntent = IssueEditActivity.makeCreateIntent(this, getString(R.string.my_username), getString(R.string.my_repo));
+                    startActivity(newIssueIntent);
+                });
             } else {
                 messageView.setText(R.string.load_failure_explanation);
                 retryButton.setVisibility(View.VISIBLE);
