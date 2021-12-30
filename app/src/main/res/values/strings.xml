@@ -29,6 +29,7 @@
     <string name="credentials_otp_prompt">Please enter the two-factor confirmation code you got via SMS.</string>
     <string name="credentials_token">Access token</string>
     <string name="try_again">Try again</string>
+    <string name="report_issue">Report issue</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="settings">Settings</string>
@@ -68,7 +69,7 @@
     <string name="pub_timeline">Public Timeline</string>
     <string name="load_failure_explanation">Loading the data from GitHub failed. Please verify you have a working network connection and try again.</string>
     <string name="load_failure_explanation_dmca">This repository was taken down for legal reasons.\nPlease see %1$s for details.</string>
-    <string name="load_failure_explanation_parsing">There was an error while parsing GitHub\'s response. See the logcat for details.</string>
+    <string name="load_failure_explanation_parsing">There was an error while parsing GitHub\'s response. You can use the button below to report this issue to the app developers.</string>
     <string name="load_failure_explanation_with_reason">Loading the data from GitHub failed. GitHub told us the following reason:\n%1$s</string>
     <string name="find_next">Find next</string>
     <string name="find_previous">Find previous</string>

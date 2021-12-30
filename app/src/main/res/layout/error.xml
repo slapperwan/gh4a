@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/error"
     android:layout_width="match_parent"
@@ -40,6 +41,23 @@
         android:textAllCaps="true"
         android:textColor="?attr/colorAccent"
         app:ghFont="medium" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/report_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:visibility="gone"
+        android:text="@string/report_issue"
+        android:textAllCaps="true"
+        android:textColor="?attr/colorAccent"
+        app:ghFont="medium"
+        tools:visibility="visible" />
 
     <View
         android:layout_width="match_parent"
