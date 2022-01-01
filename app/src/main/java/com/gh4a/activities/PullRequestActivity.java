@@ -86,9 +86,15 @@ import io.reactivex.schedulers.Schedulers;
 public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, ConfirmationDialogFragment.Callback,
         PullRequestFilesFragment.CommentUpdateListener {
+    public static Intent makeIntent(Context context, Issue issue) {
+        String[] urlParts = issue.url().split("/");
+        return makeIntent(context, urlParts[4], urlParts[5], issue.number());
+    }
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {
         return makeIntent(context, repoOwner, repoName, number, -1, null);
     }
+
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
             int number, int initialPage, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, PullRequestActivity.class)
