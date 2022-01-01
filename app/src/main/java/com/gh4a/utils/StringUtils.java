@@ -24,11 +24,11 @@ import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
 import android.util.Base64;
+import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
-import com.gh4a.widget.CustomTypefaceSpan;
-import com.gh4a.widget.StyleableTextView;
 import com.meisolsson.githubsdk.model.User;
 
 import java.util.Date;
@@ -129,12 +129,12 @@ public class StringUtils {
                 | DateUtils.FORMAT_SHOW_YEAR);
     }
 
-    public static void applyBoldTagsAndSetText(StyleableTextView view, String input) {
-        SpannableStringBuilder text = applyBoldTags(input, view.getTypefaceValue());
+    public static void applyBoldTagsAndSetText(TextView view, String input) {
+        SpannableStringBuilder text = applyBoldTags(input);
         view.setText(text);
     }
 
-    public static SpannableStringBuilder applyBoldTags(String input, int baseTypefaceValue) {
+    public static SpannableStringBuilder applyBoldTags(String input) {
         SpannableStringBuilder ssb = new SpannableStringBuilder();
         int pos = 0;
 
@@ -146,7 +146,7 @@ public class StringUtils {
                 ssb.append(input.substring(pos, start));
                 ssb.append(input.substring(start + 3, end));
 
-                Object span = new CustomTypefaceSpan(baseTypefaceValue, Typeface.BOLD);
+                Object span = new StyleSpan(Typeface.BOLD);
                 ssb.setSpan(span, ssb.length() - tokenLength, ssb.length(), 0);
 
                 pos = end + 4;

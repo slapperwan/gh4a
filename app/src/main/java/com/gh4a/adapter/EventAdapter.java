@@ -22,6 +22,7 @@ import android.graphics.Typeface;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +35,6 @@ import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
-import com.gh4a.widget.CustomTypefaceSpan;
 import com.gh4a.widget.EllipsizeLineSpan;
 import com.gh4a.widget.StyleableTextView;
 import com.meisolsson.githubsdk.model.Gist;
@@ -101,7 +101,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
         holder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
                 mContext, event.createdAt(), false));
 
-        CharSequence content = formatDescription(event, holder.tvDesc.getTypefaceValue());
+        CharSequence content = formatDescription(event);
         holder.tvDesc.setText(content);
         holder.tvDesc.setVisibility(content != null ? View.VISIBLE : View.GONE);
     }
@@ -124,7 +124,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
         return true;
     }
 
-    private CharSequence formatDescription(GitHubEvent event, int typefaceValue) {
+    private CharSequence formatDescription(GitHubEvent event) {
         GitHubEventType eventType = event.type();
         GitHubEvent.RepoIdentifier eventRepo = event.repo();
 
@@ -267,7 +267,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                         String text = res.getString(R.string.event_push_desc, count - max);
                         ssb.append("\n");
                         ssb.append(text);
-                        ssb.setSpan(new CustomTypefaceSpan(typefaceValue, Typeface.ITALIC),
+                        ssb.setSpan(new StyleSpan(Typeface.ITALIC),
                                 ssb.length() - text.length(), ssb.length(), 0);
                     }
                     return ssb;
