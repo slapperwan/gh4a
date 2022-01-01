@@ -96,14 +96,14 @@ public class IssueEditActivity extends BasePagerActivity implements
     public static Intent makeCreateIntent(Context context, String repoOwner, String repoName) {
         // can't reuse makeEditIntent here, because even a null extra counts for hasExtra()
         return new Intent(context, IssueEditActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
+                .putExtra(EXTRA_KEY_OWNER, repoOwner)
+                .putExtra(EXTRA_KEY_REPO, repoName);
     }
 
     public static Intent makeCreateIntent(Context context, String repoOwner, String repoName, String title, String body) {
         return new Intent(context, IssueEditActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
+                .putExtra(EXTRA_KEY_OWNER, repoOwner)
+                .putExtra(EXTRA_KEY_REPO, repoName)
                 .putExtra(EXTRA_KEY_TITLE, title)
                 .putExtra(EXTRA_KEY_BODY, body);
     }
@@ -111,9 +111,9 @@ public class IssueEditActivity extends BasePagerActivity implements
     public static Intent makeEditIntent(Context context, String repoOwner,
             String repoName, Issue issue) {
         return new Intent(context, IssueEditActivity.class)
-                .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("issue", issue);
+                .putExtra(EXTRA_KEY_OWNER, repoOwner)
+                .putExtra(EXTRA_KEY_REPO, repoName)
+                .putExtra(EXTRA_KEY_ISSUE, issue);
     }
 
     private interface OnAssigneesLoaded {
@@ -163,6 +163,9 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     private static final String EXTRA_KEY_TITLE = "title";
     private static final String EXTRA_KEY_BODY = "body";
+    private static final String EXTRA_KEY_OWNER = "owner";
+    private static final String EXTRA_KEY_REPO = "repo";
+    private static final String EXTRA_KEY_ISSUE = "issue";
 
     private static final String STATE_KEY_ISSUE = "issue";
     private static final String STATE_KEY_ORIGINAL_ISSUE = "original_issue";
@@ -280,12 +283,12 @@ public class IssueEditActivity extends BasePagerActivity implements
     @Override
     protected void onInitExtras(Bundle extras) {
         super.onInitExtras(extras);
-        mRepoOwner = extras.getString("owner");
-        mRepoName = extras.getString("repo");
+        mRepoOwner = extras.getString(EXTRA_KEY_OWNER);
+        mRepoName = extras.getString(EXTRA_KEY_REPO);
         // If mEditIssue is != null here, it was restored from saved state
         if (mEditIssue == null) {
-            if (extras.containsKey("issue")) {
-                mEditIssue = extras.getParcelable("issue");
+            if (extras.containsKey(EXTRA_KEY_ISSUE)) {
+                mEditIssue = extras.getParcelable(EXTRA_KEY_ISSUE);
                 // Save only editable fields
                 mOriginalIssue = Issue.builder()
                         .title(mEditIssue.title())
@@ -330,7 +333,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private boolean isEditingExistingIssue() {
-        return getIntent().hasExtra("issue");
+        return getIntent().hasExtra(EXTRA_KEY_ISSUE);
     }
 
     private boolean isContentGivenViaIntent() {
