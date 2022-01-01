@@ -71,6 +71,7 @@
     <string name="load_failure_explanation_dmca">This repository was taken down for legal reasons.\nPlease see %1$s for details.</string>
     <string name="load_failure_explanation_parsing">There was an error while parsing GitHub\'s response. You can use the button below to report this issue to the app developers.</string>
     <string name="load_failure_explanation_with_reason">Loading the data from GitHub failed. GitHub told us the following reason:\n%1$s</string>
+    <string name="issue_reported">The issue has been reported. Thank you!</string>
     <string name="find_next">Find next</string>
     <string name="find_previous">Find previous</string>
     <string name="share">Share</string>

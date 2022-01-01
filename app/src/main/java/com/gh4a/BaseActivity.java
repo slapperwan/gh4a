@@ -33,12 +33,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.CallSuper;
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.gh4a.activities.IssueEditActivity;
+import com.gh4a.utils.ActivityResultHelpers;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -127,6 +130,14 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private final int[] mProgressColors = new int[2];
     private Animator mHeaderTransition;
     private final Handler mHandler = new Handler();
+
+    private final ActivityResultLauncher<Intent> mIssueReportLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultHelpers.ActivityResultSuccessCallback(() ->
+                    Snackbar.make(mCoordinatorLayout, R.string.issue_reported, Snackbar.LENGTH_LONG)
+                            .show()
+            )
+    );
 
     private RxLoader mRxLoader;
     private final CompositeDisposable mDisposeOnStop = new CompositeDisposable();
@@ -693,7 +704,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 getString(R.string.my_username),
                 getString(R.string.my_repo),
                 issueTitle, issueBody);
-        startActivity(newIssueIntent);
+        mIssueReportLauncher.launch(newIssueIntent);
     }
 
     protected void onDrawerOpened(boolean right) {
