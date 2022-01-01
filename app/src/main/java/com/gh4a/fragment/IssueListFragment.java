@@ -15,7 +15,6 @@
  */
 package com.gh4a.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -108,10 +107,9 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
 
     @Override
     public void onItemClick(Issue issue) {
-        String[] urlPart = issue.url().split("/");
         Intent intent = issue.pullRequest() != null
-                ? PullRequestActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.number())
-                : IssueActivity.makeIntent(getActivity(), urlPart[4], urlPart[5], issue.number());
+                ? PullRequestActivity.makeIntent(getActivity(), issue)
+                : IssueActivity.makeIntent(getActivity(), issue);
         mIssueLauncher.launch(intent);
     }
 
