@@ -668,10 +668,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 retryButton.setVisibility(View.GONE);
                 View reportIssueButton = error.findViewById(R.id.report_button);
                 reportIssueButton.setVisibility(View.VISIBLE);
-                reportIssueButton.setOnClickListener(v -> {
-                    Intent newIssueIntent = IssueEditActivity.makeCreateIntent(this, getString(R.string.my_username), getString(R.string.my_repo));
-                    startActivity(newIssueIntent);
-                });
+                reportIssueButton.setOnClickListener(v -> launchIssueCreationForError(e));
             } else {
                 messageView.setText(R.string.load_failure_explanation);
                 retryButton.setVisibility(View.VISIBLE);
@@ -680,6 +677,23 @@ public abstract class BaseActivity extends AppCompatActivity implements
         } else {
             error.setVisibility(View.GONE);
         }
+    }
+
+    private void launchIssueCreationForError(Throwable e) {
+        String issueTitle = "";
+        String issueBody = new StringBuilder()
+                .append("<!-- Please describe here what you were doing when the error occurred -->\n\n")
+                .append("### Error stack trace\n")
+                .append("```\n")
+                .append(Log.getStackTraceString(e))
+                .append("\n```")
+                .toString();
+        Intent newIssueIntent = IssueEditActivity.makeCreateIntent(
+                this,
+                getString(R.string.my_username),
+                getString(R.string.my_repo),
+                issueTitle, issueBody);
+        startActivity(newIssueIntent);
     }
 
     protected void onDrawerOpened(boolean right) {
