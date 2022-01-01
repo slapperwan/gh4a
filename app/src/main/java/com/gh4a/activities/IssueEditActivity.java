@@ -100,6 +100,14 @@ public class IssueEditActivity extends BasePagerActivity implements
                 .putExtra("repo", repoName);
     }
 
+    public static Intent makeCreateIntent(Context context, String repoOwner, String repoName, String title, String body) {
+        return new Intent(context, IssueEditActivity.class)
+                .putExtra("owner", repoOwner)
+                .putExtra("repo", repoName)
+                .putExtra(EXTRA_KEY_TITLE, title)
+                .putExtra(EXTRA_KEY_BODY, body);
+    }
+
     public static Intent makeEditIntent(Context context, String repoOwner,
             String repoName, Issue issue) {
         return new Intent(context, IssueEditActivity.class)
@@ -119,10 +127,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private static final int ID_LOADER_COLLABORATOR_STATUS = 0;
-
-    private static final int[] TITLES = {
-        R.string.issue_body, R.string.preview, R.string.settings
-    };
+    private static final int[] TITLES = { R.string.issue_body, R.string.preview, R.string.settings };
 
     private final ActivityResultLauncher<Intent> mLabelManagerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -155,6 +160,9 @@ public class IssueEditActivity extends BasePagerActivity implements
     private TextView mSelectedMilestoneView;
     private ViewGroup mSelectedAssigneeContainer;
     private TextView mLabelsView;
+
+    private static final String EXTRA_KEY_TITLE = "title";
+    private static final String EXTRA_KEY_BODY = "body";
 
     private static final String STATE_KEY_ISSUE = "issue";
     private static final String STATE_KEY_ORIGINAL_ISSUE = "original_issue";
@@ -216,7 +224,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
         loadCollaboratorStatus(false);
 
-        if (savedInstanceState == null && !isInEditMode()) {
+        if (savedInstanceState == null && !isEditingExistingIssue() && !isContentGivenViaIntent()) {
             loadIssueTemplates();
             mTitleView.setEnabled(false);
             mDescView.setEnabled(false);
@@ -249,7 +257,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     @Override
     protected String getActionBarTitle() {
         boolean isPullRequest = mEditIssue.pullRequest() != null;
-        return !isInEditMode()
+        return !isEditingExistingIssue()
                 ? getString(R.string.issue_create)
                 : isPullRequest
                         ? getString(R.string.pull_request_edit_title, mEditIssue.number())
@@ -287,7 +295,10 @@ public class IssueEditActivity extends BasePagerActivity implements
                         .labels(mEditIssue.labels())
                         .build();
             } else {
-                mEditIssue = Issue.builder().build();
+                mEditIssue = Issue.builder()
+                        .title(extras.getString(EXTRA_KEY_TITLE))
+                        .body(extras.getString(EXTRA_KEY_BODY))
+                        .build();
                 mOriginalIssue = Issue.builder().build();
             }
         }
@@ -318,8 +329,12 @@ public class IssueEditActivity extends BasePagerActivity implements
                 mRootView.getPaddingRight(), appBarLayout.getTotalScrollRange() + verticalOffset);
     }
 
-    private boolean isInEditMode() {
+    private boolean isEditingExistingIssue() {
         return getIntent().hasExtra("issue");
+    }
+
+    private boolean isContentGivenViaIntent() {
+        return getIntent().hasExtra(EXTRA_KEY_TITLE) && getIntent().hasExtra(EXTRA_KEY_BODY);
     }
 
     @Override
@@ -356,7 +371,7 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     @Override
     protected Intent navigateUp() {
-        if (!isInEditMode()) {
+        if (!isEditingExistingIssue()) {
             return IssueListActivity.makeIntent(this, mRepoOwner, mRepoName);
         }
         if (mEditIssue.pullRequest() != null) {
@@ -499,7 +514,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 : getString(R.string.issue_error_create);
 
         IssueService service = ServiceFactory.get(IssueService.class, false);
-        Single<Response<Issue>> single = isInEditMode()
+        Single<Response<Issue>> single = isEditingExistingIssue()
                 ? service.editIssue(mRepoOwner, mRepoName, issueNumber, builder.build())
                 : service.createIssue(mRepoOwner, mRepoName, builder.build());
 
