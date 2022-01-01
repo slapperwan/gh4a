@@ -64,9 +64,15 @@ import java.util.Locale;
 
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, ConfirmationDialogFragment.Callback {
+    public static Intent makeIntent(Context context, Issue issue) {
+        String[] urlParts = issue.url().split("/");
+        return makeIntent(context, urlParts[4], urlParts[5], issue.number());
+    }
+
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
         return makeIntent(context, login, repoName, number, null);
     }
+
     public static Intent makeIntent(Context context, String login, String repoName,
             int number, IntentUtils.InitialCommentMarker initialComment) {
         return new Intent(context, IssueActivity.class)

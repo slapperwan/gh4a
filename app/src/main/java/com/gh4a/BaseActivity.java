@@ -21,6 +21,7 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.assist.AssistContent;
 import android.content.Intent;
@@ -40,8 +41,8 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
-import com.gh4a.utils.ActivityResultHelpers;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -81,6 +82,7 @@ import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.gh4a.widget.ToggleableAppBarLayoutBehavior;
 import com.meisolsson.githubsdk.model.ClientErrorResponse;
+import com.meisolsson.githubsdk.model.Issue;
 import com.philosophicalhacker.lib.RxLoader;
 import com.squareup.moshi.JsonDataException;
 
@@ -133,10 +135,17 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private final ActivityResultLauncher<Intent> mIssueReportLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            new ActivityResultHelpers.ActivityResultSuccessCallback(() ->
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
                     Snackbar.make(mCoordinatorLayout, R.string.issue_reported, Snackbar.LENGTH_LONG)
-                            .show()
-            )
+                            .setAction(R.string.view, v -> {
+                                Issue createdIssue = result.getData().getParcelableExtra("issue");
+                                Intent intent = IssueActivity.makeIntent(this, createdIssue);
+                                startActivity(intent);
+                            })
+                            .show();
+                }
+            }
     );
 
     private RxLoader mRxLoader;
