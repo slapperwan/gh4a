@@ -3,21 +3,17 @@ package com.gh4a;
 import android.content.Context;
 import android.util.Log;
 
-import com.gh4a.utils.Optional;
 import com.meisolsson.githubsdk.core.GitHubPaginationInterceptor;
 import com.meisolsson.githubsdk.core.ServiceGenerator;
 import com.meisolsson.githubsdk.core.StringResponseConverterFactory;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Single;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
-import okhttp3.Credentials;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -26,11 +22,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
-import retrofit2.http.Body;
-import retrofit2.http.DELETE;
-import retrofit2.http.GET;
-import retrofit2.http.POST;
-import retrofit2.http.Path;
 
 public class ServiceFactory {
     private static final String DEFAULT_HEADER_ACCEPT = "application/vnd.github.v3+json," +
@@ -193,41 +184,6 @@ public class ServiceFactory {
         return retrofit.create(serviceClass);
     }
 
-    public static LoginService createLoginService(String userName, String password,
-            Optional.Supplier<String> otpCodeSupplier) {
-        OkHttpClient.Builder clientBuilder = sApiHttpClient.newBuilder()
-                .addInterceptor(chain -> {
-                    String otpCode = otpCodeSupplier.get();
-                    Request request = chain.request();
-                    if (otpCode != null) {
-                        request = request.newBuilder()
-                                .header("X-GitHub-OTP", otpCode)
-                                .build();
-                    }
-                    return chain.proceed(request);
-                })
-                .authenticator((route, response) -> {
-                    if (response.priorResponse() != null) {
-                        return null;
-                    }
-                    return response.request().newBuilder()
-                            .header("Authorization", Credentials.basic(userName, password))
-                            .build();
-                });
-
-        if (BuildConfig.DEBUG) {
-            clientBuilder.addInterceptor(LOGGING_INTERCEPTOR);
-            clientBuilder.addInterceptor(CACHE_STATUS_INTERCEPTOR);
-        }
-        clientBuilder.addInterceptor(CACHE_BYPASS_INTERCEPTOR);
-
-        Retrofit retrofit = RETROFIT_BUILDER
-                .baseUrl("https://api.github.com")
-                .client(clientBuilder.build())
-                .build();
-        return retrofit.create(LoginService.class);
-    }
-
     public static OkHttpClient.Builder getHttpClientBuilder() {
         return sApiHttpClient.newBuilder();
     }
@@ -244,47 +200,5 @@ public class ServiceFactory {
         sImageHttpClient = sApiHttpClient.newBuilder()
                 .cache(new Cache(new File(context.getCacheDir(), "image-http"), twentyMB))
                 .build();
-    }
-
-    public interface LoginService {
-        @GET("/authorizations")
-        Single<retrofit2.Response<List<AuthorizationResponse>>> getAuthorizations();
-        @POST("/authorizations")
-        Single<retrofit2.Response<AuthorizationResponse>> createAuthorization(
-                @Body AuthorizationRequest request);
-        @DELETE("/authorizations/{id}")
-        Single<retrofit2.Response<Void>> deleteAuthorization(@Path("id") int id);
-
-        class AuthorizationRequest {
-            private String fingerprint;
-            private String[] scopes;
-            private String note;
-
-            public AuthorizationRequest(String scopes, String note, String fingerprint) {
-                this.scopes = scopes.split(",");
-                this.note = note;
-                this.fingerprint = fingerprint;
-            }
-        }
-
-        class AuthorizationResponse {
-            private int id;
-            private String token;
-            private String note;
-            private String fingerprint;
-
-            public int id() {
-                return id;
-            }
-            public String token() {
-                return token;
-            }
-            public String note() {
-                return note;
-            }
-            public String fingerprint() {
-                return fingerprint;
-            }
-        }
     }
 }

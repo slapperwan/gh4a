@@ -20,12 +20,6 @@
             android:text="@string/login_oauth" />
 
         <com.google.android.material.radiobutton.MaterialRadioButton
-            android:id="@+id/user_pw_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/login_user_pw" />
-
-        <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/token_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -46,79 +40,6 @@
             app:needsLinkHandling="true" />
 
     </FrameLayout>
-
-    <LinearLayout
-        android:id="@+id/cred_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        tools:visibility="gone">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/user_wrapper"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/credentials_username">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/user_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textNoSuggestions"
-                android:imeOptions="actionNext"
-                android:nextFocusDown="@+id/password"
-                android:singleLine="true" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/password_wrapper"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="8dp"
-            android:hint="@string/credentials_password">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionDone"
-                android:inputType="textPassword"
-                android:singleLine="true" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/otp_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        tools:visibility="gone">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="@string/credentials_otp_prompt" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/otp_wrapper"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/credentials_otp"
-            tools:visibility="gone">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/otp_code"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:singleLine="true" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/token_container"

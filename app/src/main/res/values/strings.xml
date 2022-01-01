@@ -17,16 +17,11 @@
     <string name="search_code">Search code</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
-    <string name="login_user_pw">Login with user name and password</string>
     <string name="login_oauth">Login via OAuth</string>
     <string name="login_token">Login using access token</string>
     <string name="login_summary_oauth">Log in to Github using the OAuth web login flow.\nAs the login process is done in your browser and only one account can be active at a time there, you need to make sure to be logged out from Github in your browser before being able to log in to a new account.\n\nPlease visit <a href="https://github.com/logout">Github\'s logout page</a>, finish the logout process, then close the browser window, come back to the app and continue the login process.\nIf you\'re sure you\'re not logged in, you can also continue to the login process right away.</string>
-    <string name="credentials_username">User name</string>
-    <string name="credentials_password">Password</string>
     <string name="credentials_error_empty">This field must not be empty.</string>
     <string name="credentials_error_invalid_token">The entered text does not look like a valid access token.</string>
-    <string name="credentials_otp">OTP code</string>
-    <string name="credentials_otp_prompt">Please enter the two-factor confirmation code you got via SMS.</string>
     <string name="credentials_token">Access token</string>
     <string name="try_again">Try again</string>
     <string name="report_issue">Report issue</string>
