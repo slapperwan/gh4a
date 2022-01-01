@@ -234,8 +234,7 @@ class ReviewViewHolder
 
         String login = ApiHelpers.getUserLogin(mContext, review.user());
         String textBase = mContext.getString(textResId, login);
-        SpannableStringBuilder text = StringUtils.applyBoldTags(textBase,
-                mMessageView.getTypefaceValue());
+        SpannableStringBuilder text = StringUtils.applyBoldTags(textBase);
 
         CharSequence time = review.submittedAt() != null
                 ? StringUtils.formatRelativeTime(mContext, review.submittedAt(), true) : "";

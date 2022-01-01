@@ -84,7 +84,7 @@ class EventViewHolder
             mEventIconView.setVisibility(View.GONE);
         }
 
-        mMessageView.setText(formatEvent(item.event, user, mMessageView.getTypefaceValue()));
+        mMessageView.setText(formatEvent(item.event, user));
     }
 
     private Integer getEventIcon(IssueEvent event) {
@@ -125,7 +125,7 @@ class EventViewHolder
         return null;
     }
 
-    private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue) {
+    private CharSequence formatEvent(final IssueEvent event, final User user) {
         String textBase = null;
         int textResId = 0;
         String commitId = event.commitId();
@@ -293,7 +293,7 @@ class EventViewHolder
             textBase = mContext.getString(textResId, getUserLoginWithBotSuffix(user));
         }
 
-        SpannableStringBuilder text = StringUtils.applyBoldTags(textBase, typefaceValue);
+        SpannableStringBuilder text = StringUtils.applyBoldTags(textBase);
         replaceCommitPlaceholder(text, commitId, commitUrl);
         replaceLabelPlaceholder(text, event.label());
         replaceBotPlaceholder(text);

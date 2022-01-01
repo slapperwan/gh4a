@@ -56,8 +56,7 @@ public class PullRequestBranchInfoView extends RelativeLayout implements View.On
 
     private void formatMarkerText(StyleableTextView view, @StringRes int formatResId,
             final PullRequestMarker marker, boolean makeClickable) {
-        SpannableStringBuilder builder = StringUtils.applyBoldTags(
-                getContext().getString(formatResId), view.getTypefaceValue());
+        SpannableStringBuilder builder = StringUtils.applyBoldTags(getContext().getString(formatResId));
         int pos = builder.toString().indexOf("[ref]");
         if (pos >= 0) {
             String label = TextUtils.isEmpty(marker.label()) ? marker.ref() : marker.label();
