@@ -1,9 +1,7 @@
 package com.gh4a;
 
-import android.annotation.TargetApi;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import com.google.android.material.tabs.TabLayout;
 import androidx.viewpager.widget.PagerAdapter;
@@ -211,18 +209,15 @@ public abstract class BasePagerActivity extends BaseActivity implements
     }
 
     private void tryUpdatePagerColor() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            ViewPagerEdgeColorHelper helper =
-                    (ViewPagerEdgeColorHelper) mPager.getTag(R.id.EdgeColorHelper);
-            if (helper == null) {
-                helper = new ViewPagerEdgeColorHelper(mPager);
-                mPager.setTag(R.id.EdgeColorHelper, helper);
-            }
-            helper.setColor(mCurrentHeaderColor);
+        ViewPagerEdgeColorHelper helper =
+                (ViewPagerEdgeColorHelper) mPager.getTag(R.id.EdgeColorHelper);
+        if (helper == null) {
+            helper = new ViewPagerEdgeColorHelper(mPager);
+            mPager.setTag(R.id.EdgeColorHelper, helper);
         }
+        helper.setColor(mCurrentHeaderColor);
     }
 
-    @TargetApi(21)
     private static class ViewPagerEdgeColorHelper {
         private final ViewPager mPager;
         private int mColor;

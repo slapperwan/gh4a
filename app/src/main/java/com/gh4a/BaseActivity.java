@@ -20,7 +20,6 @@ import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.assist.AssistContent;
@@ -151,15 +150,10 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private RxLoader mRxLoader;
     private final CompositeDisposable mDisposeOnStop = new CompositeDisposable();
 
-    @SuppressWarnings("Convert2Lambda") // lambda wouldn't allow TargetApi annotation
-    private final Runnable mUpdateTaskDescriptionRunnable = new Runnable() {
-        @TargetApi(21)
-        @Override
-        public void run() {
-            String label = IntentUtils.isNewTaskIntent(getIntent()) ? getActionBarTitle() : null;
-            setTaskDescription(new ActivityManager.TaskDescription(label, null,
-                    mProgressColors[0]));
-        }
+    private final Runnable mUpdateTaskDescriptionRunnable = () -> {
+        String label = IntentUtils.isNewTaskIntent(getIntent()) ? getActionBarTitle() : null;
+        setTaskDescription(new ActivityManager.TaskDescription(label, null,
+                mProgressColors[0]));
     };
 
     @Override
@@ -382,10 +376,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private void scheduleTaskDescriptionUpdate() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mHandler.removeCallbacks(mUpdateTaskDescriptionRunnable);
-            mHandler.postDelayed(mUpdateTaskDescriptionRunnable, 500);
-        }
+        mHandler.removeCallbacks(mUpdateTaskDescriptionRunnable);
+        mHandler.postDelayed(mUpdateTaskDescriptionRunnable, 500);
     }
 
     protected void updateRightNavigationDrawer() {
@@ -510,9 +502,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     @CallSuper
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-                && !IntentUtils.isNewTaskIntent(getIntent())
-                && displayDetachAction()) {
+        if (!IntentUtils.isNewTaskIntent(getIntent()) && displayDetachAction()) {
             menu.add(Menu.NONE, R.id.detach, Menu.NONE, R.string.detach);
         }
 
@@ -537,9 +527,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
 
         if (item.getItemId() == R.id.detach) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                IntentUtils.startNewTask(this, getIntent());
-            }
+            IntentUtils.startNewTask(this, getIntent());
             return true;
         }
 
@@ -631,7 +619,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
             return;
         }
         boolean wasStartedAsNewTask = (getIntent().getFlags() & Intent.FLAG_ACTIVITY_NEW_TASK) != 0;
-        if (wasStartedAsNewTask && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (wasStartedAsNewTask) {
             finishAndRemoveTask();
         } else {
             super.onBackPressed();

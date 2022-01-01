@@ -1,6 +1,5 @@
 package com.gh4a.utils;
 
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
@@ -37,7 +36,6 @@ import java.util.zip.GZIPOutputStream;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.fragment.app.FragmentActivity;
@@ -229,7 +227,6 @@ public class IntentUtils {
         return chooserIntent;
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     public static void startNewTask(@NonNull Context context, @NonNull Intent intent) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
