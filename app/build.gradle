@@ -29,7 +29,7 @@ android {
     compileSdkVersion 32
     buildToolsVersion '32.0.0'
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 73
         versionName "4.6.10"

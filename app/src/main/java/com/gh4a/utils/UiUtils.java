@@ -1,11 +1,9 @@
 package com.gh4a.utils;
 
-import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.os.Build;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
@@ -89,18 +87,15 @@ public class UiUtils {
     }
 
     public static void trySetListOverscrollColor(RecyclerView view, int color) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            RecyclerViewEdgeColorHelper helper =
-                    (RecyclerViewEdgeColorHelper) view.getTag(R.id.EdgeColorHelper);
-            if (helper == null) {
-                helper = new RecyclerViewEdgeColorHelper(view);
-                view.setTag(R.id.EdgeColorHelper, helper);
-            }
-            helper.setColor(color);
+        RecyclerViewEdgeColorHelper helper =
+                (RecyclerViewEdgeColorHelper) view.getTag(R.id.EdgeColorHelper);
+        if (helper == null) {
+            helper = new RecyclerViewEdgeColorHelper(view);
+            view.setTag(R.id.EdgeColorHelper, helper);
         }
+        helper.setColor(color);
     }
 
-    @TargetApi(21)
     private static class RecyclerViewEdgeColorHelper implements ViewTreeObserver.OnGlobalLayoutListener {
         private final RecyclerView mView;
         private int mColor;
