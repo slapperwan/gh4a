@@ -26,9 +26,7 @@
         <item name="android:textColor">@color/abc_primary_text_material_dark</item>
     </style>
 
-    <style name="TextAppearance.NotificationEmphasized" parent="TextAppearance.Compat.Notification">
-        <item name="android:textColor">#cccccc</item>
-    </style>
+    <style name="TextAppearance.NotificationEmphasized" parent="android:TextAppearance.Material.Notification.Emphasis" />
 
     <style name="TextAppearance.SmallUrl" parent="@android:style/TextAppearance.Small">
         <item name="android:textColor">?android:attr/textColorLink</item>
@@ -58,7 +56,9 @@
         <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 
-    <style name="SelectableBorderlessItem" parent="SelectableItem" />
+    <style name="SelectableBorderlessItem">
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
 
     <style name="SelectableLabel" parent="SelectableItem">
         <item name="android:paddingTop">6dp</item>
