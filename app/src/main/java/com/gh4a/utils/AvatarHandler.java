@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.net.Uri;
@@ -349,7 +350,7 @@ public class AvatarHandler {
             mState = new UserNameState(userName, identifier);
 
             mPaint = new Paint();
-            mPaint.setTypeface(TypefaceCache.getTypeface(TypefaceCache.TF_MEDIUM));
+            mPaint.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             mPaint.setTextAlign(Paint.Align.CENTER);
             mPaint.setAntiAlias(true);
 
