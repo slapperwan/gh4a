@@ -46,34 +46,40 @@
 
     </LinearLayout>
 
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_extra"
+    <LinearLayout
+        android:id="@+id/username_and_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorPrimary"
-        tools:text="Username" />
+        android:layout_toRightOf="@id/iv_gravatar">
 
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_timestamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/tv_extra"
-        android:layout_alignWithParentIfMissing="true"
-        android:layout_marginLeft="16dp"
-        android:layout_toLeftOf="@id/info"
-        android:layout_toRightOf="@id/tv_extra"
-        android:textAppearance="@style/TextAppearance.VerySmall"
-        tools:text="yesterday" />
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_extra"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?android:attr/textColorPrimary"
+            tools:text="Username"
+            tools:ignore="InefficientWeight" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="yesterday" />
+    </LinearLayout>
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignWithParentIfMissing="true"
-        android:layout_below="@id/tv_extra"
+        android:layout_below="@id/username_and_date"
         android:layout_toLeftOf="@id/info"
         android:layout_toRightOf="@id/iv_gravatar"
         android:ellipsize="end"
