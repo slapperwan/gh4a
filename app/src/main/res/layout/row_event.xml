@@ -29,30 +29,34 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 tools:src="@drawable/default_avatar" />
 
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_actor"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:layout_alignBottom="@id/iv_gravatar"
                 android:layout_alignTop="@id/iv_gravatar"
-                android:layout_toRightOf="@id/iv_gravatar"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                app:ghFont="bold"
-                tools:text="username" />
+                android:layout_toRightOf="@id/iv_gravatar">
 
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_created_at"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@id/tv_actor"
-                android:layout_alignParentRight="true"
-                android:layout_toRightOf="@id/tv_actor"
-                android:gravity="right"
-                android:maxLines="1"
-                android:textAppearance="@style/TextAppearance.VerySmall"
-                tools:text="yesterday" />
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_actor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                    app:ghFont="bold"
+                    tools:text="username" />
+
+                <com.gh4a.widget.StyleableTextView
+                    android:id="@+id/tv_created_at"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:maxLines="1"
+                    android:textAppearance="@style/TextAppearance.VerySmall"
+                    tools:text="yesterday" />
+            </LinearLayout>
 
             <com.gh4a.widget.StyleableTextView
                 android:id="@+id/tv_title"
