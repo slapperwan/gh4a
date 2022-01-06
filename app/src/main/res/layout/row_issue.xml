@@ -61,30 +61,38 @@
         android:layout_gravity="bottom"
         android:layout_marginTop="8dp" />
 
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_creator"
+    <LinearLayout
+        android:id="@+id/username_and_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/iv_gravatar"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?android:attr/textColorPrimary"
-        tools:text="IssueCreatorUsername" />
+        android:layout_toRightOf="@id/iv_gravatar">
 
-    <com.gh4a.widget.StyleableTextView
-        android:id="@+id/tv_timestamp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/tv_creator"
-        android:layout_marginLeft="16dp"
-        android:layout_toRightOf="@id/tv_creator"
-        android:textAppearance="@style/TextAppearance.VerySmall"
-        tools:text="yesterday" />
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_creator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?android:attr/textColorPrimary"
+            tools:text="IssueCreatorUsername"
+            tools:ignore="InefficientWeight" />
+
+        <com.gh4a.widget.StyleableTextView
+            android:id="@+id/tv_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:textAppearance="@style/TextAppearance.VerySmall"
+            tools:text="yesterday" />
+    </LinearLayout>
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_creator"
+        android:layout_below="@id/username_and_date"
         android:layout_toLeftOf="@id/info"
         android:layout_toRightOf="@id/iv_gravatar"
         android:ellipsize="end"
