@@ -187,7 +187,7 @@ public class RepositoryListContainerFragment extends Fragment implements
 
     private void applyFilterTypeAndSortOrder() {
         if (!isAdded()) {
-            // we'll do this in onActivityCreated()
+            // we'll do this in onViewCreated()
             return;
         }
 

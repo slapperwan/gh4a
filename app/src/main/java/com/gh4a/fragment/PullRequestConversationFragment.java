@@ -121,8 +121,8 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         loadHeadReference(false);
         loadCommitStatusesIfOpen(false);
     }
