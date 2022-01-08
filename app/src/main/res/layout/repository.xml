@@ -36,10 +36,12 @@
                     android:id="@+id/tv_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:autoLink="web"
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textIsSelectable="true"
+                    app:needsLinkHandling="true"
                     tools:text="Repository description" />
 
                 <com.gh4a.widget.StyleableTextView
