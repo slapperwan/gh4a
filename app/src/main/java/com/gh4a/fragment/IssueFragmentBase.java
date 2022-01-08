@@ -176,6 +176,10 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             // Fix an issue where the bottom sheet is initially located outside of the visible screen area
             mBottomSheet.resetPeekHeight(activity.getAppBarTotalScrollRange());
         });
+
+        fillData();
+        fillLabels(mIssue.labels());
+        updateCommentLockState();
     }
 
     @Override
@@ -200,15 +204,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         mAdapter.setHeaderView(mListHeaderView);
         View loadingView = inflater.inflate(R.layout.list_loading_view, view, false);
         showLoadingIndicator(loadingView);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        fillData();
-        fillLabels(mIssue.labels());
-        updateCommentLockState();
-
-        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
