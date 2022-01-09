@@ -3,6 +3,8 @@ package com.gh4a.fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -117,7 +119,7 @@ public class ContentListContainerFragment extends Fragment implements
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         if (context instanceof CommitSelectionCallback) {
             mCommitCallback = (CommitSelectionCallback) context;
@@ -178,17 +180,19 @@ public class ContentListContainerFragment extends Fragment implements
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mBreadcrumbs = view.findViewById(R.id.breadcrumbs);
         mBreadcrumbs.setCallback(this);
         mStateSaved = false;
         updateBreadcrumbs();
-        addFragmentForTopOfStack();
+        if (savedInstanceState == null) {
+            addFragmentForTopOfStack();
+        }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putStringArrayList(STATE_KEY_DIR_STACK, new ArrayList<>(mDirStack));
         outState.putStringArrayList(STATE_KEY_INITIAL_PATH, mInitialPathToLoad);
