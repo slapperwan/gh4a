@@ -4,7 +4,7 @@ FEATURES
 
 Authentication/authorization
 * OAuth2 web application flow.
-* Support Two factor authentication.
+* Support for authentication via personal access token.
 
 General
 * Notification support
