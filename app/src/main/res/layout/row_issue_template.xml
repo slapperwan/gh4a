@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="@dimen/content_padding"
+    android:paddingHorizontal="24dp"
     android:paddingTop="4dp"
     android:paddingBottom="4dp">
 
