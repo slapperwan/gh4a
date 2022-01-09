@@ -31,8 +31,9 @@
 
         <ImageView
             android:id="@+id/iv_advanced_editor_toggle"
-            style="@style/ImageButton"
-            android:src="@drawable/expand" />
+            android:src="@drawable/expand"
+            android:layout_marginRight="-8dp"
+            style="@style/ImageButton" />
 
         <com.gh4a.widget.HeightLimitedNestedScrollView
             android:id="@+id/basic_editor_scroll"
@@ -45,10 +46,12 @@
                 android:id="@+id/et_basic_editor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
                 android:dropDownAnchor="@id/basic_editor_scroll"
                 android:inputType="textMultiLine|textCapSentences"
                 android:minHeight="48dp"
                 android:padding="8dp"
+                android:textSize="16sp"
                 tools:text="Enter comment" />
 
         </com.gh4a.widget.HeightLimitedNestedScrollView>
