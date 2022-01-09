@@ -7,7 +7,9 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingBottom="5dp"
-    android:paddingTop="5dp">
+    android:paddingTop="5dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
 
     <View
         android:id="@+id/view_color"
@@ -21,7 +23,7 @@
         android:layout_height="wrap_content"
         android:foreground="?attr/selectableItemBackground"
         android:paddingBottom="5dp"
-        android:paddingLeft="8dp"
+        android:paddingLeft="16dp"
         android:paddingRight="8dp"
         android:paddingTop="5dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
