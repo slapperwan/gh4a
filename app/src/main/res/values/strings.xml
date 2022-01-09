@@ -378,8 +378,9 @@
     <string name="issue_sort_updated_desc">Most recently updated</string>
     <string name="issue_sort_comments_asc">Least commented</string>
     <string name="issue_sort_comments_desc">Most commented</string>
-    <string name="issue_manage_labels">Manage Labels</string>
-    <string name="issue_manage_milestones">Manage Milestones</string>
+    <string name="issue_manage">Manage</string>
+    <string name="issue_manage_labels">Manage labels</string>
+    <string name="issue_manage_milestones">Manage milestones</string>
     <string name="issue_labels">Labels</string>
     <string name="issue_milestones">Milestones</string>
     <string name="issue_dialog_delete_message">Do you really want to delete %1$s?</string>

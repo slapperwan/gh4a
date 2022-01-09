@@ -1040,7 +1040,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                     .setPositiveButton(R.string.ok, (dialog, which) -> {
                         activity.updateLabels(selectedLabels);
                     })
-                    .setNeutralButton(R.string.issue_manage_labels, (dialog, which) -> {
+                    .setNeutralButton(R.string.issue_manage, (dialog, which) -> {
                         activity.manageLabels();
                     })
                     .create();
