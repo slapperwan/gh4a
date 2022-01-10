@@ -45,6 +45,7 @@ public class StatusWrapper {
         mTargetUrl = checkRun.detailsUrl();
 
         switch (checkRun.state()) {
+            case Waiting:
             case Requested:
             case Queued:
                 mState = State.Unknown;
