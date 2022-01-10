@@ -390,7 +390,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     @Override
     public void onConfirmed(String tag, Parcelable data) {
         long id = ((Bundle) data).getLong("id");
-        doDeleteComment(id);
+        deleteComment(id);
     }
 
     private void addCommentsToMap(List<C> comments) {
@@ -446,10 +446,10 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         setContentShown(false);
     }
 
-    protected abstract Single<List<C>> createCommentSingle(boolean bypassCache);
+    protected abstract Single<List<C>> getCommentsSingle(boolean bypassCache);
     protected abstract void openCommentDialog(long id, long replyToId, String line,
             int position, int leftLine, int rightLine, PositionalCommentBase commitComment);
-    protected abstract Single<Response<Void>> doDeleteComment(long id);
+    protected abstract Single<Response<Void>> deleteCommentSingle(long id);
     protected abstract boolean canReply();
     protected abstract Uri createUrl(String lineId, long replyId);
     protected abstract PositionalCommentBase onUpdateReactions(PositionalCommentBase comment,
@@ -460,7 +460,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     }
 
     private void deleteComment(long id) {
-        doDeleteComment(id)
+        deleteCommentSingle(id)
                 .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
                 .compose(RxUtils.wrapForBackgroundTask(this, R.string.deleting_msg,
                         getString(R.string.error_delete_commit_comment)))
@@ -471,11 +471,11 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     private void loadComments(boolean useIntentExtraIfPresent, boolean force) {
         List<C> intentComments = useIntentExtraIfPresent
                 ? IntentUtils.getCompressedArrayListExtra(getIntent(), "comments") : null;
-        Single<List<C>> commentSingle = intentComments != null
+        Single<List<C>> commentsSingle = intentComments != null
                 ? Single.just(intentComments)
-                : createCommentSingle(force).compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));
+                : getCommentsSingle(force).compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));
 
-        commentSingle.subscribe(result -> {
+        commentsSingle.subscribe(result -> {
             addCommentsToMap(result);
             onDataReady();
         }, this::handleLoadFailure);
@@ -510,7 +510,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             if (id == 0 || !canReply()) {
                 menu.removeItem(R.id.reply);
             }
-            if (id == 0|| !ApiHelpers.loginEquals(comment.comment.user(), ownLogin)) {
+            if (id == 0 || !ApiHelpers.loginEquals(comment.comment.user(), ownLogin)) {
                 menu.removeItem(R.id.edit);
                 menu.removeItem(R.id.delete);
             }
