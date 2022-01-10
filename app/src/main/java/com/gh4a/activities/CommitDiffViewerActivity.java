@@ -88,14 +88,13 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     }
 
     @Override
-    public Single<Response<Void>> doDeleteComment(long id) {
+    public Single<Response<Void>> deleteCommentSingle(long id) {
         RepositoryCommentService service = ServiceFactory.get(RepositoryCommentService.class, false);
-
         return service.deleteCommitComment(mRepoOwner, mRepoName, id);
     }
 
     @Override
-    protected Single<List<GitComment>> createCommentSingle(boolean bypassCache) {
+    protected Single<List<GitComment>> getCommentsSingle(boolean bypassCache) {
         final RepositoryCommentService service =
                 ServiceFactory.get(RepositoryCommentService.class, bypassCache);
         return ApiHelpers.PageIterator

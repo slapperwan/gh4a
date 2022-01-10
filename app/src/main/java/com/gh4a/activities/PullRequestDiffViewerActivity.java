@@ -69,7 +69,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     }
 
     @Override
-    protected Single<List<ReviewComment>> createCommentSingle(boolean bypassCache) {
+    protected Single<List<ReviewComment>> getCommentsSingle(boolean bypassCache) {
         final PullRequestReviewCommentService service =
                 ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
         return ApiHelpers.PageIterator
@@ -111,7 +111,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     }
 
     @Override
-    protected Single<Response<Void>> doDeleteComment(long id) {
+    protected Single<Response<Void>> deleteCommentSingle(long id) {
         PullRequestReviewCommentService service =
                 ServiceFactory.get(PullRequestReviewCommentService.class, false);
         return service.deleteComment(mRepoOwner, mRepoName, id);
