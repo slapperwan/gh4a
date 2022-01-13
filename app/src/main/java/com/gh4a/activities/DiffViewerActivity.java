@@ -137,9 +137,9 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     private final ReactionBar.ReactionDetailsCache mReactionDetailsCache =
             new ReactionBar.ReactionDetailsCache(this);
 
-    protected static class CommitCommentWrapper implements ReactionBar.Item {
+    protected static class CommentWrapper implements ReactionBar.Item {
         public PositionalCommentBase comment;
-        public CommitCommentWrapper(PositionalCommentBase comment) {
+        public CommentWrapper(PositionalCommentBase comment) {
             this.comment = comment;
         }
         @Override
@@ -150,8 +150,8 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     private String mDiff;
     private String[] mDiffLines;
-    private final SparseArray<List<PositionalCommentBase>> mCommitCommentsByPos = new SparseArray<>();
-    private final LongSparseArray<CommitCommentWrapper> mCommitComments = new LongSparseArray<>();
+    private final SparseArray<List<PositionalCommentBase>> mCommentsByPosition = new SparseArray<>();
+    private final LongSparseArray<CommentWrapper> mWrappedComments = new LongSparseArray<>();
 
     private static final int MENU_ITEM_VIEW = 10;
 
@@ -224,9 +224,24 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     @Override
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
-        CommitCommentWrapper comment = (CommitCommentWrapper) item;
-        comment.comment = onUpdateReactions(comment.comment, reactions);
+        CommentWrapper wrapper = (CommentWrapper) item;
+        wrapper.comment = buildCommentWithReactions(wrapper.comment, reactions);
+        replaceOutdatedComment(wrapper.comment);
         onDataReady();
+    }
+
+    private void replaceOutdatedComment(PositionalCommentBase updatedComment) {
+        List<PositionalCommentBase> comments = mCommentsByPosition.get(updatedComment.position());
+        int outdatedCommentIndex = -1;
+        for (int i = 0; i < comments.size(); i++) {
+            if (comments.get(i).id().equals(updatedComment.id())) {
+                outdatedCommentIndex = i;
+                break;
+            }
+        }
+        if (outdatedCommentIndex != -1) {
+            comments.set(outdatedCommentIndex, updatedComment);
+        }
     }
 
     @Override
@@ -297,11 +312,11 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             }
             content.append(">").append(TextUtils.htmlEncode(line)).append("</div>");
 
-            List<PositionalCommentBase> comments = mCommitCommentsByPos.get(i);
+            List<PositionalCommentBase> comments = mCommentsByPosition.get(i);
             if (comments != null) {
                 for (PositionalCommentBase comment : comments) {
                     long id = comment.id();
-                    mCommitComments.put(id, new CommitCommentWrapper(comment));
+                    mWrappedComments.put(id, new CommentWrapper(comment));
                     content.append("<div ").append("id=\"comment").append(id).append("\"");
                     content.append(" class=\"comment");
                     if (mInitialComment != null && mInitialComment.matches(id, null)) {
@@ -394,16 +409,16 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     }
 
     private void addCommentsToMap(List<C> comments) {
-        mCommitCommentsByPos.clear();
+        mCommentsByPosition.clear();
         for (PositionalCommentBase comment : comments) {
             if (!TextUtils.equals(comment.path(), mPath)) {
                 continue;
             }
             int position = comment.position();
-            List<PositionalCommentBase> commentsByPos = mCommitCommentsByPos.get(position);
+            List<PositionalCommentBase> commentsByPos = mCommentsByPosition.get(position);
             if (commentsByPos == null) {
                 commentsByPos = new ArrayList<>();
-                mCommitCommentsByPos.put(position, commentsByPos);
+                mCommentsByPosition.put(position, commentsByPos);
             }
             commentsByPos.add(comment);
         }
@@ -441,7 +456,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
         // Make sure our callers are aware of the change
         setResult(RESULT_OK);
 
-        mCommitComments.clear();
+        mWrappedComments.clear();
         loadComments(false, true);
         setContentShown(false);
     }
@@ -452,7 +467,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     protected abstract Single<Response<Void>> deleteCommentSingle(long id);
     protected abstract boolean canReply();
     protected abstract Uri createUrl(String lineId, long replyId);
-    protected abstract PositionalCommentBase onUpdateReactions(PositionalCommentBase comment,
+    protected abstract PositionalCommentBase buildCommentWithReactions(PositionalCommentBase comment,
             Reactions reactions);
 
     private String createLineLinkId(int line, boolean isRight) {
@@ -503,7 +518,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             mIsRightLine = isRightLine;
 
             Menu menu = getMenu();
-            CommitCommentWrapper comment = mCommitComments.get(mId);
+            CommentWrapper comment = mWrappedComments.get(mId);
             String ownLogin = Gh4Application.get().getAuthLogin();
 
             getMenuInflater().inflate(R.menu.commit_comment_actions, menu);
@@ -552,7 +567,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
                     openCommentDialog(0L, mId, mLineText, mPosition, mLeftLine, mRightLine, null);
                     break;
                 case R.id.edit:
-                    CommitCommentWrapper wrapper = mCommitComments.get(mId);
+                    CommentWrapper wrapper = mWrappedComments.get(mId);
                     PositionalCommentBase comment = wrapper != null ? wrapper.comment : null;
                     openCommentDialog(mId, 0L, mLineText, mPosition, mLeftLine, mRightLine, comment);
                     break;
