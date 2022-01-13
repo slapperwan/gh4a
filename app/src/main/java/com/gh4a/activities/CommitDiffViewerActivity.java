@@ -71,7 +71,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     }
 
     @Override
-    protected PositionalCommentBase onUpdateReactions(PositionalCommentBase comment,
+    protected PositionalCommentBase buildCommentWithReactions(PositionalCommentBase comment,
             Reactions reactions) {
         return ((GitComment) comment).toBuilder()
                 .reactions(reactions)
@@ -104,7 +104,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
 
     @Override
     public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
-        final CommitCommentWrapper comment = (CommitCommentWrapper) item;
+        final CommentWrapper comment = (CommentWrapper) item;
         final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitCommentReactions(mRepoOwner, mRepoName, comment.comment.id(), page));
@@ -112,7 +112,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
 
     @Override
     public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
-        CommitCommentWrapper comment = (CommitCommentWrapper) item;
+        CommentWrapper comment = (CommentWrapper) item;
         final ReactionService service = ServiceFactory.get(ReactionService.class, false);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
 
