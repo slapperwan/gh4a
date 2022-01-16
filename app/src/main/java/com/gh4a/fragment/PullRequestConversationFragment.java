@@ -198,8 +198,6 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                 ServiceFactory.get(IssueEventService.class, bypassCache);
         final IssueCommentService commentService =
                 ServiceFactory.get(IssueCommentService.class, bypassCache);
-
-        final PullRequestService prService = ServiceFactory.get(PullRequestService.class, bypassCache);
         final PullRequestReviewService reviewService =
                 ServiceFactory.get(PullRequestReviewService.class, bypassCache);
         final PullRequestReviewCommentService prCommentService =
@@ -211,17 +209,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
         Single<List<TimelineItem>> eventItemSingle = ApiHelpers.PageIterator
                 .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
-                .compose((RxUtils.mapList(TimelineItem.TimelineEvent::new)));
-        Single<Map<String, GitHubFile>> filesByNameSingle = ApiHelpers.PageIterator
-                .toSingle(page -> prService.getPullRequestFiles(mRepoOwner, mRepoName, issueNumber, page))
-                .map(files -> {
-                    Map<String, GitHubFile> filesByName = new HashMap<>();
-                    for (GitHubFile file : files) {
-                        filesByName.put(file.filename(), file);
-                    }
-                    return filesByName;
-                })
-                .cache(); // single is used multiple times -> avoid refetching data
+                .compose(RxUtils.mapList(TimelineItem.TimelineEvent::new));
 
         Single<List<Review>> reviewSingle = ApiHelpers.PageIterator
                 .toSingle(page -> reviewService.getReviews(mRepoOwner, mRepoName, issueNumber, page))
@@ -256,8 +244,8 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                 });
 
         Single<List<TimelineItem.TimelineReview>> reviewTimelineSingle = Single.zip(
-                reviewSingle, filesByNameSingle, prCommentSingle, reviewCommentsByIdSingle,
-                (prReviews, filesByName, commitComments, pendingCommentsById) -> {
+                reviewSingle, prCommentSingle, reviewCommentsByIdSingle,
+                (prReviews, commitComments, pendingCommentsById) -> {
             LongSparseArray<TimelineItem.TimelineReview> reviewsById = new LongSparseArray<>();
             List<TimelineItem.TimelineReview> reviews = new ArrayList<>();
 
@@ -268,8 +256,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
 
                 if (review.state() == ReviewState.Pending) {
                     for (ReviewComment pendingComment : pendingCommentsById.get(review.id())) {
-                        GitHubFile commitFile = filesByName.get(pendingComment.path());
-                        timelineReview.addComment(pendingComment, commitFile, true);
+                        timelineReview.addComment(pendingComment, null, true);
                     }
                 }
             }
@@ -277,7 +264,6 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
             Map<String, TimelineItem.TimelineReview> reviewsBySpecialId = new HashMap<>();
 
             for (ReviewComment commitComment : commitComments) {
-                GitHubFile file = filesByName.get(commitComment.path());
                 if (commitComment.pullRequestReviewId() != null) {
                     String id = TimelineItem.Diff.getDiffHunkId(commitComment);
 
@@ -287,7 +273,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                         reviewsBySpecialId.put(id, review);
                     }
 
-                    review.addComment(commitComment, file, true);
+                    review.addComment(commitComment, null, true);
                 }
             }
 
@@ -300,22 +286,15 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                     || !item.getDiffHunks().isEmpty();
         }));
 
-        Single<List<TimelineItem.TimelineComment>> commitCommentWithoutReviewSingle = Single.zip(
-                prCommentSingle.compose(RxUtils.filter(comment -> comment.pullRequestReviewId() == null)),
-                filesByNameSingle,
-                (comments, files) -> {
-                    List<TimelineItem.TimelineComment> items = new ArrayList<>();
-                    for (ReviewComment comment : comments) {
-                        items.add(new TimelineItem.TimelineComment(comment, files.get(comment.path())));
-                    }
-                    return items;
-                });
+        Single<List<TimelineItem>> prCommentsWithoutReviewSingle = prCommentSingle
+                        .compose(RxUtils.filter(comment -> comment.pullRequestReviewId() == null))
+                        .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
 
         return Single.zip(
                 issueCommentItemSingle.subscribeOn(Schedulers.io()),
                 eventItemSingle.subscribeOn(Schedulers.io()),
                 reviewTimelineSingle.subscribeOn(Schedulers.io()),
-                commitCommentWithoutReviewSingle.subscribeOn(Schedulers.io()),
+                prCommentsWithoutReviewSingle.subscribeOn(Schedulers.io()),
                 (comments, events, reviewItems, commentsWithoutReview) -> {
             ArrayList<TimelineItem> result = new ArrayList<>();
             result.addAll(comments);
