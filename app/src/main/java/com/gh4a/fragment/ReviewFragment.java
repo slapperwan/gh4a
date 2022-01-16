@@ -168,6 +168,8 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
         final PullRequestReviewCommentService commentService =
                 ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
 
+        // The Review object passed to this fragment may be incomplete, so we re-fetch it to make
+        // sure it has all the needed fields
         Single<TimelineItem.TimelineReview> reviewItemSingle =
                 reviewService.getReview(mRepoOwner, mRepoName, mIssueNumber, mReview.id())
                 .map(ApiHelpers::throwOnFailure)
