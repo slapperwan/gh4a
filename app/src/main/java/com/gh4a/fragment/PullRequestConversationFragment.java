@@ -203,24 +203,24 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
         final PullRequestReviewCommentService prCommentService =
                 ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
 
-        Single<List<TimelineItem>> issueCommentItemSingle = ApiHelpers.PageIterator
+        Single<List<TimelineItem>> issueCommentsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
-        Single<List<TimelineItem>> eventItemSingle = ApiHelpers.PageIterator
+        Single<List<TimelineItem>> eventsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
                 .compose(RxUtils.mapList(TimelineItem.TimelineEvent::new));
 
-        Single<List<Review>> reviewSingle = ApiHelpers.PageIterator
+        Single<List<Review>> reviewsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> reviewService.getReviews(mRepoOwner, mRepoName, issueNumber, page))
                 .cache(); // single is used multiple times -> avoid refetching data
-        Single<List<ReviewComment>> prCommentSingle = ApiHelpers.PageIterator
-                .toSingle(page -> prCommentService.getPullRequestComments(
-                        mRepoOwner, mRepoName, issueNumber, page))
+        Single<List<ReviewComment>> prCommentsSingle = ApiHelpers.PageIterator
+                .toSingle(page -> prCommentService.getPullRequestComments(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.sortList(ApiHelpers.COMMENT_COMPARATOR))
                 .cache(); // single is used multiple times -> avoid refetching data
 
-        Single<LongSparseArray<List<ReviewComment>>> reviewCommentsByIdSingle = reviewSingle
+        // For reviews with pending state we have to manually load the comments
+        Single<LongSparseArray<List<ReviewComment>>> pendingReviewCommentsByIdSingle = reviewsSingle
                 .compose(RxUtils.filter(r -> r.state() == ReviewState.Pending))
                 .toObservable()
                 .flatMap(reviews -> {
@@ -229,8 +229,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                         Single<List<ReviewComment>> single = ApiHelpers.PageIterator
                                 .toSingle(page -> reviewService.getReviewComments(mRepoOwner,
                                         mRepoName, issueNumber, r.id()));
-                        obsList.add(Single.zip(Single.just(r.id()), single, Pair::create)
-                                .toObservable());
+                        obsList.add(Single.zip(Single.just(r.id()), single, Pair::create).toObservable());
                     }
                     return Observable.concat(obsList);
                 })
@@ -243,57 +242,61 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                     return result;
                 });
 
-        Single<List<TimelineItem.TimelineReview>> reviewTimelineSingle = Single.zip(
-                reviewSingle, prCommentSingle, reviewCommentsByIdSingle,
-                (prReviews, commitComments, pendingCommentsById) -> {
+        Single<List<TimelineItem.TimelineReview>> reviewItemsSingle = Single.zip(
+                reviewsSingle, prCommentsSingle, pendingReviewCommentsByIdSingle,
+                (prReviews, prComments, pendingReviewCommentsById) -> {
             LongSparseArray<TimelineItem.TimelineReview> reviewsById = new LongSparseArray<>();
-            List<TimelineItem.TimelineReview> reviews = new ArrayList<>();
+            List<TimelineItem.TimelineReview> reviewItems = new ArrayList<>();
 
             for (Review review : prReviews) {
                 TimelineItem.TimelineReview timelineReview = new TimelineItem.TimelineReview(review);
                 reviewsById.put(review.id(), timelineReview);
-                reviews.add(timelineReview);
+                reviewItems.add(timelineReview);
 
                 if (review.state() == ReviewState.Pending) {
-                    for (ReviewComment pendingComment : pendingCommentsById.get(review.id())) {
+                    for (ReviewComment pendingComment : pendingReviewCommentsById.get(review.id())) {
                         timelineReview.addComment(pendingComment, null, true);
                     }
                 }
             }
 
-            Map<String, TimelineItem.TimelineReview> reviewsBySpecialId = new HashMap<>();
+            Map<String, TimelineItem.TimelineReview> reviewsByDiffHunkId = new HashMap<>();
+            for (ReviewComment comment : prComments) {
+                if (comment.pullRequestReviewId() != null) {
+                    String hunkId = TimelineItem.Diff.getDiffHunkId(comment);
 
-            for (ReviewComment commitComment : commitComments) {
-                if (commitComment.pullRequestReviewId() != null) {
-                    String id = TimelineItem.Diff.getDiffHunkId(commitComment);
-
-                    TimelineItem.TimelineReview review = reviewsBySpecialId.get(id);
-                    if (review == null) {
-                        review = reviewsById.get(commitComment.pullRequestReviewId());
-                        reviewsBySpecialId.put(id, review);
+                    TimelineItem.TimelineReview reviewItem = reviewsByDiffHunkId.get(hunkId);
+                    if (reviewItem == null) {
+                        reviewItem = reviewsById.get(comment.pullRequestReviewId());
+                        reviewsByDiffHunkId.put(hunkId, reviewItem);
                     }
 
-                    review.addComment(commitComment, null, true);
+                    reviewItem.addComment(comment, null, true);
                 }
             }
 
-            return reviews;
+            return reviewItems;
         })
-        .compose(RxUtils.filter(item -> {
-            //noinspection CodeBlock2Expr
-            return item.review().state() != ReviewState.Commented
-                    || !TextUtils.isEmpty(item.review().body())
-                    || !item.getDiffHunks().isEmpty();
-        }));
+        // In some cases, replies to review threads are considered themselves "reviews" by GitHub.
+        // We drop these "not-really reviews" since we've already added their comments to the
+        // appropriate timeline review items.
+        .compose(RxUtils.filter(reviewItem ->
+                reviewItem.review().state() != ReviewState.Commented
+                  || !TextUtils.isEmpty(reviewItem.review().body())
+                  || !reviewItem.getDiffHunks().isEmpty()));
 
-        Single<List<TimelineItem>> prCommentsWithoutReviewSingle = prCommentSingle
+        // Before the introduction of reviews in 2016, GitHub allowed to add single
+        // review comments which are not linked to a review object.
+        // For now we're showing them in between the conversation, but it would be best
+        // to group them in threads as GitHub does.
+        Single<List<TimelineItem>> prCommentsWithoutReviewSingle = prCommentsSingle
                         .compose(RxUtils.filter(comment -> comment.pullRequestReviewId() == null))
                         .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
 
         return Single.zip(
-                issueCommentItemSingle.subscribeOn(Schedulers.io()),
-                eventItemSingle.subscribeOn(Schedulers.io()),
-                reviewTimelineSingle.subscribeOn(Schedulers.io()),
+                issueCommentsSingle.subscribeOn(Schedulers.io()),
+                eventsSingle.subscribeOn(Schedulers.io()),
+                reviewItemsSingle.subscribeOn(Schedulers.io()),
                 prCommentsWithoutReviewSingle.subscribeOn(Schedulers.io()),
                 (comments, events, reviewItems, commentsWithoutReview) -> {
             ArrayList<TimelineItem> result = new ArrayList<>();
