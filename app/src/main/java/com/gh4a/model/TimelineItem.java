@@ -50,7 +50,7 @@ public abstract class TimelineItem {
 
         private Diff diff;
 
-        public TimelineComment(@NonNull GitHubComment comment) {
+        public TimelineComment(@NonNull GitHubCommentBase comment) {
             this.comment = comment;
             this.file = null;
         }
