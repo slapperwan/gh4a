@@ -2,7 +2,6 @@ body {
     font-family: Helvetica,arial,sans-serif;
     font-size: 14px;
     line-height: 1.4;
-    background-color: #111;
     color: #A3A3A5;
     margin: 0;
     padding: 6px;
@@ -175,7 +174,6 @@ table {
 
 table tr {
     border-top: 1px solid #7A7A7A;
-    background-color: #111;
     margin: 0;
     padding: 0;
 }

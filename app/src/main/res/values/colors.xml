@@ -44,7 +44,6 @@
     <color name="code_background">#30aaaaaa</color>
 
     <color name="drawer_background">@color/background_floating_material_light</color>
-    <color name="webview_background">#f7f7f9</color>
     <color name="list_background">@android:color/white</color>
     <color name="icon_foreground">#99343434</color>
     <color name="breadcrumb_background">#7baa67</color>
