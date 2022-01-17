@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
@@ -151,9 +152,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
             s.setTextZoom(ZOOM_SIZES[initialZoomLevel]);
         }
 
-        mWebView.setBackgroundColor(UiUtils.resolveColor(this, R.attr.colorWebViewBackground));
+        mWebView.setBackgroundColor(Color.TRANSPARENT);
         mWebView.setWebViewClient(mWebViewClient);
-
         mWebView.setOnTouchListener(this);
     }
 
