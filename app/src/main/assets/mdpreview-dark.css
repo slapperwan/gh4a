@@ -2,9 +2,7 @@ body {
     background-color: #303030;
     color: #ffffff;
     font-size: 14px;
-    margin-left: 10px;
-    margin-right: 10px;
-    margin-top: 16px;
+    padding-top: 20px;
     word-wrap: break-word;
 }
 
