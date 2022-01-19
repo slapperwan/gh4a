@@ -1,18 +1,14 @@
 body {
-    font-family: Helvetica,arial,sans-serif;
+    font-family: Roboto,sans-serif;
     font-size: 14px;
     line-height: 1.4;
-    color: #A3A3A5;
+    color: #f0f0f0;
     margin: 0;
-    padding: 6px;
+    padding: 16px;
 }
 
-body>:first-child {
+body>:first-child, #content>:first-child {
     margin-top: 0!important;
-}
-
-body>:last-child {
-    margin-bottom: 0!important;
 }
 
 a {
@@ -23,19 +19,8 @@ a.absent {
     color: #c00;
 }
 
-a.anchor {
-    display: block;
-    padding-left: 30px;
-    margin-left: -30px;
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-}
-
 h1,h2,h3,h4,h5,h6 {
-    margin: 10px 0 6px;
+    margin: 16px 0 8px;
     padding: 0;
     font-weight: 700;
     -webkit-font-smoothing: antialiased;
@@ -53,12 +38,10 @@ h1 code,h1 tt,h2 code,h2 tt,h3 code,h3 tt,h4 code,h4 tt,h5 code,h5 tt,h6 code,h6
 
 h1 {
     font-size: 28px;
-    color: #A3A3A5;
 }
 
 h2 {
     font-size: 24px;
-    color: #A3A3A5;
 }
 
 h3 {
@@ -78,8 +61,12 @@ h6 {
     font-size: 14px;
 }
 
-blockquote,dl,li,ol,p,pre,table,ul {
-    margin: 8px 0;
+blockquote,dl,ol,p,pre,table,ul {
+    margin: 12px 0;
+}
+
+li {
+  margin: 4px 0;
 }
 
 hr {
@@ -206,6 +193,7 @@ table tr td :last-child,table tr th :last-child {
 }
 
 img {
+    height: auto;
     max-width: 100%;
 }
 
