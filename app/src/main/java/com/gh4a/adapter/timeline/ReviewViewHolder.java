@@ -116,14 +116,7 @@ class ReviewViewHolder
         mAvatarContainer.setTag(review.user());
 
         formatTitle(review);
-
-        boolean hasBody = !TextUtils.isEmpty(review.body());
-        if (hasBody) {
-            mImageGetter.bind(mBodyView, review.bodyHtml(), review.id());
-            mBodyView.setVisibility(View.VISIBLE);
-        } else {
-            mBodyView.setVisibility(View.GONE);
-        }
+        mImageGetter.bind(mBodyView, review.bodyHtml(), review.id());
 
         if (mCallback.canQuote()) {
             mBodyView.setCustomSelectionActionModeCallback(mQuoteActionModeCallback);
@@ -196,6 +189,7 @@ class ReviewViewHolder
             mDetailsHeader.setVisibility(View.GONE);
         }
 
+        boolean hasBody = !TextUtils.isEmpty(review.body());
         if (hasBody && mDisplayReviewDetails && hasDiffs) {
             mDetailsDivider.setVisibility(View.VISIBLE);
         } else {
