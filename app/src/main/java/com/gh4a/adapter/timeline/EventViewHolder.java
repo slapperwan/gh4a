@@ -11,6 +11,8 @@ import android.widget.ImageView;
 
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
+import com.gh4a.activities.IssueActivity;
+import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
@@ -21,6 +23,7 @@ import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.TimestampToastSpan;
 
+import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueEvent;
 import com.meisolsson.githubsdk.model.IssueEventType;
 import com.meisolsson.githubsdk.model.Label;
@@ -62,6 +65,7 @@ class EventViewHolder
         EVENT_ICONS.put(IssueEventType.ReviewRequestRemoved, R.drawable.timeline_event_review_request_removed);
         EVENT_ICONS.put(IssueEventType.ConvertToDraft, R.drawable.timeline_event_branch);
         EVENT_ICONS.put(IssueEventType.ReadyForReview, R.drawable.timeline_event_review);
+        EVENT_ICONS.put(IssueEventType.CrossReferenced, R.drawable.timeline_event_cross_referenced);
     }
 
     private final Context mContext;
@@ -240,7 +244,11 @@ class EventViewHolder
                 textResId = R.string.pull_request_event_convert_to_draft;
                 break;
             case ReadyForReview:
-                textResId = R.string.pull_request_event_ready_for_review;
+                break;
+            case CrossReferenced:
+                textResId = mIsPullRequest
+                        ? R.string.pull_request_event_mentioned
+                        : R.string.issue_event_mentioned;
                 break;
             default:
                 return null;
@@ -285,6 +293,18 @@ class EventViewHolder
         if (pos >= 0) {
             text.delete(pos, pos + 5);
             StringUtils.addUserTypeSpan(mContext, text, pos, mContext.getString(R.string.user_type_bot));
+        }
+
+        pos = text.toString().indexOf("[source]");
+        if (pos >= 0) {
+            final Issue source = event.source().issue();
+            String sourceLabel = "#" + source.number();
+            text.replace(pos, pos + 8, sourceLabel);
+            text.setSpan(new IntentSpan(mContext, context -> {
+                return source.pullRequest() != null
+                        ? PullRequestActivity.makeIntent(context, source)
+                        : IssueActivity.makeIntent(context, source);
+            }), pos, pos + sourceLabel.length(), 0);
         }
 
         CharSequence time = event.createdAt() != null

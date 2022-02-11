@@ -301,6 +301,7 @@
     <string name="issue_event_renamed">[b]%1$s[/b] changed the title from [b]%2$s[/b] to [b]%3$s[/b] [time]</string>
     <string name="issue_event_locked">[b]%1$s[/b] locked and limited conversation to collaborators [time]</string>
     <string name="issue_event_unlocked">[b]%1$s[/b] unlocked this conversation [time]</string>
+    <string name="issue_event_mentioned">[b]%1$s[/b] mentioned this issue in [b][source][/b] [time]</string>
 
     <!-- Pull request events -->
     <string name="pull_request_event_closed">[b]%1$s[/b] closed this pull request [time]</string>
@@ -325,6 +326,7 @@
     <string name="pull_request_event_comment_deleted">[b]%1$s[/b] deleted a comment [time]</string>
     <string name="pull_request_event_convert_to_draft">[b]%1$s[/b] marked this pull request as draft [time]</string>
     <string name="pull_request_event_ready_for_review">[b]%1$s[/b] marked this pull request as ready for review [time]</string>
+    <string name="pull_request_event_mentioned">[b]%1$s[/b] mentioned this pull request in [b][source][/b] [time]</string>
 
     <!-- Commit -->
     <string name="commit_title">Commit %1$s</string>

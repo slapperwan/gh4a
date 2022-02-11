@@ -59,6 +59,7 @@ import com.meisolsson.githubsdk.service.checks.ChecksService;
 import com.meisolsson.githubsdk.service.git.GitService;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 import com.meisolsson.githubsdk.service.issues.IssueEventService;
+import com.meisolsson.githubsdk.service.issues.IssueTimelineService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
@@ -194,8 +195,8 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
     @Override
     protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
         final int issueNumber = mIssue.number();
-        final IssueEventService eventService =
-                ServiceFactory.get(IssueEventService.class, bypassCache);
+        final IssueTimelineService timelineService =
+                ServiceFactory.get(IssueTimelineService.class, bypassCache);
         final IssueCommentService commentService =
                 ServiceFactory.get(IssueCommentService.class, bypassCache);
         final PullRequestReviewService reviewService =
@@ -207,7 +208,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                 .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
         Single<List<TimelineItem>> eventsSingle = ApiHelpers.PageIterator
-                .toSingle(page -> eventService.getIssueEvents(mRepoOwner, mRepoName, issueNumber, page))
+                .toSingle(page -> timelineService.getTimeline(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
                 .compose(RxUtils.mapList(TimelineItem.TimelineEvent::new));
 
