@@ -55,6 +55,7 @@ import com.gh4a.widget.SwipeRefreshLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 
+@SuppressLint("AddJavascriptInterface")
 public abstract class WebViewerActivity extends BaseActivity implements
         SwipeRefreshLayout.ChildScrollDelegate, View.OnTouchListener {
 
@@ -64,7 +65,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     private WebView mPrintWebView;
     private boolean mStarted;
     private boolean mHasData;
-    private boolean mRequiresJsInterface;
+    private boolean mRequiresNativeClient;
     private boolean mPageFinished;
     private boolean mRenderingDone;
     private final Handler mHandler = new Handler();
@@ -145,6 +146,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
         WebSettings s = mWebView.getSettings();
         initWebViewSettings(s);
+        addCommonJavascriptInterfaces(mWebView);
 
         SharedPreferences prefs = getSharedPreferences(SettingsFragment.PREF_NAME, MODE_PRIVATE);
         int initialZoomLevel = prefs.getInt(SettingsFragment.KEY_TEXT_SIZE, 2);
@@ -168,6 +170,11 @@ public abstract class WebViewerActivity extends BaseActivity implements
         s.setSupportZoom(true);
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(false);
+    }
+
+    private void addCommonJavascriptInterfaces(WebView webView) {
+        webView.addJavascriptInterface(new Base64JavascriptInterface(), "Base64");
+        webView.addJavascriptInterface(new HtmlUtilsJavascriptInterface(), "HtmlUtils");
     }
 
     @Override
@@ -232,7 +239,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         findAction.showSoftInput();
     }
 
-    @SuppressLint("AddJavascriptInterface")
     @TargetApi(19)
     private void doPrint() {
         if (handlePrintRequest()) {
@@ -241,9 +247,10 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
         mPrintWebView = new WebView(this);
         initWebViewSettings(mPrintWebView.getSettings());
+        addCommonJavascriptInterfaces(mPrintWebView);
 
-        if (mRequiresJsInterface) {
-            mPrintWebView.addJavascriptInterface(new PrintJavascriptInterface(), "NativeClient");
+        if (mRequiresNativeClient) {
+            mPrintWebView.addJavascriptInterface(new PrintNativeClientJavascriptInterface(), "NativeClient");
         } else {
             mPrintWebView.setWebViewClient(new WebViewClient() {
                 @Override
@@ -291,7 +298,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     }
 
     private void showContentIfDone() {
-        if (mPageFinished && (mRenderingDone || !mRequiresJsInterface)) {
+        if (mPageFinished && (mRenderingDone || !mRequiresNativeClient)) {
             applyLineWrapping(shouldWrapLines());
             setContentShown(true);
         }
@@ -316,13 +323,12 @@ public abstract class WebViewerActivity extends BaseActivity implements
     protected void onLineTouched(int line, int x, int y) {
     }
 
-    @SuppressLint("AddJavascriptInterface")
     protected void onDataReady() {
         final String cssTheme = getResources().getBoolean(R.bool.is_dark_theme)
                 ? DARK_CSS_THEME : LIGHT_CSS_THEME;
         final String html = generateHtml(cssTheme, false);
-        if (mRequiresJsInterface) {
-            mWebView.addJavascriptInterface(new DisplayJavascriptInterface(), "NativeClient");
+        if (mRequiresNativeClient) {
+            mWebView.addJavascriptInterface(new NativeClientJavascriptInterface(), "NativeClient");
         }
         mWebView.loadDataWithBaseURL("file:///android_asset/", html, null, "utf-8", null);
         mHasData = true;
@@ -369,7 +375,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
         content.append("<div id='content'></div>");
 
-        mWebView.addJavascriptInterface(new Base64JavascriptInterface(), "Base64");
         content.append("<script>");
         content.append("var text = Base64.decode('");
         content.append(base64Data.replaceAll("\\n", ""));
@@ -378,7 +383,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         content.append("converter.setFlavor('github');\n");
         content.append("var html = converter.makeHtml(text);\n");
         if (repoOwner != null && repoName != null) {
-            mWebView.addJavascriptInterface(new HtmlUtilsJavascriptInterface(), "HtmlUtils");
             String actualRef = ref == null ? "master" : ref;
             content.append(String.format("html = HtmlUtils.rewriteRelativeUrls(html, '%s', '%s', '%s', '%s');\n",
                     repoOwner, repoName, actualRef, folderPath));
@@ -388,7 +392,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
         content.append("</body></html>");
 
-        mRequiresJsInterface = false;
+        mRequiresNativeClient = false;
         return content.toString();
     }
 
@@ -424,7 +428,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         content.append(TextUtils.htmlEncode(data));
         content.append("</pre></body></html>");
 
-        mRequiresJsInterface = true;
+        mRequiresNativeClient = true;
         return content.toString();
     }
 
@@ -482,7 +486,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    private class DisplayJavascriptInterface {
+    private class NativeClientJavascriptInterface {
         @JavascriptInterface
         public void onLineTouched(final int line) {
             mHandler.post(() -> WebViewerActivity.this.onLineTouched(line, mLastTouchDown.x, mLastTouchDown.y));
@@ -497,7 +501,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
         }
     }
 
-    private class PrintJavascriptInterface {
+    private class PrintNativeClientJavascriptInterface {
         @JavascriptInterface
         public void onLineTouched(int line) {
         }
