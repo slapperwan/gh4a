@@ -446,14 +446,16 @@ public abstract class WebViewerActivity extends BaseActivity implements
                 : "txt";  // plain text, no highlighting
     }
 
-    protected static String wrapUnthemedHtml(String html, String cssTheme, String title) {
-        String style = TextUtils.equals(cssTheme, DARK_CSS_THEME)
-                ? "<style type=\"text/css\">" +
-                    "body { color: #A3A3A5 !important }" +
-                    "a { color: #4183C4 !important }</style>"
-                : "";
-        String titleHeader = title != null ? "<h2>" + title + "</h2>" : "";
-        return style + "<body>" + titleHeader + html + "</body>";
+    protected static String wrapWithMarkdownStyling(String html, String cssTheme, String title) {
+        StringBuilder content = new StringBuilder();
+        HtmlUtils.writeCssInclude(content, "markdown", cssTheme);
+        content.append("<body>");
+        if (title != null) {
+            content.append("<h2>").append(title).append("</h2>");
+        }
+        content.append(html);
+        content.append("</body>");
+        return content.toString();
     }
 
     @Override
