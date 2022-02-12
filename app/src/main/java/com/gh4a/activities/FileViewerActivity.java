@@ -329,14 +329,13 @@ public class FileViewerActivity extends WebViewerActivity
     private static String highlightImage(String imageUrl, String cssTheme, String title) {
         StringBuilder content = new StringBuilder();
         content.append("<html><head>");
-        HtmlUtils.writeCssInclude(content, "text", cssTheme);
+        HtmlUtils.writeCssInclude(content, "markdown", cssTheme);
         content.append("</head><body>");
         if (title != null) {
             content.append("<h2>").append(title).append("</h2>");
         }
-        content.append("<div class='image'>");
         content.append("<img src='").append(imageUrl).append("' />");
-        content.append("</div></body></html>");
+        content.append("</body></html>");
         return content.toString();
     }
 
