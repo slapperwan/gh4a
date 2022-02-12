@@ -16,12 +16,6 @@ pre > div {
     margin-right: 6px;
 }
 
-.image {
-    border: 1px solid #7a7a7a;
-    display: table;
-    padding: 3px;
-}
-
 .change {
     background-color: #9ea1a1;
     color: #eee;
