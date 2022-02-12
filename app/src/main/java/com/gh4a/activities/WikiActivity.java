@@ -68,7 +68,7 @@ public class WikiActivity extends WebViewerActivity {
     @Override
     protected String generateHtml(String cssTheme, boolean addTitleHeader) {
         String title = addTitleHeader ? getDocumentTitle() : null;
-        return wrapUnthemedHtml(mWikiPageFeed.getContent(), cssTheme, title);
+        return wrapWithMarkdownStyling(mWikiPageFeed.getContent(), cssTheme, title);
     }
 
     @Override
