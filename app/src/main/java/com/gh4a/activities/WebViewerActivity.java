@@ -162,10 +162,9 @@ public abstract class WebViewerActivity extends BaseActivity implements
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebViewSettings(WebSettings s) {
         s.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
-        s.setAllowFileAccess(true);
+        s.setAllowFileAccess(false);
         s.setBuiltInZoomControls(true);
         s.setDisplayZoomControls(false);
-        s.setLightTouchEnabled(true);
         s.setLoadsImagesAutomatically(true);
         s.setSupportZoom(true);
         s.setJavaScriptEnabled(true);
