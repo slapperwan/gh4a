@@ -244,6 +244,7 @@ class EventViewHolder
                 textResId = R.string.pull_request_event_convert_to_draft;
                 break;
             case ReadyForReview:
+                textResId = R.string.pull_request_event_ready_for_review;
                 break;
             case CrossReferenced:
                 textResId = mIsPullRequest
