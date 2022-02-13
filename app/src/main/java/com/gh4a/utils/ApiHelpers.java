@@ -17,6 +17,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
+import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
@@ -190,6 +191,16 @@ public class ApiHelpers {
                 .path(path)
                 .authority(authority)
                 .build();
+    }
+
+    public static Pair<String, String> extractRepoOwnerAndNameFromIssue(Issue issue) {
+        Repository repo = issue.repository();
+        if (repo != null) {
+            String[] splitted = repo.fullName().split("/");
+            return Pair.create(splitted[0], splitted[1]);
+        }
+        String[] urlParts = issue.url().split("/");
+        return Pair.create(urlParts[4], urlParts[5]);
     }
 
     private final static char[] HEX_CHARS = "0123456789ABCDEF".toCharArray();

@@ -38,6 +38,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.appcompat.app.AlertDialog;
+
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -87,8 +89,8 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         View.OnClickListener, ConfirmationDialogFragment.Callback,
         PullRequestFilesFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, Issue issue) {
-        String[] urlParts = issue.url().split("/");
-        return makeIntent(context, urlParts[4], urlParts[5], issue.number());
+        Pair<String, String> repoOwnerAndName = ApiHelpers.extractRepoOwnerAndNameFromIssue(issue);
+        return makeIntent(context, repoOwnerAndName.first, repoOwnerAndName.second, issue.number());
     }
 
     public static Intent makeIntent(Context context, String repoOwner, String repoName, int number) {

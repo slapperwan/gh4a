@@ -35,6 +35,8 @@ import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -65,8 +67,8 @@ import java.util.Locale;
 public class IssueActivity extends BaseActivity implements
         View.OnClickListener, ConfirmationDialogFragment.Callback {
     public static Intent makeIntent(Context context, Issue issue) {
-        String[] urlParts = issue.url().split("/");
-        return makeIntent(context, urlParts[4], urlParts[5], issue.number());
+        Pair<String, String> repoOwnerAndName = ApiHelpers.extractRepoOwnerAndNameFromIssue(issue);
+        return makeIntent(context, repoOwnerAndName.first, repoOwnerAndName.second, issue.number());
     }
 
     public static Intent makeIntent(Context context, String login, String repoName, int number) {
