@@ -289,7 +289,7 @@
     <string name="issue_event_closed_with_commit">[b]%1$s[/b] closed this issue in [commit] [time]</string>
     <string name="issue_event_reopened">[b]%1$s[/b] reopened this issue [time]</string>
     <string name="issue_event_referenced">[b]%1$s[/b] referenced this issue [time]</string>
-    <string name="issue_event_referenced_with_commit">[b]%1$s[/b] added commit [commit] that referenced this issue [time]</string>
+    <string name="issue_event_referenced_with_commit">[b]%1$s[/b] referenced this issue in commit [commit] [time]</string>
     <string name="issue_event_assigned">[b]%1$s[/b] assigned [b]%2$s[/b] [time]</string>
     <string name="issue_event_assigned_self">[b]%1$s[/b] self-assigned this issue [time]</string>
     <string name="issue_event_unassigned">[b]%1$s[/b] unassigned [b]%2$s[/b] [time]</string>
@@ -310,7 +310,7 @@
     <string name="pull_request_event_merged">[b]%1$s[/b] merged this pull request [time]</string>
     <string name="pull_request_event_merged_with_commit">[b]%1$s[/b] merged this pull request as commit [commit] [time]</string>
     <string name="pull_request_event_referenced">[b]%1$s[/b] referenced this pull request [time]</string>
-    <string name="pull_request_event_referenced_with_commit">[b]%1$s[/b] added commit [commit] that referenced this pull request [time]</string>
+    <string name="pull_request_event_referenced_with_commit">[b]%1$s[/b] referenced this pull request in commit [commit] [time]</string>
     <string name="pull_request_event_assigned_self">[b]%1$s[/b] self-assigned this pull request [time]</string>
     <string name="pull_request_event_review_approved">[b]%1$s[/b] approved these changes [time]</string>
     <string name="pull_request_event_review_requested_changes">[b]%1$s[/b] requested changes [time]</string>
