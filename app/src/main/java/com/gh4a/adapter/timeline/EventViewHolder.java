@@ -306,13 +306,19 @@ class EventViewHolder
         pos = text.toString().indexOf("[source]");
         if (pos >= 0) {
             final Issue source = event.source().issue();
-            String sourceLabel = "#" + source.number();
+            var sourceRepoOwnerAndName = ApiHelpers.extractRepoOwnerAndNameFromIssue(source);
+            String sourceRepoOwner = sourceRepoOwnerAndName.first;
+            String sourceRepoName = sourceRepoOwnerAndName.second;
+            boolean isSourceInDifferentRepo = !mRepoOwner.equals(sourceRepoOwner) || !mRepoName.equals(sourceRepoName);
+            String sourceLabel = isSourceInDifferentRepo
+                    ? sourceRepoOwner + "/" + sourceRepoName + "#" + source.number()
+                    : "#" + source.number();
             text.replace(pos, pos + 8, sourceLabel);
-            text.setSpan(new IntentSpan(mContext, context -> {
-                return source.pullRequest() != null
-                        ? PullRequestActivity.makeIntent(context, source)
-                        : IssueActivity.makeIntent(context, source);
-            }), pos, pos + sourceLabel.length(), 0);
+            text.setSpan(new IntentSpan(mContext, context ->
+                source.pullRequest() != null
+                    ? PullRequestActivity.makeIntent(context, sourceRepoOwner, sourceRepoName, source.number())
+                    : IssueActivity.makeIntent(context, sourceRepoOwner, sourceRepoName, source.number())
+            ), pos, pos + sourceLabel.length(), 0);
         }
 
         CharSequence time = event.createdAt() != null
