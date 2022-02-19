@@ -258,52 +258,67 @@ class EventViewHolder
         if (textBase == null) {
             textBase = mContext.getString(textResId, getUserLoginWithBotSuffix(user));
         }
-        SpannableStringBuilder text = StringUtils.applyBoldTags(textBase, typefaceValue);
 
+        SpannableStringBuilder text = StringUtils.applyBoldTags(textBase, typefaceValue);
+        replaceCommitPlaceholder(event, text);
+        replaceLabelPlaceholder(event, text);
+        replaceBotPlaceholder(text);
+        replaceSourcePlaceholder(event, text);
+        replaceTimePlaceholder(event, text);
+        return text;
+    }
+
+    private void replaceCommitPlaceholder(IssueEvent event, SpannableStringBuilder text) {
         int pos = text.toString().indexOf("[commit]");
         if (event.commitId() != null && pos >= 0) {
             // The commit might be in a different repo. The API doesn't provide
             // that information directly, so get it indirectly by parsing the URL
-            String repoOwner = mRepoOwner;
-            String repoName = mRepoName;
-            boolean isInDifferentRepo = false;
+            String commitRepoOwner = mRepoOwner;
+            String commitRepoName = mRepoName;
+            boolean isCommitInDifferentRepo = false;
             String url = event.commitUrl();
             if (url != null) {
                 Matcher matcher = COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN.matcher(url);
                 if (matcher.find()) {
-                    repoOwner = matcher.group(1);
-                    repoName = matcher.group(2);
-                    isInDifferentRepo = !mRepoOwner.equals(repoOwner) || !mRepoName.equals(repoName);
+                    commitRepoOwner = matcher.group(1);
+                    commitRepoName = matcher.group(2);
+                    isCommitInDifferentRepo = !mRepoOwner.equals(commitRepoOwner) || !mRepoName.equals(commitRepoName);
                 }
             }
             String shortCommitSha = event.commitId().substring(0, 7);
-            String commitText = isInDifferentRepo
-                    ? repoOwner + "/" + repoName + "#" + shortCommitSha
+            String commitText = isCommitInDifferentRepo
+                    ? commitRepoOwner + "/" + commitRepoName + "#" + shortCommitSha
                     : shortCommitSha;
             text.replace(pos, pos + 8, commitText);
 
-            String finalRepoOwner = repoOwner;
-            String finalRepoName = repoName;
+            String finalRepoOwner = commitRepoOwner;
+            String finalRepoName = commitRepoName;
             text.setSpan(new IntentSpan(mContext, context ->
                     CommitActivity.makeIntent(context, finalRepoOwner, finalRepoName, event.commitId())), pos, pos + commitText.length(), 0);
             text.setSpan(new TypefaceSpan("monospace"), pos, pos + commitText.length(), 0);
         }
+    }
 
-        pos = text.toString().indexOf("[label]");
+    private void replaceLabelPlaceholder(IssueEvent event, SpannableStringBuilder text) {
+        int pos = text.toString().indexOf("[label]");
         Label label = event.label();
         if (label != null && pos >= 0) {
             int length = label.name().length();
             text.replace(pos, pos + 7, label.name());
             text.setSpan(new IssueLabelSpan(mContext, label, false), pos, pos + length, 0);
         }
+    }
 
-        pos = text.toString().indexOf("[bot]");
+    private void replaceBotPlaceholder(SpannableStringBuilder text) {
+        int pos = text.toString().indexOf("[bot]");
         if (pos >= 0) {
             text.delete(pos, pos + 5);
             StringUtils.addUserTypeSpan(mContext, text, pos, mContext.getString(R.string.user_type_bot));
         }
+    }
 
-        pos = text.toString().indexOf("[source]");
+    private void replaceSourcePlaceholder(IssueEvent event, SpannableStringBuilder text) {
+        int pos = text.toString().indexOf("[source]");
         if (pos >= 0) {
             final Issue source = event.source().issue();
             var sourceRepoOwnerAndName = ApiHelpers.extractRepoOwnerAndNameFromIssue(source);
@@ -315,25 +330,24 @@ class EventViewHolder
                     : "#" + source.number();
             text.replace(pos, pos + 8, sourceLabel);
             text.setSpan(new IntentSpan(mContext, context ->
-                source.pullRequest() != null
-                    ? PullRequestActivity.makeIntent(context, sourceRepoOwner, sourceRepoName, source.number())
-                    : IssueActivity.makeIntent(context, sourceRepoOwner, sourceRepoName, source.number())
+                    source.pullRequest() != null
+                            ? PullRequestActivity.makeIntent(context, sourceRepoOwner, sourceRepoName, source.number())
+                            : IssueActivity.makeIntent(context, sourceRepoOwner, sourceRepoName, source.number())
             ), pos, pos + sourceLabel.length(), 0);
         }
+    }
 
-        CharSequence time = event.createdAt() != null
-                ? StringUtils.formatRelativeTime(mContext, event.createdAt(), true) : "";
-
-        pos = text.toString().indexOf("[time]");
+    private void replaceTimePlaceholder(IssueEvent event, SpannableStringBuilder text) {
+        int pos = text.toString().indexOf("[time]");
         if (pos >= 0) {
+            CharSequence time = event.createdAt() != null
+                    ? StringUtils.formatRelativeTime(mContext, event.createdAt(), true) : "";
             text.replace(pos, pos + 6, time);
             if (event.createdAt() != null) {
                 text.setSpan(new TimestampToastSpan(event.createdAt()), pos,
                         pos + time.length(), 0);
             }
         }
-
-        return text;
     }
 
     @Override
