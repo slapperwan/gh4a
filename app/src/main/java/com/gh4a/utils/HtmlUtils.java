@@ -704,19 +704,23 @@ public class HtmlUtils {
          */
         private void startCodeSnippetLineIfAppropriate(String tdCssClass) {
             if (tdCssClass.contains("blob-num-addition")) {
+                start(new Pre());
                 int color = UiUtils.resolveColor(mContext, R.attr.colorDiffAddBackground);
                 start(new Code(color));
                 mSpannableStringBuilder.append('+');
             } else if (tdCssClass.contains("blob-num-deletion")) {
+                start(new Pre());
                 int color = UiUtils.resolveColor(mContext, R.attr.colorDiffRemoveBackground);
                 start(new Code(color));
                 mSpannableStringBuilder.append('-');
             } else if (tdCssClass.contains("blob-num")) {
+                start(new Pre());
                 start(new Code(mCodeBlockBackgroundColor));
             }
         }
 
         private void endCodeSnippetLine(Code codeMark) {
+            mSpannableStringBuilder.removeSpan(getLast(Pre.class));
             setSpanFromMark(codeMark, new TypefaceSpan("monospace"), new CodeBlockSpan(codeMark.mColor));
         }
 
