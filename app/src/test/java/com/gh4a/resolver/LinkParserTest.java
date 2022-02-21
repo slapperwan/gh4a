@@ -253,6 +253,11 @@ public class LinkParserTest {
     }
 
     @Test
+    public void releaseAssetLink__opensBrowser() {
+        assertRedirectsToBrowser(parseLink("https://github.com/slapperwan/gh4a/releases/download/4.6.7/release.apk"));
+    }
+
+    @Test
     public void releaseLink_withoutTagId__opensReleaseListActivity() {
         LinkParser.ParseResult result =
                 parseLink("https://github.com/slapperwan/gh4a/releases/tag");
