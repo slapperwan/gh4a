@@ -520,8 +520,7 @@ public class LinkParserTest {
     }
 
     @Test
-    public void pullRequestLink_withDiffMarker_andInvalidNumber__opensPullRequest() throws
-            Exception {
+    public void pullRequestLink_withDiffMarker_andInvalidNumber__opensPullRequest() {
         LinkParser.ParseResult result =
                 parseLink("https://github.com/slapperwan/gh4a/pull/665/files" +
                         "#diff-38f43208e0c158ca7b78e175b8846bc6LA3");
