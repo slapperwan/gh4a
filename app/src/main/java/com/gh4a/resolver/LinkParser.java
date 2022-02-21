@@ -218,9 +218,11 @@ public class LinkParser {
         return new ParseResult(SearchActivity.makeIntent(activity, query, typeInt, true));
     }
 
-    @NonNull
     private static ParseResult parseReleaseLink(FragmentActivity activity, Uri uri,
             List<String> parts, String user, String repo, String id) {
+        if ("download".equals(id)) {
+            return null;
+        }
         if ("tag".equals(id)) {
             final String release = parts.size() >= 5 ? parts.get(4) : null;
             if (release != null) {
