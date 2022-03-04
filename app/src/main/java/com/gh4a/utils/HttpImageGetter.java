@@ -328,8 +328,8 @@ public class HttpImageGetter {
 
     private final Context mContext;
 
-    private final int mWidth;
-    private final int mHeight;
+    private final int mMaxWidth;
+    private final int mMaxHeight;
 
     private boolean mDestroyed;
 
@@ -339,10 +339,9 @@ public class HttpImageGetter {
 
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         final Point size = new Point();
-
         wm.getDefaultDisplay().getSize(size);
-        mWidth = size.x;
-        mHeight = size.y;
+        mMaxWidth = size.x;
+        mMaxHeight = size.y;
 
         mLoadingDrawable = ContextCompat.getDrawable(context, R.drawable.image_loading);
         mLoadingDrawable.setBounds(0, 0,
@@ -452,7 +451,7 @@ public class HttpImageGetter {
                         mime = URLConnection.guessContentTypeFromStream(is);
                     }
                     if (mime != null && mime.startsWith("image/svg")) {
-                        bitmap = renderSvgToBitmap(mContext.getResources(), is, mWidth, mHeight);
+                        bitmap = renderSvgToBitmap(mContext.getResources(), is);
                     } else {
                         boolean isGif = mime != null && mime.startsWith("image/gif");
                         if (!isGif || canLoadGif()) {
@@ -461,7 +460,7 @@ public class HttpImageGetter {
                                 d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
                                 return d;
                             } else {
-                                bitmap = getBitmap(responseBody, mWidth, mHeight);
+                                bitmap = getBitmap(responseBody);
                             }
                         }
                     }
@@ -501,13 +500,13 @@ public class HttpImageGetter {
         }
     }
 
-    private static Bitmap getBitmap(final byte[] image, int width, int height) {
+    private Bitmap getBitmap(final byte[] image) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeByteArray(image, 0, image.length, options);
 
         int scale = 1;
-        while (options.outWidth >= width || options.outHeight >= height) {
+        while (options.outWidth >= mMaxWidth || options.outHeight >= mMaxHeight) {
             options.outWidth /= 2;
             options.outHeight /= 2;
             scale *= 2;
@@ -520,8 +519,7 @@ public class HttpImageGetter {
         return BitmapFactory.decodeByteArray(image, 0, image.length, options);
     }
 
-    private static Bitmap renderSvgToBitmap(Resources res, InputStream is,
-            int maxWidth, int maxHeight) {
+    private Bitmap renderSvgToBitmap(Resources res, InputStream is) {
         try {
             SVG svg = SVG.getFromInputStream(is);
             if (svg != null) {
@@ -532,18 +530,18 @@ public class HttpImageGetter {
                 if (docWidth < 0 || docHeight < 0) {
                     float aspectRatio = svg.getDocumentAspectRatio();
                     if (aspectRatio > 0) {
-                        float heightForAspect = (float) maxWidth / aspectRatio;
-                        float widthForAspect = (float) maxHeight * aspectRatio;
+                        float heightForAspect = (float) mMaxWidth / aspectRatio;
+                        float widthForAspect = (float) mMaxHeight * aspectRatio;
                         if (widthForAspect < heightForAspect) {
                             docWidth = Math.round(widthForAspect);
-                            docHeight = maxHeight;
+                            docHeight = mMaxHeight;
                         } else {
-                            docWidth = maxWidth;
+                            docWidth = mMaxWidth;
                             docHeight = Math.round(heightForAspect);
                         }
                     } else {
-                        docWidth = maxWidth;
-                        docHeight = maxHeight;
+                        docWidth = mMaxWidth;
+                        docHeight = mMaxHeight;
                     }
 
                     // we didn't take density into account anymore when calculating docWidth
@@ -552,7 +550,7 @@ public class HttpImageGetter {
                     density = null;
                 }
 
-                while (docWidth >= maxWidth || docHeight >= maxHeight) {
+                while (docWidth >= mMaxWidth || docHeight >= mMaxHeight) {
                     docWidth /= 2;
                     docHeight /= 2;
                     if (density != null) {
