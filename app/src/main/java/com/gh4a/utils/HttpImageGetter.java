@@ -31,6 +31,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -466,6 +467,7 @@ public class HttpImageGetter {
                     }
                 }
             } catch (IOException e) {
+                Log.e(Gh4Application.LOG_TAG, "Couldn't display image " + url, e);
                 // fall through to showing the error bitmap
             }
         }
