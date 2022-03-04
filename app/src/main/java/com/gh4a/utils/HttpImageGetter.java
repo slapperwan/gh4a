@@ -26,9 +26,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.graphics.drawable.DrawableWrapper;
 import android.text.Html.ImageGetter;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -39,15 +36,14 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.caverock.androidsvg.SVG;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.SettingsFragment;
 
-import java.io.File;
-import java.io.FileDescriptor;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.lang.ref.WeakReference;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -55,6 +51,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.graphics.drawable.DrawableWrapper;
+import androidx.core.content.ContextCompat;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -329,8 +328,6 @@ public class HttpImageGetter {
 
     private final Context mContext;
 
-    private final File mCacheDir;
-
     private final int mWidth;
     private final int mHeight;
 
@@ -338,7 +335,6 @@ public class HttpImageGetter {
 
     public HttpImageGetter(Context context) {
         mContext = context;
-        mCacheDir = context.getCacheDir();
         mClient = ServiceFactory.getImageHttpClient();
 
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
@@ -440,14 +436,13 @@ public class HttpImageGetter {
         Bitmap bitmap = null;
 
         if (!mDestroyed && url != null) {
-            File output = null;
-            InputStream is = null;
             Request request = new Request.Builder()
                     .url(url)
                     .build();
             try (Response response = mClient.newCall(request).execute()) {
-                is = response.body().byteStream();
-                if (is != null) {
+                if (response.body() != null) {
+                    byte[] responseBody = response.body().bytes();
+                    InputStream is = new ByteArrayInputStream(responseBody);
                     MediaType mediaType = response.body().contentType();
                     String mime = mediaType != null ? mediaType.toString() : null;
                     if (mime == null) {
@@ -461,32 +456,18 @@ public class HttpImageGetter {
                     } else {
                         boolean isGif = mime != null && mime.startsWith("image/gif");
                         if (!isGif || canLoadGif()) {
-                            output = File.createTempFile("image", ".tmp", mCacheDir);
-                            if (FileUtils.save(output, is)) {
-                                if (isGif) {
-                                    GifDrawable d = new GifDrawable(output);
-                                    d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-                                    return d;
-                                } else {
-                                    bitmap = getBitmap(output, mWidth, mHeight);
-                                }
+                            if (isGif) {
+                                GifDrawable d = new GifDrawable(responseBody);
+                                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                                return d;
+                            } else {
+                                bitmap = getBitmap(responseBody, mWidth, mHeight);
                             }
                         }
                     }
                 }
             } catch (IOException e) {
                 // fall through to showing the error bitmap
-            } finally {
-                if (output != null) {
-                    output.delete();
-                }
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (IOException e) {
-                        // ignored
-                    }
-                }
             }
         }
 
@@ -520,40 +501,23 @@ public class HttpImageGetter {
         }
     }
 
-    private static Bitmap getBitmap(final File image, int width, int height) {
+    private static Bitmap getBitmap(final byte[] image, int width, int height) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
-        RandomAccessFile file = null;
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(image, 0, image.length, options);
 
-        try {
-            file = new RandomAccessFile(image.getAbsolutePath(), "r");
-            FileDescriptor fd = file.getFD();
-
-            options.inJustDecodeBounds = true;
-            BitmapFactory.decodeFileDescriptor(fd, null, options);
-
-            int scale = 1;
-            while (options.outWidth >= width || options.outHeight >= height) {
-                options.outWidth /= 2;
-                options.outHeight /= 2;
-                scale *= 2;
-            }
-
-            options.inJustDecodeBounds = false;
-            options.inDither = false;
-            options.inSampleSize = scale;
-
-            return BitmapFactory.decodeFileDescriptor(fd, null, options);
-        } catch (IOException e) {
-            return null;
-        } finally {
-            if (file != null) {
-                try {
-                    file.close();
-                } catch (IOException e) {
-                    // ignored
-                }
-            }
+        int scale = 1;
+        while (options.outWidth >= width || options.outHeight >= height) {
+            options.outWidth /= 2;
+            options.outHeight /= 2;
+            scale *= 2;
         }
+
+        options.inJustDecodeBounds = false;
+        options.inDither = false;
+        options.inSampleSize = scale;
+
+        return BitmapFactory.decodeByteArray(image, 0, image.length, options);
     }
 
     private static Bitmap renderSvgToBitmap(Resources res, InputStream is,
