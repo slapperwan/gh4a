@@ -442,6 +442,8 @@ public class HttpImageGetter {
             try (Response response = mClient.newCall(request).execute()) {
                 if (response.body() != null) {
                     byte[] responseBody = response.body().bytes();
+                    // ByteArrayInputStream supports marking, which is required for
+                    // URLConnection.guessContentTypeFromStream to work
                     InputStream is = new ByteArrayInputStream(responseBody);
                     MediaType mediaType = response.body().contentType();
                     String mime = mediaType != null ? mediaType.toString() : null;
@@ -455,14 +457,12 @@ public class HttpImageGetter {
                         bitmap = renderSvgToBitmap(mContext.getResources(), is);
                     } else {
                         boolean isGif = mime != null && mime.startsWith("image/gif");
-                        if (!isGif || canLoadGif()) {
-                            if (isGif) {
-                                GifDrawable d = new GifDrawable(responseBody);
-                                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-                                return d;
-                            } else {
-                                bitmap = getBitmap(responseBody);
-                            }
+                        if (isGif && canLoadGif()) {
+                            GifDrawable d = new GifDrawable(responseBody);
+                            d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                            return d;
+                        } else if (!isGif) {
+                            bitmap = getBitmap(responseBody);
                         }
                     }
                 }
