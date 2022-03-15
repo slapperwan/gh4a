@@ -120,10 +120,11 @@ public class FileUtils {
         if (StringUtils.isBlank(extension)) {
             return null;
         }
-        if (MIME_TYPE_OVERRIDES.containsKey(extension)) {
-            return MIME_TYPE_OVERRIDES.get(extension);
+        String lowercasedExt = extension.toLowerCase(Locale.US);
+        if (MIME_TYPE_OVERRIDES.containsKey(lowercasedExt)) {
+            return MIME_TYPE_OVERRIDES.get(lowercasedExt);
         }
-        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(lowercasedExt);
     }
 
     private static boolean isExtensionIn(String filename, List<String> extensions) {
