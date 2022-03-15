@@ -33,6 +33,7 @@ public class FileUtils {
         // JavaScript can be resolved to both text/javascript and application/javascript,
         // for our purposes it's text in any case
         MIME_TYPE_OVERRIDES.put("js", "text/javascript");
+        MIME_TYPE_OVERRIDES.put("mjs", "text/javascript");
         // Same for Ruby, LaTeX, SQL, JSON
         MIME_TYPE_OVERRIDES.put("rb", "text/x-ruby");
         MIME_TYPE_OVERRIDES.put("latex", "text/x-latex");
