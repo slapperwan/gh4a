@@ -7,26 +7,11 @@
                     android:id="@+id/filter_type_all"
                     android:title="@string/repo_type_all" />
                 <item
-                    android:id="@+id/filter_type_member"
-                    android:title="@string/repo_type_member" />
-                <item
-                    android:id="@+id/filter_type_public"
-                    android:title="@string/repo_type_public" />
-                <item
-                    android:id="@+id/filter_type_private"
-                    android:title="@string/repo_type_private" />
-                <item
                     android:id="@+id/filter_type_sources"
                     android:title="@string/repo_type_sources" />
                 <item
                     android:id="@+id/filter_type_forks"
                     android:title="@string/repo_type_forks" />
-                <item
-                    android:id="@+id/filter_type_watched"
-                    android:title="@string/repo_type_watched" />
-                <item
-                    android:id="@+id/filter_type_starred"
-                    android:title="@string/repo_type_starred" />
             </group>
         </menu>
     </item>
