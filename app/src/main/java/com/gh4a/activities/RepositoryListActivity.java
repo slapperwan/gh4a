@@ -116,6 +116,7 @@ public class RepositoryListActivity extends FragmentContainerActivity implements
         String type = mFilterDrawerHelper.handleSelectionAndGetFilterType(item);
         if (type != null) {
             mFragment.setFilterType(type);
+            mSortDrawerHelper.setFilterType(type);
             super.supportInvalidateOptionsMenu();
             updateRightNavigationDrawer();
             return true;
