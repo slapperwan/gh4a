@@ -33,7 +33,6 @@ import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.util.Pair;
@@ -119,8 +118,6 @@ public class IssueActivity extends BaseActivity implements
         mHeader.setVisibility(View.GONE);
         addHeaderView(mHeader, false);
 
-        setFragment((IssueFragment) getSupportFragmentManager().findFragmentById(R.id.details));
-
         setToolbarScrollable(true);
         loadIssue(false);
         loadCollaboratorStatus(false);
@@ -157,17 +154,18 @@ public class IssueActivity extends BaseActivity implements
             return;
         }
         FragmentManager fm = getSupportFragmentManager();
-        IssueFragment newFragment = IssueFragment.newInstance(mRepoOwner, mRepoName,
-                mIssue, mIsCollaborator, mInitialComment);
-        if (mFragment != null) {
-            Fragment.SavedState state = fm.saveFragmentInstanceState(mFragment);
-            newFragment.setInitialSavedState(state);
+        var existingFragment = (IssueFragment) fm.findFragmentById(R.id.details);
+        if (existingFragment != null) {
+            setFragment(existingFragment);
+        } else {
+            IssueFragment newFragment = IssueFragment.newInstance(mRepoOwner, mRepoName,
+                    mIssue, mIsCollaborator, mInitialComment);
+            setFragment(newFragment);
+            fm.beginTransaction()
+                    .add(R.id.details, newFragment)
+                    .commitAllowingStateLoss();
+            mInitialComment = null;
         }
-        setFragment(newFragment);
-        fm.beginTransaction()
-                .replace(R.id.details, mFragment)
-                .commitAllowingStateLoss();
-        mInitialComment = null;
 
         updateHeader();
         updateFabVisibility();
