@@ -5,6 +5,7 @@ body {
     color: #48484C;
     margin: 0;
     padding: 16px;
+    word-wrap: break-word;
 }
 
 body>:first-child, #content>:first-child {
@@ -289,7 +290,6 @@ code,tt {
     margin: 0 2px;
     padding: 1px 5px;
     white-space: pre-wrap;
-    overflow-wrap: break-word;
     background-color: #D6D6D6;
     border-radius: 3px;
     font-size: 13px;
