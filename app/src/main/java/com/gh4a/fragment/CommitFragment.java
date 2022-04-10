@@ -272,7 +272,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
     private void fillFileStats(View fileView, GitHubFile file, ForegroundColorSpan additionsSpan,
             ForegroundColorSpan deletionsSpan) {
         TextView statsView = fileView.findViewById(R.id.stats);
-        if (file.patch() != null) {
+        if (file.additions() > 0 || file.deletions() > 0) {
             SpannableStringBuilder stats = new SpannableStringBuilder();
             stats.append("+").append(String.valueOf(file.additions()));
             int addLength = stats.length();
