@@ -168,7 +168,7 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
         var info = (ContextMenuAwareRecyclerView.RecyclerContextMenuInfo) menuInfo;
         Content contents = mAdapter.getItemFromAdapterPosition(info.position);
         Set<String> subModules = mCallback.getSubModuleNames(this);
-        boolean isSubModule = subModules != null && subModules.contains(contents.name());
+        boolean isSubModule = subModules.contains(contents.name());
 
         menu.add(Menu.NONE, R.id.history, Menu.NONE, R.string.history);
         if (contents.type() == ContentType.File && !isSubModule) {
