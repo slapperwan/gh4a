@@ -288,7 +288,7 @@ class EventViewHolder
         boolean isCommitInDifferentRepo = !mRepoOwner.equals(commitRepoOwner) || !mRepoName.equals(commitRepoName);
         String shortCommitSha = commitId.substring(0, 7);
         String commitText = isCommitInDifferentRepo
-                ? commitRepoOwner + "/" + commitRepoName + "#" + shortCommitSha
+                ? commitRepoOwner + "/" + commitRepoName + "@" + shortCommitSha
                 : shortCommitSha;
         text.replace(pos, pos + 8, commitText);
 
