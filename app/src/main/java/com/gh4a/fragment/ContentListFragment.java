@@ -165,15 +165,13 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        ContextMenuAwareRecyclerView.RecyclerContextMenuInfo info =
-                (ContextMenuAwareRecyclerView.RecyclerContextMenuInfo) menuInfo;
+        var info = (ContextMenuAwareRecyclerView.RecyclerContextMenuInfo) menuInfo;
         Content contents = mAdapter.getItemFromAdapterPosition(info.position);
         Set<String> subModules = mCallback.getSubModuleNames(this);
+        boolean isSubModule = subModules != null && subModules.contains(contents.name());
 
-        if (subModules == null || !subModules.contains(contents.name())) {
-            menu.add(Menu.NONE, R.id.history, Menu.NONE, R.string.history);
-        }
-        if (contents.type() == ContentType.File) {
+        menu.add(Menu.NONE, R.id.history, Menu.NONE, R.string.history);
+        if (contents.type() == ContentType.File && !isSubModule) {
             menu.add(Menu.NONE, R.id.download, Menu.NONE, R.string.download);
         }
     }
