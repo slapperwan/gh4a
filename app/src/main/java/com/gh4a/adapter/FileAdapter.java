@@ -29,10 +29,11 @@ import com.gh4a.utils.FileUtils;
 import com.meisolsson.githubsdk.model.Content;
 import com.meisolsson.githubsdk.model.ContentType;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class FileAdapter extends RootAdapter<Content, FileAdapter.ViewHolder> {
-    private Set<String> mSubModuleNames;
+    private Set<String> mSubModuleNames = Collections.emptySet();
 
     public FileAdapter(Context context) {
         super(context);
@@ -52,7 +53,7 @@ public class FileAdapter extends RootAdapter<Content, FileAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(ViewHolder holder, Content content) {
         String name = content.name();
-        boolean isSubModule = mSubModuleNames != null && mSubModuleNames.contains(name);
+        boolean isSubModule = mSubModuleNames.contains(name);
 
         holder.icon.setBackgroundResource(getIconId(content.type(), name));
         holder.fileName.setText(name);

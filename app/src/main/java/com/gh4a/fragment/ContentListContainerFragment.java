@@ -36,6 +36,7 @@ import com.philosophicalhacker.lib.RxLoader;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -258,7 +259,7 @@ public class ContentListContainerFragment extends Fragment implements
     @Override
     public Set<String> getSubModuleNames(ContentListFragment fragment) {
         if (mGitModuleMap == null) {
-            return null;
+            return Collections.emptySet();
         }
 
         String prefix = TextUtils.isEmpty(fragment.getPath()) ? null : fragment.getPath() + "/";
