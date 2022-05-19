@@ -192,12 +192,7 @@ public class AvatarHandler {
 
             @Override
             protected int sizeOf(Long key, Bitmap value) {
-                final long sizeInBytes;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    sizeInBytes = value.getAllocationByteCount();
-                } else {
-                    sizeInBytes = value.getRowBytes() * value.getHeight();
-                }
+                final long sizeInBytes = value.getAllocationByteCount();
                 return (int) (sizeInBytes / 1024);
             }
         };

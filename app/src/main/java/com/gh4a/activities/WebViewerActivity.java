@@ -106,10 +106,8 @@ public abstract class WebViewerActivity extends BaseActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
-                WebView.setWebContentsDebuggingEnabled(true);
-            }
+        if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+            WebView.setWebContentsDebuggingEnabled(true);
         }
 
         setContentView(R.layout.web_viewer);
@@ -178,14 +176,13 @@ public abstract class WebViewerActivity extends BaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mHasData) {
-            menu.removeItem(R.id.browser);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && mHasData) {
+        if (mHasData) {
             getMenuInflater().inflate(R.menu.print_menu, menu);
             if (mPrintWebView != null) {
                 menu.findItem(R.id.print).setEnabled(false);
             }
+        } else {
+            menu.removeItem(R.id.browser);
         }
         return super.onCreateOptionsMenu(menu);
     }
