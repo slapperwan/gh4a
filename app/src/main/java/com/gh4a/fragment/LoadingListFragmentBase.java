@@ -1,6 +1,8 @@
 package com.gh4a.fragment;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,6 +27,8 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
     private LinearLayoutManager mLayoutManager;
     private NestedScrollView mEmptyViewContainer;
     private RecyclerFastScroller mFastScroller;
+
+    private static final String STATE_KEY_ARGS_HASH = "args_hash";
 
     public interface OnRecyclerViewCreatedListener {
         void onRecyclerViewCreated(Fragment fragment, RecyclerView recyclerView);
@@ -80,9 +84,25 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (savedInstanceState != null) {
+            Bundle args = getArguments();
+            int argsHash = args != null ? args.hashCode() : 0;
+            int oldArgsHash = savedInstanceState.getInt(STATE_KEY_ARGS_HASH);
+            if (argsHash != oldArgsHash) {
+                RecyclerView.Adapter<?> adapter = mRecyclerView.getAdapter();
+                adapter.setStateRestorationPolicy(RecyclerView.Adapter.StateRestorationPolicy.PREVENT);
+            }
+        }
         if (getActivity() instanceof OnRecyclerViewCreatedListener) {
             ((OnRecyclerViewCreatedListener) getActivity()).onRecyclerViewCreated(this, mRecyclerView);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        Bundle args = getArguments();
+        outState.putInt(STATE_KEY_ARGS_HASH, args != null ? args.hashCode() : 0);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
