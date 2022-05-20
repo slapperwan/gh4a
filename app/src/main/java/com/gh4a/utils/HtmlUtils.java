@@ -234,6 +234,7 @@ public class HtmlUtils {
         private static final float[] HEADING_SIZES = {
             1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,
         };
+        private static final float SMALL_TEXT_SIZE = 0.8f;
 
         private final float mDividerHeight;
         private final int mBulletMargin;
@@ -484,10 +485,10 @@ public class HtmlUtils {
                 endBlockElement();
             } else if (tag.equalsIgnoreCase("ul")) {
                 endBlockElement();
-                end(List.class, null);
+                end(List.class);
             } else if (tag.equalsIgnoreCase("ol")) {
                 endBlockElement();
-                end(List.class, null);
+                end(List.class);
             } else if (tag.equalsIgnoreCase("li")) {
                 endLi();
             } else if (tag.equalsIgnoreCase("div")) {
@@ -517,7 +518,7 @@ public class HtmlUtils {
             } else if (tag.equalsIgnoreCase("big")) {
                 end(Big.class, new RelativeSizeSpan(1.25f));
             } else if (tag.equalsIgnoreCase("small")) {
-                end(Small.class, new RelativeSizeSpan(0.8f));
+                end(Small.class, new RelativeSizeSpan(SMALL_TEXT_SIZE));
             } else if (tag.equalsIgnoreCase("font")) {
                 endFont();
             } else if (tag.equalsIgnoreCase("blockquote")) {
@@ -537,9 +538,9 @@ public class HtmlUtils {
             } else if (tag.equalsIgnoreCase("strike")) {
                 end(Strikethrough.class, new StrikethroughSpan());
             } else if (tag.equalsIgnoreCase("sup")) {
-                end(Super.class, new SuperscriptSpan());
+                end(Super.class, new SuperscriptSpan(), new RelativeSizeSpan(SMALL_TEXT_SIZE));
             } else if (tag.equalsIgnoreCase("sub")) {
-                end(Sub.class, new SubscriptSpan());
+                end(Sub.class, new SubscriptSpan(), new RelativeSizeSpan(SMALL_TEXT_SIZE));
             } else if (tag.equalsIgnoreCase("code")) {
                 Code code = getLast(Code.class);
                 if (code != null) {
@@ -757,10 +758,10 @@ public class HtmlUtils {
             mSpannableStringBuilder.setSpan(mark, len, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         }
 
-        private void end(Class<?> kind, Object repl) {
+        private void end(Class<?> kind, Object... spans) {
             Object obj = getLast(kind);
             if (obj != null) {
-                setSpanFromMark(obj, repl);
+                setSpanFromMark(obj, spans);
             }
         }
 
