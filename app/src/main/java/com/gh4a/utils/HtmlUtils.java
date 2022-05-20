@@ -232,7 +232,7 @@ public class HtmlUtils {
 
     private static class HtmlToSpannedConverter implements ContentHandler {
         private static final float[] HEADING_SIZES = {
-            1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f,
+            1.75f, 1.5f, 1.25f, 1.1f, 1f, 0.9f
         };
         private static final float SMALL_TEXT_SIZE = 0.8f;
 
