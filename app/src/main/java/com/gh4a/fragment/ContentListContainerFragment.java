@@ -323,7 +323,7 @@ public class ContentListContainerFragment extends Fragment implements
         service.getContentsRaw(repoOwner, repoName, ".gitmodules", mSelectedRef)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Optional::of)
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<String>absent()))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<byte[]>absent()))
                 .map(this::parseModuleMap)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -336,8 +336,8 @@ public class ContentListContainerFragment extends Fragment implements
                 }, ((BaseActivity) getActivity())::handleLoadFailure);
     }
 
-    private Optional<Map<String, String>> parseModuleMap(Optional<String> inputOpt) {
-        String input = inputOpt.orNull();
+    private Optional<Map<String, String>> parseModuleMap(Optional<byte[]> inputOpt) {
+        String input = inputOpt.map(bytes -> new String(bytes)).orNull();
         if (StringUtils.isBlank(input)) {
             return Optional.absent();
         }

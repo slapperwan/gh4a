@@ -3,6 +3,7 @@ package com.gh4a;
 import android.content.Context;
 import android.util.Log;
 
+import com.meisolsson.githubsdk.core.ByteArrayResponseConverterFactory;
 import com.meisolsson.githubsdk.core.GitHubPaginationInterceptor;
 import com.meisolsson.githubsdk.core.ServiceGenerator;
 import com.meisolsson.githubsdk.core.StringResponseConverterFactory;
@@ -104,6 +105,7 @@ public class ServiceFactory {
     private final static Retrofit.Builder RETROFIT_BUILDER = new Retrofit.Builder()
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(new StringResponseConverterFactory())
+            .addConverterFactory(new ByteArrayResponseConverterFactory())
             .addConverterFactory(MoshiConverterFactory.create(ServiceGenerator.moshi));
 
     private static OkHttpClient sApiHttpClient;

@@ -699,6 +699,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     private Single<IssueTemplate> parseTemplate(RepositoryContentService service, Content content) {
         return service.getContentsRaw(mRepoOwner, mRepoName, content.path(), null)
             .map(ApiHelpers::throwOnFailure)
+            .map(bytes -> new String(bytes))
             .map(IssueTemplate::new)
             .compose(RxUtils::doInBackground);
     }

@@ -229,7 +229,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                     for (Review r : reviews) {
                         Single<List<ReviewComment>> single = ApiHelpers.PageIterator
                                 .toSingle(page -> reviewService.getReviewComments(mRepoOwner,
-                                        mRepoName, issueNumber, r.id()));
+                                        mRepoName, issueNumber, r.id(), page));
                         obsList.add(Single.zip(Single.just(r.id()), single, Pair::create).toObservable());
                     }
                     return Observable.concat(obsList);
