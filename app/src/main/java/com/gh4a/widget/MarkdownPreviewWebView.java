@@ -1,22 +1,30 @@
 package com.gh4a.widget;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
+
 import androidx.core.view.NestedScrollingChild2;
 import androidx.core.view.NestedScrollingChildHelper;
 import androidx.core.view.ViewCompat;
+import androidx.fragment.app.FragmentActivity;
+
+import android.net.Uri;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 
 import com.gh4a.R;
 import com.gh4a.activities.WebViewerActivity;
 import com.gh4a.utils.HtmlUtils;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 
 public class MarkdownPreviewWebView extends WebView implements NestedScrollingChild2 {
@@ -46,8 +54,26 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
 
         if (!isInEditMode()) {
             initWebViewSettings(getSettings());
+            setWebViewClient(getUrlHandlingClient());
             setContent("");
         }
+    }
+
+    private WebViewClient getUrlHandlingClient() {
+        return new WebViewClient() {
+            @Override
+            @TargetApi(24)
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                IntentUtils.openLinkInternallyOrExternally((FragmentActivity) getContext(), request.getUrl());
+                return true;
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                IntentUtils.openLinkInternallyOrExternally((FragmentActivity) getContext(), Uri.parse(url));
+                return true;
+            }
+        };
     }
 
     public void setEditText(EditText editor) {
@@ -168,6 +194,7 @@ public class MarkdownPreviewWebView extends WebView implements NestedScrollingCh
         s.setLoadsImagesAutomatically(true);
         s.setJavaScriptEnabled(true);
         s.setUseWideViewPort(false);
+        s.setAllowFileAccess(false);
     }
 
     private void setContent(String content) {
