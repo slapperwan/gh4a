@@ -2,7 +2,9 @@
 <resources>
     <color name="primary">#65b345</color>
     <color name="primary_dark">#5aa03d</color>
-    <color name="accent">@color/primary_dark</color>
+    <color name="accent">@color/primary</color>
+
+    <color name="link_text">@color/primary_dark</color>
 
     <color name="label_fg_dark">#ff000000</color>
     <color name="label_fg_light">#fff3f3f3</color>
