@@ -4,10 +4,10 @@ import android.net.Uri;
 import android.text.style.ClickableSpan;
 import android.view.View;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.utils.IntentUtils;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentActivity;
 
 public class LinkSpan extends ClickableSpan {
     private final String mUrl;
@@ -19,7 +19,7 @@ public class LinkSpan extends ClickableSpan {
     @Override
     public void onClick(@NonNull View widget) {
         Uri clickedUri = Uri.parse(mUrl);
-        BaseActivity activity = (BaseActivity) widget.getContext();
+        var activity = (FragmentActivity) widget.getContext();
         IntentUtils.openLinkInternallyOrExternally(activity, clickedUri);
     }
 }

@@ -20,6 +20,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.fragment.app.FragmentActivity;
+
 import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
@@ -44,7 +46,7 @@ public class IntentUtils {
     private IntentUtils() {
     }
 
-    public static void openLinkInternallyOrExternally(BaseActivity activity, Uri uri) {
+    public static void openLinkInternallyOrExternally(FragmentActivity activity, Uri uri) {
         String uriScheme = uri.getScheme();
         if (uriScheme == null || uriScheme.equals("file") || uriScheme.equals("content")) {
             // We can't do anything about relative or anchor URLs here, and there are no good reasons to
@@ -63,12 +65,13 @@ public class IntentUtils {
         }
 
         LinkParser.ParseResult result = LinkParser.parseUri(activity, uri, null);
+        int headerColor = activity instanceof BaseActivity ? ((BaseActivity) activity).getCurrentHeaderColor() : 0;
         if (result == null) {
-            openInCustomTabOrBrowser(activity, uri, activity.getCurrentHeaderColor());
+            openInCustomTabOrBrowser(activity, uri, headerColor);
         } else if (result.intent != null) {
             activity.startActivity(result.intent);
         } else if (result.loadTask != null) {
-            result.loadTask.setOpenUnresolvedUriInCustomTab(activity.getCurrentHeaderColor());
+            result.loadTask.setOpenUnresolvedUriInCustomTab(headerColor);
             result.loadTask.execute();
         }
     }
