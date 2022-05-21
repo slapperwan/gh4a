@@ -89,7 +89,7 @@ public class IssueActivity extends BaseActivity implements
     private final ActivityResultLauncher<Intent> mEditIssueLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultHelpers.ActivityResultSuccessCallback(() -> {
-                loadIssue(true);
+                onRefresh();
                 setResult(RESULT_OK);
             }));
 
