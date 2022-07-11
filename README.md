@@ -44,7 +44,7 @@ Main features
 
 ### Tree/File browser
 * Browse source code
-* View code with syntax hightlighting
+* View code with syntax highlighting
 
 ### Gist
 * List public gists
