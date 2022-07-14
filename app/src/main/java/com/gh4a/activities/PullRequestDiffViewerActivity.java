@@ -135,4 +135,12 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
         return service.createPullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)
                 .map(ApiHelpers::throwOnFailure);
     }
+
+    @Override
+    public Single<Void> deleteReaction(ReactionBar.Item item, long reactionId) {
+        CommentWrapper comment = (CommentWrapper) item;
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
+        return service.deletePullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), reactionId)
+                .map(ApiHelpers::throwOnFailure);
+    }
 }

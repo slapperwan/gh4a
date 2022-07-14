@@ -225,6 +225,14 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     }
 
     @Override
+    public Single<Void> deleteReaction(ReactionBar.Item item, long reactionId) {
+        GitComment comment = ((ViewHolder) item).mBoundItem;
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
+        return service.deleteCommitCommentReaction(mRepoOwner, mRepoName, comment.id(), reactionId)
+                .map(ApiHelpers::throwOnFailure);
+    }
+
+    @Override
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         ViewHolder holder = (ViewHolder) item;
         holder.mBoundItem = holder.mBoundItem.toBuilder().reactions(reactions).build();

@@ -498,6 +498,13 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
+    public Single<Void> deleteReaction(ReactionBar.Item item, long reactionId) {
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
+        return service.deleteIssueReaction(mRepoOwner, mRepoName, mIssue.number(), reactionId)
+                .map(ApiHelpers::throwOnFailure);
+    }
+
+    @Override
     public Single<List<Reaction>> loadReactionDetails(final GitHubCommentBase comment,
             boolean bypassCache) {
         final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
@@ -509,7 +516,14 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     public Single<Reaction> addReaction(GitHubCommentBase comment, String content) {
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
-        return service.createIssueCommentReaction(mRepoOwner, mRepoName,comment.id(), request)
+        return service.createIssueCommentReaction(mRepoOwner, mRepoName, comment.id(), request)
+                .map(ApiHelpers::throwOnFailure);
+    }
+
+    @Override
+    public Single<Void> deleteReaction(GitHubCommentBase comment, long reactionId) {
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
+        return service.deleteIssueCommentReaction(mRepoOwner, mRepoName, comment.id(), reactionId)
                 .map(ApiHelpers::throwOnFailure);
     }
 

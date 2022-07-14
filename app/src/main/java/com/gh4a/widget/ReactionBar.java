@@ -55,6 +55,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         boolean canAddReaction();
         Single<List<Reaction>> loadReactionDetails(Item item, boolean bypassCache);
         Single<Reaction> addReaction(Item item, String content);
+        Single<Void> deleteReaction(Item item, long reactionId);
     }
 
     private static final @IdRes int[] VIEW_IDS = {
@@ -435,8 +436,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
             resultSingle = callback.addReaction(item, content)
                     .map(Optional::of);
         } else {
-            ReactionService service = ServiceFactory.get(ReactionService.class, false);
-            resultSingle = service.deleteReaction(id)
+            resultSingle = callback.deleteReaction(item, id)
                     .map(response -> Optional.absent());
         }
 
