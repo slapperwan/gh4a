@@ -17,6 +17,7 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.adapter.RootAdapter;
+import com.gh4a.resolver.LinkParser;
 import com.gh4a.worker.NotificationsWorker;
 import com.gh4a.model.NotificationHolder;
 import com.gh4a.resolver.BrowseFilter;
@@ -133,14 +134,24 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         if (item.notification == null) {
             intent = RepositoryActivity.makeIntent(getActivity(), item.repository);
         } else {
-            markAsRead(null, item.notification);
-
             NotificationSubject subject = item.notification.subject();
             String url = subject.url();
             if (url != null) {
                 Uri uri = ApiHelpers.normalizeUri(Uri.parse(url));
-                intent = BrowseFilter.makeRedirectionIntent(getActivity(), uri,
-                        new IntentUtils.InitialCommentMarker(item.notification.lastReadAt()));
+                IntentUtils.InitialCommentMarker initialComment =
+                        new IntentUtils.InitialCommentMarker(item.notification.lastReadAt());
+                LinkParser.ParseResult result = LinkParser.parseUri(getActivity(), uri, initialComment);
+                if (result != null && result.intent != null) {
+                    intent = result.intent;
+                } else {
+                    // We either can't handle the URL ourselves or need to resolve it
+                    // asynchronously. Pass it to the BrowseFilter for resolving or redirection
+                    intent = BrowseFilter.makeRedirectionIntent(getActivity(), uri, initialComment);
+                    // Only auto-mark the notification as read if we can handle the URL ourselves
+                    if (result != null) {
+                        markAsRead(null, item.notification);
+                    }
+                }
             } else {
                 intent = null;
             }
