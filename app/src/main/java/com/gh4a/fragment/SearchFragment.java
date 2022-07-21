@@ -151,8 +151,9 @@ public class SearchFragment extends PagedDataBaseFragment<Object> implements
     }
 
     @Override
-    protected boolean shouldDoInitialLoad() {
-        return getArguments().getBoolean("do_initial_load", true);
+    protected boolean shouldDoInitialLoad(Bundle savedInstanceState) {
+        return (savedInstanceState != null && mQuery != null) // always restore previous load results
+                || getArguments().getBoolean("do_initial_load", true);
     }
 
     @Override

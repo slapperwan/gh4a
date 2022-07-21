@@ -56,7 +56,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
 
         mRxLoader = new RxLoader(getActivity(), LoaderManager.getInstance(this));
         resetSubject();
-        if (shouldDoInitialLoad()) {
+        if (shouldDoInitialLoad(savedInstanceState)) {
             setContentShown(false);
             load(false);
         }
@@ -106,7 +106,7 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
         mPageSubject.onNext(1);
     }
 
-    protected boolean shouldDoInitialLoad() {
+    protected boolean shouldDoInitialLoad(Bundle savedInstanceState) {
         return true;
     }
 
