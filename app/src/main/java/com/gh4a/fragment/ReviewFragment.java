@@ -439,12 +439,12 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
     }
 
     @Override
-    public Single<Void> deleteReaction(GitHubCommentBase comment, long reactionId) {
+    public Single<Boolean> deleteReaction(GitHubCommentBase comment, long reactionId) {
         final ReactionService service = ServiceFactory.get(ReactionService.class, false);
         final Single<Response<Void>> responseSingle = comment instanceof ReviewComment
                 ? service.deletePullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.id(), reactionId)
                 : service.deleteIssueCommentReaction(mRepoOwner, mRepoName, comment.id(), reactionId);
-        return responseSingle.map(ApiHelpers::throwOnFailure);
+        return responseSingle.map(ApiHelpers::mapToTrueOnSuccess);
     }
 
     @Override

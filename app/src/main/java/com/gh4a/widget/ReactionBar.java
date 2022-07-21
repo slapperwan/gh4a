@@ -55,7 +55,7 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
         boolean canAddReaction();
         Single<List<Reaction>> loadReactionDetails(Item item, boolean bypassCache);
         Single<Reaction> addReaction(Item item, String content);
-        Single<Void> deleteReaction(Item item, long reactionId);
+        Single<Boolean> deleteReaction(Item item, long reactionId);
     }
 
     private static final @IdRes int[] VIEW_IDS = {

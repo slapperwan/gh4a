@@ -498,10 +498,10 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public Single<Void> deleteReaction(ReactionBar.Item item, long reactionId) {
+    public Single<Boolean> deleteReaction(ReactionBar.Item item, long reactionId) {
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deleteIssueReaction(mRepoOwner, mRepoName, mIssue.number(), reactionId)
-                .map(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::mapToTrueOnSuccess);
     }
 
     @Override
@@ -521,10 +521,10 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    public Single<Void> deleteReaction(GitHubCommentBase comment, long reactionId) {
+    public Single<Boolean> deleteReaction(GitHubCommentBase comment, long reactionId) {
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deleteIssueCommentReaction(mRepoOwner, mRepoName, comment.id(), reactionId)
-                .map(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::mapToTrueOnSuccess);
     }
 
     @Override

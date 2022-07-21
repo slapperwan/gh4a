@@ -65,7 +65,7 @@ class CommentViewHolder
         boolean onMenItemClick(TimelineItem.TimelineComment comment, MenuItem menuItem);
         Single<List<Reaction>> loadReactionDetails(TimelineItem.TimelineComment item, boolean bypassCache);
         Single<Reaction> addReaction(TimelineItem.TimelineComment item, String content);
-        Single<Void> deleteReaction(TimelineItem.TimelineComment item, long reactionId);
+        Single<Boolean> deleteReaction(TimelineItem.TimelineComment item, long reactionId);
     }
 
     public CommentViewHolder(View view, HttpImageGetter imageGetter, String repoOwner,
@@ -263,7 +263,7 @@ class CommentViewHolder
     }
 
     @Override
-    public Single<Void> deleteReaction(ReactionBar.Item item, long reactionId) {
+    public Single<Boolean> deleteReaction(ReactionBar.Item item, long reactionId) {
         return mCallback.deleteReaction(mBoundItem, reactionId);
     }
 }

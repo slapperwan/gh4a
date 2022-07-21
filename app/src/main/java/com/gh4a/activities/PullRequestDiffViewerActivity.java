@@ -137,10 +137,10 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     }
 
     @Override
-    public Single<Void> deleteReaction(ReactionBar.Item item, long reactionId) {
+    public Single<Boolean> deleteReaction(ReactionBar.Item item, long reactionId) {
         CommentWrapper comment = (CommentWrapper) item;
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deletePullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), reactionId)
-                .map(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::mapToTrueOnSuccess);
     }
 }

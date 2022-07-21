@@ -121,10 +121,10 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     }
 
     @Override
-    public Single<Void> deleteReaction(ReactionBar.Item item, long reactionId) {
+    public Single<Boolean> deleteReaction(ReactionBar.Item item, long reactionId) {
         CommentWrapper comment = (CommentWrapper) item;
         final ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deleteCommitCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), reactionId)
-                .map(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::mapToTrueOnSuccess);
     }
 }

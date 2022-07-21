@@ -60,7 +60,7 @@ public class TimelineItemAdapter
         String getShareSubject(GitHubCommentBase comment);
         Single<List<Reaction>> loadReactionDetails(GitHubCommentBase comment, boolean bypassCache);
         Single<Reaction> addReaction(GitHubCommentBase comment, String content);
-        Single<Void> deleteReaction(GitHubCommentBase comment, long reactionId);
+        Single<Boolean> deleteReaction(GitHubCommentBase comment, long reactionId);
     }
 
     private final ReviewViewHolder.Callback mReviewCallback = new ReviewViewHolder.Callback() {
@@ -135,7 +135,7 @@ public class TimelineItemAdapter
         }
 
         @Override
-        public Single<Void> deleteReaction(TimelineItem.TimelineComment item, long reactionId) {
+        public Single<Boolean> deleteReaction(TimelineItem.TimelineComment item, long reactionId) {
             return mActionCallback.deleteReaction(item.comment(), reactionId);
         }
     };
