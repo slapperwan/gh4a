@@ -165,7 +165,16 @@ public abstract class PagedDataBaseFragment<T> extends LoadingListFragmentBase i
     @Override
     public void onScrolledToFooter() {
         if (mNextPage != null && mLoadingView.getVisibility() == View.VISIBLE) {
-            mPageSubject.onNext(mNextPage);
+            // Even if our subscription above is active, the page subject might not be subscribed
+            // to yet - this is the case if the data comes from the RX loader's cache. In that case,
+            // updating the page subject is pointless at this point. Force a load to subscribe to
+            // the page subject, which will cause the data to be delivered again, after which
+            // onScrolledToFooter will be called again.
+            if (mPageSubject.hasObservers()) {
+                mPageSubject.onNext(mNextPage);
+            } else {
+                load(true);
+            }
             mNextPage = null;
         }
     }
