@@ -150,6 +150,10 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
     }
 
     private void updateTitle() {
+        // The repository may have been moved or renamed, so we want to make sure that
+        // the title matches the current name of the repository
+        mActionBar.setTitle(mRepository.fullName());
+
         mActionBar.setSubtitle(getCurrentRef());
         invalidateFragments();
     }
