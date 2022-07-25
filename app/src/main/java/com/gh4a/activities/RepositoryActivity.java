@@ -120,7 +120,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
 
         setContentShown(false);
 
-        loadRepository(false);
+        loadRepository();
     }
 
     @Override
@@ -243,7 +243,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         clearRefDependentFragments();
         setContentShown(false);
         invalidateTabs();
-        loadRepository(true);
+        loadRepository();
         super.onRefresh();
     }
 
@@ -349,11 +349,14 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         mCommitListFragment = null;
     }
 
-    private void loadRepository(boolean force) {
-        RepositoryService service = ServiceFactory.get(RepositoryService.class, force);
+    private void loadRepository() {
+        // We always skip the cache in this case, since the repository endpoint incorrectly returns the
+        // same ETag even if some fields are changed (like the open issues count and the watchers count)
+        boolean skipCache = true;
+        RepositoryService service = ServiceFactory.get(RepositoryService.class, skipCache);
         service.getRepository(mRepoOwner, mRepoName)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(makeLoaderSingle(ID_LOADER_REPO, force))
+                .compose(makeLoaderSingle(ID_LOADER_REPO, skipCache))
                 .subscribe(result -> {
                     mRepository = result;
                     updateTitle();
