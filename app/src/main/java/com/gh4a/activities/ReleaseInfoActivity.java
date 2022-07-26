@@ -19,9 +19,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,7 +46,9 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
 import java.util.Date;
 
-import io.reactivex.disposables.Disposable;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
@@ -76,7 +75,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
     private Release mRelease;
     private long mReleaseId;
 
-    private Disposable mBodySubscription;
     private View mRootView;
     private HttpImageGetter mImageGetter;
 
@@ -140,16 +138,17 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     @Override
+    protected boolean canSwipeToRefresh() {
+        // Allow refresh only when the release is not passed via intent extras
+        return mReleaseId != 0;
+    }
+
+    @Override
     public void onRefresh() {
-        if (!getIntent().hasExtra("release")) {
-            mRelease = null;
-            setContentShown(false);
-            mImageGetter.clearHtmlCache();
-            if (mBodySubscription != null) {
-                mBodySubscription.dispose();
-            }
-            loadRelease(true);
-        }
+        mRelease = null;
+        setContentShown(false);
+        mImageGetter.clearHtmlCache();
+        loadRelease(true);
         super.onRefresh();
     }
 
