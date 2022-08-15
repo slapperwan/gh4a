@@ -26,6 +26,7 @@ import com.gh4a.widget.TimestampToastSpan;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueEvent;
 import com.meisolsson.githubsdk.model.IssueEventType;
+import com.meisolsson.githubsdk.model.IssueStateReason;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Rename;
 import com.meisolsson.githubsdk.model.User;
@@ -33,6 +34,7 @@ import com.meisolsson.githubsdk.model.User;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,32 +44,6 @@ class EventViewHolder
 
     private static final Pattern COMMIT_URL_REPO_NAME_AND_OWNER_PATTERN =
             Pattern.compile(".*github\\.com/repos/([^/]+)/([^/]+)/commits");
-    private static final HashMap<IssueEventType, Integer> EVENT_ICONS = new HashMap<>();
-
-    static {
-        EVENT_ICONS.put(IssueEventType.Closed, R.drawable.issue_event_closed);
-        EVENT_ICONS.put(IssueEventType.Reopened, R.drawable.issue_event_reopened);
-        EVENT_ICONS.put(IssueEventType.Merged, R.drawable.issue_event_merged);
-        EVENT_ICONS.put(IssueEventType.Referenced, R.drawable.issue_event_referenced);
-        EVENT_ICONS.put(IssueEventType.Assigned, R.drawable.issue_event_person);
-        EVENT_ICONS.put(IssueEventType.Unassigned, R.drawable.issue_event_person);
-        EVENT_ICONS.put(IssueEventType.Labeled, R.drawable.issue_event_label);
-        EVENT_ICONS.put(IssueEventType.Unlabeled, R.drawable.issue_event_label);
-        EVENT_ICONS.put(IssueEventType.Locked, R.drawable.issue_event_locked);
-        EVENT_ICONS.put(IssueEventType.Unlocked, R.drawable.issue_event_unlocked);
-        EVENT_ICONS.put(IssueEventType.Milestoned, R.drawable.issue_event_milestone);
-        EVENT_ICONS.put(IssueEventType.Demilestoned, R.drawable.issue_event_milestone);
-        EVENT_ICONS.put(IssueEventType.Renamed, R.drawable.issue_event_renamed);
-        EVENT_ICONS.put(IssueEventType.HeadRefDeleted, R.drawable.timeline_event_branch);
-        EVENT_ICONS.put(IssueEventType.HeadRefRestored, R.drawable.timeline_event_branch);
-        EVENT_ICONS.put(IssueEventType.HeadRefForcePushed, R.drawable.timeline_event_branch);
-        EVENT_ICONS.put(IssueEventType.CommentDeleted, R.drawable.timeline_event_comment_deleted);
-        EVENT_ICONS.put(IssueEventType.ReviewRequested, R.drawable.timeline_event_review);
-        EVENT_ICONS.put(IssueEventType.ReviewRequestRemoved, R.drawable.timeline_event_review_request_removed);
-        EVENT_ICONS.put(IssueEventType.ConvertToDraft, R.drawable.timeline_event_branch);
-        EVENT_ICONS.put(IssueEventType.ReadyForReview, R.drawable.timeline_event_review);
-        EVENT_ICONS.put(IssueEventType.CrossReferenced, R.drawable.timeline_event_cross_referenced);
-    }
 
     private final Context mContext;
     private final String mRepoOwner;
@@ -102,7 +78,7 @@ class EventViewHolder
         AvatarHandler.assignAvatar(mAvatarView, user);
         mAvatarContainer.setTag(user);
 
-        Integer eventIconResId = EVENT_ICONS.get(item.event.event());
+        Integer eventIconResId = getEventIcon(item.event);
         if (eventIconResId != null) {
             mEventIconView.setImageResource(eventIconResId);
             mEventIconView.setVisibility(View.VISIBLE);
@@ -110,29 +86,69 @@ class EventViewHolder
             mEventIconView.setVisibility(View.GONE);
         }
 
-        mMessageView.setText(formatEvent(item.event, user,
-                mMessageView.getTypefaceValue(), mIsPullRequest));
+        mMessageView.setText(formatEvent(item.event, user, mMessageView.getTypefaceValue()));
     }
 
-    private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue,
-            boolean isPullRequestEvent) {
+    private Integer getEventIcon(IssueEvent event) {
+        switch (event.event()) {
+            case Closed:
+                return mIsPullRequest || event.stateReason() == IssueStateReason.NotPlanned
+                        ? R.drawable.issue_event_closed
+                        : R.drawable.issue_event_closed_completed;
+            case Reopened: return R.drawable.issue_event_reopened;
+            case Merged: return R.drawable.issue_event_merged;
+            case Referenced: return R.drawable.issue_event_referenced;
+            case Assigned:
+            case Unassigned:
+                return R.drawable.issue_event_person;
+            case Labeled:
+            case Unlabeled:
+                return R.drawable.issue_event_label;
+            case Locked: return R.drawable.issue_event_locked;
+            case Unlocked: return R.drawable.issue_event_unlocked;
+            case Milestoned:
+            case Demilestoned:
+                return R.drawable.issue_event_milestone;
+            case Renamed: return R.drawable.issue_event_renamed;
+            case CommentDeleted: return R.drawable.timeline_event_comment_deleted;
+            case HeadRefDeleted:
+            case HeadRefRestored:
+            case HeadRefForcePushed:
+            case ConvertToDraft:
+                return R.drawable.timeline_event_branch;
+            case ReviewRequested:
+            case ReadyForReview:
+                return R.drawable.timeline_event_review;
+            case ReviewRequestRemoved: return R.drawable.timeline_event_review_request_removed;
+            case CrossReferenced: return R.drawable.timeline_event_cross_referenced;
+        }
+        return null;
+    }
+
+    private CharSequence formatEvent(final IssueEvent event, final User user, int typefaceValue) {
         String textBase = null;
         int textResId = 0;
 
         switch (event.event()) {
             case Closed:
-                if (isPullRequestEvent) {
+                if (mIsPullRequest) {
                     textResId = event.commitId() != null
                             ? R.string.pull_request_event_closed_with_commit
                             : R.string.pull_request_event_closed;
                 } else {
-                    textResId = event.commitId() != null
-                            ? R.string.issue_event_closed_with_commit
-                            : R.string.issue_event_closed;
+                    if (event.stateReason() == IssueStateReason.NotPlanned) {
+                        textResId = event.commitId() != null
+                                ? R.string.issue_event_closed_not_planned_with_commit
+                                : R.string.issue_event_closed_not_planned;
+                    } else {
+                        textResId = event.commitId() != null
+                                ? R.string.issue_event_closed_completed_with_commit
+                                : R.string.issue_event_closed_completed;
+                    }
                 }
                 break;
             case Reopened:
-                textResId = isPullRequestEvent
+                textResId = mIsPullRequest
                         ? R.string.pull_request_event_reopened
                         : R.string.issue_event_reopened;
                 break;
@@ -142,7 +158,7 @@ class EventViewHolder
                         : R.string.pull_request_event_merged;
                 break;
             case Referenced:
-                if (isPullRequestEvent) {
+                if (mIsPullRequest) {
                     textResId = event.commitId() != null
                             ? R.string.pull_request_event_referenced_with_commit
                             : R.string.pull_request_event_referenced;
@@ -159,7 +175,7 @@ class EventViewHolder
                 String assigneeLogin = event.assignee() != null ? event.assignee().login() : null;
                 if (assigneeLogin != null && assigneeLogin.equals(actorLogin)) {
                     if (isAssign) {
-                        textResId = isPullRequestEvent
+                        textResId = mIsPullRequest
                                 ? R.string.pull_request_event_assigned_self
                                 : R.string.issue_event_assigned_self;
                     } else {

@@ -286,8 +286,10 @@
     <string name="repo_activity">Activity</string>
 
     <!-- Issue events -->
-    <string name="issue_event_closed">[b]%1$s[/b] closed this issue [time]</string>
-    <string name="issue_event_closed_with_commit">[b]%1$s[/b] closed this issue in [commit] [time]</string>
+    <string name="issue_event_closed_completed">[b]%1$s[/b] closed this issue as completed [time]</string>
+    <string name="issue_event_closed_completed_with_commit">[b]%1$s[/b] closed this issue as completed in [commit] [time]</string>
+    <string name="issue_event_closed_not_planned">[b]%1$s[/b] closed this issue as not planned [time]</string>
+    <string name="issue_event_closed_not_planned_with_commit">[b]%1$s[/b] closed this issue as not planned in [commit] [time]</string>
     <string name="issue_event_reopened">[b]%1$s[/b] reopened this issue [time]</string>
     <string name="issue_event_referenced">[b]%1$s[/b] referenced this issue [time]</string>
     <string name="issue_event_referenced_with_commit">[b]%1$s[/b] referenced this issue in commit [commit] [time]</string>
