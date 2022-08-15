@@ -303,6 +303,7 @@
     <string name="issue_event_demilestoned">[b]%1$s[/b] removed this from the [b]%2$s[/b] milestone [time]</string>
     <string name="issue_event_renamed">[b]%1$s[/b] changed the title from [b]%2$s[/b] to [b]%3$s[/b] [time]</string>
     <string name="issue_event_locked">[b]%1$s[/b] locked and limited conversation to collaborators [time]</string>
+    <string name="issue_event_locked_with_reason">[b]%1$s[/b] locked as [b]%2$s[/b] and limited conversation to collaborators [time]</string>
     <string name="issue_event_unlocked">[b]%1$s[/b] unlocked this conversation [time]</string>
     <string name="issue_event_mentioned">[b]%1$s[/b] mentioned this issue in [b][source][/b] [time]</string>
 

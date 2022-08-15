@@ -198,7 +198,12 @@ class EventViewHolder
                 textResId = R.string.issue_event_unlabeled;
                 break;
             case Locked:
-                textResId = R.string.issue_event_locked;
+                if (event.lockReason() == null) {
+                    textResId = R.string.issue_event_locked;
+                } else {
+                    textBase = mContext.getString(R.string.issue_event_locked_with_reason,
+                        getUserLoginWithBotSuffix(user), event.lockReason());
+                }
                 break;
             case Unlocked:
                 textResId = R.string.issue_event_unlocked;
