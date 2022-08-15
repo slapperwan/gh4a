@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.resolver.LinkParser;
+import com.gh4a.fragment.SettingsFragment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -130,8 +132,12 @@ public class IntentUtils {
     }
 
     public static void openInCustomTabOrBrowser(Activity activity, Uri uri, int headerColor) {
+        SharedPreferences prefs = activity.getSharedPreferences(SettingsFragment.PREF_NAME,
+                Context.MODE_PRIVATE);
+        boolean customTabsEnabled = prefs.getBoolean(SettingsFragment.KEY_CUSTOM_TABS, true);
         String pkg = CustomTabsHelper.getPackageNameToUse(activity);
-        if (pkg != null) {
+
+        if (pkg != null && customTabsEnabled) {
             if (headerColor == 0) {
                 headerColor = UiUtils.resolveColor(activity, R.attr.colorPrimary);
             }
