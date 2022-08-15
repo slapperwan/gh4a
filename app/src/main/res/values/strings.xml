@@ -592,4 +592,8 @@
     <string name="theme_light">Day</string>
     <string name="theme_dark">Night</string>
     <string name="theme_system">Use system setting</string>
+
+    <string name="use_custom_tabs">Use built-in browser</string>
+    <string name="open_links_inside_app">Open links inside the app</string>
+    <string name="open_links_external_browser">Open links in an external browser</string>
 </resources>

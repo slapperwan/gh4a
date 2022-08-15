@@ -40,6 +40,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     public static final String KEY_START_PAGE = "start_page";
     public static final String KEY_TEXT_SIZE = "webview_initial_zoom";
     public static final String KEY_GIF_LOADING = "http_gif_load_mode";
+    public static final String KEY_CUSTOM_TABS = "use_custom_tabs";
     public static final String KEY_NOTIFICATIONS = "notifications";
     public static final String KEY_NOTIFICATION_INTERVAL = "notification_interval";
     private static final String KEY_ABOUT = "about";
