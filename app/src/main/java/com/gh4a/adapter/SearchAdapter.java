@@ -93,7 +93,7 @@ public class SearchAdapter extends RootAdapter<Object, RecyclerView.ViewHolder> 
         @Override
         public void onBindViewHolder(ViewHolder holder, SearchCode result) {
             Repository repo = result.repository();
-            holder.tvTitle.setText(result.name());
+            holder.tvTitle.setText(result.path());
             holder.tvRepo.setText(ApiHelpers.formatRepoName(mContext, repo));
 
             List<TextMatch> matches = result.textMatches();
@@ -127,6 +127,7 @@ public class SearchAdapter extends RootAdapter<Object, RecyclerView.ViewHolder> 
                     tvMatch.setText(builder);
                     tvMatch.setTag(result);
                     tvMatch.setTag(R.id.search_match_index, i);
+                    tvMatch.setTypeface(Typeface.MONOSPACE);
                     row.setVisibility(View.VISIBLE);
                 }
                 for (int i = matches.size(); i < holder.matchesContainer.getChildCount(); i++) {
