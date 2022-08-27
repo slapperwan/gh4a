@@ -323,6 +323,7 @@ public class HttpImageGetter {
 
     private final Handler mHandler = new Handler();
     private final Map<Object, ObjectInfo> mObjectInfos = new HashMap<>();
+    private final Drawable mGifPlaceholderDrawable;
     private final Drawable mLoadingDrawable;
     private final Drawable mErrorDrawable;
     private final OkHttpClient mClient;
@@ -344,11 +345,15 @@ public class HttpImageGetter {
         mMaxWidth = size.x;
         mMaxHeight = size.y;
 
+        mGifPlaceholderDrawable = ContextCompat.getDrawable(context, R.drawable.image_gif_placeholder);
+        mGifPlaceholderDrawable.setBounds(0, 0,
+                mGifPlaceholderDrawable.getIntrinsicWidth(), mGifPlaceholderDrawable.getIntrinsicHeight());
+
         mLoadingDrawable = ContextCompat.getDrawable(context, R.drawable.image_loading);
         mLoadingDrawable.setBounds(0, 0,
                 mLoadingDrawable.getIntrinsicWidth(), mLoadingDrawable.getIntrinsicHeight());
 
-        mErrorDrawable = ContextCompat.getDrawable(context, R.drawable.content_picture);
+        mErrorDrawable = ContextCompat.getDrawable(context, R.drawable.image_error);
         mErrorDrawable.setBounds(0, 0,
                 mErrorDrawable.getIntrinsicWidth(), mErrorDrawable.getIntrinsicHeight());
     }
@@ -457,11 +462,15 @@ public class HttpImageGetter {
                         bitmap = renderSvgToBitmap(mContext.getResources(), is);
                     } else {
                         boolean isGif = mime != null && mime.startsWith("image/gif");
-                        if (isGif && canLoadGif()) {
-                            GifDrawable d = new GifDrawable(responseBody);
-                            d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-                            return d;
-                        } else if (!isGif) {
+                        if (isGif) {
+                            if (canLoadGif()) {
+                                GifDrawable d = new GifDrawable(responseBody);
+                                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+                                return d;
+                            } else {
+                                return mGifPlaceholderDrawable;
+                            }
+                        } else {
                             bitmap = getBitmap(responseBody);
                         }
                     }
