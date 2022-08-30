@@ -20,11 +20,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Parcelable;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.view.LayoutInflater;
@@ -64,13 +59,17 @@ import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.request.CommentRequest;
 import com.meisolsson.githubsdk.model.request.ReactionRequest;
-import com.meisolsson.githubsdk.service.reactions.ReactionService;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
+import com.meisolsson.githubsdk.service.reactions.ReactionService;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.Single;
 import retrofit2.Response;
 
@@ -309,19 +308,15 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         if (mInitialComment != null) {
             for (int i = 0; i < data.size(); i++) {
                 TimelineItem item = data.get(i);
-
+                long itemId = 0;
                 if (item instanceof TimelineItem.TimelineComment) {
-                    TimelineItem.TimelineComment comment = (TimelineItem.TimelineComment) item;
-                    if (mInitialComment.matches(comment.comment().id(), comment.getCreatedAt())) {
-                        scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
-                        break;
-                    }
+                    itemId = ((TimelineItem.TimelineComment) item).comment().id();
                 } else if (item instanceof TimelineItem.TimelineReview) {
-                    TimelineItem.TimelineReview review = (TimelineItem.TimelineReview) item;
-                    if (mInitialComment.matches(review.review().id(), review.getCreatedAt())) {
-                        scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
-                        break;
-                    }
+                    itemId = ((TimelineItem.TimelineReview) item).review().id();
+                }
+                if (mInitialComment.matches(itemId, item.getCreatedAt())) {
+                    scrollToAndHighlightPosition(i + 1 /* adjust for header view */);
+                    break;
                 }
             }
             mInitialComment = null;
