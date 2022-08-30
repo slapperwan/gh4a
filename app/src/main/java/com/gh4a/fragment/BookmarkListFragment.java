@@ -107,7 +107,9 @@ public class BookmarkListFragment extends LoadingListFragmentBase implements
 
         public BookmarkDragHelperCallback(BaseActivity baseActivity, BookmarkAdapter adapter) {
             super(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
-                    ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+                  // disable left swipe to avoid accidentally removing a bookmark when
+                  // moving to the Stars tab in the "Bookmarks and Stars" screen
+                  ItemTouchHelper.RIGHT);
             mBaseActivity = baseActivity;
             mAdapter = adapter;
         }
