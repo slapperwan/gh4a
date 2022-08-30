@@ -16,13 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.browser.customtabs.CustomTabColorSchemeParams;
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.fragment.app.FragmentActivity;
-
 import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
@@ -38,8 +31,16 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.browser.customtabs.CustomTabColorSchemeParams;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.fragment.app.FragmentActivity;
 
 public class IntentUtils {
     private static final String EXTRA_NEW_TASK = "IntentUtils.new_task";
@@ -377,12 +378,16 @@ public class IntentUtils {
             this.date = date;
         }
 
-        public boolean matches(long id, Date date) {
+        public boolean matches(long id, Date dateToMatch) {
             if (commentId >= 0 && id >= 0) {
                 return commentId == id;
             }
-            if (date != null && this.date != null) {
-                return date.after(this.date);
+            if (dateToMatch != null && this.date != null) {
+                // We consider the date matching even if it's slightly behind this marker's date (which
+                // is likely to come from a notification timestamp), because GH notification timestamps
+                // tend to be ~10 seconds ahead the event that triggered them
+                long dateDiff = this.date.getTime() - dateToMatch.getTime();
+                return dateDiff >= 0 && dateDiff < TimeUnit.SECONDS.toMillis(30);
             }
             return false;
         }

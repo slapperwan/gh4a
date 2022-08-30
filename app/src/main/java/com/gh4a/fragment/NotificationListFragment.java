@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -17,13 +15,13 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.adapter.NotificationAdapter;
 import com.gh4a.adapter.RootAdapter;
-import com.gh4a.worker.NotificationsWorker;
 import com.gh4a.model.NotificationHolder;
 import com.gh4a.resolver.BrowseFilter;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.SingleFactory;
+import com.gh4a.worker.NotificationsWorker;
 import com.meisolsson.githubsdk.model.NotificationSubject;
 import com.meisolsson.githubsdk.model.NotificationThread;
 import com.meisolsson.githubsdk.model.Repository;
@@ -34,6 +32,8 @@ import com.meisolsson.githubsdk.service.activity.NotificationService;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.Single;
 import retrofit2.Response;
 
@@ -138,7 +138,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
             if (url != null) {
                 Uri uri = ApiHelpers.normalizeUri(Uri.parse(url));
                 intent = BrowseFilter.makeRedirectionIntent(getActivity(), uri,
-                        new IntentUtils.InitialCommentMarker(item.notification.lastReadAt()));
+                        new IntentUtils.InitialCommentMarker(item.notification.updatedAt()));
             } else {
                 intent = null;
             }
