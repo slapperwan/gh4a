@@ -23,7 +23,6 @@ import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import androidx.core.content.ContextCompat;
 import android.text.Html.ImageGetter;
 import android.text.Layout;
 import android.text.Spannable;
@@ -62,6 +61,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.core.content.ContextCompat;
 
 import static android.graphics.Paint.Style.FILL;
 
@@ -394,14 +395,6 @@ public class HtmlUtils {
                 }
             } else if (tag.equalsIgnoreCase("div")) {
                 startBlockElement(attributes);
-                String cssClass = attributes.getValue("", "class");
-                if (cssClass != null && cssClass.indexOf("highlight") == 0) {
-                    start(new CodeDiv());
-                }
-                CodeDiv code = getLast(CodeDiv.class);
-                if (code != null) {
-                    code.mLevel++;
-                }
             } else if (tag.equalsIgnoreCase("span")) {
                 startCssStyle(attributes);
             } else if (tag.equalsIgnoreCase("hr")) {
@@ -431,14 +424,10 @@ public class HtmlUtils {
                 startFont(attributes);
             } else if (tag.equalsIgnoreCase("blockquote")) {
                 startBlockquote(attributes);
-            } else if (tag.equalsIgnoreCase("tt")) {
+            } else if (tag.equalsIgnoreCase("samp")) {
                 start(new Monospace());
             } else if (tag.equalsIgnoreCase("pre")) {
                 start(new Pre());
-                CodeDiv div = getLast(CodeDiv.class);
-                if (div != null) {
-                    div.mHasPre = true;
-                }
             } else if (tag.equalsIgnoreCase("a")) {
                 startA(attributes);
             } else if (tag.equalsIgnoreCase("u")) {
@@ -453,12 +442,13 @@ public class HtmlUtils {
                 start(new Super());
             } else if (tag.equalsIgnoreCase("sub")) {
                 start(new Sub());
-            } else if (tag.equalsIgnoreCase("code")) {
+            } else if (tag.equalsIgnoreCase("code") || tag.equalsIgnoreCase("tt")) {
                 boolean inPre = getLast(Pre.class) != null;
-                if (inPre) {
-                    appendNewlines(1);
+                // GitHub code blocks have <code> tags inside a <pre> tag. In these cases, we ignore
+                // <code> tags since the code block formatting is already applied by handling the <pre> tag.
+                if (!inPre) {
+                    start(new Code());
                 }
-                start(new Code(inPre));
             } else if (tag.length() == 2 &&
                     Character.toLowerCase(tag.charAt(0)) == 'h' &&
                     tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
@@ -493,14 +483,6 @@ public class HtmlUtils {
                 endLi();
             } else if (tag.equalsIgnoreCase("div")) {
                 endBlockElement();
-                CodeDiv code = getLast(CodeDiv.class);
-                if (code != null && --code.mLevel == 0) {
-                    if (code.mHasPre) {
-                        setSpanFromMark(code, new CodeBlockSpan(mCodeBlockBackgroundColor));
-                    } else {
-                        mSpannableStringBuilder.removeSpan(code);
-                    }
-                }
             } else if (tag.equalsIgnoreCase("span")) {
                 endCssStyle();
             } else if (tag.equalsIgnoreCase("strong")) {
@@ -523,10 +505,11 @@ public class HtmlUtils {
                 endFont();
             } else if (tag.equalsIgnoreCase("blockquote")) {
                 endBlockquote();
-            } else if (tag.equalsIgnoreCase("tt")) {
+            } else if (tag.equalsIgnoreCase("samp")) {
                 end(Monospace.class, new TypefaceSpan("monospace"));
             } else if (tag.equalsIgnoreCase("pre")) {
-                end(Pre.class, new TypefaceSpan("monospace"));
+                appendNewlines(1);
+                end(Pre.class, new TypefaceSpan("monospace"), new CodeBlockSpan(mCodeBlockBackgroundColor));
             } else if (tag.equalsIgnoreCase("a")) {
                 endA();
             } else if (tag.equalsIgnoreCase("u")) {
@@ -541,17 +524,8 @@ public class HtmlUtils {
                 end(Super.class, new SuperscriptSpan(), new RelativeSizeSpan(SMALL_TEXT_SIZE));
             } else if (tag.equalsIgnoreCase("sub")) {
                 end(Sub.class, new SubscriptSpan(), new RelativeSizeSpan(SMALL_TEXT_SIZE));
-            } else if (tag.equalsIgnoreCase("code")) {
-                Code code = getLast(Code.class);
-                if (code != null) {
-                    Object backgroundSpan = code.mInPre
-                            ? new CodeBlockSpan(mCodeBlockBackgroundColor)
-                            : new BackgroundColorSpan(mCodeBlockBackgroundColor);
-                    if (code.mInPre) {
-                        appendNewlines(1);
-                    }
-                    setSpanFromMark(code, new TypefaceSpan("monospace"), backgroundSpan);
-                }
+            } else if (tag.equalsIgnoreCase("code") || tag.equalsIgnoreCase("tt")) {
+                end(Code.class, new TypefaceSpan("monospace"), new BackgroundColorSpan(mCodeBlockBackgroundColor));
             } else if (tag.length() == 2 &&
                     Character.toLowerCase(tag.charAt(0)) == 'h' &&
                     tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
@@ -977,11 +951,6 @@ public class HtmlUtils {
         private static class Sub { }
         private static class Pre { }
 
-        private static class CodeDiv {
-            public boolean mHasPre;
-            public int mLevel;
-        }
-
         private static class NeedsReversingSpan {
             public final Object mActualSpan;
             public NeedsReversingSpan(Object actualSpan) {
@@ -990,17 +959,14 @@ public class HtmlUtils {
         }
 
         private static class Code {
-            private final boolean mInPre;
             private final int mColor;
 
-            public Code(boolean inPre) {
-                mInPre = inPre;
+            public Code() {
                 mColor = 0;
             }
 
             public Code(int color) {
                 mColor = color;
-                mInPre = false;
             }
         }
 
