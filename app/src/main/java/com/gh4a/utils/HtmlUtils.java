@@ -399,11 +399,11 @@ public class HtmlUtils {
                 startCssStyle(attributes);
             } else if (tag.equalsIgnoreCase("hr")) {
                 HorizontalLineSpan span = new HorizontalLineSpan(mDividerHeight, 0x60aaaaaa);
-                // enforce the following newlines to be written
-                mSpannableStringBuilder.append(' ');
-                appendNewlines(2);
+                appendNewlines(1);
+                mSpannableStringBuilder.append(' '); // enforce the following newline to be written
+                appendNewlines(1);
                 int len = mSpannableStringBuilder.length();
-                mSpannableStringBuilder.setSpan(span, len - 1, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+                mSpannableStringBuilder.setSpan(span, len - 2, len, Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
             } else if (tag.equalsIgnoreCase("strong")) {
                 start(new Bold());
             } else if (tag.equalsIgnoreCase("b")) {
