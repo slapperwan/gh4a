@@ -130,6 +130,40 @@ public class HtmlUtils {
         }
     }
 
+    private static class NumberedItemSpan implements LeadingMarginSpan {
+        private final int mNumber;
+        private final float mTextScaling;
+
+        public NumberedItemSpan(int number, float textScaling) {
+            mNumber = number;
+            mTextScaling = textScaling;
+        }
+
+        private String getItemText() {
+            return mNumber + ". ";
+        }
+
+        @Override
+        public int getLeadingMargin(boolean first) {
+            // Since we don't have access to the Paint object to measure text width here, we have to
+            // compute the width in a more approximate way by taking into account the current text scaling
+            return 4 + Math.round(getItemText().length() * 6 * mTextScaling);
+        }
+
+        @Override
+        public void drawLeadingMargin(Canvas c, Paint p, int x, int dir, int top, int baseline, int bottom,
+                CharSequence text, int start, int end, boolean first, Layout l) {
+            if (((Spanned) text).getSpanStart(this) == start) {
+                Paint.Style previousStyle = p.getStyle();
+
+                p.setStyle(Paint.Style.FILL);
+                c.drawText(getItemText(), x + dir, bottom - p.descent(), p);
+
+                p.setStyle(previousStyle);
+            }
+        }
+    }
+
     private static class HorizontalLineSpan implements LineBackgroundSpan {
         private final int mColor;
         private final float mHeight;
@@ -238,6 +272,7 @@ public class HtmlUtils {
         private static final float SMALL_TEXT_SIZE = 0.8f;
 
         private final float mDividerHeight;
+        private final float mDisplayTextScaling;
         private final int mBulletMargin;
         private final int mReplyMargin;
         private final int mReplyMarkerSize;
@@ -289,6 +324,7 @@ public class HtmlUtils {
                 android.text.Html.ImageGetter imageGetter, Parser parser) {
             final Resources res = context.getResources();
             mDividerHeight = res.getDimension(R.dimen.divider_span_height);
+            mDisplayTextScaling = res.getDisplayMetrics().scaledDensity;
             mBulletMargin = res.getDimensionPixelSize(R.dimen.bullet_span_margin);
             mReplyMargin = res.getDimensionPixelSize(R.dimen.reply_span_margin);
             mReplyMarkerSize = res.getDimensionPixelSize(R.dimen.reply_span_size);
@@ -616,9 +652,6 @@ public class HtmlUtils {
             ListItem item = new ListItem(getLast(List.class), attributes);
             startBlockElement(attributes, 1);
             start(item);
-            if (item.mOrdered) {
-                mSpannableStringBuilder.insert(mSpannableStringBuilder.length(), "" + item.mPosition + ". ");
-            }
             startCssStyle(attributes);
         }
 
@@ -628,7 +661,7 @@ public class HtmlUtils {
             ListItem item = getLast(ListItem.class);
             if (item != null) {
                 if (item.mOrdered) {
-                    mSpannableStringBuilder.removeSpan(item);
+                    setSpanFromMark(item, new NumberedItemSpan(item.mPosition, mDisplayTextScaling));
                 } else {
                     setSpanFromMark(item, new BulletSpan(mBulletMargin));
                 }
