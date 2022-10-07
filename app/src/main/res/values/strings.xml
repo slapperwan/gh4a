@@ -125,6 +125,7 @@
     <string name="start_page_last_selected">Last selected</string>
     <string name="comment_editor_locked_hint">Comments are only available to collaborators</string>
     <string name="user_type_bot">Bot</string>
+    <string name="user_type_mannequin">Mannequin</string>
     <string name="user_type_org">Organization</string>
     <string name="clear_suggestions">Clear suggestions</string>
     <string name="quote">Quote</string>

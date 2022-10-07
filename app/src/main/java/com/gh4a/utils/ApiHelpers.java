@@ -118,9 +118,17 @@ public class ApiHelpers {
             builder.setSpan(new StyleSpan(Typeface.BOLD), 0, builder.length(), 0);
         }
         final User actualUser = adjustUserForBotSuffix(user);
-        if (actualUser != null && actualUser.type() == UserType.Bot) {
-            StringUtils.addUserTypeSpan(context, builder, builder.length(),
-                    context.getString(R.string.user_type_bot));
+        if (actualUser != null) {
+            int userTypeAppendixResId = 0;
+            if (actualUser.type() == UserType.Bot) {
+                userTypeAppendixResId = R.string.user_type_bot;
+            } else if (actualUser.type() == UserType.Mannequin) {
+                userTypeAppendixResId = R.string.user_type_mannequin;
+            }
+            if (userTypeAppendixResId != 0) {
+                StringUtils.addUserTypeSpan(context, builder, builder.length(),
+                        context.getString(userTypeAppendixResId));
+            }
         }
         return builder;
     }
