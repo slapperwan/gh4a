@@ -1,85 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/relativeLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
     android:clipToPadding="false"
     android:minHeight="?attr/listPreferredItemHeight"
-    android:orientation="vertical"
     android:padding="@dimen/content_padding">
 
-    <LinearLayout
+    <com.gh4a.widget.FixedSizeImageView
+        android:id="@+id/iv_gravatar"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginRight="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        tools:src="@drawable/default_avatar" />
+
+    <ImageView
+        android:id="@+id/iv_menu"
+        style="@style/SelectableBorderlessItem"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="-8dp"
+        android:scaleType="center"
+        android:src="@drawable/overflow" />
+
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_extra"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/iv_gravatar"
+        android:background="?selectableItemBackground"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="username" />
 
-        <com.gh4a.widget.FixedSizeImageView
-            android:id="@+id/iv_gravatar"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="16dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            tools:src="@drawable/default_avatar" />
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tv_extra"
+        android:layout_alignWithParentIfMissing="true"
+        android:layout_marginLeft="16dp"
+        android:layout_toLeftOf="@id/iv_menu"
+        android:layout_toRightOf="@id/tv_extra"
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="5 days ago" />
 
-        <com.gh4a.widget.StyleableTextView
-            android:id="@+id/tv_extra"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_weight="1"
-            android:background="?selectableItemBackground"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?android:attr/textColorPrimary"
-            tools:text="username" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_timestamp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.VerySmall"
-                tools:text="5 days ago" />
-
-            <com.gh4a.widget.StyleableTextView
-                android:id="@+id/tv_edit_timestamp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawableLeft="@drawable/comment_edit"
-                android:drawablePadding="2dp"
-                android:textAppearance="@style/TextAppearance.VerySmall"
-                tools:text="5 days ago" />
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/iv_menu"
-            style="@style/SelectableBorderlessItem"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="-8dp"
-            android:scaleType="center"
-            android:src="@drawable/overflow" />
-
-    </LinearLayout>
+    <com.gh4a.widget.StyleableTextView
+        android:id="@+id/tv_edit_timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_timestamp"
+        android:layout_marginLeft="16dp"
+        android:layout_toLeftOf="@id/iv_menu"
+        android:layout_toRightOf="@id/tv_extra"
+        android:drawableLeft="@drawable/comment_edit"
+        android:drawablePadding="2dp"
+        android:textAppearance="@style/TextAppearance.VerySmall"
+        tools:text="5 days ago" />
 
     <com.gh4a.widget.StyleableTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/tv_edit_timestamp"
         android:layout_marginTop="8dp"
+        android:layout_toLeftOf="@id/iv_menu"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="?android:attr/textColorPrimary"
         android:textIsSelectable="true"
-        app:layout_constraintEnd_toStartOf="@id/iv_menu"
-        app:layout_constraintTop_toBottomOf="@id/tv_edit_timestamp"
         app:needsLinkHandling="true"
         tools:text="Comment text" />
 
@@ -87,8 +81,8 @@
         android:id="@+id/reactions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/tv_desc"
         android:layout_marginTop="2dp"
-        app:layout_constraintRight_toLeftOf="@id/iv_menu"
-        app:layout_constraintTop_toBottomOf="@id/tv_desc" />
+        android:layout_toLeftOf="@id/iv_menu" />
 
-</LinearLayout>
+</RelativeLayout>
