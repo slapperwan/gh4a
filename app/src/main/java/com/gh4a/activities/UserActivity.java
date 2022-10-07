@@ -20,10 +20,15 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.User;
+import com.meisolsson.githubsdk.model.UserType;
 import com.meisolsson.githubsdk.service.users.UserService;
 
 public class UserActivity extends BaseFragmentPagerActivity {
     public static Intent makeIntent(Context context, User user) {
+        if (user != null && user.type() == UserType.Mannequin) {
+            // Mannequin users do not have a meaningful profile page
+            return null;
+        }
         // User responses from other endpoints are likely to not be complete, so
         // we only use the login from it and reload all other info
         return makeIntent(context, user != null ? user.login() : null);
