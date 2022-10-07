@@ -517,7 +517,7 @@ public class HttpImageGetter {
         BitmapFactory.decodeByteArray(image, 0, image.length, options);
 
         int scale = 1;
-        while (options.outWidth >= mMaxWidth || options.outHeight >= mMaxHeight) {
+        while (options.outWidth >= mMaxWidth) {
             options.outWidth /= 2;
             options.outHeight /= 2;
             scale *= 2;
@@ -561,7 +561,7 @@ public class HttpImageGetter {
                     density = null;
                 }
 
-                while (docWidth >= mMaxWidth || docHeight >= mMaxHeight) {
+                while (docWidth >= mMaxWidth) {
                     docWidth /= 2;
                     docHeight /= 2;
                     if (density != null) {
