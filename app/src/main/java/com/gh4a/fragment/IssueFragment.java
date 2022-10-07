@@ -17,7 +17,6 @@ import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
-import com.meisolsson.githubsdk.service.issues.IssueEventService;
 import com.meisolsson.githubsdk.service.issues.IssueTimelineService;
 
 import java.util.ArrayList;

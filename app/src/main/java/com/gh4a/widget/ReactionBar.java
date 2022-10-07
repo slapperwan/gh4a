@@ -29,7 +29,6 @@ import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
-import com.gh4a.ServiceFactory;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
@@ -39,7 +38,6 @@ import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Reaction;
 import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.User;
-import com.meisolsson.githubsdk.service.reactions.ReactionService;
 
 import java.util.ArrayList;
 import java.util.HashMap;

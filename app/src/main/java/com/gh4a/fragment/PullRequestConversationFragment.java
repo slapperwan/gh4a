@@ -43,7 +43,6 @@ import com.gh4a.widget.PullRequestBranchInfoView;
 
 import com.meisolsson.githubsdk.model.CheckRun;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
-import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.PullRequest;
@@ -58,11 +57,9 @@ import com.meisolsson.githubsdk.model.request.git.CreateGitReference;
 import com.meisolsson.githubsdk.service.checks.ChecksService;
 import com.meisolsson.githubsdk.service.git.GitService;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
-import com.meisolsson.githubsdk.service.issues.IssueEventService;
 import com.meisolsson.githubsdk.service.issues.IssueTimelineService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
-import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryStatusService;
 
 import java.net.HttpURLConnection;

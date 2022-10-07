@@ -1,12 +1,11 @@
 package com.gh4a.fragment;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
+
 import android.view.View;
 
 import com.gh4a.R;

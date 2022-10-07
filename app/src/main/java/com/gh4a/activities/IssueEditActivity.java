@@ -61,7 +61,6 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.SingleFactory;
-import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.MarkdownButtonsBar;
 import com.gh4a.widget.MarkdownPreviewWebView;
