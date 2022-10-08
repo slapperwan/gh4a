@@ -2,8 +2,6 @@ package com.gh4a.model;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.utils.IntentUtils;
@@ -25,6 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public abstract class TimelineItem {
     public static final Comparator<TimelineItem> COMPARATOR = (lhs, rhs) -> {
@@ -74,6 +75,10 @@ public abstract class TimelineItem {
             } else {
                 comment = ((GitHubComment) comment).toBuilder().reactions(reactions).build();
             }
+        }
+
+        public boolean hasFilePatch() {
+            return file != null && file.patch() != null;
         }
 
         @Nullable
