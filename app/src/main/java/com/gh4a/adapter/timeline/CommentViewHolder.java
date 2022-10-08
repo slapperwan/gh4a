@@ -2,8 +2,6 @@ package com.gh4a.adapter.timeline;
 
 import android.content.Context;
 import android.content.Intent;
-import androidx.annotation.Nullable;
-
 import android.text.SpannableStringBuilder;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,6 +29,7 @@ import com.meisolsson.githubsdk.model.User;
 import java.util.Date;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import io.reactivex.Single;
 
 class CommentViewHolder
@@ -171,7 +170,7 @@ class CommentViewHolder
         Menu menu = mPopupMenu.getMenu();
         menu.findItem(R.id.edit).setVisible(canEdit);
         menu.findItem(R.id.delete).setVisible(canEdit);
-        menu.findItem(R.id.view_in_file).setVisible(item.file != null && position != -1);
+        menu.findItem(R.id.view_in_file).setVisible(item.hasFilePatch() && position != -1);
     }
 
     @Nullable
