@@ -27,8 +27,8 @@
             android:id="@+id/title_field"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:expandedHintEnabled="false"
-            android:hint="@string/pull_merge_title_description">
+            android:hint="@string/pull_merge_title_description"
+            app:helperText="@string/pull_merge_title_helper">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -42,12 +42,10 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/details_field"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/pull_merge_message_description"
-            app:expandedHintEnabled="false"
-            app:placeholderText="@string/pull_merge_message_hint">
+            android:hint="@string/pull_merge_message_description">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
