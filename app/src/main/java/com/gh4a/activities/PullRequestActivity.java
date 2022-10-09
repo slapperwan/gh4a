@@ -203,9 +203,14 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
         if (!canMerge || isClosed) {
             menu.removeItem(R.id.pull_merge);
-        } else if (mPullRequest.mergeable() == null || !mPullRequest.mergeable()) {
-            MenuItem mergeItem = menu.findItem(R.id.pull_merge);
-            mergeItem.setEnabled(false);
+        } else {
+            // Mergeability is checked according to the information found here: https://github.com/octokit/octokit.net/issues/1763
+            boolean isMergeable = mPullRequest.mergeableState() == PullRequest.MergeableState.Clean ||
+                    mPullRequest.mergeableState() == PullRequest.MergeableState.Unstable;
+            if (!isMergeable) {
+                MenuItem mergeItem = menu.findItem(R.id.pull_merge);
+                mergeItem.setEnabled(false);
+            }
         }
 
         if (mPullRequest == null) {
