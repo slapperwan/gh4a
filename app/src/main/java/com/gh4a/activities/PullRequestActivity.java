@@ -197,15 +197,13 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         if (!canClose || isClosed) {
             menu.removeItem(R.id.pull_close);
         }
-        if (!canOpen || !isClosed) {
+        if (!canOpen || !isClosed || mPullRequest.merged()) {
             menu.removeItem(R.id.pull_reopen);
-        } else if (isClosed && mPullRequest.merged()) {
-            menu.findItem(R.id.pull_reopen).setEnabled(false);
         }
-        if (!canMerge) {
+
+        if (!canMerge || isClosed) {
             menu.removeItem(R.id.pull_merge);
-        } else if (mPullRequest.merged()
-                || mPullRequest.mergeable() == null || !mPullRequest.mergeable()) {
+        } else if (mPullRequest.mergeable() == null || !mPullRequest.mergeable()) {
             MenuItem mergeItem = menu.findItem(R.id.pull_merge);
             mergeItem.setEnabled(false);
         }
