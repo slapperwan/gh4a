@@ -18,9 +18,6 @@ package com.gh4a.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import androidx.annotation.AttrRes;
-import androidx.annotation.StringRes;
-import androidx.collection.LongSparseArray;
 import android.text.TextUtils;
 import android.util.Pair;
 import android.view.Menu;
@@ -40,7 +37,6 @@ import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.CommitStatusBox;
 import com.gh4a.widget.PullRequestBranchInfoView;
-
 import com.meisolsson.githubsdk.model.CheckRun;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.Issue;
@@ -73,6 +69,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import androidx.annotation.AttrRes;
+import androidx.annotation.StringRes;
+import androidx.collection.LongSparseArray;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
@@ -401,7 +400,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
         String repo = head.repo().name();
 
         service.deleteGitReference(owner, repo, "heads/" + head.ref())
-                .map(ApiHelpers::mapToBooleanOrThrowOnFailure)
+                .map(ApiHelpers::mapToTrueOnSuccess)
                 .compose(RxUtils.wrapForBackgroundTask(getBaseActivity(),
                         R.string.deleting_msg, R.string.delete_branch_error))
                 .subscribe(result -> {
