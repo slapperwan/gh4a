@@ -463,6 +463,7 @@ public class HtmlUtils {
             } else if (tag.equalsIgnoreCase("samp")) {
                 start(new Monospace());
             } else if (tag.equalsIgnoreCase("pre")) {
+                startBlockElement(attributes, 1);
                 start(new Pre());
             } else if (tag.equalsIgnoreCase("a")) {
                 startA(attributes);
@@ -544,7 +545,7 @@ public class HtmlUtils {
             } else if (tag.equalsIgnoreCase("samp")) {
                 end(Monospace.class, new TypefaceSpan("monospace"));
             } else if (tag.equalsIgnoreCase("pre")) {
-                appendNewlines(1);
+                endBlockElement();
                 end(Pre.class, new TypefaceSpan("monospace"), new CodeBlockSpan(mCodeBlockBackgroundColor));
             } else if (tag.equalsIgnoreCase("a")) {
                 endA();
