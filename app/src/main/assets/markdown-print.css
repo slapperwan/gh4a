@@ -38,11 +38,11 @@ h1 code,h1 tt,h2 code,h2 tt,h3 code,h3 tt,h4 code,h4 tt,h5 code,h5 tt,h6 code,h6
 }
 
 h1 {
-    font-size: 28px;
+    font-size: 26px;
 }
 
 h2 {
-    font-size: 24px;
+    font-size: 22px;
 }
 
 h3 {
@@ -58,8 +58,7 @@ h5 {
 }
 
 h6 {
-    color: #777;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 blockquote,dl,ol,p,pre,table,ul {
@@ -72,7 +71,7 @@ li {
 
 hr {
     border: none;
-    border-bottom: 1px solid #7A7A7A;
+    border-bottom: 1px solid #dfdfdf;
     height: 4px;
     padding: 0;
 }
@@ -141,8 +140,8 @@ dl dd>:last-child {
 }
 
 blockquote {
-    border-left: 4px solid #6E6E6E;
-    padding: 0 6px;
+    border-left: 2px solid #dddddd;
+    padding: 0 8px;
     color: #777;
 }
 
