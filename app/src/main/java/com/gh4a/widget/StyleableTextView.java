@@ -122,9 +122,7 @@ public class StyleableTextView extends AppCompatTextView {
         if (needsLinkHandling) {
             setMovementMethod(CHECKING_LINK_METHOD);
         }
-        if (!isInEditMode()) {
-            setTypeface(TypefaceCache.getTypeface(mTypefaceValue));
-        }
+        setTypeface(TypefaceCache.getTypeface(mTypefaceValue));
     }
 
     @Override
