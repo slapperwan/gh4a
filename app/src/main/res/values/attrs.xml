@@ -17,7 +17,6 @@
     <attr name="colorCommitDeletion" format="color" />
     <attr name="colorFab" format="color" />
     <attr name="colorBreadcrumbBackground" format="color" />
-    <attr name="colorWebViewBackground" format="color" />
     <attr name="colorScrollbarThumb" format="color" />
     <attr name="colorDiffAddBackground" format="color" />
     <attr name="colorDiffRemoveBackground" format="color" />
