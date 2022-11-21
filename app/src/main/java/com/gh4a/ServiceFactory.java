@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.CacheControl;
+import okhttp3.Credentials;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -152,6 +153,9 @@ public class ServiceFactory {
                             ? token : Gh4Application.get().getAuthToken();
                     if (tokenToUse != null) {
                         requestBuilder.header("Authorization", "Token " + tokenToUse);
+                    } else {
+                        requestBuilder.header("Authorization",
+                                Credentials.basic(BuildConfig.CLIENT_ID, BuildConfig.CLIENT_SECRET));
                     }
                     if (pageSize != null) {
                         requestBuilder.url(original.url().newBuilder()
