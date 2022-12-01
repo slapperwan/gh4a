@@ -320,6 +320,8 @@
     <string name="pull_request_event_review_requested_changes">[b]%1$s[/b] requested changes [time]</string>
     <string name="pull_request_event_review_reviewed">[b]%1$s[/b] reviewed [time]</string>
     <string name="pull_request_event_review_previously_reviewed">[b]%1$s[/b] previously reviewed [time]</string>
+    <string name="pull_request_event_review_dismissed">[b]%1$s[/b] dismissed a stale review [time]</string>
+    <string name="pull_request_event_review_dismissed_via_commit">[b]%1$s[/b] dismissed a stale review via [commit] [time]</string>
     <string name="pull_request_event_review_started_review">[b]%1$s[/b] started a review [time]</string>
     <string name="pull_request_event_review_requested">[b]%1$s[/b] requested a review by [b]%2$s[/b] [time]</string>
     <string name="pull_request_event_review_request_removed">[b]%1$s[/b] removed their review request for [b]%2$s[/b] [time]</string>
