@@ -221,6 +221,8 @@ class ReviewViewHolder
                 textResId = R.string.pull_request_event_review_requested_changes;
                 break;
             case Dismissed:
+                textResId = R.string.pull_request_event_review_previously_reviewed;
+                break;
             case Commented:
             default:
                 textResId = R.string.pull_request_event_review_reviewed;
