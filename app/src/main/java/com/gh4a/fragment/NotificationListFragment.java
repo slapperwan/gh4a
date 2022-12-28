@@ -128,20 +128,21 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
 
     @Override
     public void onItemClick(NotificationHolder item) {
-        final Intent intent;
-
         if (item.notification == null) {
-            intent = RepositoryActivity.makeIntent(getActivity(), item.repository);
+            var intent = RepositoryActivity.makeIntent(getActivity(), item.repository);
+            startActivity(intent);
+            return;
+        }
+
+        NotificationSubject subject = item.notification.subject();
+        String url = subject.url();
+        final Intent intent;
+        if (url != null) {
+            Uri uri = ApiHelpers.normalizeUri(Uri.parse(url));
+            intent = BrowseFilter.makeRedirectionIntent(getActivity(), uri,
+                    new IntentUtils.InitialCommentMarker(item.notification.updatedAt()));
         } else {
-            NotificationSubject subject = item.notification.subject();
-            String url = subject.url();
-            if (url != null) {
-                Uri uri = ApiHelpers.normalizeUri(Uri.parse(url));
-                intent = BrowseFilter.makeRedirectionIntent(getActivity(), uri,
-                        new IntentUtils.InitialCommentMarker(item.notification.updatedAt()));
-            } else {
-                intent = null;
-            }
+            intent = null;
         }
 
         if (intent != null) {
