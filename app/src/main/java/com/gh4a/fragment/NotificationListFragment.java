@@ -256,6 +256,9 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         NotificationService service = ServiceFactory.get(NotificationService.class, false);
         final Single<Response<Void>> responseSingle;
         if (notification != null) {
+            if (!notification.unread()) {
+                return;
+            }
             responseSingle = service.markNotificationRead(notification.id());
         } else {
             NotificationReadRequest request = NotificationReadRequest.builder()
