@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
@@ -206,7 +207,7 @@ public class NotificationListFragment extends LoadingListFragmentBase implements
         service.setNotificationThreadSubscription(notification.id(), request)
                 .map(ApiHelpers::throwOnFailure)
                 .compose(RxUtils::doInBackground)
-                .subscribe(result -> handleMarkAsRead(null, notification),
+                .subscribe(result -> Toast.makeText(getContext(), R.string.unsubscribe_success, Toast.LENGTH_SHORT).show(),
                         error -> handleActionFailure("Unsubscribing notification failed", error));
     }
 

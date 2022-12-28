@@ -134,6 +134,7 @@
     <string name="mark_all_as_read">Mark all as read</string>
     <string name="mark_as_read">Mark as read</string>
     <string name="unsubscribe">Unsubscribe</string>
+    <string name="unsubscribe_success">Unsubscribed from the conversation</string>
     <string name="mark_repository_as_read_question">Mark all notifications from %1$s as read?</string>
     <string name="mark_all_as_read_question">Mark all notifications as read?</string>
     <string name="unread">Unread</string>
