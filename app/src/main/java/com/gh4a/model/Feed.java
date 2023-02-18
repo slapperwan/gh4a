@@ -73,6 +73,8 @@ public class Feed implements Parcelable {
         preview = generatePreview(content);
         if (StringUtils.isBlank(title)) {
             title = getTitleFromUrl(link);
+        } else {
+            title = StringUtils.unescapeCommonHtmlEntities(title);
         }
     }
 
@@ -81,12 +83,7 @@ public class Feed implements Parcelable {
             return null;
         }
         String preview = content.length() > 2000 ? content.substring(0, 2000) : content;
-        preview = preview.replaceAll("<(.|\n)*?>", "")
-                .replace("&lt;", "<")
-                .replace("&gt;", ">")
-                .replace("&amp;", "&")
-                .replace("&#8217;", "’")
-                .trim();
+        preview = StringUtils.unescapeCommonHtmlEntities(preview.replaceAll("<(.|\n)*?>", "")).trim();
         if (preview.length() > 500) {
             preview = preview.substring(0, 500);
         }

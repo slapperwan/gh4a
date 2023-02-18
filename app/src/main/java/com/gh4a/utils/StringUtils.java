@@ -211,4 +211,12 @@ public class StringUtils {
         final Set<String> value = prefs.getStringSet(key, null);
         return value != null ? new HashSet<>(value) : new HashSet<>();
     }
+
+    public static String unescapeCommonHtmlEntities(String sourceText) {
+        return sourceText.replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&")
+                .replace("&#8217;", "’")
+                .replace("&#8211;", "–");
+    }
 }
