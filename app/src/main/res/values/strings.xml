@@ -412,7 +412,7 @@
     <string name="issue_milestone_close_error">Closing milestone failed.</string>
     <string name="issue_milestone_reopen_error">Reopening milestone failed.</string>
     <string name="issue_filter">Filter</string>
-    <string name="issue_filter_by_labels">Filter by labels</string>
+    <string name="issue_filter_by_label">Filter by label</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>
     <string name="issue_filter_by_assignee">Filter by assignee</string>
     <string name="issue_filter_by_participating">Filter by participating status</string>

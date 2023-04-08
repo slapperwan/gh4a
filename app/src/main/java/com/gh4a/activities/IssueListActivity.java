@@ -340,7 +340,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                     mSelectedLabel.isEmpty() ? getString(R.string.issue_filter_by_no_label) :
                     mSelectedLabel;
             UiUtils.setMenuItemText(this, labelFilterItem,
-                    getString(R.string.issue_filter_by_labels), subtitle);
+                    getString(R.string.issue_filter_by_label), subtitle);
         }
         MenuItem assigneeFilterItem = menu.findItem(R.id.filter_by_assignee);
         if (assigneeFilterItem != null) {
@@ -549,7 +549,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         }
 
         SingleChoiceDialogFragment.show(this, labels,
-                R.string.issue_filter_by_labels, selected, "labelselect");
+                R.string.issue_filter_by_label, selected, "labelselect");
     }
 
     private void showMilestonesDialog() {
