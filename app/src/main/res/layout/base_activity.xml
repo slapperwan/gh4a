@@ -95,6 +95,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="right"
-        android:background="?attr/drawerBackground" />
+        android:background="?attr/drawerBackground"
+        app:itemMaxLines="2" />
 
 </com.gh4a.widget.InvalidatingDrawerLayout>
