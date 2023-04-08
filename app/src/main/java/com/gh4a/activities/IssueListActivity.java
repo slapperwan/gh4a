@@ -111,8 +111,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private static final String STATE_KEY_SELECTED_ASSIGNEE = "selected_assignee";
     private static final String STATE_KEY_PARTICIPATING_STATUS = "participating_status";
 
-    private static final String LIST_QUERY = "is:%s %s repo:%s/%s %s %s %s %s";
-    private static final String SEARCH_QUERY = "is:%s %s repo:%s/%s %s";
+    private static final String LIST_QUERY = "is:%s %s repo:%s/%s %s %s %s %s %s";
 
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
@@ -248,23 +247,20 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     @Override
     protected Fragment makeFragment(int position) {
-        final @StringRes int emptyTextResId;
-        final String query;
+        String query = String.format(Locale.US, LIST_QUERY,
+                mIsPullRequest ? "pr" : "issue",
+                getIssueType(position), mRepoOwner, mRepoName,
+                mSearchQuery == null ? "" : mSearchQuery,
+                buildFilterItem("assignee", mSelectedAssignee),
+                buildFilterItem("label", mSelectedLabel),
+                buildFilterItem("milestone", mSelectedMilestone),
+                buildParticipatingFilterItem()).trim();
 
+        @StringRes int emptyTextResId;
         if (mSearchMode) {
-            query = String.format(Locale.US, SEARCH_QUERY,
-                    mIsPullRequest ? "pr" : "issue",
-                    getIssueType(position), mRepoOwner, mRepoName, mSearchQuery);
             emptyTextResId = mIsPullRequest
                     ? R.string.no_search_pull_requests_found : R.string.no_search_issues_found;
         } else {
-            query = String.format(Locale.US, LIST_QUERY,
-                    mIsPullRequest ? "pr" : "issue",
-                    getIssueType(position), mRepoOwner, mRepoName,
-                    buildFilterItem("assignee", mSelectedAssignee),
-                    buildFilterItem("label", mSelectedLabel),
-                    buildFilterItem("milestone", mSelectedMilestone),
-                    buildParticipatingFilterItem()).trim();
             emptyTextResId = mIsPullRequest
                     ? R.string.no_pull_requests_found : R.string.no_issues_found;
         }
@@ -313,12 +309,10 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     @Override
     protected int[] getRightNavigationDrawerMenuResources() {
-        int[] menuResIds = new int[mSearchMode ? 1 : 2];
+        int[] menuResIds = new int[2];
         menuResIds[0] = IssueListFragment.SortDrawerHelper.getMenuResId();
-        if (!mSearchMode) {
-            menuResIds[1] = mIsCollaborator != null && mIsCollaborator
-                    ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
-        }
+        menuResIds[1] = mIsCollaborator != null && mIsCollaborator
+                ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
         return menuResIds;
     }
 
@@ -492,15 +486,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void setSearchMode(boolean enabled) {
-        boolean changed = mSearchMode != enabled;
         mSearchMode = enabled;
         if (mCreateFab != null) {
             mCreateFab.setVisibility(enabled ? View.GONE : View.VISIBLE);
         }
         invalidateFragments();
-        if (changed) {
-            updateRightNavigationDrawer();
-        }
     }
 
     private String getIssueState(int position) {
