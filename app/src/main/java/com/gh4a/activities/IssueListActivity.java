@@ -94,6 +94,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private int mSelectedParticipatingStatus = 0;
 
     private FloatingActionButton mCreateFab;
+    private MenuItem mRemoveFilterButton;
     private IssueListFragment mOpenFragment;
     private Boolean mIsCollaborator;
     private List<Label> mLabels;
@@ -399,6 +400,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.issue_list_menu, menu);
+        mRemoveFilterButton = menu.findItem(R.id.remove_filter);
 
         MenuItem searchItem = menu.findItem(R.id.search);
         searchItem.setOnActionExpandListener(this);
@@ -411,11 +413,14 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         searchView.setOnCloseListener(this);
         searchView.setOnQueryTextListener(this);
 
-        if (isFiltering()) {
-            menu.findItem(R.id.remove_filter).setVisible(true);
-        }
-
+        updateRemoveFilterButtonVisibility();
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void updateRemoveFilterButtonVisibility() {
+        if (mRemoveFilterButton != null) {
+            mRemoveFilterButton.setVisible(isFiltering());
+        }
     }
 
     @Override
@@ -577,7 +582,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     private void onFilterUpdated() {
         invalidateFragments();
-        invalidateOptionsMenu();
+        updateRemoveFilterButtonVisibility();
         updateRightNavigationDrawer();
     }
 
