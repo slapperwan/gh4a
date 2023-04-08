@@ -129,19 +129,20 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mUserLogin = Gh4Application.get().getAuthLogin();
-
+        // We're restoring instance state before calling super.onCreate() because some of the fields
+        // are used to populate the right navigation drawer, which is done in BaseActivity.onCreate()
         if (savedInstanceState != null) {
             mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
             mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
             mSearchIsExpanded = savedInstanceState.getBoolean(STATE_KEY_SEARCH_IS_EXPANDED);
+            mSelectedMilestone = savedInstanceState.getString(STATE_KEY_SELECTED_MILESTONE);
             mSelectedLabel = savedInstanceState.getString(STATE_KEY_SELECTED_LABEL);
             mSelectedAssignee = savedInstanceState.getString(STATE_KEY_SELECTED_ASSIGNEE);
-            mSelectedParticipatingStatus =
-                    savedInstanceState.getInt(STATE_KEY_PARTICIPATING_STATUS);
+            mSelectedParticipatingStatus = savedInstanceState.getInt(STATE_KEY_PARTICIPATING_STATUS);
         }
+
+        super.onCreate(savedInstanceState);
+        mUserLogin = Gh4Application.get().getAuthLogin();
 
         if (!mIsPullRequest && Gh4Application.get().isAuthorized()) {
             CoordinatorLayout rootLayout = getRootLayout();
