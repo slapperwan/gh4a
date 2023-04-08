@@ -257,7 +257,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                 buildParticipatingFilterItem()).trim();
 
         @StringRes int emptyTextResId;
-        if (mSearchMode) {
+        if (mSearchMode || isFiltering()) {
             emptyTextResId = mIsPullRequest
                     ? R.string.no_search_pull_requests_found : R.string.no_search_issues_found;
         } else {
@@ -410,8 +410,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         searchView.setOnCloseListener(this);
         searchView.setOnQueryTextListener(this);
 
-        if (mSelectedMilestone != null || mSelectedAssignee != null
-                || mSelectedLabel != null || mSelectedParticipatingStatus != 0) {
+        if (isFiltering()) {
             menu.findItem(R.id.remove_filter).setVisible(true);
         }
 
@@ -429,6 +428,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean isFiltering() {
+        return mSelectedMilestone != null || mSelectedAssignee != null
+                || mSelectedLabel != null || mSelectedParticipatingStatus != 0;
     }
 
     private void removeFilter() {
