@@ -1,7 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#396426</color>
-    <color name="primary_dark">#2d501e</color>
+    <color name="color_primary">#69A64E</color>
+    <color name="color_onPrimary">#0E3900</color>
+    <color name="color_primaryContainer">#185200</color>
+    <color name="color_onPrimaryContainer">#A4F780</color>
+    <color name="color_secondary">#BCCBB0</color>
+    <color name="color_onSecondary">#273421</color>
+    <color name="color_secondaryContainer">#3D4B36</color>
+    <color name="color_onSecondaryContainer">#D8E7CB</color>
+    <color name="color_tertiary">#A0CFD0</color>
+    <color name="color_onTertiary">#003738</color>
+    <color name="color_tertiaryContainer">#1E4E4F</color>
+    <color name="color_onTertiaryContainer">#BBEBEC</color>
+    <color name="color_error">#FFB4AB</color>
+    <color name="color_errorContainer">#93000A</color>
+    <color name="color_onError">#690005</color>
+    <color name="color_onErrorContainer">#FFDAD6</color>
+    <color name="color_background">#1A1C18</color>
+    <color name="color_onBackground">#E3E3DC</color>
+    <color name="color_surface">#1A1C18</color>
+    <color name="color_onSurface">#E3E3DC</color>
+    <color name="color_surfaceVariant">#43483F</color>
+    <color name="color_onSurfaceVariant">#C3C8BB</color>
+    <color name="color_outline">#8D9287</color>
+    <color name="color_inverseOnSurface">#1A1C18</color>
+    <color name="color_inverseSurface">#E3E3DC</color>
+    <color name="color_inversePrimary">#226D00</color>
+    <color name="color_shadow">#000000</color>
+    <color name="color_surfaceTint">#8ADA67</color>
+    <color name="color_outlineVariant">#43483F</color>
+    <color name="color_scrim">#000000</color>
 
     <color name="label_fg">@color/label_fg_light</color>
     <color name="scrollbar_thumb">#5dffffff</color>

@@ -14,11 +14,32 @@
         <item name="actionBarTheme">@style/AppTheme.AppBarOverlay</item>
         <item name="switchPreferenceCompatStyle">@style/SwitchPreference</item>
 
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <item name="colorSecondary">@color/primary</item>
-        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorOnPrimary">@color/color_onPrimary</item>
+        <item name="colorPrimaryContainer">@color/color_primaryContainer</item>
+        <item name="colorOnPrimaryContainer">@color/color_onPrimaryContainer</item>
+        <item name="colorSecondary">@color/color_secondary</item>
+        <item name="colorOnSecondary">@color/color_onSecondary</item>
+        <item name="colorSecondaryContainer">@color/color_secondaryContainer</item>
+        <item name="colorOnSecondaryContainer">@color/color_onSecondaryContainer</item>
+        <item name="colorTertiary">@color/color_tertiary</item>
+        <item name="colorOnTertiary">@color/color_onTertiary</item>
+        <item name="colorTertiaryContainer">@color/color_tertiaryContainer</item>
+        <item name="colorOnTertiaryContainer">@color/color_onTertiaryContainer</item>
+        <item name="colorError">@color/color_error</item>
+        <item name="colorErrorContainer">@color/color_errorContainer</item>
+        <item name="colorOnError">@color/color_onError</item>
+        <item name="colorOnErrorContainer">@color/color_onErrorContainer</item>
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="colorOnBackground">@color/color_onBackground</item>
+        <item name="colorSurface">@color/color_surface</item>
+        <item name="colorOnSurface">@color/color_onSurface</item>
+        <item name="colorSurfaceVariant">@color/color_surfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/color_onSurfaceVariant</item>
+        <item name="colorOutline">@color/color_outline</item>
+        <item name="colorOnSurfaceInverse">@color/color_inverseOnSurface</item>
+        <item name="colorSurfaceInverse">@color/color_inverseSurface</item>
+        <item name="colorPrimaryInverse">@color/color_inversePrimary</item>
 
         <item name="colorIssueOpen">?attr/colorPrimary</item>
         <item name="colorIssueClosed">?attr/colorTertiary</item>
