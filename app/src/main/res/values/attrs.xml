@@ -4,18 +4,17 @@
     <attr name="cardViewTheme" format="reference" />
     <attr name="inlineButtonStyle" format="reference" />
     <attr name="drawerBackground" format="reference" />
-    <attr name="colorIssueOpen" format="color" />
-    <attr name="colorIssueClosed" format="color" />
-    <attr name="colorPullRequestMerged" format="color" />
-    <attr name="colorPullRequestDraft" format="color" />
-    <attr name="colorIssueOpenDark" format="color" />
-    <attr name="colorIssueClosedDark" format="color" />
-    <attr name="colorPullRequestMergedDark" format="color" />
-    <attr name="colorPullRequestDraftDark" format="color" />
+    <attr name="colorIssueOpen" format="reference" />
+    <attr name="colorIssueClosed" format="reference" />
+    <attr name="colorPullRequestMerged" format="reference" />
+    <attr name="colorPullRequestDraft" format="reference" />
+    <attr name="colorIssueOpenDark" format="reference" />
+    <attr name="colorIssueClosedDark" format="reference" />
+    <attr name="colorPullRequestMergedDark" format="reference" />
+    <attr name="colorPullRequestDraftDark" format="reference" />
     <attr name="colorIssueEditFab" format="reference" />
     <attr name="colorCommitAddition" format="color" />
     <attr name="colorCommitDeletion" format="color" />
-    <attr name="colorFab" format="color" />
     <attr name="colorBreadcrumbBackground" format="color" />
     <attr name="colorWebViewBackground" format="color" />
     <attr name="colorScrollbarThumb" format="color" />

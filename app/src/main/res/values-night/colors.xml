@@ -2,26 +2,8 @@
 <resources>
     <color name="primary">#396426</color>
     <color name="primary_dark">#2d501e</color>
-    <color name="accent">#559639</color>
 
     <color name="label_fg">@color/label_fg_light</color>
-
-    <color name="issue_open">#396426</color>
-    <color name="issue_closed">#642626</color>
-    <color name="pr_merged">#3a2664</color>
-    <color name="pr_draft">#363940</color>
-    <color name="issue_open_dark">#2e501e</color>
-    <color name="issue_closed_dark">#501e1e</color>
-    <color name="pr_merged_dark">#2e1e50</color>
-    <color name="pr_draft_dark">#27292e</color>
-    <color name="issue_open_button">#569639</color>
-    <color name="issue_closed_button">#963939</color>
-    <color name="pr_merged_button">#563996</color>
-    <color name="pr_draft_button">#606673</color>
-
-    <color name="fab">#569639</color>
-    <color name="fab_pressed">#2d501e</color>
-
     <color name="scrollbar_thumb">#5dffffff</color>
 
     <color name="diff_add">#103810</color>
