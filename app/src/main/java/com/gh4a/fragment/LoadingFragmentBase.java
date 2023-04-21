@@ -25,7 +25,6 @@ public abstract class LoadingFragmentBase extends Fragment implements
     private ViewGroup mContentContainer;
     private View mContentView;
     private LinearProgressIndicator mProgress;
-    private final int[] mProgressColors = new int[2];
     private boolean mContentShown = true;
     private RxLoader mRxLoader;
 
@@ -95,12 +94,9 @@ public abstract class LoadingFragmentBase extends Fragment implements
     }
 
     protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
+        mProgress.setIndicatorColor(UiUtils.resolveColor(mProgress.getContext(), colorAttrId));
     }
-
-    protected int getHighlightColor() {
-        return mProgressColors[0];
-    }
-
+    
     protected boolean isContentShown() {
         return mContentShown;
     }

@@ -148,8 +148,9 @@ public abstract class LoadingListFragmentBase extends LoadingFragmentBase implem
     @Override
     protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
         super.setHighlightColors(colorAttrId, statusBarColorAttrId);
-        UiUtils.trySetListOverscrollColor(mRecyclerView, getHighlightColor());
-        mFastScroller.setHandlePressedColor(getHighlightColor());
+        int highlightColor = UiUtils.resolveColor(getContext(), colorAttrId);
+        UiUtils.trySetListOverscrollColor(mRecyclerView, highlightColor);
+        mFastScroller.setHandlePressedColor(highlightColor);
     }
 
     protected abstract int getEmptyTextResId();
