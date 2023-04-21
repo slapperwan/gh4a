@@ -9,7 +9,7 @@
         android:id="@+id/breadcrumbs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorBreadcrumbBackground"
+        android:background="?attr/colorSecondary"
         android:elevation="2dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"

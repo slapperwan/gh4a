@@ -23,6 +23,6 @@
         android:layout_height="wrap_content"
         android:text="@string/loading_msg"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="?attr/colorAccent" />
+        android:textColor="?attr/colorPrimary" />
 
 </LinearLayout>

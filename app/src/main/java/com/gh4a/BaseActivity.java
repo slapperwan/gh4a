@@ -865,7 +865,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
             return null;
         }
         ColorStateList baseColor = ContextCompat.getColorStateList(this, value.resourceId);
-        if (!getTheme().resolveAttribute(R.attr.colorAccent, value, true)) {
+        if (!getTheme().resolveAttribute(R.attr.colorPrimary, value, true)) {
             return null;
         }
         int colorAccent = value.data;

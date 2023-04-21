@@ -38,7 +38,7 @@
         android:summary="%s"
         android:title="@string/menu_gif_load_mode" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         android:defaultValue="true"
         android:key="use_custom_tabs"
@@ -46,7 +46,7 @@
         android:summaryOff="@string/open_links_external_browser"
         android:title="@string/use_custom_tabs" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         app:iconSpaceReserved="false"
         android:defaultValue="false"
         android:key="notifications"

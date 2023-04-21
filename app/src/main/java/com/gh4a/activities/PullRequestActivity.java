@@ -37,7 +37,6 @@ import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
 
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -66,6 +65,7 @@ import com.gh4a.utils.Triplet;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
@@ -608,7 +608,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             setupMergeMethodSpinner();
 
             final PullRequestActivity activity = (PullRequestActivity) getContext();
-            return new AlertDialog.Builder(activity)
+            return new MaterialAlertDialogBuilder(activity)
                     .setTitle(getString(R.string.pull_message_dialog_title, mPr.number()))
                     .setView(view)
                     .setPositiveButton(R.string.pull_request_merge, (dialog, which) -> {

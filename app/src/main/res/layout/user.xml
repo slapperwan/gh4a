@@ -13,7 +13,7 @@
         android:orientation="vertical">
 
         <!-- user info section -->
-        <androidx.cardview.widget.CardView style="?attr/cardViewTheme">
+        <com.google.android.material.card.MaterialCardView style="?attr/cardViewTheme">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -162,10 +162,10 @@
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Repository section -->
-        <androidx.cardview.widget.CardView style="?attr/cardViewTheme">
+        <com.google.android.material.card.MaterialCardView style="?attr/cardViewTheme">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -205,10 +205,10 @@
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Organizations section -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/ll_orgs"
             style="?attr/cardViewTheme">
 
@@ -232,6 +232,6 @@
                     android:orientation="vertical" />
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

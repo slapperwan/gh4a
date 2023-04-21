@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialog;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.TwoStatePreference;
@@ -27,6 +28,9 @@ import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.worker.NotificationsWorker;
 import com.gh4a.widget.IntegerListPreference;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import java.util.Arrays;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -140,6 +144,30 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
     }
 
+    @Override
+    public void onDisplayPreferenceDialog(@NonNull Preference preference) {
+        if (preference instanceof ListPreference) {
+            showListPreference((ListPreference) preference);
+        } else {
+            super.onDisplayPreferenceDialog(preference);
+        }
+    }
+
+    public void showListPreference(@NonNull ListPreference preference) {
+        int selectionIndex = Arrays.asList(preference.getEntryValues()).indexOf(preference.getValue());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext());
+        builder.setTitle(preference.getTitle());
+        builder.setNegativeButton(android.R.string.cancel, null);
+        builder.setSingleChoiceItems(preference.getEntries(), selectionIndex, (dialog, index) -> {
+            String newValue = preference.getEntryValues()[index].toString();
+            if (preference.callChangeListener(newValue)) {
+                preference.setValue(newValue);
+            }
+            dialog.dismiss();
+        });
+        builder.show();
+    }
+
     public static class AboutDialogFragment extends DialogFragment {
         public static AboutDialogFragment newInstance(String title, boolean loggedIn) {
             AboutDialogFragment f = new AboutDialogFragment();
@@ -155,58 +183,45 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             String title = getArguments().getString("title");
             boolean loggedIn = getArguments().getBoolean("loggedIn");
-            return new AboutDialog(getContext(), title, loggedIn);
-        }
-    }
-
-    private static class AboutDialog extends AppCompatDialog implements View.OnClickListener {
-        public AboutDialog(Context context, String title, boolean loggedIn) {
-            super(context);
-
-            setContentView(R.layout.about_dialog);
-            setTitle(title);
-
-            TextView tvCopyright = findViewById(R.id.copyright);
+            View view = getLayoutInflater().inflate(R.layout.about_dialog, null);
+            TextView tvCopyright = view.findViewById(R.id.copyright);
             tvCopyright.setText(R.string.copyright_notice);
 
-            findViewById(R.id.btn_by_email).setOnClickListener(this);
+            view.findViewById(R.id.btn_by_email).setOnClickListener((v) -> {
+                    Intent sendIntent = new Intent(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{
+                            getContext().getString(R.string.my_email)
+                    });
+                    sendIntent.setType("message/rfc822");
 
-            View newIssueButton = findViewById(R.id.btn_by_gh4a);
+                    Intent chooserIntent = Intent.createChooser(sendIntent,
+                            getContext().getString(R.string.send_email_title));
+                    getContext().startActivity(chooserIntent);
+            });
+
+            View newIssueButton = view.findViewById(R.id.btn_by_gh4a);
             if (loggedIn) {
-                newIssueButton.setOnClickListener(this);
+                newIssueButton.setOnClickListener((v) -> {
+                        Intent intent = IssueListActivity.makeIntent(getContext(),
+                                getContext().getString(R.string.my_username),
+                                getContext().getString(R.string.my_repo));
+                        getContext().startActivity(intent);
+                });
             } else {
                 newIssueButton.setVisibility(View.GONE);
             }
 
-            findViewById(R.id.btn_gh4a).setOnClickListener(this);
-        }
+            view.findViewById(R.id.btn_gh4a).setOnClickListener((v) -> {
+                    Intent intent = RepositoryActivity.makeIntent(getContext(),
+                            getContext().getString(R.string.my_username),
+                            getContext().getString(R.string.my_repo));
+                    getContext().startActivity(intent);
+            });
 
-        @Override
-        public void onClick(View view) {
-            Context context = getContext();
-            int id = view.getId();
-
-            if (id == R.id.btn_by_email) {
-                Intent sendIntent = new Intent(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{
-                        context.getString(R.string.my_email)
-                });
-                sendIntent.setType("message/rfc822");
-
-                Intent chooserIntent = Intent.createChooser(sendIntent,
-                        context.getString(R.string.send_email_title));
-                context.startActivity(chooserIntent);
-            } else if (id == R.id.btn_by_gh4a) {
-                Intent intent = IssueListActivity.makeIntent(context,
-                        context.getString(R.string.my_username),
-                        context.getString(R.string.my_repo));
-                context.startActivity(intent);
-            } else if (id == R.id.btn_gh4a) {
-                Intent intent = RepositoryActivity.makeIntent(context,
-                        context.getString(R.string.my_username),
-                        context.getString(R.string.my_repo));
-                context.startActivity(intent);
-            }
+            return new MaterialAlertDialogBuilder(getContext())
+                    .setTitle(title)
+                    .setView(view)
+                    .create();
         }
     }
 
@@ -219,7 +234,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             rv.setLayoutManager(new LinearLayoutManager(getContext()));
             rv.setAdapter(new OpenSourceComponentAdapter(getContext()));
 
-            return new AlertDialog.Builder(getContext())
+            return new MaterialAlertDialogBuilder(getContext())
                     .setView(rv)
                     .setTitle(R.string.open_source_components)
                     .setPositiveButton(R.string.ok, null)

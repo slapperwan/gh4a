@@ -38,7 +38,8 @@
         <activity
             android:name=".activities.Github4AndroidActivity"
             android:launchMode="singleTop"
-            android:configChanges="orientation|screenSize" >
+            android:configChanges="orientation|screenSize"
+            android:exported="true" >
             <intent-filter>
                 <action
                     android:name="android.intent.action.MAIN" />
@@ -145,7 +146,8 @@
         <activity android:name=".resolver.BrowseFilter"
             android:excludeFromRecents="true"
             android:taskAffinity=""
-            android:theme="@style/TransparentTheme">
+            android:theme="@style/TransparentTheme"
+            android:exported="true">
             <intent-filter>
                 <action
                     android:name="android.intent.action.VIEW" />
@@ -198,7 +200,8 @@
             android:exported="false" />
 
         <receiver
-            android:name="EventReceiver">
+            android:name="EventReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
             </intent-filter>

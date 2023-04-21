@@ -70,7 +70,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mDefaultBackgroundColor = ContextCompat.getColor(context, R.color.diff_default_background);
         mDefaultLineNumberBackgroundColor =
                 ContextCompat.getColor(context, R.color.diff_default_line_number_background);
-        mAccentColor = UiUtils.resolveColor(context, R.attr.colorAccent);
+        mAccentColor = UiUtils.resolveColor(context, R.attr.colorPrimary);
         mPadding = context.getResources().getDimensionPixelSize(R.dimen.code_diff_padding);
 
         mDiffHunkTextView = itemView.findViewById(R.id.diff_hunk);

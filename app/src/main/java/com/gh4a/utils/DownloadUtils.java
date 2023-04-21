@@ -15,6 +15,7 @@ import com.gh4a.BaseActivity;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.meisolsson.githubsdk.model.Download;
 import com.meisolsson.githubsdk.model.ReleaseAsset;
 
@@ -149,7 +150,7 @@ public class DownloadUtils {
             enqueueDownload(context, uri, fileName, description, mimeType, mediaType, wifiOnly, addAuthHeader);
         };
 
-        new AlertDialog.Builder(context)
+        new MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.download_mobile_warning_title)
                 .setMessage(R.string.download_mobile_warning_message)
                 .setPositiveButton(R.string.download_now_button, buttonListener)

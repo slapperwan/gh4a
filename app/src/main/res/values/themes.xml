@@ -1,5 +1,5 @@
 <resources>
-    <style name="AppThemeBase" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="AppThemeBase" parent="Theme.Material3.DayNight">
         <item name="android:windowSoftInputMode">adjustResize</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -11,10 +11,9 @@
         <item name="overviewRowStyle">@style/OverviewRow</item>
         <item name="cardViewTheme">@style/CardView.DayNight</item>
         <item name="inlineButtonStyle">@style/Widget.MaterialComponents.Button.TextButton</item>
+        <item name="actionBarTheme">@style/AppTheme.AppBarOverlay</item>
+        <item name="switchPreferenceCompatStyle">@style/SwitchPreference</item>
 
-        <item name="android:textColorLink">@color/link_text</item>
-
-        <item name="colorAccent">@color/accent</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorOnPrimary">@android:color/white</item>
@@ -59,7 +58,7 @@
         <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
     </style>
 
-    <style name="HeaderTheme" parent="Theme.MaterialComponents">
+    <style name="HeaderTheme" parent="Theme.Material3.DayNight">
         <item name="colorPrimary">#ffffff</item>
         <item name="colorSecondary">#ffffff</item>
         <item name="colorControlActivated">#ffffff</item>
@@ -72,14 +71,23 @@
 
     <style name="PreferenceTheme" parent="PreferenceThemeOverlay.v14.Material" />
 
-    <style name="CardView.DayNight" parent="CardView.Light">
+    <style name="CardView.DayNight" parent="Widget.Material3.CardView.Elevated">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginLeft">@dimen/card_margin</item>
         <item name="android:layout_marginRight">@dimen/card_margin</item>
         <item name="android:layout_marginTop">@dimen/card_top_bottom_margin</item>
         <item name="android:layout_marginBottom">@dimen/card_top_bottom_margin</item>
-        <item name="android:foreground">?android:attr/selectableItemBackground</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="strokeWidth">0dp</item>
+        <item name="cardElevation">5dp</item>
     </style>
 
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.Material3">
+        <item name="android:textColorPrimary">@android:color/darker_gray</item>
+    </style>
+
+    <style name="SwitchPreference" parent="@style/Preference.SwitchPreferenceCompat.Material">
+        <item name="widgetLayout">@layout/view_preference_switch</item>
+    </style>
 </resources>

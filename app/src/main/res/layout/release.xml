@@ -14,7 +14,7 @@
         android:orientation="vertical">
 
         <!-- header -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             style="?attr/cardViewTheme">
 
             <RelativeLayout
@@ -58,15 +58,15 @@
                     android:layout_toRightOf="@id/iv_gravatar"
                     android:background="?attr/selectableItemBackground"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="?attr/colorAccent"
+                    android:textColor="?attr/colorPrimary"
                     tools:text="On tag v3.23.2" />
 
             </RelativeLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- release notes section -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             style="?attr/cardViewTheme">
 
             <LinearLayout
@@ -95,10 +95,10 @@
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- downloads section -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/downloads"
             style="?attr/cardViewTheme">
 
@@ -122,7 +122,7 @@
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 

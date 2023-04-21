@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.widget.IssueLabelSpan;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.meisolsson.githubsdk.model.Label;
 
 import java.lang.reflect.Field;
@@ -37,7 +38,6 @@ import androidx.annotation.AttrRes;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -206,7 +206,7 @@ public class UiUtils {
         TextView message = content.findViewById(R.id.message);
 
         message.setText(messageResId);
-        return new AlertDialog.Builder(context)
+        return new MaterialAlertDialogBuilder(context)
                 .setView(content)
                 .create();
     }
