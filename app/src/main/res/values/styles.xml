@@ -92,10 +92,6 @@
         <item name="android:paddingRight">@dimen/content_padding</item>
     </style>
 
-    <style name="CardContainer">
-        <item name="android:background">@color/cardview_light_background</item>
-    </style>
-
     <style name="Widget.ActionBar.TabView" parent="Widget.AppCompat.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator</item>
     </style>

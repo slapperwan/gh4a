@@ -4,8 +4,4 @@
         <item name="ghFont">bold</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
-
-    <style name="CardContainer">
-        <item name="android:background">@color/cardview_dark_background</item>
-    </style>
 </resources>
