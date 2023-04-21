@@ -48,6 +48,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -90,7 +91,6 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 import io.reactivex.SingleTransformer;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -112,7 +112,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private AppBarLayout mHeader;
     private ToggleableAppBarLayoutBehavior mHeaderBehavior;
-    private SmoothProgressBar mProgress;
+    private LinearProgressIndicator mProgress;
     private SwipeRefreshLayout mSwipeLayout;
     private DrawerLayout mDrawerLayout;
     private CoordinatorLayout mCoordinatorLayout;
@@ -894,9 +894,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
             return;
         }
         mProgress = findViewById(R.id.progress);
-        mProgressColors[0] = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        mProgressColors[1] = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
-        mProgress.setSmoothProgressDrawableColors(mProgressColors);
 
         mCoordinatorLayout = findViewById(R.id.coordinator_layout);
         mContentContainer = findViewById(R.id.content_container);

@@ -15,16 +15,16 @@ import com.gh4a.R;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.philosophicalhacker.lib.RxLoader;
 
-import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
 import io.reactivex.SingleTransformer;
 
 public abstract class LoadingFragmentBase extends Fragment implements
         BaseActivity.RefreshableChild, SwipeRefreshLayout.ChildScrollDelegate {
     private ViewGroup mContentContainer;
     private View mContentView;
-    private SmoothProgressBar mProgress;
+    private LinearProgressIndicator mProgress;
     private final int[] mProgressColors = new int[2];
     private boolean mContentShown = true;
     private RxLoader mRxLoader;
@@ -55,9 +55,6 @@ public abstract class LoadingFragmentBase extends Fragment implements
         super.onViewCreated(view, savedInstanceState);
 
         mProgress = view.findViewById(R.id.progress);
-        mProgressColors[0] = UiUtils.resolveColor(mProgress.getContext(), R.attr.colorPrimary);
-        mProgressColors[1] = UiUtils.resolveColor(mProgress.getContext(), R.attr.colorPrimaryDark);
-        mProgress.setSmoothProgressDrawableColors(mProgressColors);
         updateContentVisibility();
     }
 
@@ -98,11 +95,6 @@ public abstract class LoadingFragmentBase extends Fragment implements
     }
 
     protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
-        mProgressColors[0] = UiUtils.resolveColor(getActivity(), colorAttrId);
-        mProgressColors[1] = UiUtils.resolveColor(getActivity(), statusBarColorAttrId);
-        if (mProgress != null) {
-            mProgress.invalidate();
-        }
     }
 
     protected int getHighlightColor() {
