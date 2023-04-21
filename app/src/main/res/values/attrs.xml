@@ -15,7 +15,6 @@
     <attr name="colorIssueEditFab" format="reference" />
     <attr name="colorCommitAddition" format="color" />
     <attr name="colorCommitDeletion" format="color" />
-    <attr name="colorBreadcrumbBackground" format="color" />
     <attr name="colorWebViewBackground" format="color" />
     <attr name="colorScrollbarThumb" format="color" />
     <attr name="colorDiffAddBackground" format="color" />

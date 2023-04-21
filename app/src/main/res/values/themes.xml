@@ -51,7 +51,6 @@
         <item name="colorPullRequestDraftDark">?attr/colorSecondaryContainer</item>
 
         <item name="colorIssueEditFab">@color/issue_edit_fab</item>
-        <item name="colorScrollbarThumb">@color/scrollbar_thumb</item>
         <item name="colorDiffAddBackground">@color/diff_add</item>
         <item name="colorDiffRemoveBackground">@color/diff_remove</item>
         <item name="colorDiffAddLineNumberBackground">@color/diff_add_line_number</item>
@@ -59,9 +58,10 @@
         <item name="colorCommitAddition">@color/commit_addition</item>
         <item name="colorCommitDeletion">@color/commit_deletion</item>
         <item name="colorCodeBackground">@color/code_background</item>
-        <item name="colorBreadcrumbBackground">@color/breadcrumb_background</item>
         <item name="colorIconForeground">@color/icon_foreground</item>
+
         <item name="drawerBackground">?attr/colorSurface</item>
+        <item name="colorScrollbarThumb">?attr/colorOnBackground</item>
     </style>
 
     <style name="AppTheme" parent="AppThemeBase" />

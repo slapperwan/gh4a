@@ -32,7 +32,6 @@
     <color name="color_scrim">#000000</color>
 
     <color name="label_fg">@color/label_fg_light</color>
-    <color name="scrollbar_thumb">#5dffffff</color>
 
     <color name="diff_add">#103810</color>
     <color name="diff_remove">#481010</color>

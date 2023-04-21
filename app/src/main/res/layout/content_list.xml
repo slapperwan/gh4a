@@ -9,11 +9,10 @@
         android:id="@+id/breadcrumbs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSecondary"
+        android:background="?attr/colorPrimary"
         android:elevation="2dp"
         android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:scrollbarSize="2dp" />
+        android:paddingRight="8dp" />
 
     <FrameLayout
         android:id="@+id/content_list_container"
