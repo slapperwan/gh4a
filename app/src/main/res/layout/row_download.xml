@@ -41,6 +41,20 @@
 
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/btn_copy_link"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        style="@style/SelectableBorderlessItem"
+        android:layout_gravity="center_vertical"
+        android:contentDescription="@string/copy_download_link"
+        android:src="@drawable/icon_copy_link" />
+
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
