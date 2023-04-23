@@ -18,6 +18,7 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -25,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gh4a.BaseActivity;
 import com.gh4a.R;
@@ -240,6 +242,9 @@ public class ReleaseInfoActivity extends BaseActivity implements
     public boolean onItemLongClick(ReleaseAsset item) {
         String label = "Release asset " + item.name();
         IntentUtils.copyToClipboard(this, label, item.browserDownloadUrl());
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
+            Toast.makeText(this, R.string.link_copied, Toast.LENGTH_SHORT).show();
+
         return true;
     }
 
