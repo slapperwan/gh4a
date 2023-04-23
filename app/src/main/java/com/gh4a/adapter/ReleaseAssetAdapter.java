@@ -6,11 +6,9 @@ import android.text.format.Formatter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.gh4a.R;
-import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.ReleaseAsset;
 
@@ -22,9 +20,7 @@ public class ReleaseAssetAdapter extends RootAdapter<ReleaseAsset, ReleaseAssetA
     @Override
     public ViewHolder onCreateViewHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
         View v = inflater.inflate(R.layout.row_download, parent, false);
-        ViewHolder holder = new ViewHolder(v);
-        holder.btnCopyLink.setOnClickListener(this);
-        return holder;
+        return new ViewHolder(v);
     }
 
     @Override
@@ -37,23 +33,10 @@ public class ReleaseAssetAdapter extends RootAdapter<ReleaseAsset, ReleaseAssetA
             holder.tvDesc.setVisibility(View.GONE);
         }
 
-        holder.btnCopyLink.setTag(asset);
-
         holder.tvCreatedAt.setText(mContext.getString(R.string.download_created,
                 StringUtils.formatRelativeTime(mContext, asset.createdAt(), true)));
         holder.tvSize.setText(Formatter.formatFileSize(mContext, asset.size()));
         holder.tvDownloads.setText(String.valueOf(asset.downloadCount()));
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.btn_copy_link) {
-            ReleaseAsset asset = (ReleaseAsset) v.getTag();
-            String label = "Release asset " + asset.name();
-            IntentUtils.copyToClipboard(mContext, label, asset.browserDownloadUrl());
-        } else {
-            super.onClick(v);
-        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -64,7 +47,6 @@ public class ReleaseAssetAdapter extends RootAdapter<ReleaseAsset, ReleaseAssetA
             tvCreatedAt = view.findViewById(R.id.tv_created_at);
             tvSize = view.findViewById(R.id.tv_size);
             tvDownloads = view.findViewById(R.id.tv_downloads);
-            btnCopyLink = view.findViewById(R.id.btn_copy_link);
         }
 
         private final TextView tvTitle;
@@ -72,6 +54,5 @@ public class ReleaseAssetAdapter extends RootAdapter<ReleaseAsset, ReleaseAssetA
         private final TextView tvSize;
         private final TextView tvDownloads;
         private final TextView tvCreatedAt;
-        private final ImageButton btnCopyLink;
     }
 }

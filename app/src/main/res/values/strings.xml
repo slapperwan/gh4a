@@ -73,7 +73,6 @@
     <string name="print">Print</string>
     <string name="downloads">Downloads</string>
     <string name="releases">Releases</string>
-    <string name="copy_download_link">Copy download link</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
     <string name="wrap_lines">Wrap lines</string>

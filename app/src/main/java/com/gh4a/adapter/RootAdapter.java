@@ -36,9 +36,12 @@ import java.util.List;
  */
 public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements Filterable, View.OnClickListener {
+        implements Filterable, View.OnClickListener, View.OnLongClickListener {
     public interface OnItemClickListener<T> {
         void onItemClick(T item);
+    }
+    public interface OnItemLongClickListener<T> {
+        boolean onItemLongClick(T item);
     }
     public interface OnScrolledToFooterListener {
         void onScrolledToFooter();
@@ -56,6 +59,7 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
     protected final Context mContext;
     private final LayoutInflater mInflater;
     private OnItemClickListener<T> mItemClickListener;
+    private OnItemLongClickListener<T> mItemLongClickListener;
     private boolean mContextMenuSupported;
 
     private View mHeaderView;
@@ -126,6 +130,13 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
             throw new IllegalStateException("Must not set item click listener after views are bound");
         }
         mItemClickListener = listener;
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener<T> listener) {
+        if (mHolderCreated) {
+            throw new IllegalStateException("Must not set item long click listener after views are bound");
+        }
+        mItemLongClickListener = listener;
     }
 
     public void setContextMenuSupported(boolean supported) {
@@ -217,6 +228,10 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
                     holder.itemView.setOnClickListener(this);
                     holder.itemView.setTag(holder);
                 }
+                if (mItemLongClickListener != null) {
+                    holder.itemView.setOnLongClickListener(this);
+                    holder.itemView.setTag(holder);
+                }
                 if (mContextMenuSupported) {
                     holder.itemView.setLongClickable(true);
                 }
@@ -255,6 +270,17 @@ public abstract class RootAdapter<T, VH extends RecyclerView.ViewHolder>
         if (position != RecyclerView.NO_POSITION) {
             mItemClickListener.onItemClick(getItemFromAdapterPosition(position));
         }
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        VH holder = (VH) view.getTag();
+        int position = holder.getBindingAdapterPosition();
+        if (position != RecyclerView.NO_POSITION) {
+            return mItemLongClickListener.onItemLongClick(getItemFromAdapterPosition(position));
+        }
+
+        return false;
     }
 
     protected abstract VH onCreateViewHolder(LayoutInflater inflater, ViewGroup parent,
