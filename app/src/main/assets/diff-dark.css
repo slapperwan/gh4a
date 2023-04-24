@@ -1,0 +1,26 @@
+@import "diff-light.css";
+
+body {
+    color: #f0f0f0;
+}
+
+.change {
+    background-color: #3a3c3d;
+}
+
+.add {
+    background-color: #244224;
+}
+
+.remove {
+    background-color: #581616;
+}
+
+.highlighted {
+    background: #555512;
+}
+
+.reaction > svg > path {
+    opacity: 0.8;
+    fill: #ffffff;
+}
