@@ -40,6 +40,7 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.StyleableTextView;
 import com.gh4a.widget.SwipeRefreshLayout;
+import com.google.android.material.snackbar.Snackbar;
 import com.meisolsson.githubsdk.model.Release;
 import com.meisolsson.githubsdk.model.ReleaseAsset;
 import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
@@ -52,7 +53,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
-        RootAdapter.OnItemClickListener<ReleaseAsset> {
+        RootAdapter.OnItemClickListener<ReleaseAsset>,
+        RootAdapter.OnItemLongClickListener<ReleaseAsset> {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, long id) {
         return new Intent(context, ReleaseInfoActivity.class)
                 .putExtra("owner", repoOwner)
@@ -221,6 +223,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
             ReleaseAssetAdapter adapter = new ReleaseAssetAdapter(this);
             adapter.addAll(mRelease.assets());
             adapter.setOnItemClickListener(this);
+            adapter.setOnItemLongClickListener(this);
             downloadsList.setLayoutManager(new LinearLayoutManager(this));
             downloadsList.setNestedScrollingEnabled(false);
             downloadsList.setAdapter(adapter);
@@ -232,6 +235,15 @@ public class ReleaseInfoActivity extends BaseActivity implements
     @Override
     public void onItemClick(ReleaseAsset item) {
         DownloadUtils.enqueueDownloadWithPermissionCheck(this, item);
+    }
+
+    @Override
+    public boolean onItemLongClick(ReleaseAsset item) {
+        String label = "Release asset " + item.name();
+        IntentUtils.copyToClipboard(this, label, item.browserDownloadUrl());
+        Snackbar.make(getRootLayout(), R.string.link_copied, Snackbar.LENGTH_SHORT).show();
+
+        return true;
     }
 
     @Override
