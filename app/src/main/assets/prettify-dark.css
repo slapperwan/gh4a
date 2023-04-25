@@ -1,6 +1,4 @@
-body {
-    margin: 6px 0 6px 0;
-}
+@import "prettify-light.css";
 
 .pln {
     color: #F1F2F3;
@@ -15,8 +13,7 @@ body {
 }
 
 .com {
-    color: #555;
-    font-style: italic;
+    color: #686868;
 }
 
 .typ {
@@ -55,28 +52,12 @@ body {
     color: #bbdaff;
 }
 
-pre.prettyprint {
-    min-width: 100%;
-    display: table;
-}
-
-pre.prettyprint > ol {
-    margin-left: 6px;
-    margin-right: 6px;
+pre.prettyprint.linenums {
+    box-shadow: 40px 0 0 #151515 inset,41px 0 0 #1d1d1d inset;
 }
 
 ol.linenums li {
     color: #7285b7;
-    list-style-type: none;
-    counter-increment: linenumber;
-}
-
-ol.linenums li:before {
-    content: counter(linenumber);
-    float: left;
-    margin-left: -4em;
-    text-align: right;
-    width: 3em;
 }
 
 li.L0,li.L1,li.L2,li.L3,li.L4,li.L5,li.L6,li.L7,li.L8,li.L9 {
@@ -84,7 +65,7 @@ li.L0,li.L1,li.L2,li.L3,li.L4,li.L5,li.L6,li.L7,li.L8,li.L9 {
 }
 
 li.L1,li.L3,li.L5,li.L7,li.L9 {
-    background: #111;
+    background: #1e1e1e;
 }
 
 li.highlighted {
