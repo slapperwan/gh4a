@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -27,6 +28,8 @@ import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.worker.NotificationsWorker;
 import com.gh4a.widget.IntegerListPreference;
+
+import static android.Manifest.permission.POST_NOTIFICATIONS;
 
 public class SettingsFragment extends PreferenceFragmentCompat implements
         Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
@@ -95,6 +98,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 NotificationsWorker.createNotificationChannels(getActivity());
                 NotificationsWorker.schedule(getContext(),
                         Integer.valueOf(mNotificationIntervalPref.getValue()));
+                // On Android 13 and up, notification permissions must be granted manually
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                        getActivity().checkSelfPermission(POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    getActivity().requestPermissions(new String[] { POST_NOTIFICATIONS }, 0);
+                }
             } else {
                 NotificationsWorker.cancel(getContext());
             }
