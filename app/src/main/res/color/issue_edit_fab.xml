@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<selector xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item app:state_draft="true" android:color="?attr/colorPullRequestDraft"/>
-    <item app:state_merged="true" android:color="?attr/colorPullRequestMerged"/>
-    <item app:state_closed="true" android:color="?attr/colorPullRequestDraft"/>
-    <item android:color="?attr/colorIssueOpen"/>
-</selector>

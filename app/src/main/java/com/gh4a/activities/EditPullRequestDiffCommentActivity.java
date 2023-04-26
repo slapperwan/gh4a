@@ -29,7 +29,7 @@ public class EditPullRequestDiffCommentActivity extends EditCommentActivity {
                 .putExtra("position", position)
                 .putExtra("pull_request_number", pullRequestNumber);
         return EditCommentActivity.fillInIntent(intent, repoOwner, repoName,
-                id, replyToCommentId, body, R.attr.colorIssueOpen);
+                id, replyToCommentId, body, R.attr.colorPrimary);
     }
 
     @Override

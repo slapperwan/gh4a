@@ -253,12 +253,6 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     }
 
     @Override
-    protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
-        super.setHighlightColors(colorAttrId, statusBarColorAttrId);
-        mBottomSheet.setHighlightColor(colorAttrId);
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.issue_fragment_menu, menu);

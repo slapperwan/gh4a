@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -44,14 +45,18 @@ import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
 import com.google.android.material.appbar.AppBarLayout;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
+import com.google.android.material.elevation.SurfaceColors;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -162,6 +167,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (extras != null) {
             onInitExtras(extras);
         }
+
+        updateStatusBarColor();
+
         super.onCreate(savedInstanceState);
 
         mRxLoader = new RxLoader(this, LoaderManager.getInstance(this));
@@ -204,6 +212,19 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     public void handleActionFailure(String text, Throwable e) {
         handleFailure(text, e);
+    }
+
+    private void updateStatusBarColor() {
+        int elevatedPrimaryColor = SurfaceColors.getColorForElevation(this, 2f);
+        getWindow().setStatusBarColor(elevatedPrimaryColor);
+
+        View view = getWindow().getDecorView();
+        if ((getResources().getConfiguration().uiMode &
+                Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES) {
+            view.setSystemUiVisibility(view.getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        } else {
+            view.setSystemUiVisibility(view.getSystemUiVisibility() & ~View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        }
     }
 
     private void handleFailure(String text, Throwable e) {
@@ -718,11 +739,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private void setupHeaderDrawable() {
         ensureContent();
 
-        int primaryColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        assignBackground(mLeftDrawerHeader, primaryColor);
-        assignBackground(mRightDrawerHeader, primaryColor);
-        assignBackground(mHeader, primaryColor);
-
         int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
         ColorDrawable d = new ColorDrawable(primaryDarkColor);
         mDrawerLayout.setStatusBarBackground(d);
@@ -734,15 +750,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
                 "color", drawable.getColor(), color);
         animation.setEvaluator(new ArgbEvaluator());
         return animation;
-    }
-
-    private void assignBackground(View view, int color) {
-        if (view == null) {
-            return;
-        }
-        ColorDrawable background = new ColorDrawable(color);
-        view.setBackground(background);
-        mHeaderDrawables.add(background);
     }
 
     private void setupSwipeToRefresh() {
@@ -825,7 +832,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_left, Gravity.LEFT);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow_right, Gravity.RIGHT);
-        mDrawerLayout.setScrimColor(ContextCompat.getColor(this, R.color.drawer_scrim));
 
         mRightDrawerHeader = mRightDrawer.inflateHeaderView(R.layout.drawer_header_right);
 

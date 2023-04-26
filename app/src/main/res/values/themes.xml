@@ -8,12 +8,10 @@
         <item name="windowActionModeOverlay">true</item>
 
         <item name="preferenceTheme">@style/PreferenceTheme</item>
-        <item name="actionMenuTextAppearance">@style/TextAppearance.Widget.ActionBar.Menu</item>
         <item name="actionBarTabStyle">@style/Widget.ActionBar.TabView</item>
         <item name="overviewRowStyle">@style/OverviewRow</item>
         <item name="cardViewTheme">@style/CardView.DayNight</item>
         <item name="inlineButtonStyle">@style/Widget.MaterialComponents.Button.TextButton</item>
-        <item name="actionBarTheme">@style/AppTheme.AppBarOverlay</item>
         <item name="switchPreferenceCompatStyle">@style/SwitchPreference</item>
 
         <item name="colorPrimary">@color/color_primary</item>
@@ -43,16 +41,6 @@
         <item name="colorSurfaceInverse">@color/color_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/color_inversePrimary</item>
 
-        <item name="colorIssueOpen">?attr/colorPrimary</item>
-        <item name="colorIssueClosed">?attr/colorTertiary</item>
-        <item name="colorPullRequestMerged">?attr/colorTertiary</item>
-        <item name="colorPullRequestDraft">?attr/colorSecondary</item>
-        <item name="colorIssueOpenDark">?attr/colorPrimaryDark</item>
-        <item name="colorIssueClosedDark">?attr/colorTertiaryContainer</item>
-        <item name="colorPullRequestMergedDark">?attr/colorTertiaryContainer</item>
-        <item name="colorPullRequestDraftDark">?attr/colorSecondaryContainer</item>
-
-        <item name="colorIssueEditFab">@color/issue_edit_fab</item>
         <item name="colorDiffAddBackground">@color/diff_add</item>
         <item name="colorDiffRemoveBackground">@color/diff_remove</item>
         <item name="colorDiffAddLineNumberBackground">@color/diff_add_line_number</item>
@@ -102,10 +90,6 @@
         <item name="cardCornerRadius">16dp</item>
         <item name="strokeWidth">0dp</item>
         <item name="cardElevation">5dp</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.Material3">
-        <item name="android:textColorPrimary">@android:color/darker_gray</item>
     </style>
 
     <style name="SwitchPreference" parent="@style/Preference.SwitchPreferenceCompat.Material">

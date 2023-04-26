@@ -49,10 +49,6 @@ public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implem
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
     };
-    private static final int[][] HEADER_COLOR_ATTRS = new int[][] {
-        { R.attr.colorIssueOpen, R.attr.colorIssueOpenDark },
-        { R.attr.colorIssueClosed, R.attr.colorIssueClosedDark }
-    };
 
     private final ActivityResultLauncher<Intent> mCreateMilestoneLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -142,11 +138,6 @@ public class IssueMilestoneListActivity extends BaseFragmentPagerActivity implem
             mCreateFab.setScaleY(openFraction);
             mCreateFab.setVisibility(openFraction == 0 ? View.INVISIBLE : View.VISIBLE);
         }
-    }
-
-    @Override
-    protected int[][] getTabHeaderColorAttrs() {
-        return HEADER_COLOR_ATTRS;
     }
 
     @Override

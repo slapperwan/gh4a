@@ -73,7 +73,7 @@ public class CreateReviewActivity extends AppCompatActivity implements
         mEditorSheet.setAllowEmpty(true);
         boolean isDraftPR = extras.getBoolean(EXTRA_DRAFT_PR);
         if (isDraftPR) {
-            mEditorSheet.setHighlightColor(R.attr.colorPullRequestDraft);
+            mEditorSheet.setHighlightColor(R.attr.colorTertiary);
         }
 
         mReviewEventAdapter = new ArrayAdapter<>(this, R.layout.spinner_item);

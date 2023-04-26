@@ -43,7 +43,6 @@
                     android:layout_height="wrap_content"
                     android:text="@string/app_name"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textColor="@color/nav_header_primary_text"
                     app:ghFont="bold"
                     tools:text="user" />
 
@@ -52,7 +51,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textColor="@color/nav_header_secondary_text"
                     android:visibility="gone"
                     tools:text="User real name"
                     tools:visibility="visible" />

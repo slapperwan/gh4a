@@ -91,18 +91,20 @@ public class IssueListFragment extends PagedDataBaseFragment<Issue> {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        switch (mIssueState) {
-            case ApiHelpers.IssueState.CLOSED:
-                setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
-                break;
-            case ApiHelpers.IssueState.MERGED:
-                setHighlightColors(R.attr.colorPullRequestMerged,
-                        R.attr.colorPullRequestMergedDark);
-                break;
-            default:
-                setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
-                break;
-        }
+        /** TODO
+         * switch (mIssueState) {
+         *             case ApiHelpers.IssueState.CLOSED:
+         *                 setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
+         *                 break;
+         *             case ApiHelpers.IssueState.MERGED:
+         *                 setHighlightColors(R.attr.colorPullRequestMerged,
+         *                         R.attr.colorPullRequestMergedDark);
+         *                 break;
+         *             default:
+         *                 setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
+         *                 break;
+         *         }
+         */
     }
 
     @Override

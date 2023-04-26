@@ -301,8 +301,10 @@ public class IssueMilestoneEditActivity extends BasePagerActivity implements
 
     private void updateHighlightColor() {
         boolean closed = mMilestone.state() == IssueState.Closed;
-        transitionHeaderToColor(closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
-                closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
+        /** TODO
+         * transitionHeaderToColor(closed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
+         *                 closed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark);
+         */
         mSaveFab.setState(mMilestone.state());
     }
 

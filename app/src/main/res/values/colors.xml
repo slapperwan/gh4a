@@ -35,12 +35,6 @@
     <color name="label_fg_light">#fff3f3f3</color>
     <color name="label_fg">@color/label_fg_dark</color>
 
-    <color name="tab_indicator_color">#fff</color>
-    <color name="drawer_scrim">#60000000</color>
-
-    <color name="nav_header_primary_text">#ffffffff</color>
-    <color name="nav_header_secondary_text">#b3ffffff</color>
-
     <color name="diff_add">#eaffea</color>
     <color name="diff_remove">#ffecec</color>
     <color name="diff_add_line_number">#dbffdb</color>

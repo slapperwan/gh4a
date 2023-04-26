@@ -422,26 +422,16 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private void fillHeader() {
         final int stateTextResId;
 
+        // TODO
+
         if (mPullRequest.merged()) {
             stateTextResId = R.string.pull_request_merged;
-            mHeaderColorAttrs = new int[] {
-                R.attr.colorPullRequestMerged, R.attr.colorPullRequestMergedDark
-            };
         } else if (mPullRequest.state() == IssueState.Closed) {
             stateTextResId = R.string.closed;
-            mHeaderColorAttrs = new int[] {
-                R.attr.colorIssueClosed, R.attr.colorIssueClosedDark
-            };
         } else if (mPullRequest.draft()) {
             stateTextResId = R.string.draft;
-            mHeaderColorAttrs = new int[] {
-                R.attr.colorPullRequestDraft, R.attr.colorPullRequestDraftDark
-            };
         } else {
             stateTextResId = R.string.open;
-            mHeaderColorAttrs = new int[] {
-                R.attr.colorIssueOpen, R.attr.colorIssueOpenDark
-            };
         }
 
         TextView tvState = mHeader.findViewById(R.id.tv_state);

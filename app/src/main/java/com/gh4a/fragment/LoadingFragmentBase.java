@@ -92,10 +92,6 @@ public abstract class LoadingFragmentBase extends Fragment implements
             activity.handleActionFailure(text, error);
         }
     }
-
-    protected void setHighlightColors(int colorAttrId, int statusBarColorAttrId) {
-        mProgress.setIndicatorColor(UiUtils.resolveColor(mProgress.getContext(), colorAttrId));
-    }
     
     protected boolean isContentShown() {
         return mContentShown;
