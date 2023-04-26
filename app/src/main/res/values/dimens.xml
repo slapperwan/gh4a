@@ -13,7 +13,7 @@
     <dimen name="issue_label_margin">2dp</dimen>
     <dimen name="mini_fab_size_with_margin">56dp</dimen> <!-- 40dp FAB + 16dp margin -->
     <dimen name="reaction_details_popup_width">200dp</dimen>
-    <dimen name="comment_editor_peek_height">52dp</dimen>
+    <dimen name="comment_editor_peek_height">70dp</dimen>
     <dimen name="comment_advanced_editor_peek_height">104dp</dimen>
     <dimen name="comment_bottom_sheet_height">400dp</dimen>
     <dimen name="bottom_sheet_top_shadow_height">4dp</dimen>
