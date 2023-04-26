@@ -57,17 +57,14 @@ import com.gh4a.fragment.CommitCompareFragment;
 import com.gh4a.fragment.ConfirmationDialogFragment;
 import com.gh4a.fragment.PullRequestConversationFragment;
 import com.gh4a.fragment.PullRequestFilesFragment;
-import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.Triplet;
-import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.textfield.TextInputLayout;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
@@ -422,8 +419,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private void fillHeader() {
         final int stateTextResId;
 
-        // TODO
-
         if (mPullRequest.merged()) {
             stateTextResId = R.string.pull_request_merged;
         } else if (mPullRequest.state() == IssueState.Closed) {
@@ -439,6 +434,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
         TextView tvTitle = mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mPullRequest.title());
+        tvTitle.setSelected(true);
 
         mHeader.setVisibility(View.VISIBLE);
     }

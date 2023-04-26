@@ -169,12 +169,6 @@ public class IssueListFactory extends FragmentFactory {
     }
 
     private void updateHeaderColor() {
-        /** TODO
-         * mHeaderColorAttrs = new int[] {
-         *             mShowingClosed ? R.attr.colorIssueClosed : R.attr.colorIssueOpen,
-         *             mShowingClosed ? R.attr.colorIssueClosedDark : R.attr.colorIssueOpenDark
-         *         };
-         */
         mActivity.invalidateTabs();
     }
 

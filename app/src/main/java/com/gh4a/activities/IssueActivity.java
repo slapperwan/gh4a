@@ -185,6 +185,7 @@ public class IssueActivity extends BaseActivity implements
 
         TextView tvTitle = mHeader.findViewById(R.id.tv_title);
         tvTitle.setText(mIssue.title());
+        tvTitle.setSelected(true);
 
         mHeader.setVisibility(View.VISIBLE);
     }

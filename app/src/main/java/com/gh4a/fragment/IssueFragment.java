@@ -37,7 +37,6 @@ public class IssueFragment extends IssueFragmentBase {
 
     public void updateState(Issue issue) {
         mIssue = mIssue.toBuilder().state(issue.state()).build();
-        assignHighlightColor();
         reloadEvents(false);
     }
 
@@ -50,17 +49,6 @@ public class IssueFragment extends IssueFragmentBase {
         } else {
             tvPull.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    protected void assignHighlightColor() {
-        /** TODO
-         * if (mIssue.state() == IssueState.Closed) {
-         *             setHighlightColors(R.attr.colorIssueClosed, R.attr.colorIssueClosedDark);
-         *         } else {
-         *             setHighlightColors(R.attr.colorIssueOpen, R.attr.colorIssueOpenDark);
-         *         }
-         */
     }
 
     @Override
