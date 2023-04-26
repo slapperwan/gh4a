@@ -1,6 +1,8 @@
 <resources>
-    <style name="AppThemeBase" parent="Theme.Material3.DayNight">
+    <style name="AppTheme" parent="Theme.Material3.DayNight">
         <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
@@ -64,17 +66,14 @@
         <item name="colorScrollbarThumb">?attr/colorOnBackground</item>
     </style>
 
-    <style name="AppTheme" parent="AppThemeBase" />
-
-    <style name="TransparentThemeBase" parent="AppTheme">
+    <style name="TransparentTheme" parent="AppTheme">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
-
-    <style name="TransparentTheme" parent="TransparentThemeBase" />
 
     <style name="BottomSheetTheme" parent="TransparentTheme">
         <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>

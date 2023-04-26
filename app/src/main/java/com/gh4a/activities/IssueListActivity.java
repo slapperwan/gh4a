@@ -94,6 +94,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private int mSelectedParticipatingStatus = 0;
 
     private FloatingActionButton mCreateFab;
+    private MenuItem mRemoveFilterButton;
     private IssueListFragment mOpenFragment;
     private Boolean mIsCollaborator;
     private List<Label> mLabels;
@@ -111,8 +112,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     private static final String STATE_KEY_SELECTED_ASSIGNEE = "selected_assignee";
     private static final String STATE_KEY_PARTICIPATING_STATUS = "participating_status";
 
-    private static final String LIST_QUERY = "is:%s %s repo:%s/%s %s %s %s %s";
-    private static final String SEARCH_QUERY = "is:%s %s repo:%s/%s %s";
+    private static final String LIST_QUERY = "is:%s %s repo:%s/%s %s %s %s %s %s";
 
     private static final int[] TITLES = new int[] {
         R.string.open, R.string.closed
@@ -130,19 +130,20 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mUserLogin = Gh4Application.get().getAuthLogin();
-
+        // We're restoring instance state before calling super.onCreate() because some of the fields
+        // are used to populate the right navigation drawer, which is done in BaseActivity.onCreate()
         if (savedInstanceState != null) {
             mSearchQuery = savedInstanceState.getString(STATE_KEY_SEARCH_QUERY);
             mSearchMode = savedInstanceState.getBoolean(STATE_KEY_SEARCH_MODE);
             mSearchIsExpanded = savedInstanceState.getBoolean(STATE_KEY_SEARCH_IS_EXPANDED);
+            mSelectedMilestone = savedInstanceState.getString(STATE_KEY_SELECTED_MILESTONE);
             mSelectedLabel = savedInstanceState.getString(STATE_KEY_SELECTED_LABEL);
             mSelectedAssignee = savedInstanceState.getString(STATE_KEY_SELECTED_ASSIGNEE);
-            mSelectedParticipatingStatus =
-                    savedInstanceState.getInt(STATE_KEY_PARTICIPATING_STATUS);
+            mSelectedParticipatingStatus = savedInstanceState.getInt(STATE_KEY_PARTICIPATING_STATUS);
         }
+
+        super.onCreate(savedInstanceState);
+        mUserLogin = Gh4Application.get().getAuthLogin();
 
         if (!mIsPullRequest && Gh4Application.get().isAuthorized()) {
             CoordinatorLayout rootLayout = getRootLayout();
@@ -248,23 +249,20 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     @Override
     protected Fragment makeFragment(int position) {
-        final @StringRes int emptyTextResId;
-        final String query;
+        String query = String.format(Locale.US, LIST_QUERY,
+                mIsPullRequest ? "pr" : "issue",
+                getIssueType(position), mRepoOwner, mRepoName,
+                mSearchQuery == null ? "" : mSearchQuery,
+                buildFilterItem("assignee", mSelectedAssignee),
+                buildFilterItem("label", mSelectedLabel),
+                buildFilterItem("milestone", mSelectedMilestone),
+                buildParticipatingFilterItem()).trim();
 
-        if (mSearchMode) {
-            query = String.format(Locale.US, SEARCH_QUERY,
-                    mIsPullRequest ? "pr" : "issue",
-                    getIssueType(position), mRepoOwner, mRepoName, mSearchQuery);
+        @StringRes int emptyTextResId;
+        if (mSearchMode || isFiltering()) {
             emptyTextResId = mIsPullRequest
                     ? R.string.no_search_pull_requests_found : R.string.no_search_issues_found;
         } else {
-            query = String.format(Locale.US, LIST_QUERY,
-                    mIsPullRequest ? "pr" : "issue",
-                    getIssueType(position), mRepoOwner, mRepoName,
-                    buildFilterItem("assignee", mSelectedAssignee),
-                    buildFilterItem("label", mSelectedLabel),
-                    buildFilterItem("milestone", mSelectedMilestone),
-                    buildParticipatingFilterItem()).trim();
             emptyTextResId = mIsPullRequest
                     ? R.string.no_pull_requests_found : R.string.no_issues_found;
         }
@@ -313,12 +311,10 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     @Override
     protected int[] getRightNavigationDrawerMenuResources() {
-        int[] menuResIds = new int[mSearchMode ? 1 : 2];
+        int[] menuResIds = new int[2];
         menuResIds[0] = IssueListFragment.SortDrawerHelper.getMenuResId();
-        if (!mSearchMode) {
-            menuResIds[1] = mIsCollaborator != null && mIsCollaborator
-                    ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
-        }
+        menuResIds[1] = mIsCollaborator != null && mIsCollaborator
+                ? R.menu.issue_list_filter_collab : R.menu.issue_list_filter;
         return menuResIds;
     }
 
@@ -346,7 +342,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
                     mSelectedLabel.isEmpty() ? getString(R.string.issue_filter_by_no_label) :
                     mSelectedLabel;
             UiUtils.setMenuItemText(this, labelFilterItem,
-                    getString(R.string.issue_filter_by_labels), subtitle);
+                    getString(R.string.issue_filter_by_label), subtitle);
         }
         MenuItem assigneeFilterItem = menu.findItem(R.id.filter_by_assignee);
         if (assigneeFilterItem != null) {
@@ -404,6 +400,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.issue_list_menu, menu);
+        mRemoveFilterButton = menu.findItem(R.id.remove_filter);
 
         MenuItem searchItem = menu.findItem(R.id.search);
         searchItem.setOnActionExpandListener(this);
@@ -416,12 +413,14 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         searchView.setOnCloseListener(this);
         searchView.setOnQueryTextListener(this);
 
-        if (mSelectedMilestone != null || mSelectedAssignee != null
-                || mSelectedLabel != null || mSelectedParticipatingStatus != 0) {
-            menu.findItem(R.id.remove_filter).setVisible(true);
-        }
-
+        updateRemoveFilterButtonVisibility();
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void updateRemoveFilterButtonVisibility() {
+        if (mRemoveFilterButton != null) {
+            mRemoveFilterButton.setVisible(isFiltering());
+        }
     }
 
     @Override
@@ -435,6 +434,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean isFiltering() {
+        return mSelectedMilestone != null || mSelectedAssignee != null
+                || mSelectedLabel != null || mSelectedParticipatingStatus != 0;
     }
 
     private void removeFilter() {
@@ -492,15 +496,11 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     private void setSearchMode(boolean enabled) {
-        boolean changed = mSearchMode != enabled;
         mSearchMode = enabled;
         if (mCreateFab != null) {
             mCreateFab.setVisibility(enabled ? View.GONE : View.VISIBLE);
         }
         invalidateFragments();
-        if (changed) {
-            updateRightNavigationDrawer();
-        }
     }
 
     private String getIssueState(int position) {
@@ -559,7 +559,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         }
 
         SingleChoiceDialogFragment.show(this, labels,
-                R.string.issue_filter_by_labels, selected, "labelselect");
+                R.string.issue_filter_by_label, selected, "labelselect");
     }
 
     private void showMilestonesDialog() {
@@ -582,7 +582,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     private void onFilterUpdated() {
         invalidateFragments();
-        invalidateOptionsMenu();
+        updateRemoveFilterButtonVisibility();
         updateRightNavigationDrawer();
     }
 

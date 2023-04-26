@@ -58,4 +58,6 @@
     <color name="breadcrumb_background">#7baa67</color>
 
     <color name="octodroid">#97C03E</color>
+    <!-- Equal to primary, but not overridden in night mode -->
+    <color name="launcher_bg">#65b345</color>
 </resources>

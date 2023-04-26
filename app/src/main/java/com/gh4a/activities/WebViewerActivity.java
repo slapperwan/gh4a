@@ -19,12 +19,10 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.print.PrintAttributes;
@@ -42,6 +40,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.BuildConfig;
 import com.gh4a.R;
 import com.gh4a.fragment.SettingsFragment;
 import com.gh4a.utils.FileUtils;
@@ -106,7 +105,7 @@ public abstract class WebViewerActivity extends BaseActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+        if (BuildConfig.DEBUG) {
             WebView.setWebContentsDebuggingEnabled(true);
         }
 
@@ -235,7 +234,6 @@ public abstract class WebViewerActivity extends BaseActivity implements
         findAction.showSoftInput();
     }
 
-    @TargetApi(19)
     private void doPrint() {
         if (handlePrintRequest()) {
             return;
@@ -260,26 +258,15 @@ public abstract class WebViewerActivity extends BaseActivity implements
         supportInvalidateOptionsMenu();
     }
 
-    @TargetApi(19)
     private void doPrintHtml() {
         if (!isFinishing()) {
             final String title = getDocumentTitle();
             PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
-            PrintDocumentAdapter printAdapter = getPrintAdapterForWebView(mPrintWebView, title);
+            PrintDocumentAdapter printAdapter = mPrintWebView.createPrintDocumentAdapter(title);
             printManager.print(title, printAdapter, new PrintAttributes.Builder().build());
         }
         mPrintWebView = null;
         supportInvalidateOptionsMenu();
-    }
-
-    @SuppressWarnings("deprecation")
-    @TargetApi(19)
-    private PrintDocumentAdapter getPrintAdapterForWebView(WebView webView, String title) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return webView.createPrintDocumentAdapter(title);
-        } else {
-            return webView.createPrintDocumentAdapter();
-        }
     }
 
     @Override

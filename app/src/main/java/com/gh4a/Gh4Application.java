@@ -16,6 +16,7 @@
 
 package com.gh4a;
 
+import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.res.Configuration;
@@ -36,12 +37,11 @@ import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.multidex.MultiDexApplication;
 
 /**
  * The Class Gh4Application.
  */
-public class Gh4Application extends MultiDexApplication implements
+public class Gh4Application extends Application implements
         androidx.work.Configuration.Provider,
         OnSharedPreferenceChangeListener {
     public static final String LOG_TAG = "Gh4a";

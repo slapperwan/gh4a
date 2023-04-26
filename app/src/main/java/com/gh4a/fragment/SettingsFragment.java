@@ -1,10 +1,12 @@
 package com.gh4a.fragment;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -99,6 +101,11 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
                 NotificationsWorker.createNotificationChannels(getActivity());
                 NotificationsWorker.schedule(getContext(),
                         Integer.valueOf(mNotificationIntervalPref.getValue()));
+                // On Android 13 and up, notification permissions must be granted manually
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                        getActivity().checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    getActivity().requestPermissions(new String[] { Manifest.permission.POST_NOTIFICATIONS }, 0);
+                }
             } else {
                 NotificationsWorker.cancel(getContext());
             }

@@ -75,6 +75,7 @@
     <string name="releases">Releases</string>
     <string name="open_in_browser">Open in browser</string>
     <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
+    <string name="link_copied">Link copied</string>
     <string name="wrap_lines">Wrap lines</string>
     <string name="unknown">unknown</string>
     <string name="history">History</string>
@@ -412,7 +413,7 @@
     <string name="issue_milestone_close_error">Closing milestone failed.</string>
     <string name="issue_milestone_reopen_error">Reopening milestone failed.</string>
     <string name="issue_filter">Filter</string>
-    <string name="issue_filter_by_labels">Filter by labels</string>
+    <string name="issue_filter_by_label">Filter by label</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>
     <string name="issue_filter_by_assignee">Filter by assignee</string>
     <string name="issue_filter_by_participating">Filter by participating status</string>
@@ -453,8 +454,8 @@
     <string name="pull_error_merge">Merging pull request #%1$d failed.</string>
     <string name="pull_message_dialog_title">Merge pull request #%1$d</string>
     <string name="pull_merge_title_description">Merge commit title</string>
+    <string name="pull_merge_title_helper">Leave this empty to use the default title provided by GitHub.</string>
     <string name="pull_merge_message_description">Merge commit details</string>
-    <string name="pull_merge_message_hint">If you want to add more details to the merge commit, enter them here.</string>
     <string name="pull_merge_status_loading">Loading pull request status…</string>
     <string name="pull_merge_status_behind">This branch is out-of-date with the base branch</string>
     <string name="pull_merge_status_blocked">Merging is blocked</string>

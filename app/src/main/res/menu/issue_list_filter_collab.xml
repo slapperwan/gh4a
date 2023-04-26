@@ -7,7 +7,7 @@
                 android:title="@string/issue_filter_by_milestone" />
             <item
                 android:id="@+id/filter_by_label"
-                android:title="@string/issue_filter_by_labels" />
+                android:title="@string/issue_filter_by_label" />
             <item
                 android:id="@+id/filter_by_assignee"
                 android:title="@string/issue_filter_by_assignee" />

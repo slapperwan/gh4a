@@ -7,8 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.Uri;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.PopupMenu;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -29,8 +27,10 @@ import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.ReviewComment;
 
-class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Diff>
-        implements View.OnClickListener {
+import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
+
+class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<TimelineItem.Diff> {
     private static final float[] DIFF_SIZE_MULTIPLIERS = new float[] {
             0.8F, 0.9F, 1F, 1.25F, 1.5F
     };
@@ -76,7 +76,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mDiffHunkTextView = itemView.findViewById(R.id.diff_hunk);
         mInitialDiffTextSize = mDiffHunkTextView.getTextSize();
         mFileTextView = itemView.findViewById(R.id.tv_file);
-        mFileTextView.setOnClickListener(this);
+        mFileTextView.setOnClickListener(this::onFileNameClick);
     }
 
     @Override
@@ -90,8 +90,9 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mFileTextView.setPaintFlags(isOutdated
                 ? mFileTextView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG
                 : mFileTextView.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
-        mFileTextView.setClickable(!isOutdated);
-        mFileTextView.setTextColor(isOutdated ? mSecondaryTextColor : mAccentColor);
+        boolean isClickable = !isOutdated && item.getInitialTimelineComment().hasFilePatch();
+        mFileTextView.setClickable(isClickable);
+        mFileTextView.setTextColor(isClickable ? mAccentColor : mSecondaryTextColor);
 
         String[] lines = comment.diffChunk().split("\n");
 
@@ -207,16 +208,12 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.tv_file) {
-            TimelineItem.TimelineComment timelineComment =
-                    (TimelineItem.TimelineComment) view.getTag();
-            Intent intent = timelineComment.makeDiffIntent(mContext);
+    private void onFileNameClick(View view) {
+        var timelineComment = (TimelineItem.TimelineComment) view.getTag();
+        Intent intent = timelineComment.makeDiffIntent(mContext);
 
-            if (intent != null) {
-                view.getContext().startActivity(intent);
-            }
+        if (intent != null) {
+            view.getContext().startActivity(intent);
         }
     }
 
@@ -237,7 +234,8 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         Menu menu = popupMenu.getMenu();
         popupMenu.getMenuInflater().inflate(R.menu.review_diff_hunk_menu, menu);
 
-        menu.findItem(R.id.view_in_file).setVisible(diff.getInitialComment().position() != null);
+        menu.findItem(R.id.view_in_file)
+            .setVisible(diff.getInitialTimelineComment().hasFilePatch() && diff.getInitialComment().position() != null);
 
         popupMenu.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
