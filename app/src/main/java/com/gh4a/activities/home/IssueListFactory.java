@@ -26,7 +26,6 @@ public class IssueListFactory extends FragmentFactory {
     private final boolean mIsPullRequest;
     private final IssueListFragment.SortDrawerHelper mDrawerHelper =
             new IssueListFragment.SortDrawerHelper();
-    private int[] mHeaderColorAttrs;
     private SharedPreferences mPrefs;
 
     public IssueListFactory(HomeActivity activity, String userLogin, boolean pr,
@@ -56,11 +55,6 @@ public class IssueListFactory extends FragmentFactory {
     @Override
     protected int[] getTabTitleResIds() {
         return TAB_TITLES;
-    }
-
-    @Override
-    protected int[] getHeaderColorAttrs() {
-        return mHeaderColorAttrs;
     }
 
     @Override
@@ -151,7 +145,6 @@ public class IssueListFactory extends FragmentFactory {
         if (mShowingClosed != showedClosed) {
             mShowingClosed = showedClosed;
             reloadIssueList();
-            updateHeaderColor();
             mActivity.invalidateTitle();
         }
     }
@@ -163,13 +156,8 @@ public class IssueListFactory extends FragmentFactory {
     private void toggleStateFilter() {
         mShowingClosed = !mShowingClosed;
         reloadIssueList();
-        updateHeaderColor();
         mActivity.invalidateTitle();
         mActivity.supportInvalidateOptionsMenu();
-    }
-
-    private void updateHeaderColor() {
-        mActivity.invalidateTabs();
     }
 
     private String getSortOrderPrefKey() {

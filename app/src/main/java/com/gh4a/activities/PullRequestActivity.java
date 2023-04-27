@@ -133,7 +133,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     private boolean mPendingReviewLoaded;
 
     private ViewGroup mHeader;
-    private int[] mHeaderColorAttrs;
 
     private final ActivityResultLauncher<Intent> mCreateReviewLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -287,7 +286,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
             mEditFab.post(this::updateFabVisibility);
         }
         mHeader.setVisibility(View.GONE);
-        mHeaderColorAttrs = null;
         load(true);
         loadPendingReview(true);
         invalidateTabs();
@@ -298,11 +296,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     @Override
     protected int[] getTabTitleResIds() {
         return mPullRequest != null && mIssue != null && mIsCollaborator != null ? TITLES : null;
-    }
-
-    @Override
-    protected int[] getHeaderColorAttrs() {
-        return mHeaderColorAttrs;
     }
 
     @Override
@@ -454,7 +447,6 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
         }
         fillHeader();
         updateFabVisibility();
-        transitionHeaderToColor(mHeaderColorAttrs[0], mHeaderColorAttrs[1]);
         supportInvalidateOptionsMenu();
     }
 

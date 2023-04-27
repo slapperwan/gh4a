@@ -237,15 +237,6 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
-    protected int[][] getTabHeaderColorAttrs() {
-        return new int[][]{
-                new int[]{R.attr.colorPrimary, R.attr.colorPrimary},
-                new int[]{R.attr.colorPrimary, R.attr.colorPrimary},
-                new int[]{R.attr.colorPrimary, R.attr.colorPrimary},
-        };
-    }
-
-    @Override
     protected Fragment makeFragment(int position) {
         String query = String.format(Locale.US, LIST_QUERY,
                 mIsPullRequest ? "pr" : "issue",

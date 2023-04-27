@@ -16,10 +16,8 @@
 package com.gh4a;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.assist.AssistContent;
@@ -45,7 +43,6 @@ import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
 import com.google.android.material.appbar.AppBarLayout;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
@@ -56,7 +53,6 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -333,60 +329,6 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     protected void onInitExtras(Bundle extras) {
 
-    }
-
-    public int getCurrentHeaderColor() {
-        return mProgressColors[0];
-    }
-
-    protected void setHeaderColor(int color, int statusBarColor) {
-        cancelHeaderTransition();
-
-        for (ColorDrawable d : mHeaderDrawables) {
-            d.setColor(color);
-        }
-        for (ColorDrawable d : mStatusBarDrawables) {
-            d.setColor(statusBarColor);
-        }
-        mProgressColors[0] = color;
-        mProgressColors[1] = statusBarColor;
-        mProgress.invalidate();
-        scheduleTaskDescriptionUpdate();
-    }
-
-    protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
-        final AnimatorSet animation = new AnimatorSet();
-        List<Animator> animators = new ArrayList<>();
-        int color = UiUtils.resolveColor(this, colorAttrId);
-        int statusBarColor = UiUtils.resolveColor(this, statusBarColorAttrId);
-
-        for (ColorDrawable d : mHeaderDrawables) {
-            animators.add(createColorTransition(d, color));
-        }
-        for (ColorDrawable d : mStatusBarDrawables) {
-            animators.add(createColorTransition(d, statusBarColor));
-        }
-
-        final ValueAnimator progressAnimator1 = ValueAnimator.ofInt(mProgressColors[0], color);
-        progressAnimator1.setEvaluator(new ArgbEvaluator());
-        animators.add(progressAnimator1);
-        final ValueAnimator progressAnimator2 = ValueAnimator.ofInt(mProgressColors[1], statusBarColor);
-        progressAnimator2.setEvaluator(new ArgbEvaluator());
-        animators.add(progressAnimator2);
-
-        progressAnimator1.addUpdateListener(anim -> {
-            mProgressColors[0] = (int) progressAnimator1.getAnimatedValue();
-            mProgressColors[1] = (int) progressAnimator2.getAnimatedValue();
-            mProgress.invalidate();
-        });
-
-        cancelHeaderTransition();
-
-        animation.playTogether(animators);
-        animation.setDuration(200);
-        animation.start();
-        mHeaderTransition = animation;
-        scheduleTaskDescriptionUpdate();
     }
 
     private void cancelHeaderTransition() {

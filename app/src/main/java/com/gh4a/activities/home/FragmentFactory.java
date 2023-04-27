@@ -26,10 +26,6 @@ public abstract class FragmentFactory {
     protected void onFragmentDestroyed(Fragment f) {
     }
 
-    protected int[] getHeaderColorAttrs() {
-        return null;
-    }
-
     protected int[] getToolDrawerMenuResIds() {
         return null;
     }

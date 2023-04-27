@@ -17,7 +17,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.Toast;
 
-import com.gh4a.BaseActivity;
 import com.gh4a.R;
 import com.gh4a.resolver.LinkParser;
 import com.gh4a.fragment.SettingsFragment;
@@ -36,7 +35,6 @@ import java.util.zip.GZIPOutputStream;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.fragment.app.FragmentActivity;
 
@@ -66,13 +64,12 @@ public class IntentUtils {
         }
 
         LinkParser.ParseResult result = LinkParser.parseUri(activity, uri, null);
-        int headerColor = activity instanceof BaseActivity ? ((BaseActivity) activity).getCurrentHeaderColor() : 0;
         if (result == null) {
-            openInCustomTabOrBrowser(activity, uri, headerColor);
+            openInCustomTabOrBrowser(activity, uri);
         } else if (result.intent != null) {
             activity.startActivity(result.intent);
         } else if (result.loadTask != null) {
-            result.loadTask.setOpenUnresolvedUriInCustomTab(headerColor);
+            result.loadTask.setOpenUnresolvedUriInCustomTab();
             result.loadTask.execute();
         }
     }
@@ -127,24 +124,13 @@ public class IntentUtils {
     }
 
     public static void openInCustomTabOrBrowser(Activity activity, Uri uri) {
-        openInCustomTabOrBrowser(activity, uri, 0);
-    }
-
-    public static void openInCustomTabOrBrowser(Activity activity, Uri uri, int headerColor) {
         SharedPreferences prefs = activity.getSharedPreferences(SettingsFragment.PREF_NAME,
                 Context.MODE_PRIVATE);
         boolean customTabsEnabled = prefs.getBoolean(SettingsFragment.KEY_CUSTOM_TABS, true);
         String pkg = CustomTabsHelper.getPackageNameToUse(activity);
 
         if (pkg != null && customTabsEnabled) {
-            if (headerColor == 0) {
-                headerColor = UiUtils.resolveColor(activity, R.attr.colorPrimary);
-            }
-            CustomTabColorSchemeParams colorParams = new CustomTabColorSchemeParams.Builder()
-                    .setToolbarColor(headerColor)
-                    .build();
             CustomTabsIntent i = new CustomTabsIntent.Builder()
-                    .setDefaultColorSchemeParams(colorParams)
                     .build();
             i.intent.setPackage(pkg);
             i.launchUrl(activity, uri);

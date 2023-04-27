@@ -331,11 +331,6 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
-    protected int[] getHeaderColorAttrs() {
-        return mFactory.getHeaderColorAttrs();
-    }
-
-    @Override
     protected Fragment makeFragment(int position) {
         return mFactory.makeFragment(position);
     }

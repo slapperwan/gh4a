@@ -12,8 +12,6 @@ import android.view.ViewGroup;
 import android.widget.EdgeEffect;
 import android.widget.LinearLayout;
 
-import com.gh4a.utils.UiUtils;
-
 import java.lang.reflect.Field;
 
 public abstract class BasePagerActivity extends BaseActivity implements
@@ -21,10 +19,8 @@ public abstract class BasePagerActivity extends BaseActivity implements
     private PagerAdapter mAdapter;
     private TabLayout mTabs;
     private ViewPager mPager;
-    private int[][] mTabHeaderColors;
     private boolean mScrolling;
     private boolean mErrorViewVisible;
-    private int mCurrentHeaderColor;
     private int mLastTabCount;
 
     @Override
@@ -34,8 +30,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
         setContentView(R.layout.view_pager);
         mPager = setupPager();
 
-        mCurrentHeaderColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        updateTabHeaderColors();
         updateTabVisibility();
     }
 
@@ -61,17 +55,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
 
     protected void invalidateTabs() {
         invalidatePages();
-        updateTabHeaderColors();
-        if (mTabHeaderColors != null) {
-            onPageMoved(0, 0);
-        } else {
-            int[] colorAttrs = getHeaderColorAttrs();
-            if (colorAttrs != null) {
-                transitionHeaderToColor(colorAttrs[0], colorAttrs[1]);
-            } else {
-                transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
-            }
-        }
+        onPageMoved(0, 0);
         tryUpdatePagerColor();
     }
 
@@ -88,20 +72,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
         mErrorViewVisible = visible;
         updateTabVisibility();
         super.setErrorViewVisibility(visible, e);
-    }
-
-    private void updateTabHeaderColors() {
-        int[][] colorAttrs = getTabHeaderColorAttrs();
-        if (colorAttrs == null) {
-            mTabHeaderColors = null;
-            return;
-        }
-
-        mTabHeaderColors = new int[colorAttrs.length][2];
-        for (int i = 0; i < mTabHeaderColors.length; i++) {
-            mTabHeaderColors[i][0] = UiUtils.resolveColor(this, colorAttrs[i][0]);
-            mTabHeaderColors[i][1] = UiUtils.resolveColor(this, colorAttrs[i][1]);
-        }
     }
 
     private ViewPager setupPager() {
@@ -153,29 +123,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         }
     }
 
-    @Override
-    protected void setHeaderColor(int color, int statusBarColor) {
-        super.setHeaderColor(color, statusBarColor);
-        mCurrentHeaderColor = color;
-    }
-
-    @Override
-    protected void transitionHeaderToColor(int colorAttrId, int statusBarColorAttrId) {
-        super.transitionHeaderToColor(colorAttrId, statusBarColorAttrId);
-        mCurrentHeaderColor = UiUtils.resolveColor(this, colorAttrId);
-    }
-
     protected abstract PagerAdapter createAdapter(ViewGroup root);
-
-    /* expected format: int[tabCount][2] - 0 is header, 1 is status bar */
-    protected int[][] getTabHeaderColorAttrs() {
-        return null;
-    }
-
-    /* expected format: int[2] - 0 is header, 1 is status bar */
-    protected int[] getHeaderColorAttrs() {
-        return null;
-    }
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -192,21 +140,9 @@ public abstract class BasePagerActivity extends BaseActivity implements
     @Override
     public void onPageScrollStateChanged(int state) {
         mScrolling = state != ViewPager.SCROLL_STATE_IDLE;
-        if (!mScrolling) {
-            tryUpdatePagerColor();
-        }
     }
 
-    protected void onPageMoved(int position, float fraction) {
-        if (mTabHeaderColors != null) {
-            int nextIndex = Math.max(0, Math.min(position + 1, mTabHeaderColors.length - 1));
-            int headerColor = UiUtils.mixColors(mTabHeaderColors[position][0],
-                    mTabHeaderColors[nextIndex][0], fraction);
-            int statusBarColor = UiUtils.mixColors(mTabHeaderColors[position][1],
-                    mTabHeaderColors[nextIndex][1], fraction);
-            setHeaderColor(headerColor, statusBarColor);
-        }
-    }
+    protected void onPageMoved(int position, float fraction) {}
 
     private void tryUpdatePagerColor() {
         ViewPagerEdgeColorHelper helper =
@@ -215,7 +151,6 @@ public abstract class BasePagerActivity extends BaseActivity implements
             helper = new ViewPagerEdgeColorHelper(mPager);
             mPager.setTag(R.id.EdgeColorHelper, helper);
         }
-        helper.setColor(mCurrentHeaderColor);
     }
 
     private static class ViewPagerEdgeColorHelper {
