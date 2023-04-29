@@ -289,7 +289,7 @@ code,tt {
     margin: 0 2px;
     padding: 1px 5px;
     white-space: pre-wrap;
-    background-color: #D6D6D6;
+    background-color: rgba(140, 140, 140, 0.19);
     border-radius: 3px;
     font-size: 13px;
 }
@@ -305,7 +305,7 @@ pre code,pre tt {
 }
 
 .highlight pre,pre {
-    background-color: #D6D6D6;
+    background-color: rgba(140, 140, 140, 0.19);
     border: 1px solid #7A7A7A;
     font-size: 13px;
     line-height: 19px;
