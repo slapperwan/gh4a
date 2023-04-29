@@ -157,6 +157,8 @@ table {
     padding: 0;
     font-size: 14px;
     border-collapse: collapse;
+    display: block;
+    overflow: auto;
 }
 
 table tr {
