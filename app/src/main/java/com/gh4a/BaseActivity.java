@@ -51,6 +51,8 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -275,6 +277,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     protected void configureLeftDrawerHeader(View header) {
+        ViewCompat.setOnApplyWindowInsetsListener(header, (view, insets) -> {
+            int statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top;
+            view.setPadding(0, statusBarHeight, 0, 0);
+            return insets;
+        });
     }
 
     protected boolean canSwipeToRefresh() {
