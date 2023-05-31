@@ -283,7 +283,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             content.append(title);
         }
         content.append("</title>");
-        HtmlUtils.writeCssInclude(content, "text", cssTheme);
+        HtmlUtils.writeCssInclude(content, "diff", cssTheme);
         HtmlUtils.writeScriptInclude(content, "codeutils");
         content.append("</head><body");
 
