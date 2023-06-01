@@ -28,7 +28,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import com.google.android.material.appbar.AppBarLayout;
 
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.textfield.TextInputLayout;
 import androidx.fragment.app.DialogFragment;

@@ -33,7 +33,6 @@ import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.UiUtils;
 import com.google.android.material.appbar.AppBarLayout;
 
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;

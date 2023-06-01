@@ -43,7 +43,6 @@ import com.gh4a.activities.IssueActivity;
 import com.gh4a.activities.IssueEditActivity;
 import com.google.android.material.appbar.AppBarLayout;
 
-import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.google.android.material.elevation.SurfaceColors;
