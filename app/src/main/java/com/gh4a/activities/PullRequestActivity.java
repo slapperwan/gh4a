@@ -152,8 +152,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        LayoutInflater inflater =
-                LayoutInflater.from(new ContextThemeWrapper(this, R.style.HeaderTheme));
+        LayoutInflater inflater = LayoutInflater.from(this);
         mHeader = (ViewGroup) inflater.inflate(R.layout.issue_header, null);
         mHeader.setClickable(false);
         mHeader.setVisibility(View.GONE);

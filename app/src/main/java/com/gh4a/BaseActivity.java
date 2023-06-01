@@ -456,8 +456,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     public MenuInflater getMenuInflater() {
         if (mMenuInflater == null) {
-            mMenuInflater = new SupportMenuInflater(
-                    new ContextThemeWrapper(this, R.style.HeaderTheme));
+            mMenuInflater = new SupportMenuInflater(this);
         }
         return mMenuInflater;
     }

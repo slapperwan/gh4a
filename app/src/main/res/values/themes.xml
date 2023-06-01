@@ -51,7 +51,7 @@
         <item name="colorIconForeground">@color/icon_foreground</item>
 
         <item name="drawerBackground">?attr/colorSurface</item>
-        <item name="colorScrollbarThumb">?attr/colorOnBackground</item>
+        <item name="colorScrollbarThumb">?colorControlNormal</item>
     </style>
 
     <style name="TransparentTheme" parent="AppTheme">
@@ -65,17 +65,6 @@
 
     <style name="BottomSheetTheme" parent="TransparentTheme">
         <item name="android:windowAnimationStyle">@style/Animation.Design.BottomSheetDialog</item>
-    </style>
-
-    <style name="HeaderTheme" parent="Theme.Material3.DayNight">
-        <item name="colorPrimary">#ffffff</item>
-        <item name="colorSecondary">#ffffff</item>
-        <item name="colorControlActivated">#ffffff</item>
-        <item name="colorSurface">@android:color/transparent</item>
-        <item name="colorOnSurface">#ffffffff</item>
-        <item name="android:spinnerStyle">@style/Widget.Spinner.ActionBar.Light</item>
-        <!-- used by appcompat to tint the spinner background drawable -->
-        <item name="android:colorBackground">#ffffff</item>
     </style>
 
     <style name="PreferenceTheme" parent="PreferenceThemeOverlay.v14.Material" />

@@ -8,5 +8,4 @@
     android:layout_gravity="bottom|right"
     android:layout_margin="16dp"
     android:src="@drawable/menu_add"
-    app:backgroundTint="?attr/colorPrimary"
     app:layout_behavior="com.gh4a.widget.ScrollAwareFloatingActionButtonBehavior" />

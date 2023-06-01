@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    tools:theme="@style/HeaderTheme">
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/tv_title"
@@ -14,7 +13,6 @@
         android:layout_gravity="center_vertical"
         android:layout_marginVertical="5dp"
         android:ellipsize="marquee"
-        android:marqueeRepeatLimit="marquee_forever"
         android:paddingHorizontal="10dp"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
@@ -27,7 +25,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="5dp"
-        app:cardElevation="5dp"
+        app:cardElevation="3dp"
         app:strokeWidth="0dp">
 
         <TextView
@@ -41,6 +39,7 @@
             android:paddingRight="16dp"
             android:textAppearance="@style/TextAppearance.VerySmall"
             android:textColor="?android:attr/textColorPrimary"
+            android:background="@android:color/transparent"
             tools:text="OPEN" />
 
     </com.google.android.material.card.MaterialCardView>

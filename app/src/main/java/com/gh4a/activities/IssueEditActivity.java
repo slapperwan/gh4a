@@ -186,8 +186,7 @@ public class IssueEditActivity extends BasePagerActivity implements
             return;
         }
 
-        LayoutInflater headerInflater =
-                LayoutInflater.from(new ContextThemeWrapper(this, R.style.HeaderTheme));
+        LayoutInflater headerInflater = LayoutInflater.from(this);
         View header = headerInflater.inflate(R.layout.issue_create_header, null);
         addHeaderView(header, false);
 

@@ -3,7 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:paddingBottom="@dimen/issue_edit_header_bottom_padding"
     android:paddingLeft="@dimen/content_padding"
@@ -14,20 +13,13 @@
         android:id="@+id/title_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:boxStrokeErrorColor="?attr/colorOnError"
-        app:errorTextColor="?attr/colorOnError"
-        app:errorIconTint="?attr/colorOnError"
-        app:boxStrokeColor="?attr/colorTertiaryContainer"
-        android:textColorHint="?attr/colorTertiaryContainer"
         android:hint="@string/issue_title">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_title"
-            style="@style/TextAppearance.Header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textCapSentences|textAutoComplete|textAutoCorrect"
-            android:textColor="?attr/colorTertiaryContainer"
             android:maxLines="2" />
 
     </com.google.android.material.textfield.TextInputLayout>
