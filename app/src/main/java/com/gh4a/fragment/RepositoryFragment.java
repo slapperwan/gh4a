@@ -448,13 +448,14 @@ public class RepositoryFragment extends LoadingFragmentBase implements
                 .map(SearchPage::totalCount)
                 .compose(makeLoaderSingle(ID_LOADER_PULL_REQUEST_COUNT, force))
                 .subscribe(count -> {
-                    int issueCount = mRepository.openIssuesCount() - count;
+                    int totalCount = count.intValue();
+                    int issueCount = mRepository.openIssuesCount() - totalCount;
 
                     OverviewRow issuesRow = mContentView.findViewById(R.id.issues_row);
                     issuesRow.setText(getResources().getQuantityString(R.plurals.issue, issueCount, issueCount));
 
                     OverviewRow pullsRow = mContentView.findViewById(R.id.pulls_row);
-                    pullsRow.setText(getResources().getQuantityString(R.plurals.pull_request, count, count));
+                    pullsRow.setText(getResources().getQuantityString(R.plurals.pull_request, totalCount, totalCount));
                 }, this::handleLoadFailure);
     }
 
