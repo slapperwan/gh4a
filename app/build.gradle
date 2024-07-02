@@ -30,8 +30,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 73
-        versionName "4.6.10"
+        versionCode 74
+        versionName "4.6.11"
         applicationId "com.gh4a"
 
         buildConfigField 'String', 'CLIENT_ID', ClientId
