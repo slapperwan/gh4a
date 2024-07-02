@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.graphics.drawable.DrawableWrapper;
+import androidx.appcompat.graphics.drawable.DrawableWrapperCompat;
 import androidx.core.content.ContextCompat;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -123,7 +123,7 @@ public class HttpImageGetter {
         }
     }
 
-    private static class PlaceholderDrawable extends DrawableWrapper implements Runnable {
+    private static class PlaceholderDrawable extends DrawableWrapperCompat implements Runnable {
         private final String mUrl;
         private final ObjectInfo mInfo;
         private Drawable mLoadedImage;
@@ -148,7 +148,7 @@ public class HttpImageGetter {
 
         @Override
         public void run() {
-            setWrappedDrawable(mLoadedImage);
+            setDrawable(mLoadedImage);
             setBounds(0, 0, mLoadedImage.getIntrinsicWidth(), mLoadedImage.getIntrinsicHeight());
             mInfo.invalidateViewsForNewDrawable();
         }
@@ -208,7 +208,7 @@ public class HttpImageGetter {
                 Drawable d = span.getDrawable();
                 if (d instanceof PlaceholderDrawable) {
                     PlaceholderDrawable phd = (PlaceholderDrawable) d;
-                    d = phd.getWrappedDrawable();
+                    d = phd.getDrawable();
                 }
                 if (d instanceof GifDrawable) {
                     GifDrawable gd = (GifDrawable) d;
