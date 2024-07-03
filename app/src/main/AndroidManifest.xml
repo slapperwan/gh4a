@@ -201,13 +201,6 @@
             android:authorities="${applicationId}.SuggestionsProvider"
             android:exported="false" />
 
-        <receiver
-            android:name="EventReceiver"
-            android:exported="true">
-        <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED" />
-            </intent-filter>
-        </receiver>
         <meta-data android:name="android.webkit.WebView.MetricsOptOut" android:value="true" />
     </application>
 </manifest>
