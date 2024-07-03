@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.gh4a.Gh4Application;
 import com.gh4a.ServiceFactory;
-import com.gh4a.activities.home.HomeActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.request.NotificationReadRequest;
 import com.meisolsson.githubsdk.service.activity.NotificationService;
@@ -24,7 +23,6 @@ public class NotificationHandlingService extends IntentService {
 
     private static final String ACTION_MARK_SEEN = "com.gh4a.action.MARK_AS_SEEN";
     private static final String ACTION_MARK_READ = "com.gh4a.action.MARK_AS_READ";
-    private static final String ACTION_OPEN_NOTIFICATION = "com.gh4a.action.OPEN_NOTIFICATION";
     private static final String ACTION_HANDLE_NOTIFICATION_DISMISS =
             "com.gh4a.action.HANDLE_NOTIFICATION_DISMISS";
 
@@ -47,14 +45,6 @@ public class NotificationHandlingService extends IntentService {
                 .putExtra(EXTRA_REPO_OWNER, repoOwner)
                 .putExtra(EXTRA_REPO_NAME, repoName)
                 .putExtra(EXTRA_TIMESTAMP, System.currentTimeMillis());
-    }
-
-    public static Intent makeOpenNotificationActionIntent(Context context,
-            String repoOwner, String repoName) {
-        return new Intent(context, NotificationHandlingService.class)
-                .setAction(ACTION_OPEN_NOTIFICATION)
-                .putExtra(EXTRA_REPO_OWNER, repoOwner)
-                .putExtra(EXTRA_REPO_NAME, repoName);
     }
 
     public NotificationHandlingService() {
@@ -90,13 +80,6 @@ public class NotificationHandlingService extends IntentService {
                             (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     NotificationsWorker.handleNotificationDismiss(this, notificationId);
                     notificationManager.cancel(notificationId);
-                }
-                break;
-            case ACTION_OPEN_NOTIFICATION:
-                if (repoOwner != null && repoName != null) {
-                    Intent notifIntent = HomeActivity.makeNotificationsIntent(this, repoOwner, repoName)
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(notifIntent);
                 }
                 break;
         }

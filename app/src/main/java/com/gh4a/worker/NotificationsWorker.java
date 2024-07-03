@@ -242,9 +242,10 @@ public class NotificationsWorker extends Worker {
                 R.plurals.unread_notifications_summary_text,
                 notifications.size(), notifications.size());
 
-        Intent intent = NotificationHandlingService.makeOpenNotificationActionIntent(
-                context, repository.owner().login(), repository.name());
-        PendingIntent contentIntent = PendingIntent.getService(context, id, intent,
+        Intent intent = HomeActivity.makeNotificationsIntent(
+                context, repository.owner().login(), repository.name())
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, id, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         PendingIntent deleteIntent = PendingIntent.getService(context, id,
