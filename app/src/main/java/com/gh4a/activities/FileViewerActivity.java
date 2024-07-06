@@ -49,6 +49,7 @@ import com.meisolsson.githubsdk.model.TextMatch;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.Single;
 
@@ -364,8 +365,16 @@ public class FileViewerActivity extends WebViewerActivity
                 .subscribe(result -> {
                     if (result.isPresent()) {
                         mContent = result.get();
-                        onDataReady();
-                        setContentEmpty(false);
+                        // When file size is >1 and <100 MB, the GH API endpoint returns a successful response
+                        // but does not include the file contents in the response payload.
+                        // See https://docs.github.com/en/rest/repos/contents#get-repository-content
+                        boolean fileContentIsMissing = mContent.size() > 0 && Objects.equals(mContent.content(), "");
+                        if (fileContentIsMissing) {
+                            openUnsuitableFileAndFinish();
+                        } else {
+                            onDataReady();
+                            setContentEmpty(false);
+                        }
                     } else {
                         setContentEmpty(true);
                         setContentShown(true);
