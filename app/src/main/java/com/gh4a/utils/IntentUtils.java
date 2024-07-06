@@ -219,12 +219,8 @@ public class IntentUtils {
             return lastIntent;
         }
 
-        Intent chooserIntent = Intent.createChooser(lastIntent, null);
-        String extraName = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                ? Intent.EXTRA_ALTERNATE_INTENTS
-                : Intent.EXTRA_INITIAL_INTENTS;
-        chooserIntent.putExtra(extraName, chooserIntents.toArray(new Intent[0]));
-        return chooserIntent;
+        return Intent.createChooser(lastIntent, null)
+                .putExtra(Intent.EXTRA_ALTERNATE_INTENTS, chooserIntents.toArray(new Intent[0]));
     }
 
     public static void startNewTask(@NonNull Context context, @NonNull Intent intent) {
