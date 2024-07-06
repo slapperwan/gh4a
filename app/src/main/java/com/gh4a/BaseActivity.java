@@ -912,12 +912,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     @Override
     public void onProvideAssistContent(AssistContent outContent) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Uri activityUri = getActivityUri();
-
-            if (activityUri != null) {
-                outContent.setWebUri(activityUri);
-            }
+        Uri activityUri = getActivityUri();
+        if (activityUri != null) {
+            outContent.setWebUri(activityUri);
         }
     }
 
