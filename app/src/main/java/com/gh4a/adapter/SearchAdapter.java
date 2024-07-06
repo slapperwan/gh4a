@@ -109,7 +109,10 @@ public class SearchAdapter extends RootAdapter<Object, RecyclerView.ViewHolder> 
                         for (TextMatch.MatchItem item : items) {
                             int start = item.getStartPos();
                             int end = item.getEndPos();
-                            if (start >= 0 && end > start) {
+                            // GH API returns incorrect indices for match items when the code snippet contains multi-byte characters.
+                            // We want to make sure we don't crash when those indices fall outside the text length.
+                            boolean isInsideTextRange = start < builder.length() && end < builder.length();
+                            if (start >= 0 && end > start && isInsideTextRange) {
                                 builder.setSpan(new StyleSpan(Typeface.BOLD), start, end, 0);
                             }
                         }
