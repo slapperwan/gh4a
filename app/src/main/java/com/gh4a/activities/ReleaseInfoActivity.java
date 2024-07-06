@@ -62,12 +62,12 @@ public class ReleaseInfoActivity extends BaseActivity implements
                 .putExtra("id", id);
     }
 
-    public static Intent makeIntent(Context context, String repoOwner, String repoName,
-                                    Release release) {
-        return new Intent(context, ReleaseInfoActivity.class)
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, Release release) {
+        Intent intent = new Intent(context, ReleaseInfoActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName)
-                .putExtra("release", release);
+                .putExtra("repo", repoName);
+        IntentUtils.putCompressedParcelableExtra(intent, "release", release, 800_000);
+        return intent;
     }
 
     private static final int ID_LOADER_RELEASE = 0;
@@ -115,7 +115,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
-        mRelease = extras.getParcelable("release");
+        mRelease = IntentUtils.readCompressedParcelableFromBundle(extras, "release");
         mReleaseId = extras.getLong("id");
     }
 
