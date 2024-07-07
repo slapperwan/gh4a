@@ -45,7 +45,7 @@
                     android:maxLines="1"
                     android:ellipsize="end"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    app:ghFont="bold"
+                    android:textStyle="bold"
                     tools:text="username" />
 
                 <com.gh4a.widget.StyleableTextView
