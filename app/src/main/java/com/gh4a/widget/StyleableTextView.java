@@ -18,9 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
 
 public class StyleableTextView extends AppCompatTextView {
-    private static final int[] TEXT_APPEARANCE_ATTRS = new int[] {
-        android.R.attr.textAppearance
-    };
 
     private static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
         @Override
@@ -58,31 +55,12 @@ public class StyleableTextView extends AppCompatTextView {
     private void initAttributes(Context context, AttributeSet attrs, int defStyle) {
         Resources.Theme theme = context.getTheme();
         boolean needsLinkHandling = false;
-        TypedArray appearance = null;
 
         // If text is selectable, TextView.onTouchEvent() triggers a link click action,
         // which might cause double link open actions. Since we don't need auto-linkification
         // (we install our own movement method), just turn off auto-installation of
         // LinkMovementMethod
         setLinksClickable(false);
-
-        if (attrs != null) {
-            TypedArray a = theme.obtainStyledAttributes(attrs, TEXT_APPEARANCE_ATTRS, defStyle, 0);
-            int ap = a.getResourceId(0, -1);
-            if (ap != -1) {
-                appearance = theme.obtainStyledAttributes(ap, R.styleable.StyleableTextView);
-            }
-            a.recycle();
-        }
-
-        if (appearance != null) {
-            for (int i = 0; i < appearance.getIndexCount(); i++) {
-                int attr = appearance.getIndex(i);
-                if (attr == R.styleable.StyleableTextView_needsLinkHandling) {
-                    needsLinkHandling = appearance.getBoolean(attr, false);
-                }
-            }
-        }
 
         TypedArray a = theme.obtainStyledAttributes(attrs, R.styleable.StyleableTextView, defStyle, 0);
         for (int i = 0; i < a.getIndexCount(); i++) {
