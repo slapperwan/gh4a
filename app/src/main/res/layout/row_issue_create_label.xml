@@ -27,7 +27,7 @@
         android:paddingRight="8dp"
         android:paddingTop="5dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        app:ghFont="condensed"
+        android:fontFamily="sans-serif-condensed"
         tools:text="Label title" />
 
 </LinearLayout>
