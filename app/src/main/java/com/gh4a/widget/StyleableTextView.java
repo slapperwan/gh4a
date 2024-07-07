@@ -71,7 +71,8 @@ public class StyleableTextView extends AppCompatTextView {
         }
         a.recycle();
 
-        if (needsLinkHandling) {
+        boolean isAutoLinkEnabled = getAutoLinkMask() > 0;
+        if (needsLinkHandling || isAutoLinkEnabled) {
             setMovementMethod(CHECKING_LINK_METHOD);
         }
     }
