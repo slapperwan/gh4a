@@ -268,7 +268,9 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                         reviewsByDiffHunkId.put(hunkId, reviewItem);
                     }
 
-                    reviewItem.addComment(comment, null, true);
+                    if (reviewItem != null) {
+                        reviewItem.addComment(comment, null, true);
+                    }
                 }
             }
 
