@@ -16,14 +16,14 @@
             android:orientation="vertical"
             android:padding="4dp">
 
-            <com.gh4a.widget.StyleableTextView
+            <com.gh4a.widget.LinkHandlingTextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.ItemTitle"
                 tools:text="Library title" />
 
-            <com.gh4a.widget.StyleableTextView
+            <com.gh4a.widget.LinkHandlingTextView
                 android:id="@+id/url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

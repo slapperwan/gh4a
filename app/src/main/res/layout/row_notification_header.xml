@@ -33,7 +33,7 @@
                 android:contentDescription="@string/repository_owner_avatar"
                 tools:src="@drawable/default_avatar" />
 
-            <com.gh4a.widget.StyleableTextView
+            <com.gh4a.widget.LinkHandlingTextView
                 android:id="@+id/tv_title"
                 style="@style/HeaderLabel"
                 android:layout_width="0dp"

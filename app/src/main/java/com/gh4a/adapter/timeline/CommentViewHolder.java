@@ -20,7 +20,7 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
-import com.gh4a.widget.StyleableTextView;
+import com.gh4a.widget.LinkHandlingTextView;
 import com.meisolsson.githubsdk.model.AuthorAssociation;
 import com.meisolsson.githubsdk.model.Reaction;
 import com.meisolsson.githubsdk.model.Reactions;
@@ -43,8 +43,8 @@ class CommentViewHolder
     private final String mRepoOwner;
 
     private final ImageView ivGravatar;
-    private final StyleableTextView tvDesc;
-    private final StyleableTextView tvExtra;
+    private final LinkHandlingTextView tvDesc;
+    private final LinkHandlingTextView tvExtra;
     private final TextView tvTimestamp;
     private final TextView tvEditTimestamp;
     private final ImageView ivMenu;

@@ -17,14 +17,14 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.ItemTitle"
             tools:text="filename" />
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/tv_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             tools:text="Description" />
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/tv_created_at"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
         android:layout_marginLeft="8dp"
         android:orientation="vertical">
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/tv_size"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
             android:textAppearance="@style/TextAppearance.VerySmall"
             tools:text="4.75 MB" />
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/tv_downloads"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -20,7 +20,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.IssueLabelSpan;
-import com.gh4a.widget.StyleableTextView;
+import com.gh4a.widget.LinkHandlingTextView;
 import com.gh4a.widget.TimestampToastSpan;
 
 import com.meisolsson.githubsdk.model.Issue;
@@ -50,7 +50,7 @@ class EventViewHolder
 
     private final ImageView mAvatarView;
     private final ImageView mEventIconView;
-    private final StyleableTextView mMessageView;
+    private final LinkHandlingTextView mMessageView;
     private final View mAvatarContainer;
 
     public EventViewHolder(View itemView, String repoOwner, String repoName,

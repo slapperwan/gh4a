@@ -18,8 +18,8 @@ import com.meisolsson.githubsdk.model.PullRequestMarker;
 import com.meisolsson.githubsdk.model.git.GitReference;
 
 public class PullRequestBranchInfoView extends RelativeLayout implements View.OnClickListener {
-    private final StyleableTextView mSourceBranchView;
-    private final StyleableTextView mTargetBranchView;
+    private final LinkHandlingTextView mSourceBranchView;
+    private final LinkHandlingTextView mTargetBranchView;
     private final int mAccentColor;
 
     private PullRequestMarker mSourceMarker;
@@ -54,7 +54,7 @@ public class PullRequestBranchInfoView extends RelativeLayout implements View.On
         formatMarkerText(mTargetBranchView, R.string.pull_request_to, targetMarker, true);
     }
 
-    private void formatMarkerText(StyleableTextView view, @StringRes int formatResId,
+    private void formatMarkerText(LinkHandlingTextView view, @StringRes int formatResId,
             final PullRequestMarker marker, boolean makeClickable) {
         SpannableStringBuilder builder = StringUtils.applyBoldTags(getContext().getString(formatResId));
         int pos = builder.toString().indexOf("[ref]");

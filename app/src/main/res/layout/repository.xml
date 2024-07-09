@@ -22,7 +22,7 @@
                 android:paddingTop="@dimen/content_padding"
                 android:paddingBottom="@dimen/content_padding">
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_repo_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
                     app:needsLinkHandling="true"
                     tools:text="Username/Repository" />
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
                     app:needsLinkHandling="true"
                     tools:text="Repository description" />
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_url"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -141,7 +141,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/readme_title"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
@@ -157,7 +157,7 @@
                     android:layout_marginBottom="@dimen/content_padding"
                     android:visibility="gone" />
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/readme"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -182,14 +182,14 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/other_info"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/other_info" />
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_contributors_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -198,7 +198,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/repo_contributors" />
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_collaborators_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -207,7 +207,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/repo_collaborators" />
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_wiki_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -216,7 +216,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/recent_wiki" />
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_releases_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
