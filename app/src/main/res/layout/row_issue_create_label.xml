@@ -17,7 +17,7 @@
         android:layout_height="match_parent"
         tools:background="#f00" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

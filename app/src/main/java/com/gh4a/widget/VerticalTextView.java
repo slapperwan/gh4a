@@ -8,7 +8,7 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Gravity;
 
-public class VerticalTextView extends StyleableTextView {
+public class VerticalTextView extends LinkHandlingTextView {
     private final boolean mTopDown;
 
     public VerticalTextView(Context context, AttributeSet attrs) {

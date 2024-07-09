@@ -18,7 +18,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp" />
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/tv_title"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -122,7 +122,7 @@
                 android:foreground="?attr/selectableItemBackground"
                 android:tag="e102d8" />
 
-            <com.gh4a.widget.StyleableTextView
+            <com.gh4a.widget.LinkHandlingTextView
                 android:id="@+id/custom"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"

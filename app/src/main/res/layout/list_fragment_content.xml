@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:visibility="gone">
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@android:id/empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

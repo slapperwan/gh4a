@@ -11,7 +11,7 @@
         android:id="@+id/header"
         layout="@layout/row_timeline_event" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
         android:layout_marginRight="32dp"
         android:background="?android:attr/listDivider" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/details_container_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -17,7 +17,7 @@ import com.gh4a.R;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
 
-public class StyleableTextView extends AppCompatTextView {
+public class LinkHandlingTextView extends AppCompatTextView {
 
     private static final LinkMovementMethod CHECKING_LINK_METHOD = new LinkMovementMethod() {
         @Override
@@ -38,16 +38,16 @@ public class StyleableTextView extends AppCompatTextView {
         }
     };
 
-    public StyleableTextView(Context context) {
+    public LinkHandlingTextView(Context context) {
         super(context, null);
     }
 
-    public StyleableTextView(Context context, AttributeSet attrs) {
+    public LinkHandlingTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initAttributes(context, attrs, 0);
     }
 
-    public StyleableTextView(Context context, AttributeSet attrs, int defStyle) {
+    public LinkHandlingTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initAttributes(context, attrs, defStyle);
     }
@@ -62,10 +62,10 @@ public class StyleableTextView extends AppCompatTextView {
         // LinkMovementMethod
         setLinksClickable(false);
 
-        TypedArray a = theme.obtainStyledAttributes(attrs, R.styleable.StyleableTextView, defStyle, 0);
+        TypedArray a = theme.obtainStyledAttributes(attrs, R.styleable.LinkHandlingTextView, defStyle, 0);
         for (int i = 0; i < a.getIndexCount(); i++) {
             int attr = a.getIndex(i);
-            if (attr == R.styleable.StyleableTextView_needsLinkHandling) {
+            if (attr == R.styleable.LinkHandlingTextView_needsLinkHandling) {
                 needsLinkHandling = a.getBoolean(attr, false);
             }
         }

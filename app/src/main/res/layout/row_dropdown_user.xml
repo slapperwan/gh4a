@@ -18,7 +18,7 @@
         android:layout_marginRight="16dp"
         tools:src="@drawable/default_avatar" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

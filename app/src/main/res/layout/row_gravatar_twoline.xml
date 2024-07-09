@@ -18,7 +18,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         tools:src="@drawable/default_avatar" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +28,7 @@
         android:textStyle="bold"
         tools:text="Username" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_extra"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

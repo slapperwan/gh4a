@@ -15,7 +15,7 @@
         android:layout_marginRight="10dp"
         android:src="@drawable/pull_request" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_pr_from"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         tools:text="From branch" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_pr_to"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

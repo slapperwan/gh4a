@@ -35,7 +35,7 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/tv_comments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@id/iv_gravatar">
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/tv_extra"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
             tools:text="Username"
             tools:ignore="InefficientWeight" />
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/tv_timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
             tools:text="yesterday" />
     </LinearLayout>
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_desc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -87,7 +87,7 @@
         android:textAppearance="@style/TextAppearance.ItemTitle"
         tools:text="Commit title" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_sha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

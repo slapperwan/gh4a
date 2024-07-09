@@ -34,7 +34,7 @@
                         android:background="?attr/selectableItemBackgroundBorderless"
                         tools:src="@drawable/default_avatar" />
 
-                    <com.gh4a.widget.StyleableTextView
+                    <com.gh4a.widget.LinkHandlingTextView
                         android:id="@+id/tv_author"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
                         android:textSize="16sp"
                         tools:text="Username" />
 
-                    <com.gh4a.widget.StyleableTextView
+                    <com.gh4a.widget.LinkHandlingTextView
                         android:id="@+id/tv_timestamp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
                         android:layout_marginRight="8dp"
                         tools:src="@drawable/default_avatar" />
 
-                    <com.gh4a.widget.StyleableTextView
+                    <com.gh4a.widget.LinkHandlingTextView
                         android:id="@+id/tv_commit_extra"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -81,7 +81,7 @@
 
                 </LinearLayout>
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
                     android:textIsSelectable="true"
                     tools:text="Commit title" />
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
                     app:needsLinkHandling="true"
                     tools:text="Commit message" />
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/tv_desc"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -125,7 +125,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/commit_changed"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
@@ -154,7 +154,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/commit_added"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
@@ -183,7 +183,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/commit_renamed"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
@@ -212,7 +212,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.StyleableTextView
+                <com.gh4a.widget.LinkHandlingTextView
                     android:id="@+id/commit_deleted"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"

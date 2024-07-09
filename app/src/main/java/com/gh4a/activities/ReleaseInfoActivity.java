@@ -38,7 +38,7 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.StyleableTextView;
+import com.gh4a.widget.LinkHandlingTextView;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.meisolsson.githubsdk.model.Release;
@@ -191,7 +191,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         AvatarHandler.assignAvatar(gravatar, mRelease.author());
         gravatar.setOnClickListener(this);
 
-        StyleableTextView details = findViewById(R.id.tv_releaseinfo);
+        LinkHandlingTextView details = findViewById(R.id.tv_releaseinfo);
         Date releaseDateToShow = mRelease.publishedAt() != null ? mRelease.publishedAt() : mRelease.createdAt();
         String detailsText = getString(R.string.release_details,
                 ApiHelpers.getUserLogin(this, mRelease.author()),

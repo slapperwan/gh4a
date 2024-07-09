@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/title"
         style="@style/TextAppearance.ItemTitle"
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
         android:scrollbarStyle="outsideInset"
         android:scrollbars="horizontal">
 
-        <com.gh4a.widget.StyleableTextView
+        <com.gh4a.widget.LinkHandlingTextView
             android:id="@+id/line"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

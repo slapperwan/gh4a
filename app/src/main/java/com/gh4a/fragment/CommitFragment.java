@@ -30,7 +30,7 @@ import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.StyleableTextView;
+import com.gh4a.widget.LinkHandlingTextView;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
@@ -168,7 +168,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
         if (!ApiHelpers.authorEqualsCommitter(mCommit)) {
             ImageView commitGravatar = mContentView.findViewById(R.id.iv_commit_gravatar);
-            StyleableTextView commitExtra =
+            LinkHandlingTextView commitExtra =
                     mContentView.findViewById(R.id.tv_commit_extra);
 
             AvatarHandler.assignAvatar(commitGravatar, mCommit.committer());

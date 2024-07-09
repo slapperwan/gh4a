@@ -32,7 +32,7 @@
         <attr name="badgeSpacing" format="dimension" />
     </declare-styleable>
 
-    <declare-styleable name="StyleableTextView">
+    <declare-styleable name="LinkHandlingTextView">
         <attr name="needsLinkHandling" format="boolean" />
     </declare-styleable>
 

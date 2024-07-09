@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/review_dialog_title"
         android:layout_width="match_parent"
         android:layout_marginBottom="16dp"
@@ -15,7 +15,7 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         tools:text="@string/pull_request_review_dialog_title" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/pull_request_review_event" />

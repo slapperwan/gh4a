@@ -55,7 +55,7 @@
                         app:spb_sections_count="6"
                         app:spb_speed="1.0" />
 
-                    <com.gh4a.widget.StyleableTextView
+                    <com.gh4a.widget.LinkHandlingTextView
                         android:id="@android:id/empty"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

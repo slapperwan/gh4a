@@ -31,7 +31,7 @@
             tools:src="@drawable/issue_event_closed" />
     </FrameLayout>
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:id="@+id/tv_message"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

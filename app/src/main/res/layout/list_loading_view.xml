@@ -18,7 +18,7 @@
         android:layout_marginRight="8dp"
         android:indeterminate="true" />
 
-    <com.gh4a.widget.StyleableTextView
+    <com.gh4a.widget.LinkHandlingTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/loading_msg"
