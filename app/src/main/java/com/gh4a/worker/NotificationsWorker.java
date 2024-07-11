@@ -246,17 +246,17 @@ public class NotificationsWorker extends Worker {
                 context, repository.owner().login(), repository.name())
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent contentIntent = PendingIntent.getActivity(context, id, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         PendingIntent deleteIntent = PendingIntent.getService(context, id,
                 NotificationHandlingService.makeHandleDismissIntent(context, id),
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         Intent markReadIntent =
                 NotificationHandlingService.makeMarkReposNotificationsAsReadActionIntent(
                         context, id, repository.owner().login(), repository.name());
         PendingIntent markReadPendingIntent = PendingIntent.getService(context, id,
-                markReadIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                markReadIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Action markReadAction = new NotificationCompat.Action(
                 R.drawable.mark_read, context.getString(R.string.mark_as_read),
                 markReadPendingIntent);
