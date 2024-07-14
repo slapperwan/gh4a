@@ -20,7 +20,7 @@
         android:layout_marginRight="16dp"
         android:background="?attr/selectableItemBackgroundBorderless" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/tv_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

@@ -33,7 +33,7 @@
             android:visibility="invisible"
             tools:src="@drawable/pull_request_merge_ok" />
 
-        <com.gh4a.widget.LinkHandlingTextView
+        <TextView
             android:id="@+id/merge_status_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
             android:text="@string/pull_merge_status_loading"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-        <com.gh4a.widget.LinkHandlingTextView
+        <TextView
             android:id="@+id/merge_commit_summary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

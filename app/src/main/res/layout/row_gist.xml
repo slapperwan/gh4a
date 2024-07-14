@@ -17,7 +17,7 @@
         android:layout_marginLeft="8dp"
         android:orientation="vertical">
 
-        <com.gh4a.widget.LinkHandlingTextView
+        <TextView
             android:id="@+id/tv_private"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,7 +29,7 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <com.gh4a.widget.LinkHandlingTextView
+        <TextView
             android:id="@+id/tv_files"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
 
     </LinearLayout>
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/tv_creator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
         tools:text="Creator"
         tools:visibility="visible" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/tv_timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -63,7 +63,7 @@
         android:textAppearance="@style/TextAppearance.VerySmall"
         tools:text="yesterday" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
         android:textAppearance="@style/TextAppearance.ItemTitle"
         tools:text="Gist title" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/tv_sha"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

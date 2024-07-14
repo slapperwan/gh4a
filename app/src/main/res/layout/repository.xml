@@ -141,7 +141,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/readme_title"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
@@ -182,14 +182,14 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/other_info"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/other_info" />
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/tv_contributors_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -198,7 +198,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/repo_contributors" />
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/tv_collaborators_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -207,7 +207,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/repo_collaborators" />
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/tv_wiki_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"
@@ -216,7 +216,7 @@
                     android:paddingRight="@dimen/content_padding"
                     android:text="@string/recent_wiki" />
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/tv_releases_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"

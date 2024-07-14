@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         tools:src="@drawable/icon_repositories" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/label"
         style="?android:attr/spinnerDropDownItemStyle"
         android:layout_width="wrap_content"

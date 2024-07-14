@@ -30,7 +30,7 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <com.gh4a.widget.LinkHandlingTextView
+            <TextView
                 android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 android:textAppearance="@style/TextAppearance.ItemTitle"
                 tools:text="username/repository" />
 
-            <com.gh4a.widget.LinkHandlingTextView
+            <TextView
                 android:id="@+id/tv_extra"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

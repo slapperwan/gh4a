@@ -12,7 +12,7 @@
     android:paddingRight="16dp"
     android:paddingTop="8dp">
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/tv_file"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -20,7 +20,7 @@
         android:textColor="?android:textColorPrimary"
         tools:text="path/to/file/name.txt" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/tv_file_comments"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

@@ -173,7 +173,7 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/tv_pub_repos_label"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
@@ -191,7 +191,7 @@
                     android:orientation="vertical"
                     android:visibility="gone" />
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/btn_repos"
                     style="@style/MoreButton"
                     android:layout_width="match_parent"
@@ -217,7 +217,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/tv_orgs"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"

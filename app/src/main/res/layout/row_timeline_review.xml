@@ -36,7 +36,7 @@
         android:layout_marginRight="32dp"
         android:background="?android:attr/listDivider" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/details_container_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
