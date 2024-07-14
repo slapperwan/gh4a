@@ -36,7 +36,6 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.EllipsizeLineSpan;
-import com.gh4a.widget.LinkHandlingTextView;
 import com.meisolsson.githubsdk.model.Gist;
 import com.meisolsson.githubsdk.model.GitHubEvent;
 import com.meisolsson.githubsdk.model.GitHubEventType;
@@ -537,8 +536,8 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
 
         private final ImageView ivGravatar;
         private final TextView tvActor;
-        private final LinkHandlingTextView tvTitle;
-        private final LinkHandlingTextView tvDesc;
+        private final TextView tvTitle;
+        private final TextView tvDesc;
         private final TextView tvCreatedAt;
     }
 }

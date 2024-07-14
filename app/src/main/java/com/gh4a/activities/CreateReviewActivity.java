@@ -10,12 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.widget.EditorBottomSheet;
-import com.gh4a.widget.LinkHandlingTextView;
 import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.request.pull_request.CreateReview;
 import com.meisolsson.githubsdk.model.request.pull_request.SubmitReview;
@@ -87,7 +87,7 @@ public class CreateReviewActivity extends AppCompatActivity implements
         mReviewEventSpinner = header.findViewById(R.id.pull_request_review_event);
         mReviewEventSpinner.setAdapter(mReviewEventAdapter);
 
-        LinkHandlingTextView titleView = header.findViewById(R.id.review_dialog_title);
+        TextView titleView = header.findViewById(R.id.review_dialog_title);
         titleView.setText(getString(R.string.pull_request_review_dialog_title, mPullRequestNumber));
 
         mEditorSheet.setCallback(this);

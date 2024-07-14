@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.gh4a.ColorPickerDialog;
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.LinkHandlingTextView;
 import com.meisolsson.githubsdk.model.Label;
 
 public class IssueLabelAdapter extends
@@ -198,7 +197,7 @@ public class IssueLabelAdapter extends
         private EditableLabel lastAssignedLabel;
 
         private final View color;
-        private final LinkHandlingTextView label;
+        private final TextView label;
         private final EditText editor;
         private final TextView customColorButton;
         private final View collapsedContainer;

@@ -9,6 +9,7 @@ import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.activities.RepositoryActivity;
@@ -18,8 +19,8 @@ import com.meisolsson.githubsdk.model.PullRequestMarker;
 import com.meisolsson.githubsdk.model.git.GitReference;
 
 public class PullRequestBranchInfoView extends RelativeLayout implements View.OnClickListener {
-    private final LinkHandlingTextView mSourceBranchView;
-    private final LinkHandlingTextView mTargetBranchView;
+    private final TextView mSourceBranchView;
+    private final TextView mTargetBranchView;
     private final int mAccentColor;
 
     private PullRequestMarker mSourceMarker;
@@ -54,7 +55,7 @@ public class PullRequestBranchInfoView extends RelativeLayout implements View.On
         formatMarkerText(mTargetBranchView, R.string.pull_request_to, targetMarker, true);
     }
 
-    private void formatMarkerText(LinkHandlingTextView view, @StringRes int formatResId,
+    private void formatMarkerText(TextView view, @StringRes int formatResId,
             final PullRequestMarker marker, boolean makeClickable) {
         SpannableStringBuilder builder = StringUtils.applyBoldTags(getContext().getString(formatResId));
         int pos = builder.toString().indexOf("[ref]");
