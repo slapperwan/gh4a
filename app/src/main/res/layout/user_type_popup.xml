@@ -20,7 +20,7 @@
         android:layout_marginRight="16dp"
         tools:src="@drawable/default_avatar" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/tv_title"
         style="?android:attr/spinnerDropDownItemStyle"
         android:layout_width="0dp"

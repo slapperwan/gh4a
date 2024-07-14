@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge  xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/plus_one"
         style="@style/ReactionBarButton"
         android:drawableLeft="@drawable/reaction_plus_one" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/minus_one"
         style="@style/ReactionBarButton"
         android:drawableLeft="@drawable/reaction_minus_one" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/laugh"
         style="@style/ReactionBarButton"
         android:drawableLeft="@drawable/reaction_laugh" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/hooray"
         style="@style/ReactionBarButton"
         android:drawableLeft="@drawable/reaction_hooray" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/confused"
         style="@style/ReactionBarButton"
         android:drawableLeft="@drawable/reaction_confused" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/heart"
         style="@style/ReactionBarButton"
         android:drawableLeft="@drawable/reaction_heart" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/rocket"
         style="@style/ReactionBarButton"
         android:drawableLeft="@drawable/reaction_rocket" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/eyes"
         style="@style/ReactionBarButton"
         android:drawableLeft="@drawable/reaction_eyes" />

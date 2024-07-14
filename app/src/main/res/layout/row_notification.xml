@@ -42,7 +42,7 @@
                 tools:layout_alignParentBottom="false"
                 tools:layout_alignParentTop="false" />
 
-            <com.gh4a.widget.LinkHandlingTextView
+            <TextView
                 android:id="@+id/tv_timestamp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
                 android:textAppearance="@style/TextAppearance.VerySmall"
                 tools:text="yesterday" />
 
-            <com.gh4a.widget.LinkHandlingTextView
+            <TextView
                 android:id="@+id/tv_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

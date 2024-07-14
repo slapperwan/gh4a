@@ -21,7 +21,7 @@
                 android:orientation="vertical"
                 android:padding="@dimen/content_padding">
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/tv_created_at"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
                     android:textAppearance="@style/TextAppearance.ItemTitle"
                     tools:text="Gist title" />
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/tv_private"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -61,7 +61,7 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/files_title"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"

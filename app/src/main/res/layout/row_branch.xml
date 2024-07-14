@@ -17,7 +17,7 @@
         android:layout_gravity="center_vertical"
         tools:src="@drawable/branch" />
 
-    <com.gh4a.widget.LinkHandlingTextView
+    <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
