@@ -26,7 +26,6 @@ import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
-import com.gh4a.widget.LinkHandlingTextView;
 import com.gh4a.widget.TimestampToastSpan;
 
 import com.meisolsson.githubsdk.model.Review;
@@ -49,7 +48,7 @@ class ReviewViewHolder
     private final Callback mCallback;
 
     private final ImageView mAvatarView;
-    private final LinkHandlingTextView mMessageView;
+    private final TextView mMessageView;
     private final TextView mBodyView;
     private final Button mShowDetailsButton;
     private final View mAvatarContainer;

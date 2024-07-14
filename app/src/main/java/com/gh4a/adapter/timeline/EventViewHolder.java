@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.text.style.TypefaceSpan;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.activities.CommitActivity;
@@ -20,7 +21,6 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.IntentSpan;
 import com.gh4a.widget.IssueLabelSpan;
-import com.gh4a.widget.LinkHandlingTextView;
 import com.gh4a.widget.TimestampToastSpan;
 
 import com.meisolsson.githubsdk.model.Issue;
@@ -50,7 +50,7 @@ class EventViewHolder
 
     private final ImageView mAvatarView;
     private final ImageView mEventIconView;
-    private final LinkHandlingTextView mMessageView;
+    private final TextView mMessageView;
     private final View mAvatarContainer;
 
     public EventViewHolder(View itemView, String repoOwner, String repoName,

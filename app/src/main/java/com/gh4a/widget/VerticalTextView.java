@@ -3,12 +3,14 @@ package com.gh4a.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatTextView;
+
 import android.text.Layout;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Gravity;
 
-public class VerticalTextView extends LinkHandlingTextView {
+public class VerticalTextView extends AppCompatTextView {
     private final boolean mTopDown;
 
     public VerticalTextView(Context context, AttributeSet attrs) {
