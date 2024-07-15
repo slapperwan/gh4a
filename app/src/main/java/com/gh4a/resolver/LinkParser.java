@@ -100,7 +100,7 @@ public class LinkParser {
             case "blog":
                 return parseBlogLink(activity, parts);
             case "orgs":
-                return parseOrganizationLink(activity, parts);
+                return parseOrganizationLink(activity, uri, parts);
             case "search":
                 return parseSearchLink(activity, uri);
         }
@@ -169,7 +169,7 @@ public class LinkParser {
     }
 
     @Nullable
-    private static ParseResult parseOrganizationLink(FragmentActivity activity,
+    private static ParseResult parseOrganizationLink(FragmentActivity activity, Uri uri,
             List<String> parts) {
         String org = parts.size() >= 2 ? parts.get(1) : null;
         String action = parts.size() >= 3 ? parts.get(2) : null;
@@ -177,10 +177,16 @@ public class LinkParser {
         if (org == null) {
             return null;
         }
+        if (action == null) {
+            return new ParseResult(UserActivity.makeIntent(activity, org));
+        }
         if ("people".equals(action)) {
             return new ParseResult(OrganizationMemberListActivity.makeIntent(activity, org));
         }
-        return new ParseResult(UserActivity.makeIntent(activity, org));
+        if ("repositories".equals(action)) {
+            return new ParseResult(new UserReposLoadTask(activity, uri, org, false));
+        }
+        return null;
     }
 
     private static ParseResult parseUserLink(FragmentActivity activity, @NonNull Uri uri,
