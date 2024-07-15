@@ -93,7 +93,7 @@ dependencies {
     implementation 'com.github.Tunous:MarkdownEdit:1.0.0'
     implementation 'com.github.qoqa:traceur:2.2.12'
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.robolectric:robolectric:4.4'
+    testImplementation 'org.robolectric:robolectric:4.13'
 }
 
 def props = new Properties()
