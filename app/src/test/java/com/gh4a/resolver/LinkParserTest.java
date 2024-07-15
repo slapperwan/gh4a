@@ -163,17 +163,29 @@ public class LinkParserTest {
     }
 
     @Test
-    public void organizationLink_withoutName__opensBrowser() {
-        assertRedirectsToBrowser(parseLink("https://github.com/orgs"));
-    }
-
-    @Test
-    public void organisationLink_leadingToMembers__opensOrganizationMemberListActivity() {
+    public void organizationLink_leadingToMembers__opensOrganizationMemberListActivity() {
         LinkParser.ParseResult result = parseLink("https://github.com/orgs/android/people");
         assertRedirectsTo(result, OrganizationMemberListActivity.class);
         Bundle extras = result.intent.getExtras();
         assertThat("Extras are missing", extras, is(notNullValue()));
         assertThat("Organization name is incorrect", extras.getString("login"), is("android"));
+    }
+
+    public void organizationLink_leadingToRepositories__loadsOrganizationRepos() {
+        LinkParser.ParseResult result = parseLink("https://github.com/orgs/android/repositories/");
+        UserReposLoadTask loadTask = assertThatLoadTaskIs(result.loadTask, UserReposLoadTask.class);
+        assertThat("Loading starred repos is set to true", loadTask.mShowStars, is(false));
+        assertThat("User name is incorrect", loadTask.mUserLogin, is("android"));
+    }
+
+    @Test
+    public void organizationLink_leadingToAnotherSubPage__opensBrowser() {
+        assertRedirectsToBrowser(parseLink("https://github.com/orgs/community/discussions/"));
+    }
+
+    @Test
+    public void organizationLink_withoutName__opensBrowser() {
+        assertRedirectsToBrowser(parseLink("https://github.com/orgs"));
     }
 
     @Test
