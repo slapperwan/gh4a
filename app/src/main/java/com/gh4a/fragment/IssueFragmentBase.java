@@ -264,7 +264,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         inflater.inflate(R.menu.issue_fragment_menu, menu);
 
         MenuItem reactItem = menu.findItem(R.id.react);
-        if (isLocked()) {
+        if (!Gh4Application.get().isAuthorized() || isLocked()) {
             reactItem.setVisible(false);
         } else {
             inflater.inflate(R.menu.reaction_menu, reactItem.getSubMenu());

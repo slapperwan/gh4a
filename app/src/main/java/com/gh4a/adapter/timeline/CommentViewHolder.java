@@ -93,7 +93,7 @@ class CommentViewHolder
         mPopupMenu.setOnMenuItemClickListener(this);
 
         MenuItem reactItem = mPopupMenu.getMenu().findItem(R.id.react);
-        if (callback.canAddReaction()) {
+        if (Gh4Application.get().isAuthorized() && callback.canAddReaction()) {
             mPopupMenu.getMenuInflater().inflate(R.menu.reaction_menu, reactItem.getSubMenu());
             mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(view.getContext(),
                     reactItem.getSubMenu(), this, this, reactionDetailsCache);
