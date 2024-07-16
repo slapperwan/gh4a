@@ -1,53 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <TextView
-        android:id="@+id/plus_one"
-        style="@style/ReactionBarButton"
-        android:drawableLeft="@drawable/reaction_plus_one" />
-
-    <TextView
-        android:id="@+id/minus_one"
-        style="@style/ReactionBarButton"
-        android:drawableLeft="@drawable/reaction_minus_one" />
-
-    <TextView
-        android:id="@+id/laugh"
-        style="@style/ReactionBarButton"
-        android:drawableLeft="@drawable/reaction_laugh" />
-
-    <TextView
-        android:id="@+id/hooray"
-        style="@style/ReactionBarButton"
-        android:drawableLeft="@drawable/reaction_hooray" />
-
-    <TextView
-        android:id="@+id/confused"
-        style="@style/ReactionBarButton"
-        android:drawableLeft="@drawable/reaction_confused" />
-
-    <TextView
-        android:id="@+id/heart"
-        style="@style/ReactionBarButton"
-        android:drawableLeft="@drawable/reaction_heart" />
-
-    <TextView
-        android:id="@+id/rocket"
-        style="@style/ReactionBarButton"
-        android:drawableLeft="@drawable/reaction_rocket" />
-
-    <TextView
-        android:id="@+id/eyes"
-        style="@style/ReactionBarButton"
-        android:drawableLeft="@drawable/reaction_eyes" />
-
-    <ImageView
-        android:id="@+id/react"
-        style="@style/SelectableBorderlessItem"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:padding="8dp"
-        android:src="@drawable/overflow" />
+        android:orientation="horizontal">
 
+        <TextView
+            android:id="@+id/plus_one"
+            style="@style/ReactionBarButton"
+            android:drawableLeft="@drawable/reaction_plus_one" />
+
+        <TextView
+            android:id="@+id/minus_one"
+            style="@style/ReactionBarButton"
+            android:drawableLeft="@drawable/reaction_minus_one" />
+
+        <TextView
+            android:id="@+id/laugh"
+            style="@style/ReactionBarButton"
+            android:drawableLeft="@drawable/reaction_laugh" />
+
+        <TextView
+            android:id="@+id/hooray"
+            style="@style/ReactionBarButton"
+            android:drawableLeft="@drawable/reaction_hooray" />
+
+        <TextView
+            android:id="@+id/confused"
+            style="@style/ReactionBarButton"
+            android:drawableLeft="@drawable/reaction_confused" />
+
+        <TextView
+            android:id="@+id/heart"
+            style="@style/ReactionBarButton"
+            android:drawableLeft="@drawable/reaction_heart" />
+
+        <TextView
+            android:id="@+id/rocket"
+            style="@style/ReactionBarButton"
+            android:drawableLeft="@drawable/reaction_rocket" />
+
+        <TextView
+            android:id="@+id/eyes"
+            style="@style/ReactionBarButton"
+            android:drawableLeft="@drawable/reaction_eyes" />
+
+        <ImageView
+            android:id="@+id/react"
+            style="@style/SelectableBorderlessItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:padding="8dp"
+            android:src="@drawable/overflow" />
+
+    </LinearLayout>
 </merge>
