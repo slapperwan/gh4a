@@ -23,8 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
@@ -45,7 +45,7 @@ import java.util.List;
 
 import io.reactivex.Single;
 
-public class ReactionBar extends LinearLayout implements View.OnClickListener {
+public class ReactionBar extends HorizontalScrollView implements View.OnClickListener {
     public interface Item {
         Object getCacheKey();
     }
@@ -104,7 +104,6 @@ public class ReactionBar extends LinearLayout implements View.OnClickListener {
     public ReactionBar(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        setOrientation(HORIZONTAL);
         inflate(context, R.layout.reaction_bar, this);
 
         mPlusOneView = findViewById(R.id.plus_one);
