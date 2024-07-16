@@ -152,7 +152,8 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         for (int id : VIEW_IDS) {
             findViewById(id).setOnClickListener(callback != null ? this : null);
         }
-        mReactButton.setVisibility(callback != null && callback.canAddReaction()
+        boolean isUserLoggedIn = Gh4Application.get().isAuthorized();
+        mReactButton.setVisibility(isUserLoggedIn && callback != null && callback.canAddReaction()
                 ? View.VISIBLE : View.GONE);
         mReactButton.setOnClickListener(callback != null ? this : null);
     }
