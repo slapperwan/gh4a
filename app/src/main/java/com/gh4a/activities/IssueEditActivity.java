@@ -829,7 +829,7 @@ public class IssueEditActivity extends BasePagerActivity implements
             private LayoutInflater mInflater;
 
             public Adapter(Context context, List<IssueTemplate> templates) {
-                super(context, R.layout.row_issue_template, templates);
+                super(context, R.layout.row_item_with_description, templates);
                 mInflater = LayoutInflater.from(context);
             }
 
@@ -838,7 +838,7 @@ public class IssueEditActivity extends BasePagerActivity implements
             public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
                 final View view;
                 if (convertView == null) {
-                    view = mInflater.inflate(R.layout.row_issue_template, parent, false);
+                    view = mInflater.inflate(R.layout.row_item_with_description, parent, false);
                 } else {
                     view = convertView;
                 }
