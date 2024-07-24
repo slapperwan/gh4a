@@ -432,8 +432,13 @@
     <string name="issue_comment_hint">Comment on this issue</string>
     <string name="commit_comment_header">%1$s added a note %2$s</string>
     <string name="issue_no_description">No description provided.</string>
-    <string name="close_issue_confirm">Do you really want to close this issue?</string>
     <string name="reopen_issue_confirm">Do you really want to reopen this issue?</string>
+    <string name="close_issue_dialog_title">Close issue as\u2026</string>
+    <string name="issue_reason_not_planned">Not planned</string>
+    <string name="issue_reason_not_planned_description">Won\'t fix, duplicate, stale</string>
+    <string name="issue_reason_completed">Completed</string>
+    <string name="issue_reason_completed_description">Done, closed, fixed, resolved</string>
+    <string name="close_issue">Close issue</string>
     <string name="issue_template_dialog_title">Select issue type</string>
 
     <!-- Pull Request -->
