@@ -12,6 +12,7 @@ import com.gh4a.activities.IssueEditActivity;
 import com.gh4a.activities.IssueListActivity;
 import com.gh4a.activities.OrganizationMemberListActivity;
 import com.gh4a.activities.PullRequestActivity;
+import com.gh4a.activities.ReleaseInfoActivity;
 import com.gh4a.activities.ReleaseListActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.activities.TimelineActivity;
@@ -281,13 +282,15 @@ public class LinkParserTest {
     }
 
     @Test
-    public void releaseLink_withTagId__loadsRelease() {
+    public void releaseLink_withTagName__opensReleaseActivity() {
         LinkParser.ParseResult result =
                 parseLink("https://github.com/slapperwan/gh4a/releases/tag/tagName");
-        ReleaseLoadTask loadTask = assertThatLoadTaskIs(result.loadTask, ReleaseLoadTask.class);
-        assertThat("User name is incorrect", loadTask.mRepoOwner, is("slapperwan"));
-        assertThat("Repo name is incorrect", loadTask.mRepoName, is("gh4a"));
-        assertThat("Tag name is incorrect", loadTask.mTagName, is("tagName"));
+        assertRedirectsTo(result, ReleaseInfoActivity.class);
+        Bundle extras = result.intent.getExtras();
+        assertThat("Extras are missing", extras, is(notNullValue()));
+        assertThat("User name is incorrect", extras.getString("owner"), is("slapperwan"));
+        assertThat("Repo name is incorrect", extras.getString("repo"), is("gh4a"));
+        assertThat("Tag name is incorrect", extras.getString("tag"), is("tagName"));
     }
 
     @Test
