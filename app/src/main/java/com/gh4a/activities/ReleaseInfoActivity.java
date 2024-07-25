@@ -49,6 +49,8 @@ import java.util.Date;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public class ReleaseInfoActivity extends BaseActivity implements
         View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
@@ -61,20 +63,20 @@ public class ReleaseInfoActivity extends BaseActivity implements
                 .putExtra("id", id);
     }
 
-    public static Intent makeIntent(Context context, String repoOwner, String repoName, Release release) {
-        Intent intent = new Intent(context, ReleaseInfoActivity.class)
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, String tagName) {
+        return new Intent(context, ReleaseInfoActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
-        IntentUtils.putCompressedParcelableExtra(intent, "release", release, 800_000);
-        return intent;
+                .putExtra("repo", repoName)
+                .putExtra("tag", tagName);
     }
 
     private static final int ID_LOADER_RELEASE = 0;
 
+    private Release mRelease;
     private String mRepoOwner;
     private String mRepoName;
-    private Release mRelease;
     private long mReleaseId;
+    private String mTagName;
 
     private View mRootView;
     private HttpImageGetter mImageGetter;
@@ -89,12 +91,8 @@ public class ReleaseInfoActivity extends BaseActivity implements
         mImageGetter = new HttpImageGetter(this);
         setChildScrollDelegate(this);
 
-        if (mRelease != null) {
-            handleReleaseReady();
-        } else {
-            setContentShown(false);
-            loadRelease(false);
-        }
+        setContentShown(false);
+        loadRelease(false);
     }
 
     @Nullable
@@ -114,7 +112,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
-        mRelease = IntentUtils.readCompressedParcelableFromBundle(extras, "release");
+        mTagName = extras.getString("tag");
         mReleaseId = extras.getLong("id");
     }
 
@@ -136,12 +134,6 @@ public class ReleaseInfoActivity extends BaseActivity implements
     @Override
     public boolean canChildScrollUp() {
         return UiUtils.canViewScrollUp(mRootView);
-    }
-
-    @Override
-    protected boolean canSwipeToRefresh() {
-        // Allow refresh only when the release is not passed via intent extras
-        return mReleaseId != 0;
     }
 
     @Override
@@ -267,7 +259,13 @@ public class ReleaseInfoActivity extends BaseActivity implements
     private void loadRelease(boolean force) {
         RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class, force);
 
-        service.getRelease(mRepoOwner, mRepoName, mReleaseId)
+        Single<Response<Release>> releaseSingle;
+        if (mTagName != null) {
+            releaseSingle = service.getRelaseByTagName(mRepoOwner, mRepoName, mTagName);
+        } else {
+            releaseSingle = service.getRelease(mRepoOwner, mRepoName, mReleaseId);
+        }
+        releaseSingle
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_RELEASE, force))
                 .subscribe(result -> {

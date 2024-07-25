@@ -46,9 +46,7 @@ public class ReleaseListFragment extends PagedDataBaseFragment<Release> implemen
 
     @Override
     protected RootAdapter<Release, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        ReleaseAdapter adapter = new ReleaseAdapter(getActivity());
-        adapter.setOnItemClickListener(this);
-        return adapter;
+        return new ReleaseAdapter(getActivity());
     }
 
     @Override
@@ -58,6 +56,6 @@ public class ReleaseListFragment extends PagedDataBaseFragment<Release> implemen
 
     @Override
     public void onItemClick(Release release) {
-        startActivity(ReleaseInfoActivity.makeIntent(getActivity(), mUserLogin, mRepoName, release));
+        startActivity(ReleaseInfoActivity.makeIntent(getActivity(), mUserLogin, mRepoName, release.id()));
     }
 }
