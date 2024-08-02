@@ -15,6 +15,7 @@
  */
 package com.gh4a.activities;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -29,12 +30,19 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 
 import com.gh4a.utils.ActivityResultHelpers;
+import com.gh4a.utils.UiUtils;
 import com.google.android.material.appbar.AppBarLayout;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,6 +66,7 @@ import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
 import com.gh4a.widget.IssueStateTrackingFloatingActionButton;
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueState;
+import com.meisolsson.githubsdk.model.IssueStateReason;
 import com.meisolsson.githubsdk.model.request.issue.IssueRequest;
 import com.meisolsson.githubsdk.service.issues.IssueService;
 
@@ -239,9 +248,13 @@ public class IssueActivity extends BaseActivity implements
         int itemId = item.getItemId();
         switch (itemId) {
             case R.id.issue_close:
+                if (checkForAuthOrExit()) {
+                    showCloseReasonDialog();
+                }
+                return true;
             case R.id.issue_reopen:
                 if (checkForAuthOrExit()) {
-                    showOpenCloseConfirmDialog(itemId == R.id.issue_reopen);
+                    showReopenConfirmDialog();
                 }
                 return true;
             case R.id.share:
@@ -296,46 +309,57 @@ public class IssueActivity extends BaseActivity implements
 
     @Override
     public void onConfirmed(String tag, Parcelable data) {
-        boolean reopen = ((Bundle) data).getBoolean("reopen");
-        updateIssueState(reopen);
+        reopenIssue();
     }
 
-    private void showOpenCloseConfirmDialog(final boolean reopen) {
-        @StringRes int messageResId = reopen
-                ? R.string.reopen_issue_confirm : R.string.close_issue_confirm;
-        @StringRes int buttonResId = reopen
-                ? R.string.pull_request_reopen : R.string.pull_request_close;
-
-        Bundle data = new Bundle();
-        data.putBoolean("reopen", reopen);
-        ConfirmationDialogFragment.show(this, messageResId, buttonResId, data, "reopenconfirm");
+    private void showReopenConfirmDialog() {
+        ConfirmationDialogFragment.show(this, R.string.reopen_issue_confirm,
+                R.string.pull_request_reopen, null, "reopenconfirm");
     }
 
-    private void updateIssueState(boolean reopen) {
+    private void showCloseReasonDialog() {
+        new CloseReasonDialogFragment().show(getSupportFragmentManager(), "close_reason");
+    }
+
+    private void reopenIssue() {
         IssueService service = ServiceFactory.get(IssueService.class, false);
         IssueRequest request = IssueRequest.builder()
-                .state(reopen ? IssueState.Open : IssueState.Closed)
+                .state(IssueState.Open)
                 .build();
-        @StringRes int dialogResId = reopen ? R.string.opening_msg : R.string.closing_msg;
-        @StringRes int errorMessageResId =
-                reopen ? R.string.issue_error_reopen : R.string.issue_error_close;
 
+        String failureMessage = getString(R.string.issue_error_reopen, mIssueNumber);
         service.editIssue(mRepoOwner, mRepoName, mIssueNumber, request)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils.wrapForBackgroundTask(this, dialogResId, getString(errorMessageResId, mIssueNumber)))
-                .subscribe(result -> {
-                    mIssue = result;
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.opening_msg, failureMessage))
+                .subscribe(this::updateUiAfterStateUpdate, error -> handleActionFailure("Reopening issue failed", error));
+    }
 
-                    updateHeader();
-                    if (mEditFab != null) {
-                        mEditFab.setState(mIssue.state());
-                    }
-                    if (mFragment != null) {
-                        mFragment.updateState(mIssue);
-                    }
-                    setResult(RESULT_OK);
-                    supportInvalidateOptionsMenu();
-                }, error -> handleActionFailure("Updating issue state failed", error));
+    private void closeIssue(IssueStateReason reason) {
+        IssueService service = ServiceFactory.get(IssueService.class, false);
+        IssueRequest request = IssueRequest.builder()
+                .state(IssueState.Closed)
+                .stateReason(reason)
+                .build();
+
+        String failureMessage = getString(R.string.issue_error_close, mIssueNumber);
+        service.editIssue(mRepoOwner, mRepoName, mIssueNumber, request)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapForBackgroundTask(this, R.string.closing_msg, failureMessage))
+                .subscribe(this::updateUiAfterStateUpdate, error -> handleActionFailure("Closing issue failed", error));
+    }
+
+    private void updateUiAfterStateUpdate(Issue updatedIssue) {
+        mIssue = updatedIssue;
+
+        updateHeader();
+        if (mEditFab != null) {
+            mEditFab.setState(mIssue.state());
+        }
+        if (mFragment != null) {
+            mFragment.updateState(mIssue);
+        }
+        setResult(RESULT_OK);
+        supportInvalidateOptionsMenu();
     }
 
     private void updateFabVisibility() {
@@ -407,5 +431,58 @@ public class IssueActivity extends BaseActivity implements
                 .appendPath("issues")
                 .appendPath(String.valueOf(mIssueNumber))
                 .build();
+    }
+
+    public static class CloseReasonDialogFragment extends DialogFragment {
+        private static final String KEY_SELECTED_ITEM_INDEX = "selected_item";
+
+        private int mSelectedItemIndex;
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+            if (savedInstanceState != null) {
+                mSelectedItemIndex = savedInstanceState.getInt(KEY_SELECTED_ITEM_INDEX);
+            }
+
+            var reasonItems = new CharSequence[] {
+                buildItemText(R.string.issue_reason_completed, R.string.issue_reason_completed_description),
+                buildItemText(R.string.issue_reason_not_planned, R.string.issue_reason_not_planned_description),
+            };
+
+            IssueActivity activity = (IssueActivity) requireActivity();
+            return new AlertDialog.Builder(activity)
+                    .setTitle(R.string.close_issue_dialog_title)
+                    .setSingleChoiceItems(reasonItems, mSelectedItemIndex, (dialog, selectedIndex) -> {
+                        mSelectedItemIndex = selectedIndex;
+                    })
+                    .setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.close_issue, (dialog, _btn) -> {
+                        var closeReason = mSelectedItemIndex == 0 ? IssueStateReason.Completed : IssueStateReason.NotPlanned;
+                        activity.closeIssue(closeReason);
+                    })
+                    .create();
+        }
+
+        @Override
+        public void onSaveInstanceState(@NonNull Bundle outState) {
+            super.onSaveInstanceState(outState);
+            outState.putInt(KEY_SELECTED_ITEM_INDEX, mSelectedItemIndex);
+        }
+
+        private CharSequence buildItemText(@StringRes int title, @StringRes int description) {
+            var text = new SpannableStringBuilder(getString(title)).append('\n');
+            int descriptionStartIndex = text.length();
+            text.append(getString(description));
+
+            int secondaryTextColor = UiUtils.resolveColor(requireContext(), android.R.attr.textColorSecondary);
+            text.setSpan(new ForegroundColorSpan(secondaryTextColor), descriptionStartIndex, text.length(),
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            text.setSpan(new RelativeSizeSpan(0.82f), descriptionStartIndex, text.length(),
+                    Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+            // Simple trick to increase the second line's height so that the description text isn't too close to the title
+            text.append(' ');
+            return text;
+        }
     }
 }
