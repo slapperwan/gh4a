@@ -28,6 +28,7 @@ import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.gh4a.adapter.ItemsWithDescriptionAdapter;
 import com.gh4a.utils.ActivityResultHelpers;
 import com.google.android.material.appbar.AppBarLayout;
 
@@ -43,11 +44,9 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -88,6 +87,8 @@ import java.util.regex.Pattern;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 import retrofit2.Response;
+
+import static java.util.stream.Collectors.toList;
 
 public class IssueEditActivity extends BasePagerActivity implements
         AppBarLayout.OnOffsetChangedListener, View.OnClickListener,
@@ -787,8 +788,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         }
     }
 
-    public static class IssueTemplateSelectionDialogFragment extends DialogFragment
-            implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener {
+    public static class IssueTemplateSelectionDialogFragment extends DialogFragment {
         private List<IssueTemplate> mTemplates;
 
         public static IssueTemplateSelectionDialogFragment newInstance(List<IssueTemplate> templates) {
@@ -802,57 +802,26 @@ public class IssueEditActivity extends BasePagerActivity implements
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            Bundle args = getArguments();
-            mTemplates = args.getParcelableArrayList("templates");
+            mTemplates = requireArguments().getParcelableArrayList("templates");
+            var templateItems = mTemplates.stream()
+                    .map(template -> new ItemsWithDescriptionAdapter.Item(template.name, template.description))
+                    .collect(toList());
 
-            return new AlertDialog.Builder(getContext())
+            var activity = (IssueEditActivity) requireActivity();
+            return new AlertDialog.Builder(activity)
                     .setTitle(R.string.issue_template_dialog_title)
-                    .setSingleChoiceItems(new Adapter(getContext(), mTemplates), -1, this)
-                    .setOnCancelListener(this)
-                    .setNegativeButton(R.string.cancel, null)
+                    .setAdapter(
+                        new ItemsWithDescriptionAdapter(activity, templateItems),
+                        (dialog, itemIndex) -> activity.handleIssueTemplateSelected(mTemplates.get(itemIndex))
+                    )
+                    .setNegativeButton(R.string.cancel, (dialog, _btn) -> dialog.cancel())
                     .create();
-        }
-
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            ((IssueEditActivity) getActivity()).handleIssueTemplateSelected(mTemplates.get(which));
-            dialog.dismiss();
         }
 
         @Override
         public void onCancel(@NonNull DialogInterface dialog) {
             super.onCancel(dialog);
-            ((IssueEditActivity) getActivity()).handleIssueTemplateSelected(null);
-        }
-
-        private static class Adapter extends ArrayAdapter<IssueTemplate> {
-            private LayoutInflater mInflater;
-
-            public Adapter(Context context, List<IssueTemplate> templates) {
-                super(context, R.layout.row_item_with_description, templates);
-                mInflater = LayoutInflater.from(context);
-            }
-
-            @NonNull
-            @Override
-            public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                final View view;
-                if (convertView == null) {
-                    view = mInflater.inflate(R.layout.row_item_with_description, parent, false);
-                } else {
-                    view = convertView;
-                }
-
-                TextView title = view.findViewById(R.id.title);
-                TextView description = view.findViewById(R.id.description);
-                IssueTemplate template = getItem(position);
-
-                title.setText(template.name);
-                description.setText(template.description);
-                description.setVisibility(TextUtils.isEmpty(template.description) ? View.GONE : View.VISIBLE);
-
-                return view;
-            }
+            ((IssueEditActivity) requireActivity()).handleIssueTemplateSelected(null);
         }
     }
 
