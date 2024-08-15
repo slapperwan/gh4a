@@ -79,6 +79,7 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -603,12 +604,10 @@ public class IssueEditActivity extends BasePagerActivity implements
                         if (templates.size() == 1) {
                             handleIssueTemplateSelected(templates.get(0));
                         } else {
-                            List<IssueTemplate> namedTemplates = new ArrayList<>();
-                            for (IssueTemplate t : templates) {
-                                if (t.name != null) {
-                                    namedTemplates.add(t);
-                                }
-                            }
+                            List<IssueTemplate> namedTemplates = templates.stream()
+                                    .filter(template -> template.name != null)
+                                    .sorted(Comparator.comparing(template -> template.name))
+                                    .collect(toList());
                             IssueTemplateSelectionDialogFragment f =
                                     IssueTemplateSelectionDialogFragment.newInstance(namedTemplates);
                             f.show(getSupportFragmentManager(), "template-selection");
