@@ -6,4 +6,11 @@
         android:icon="@drawable/menu_web"
         android:title="@string/open_in_browser"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/react"
+        android:title="@string/add_reaction"
+        android:visible="false">
+        <menu />
+    </item>
 </menu>
