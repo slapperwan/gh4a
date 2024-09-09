@@ -80,9 +80,12 @@ public class NewsFeedFactory extends FragmentFactory implements Spinner.OnItemSe
 
         mActivity.getMenuInflater().inflate(R.menu.user_selector, menu);
 
+        int selectedPosition = mSelectedOrganization != null
+                ? mUserScopes.indexOf(mSelectedOrganization) : -1;
         Spinner spinner = (Spinner) menu.findItem(R.id.selector).getActionView();
         UserAdapter adapter = new UserAdapter(mActivity, mSelf, mUserScopes);
         spinner.setAdapter(adapter);
+        spinner.setSelection(selectedPosition + 1);
         spinner.setGravity(Gravity.RIGHT);
         spinner.setOnItemSelectedListener(this);
 
