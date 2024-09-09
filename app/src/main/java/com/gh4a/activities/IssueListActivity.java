@@ -26,10 +26,10 @@ import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.widget.SearchView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.SearchView;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -397,6 +397,8 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         return false;
     }
 
+    private SearchView mSearch;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.issue_list_menu, menu);
@@ -405,13 +407,13 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         MenuItem searchItem = menu.findItem(R.id.search);
         searchItem.setOnActionExpandListener(this);
 
-        final SearchView searchView = (SearchView) searchItem.getActionView();
+        mSearch = (SearchView) searchItem.getActionView();
         if (mSearchIsExpanded) {
             searchItem.expandActionView();
-            searchView.setQuery(mSearchQuery, false);
+            mSearch.setQuery(mSearchQuery, false);
         }
-        searchView.setOnCloseListener(this);
-        searchView.setOnQueryTextListener(this);
+        mSearch.setOnCloseListener(this);
+        mSearch.setOnQueryTextListener(this);
 
         updateRemoveFilterButtonVisibility();
         return super.onCreateOptionsMenu(menu);
@@ -480,7 +482,9 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        mSearchQuery = newText;
+        if (mSearch.isExpanded()) {
+            mSearchQuery = newText;
+        }
         return false;
     }
 
