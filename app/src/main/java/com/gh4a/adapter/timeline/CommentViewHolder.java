@@ -241,7 +241,7 @@ class CommentViewHolder
         }
         this.reactions.setReactions(reactions);
         if (mReactionMenuHelper != null) {
-            mReactionMenuHelper.update();
+            mReactionMenuHelper.updateMenuItems();
         }
     }
 

@@ -268,12 +268,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             reactItem.setVisible(false);
         } else {
             inflater.inflate(R.menu.reaction_menu, reactItem.getSubMenu());
-            if (mReactionMenuHelper == null) {
-                mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(getActivity(),
-                        reactItem.getSubMenu(), this, this, mReactionDetailsCache);
-            } else {
-                mReactionMenuHelper.updateFromMenu(reactItem.getSubMenu());
-            }
+            mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(getActivity(),
+                    reactItem.getSubMenu(), this, this, mReactionDetailsCache);
             mReactionMenuHelper.startLoadingIfNeeded();
         }
     }
@@ -530,7 +526,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             bar.setReactions(reactions);
         }
         if (mReactionMenuHelper != null) {
-            mReactionMenuHelper.update();
+            mReactionMenuHelper.updateMenuItems();
             getActivity().invalidateOptionsMenu();
         }
     }
