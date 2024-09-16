@@ -42,6 +42,7 @@ import com.meisolsson.githubsdk.model.User;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Single;
 
@@ -56,12 +57,12 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         Single<Boolean> deleteReaction(Item item, long reactionId);
     }
 
-    private static final @IdRes int[] VIEW_IDS = {
+    private static final @IdRes int[] REACTION_VIEW_IDS = {
         R.id.plus_one, R.id.minus_one, R.id.laugh,
         R.id.hooray, R.id.heart, R.id.confused,
         R.id.rocket, R.id.eyes
     };
-    private static final String[] CONTENTS = {
+    private static final String[] REACTION_CONTENTS = {
         Reaction.CONTENT_PLUS_ONE, Reaction.CONTENT_MINUS_ONE,
         Reaction.CONTENT_LAUGH, Reaction.CONTENT_HOORAY,
         Reaction.CONTENT_HEART, Reaction.CONTENT_CONFUSED,
@@ -124,7 +125,7 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
             mPopup.update();
         }
         if (mAddHelper != null) {
-            mAddHelper.update();
+            mAddHelper.updateMenuItems();
         }
         if (reactions != null && reactions.totalCount() > 0) {
             updateView(mPlusOneView, reactions.plusOne());
@@ -149,7 +150,7 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         mCallback = callback;
         mReferenceItem = item;
 
-        for (int id : VIEW_IDS) {
+        for (int id : REACTION_VIEW_IDS) {
             findViewById(id).setOnClickListener(callback != null ? this : null);
         }
         boolean isUserLoggedIn = Gh4Application.get().isAuthorized();
@@ -196,14 +197,14 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
             mAddReactionPopup.show();
             return;
         }
-        for (int i = 0; i < VIEW_IDS.length; i++) {
-            if (view.getId() == VIEW_IDS[i]) {
+        for (int i = 0; i < REACTION_VIEW_IDS.length; i++) {
+            if (view.getId() == REACTION_VIEW_IDS[i]) {
                 if (mPopup == null) {
                     mPopup = new ReactionUserPopup(getContext(),
                             mCallback, mReferenceItem, mDetailsCache);
                 }
                 mPopup.setAnchorView(view);
-                mPopup.show(CONTENTS[i]);
+                mPopup.show(REACTION_CONTENTS[i]);
             }
         }
     }
@@ -215,6 +216,15 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         } else {
             view.setVisibility(View.GONE);
         }
+    }
+
+    private static String getReactionContentByViewId(@IdRes int reactionViewId) {
+        for (int i = 0; i < REACTION_VIEW_IDS.length; i++) {
+            if (REACTION_VIEW_IDS[i] == reactionViewId) {
+                return REACTION_CONTENTS[i];
+            }
+        }
+        return null;
     }
 
     private static class ReactionUserPopup extends ListPopupWindow {
@@ -240,7 +250,7 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         }
 
         public void update() {
-            List<Reaction> details = mDetailsCache.getEntry(mItem);
+            List<Reaction> details = mDetailsCache.getReactions(mItem);
             if (details != null) {
                 populateAdapter(details);
             }
@@ -253,7 +263,7 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
             }
             show();
 
-            List<Reaction> details = mDetailsCache.getEntry(mItem);
+            List<Reaction> details = mDetailsCache.getReactions(mItem);
             if (details != null) {
                 populateAdapter(details);
             } else {
@@ -266,7 +276,7 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         }
 
         public void toggleOwnReaction(Reaction currentReaction) {
-            final long id = currentReaction != null ? currentReaction.id() : 0;
+            Long id = currentReaction != null ? currentReaction.id() : null;
             toggleReaction(mContent, id, mLastKnownDetails, mCallback, mItem, mDetailsCache)
                     .subscribe(result -> dismiss(), error -> {
                         Log.d(Gh4Application.LOG_TAG, "Toggling reaction failed", error);
@@ -422,15 +432,15 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
                     }
                     return result;
                 }))
-                .doOnSuccess(result -> cache.putEntry(item, result));
+                .doOnSuccess(reactions -> cache.putReactions(item, reactions));
     }
 
-    private static Single<Optional<Reaction>> toggleReaction(String content, long id,
+    private static Single<Optional<Reaction>> toggleReaction(String content, Long id,
             List<Reaction> existingDetails, Callback callback, Item item,
             ReactionDetailsCache cache) {
         final Single<Optional<Reaction>> resultSingle;
 
-        if (id == 0) {
+        if (id == null) {
             resultSingle = callback.addReaction(item, content)
                     .map(Optional::of);
         } else {
@@ -446,23 +456,22 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
                     } else {
                         for (int i = 0; i < existingDetails.size(); i++) {
                             Reaction reaction = existingDetails.get(i);
-                            if (reaction.id() == id) {
+                            if (reaction.id().equals(id)) {
                                 existingDetails.remove(i);
                                 break;
                             }
                         }
                     }
-                    cache.putEntry(item, existingDetails);
+                    cache.putReactions(item, existingDetails);
                 });
     }
 
     public static class AddReactionMenuHelper {
         private final Context mContext;
         private MenuItem mLoadingItem;
-        private final MenuItem[] mItems = new MenuItem[CONTENTS.length];
+        private final MenuItem[] mReactionMenuItems = new MenuItem[REACTION_VIEW_IDS.length];
         private final ReactionDetailsCache mDetailsCache;
-        private List<Reaction> mLastKnownDetails;
-        private long[] mOldReactionIds;
+        private final Map<String, Long> mUserOwnReactions = new HashMap<>();
         private final Callback mCallback;
         private final Item mItem;
         private boolean mLoading;
@@ -474,110 +483,96 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
             mItem = item;
             mDetailsCache = detailsCache;
 
-            updateFromMenu(menu);
+            initializeMenuItems(menu);
         }
 
-        public void updateFromMenu(Menu menu) {
+        private void initializeMenuItems(Menu menu) {
             mLoadingItem = menu.findItem(R.id.loading);
 
-            for (int i = 0; i < VIEW_IDS.length; i++) {
-                mItems[i] = menu.findItem(VIEW_IDS[i]);
-                Drawable icon = DrawableCompat.wrap(mItems[i].getIcon().mutate());
+            for (int i = 0; i < REACTION_VIEW_IDS.length; i++) {
+                mReactionMenuItems[i] = menu.findItem(REACTION_VIEW_IDS[i]);
+                Drawable icon = DrawableCompat.wrap(mReactionMenuItems[i].getIcon().mutate());
                 DrawableCompat.setTintMode(icon, PorterDuff.Mode.SRC_ATOP);
-                mItems[i].setIcon(icon);
-            }
-            if (mOldReactionIds != null) {
-                setDataItemsVisible(true);
+                mReactionMenuItems[i].setIcon(icon);
             }
         }
 
-        public boolean onItemClick(MenuItem item) {
-            for (int i = 0; i < mItems.length; i++) {
-                if (item == mItems[i]) {
-                    item.setChecked(mOldReactionIds[i] == 0);
-                    addOrRemoveReaction(CONTENTS[i], mOldReactionIds[i]);
-                    updateDrawableState();
+        public boolean onItemClick(MenuItem clickedItem) {
+            for (MenuItem item : mReactionMenuItems) {
+                if (clickedItem == item) {
+                    String reactionContent = getReactionContentByViewId(item.getItemId());
+                    Long userReactionId = mUserOwnReactions.get(reactionContent);
+                    addOrRemoveReaction(reactionContent, userReactionId);
                     return true;
                 }
             }
             return false;
         }
 
-        public void update() {
-            List<Reaction> reactions = mDetailsCache.getEntry(mItem);
-            if (reactions != null) {
-                mOldReactionIds = new long[mItems.length];
-                mLastKnownDetails = new ArrayList<>(reactions);
-
-                String ownLogin = Gh4Application.get().getAuthLogin();
-                for (Reaction reaction : reactions) {
-                    if (!ApiHelpers.loginEquals(reaction.user(), ownLogin)) {
-                        continue;
-                    }
-                    for (int i = 0; i < CONTENTS.length; i++) {
-                        if (TextUtils.equals(CONTENTS[i], reaction.content())) {
-                            mOldReactionIds[i] = reaction.id();
-                            break;
-                        }
-                    }
-                }
-            } else {
-                mOldReactionIds = null;
-                mLastKnownDetails = null;
+        public void updateMenuItems() {
+            mUserOwnReactions.clear();
+            List<Reaction> reactions = mDetailsCache.getReactions(mItem);
+            if (reactions == null) {
+                setReactionMenuItemsVisible(false);
+                return;
             }
-            setDataItemsVisible(mOldReactionIds != null);
+
+            String ownLogin = Gh4Application.get().getAuthLogin();
+            reactions.stream()
+                    .filter(reaction -> ApiHelpers.loginEquals(reaction.user(), ownLogin))
+                    .forEach(reaction -> mUserOwnReactions.put(reaction.content(), reaction.id()));
+            setReactionMenuItemsVisible(true);
         }
 
         public void startLoadingIfNeeded() {
-            if (mOldReactionIds != null) {
-                syncCheckStates();
-            } else if (mDetailsCache.hasEntryFor(mItem)) {
-                update();
+            if (mDetailsCache.hasEntryFor(mItem)) {
+                updateMenuItems();
             } else if (!mLoading) {
                 fetchReactions(mCallback, mItem, mDetailsCache)
                         .doOnSubscribe(disposable -> mLoading = true)
                         .doOnSuccess(result -> mLoading = false)
                         .doOnError(error -> mLoading = false)
-                        .subscribe(reactions -> update(), error -> {
+                        .subscribe(reactions -> updateMenuItems(), error -> {
                             Log.d(Gh4Application.LOG_TAG, "Fetching reactions failed", error);
-                            update();
+                            updateMenuItems();
                         });
             }
         }
 
-        private void setDataItemsVisible(boolean visible) {
+        private void setReactionMenuItemsVisible(boolean visible) {
             mLoadingItem.setVisible(!visible);
-            for (MenuItem item : mItems) {
+            for (MenuItem item : mReactionMenuItems) {
                 item.setVisible(visible);
             }
-            syncCheckStates();
+            updateCheckedStates();
         }
 
-        private void syncCheckStates() {
-            for (int i = 0; i < mItems.length; i++) {
-                mItems[i].setChecked(mOldReactionIds != null && mOldReactionIds[i] != 0);
+        private void updateCheckedStates() {
+            for (MenuItem item : mReactionMenuItems) {
+                var reactionContent = getReactionContentByViewId(item.getItemId());
+                item.setChecked(mUserOwnReactions.containsKey(reactionContent));
             }
-            updateDrawableState();
+            updateDrawableColors();
         }
 
-        private void updateDrawableState() {
+        private void updateDrawableColors() {
             @ColorInt int accentColor = UiUtils.resolveColor(mContext, R.attr.colorAccent);
             @ColorInt int secondaryColor = UiUtils.resolveColor(mContext,
                     android.R.attr.textColorSecondary);
-            for (MenuItem item : mItems) {
+            for (MenuItem item : mReactionMenuItems) {
                 DrawableCompat.setTint(item.getIcon(),
                         item.isChecked() ? accentColor : secondaryColor);
             }
         }
 
-        private void addOrRemoveReaction(final String content, final long id) {
-            toggleReaction(content, id, mLastKnownDetails, mCallback, mItem, mDetailsCache)
-                    .subscribe(result -> {
-                        for (int i = 0; i < CONTENTS.length; i++) {
-                            if (TextUtils.equals(CONTENTS[i], content)) {
-                                mOldReactionIds[i] = result.isPresent() ? result.get().id() : 0;
-                                break;
-                            }
+        private void addOrRemoveReaction(final String content, final Long id) {
+            var currentReactions = new ArrayList<>(mDetailsCache.getReactions(mItem));
+            toggleReaction(content, id, currentReactions, mCallback, mItem, mDetailsCache)
+                    .subscribe(addedReaction -> {
+                        if (addedReaction.isPresent()) {
+                            mUserOwnReactions.put(content, addedReaction.get().id());
+                        } else {
+                            mUserOwnReactions.remove(content);
                         }
                     }, error -> Log.d(Gh4Application.LOG_TAG, "Changing reaction failed", error));
         }
@@ -609,17 +604,16 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
             return mMap.containsKey(item.getCacheKey());
         }
 
-        public List<Reaction> getEntry(Item item) {
+        public List<Reaction> getReactions(Item item) {
             return mMap.get(item.getCacheKey());
         }
 
-        public List<Reaction> putEntry(Item item, List<Reaction> value) {
+        public void putReactions(Item item, List<Reaction> value) {
             Object key = item.getCacheKey();
             List<Reaction> result = mMap.put(key, new ArrayList<>(value));
             if (result != null && !mDestroyed) {
                 mListener.onReactionsUpdated(item, buildReactions(value));
             }
-            return result;
         }
 
         private Reactions buildReactions(List<Reaction> reactions) {
