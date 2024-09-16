@@ -187,7 +187,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
         holder.tvExtra.setTag(user);
 
         holder.reactions.setReactions(item.reactions());
-        holder.mReactionMenuHelper.update();
+        holder.mReactionMenuHelper.updateMenuItems();
 
         String ourLogin = Gh4Application.get().getAuthLogin();
         boolean canEdit = ApiHelpers.loginEquals(user, ourLogin)
@@ -237,7 +237,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
         holder.mBoundItem = holder.mBoundItem.toBuilder().reactions(reactions).build();
         holder.reactions.setReactions(reactions);
         if (holder.mReactionMenuHelper != null) {
-            holder.mReactionMenuHelper.update();
+            holder.mReactionMenuHelper.updateMenuItems();
         }
         notifyItemChanged(holder.getBindingAdapterPosition());
     }
