@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import androidx.annotation.ColorInt;
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
+import androidx.annotation.MenuRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.DrawableCompat;
@@ -85,14 +86,8 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
 
     private ReactionDetailsCache mDetailsCache;
     private MenuPopupHelper mAddReactionPopup;
-    private AddReactionMenuHelper mAddHelper;
-    private final PopupMenu.OnMenuItemClickListener mAddReactionClickListener =
-            new PopupMenu.OnMenuItemClickListener() {
-        @Override
-        public boolean onMenuItemClick(MenuItem item) {
-            return mAddHelper.onItemClick(item);
-        }
-    };
+    private @MenuRes int mAddReactionMenuResId = R.menu.reaction_menu;
+    private AddReactionMenuHelper mAddReactionMenuHelper;
 
     public ReactionBar(Context context) {
         this(context, null);
@@ -124,8 +119,8 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         if (mPopup != null) {
             mPopup.update();
         }
-        if (mAddHelper != null) {
-            mAddHelper.updateMenuItems();
+        if (mAddReactionMenuHelper != null) {
+            mAddReactionMenuHelper.updateMenuItems();
         }
         if (reactions != null && reactions.totalCount() > 0) {
             updateView(mPlusOneView, reactions.plusOne());
@@ -159,6 +154,10 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         mReactButton.setOnClickListener(callback != null ? this : null);
     }
 
+    public void setAddReactionPopupMenu(@MenuRes int menuResId) {
+        mAddReactionMenuResId = menuResId;
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         if (mPopup != null) {
@@ -184,16 +183,15 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         if (view == mReactButton) {
             if (mAddReactionPopup == null) {
                 PopupMenu popup = new PopupMenu(getContext(), mReactButton);
-                popup.inflate(R.menu.reaction_menu);
-                popup.setOnMenuItemClickListener(mAddReactionClickListener);
-                mAddHelper = new AddReactionMenuHelper(getContext(), popup.getMenu(),
+                popup.inflate(mAddReactionMenuResId);
+                popup.setOnMenuItemClickListener(item -> mAddReactionMenuHelper.onItemClick(item));
+                mAddReactionMenuHelper = new AddReactionMenuHelper(getContext(), popup.getMenu(),
                         mCallback, mReferenceItem, mDetailsCache);
 
-                mAddReactionPopup = new MenuPopupHelper(getContext(), (MenuBuilder) popup.getMenu(),
-                        mReactButton);
+                mAddReactionPopup = new MenuPopupHelper(getContext(), (MenuBuilder) popup.getMenu(), mReactButton);
                 mAddReactionPopup.setForceShowIcon(true);
             }
-            mAddHelper.startLoadingIfNeeded();
+            mAddReactionMenuHelper.startLoadingIfNeeded();
             mAddReactionPopup.show();
             return;
         }
@@ -469,7 +467,7 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
     public static class AddReactionMenuHelper {
         private final Context mContext;
         private MenuItem mLoadingItem;
-        private final MenuItem[] mReactionMenuItems = new MenuItem[REACTION_VIEW_IDS.length];
+        private final List<MenuItem> mReactionMenuItems = new ArrayList<>();
         private final ReactionDetailsCache mDetailsCache;
         private final Map<String, Long> mUserOwnReactions = new HashMap<>();
         private final Callback mCallback;
@@ -489,11 +487,14 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         private void initializeMenuItems(Menu menu) {
             mLoadingItem = menu.findItem(R.id.loading);
 
-            for (int i = 0; i < REACTION_VIEW_IDS.length; i++) {
-                mReactionMenuItems[i] = menu.findItem(REACTION_VIEW_IDS[i]);
-                Drawable icon = DrawableCompat.wrap(mReactionMenuItems[i].getIcon().mutate());
-                DrawableCompat.setTintMode(icon, PorterDuff.Mode.SRC_ATOP);
-                mReactionMenuItems[i].setIcon(icon);
+            for (int reactionViewId : REACTION_VIEW_IDS) {
+                var reactionMenuItem = menu.findItem(reactionViewId);
+                if (reactionMenuItem != null) {
+                    mReactionMenuItems.add(reactionMenuItem);
+                    Drawable icon = DrawableCompat.wrap(reactionMenuItem.getIcon().mutate());
+                    DrawableCompat.setTintMode(icon, PorterDuff.Mode.SRC_ATOP);
+                    reactionMenuItem.setIcon(icon);
+                }
             }
         }
 
