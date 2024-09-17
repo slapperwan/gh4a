@@ -130,7 +130,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.release, menu);
         MenuItem reactItem = menu.findItem(R.id.react);
-        getMenuInflater().inflate(R.menu.reaction_menu, reactItem.getSubMenu());
+        getMenuInflater().inflate(R.menu.release_reaction_menu, reactItem.getSubMenu());
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -241,6 +241,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         ReactionBar reactionBar = findViewById(R.id.reactions);
         reactionBar.setReactions(mRelease.reactions());
         reactionBar.setDetailsCache(mReactionDetailsCache);
+        reactionBar.setAddReactionPopupMenu(R.menu.release_reaction_menu);
         reactionBar.setCallback(this, () -> mRelease.id());
 
         if (mRelease.assets() != null && !mRelease.assets().isEmpty()) {
