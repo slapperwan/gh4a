@@ -186,7 +186,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
         holder.tvExtra.setText(login);
         holder.tvExtra.setTag(user);
 
-        holder.reactions.setReactions(item.reactions());
+        holder.mReactionBar.setReactions(item.reactions());
         holder.mReactionMenuHelper.updateMenuItems();
 
         String ourLogin = Gh4Application.get().getAuthLogin();
@@ -235,11 +235,10 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         ViewHolder holder = (ViewHolder) item;
         holder.mBoundItem = holder.mBoundItem.toBuilder().reactions(reactions).build();
-        holder.reactions.setReactions(reactions);
+        holder.mReactionBar.setReactions(reactions);
         if (holder.mReactionMenuHelper != null) {
             holder.mReactionMenuHelper.updateMenuItems();
         }
-        notifyItemChanged(holder.getBindingAdapterPosition());
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements
@@ -269,9 +268,9 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
             tvEditTimestamp = view.findViewById(R.id.tv_edit_timestamp);
             ivMenu = view.findViewById(R.id.iv_menu);
             ivMenu.setOnClickListener(this);
-            reactions = view.findViewById(R.id.reactions);
-            reactions.setCallback(reactionCallback, this);
-            reactions.setDetailsCache(reactionDetailsCache);
+            mReactionBar = view.findViewById(R.id.reactions);
+            mReactionBar.setCallback(reactionCallback, this);
+            mReactionBar.setDetailsCache(reactionDetailsCache);
 
             mPopupMenu = new PopupMenu(view.getContext(), ivMenu);
             mPopupMenu.getMenuInflater().inflate(R.menu.comment_menu, mPopupMenu.getMenu());
@@ -290,7 +289,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
         private final TextView tvTimestamp;
         private final TextView tvEditTimestamp;
         private final ImageView ivMenu;
-        private final ReactionBar reactions;
+        private final ReactionBar mReactionBar;
         private final PopupMenu mPopupMenu;
         private final Callback mCallback;
 
