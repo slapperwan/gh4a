@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
+import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -117,7 +118,8 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
         ReactionRequest request = ReactionRequest.builder().content(content).build();
 
         return service.createCommitCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)
-                .map(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.add_reaction_error));
     }
 
     @Override
@@ -125,6 +127,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
         CommentWrapper comment = (CommentWrapper) item;
         final ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deleteCommitCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), reactionId)
-                .map(ApiHelpers::mapToTrueOnSuccess);
+                .map(ApiHelpers::mapToTrueOnSuccess)
+                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.remove_reaction_error));
     }
 }

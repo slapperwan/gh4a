@@ -37,6 +37,7 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
 import com.gh4a.widget.ReactionBar;
@@ -275,14 +276,16 @@ public class ReleaseInfoActivity extends BaseActivity implements
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createReleaseReaction(mRepoOwner, mRepoName, mRelease.id(), request)
-                .map(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.add_reaction_error));
     }
 
     @Override
     public Single<Boolean> deleteReaction(ReactionBar.Item item, long reactionId) {
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deleteReleaseReaction(mRepoOwner, mRepoName, mRelease.id(), reactionId)
-                .map(ApiHelpers::mapToTrueOnSuccess);
+                .map(ApiHelpers::mapToTrueOnSuccess)
+                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.remove_reaction_error));
     }
 
     private void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
