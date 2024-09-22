@@ -20,6 +20,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
+import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
@@ -133,7 +134,8 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
         ReactionRequest request = ReactionRequest.builder().content(content).build();
 
         return service.createPullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)
-                .map(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.add_reaction_error));
     }
 
     @Override
@@ -141,6 +143,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
         CommentWrapper comment = (CommentWrapper) item;
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deletePullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), reactionId)
-                .map(ApiHelpers::mapToTrueOnSuccess);
+                .map(ApiHelpers::mapToTrueOnSuccess)
+                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.remove_reaction_error));
     }
 }
