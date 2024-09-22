@@ -54,6 +54,8 @@
     <string name="add_comment">Add comment</string>
     <string name="add_reaction">Add reaction</string>
     <string name="remove_reaction">Remove reaction</string>
+    <string name="add_reaction_error">Adding reaction failed.</string>
+    <string name="remove_reaction_error">Removing reaction failed.</string>
     <string name="edit">Edit</string>
     <string name="members">Members</string>
     <string name="open">Open</string>

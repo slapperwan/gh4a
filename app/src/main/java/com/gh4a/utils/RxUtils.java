@@ -148,6 +148,13 @@ public class RxUtils {
         };
     }
 
+    public static <T> SingleTransformer<T, T> wrapWithErrorSnackbar(BaseActivity activity, @StringRes int errorMessageResId) {
+        return single -> single.doOnError(error -> {
+            Snackbar.make(activity.getRootLayout(), activity.getString(errorMessageResId), Snackbar.LENGTH_LONG)
+                    .show();
+        });
+    }
+
     public static <T> SingleTransformer<T, T> wrapWithRetrySnackbar(
             final CoordinatorLayout rootLayout, final String errorMessage) {
         return new SingleTransformer<T, T>() {
