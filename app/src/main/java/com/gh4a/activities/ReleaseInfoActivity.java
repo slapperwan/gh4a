@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gh4a.BaseActivity;
+import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.adapter.ReleaseAssetAdapter;
@@ -36,22 +37,31 @@ import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
+import com.gh4a.widget.ReactionBar;
 import com.gh4a.widget.SwipeRefreshLayout;
 import com.google.android.material.snackbar.Snackbar;
+import com.meisolsson.githubsdk.model.Reaction;
+import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.Release;
 import com.meisolsson.githubsdk.model.ReleaseAsset;
+import com.meisolsson.githubsdk.model.request.ReactionRequest;
+import com.meisolsson.githubsdk.service.reactions.ReactionService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryReleaseService;
 
 import java.util.Date;
+import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import io.reactivex.Single;
+import retrofit2.Response;
 
 public class ReleaseInfoActivity extends BaseActivity implements
-        View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate,
+        View.OnClickListener, SwipeRefreshLayout.ChildScrollDelegate, ReactionBar.Callback,
         RootAdapter.OnItemClickListener<ReleaseAsset>,
         RootAdapter.OnItemLongClickListener<ReleaseAsset> {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, long id) {
@@ -61,23 +71,26 @@ public class ReleaseInfoActivity extends BaseActivity implements
                 .putExtra("id", id);
     }
 
-    public static Intent makeIntent(Context context, String repoOwner, String repoName, Release release) {
-        Intent intent = new Intent(context, ReleaseInfoActivity.class)
+    public static Intent makeIntent(Context context, String repoOwner, String repoName, String tagName) {
+        return new Intent(context, ReleaseInfoActivity.class)
                 .putExtra("owner", repoOwner)
-                .putExtra("repo", repoName);
-        IntentUtils.putCompressedParcelableExtra(intent, "release", release, 800_000);
-        return intent;
+                .putExtra("repo", repoName)
+                .putExtra("tag", tagName);
     }
 
     private static final int ID_LOADER_RELEASE = 0;
 
+    private Release mRelease;
     private String mRepoOwner;
     private String mRepoName;
-    private Release mRelease;
     private long mReleaseId;
+    private String mTagName;
 
     private View mRootView;
     private HttpImageGetter mImageGetter;
+    private ReactionBar.AddReactionMenuHelper mReactionMenuHelper;
+    private final ReactionBar.ReactionDetailsCache mReactionDetailsCache =
+            new ReactionBar.ReactionDetailsCache(this::onReactionsUpdated);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,12 +102,8 @@ public class ReleaseInfoActivity extends BaseActivity implements
         mImageGetter = new HttpImageGetter(this);
         setChildScrollDelegate(this);
 
-        if (mRelease != null) {
-            handleReleaseReady();
-        } else {
-            setContentShown(false);
-            loadRelease(false);
-        }
+        setContentShown(false);
+        loadRelease(false);
     }
 
     @Nullable
@@ -114,18 +123,35 @@ public class ReleaseInfoActivity extends BaseActivity implements
         super.onInitExtras(extras);
         mRepoOwner = extras.getString("owner");
         mRepoName = extras.getString("repo");
-        mRelease = IntentUtils.readCompressedParcelableFromBundle(extras, "release");
+        mTagName = extras.getString("tag");
         mReleaseId = extras.getLong("id");
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.release, menu);
+        MenuItem reactItem = menu.findItem(R.id.react);
+        getMenuInflater().inflate(R.menu.release_reaction_menu, reactItem.getSubMenu());
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (canAddReaction()) {
+            MenuItem reactItem = menu.findItem(R.id.react);
+            reactItem.setVisible(true);
+            mReactionMenuHelper = new ReactionBar.AddReactionMenuHelper(this,
+                    reactItem.getSubMenu(), this, () -> mRelease.id(), mReactionDetailsCache);
+            mReactionMenuHelper.startLoadingIfNeeded();
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (mReactionMenuHelper != null && mReactionMenuHelper.onItemClick(item)) {
+            return true;
+        }
         if (item.getItemId() == R.id.browser) {
             IntentUtils.launchBrowser(this, Uri.parse(mRelease.htmlUrl()));
             return true;
@@ -139,16 +165,11 @@ public class ReleaseInfoActivity extends BaseActivity implements
     }
 
     @Override
-    protected boolean canSwipeToRefresh() {
-        // Allow refresh only when the release is not passed via intent extras
-        return mReleaseId != 0;
-    }
-
-    @Override
     public void onRefresh() {
         mRelease = null;
         setContentShown(false);
         mImageGetter.clearHtmlCache();
+        mReactionDetailsCache.clear();
         loadRelease(true);
         super.onRefresh();
     }
@@ -169,6 +190,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
     protected void onDestroy() {
         super.onDestroy();
         mImageGetter.destroy();
+        mReactionDetailsCache.destroy();
     }
 
     @Override
@@ -182,6 +204,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
             name = mRelease.tagName();
         }
         getSupportActionBar().setTitle(name);
+        invalidateOptionsMenu();
         fillData();
     }
 
@@ -216,6 +239,11 @@ public class ReleaseInfoActivity extends BaseActivity implements
         } else {
             body.setText(R.string.release_no_releasenotes);
         }
+        ReactionBar reactionBar = findViewById(R.id.reactions);
+        reactionBar.setReactions(mRelease.reactions());
+        reactionBar.setDetailsCache(mReactionDetailsCache);
+        reactionBar.setAddReactionPopupMenu(R.menu.release_reaction_menu);
+        reactionBar.setCallback(this, () -> mRelease.id());
 
         if (mRelease.assets() != null && !mRelease.assets().isEmpty()) {
             RecyclerView downloadsList = findViewById(R.id.download_list);
@@ -229,6 +257,40 @@ public class ReleaseInfoActivity extends BaseActivity implements
         } else {
             findViewById(R.id.downloads).setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public boolean canAddReaction() {
+        return Gh4Application.get().isAuthorized() && mRelease != null && !mRelease.draft();
+    }
+
+    @Override
+    public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
+        ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
+        return ApiHelpers.PageIterator
+                .toSingle(page -> service.getReleaseReactions(mRepoOwner, mRepoName, mRelease.id(), page));
+    }
+
+    @Override
+    public Single<Reaction> addReaction(ReactionBar.Item item, String content) {
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
+        ReactionRequest request = ReactionRequest.builder().content(content).build();
+        return service.createReleaseReaction(mRepoOwner, mRepoName, mRelease.id(), request)
+                .map(ApiHelpers::throwOnFailure)
+                .compose(RxUtils.wrapWithErrorSnackbar(this, R.string.add_reaction_error));
+    }
+
+    @Override
+    public Single<Boolean> deleteReaction(ReactionBar.Item item, long reactionId) {
+        ReactionService service = ServiceFactory.get(ReactionService.class, false);
+        return service.deleteReleaseReaction(mRepoOwner, mRepoName, mRelease.id(), reactionId)
+                .map(ApiHelpers::mapToTrueOnSuccess)
+                .compose(RxUtils.wrapWithErrorSnackbar(this, R.string.remove_reaction_error));
+    }
+
+    private void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
+        ReactionBar reactionBar = findViewById(R.id.reactions);
+        reactionBar.setReactions(reactions);
     }
 
     @Override
@@ -267,7 +329,13 @@ public class ReleaseInfoActivity extends BaseActivity implements
     private void loadRelease(boolean force) {
         RepositoryReleaseService service = ServiceFactory.get(RepositoryReleaseService.class, force);
 
-        service.getRelease(mRepoOwner, mRepoName, mReleaseId)
+        Single<Response<Release>> releaseSingle;
+        if (mTagName != null) {
+            releaseSingle = service.getRelaseByTagName(mRepoOwner, mRepoName, mTagName);
+        } else {
+            releaseSingle = service.getRelease(mRepoOwner, mRepoName, mReleaseId);
+        }
+        releaseSingle
                 .map(ApiHelpers::throwOnFailure)
                 .compose(makeLoaderSingle(ID_LOADER_RELEASE, force))
                 .subscribe(result -> {
