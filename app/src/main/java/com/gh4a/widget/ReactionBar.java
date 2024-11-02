@@ -561,7 +561,7 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
         }
 
         private void updateDrawableState() {
-            @ColorInt int accentColor = UiUtils.resolveColor(mContext, R.attr.colorAccent);
+            @ColorInt int accentColor = UiUtils.resolveColor(mContext, androidx.appcompat.R.attr.colorAccent);
             @ColorInt int secondaryColor = UiUtils.resolveColor(mContext,
                     android.R.attr.textColorSecondary);
             for (MenuItem item : mItems) {

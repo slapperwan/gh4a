@@ -127,7 +127,7 @@ public class OverviewRow extends LinearLayoutCompat implements View.OnClickListe
             return;
         }
         int tintColor = UiUtils.resolveColor(getContext(),
-                mIconClickListener != null ? R.attr.colorAccent : R.attr.colorIconForeground);
+                mIconClickListener != null ? androidx.appcompat.R.attr.colorAccent : R.attr.colorIconForeground);
         DrawableCompat.setTint(drawable, tintColor);
         DrawableCompat.setTintMode(drawable, PorterDuff.Mode.SRC_IN);
     }
