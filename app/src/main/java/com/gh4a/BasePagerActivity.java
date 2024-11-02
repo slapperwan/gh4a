@@ -34,7 +34,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
         setContentView(R.layout.view_pager);
         mPager = setupPager();
 
-        mCurrentHeaderColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
+        mCurrentHeaderColor = UiUtils.resolveColor(this, androidx.appcompat.R.attr.colorPrimary);
         updateTabHeaderColors();
         updateTabVisibility();
     }
@@ -69,7 +69,7 @@ public abstract class BasePagerActivity extends BaseActivity implements
             if (colorAttrs != null) {
                 transitionHeaderToColor(colorAttrs[0], colorAttrs[1]);
             } else {
-                transitionHeaderToColor(R.attr.colorPrimary, R.attr.colorPrimaryDark);
+                transitionHeaderToColor(androidx.appcompat.R.attr.colorPrimary, androidx.appcompat.R.attr.colorPrimaryDark);
             }
         }
         tryUpdatePagerColor();

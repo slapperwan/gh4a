@@ -138,7 +138,7 @@ public class IntentUtils {
 
         if (pkg != null && customTabsEnabled) {
             if (headerColor == 0) {
-                headerColor = UiUtils.resolveColor(activity, R.attr.colorPrimary);
+                headerColor = UiUtils.resolveColor(activity, androidx.appcompat.R.attr.colorPrimary);
             }
             CustomTabColorSchemeParams colorParams = new CustomTabColorSchemeParams.Builder()
                     .setToolbarColor(headerColor)
