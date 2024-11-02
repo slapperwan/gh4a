@@ -23,9 +23,6 @@ ext {
 }
 
 android {
-    signingConfigs {
-        playStore
-    }
     compileSdk 34
     defaultConfig {
         minSdkVersion 23
@@ -39,13 +36,17 @@ android {
         buildConfigField 'String', 'CLIENT_SECRET', ClientSecret
     }
 
+    signingConfigs {
+        release
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
         }
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.playStore
+            signingConfig signingConfigs.release
         }
     }
 
@@ -114,10 +115,10 @@ if (props.containsKey('STORE_FILE')
         && props.containsKey('STORE_PASSWORD')
         && props.containsKey('KEY_ALIAS')
         && props.containsKey('KEY_PASSWORD')) {
-    android.signingConfigs.playStore.storeFile = file(props['STORE_FILE'])
-    android.signingConfigs.playStore.storePassword = props['STORE_PASSWORD']
-    android.signingConfigs.playStore.keyAlias = props['KEY_ALIAS']
-    android.signingConfigs.playStore.keyPassword = props['KEY_PASSWORD']
+    android.signingConfigs.release.storeFile = file(props['STORE_FILE'])
+    android.signingConfigs.release.storePassword = props['STORE_PASSWORD']
+    android.signingConfigs.release.keyAlias = props['KEY_ALIAS']
+    android.signingConfigs.release.keyPassword = props['KEY_PASSWORD']
 } else {
     println 'signing.properties not found or incomplete'
     android.buildTypes.release.signingConfig = null
