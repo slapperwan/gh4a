@@ -234,7 +234,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     @Override
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         ViewHolder holder = (ViewHolder) item;
-        holder.mBoundItem = holder.mBoundItem.toBuilder().reactions(reactions).build();
+        holder.mBoundItem = holder.mBoundItem.withReactions(reactions);
         holder.reactions.setReactions(reactions);
         if (holder.mReactionMenuHelper != null) {
             holder.mReactionMenuHelper.updateMenuItems();

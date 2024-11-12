@@ -28,7 +28,6 @@ import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.ReactionBar;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
 import com.meisolsson.githubsdk.model.Reaction;
-import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.ReviewComment;
 import com.meisolsson.githubsdk.model.request.ReactionRequest;
 import com.meisolsson.githubsdk.service.reactions.ReactionService;
@@ -101,14 +100,6 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     @Override
     protected boolean canReply() {
         return true;
-    }
-
-    @Override
-    protected PositionalCommentBase buildCommentWithReactions(PositionalCommentBase comment,
-            Reactions reactions) {
-        return ((ReviewComment) comment).toBuilder()
-                .reactions(reactions)
-                .build();
     }
 
     @Override
