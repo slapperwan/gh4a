@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/loading"
+        android:title="@string/loading_msg" />
+
+    <item
+        android:id="@+id/plus_one"
+        android:icon="@drawable/reaction_plus_one"
+        android:title="@string/reaction_plus_one"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/laugh"
+        android:icon="@drawable/reaction_laugh"
+        android:title="@string/reaction_laugh"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/hooray"
+        android:icon="@drawable/reaction_hooray"
+        android:title="@string/reaction_hooray"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/heart"
+        android:icon="@drawable/reaction_heart"
+        android:title="@string/reaction_heart"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/rocket"
+        android:icon="@drawable/reaction_rocket"
+        android:title="@string/reaction_rocket"
+        android:visible="false" />
+
+    <item
+        android:id="@+id/eyes"
+        android:icon="@drawable/reaction_eyes"
+        android:title="@string/reaction_eyes"
+        android:visible="false" />
+
+</menu>

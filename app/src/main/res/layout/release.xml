@@ -75,7 +75,7 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/release_notes_title"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
@@ -86,12 +86,20 @@
                     android:id="@+id/tv_release_notes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingBottom="@dimen/content_padding"
+                    android:paddingBottom="@dimen/overview_item_spacing"
                     android:paddingLeft="@dimen/content_padding"
                     android:paddingRight="@dimen/content_padding"
                     android:textIsSelectable="true"
                     app:needsLinkHandling="true"
                     tools:text="Release notes text" />
+
+                <com.gh4a.widget.ReactionBar
+                    android:id="@+id/reactions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding" />
 
             </LinearLayout>
 
@@ -108,7 +116,7 @@
                 android:layout_marginBottom="@dimen/overview_header_spacing"
                 android:orientation="vertical">
 
-                <com.gh4a.widget.LinkHandlingTextView
+                <TextView
                     android:id="@+id/downloads_title"
                     style="@style/HeaderLabel"
                     android:layout_width="match_parent"
