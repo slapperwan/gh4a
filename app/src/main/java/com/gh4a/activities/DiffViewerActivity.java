@@ -253,7 +253,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     @Override
     public void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
         CommentWrapper wrapper = (CommentWrapper) item;
-        wrapper.comment = buildCommentWithReactions(wrapper.comment, reactions);
+        wrapper.comment = wrapper.comment.withReactions(reactions);
         replaceOutdatedComment(wrapper.comment);
         onDataReady();
     }
@@ -497,8 +497,6 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     protected abstract Single<Response<Void>> deleteCommentSingle(long id);
     protected abstract boolean canReply();
     protected abstract Uri createUrl(String lineId, long replyId);
-    protected abstract PositionalCommentBase buildCommentWithReactions(PositionalCommentBase comment,
-            Reactions reactions);
 
     private String createLineLinkId(int line, boolean isRight) {
         return (isRight ? "R" : "L") + line;

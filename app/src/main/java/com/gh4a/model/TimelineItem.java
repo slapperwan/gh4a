@@ -70,11 +70,7 @@ public abstract class TimelineItem {
         }
 
         public void setReactions(Reactions reactions) {
-            if (comment instanceof ReviewComment) {
-                comment = ((ReviewComment) comment).toBuilder().reactions(reactions).build();
-            } else {
-                comment = ((GitHubComment) comment).toBuilder().reactions(reactions).build();
-            }
+            comment = comment.withReactions(reactions);
         }
 
         public boolean hasFilePatch() {

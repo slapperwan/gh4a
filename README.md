@@ -6,7 +6,7 @@ This application provides access to [GitHub](https://github.com/) and lets you s
 
 Download
 --------
-<a href='https://play.google.com/store/apps/details?id=com.gh4a'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' height="80px" align="left"/></a>[<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80px">](https://f-droid.org/packages/com.gh4a/)
+[<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80px">](https://f-droid.org/packages/com.gh4a/)
 
 Main features
 -------------

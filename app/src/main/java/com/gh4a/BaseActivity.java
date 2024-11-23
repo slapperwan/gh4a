@@ -29,7 +29,6 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -725,12 +724,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
     private void setupHeaderDrawable() {
         ensureContent();
 
-        int primaryColor = UiUtils.resolveColor(this, R.attr.colorPrimary);
+        int primaryColor = UiUtils.resolveColor(this, androidx.appcompat.R.attr.colorPrimary);
         assignBackground(mLeftDrawerHeader, primaryColor);
         assignBackground(mRightDrawerHeader, primaryColor);
         assignBackground(mHeader, primaryColor);
 
-        int primaryDarkColor = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
+        int primaryDarkColor = UiUtils.resolveColor(this, androidx.appcompat.R.attr.colorPrimaryDark);
         ColorDrawable d = new ColorDrawable(primaryDarkColor);
         mDrawerLayout.setStatusBarBackground(d);
         mStatusBarDrawables.add(d);
@@ -757,8 +756,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (canSwipeToRefresh()) {
             mSwipeLayout.setOnRefreshListener(this);
             mSwipeLayout.setColorSchemeColors(
-                    UiUtils.resolveColor(this, R.attr.colorPrimary), 0,
-                    UiUtils.resolveColor(this, R.attr.colorPrimaryDark), 0
+                    UiUtils.resolveColor(this, androidx.appcompat.R.attr.colorPrimary), 0,
+                    UiUtils.resolveColor(this, androidx.appcompat.R.attr.colorPrimaryDark), 0
             );
         }
 
@@ -860,7 +859,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
             return null;
         }
         ColorStateList baseColor = ContextCompat.getColorStateList(this, value.resourceId);
-        if (!getTheme().resolveAttribute(R.attr.colorAccent, value, true)) {
+        if (!getTheme().resolveAttribute(androidx.appcompat.R.attr.colorAccent, value, true)) {
             return null;
         }
         int colorAccent = value.data;
@@ -889,8 +888,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
             return;
         }
         mProgress = findViewById(R.id.progress);
-        mProgressColors[0] = UiUtils.resolveColor(this, R.attr.colorPrimary);
-        mProgressColors[1] = UiUtils.resolveColor(this, R.attr.colorPrimaryDark);
+        mProgressColors[0] = UiUtils.resolveColor(this, androidx.appcompat.R.attr.colorPrimary);
+        mProgressColors[1] = UiUtils.resolveColor(this, androidx.appcompat.R.attr.colorPrimaryDark);
         mProgress.setSmoothProgressDrawableColors(mProgressColors);
 
         mCoordinatorLayout = findViewById(R.id.coordinator_layout);
