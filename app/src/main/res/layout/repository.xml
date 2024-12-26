@@ -208,6 +208,15 @@
                     android:text="@string/repo_collaborators" />
 
                 <TextView
+                    android:id="@+id/tv_discussions_label"
+                    style="@style/SelectableLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="@dimen/content_padding"
+                    android:paddingRight="@dimen/content_padding"
+                    android:text="@string/repo_discussions" />
+
+                <TextView
                     android:id="@+id/tv_wiki_label"
                     style="@style/SelectableLabel"
                     android:layout_width="match_parent"

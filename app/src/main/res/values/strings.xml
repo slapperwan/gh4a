@@ -283,6 +283,7 @@
     <string name="repo_download_action">Download code as ZIP</string>
     <string name="repo_contributors">Contributors</string>
     <string name="repo_collaborators">Collaborators</string>
+    <string name="repo_discussions">Discussions</string>
     <string name="repo_files">Files</string>
     <string name="repo_short">Repos</string>
     <string name="repo_no_readme">No README file found</string>

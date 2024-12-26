@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import android.text.SpannableString;
@@ -45,6 +46,7 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
@@ -69,7 +71,7 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class RepositoryFragment extends LoadingFragmentBase implements
-        OverviewRow.OnIconClickListener, View.OnClickListener {
+        OverviewRow.OnIconClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
         RepositoryFragment f = new RepositoryFragment();
 
@@ -283,15 +285,14 @@ public class RepositoryFragment extends LoadingFragmentBase implements
             updateStargazerUi();
         }
 
-        mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this);
-        mContentView.findViewById(R.id.other_info).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
-        mReadmeTitleView.setOnClickListener(this);
+        mReadmeTitleView.setOnClickListener(view -> toggleReadmeExpanded());
+        mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this::onOtherInfoLabelClick);
+        mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this::onOtherInfoLabelClick);
 
         Permissions permissions = mRepository.permissions();
-        updateClickableLabel(R.id.tv_collaborators_label,
-                permissions != null && permissions.push());
+        updateClickableLabel(R.id.tv_collaborators_label, permissions != null && permissions.push());
         updateClickableLabel(R.id.tv_wiki_label, mRepository.hasWiki());
+        updateClickableLabel(R.id.tv_discussions_label, mRepository.hasDiscussions());
     }
 
     @NonNull
@@ -306,7 +307,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
     private void updateClickableLabel(int id, boolean enable) {
         View view = mContentView.findViewById(id);
         if (enable) {
-            view.setOnClickListener(this);
+            view.setOnClickListener(this::onOtherInfoLabelClick);
             view.setVisibility(View.VISIBLE);
         } else {
             view.setVisibility(View.GONE);
@@ -340,12 +341,11 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         mWatcherRow.setToggleState(mIsWatching != null && mIsWatching);
     }
 
-    @Override
-    public void onClick(View view) {
+    private void onOtherInfoLabelClick(View view) {
         int id = view.getId();
 
-        if (id == R.id.readme_title) {
-            toggleReadmeExpanded();
+        if (id == R.id.tv_discussions_label) {
+            IntentUtils.openInCustomTabOrBrowser(getActivity(), Uri.parse(mRepository.htmlUrl() + "/discussions"));
             return;
         }
 
@@ -361,8 +361,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements
             intent = WikiListActivity.makeIntent(getActivity(), owner, name, null);
         } else if (id == R.id.tv_releases_label) {
             intent = ReleaseListActivity.makeIntent(getActivity(), owner, name);
-        } else if (view.getTag() instanceof Repository) {
-            intent = RepositoryActivity.makeIntent(getActivity(), (Repository) view.getTag());
         }
 
         if (intent != null) {
