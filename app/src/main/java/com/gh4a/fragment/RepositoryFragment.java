@@ -18,6 +18,7 @@ package com.gh4a.fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import android.text.SpannableString;
@@ -45,6 +46,7 @@ import com.gh4a.activities.WikiListActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.HttpImageGetter;
+import com.gh4a.utils.IntentUtils;
 import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
@@ -283,15 +285,15 @@ public class RepositoryFragment extends LoadingFragmentBase implements
             updateStargazerUi();
         }
 
+        mReadmeTitleView.setOnClickListener(view -> toggleReadmeExpanded());
         mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this);
         mContentView.findViewById(R.id.other_info).setOnClickListener(this);
         mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
-        mReadmeTitleView.setOnClickListener(this);
 
         Permissions permissions = mRepository.permissions();
-        updateClickableLabel(R.id.tv_collaborators_label,
-                permissions != null && permissions.push());
+        updateClickableLabel(R.id.tv_collaborators_label, permissions != null && permissions.push());
         updateClickableLabel(R.id.tv_wiki_label, mRepository.hasWiki());
+        updateClickableLabel(R.id.tv_discussions_label, mRepository.hasDiscussions());
     }
 
     @NonNull
@@ -344,8 +346,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements
     public void onClick(View view) {
         int id = view.getId();
 
-        if (id == R.id.readme_title) {
-            toggleReadmeExpanded();
+        if (id == R.id.tv_discussions_label) {
+            IntentUtils.openInCustomTabOrBrowser(getActivity(), Uri.parse(mRepository.htmlUrl() + "/discussions"));
             return;
         }
 
