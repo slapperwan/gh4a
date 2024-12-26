@@ -71,7 +71,7 @@ import io.reactivex.Single;
 import retrofit2.Response;
 
 public class RepositoryFragment extends LoadingFragmentBase implements
-        OverviewRow.OnIconClickListener, View.OnClickListener {
+        OverviewRow.OnIconClickListener {
     public static RepositoryFragment newInstance(Repository repository, String ref) {
         RepositoryFragment f = new RepositoryFragment();
 
@@ -286,9 +286,8 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         }
 
         mReadmeTitleView.setOnClickListener(view -> toggleReadmeExpanded());
-        mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this);
-        mContentView.findViewById(R.id.other_info).setOnClickListener(this);
-        mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this);
+        mContentView.findViewById(R.id.tv_contributors_label).setOnClickListener(this::onOtherInfoLabelClick);
+        mContentView.findViewById(R.id.tv_releases_label).setOnClickListener(this::onOtherInfoLabelClick);
 
         Permissions permissions = mRepository.permissions();
         updateClickableLabel(R.id.tv_collaborators_label, permissions != null && permissions.push());
@@ -308,7 +307,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
     private void updateClickableLabel(int id, boolean enable) {
         View view = mContentView.findViewById(id);
         if (enable) {
-            view.setOnClickListener(this);
+            view.setOnClickListener(this::onOtherInfoLabelClick);
             view.setVisibility(View.VISIBLE);
         } else {
             view.setVisibility(View.GONE);
@@ -342,8 +341,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         mWatcherRow.setToggleState(mIsWatching != null && mIsWatching);
     }
 
-    @Override
-    public void onClick(View view) {
+    private void onOtherInfoLabelClick(View view) {
         int id = view.getId();
 
         if (id == R.id.tv_discussions_label) {
@@ -363,8 +361,6 @@ public class RepositoryFragment extends LoadingFragmentBase implements
             intent = WikiListActivity.makeIntent(getActivity(), owner, name, null);
         } else if (id == R.id.tv_releases_label) {
             intent = ReleaseListActivity.makeIntent(getActivity(), owner, name);
-        } else if (view.getTag() instanceof Repository) {
-            intent = RepositoryActivity.makeIntent(getActivity(), (Repository) view.getTag());
         }
 
         if (intent != null) {
