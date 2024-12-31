@@ -277,7 +277,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createReleaseReaction(mRepoOwner, mRepoName, mRelease.id(), request)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.add_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(this, R.string.add_reaction_error));
     }
 
     @Override
@@ -285,7 +285,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deleteReleaseReaction(mRepoOwner, mRepoName, mRelease.id(), reactionId)
                 .map(ApiHelpers::mapToTrueOnSuccess)
-                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.remove_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(this, R.string.remove_reaction_error));
     }
 
     private void onReactionsUpdated(ReactionBar.Item item, Reactions reactions) {
