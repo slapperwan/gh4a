@@ -29,11 +29,13 @@ public class FileUtils {
         // for our purposes it's text in any case
         MIME_TYPE_OVERRIDES.put("js", "text/javascript");
         MIME_TYPE_OVERRIDES.put("mjs", "text/javascript");
-        // Same for Ruby, LaTeX, SQL, JSON
+        // Same for Ruby, LaTeX, SQL, JSON, YAML
         MIME_TYPE_OVERRIDES.put("rb", "text/x-ruby");
         MIME_TYPE_OVERRIDES.put("latex", "text/x-latex");
         MIME_TYPE_OVERRIDES.put("sql", "text/x-sql");
         MIME_TYPE_OVERRIDES.put("json", "text/x-json");
+        MIME_TYPE_OVERRIDES.put("yml", "text/x-yaml");
+        MIME_TYPE_OVERRIDES.put("yaml", "text/x-yaml");
         // Also treat batch files as plain text (we want to open them in our text viewer,
         // and they can't be run within Android anyway)
         MIME_TYPE_OVERRIDES.put("bat", "text/plain");
