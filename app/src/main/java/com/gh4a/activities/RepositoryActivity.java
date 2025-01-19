@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 public class RepositoryActivity extends BaseFragmentPagerActivity implements
         CommitListFragment.ContextSelectionCallback,
@@ -380,9 +381,11 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
             final RepositoryService repoService = ServiceFactory.get(RepositoryService.class, false);
 
             Single<List<Branch>> branchSingle = ApiHelpers.PageIterator
-                    .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page));
+                    .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page))
+                    .subscribeOn(Schedulers.io());
             Single<List<Branch>> tagSingle = ApiHelpers.PageIterator
-                    .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page));
+                    .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page))
+                    .subscribeOn(Schedulers.io());
 
             registerTemporarySubscription(Single.zip(branchSingle, tagSingle, Pair::create)
                     .compose(RxUtils::doInBackground)
