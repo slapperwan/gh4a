@@ -351,7 +351,7 @@ public class UserFragment extends LoadingFragmentBase implements
     }
 
     private void loadTopRepositories(boolean force) {
-        RepositoryService service = ServiceFactory.get(RepositoryService.class, force, null, null, 5);
+        RepositoryService service = ServiceFactory.get(RepositoryService.class, force, 5);
         final Single<Response<Page<Repository>>> observable;
 
         Map<String, String> filterData = new HashMap<>();

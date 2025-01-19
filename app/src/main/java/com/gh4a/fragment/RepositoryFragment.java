@@ -439,7 +439,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
     }
 
     private void loadPullRequestCount(boolean force) {
-        SearchService service = ServiceFactory.get(SearchService.class, force, null, null, 1);
+        SearchService service = ServiceFactory.get(SearchService.class, force, 1);
         String query = String.format(Locale.US, "type:pr repo:%s/%s state:open",
                 mRepository.owner().login(), mRepository.name());
 
