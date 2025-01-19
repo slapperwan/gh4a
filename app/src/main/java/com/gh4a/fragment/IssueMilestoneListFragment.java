@@ -100,7 +100,7 @@ public class IssueMilestoneListFragment extends ListDataBaseFragment<Milestone> 
     @Override
     protected Single<List<Milestone>> onCreateDataSingle(boolean bypassCache) {
         final IssueMilestoneService service =
-                ServiceFactory.get(IssueMilestoneService.class, bypassCache);
+                ServiceFactory.get(IssueMilestoneService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         String targetState = mShowClosed ? "closed" : "open";
 
         return ApiHelpers.PageIterator

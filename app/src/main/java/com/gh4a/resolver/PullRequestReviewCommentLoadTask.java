@@ -53,7 +53,7 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
         final PullRequestReviewService reviewService =
                 ServiceFactory.get(PullRequestReviewService.class, false);
         final PullRequestReviewCommentService commentService =
-                ServiceFactory.get(PullRequestReviewCommentService.class, false);
+                ServiceFactory.get(PullRequestReviewCommentService.class, false, ApiHelpers.MAX_PAGE_SIZE);
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getPullRequestComments(

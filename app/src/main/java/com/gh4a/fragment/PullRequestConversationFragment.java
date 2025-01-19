@@ -192,11 +192,11 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
     protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
         final int issueNumber = mIssue.number();
         final IssueTimelineService timelineService =
-                ServiceFactory.get(IssueTimelineService.class, bypassCache);
+                ServiceFactory.get(IssueTimelineService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         final PullRequestReviewService reviewService =
-                ServiceFactory.get(PullRequestReviewService.class, bypassCache);
+                ServiceFactory.get(PullRequestReviewService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         final PullRequestReviewCommentService prCommentService =
-                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
+                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
 
         Single<List<TimelineItem>> timelineItemsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> timelineService.getTimeline(mRepoOwner, mRepoName, issueNumber, page))
@@ -437,7 +437,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
         CommitStatusBox commitStatusBox = mListHeaderView.findViewById(R.id.commit_status_box);
         commitStatusBox.setVisibility(View.VISIBLE);
 
-        RepositoryStatusService repoService = ServiceFactory.get(RepositoryStatusService.class, force);
+        RepositoryStatusService repoService = ServiceFactory.get(RepositoryStatusService.class, force, ApiHelpers.MAX_PAGE_SIZE);
         String sha = mPullRequest.head().sha();
 
         Single<List<Status>> statusSingle = ApiHelpers.PageIterator

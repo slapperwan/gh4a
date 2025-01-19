@@ -118,6 +118,10 @@ public class ServiceFactory {
         return get(serviceClass, bypassCache, null, null, null);
     }
 
+    public static <S> S get(Class<S> serviceClass, boolean bypassCache, Integer pageSize) {
+        return get(serviceClass, bypassCache, null, null, pageSize);
+    }
+
     public static <S> S get(Class<S> serviceClass, boolean bypassCache, String acceptHeader,
             String token, Integer pageSize) {
         String key = makeKey(serviceClass, bypassCache, acceptHeader, token, pageSize);

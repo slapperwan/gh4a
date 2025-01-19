@@ -74,7 +74,8 @@ public class IssueFragment extends IssueFragmentBase {
     @Override
     protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
         final int issueNumber = mIssue.number();
-        final IssueTimelineService timelineService = ServiceFactory.get(IssueTimelineService.class, bypassCache);
+        final IssueTimelineService timelineService =
+                ServiceFactory.get(IssueTimelineService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> timelineService.getTimeline(mRepoOwner, mRepoName, issueNumber, page))

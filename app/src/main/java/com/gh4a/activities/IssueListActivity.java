@@ -612,7 +612,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         if (mAssignees != null) {
             showAssigneesDialog();
         } else {
-            final IssueAssigneeService service = ServiceFactory.get(IssueAssigneeService.class, false);
+            final IssueAssigneeService service = ServiceFactory.get(IssueAssigneeService.class, false, ApiHelpers.MAX_PAGE_SIZE);
             registerTemporarySubscription(ApiHelpers.PageIterator
                     .toSingle(page -> service.getAssignees(mRepoOwner, mRepoName, page))
                     .compose(RxUtils::doInBackground)
@@ -628,7 +628,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         if (mMilestones != null) {
             showMilestonesDialog();
         } else {
-            final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false);
+            final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false, ApiHelpers.MAX_PAGE_SIZE);
             registerTemporarySubscription(ApiHelpers.PageIterator
                     .toSingle(page -> service.getRepositoryMilestones(mRepoOwner, mRepoName, "open", page))
                     .compose(RxUtils::doInBackground)
@@ -644,7 +644,7 @@ public class IssueListActivity extends BaseFragmentPagerActivity implements
         if (mLabels != null) {
             showLabelsDialog();
         } else {
-            final IssueLabelService service = ServiceFactory.get(IssueLabelService.class, false);
+            final IssueLabelService service = ServiceFactory.get(IssueLabelService.class, false, ApiHelpers.MAX_PAGE_SIZE);
             registerTemporarySubscription(ApiHelpers.PageIterator
                     .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                     .compose(RxUtils::doInBackground)

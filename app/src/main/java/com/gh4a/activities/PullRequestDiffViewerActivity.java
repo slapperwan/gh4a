@@ -71,7 +71,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     @Override
     protected Single<List<ReviewComment>> getCommentsSingle(boolean bypassCache) {
         final PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
+                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
@@ -112,7 +112,7 @@ public class PullRequestDiffViewerActivity extends DiffViewerActivity<ReviewComm
     @Override
     public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
         final CommentWrapper comment = (CommentWrapper) item;
-        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestReviewCommentReactions(
                         mRepoOwner, mRepoName, comment.comment.id(), page));

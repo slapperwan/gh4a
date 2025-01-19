@@ -382,7 +382,7 @@ public class UserFragment extends LoadingFragmentBase implements
             return;
         }
 
-        final OrganizationService service = ServiceFactory.get(OrganizationService.class, force);
+        final OrganizationService service = ServiceFactory.get(OrganizationService.class, force, ApiHelpers.MAX_PAGE_SIZE);
         ApiHelpers.PageIterator
                 .toSingle(page -> mIsSelf
                         ? service.getMyOrganizations(page)
@@ -397,7 +397,7 @@ public class UserFragment extends LoadingFragmentBase implements
             return;
         }
         final OrganizationMemberService service =
-                ServiceFactory.get(OrganizationMemberService.class, force);
+                ServiceFactory.get(OrganizationMemberService.class, force, ApiHelpers.MAX_PAGE_SIZE);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getMembers(mUser.login(), page))
                 .map(memberList -> memberList.size())
