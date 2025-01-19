@@ -161,11 +161,12 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
 
     @Override
     protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
-        final PullRequestService prService = ServiceFactory.get(PullRequestService.class, bypassCache);
+        final PullRequestService prService =
+                ServiceFactory.get(PullRequestService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         final PullRequestReviewService reviewService =
-                ServiceFactory.get(PullRequestReviewService.class, bypassCache);
+                ServiceFactory.get(PullRequestReviewService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         final PullRequestReviewCommentService commentService =
-                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
+                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
 
         // The Review object passed to this fragment may be incomplete, so we re-fetch it to make
         // sure it has all the needed fields
@@ -418,7 +419,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
     @Override
     public Single<List<Reaction>> loadReactionDetails(final GitHubCommentBase comment,
             boolean bypassCache) {
-        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         return ApiHelpers.PageIterator
                 .toSingle(page -> comment instanceof ReviewComment
                         ? service.getPullRequestReviewCommentReactions(

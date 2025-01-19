@@ -225,7 +225,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
 
     private void loadComments(boolean force) {
         final RepositoryCommentService service =
-                ServiceFactory.get(RepositoryCommentService.class, force);
+                ServiceFactory.get(RepositoryCommentService.class, force, ApiHelpers.MAX_PAGE_SIZE);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mObjectSha, page))
                 .compose(makeLoaderSingle(ID_LOADER_COMMENTS, force))

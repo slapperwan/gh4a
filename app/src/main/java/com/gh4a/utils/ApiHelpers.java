@@ -40,6 +40,8 @@ import io.reactivex.subjects.BehaviorSubject;
 import retrofit2.Response;
 
 public class ApiHelpers {
+    public static final int MAX_PAGE_SIZE = 100;
+
     public interface IssueState {
         String OPEN = "open";
         String CLOSED = "closed";

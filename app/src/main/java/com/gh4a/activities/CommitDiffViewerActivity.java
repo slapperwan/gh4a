@@ -88,7 +88,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     @Override
     protected Single<List<GitComment>> getCommentsSingle(boolean bypassCache) {
         final RepositoryCommentService service =
-                ServiceFactory.get(RepositoryCommentService.class, bypassCache);
+                ServiceFactory.get(RepositoryCommentService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mSha, page))
                 .compose(RxUtils.filter(c -> c.position() != null));
@@ -97,7 +97,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
     @Override
     public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
         final CommentWrapper comment = (CommentWrapper) item;
-        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitCommentReactions(mRepoOwner, mRepoName, comment.comment.id(), page));
     }
