@@ -396,11 +396,13 @@ public class UserFragment extends LoadingFragmentBase implements
         if (mUser.type() != UserType.Organization) {
             return;
         }
-        final OrganizationMemberService service =
-                ServiceFactory.get(OrganizationMemberService.class, force, ApiHelpers.MAX_PAGE_SIZE);
-        ApiHelpers.PageIterator
-                .toSingle(page -> service.getMembers(mUser.login(), page))
-                .map(memberList -> memberList.size())
+        final OrganizationMemberService service = ServiceFactory.get(OrganizationMemberService.class, force, 1);
+        service.getMembers(mUser.login(), 1)
+                .map(ApiHelpers::throwOnFailure)
+                .map(page -> {
+                    int pagesCount = ApiHelpers.getTotalPagesCount(page);
+                    return pagesCount == 1 ? page.items().size() : pagesCount;
+                })
                 .compose(makeLoaderSingle(ID_LOADER_ORG_MEMBER_COUNT, force))
                 .subscribe(count -> {
                     OverviewRow membersRow = mContentView.findViewById(R.id.members_row);
