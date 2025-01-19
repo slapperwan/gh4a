@@ -75,26 +75,12 @@ public class IssueFragment extends IssueFragmentBase {
     protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
         final int issueNumber = mIssue.number();
         final IssueTimelineService timelineService = ServiceFactory.get(IssueTimelineService.class, bypassCache);
-        final IssueCommentService commentService =
-                ServiceFactory.get(IssueCommentService.class, bypassCache);
 
-        Single<List<TimelineItem.TimelineComment>> commentSingle = ApiHelpers.PageIterator
-                .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
-                .compose(RxUtils.mapList(TimelineItem.TimelineComment::new))
-                .subscribeOn(Schedulers.io());
-        Single<List<TimelineItem.TimelineEvent>> eventSingle = ApiHelpers.PageIterator
+        return ApiHelpers.PageIterator
                 .toSingle(page -> timelineService.getTimeline(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
-                .compose((RxUtils.mapList(TimelineItem.TimelineEvent::new)))
+                .compose(RxUtils.mapList(TimelineItem::fromIssueEvent))
                 .subscribeOn(Schedulers.io());
-
-        return Single.zip(commentSingle, eventSingle, (comments, events) -> {
-            ArrayList<TimelineItem> result = new ArrayList<>();
-            result.addAll(comments);
-            result.addAll(events);
-            Collections.sort(result, TimelineItem.COMPARATOR);
-            return result;
-        });
     }
 
     @Override
