@@ -161,7 +161,7 @@ public class ServiceFactory {
                         requestBuilder.header("Authorization",
                                 Credentials.basic(BuildConfig.CLIENT_ID, BuildConfig.CLIENT_SECRET));
                     }
-                    if (pageSize != null) {
+                    if (pageSize != null && original.url().queryParameterNames().contains("page")) {
                         requestBuilder.url(original.url().newBuilder()
                                 .addQueryParameter("per_page", String.valueOf(pageSize))
                                 .build());
