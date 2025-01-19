@@ -571,8 +571,7 @@ public class HomeActivity extends BaseFragmentPagerActivity implements
     }
 
     private void loadNotificationIndicator(boolean force) {
-        NotificationService service = ServiceFactory.get(
-                NotificationService.class, force, null, null, 1);
+        NotificationService service = ServiceFactory.get(NotificationService.class, force, 1);
         HashMap<String, Object> options = new HashMap<>();
         options.put("all", false);
         options.put("participating", false);
