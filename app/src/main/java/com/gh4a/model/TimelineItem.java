@@ -5,10 +5,10 @@ import android.content.Intent;
 
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.utils.IntentUtils;
-import com.meisolsson.githubsdk.model.GitHubComment;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.IssueEvent;
+import com.meisolsson.githubsdk.model.IssueEventType;
 import com.meisolsson.githubsdk.model.Reactions;
 import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
@@ -38,6 +38,13 @@ public abstract class TimelineItem {
         return lhs.getCreatedAt().compareTo(rhs.getCreatedAt());
     };
 
+    public static TimelineItem fromIssueEvent(IssueEvent event) {
+        if (event.event() == IssueEventType.Commented) {
+            return new TimelineComment(event.toComment());
+        } else {
+            return new TimelineEvent(event);
+        }
+    }
 
     public static class TimelineComment extends TimelineItem {
         private static final Pattern PULL_REQUEST_PATTERN =

@@ -193,20 +193,15 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
         final int issueNumber = mIssue.number();
         final IssueTimelineService timelineService =
                 ServiceFactory.get(IssueTimelineService.class, bypassCache);
-        final IssueCommentService commentService =
-                ServiceFactory.get(IssueCommentService.class, bypassCache);
         final PullRequestReviewService reviewService =
                 ServiceFactory.get(PullRequestReviewService.class, bypassCache);
         final PullRequestReviewCommentService prCommentService =
                 ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
 
-        Single<List<TimelineItem>> issueCommentsSingle = ApiHelpers.PageIterator
-                .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
-                .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
-        Single<List<TimelineItem>> eventsSingle = ApiHelpers.PageIterator
+        Single<List<TimelineItem>> timelineItemsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> timelineService.getTimeline(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
-                .compose(RxUtils.mapList(TimelineItem.TimelineEvent::new));
+                .compose(RxUtils.mapList(TimelineItem::fromIssueEvent));
 
         Single<List<Review>> reviewsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> reviewService.getReviews(mRepoOwner, mRepoName, issueNumber, page))
@@ -293,14 +288,12 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                         .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
 
         return Single.zip(
-                issueCommentsSingle.subscribeOn(Schedulers.io()),
-                eventsSingle.subscribeOn(Schedulers.io()),
+                timelineItemsSingle.subscribeOn(Schedulers.io()),
                 reviewItemsSingle.subscribeOn(Schedulers.io()),
                 prCommentsWithoutReviewSingle.subscribeOn(Schedulers.io()),
-                (comments, events, reviewItems, commentsWithoutReview) -> {
+                (timelineItems, reviewItems, commentsWithoutReview) -> {
             ArrayList<TimelineItem> result = new ArrayList<>();
-            result.addAll(comments);
-            result.addAll(events);
+            result.addAll(timelineItems);
             result.addAll(reviewItems);
             result.addAll(commentsWithoutReview);
             Collections.sort(result, TimelineItem.COMPARATOR);
