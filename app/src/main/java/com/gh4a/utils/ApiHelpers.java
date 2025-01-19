@@ -233,6 +233,12 @@ public class ApiHelpers {
         return "";
     }
 
+    public static int getTotalPagesCount(Page<?> page) {
+        // When all items of a paginated list fit in a single page,
+        // GitHub API responses do not include pagination details
+        return page.last() != null ? page.last() : 1;
+    }
+
     public static <T> T throwOnFailure(Response<T> response) throws ApiRequestException {
         if (response.code() == HttpURLConnection.HTTP_UNAUTHORIZED) {
             Gh4Application.get().logout();
