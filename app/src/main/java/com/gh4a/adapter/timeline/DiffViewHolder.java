@@ -94,7 +94,20 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mFileTextView.setClickable(isClickable);
         mFileTextView.setTextColor(isClickable ? mAccentColor : mSecondaryTextColor);
 
-        String[] lines = comment.diffChunk().split("\n");
+        String diffHunk = comment.diffChunk();
+        if (diffHunk.isEmpty()) {
+            mDiffHunkTextView.setVisibility(View.GONE);
+        } else {
+            mDiffHunkTextView.setVisibility(View.VISIBLE);
+            mDiffHunkTextView.setTypeface(Typeface.MONOSPACE);
+            mDiffHunkTextView.setText(buildFormattedDiffText(item, diffHunk));
+            mDiffHunkTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    mInitialDiffTextSize * getDiffSizeMultiplier());
+        }
+    }
+
+    private SpannableStringBuilder buildFormattedDiffText(TimelineItem.Diff item, String diffHunk) {
+        String[] lines = diffHunk.split("\n");
 
         int leftLine = 0;
         int rightLine = 0;
@@ -164,10 +177,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
             builder.setSpan(new TypefaceSpan("normal"),
                     spanStart + lineNumberLength, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        mDiffHunkTextView.setTypeface(Typeface.MONOSPACE);
-        mDiffHunkTextView.setText(builder);
-        mDiffHunkTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                mInitialDiffTextSize * getDiffSizeMultiplier());
+        return builder;
     }
 
     private float getDiffSizeMultiplier() {
