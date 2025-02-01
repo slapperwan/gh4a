@@ -75,6 +75,7 @@ import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 import com.meisolsson.githubsdk.service.issues.IssueService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
+import com.vdurmont.emoji.EmojiParser;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -990,7 +991,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 viewColor.setBackgroundColor(ApiHelpers.colorForLabel(label));
 
                 final TextView tvLabel = rowView.findViewById(R.id.tv_title);
-                tvLabel.setText(label.name());
+                tvLabel.setText(EmojiParser.parseToUnicode(label.name()));
                 tvLabel.setOnClickListener(clickListener);
                 tvLabel.setTag(label);
 

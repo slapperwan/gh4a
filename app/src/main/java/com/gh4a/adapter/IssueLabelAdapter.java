@@ -18,6 +18,7 @@ import com.gh4a.ColorPickerDialog;
 import com.gh4a.R;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Label;
+import com.vdurmont.emoji.EmojiParser;
 
 public class IssueLabelAdapter extends
         RootAdapter<IssueLabelAdapter.EditableLabel, IssueLabelAdapter.ViewHolder> {
@@ -148,7 +149,7 @@ public class IssueLabelAdapter extends
         }
 
         assignColor(holder, label.editedColor != null ? label.editedColor : label.color());
-        holder.label.setText(label.name());
+        holder.label.setText(EmojiParser.parseToUnicode(label.name()));
         holder.editor.setText(label.editedName != null ? label.editedName : label.name());
     }
 
