@@ -266,7 +266,7 @@ public class ReleaseInfoActivity extends BaseActivity implements
 
     @Override
     public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
-        ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
+        ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getReleaseReactions(mRepoOwner, mRepoName, mRelease.id(), page));
     }

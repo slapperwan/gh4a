@@ -204,7 +204,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
     @Override
     public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
         final GitComment comment = ((ViewHolder) item).mBoundItem;
-        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitCommentReactions(mRepoOwner, mRepoName, comment.id(), page));
     }

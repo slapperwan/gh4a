@@ -351,7 +351,7 @@ public class UserFragment extends LoadingFragmentBase implements
     }
 
     private void loadTopRepositories(boolean force) {
-        RepositoryService service = ServiceFactory.get(RepositoryService.class, force, null, null, 5);
+        RepositoryService service = ServiceFactory.get(RepositoryService.class, force, 5);
         final Single<Response<Page<Repository>>> observable;
 
         Map<String, String> filterData = new HashMap<>();
@@ -382,7 +382,7 @@ public class UserFragment extends LoadingFragmentBase implements
             return;
         }
 
-        final OrganizationService service = ServiceFactory.get(OrganizationService.class, force);
+        final OrganizationService service = ServiceFactory.get(OrganizationService.class, force, ApiHelpers.MAX_PAGE_SIZE);
         ApiHelpers.PageIterator
                 .toSingle(page -> mIsSelf
                         ? service.getMyOrganizations(page)
@@ -396,11 +396,13 @@ public class UserFragment extends LoadingFragmentBase implements
         if (mUser.type() != UserType.Organization) {
             return;
         }
-        final OrganizationMemberService service =
-                ServiceFactory.get(OrganizationMemberService.class, force);
-        ApiHelpers.PageIterator
-                .toSingle(page -> service.getMembers(mUser.login(), page))
-                .map(memberList -> memberList.size())
+        final OrganizationMemberService service = ServiceFactory.get(OrganizationMemberService.class, force, 1);
+        service.getMembers(mUser.login(), 1)
+                .map(ApiHelpers::throwOnFailure)
+                .map(page -> {
+                    int pagesCount = ApiHelpers.getTotalPagesCount(page);
+                    return pagesCount == 1 ? page.items().size() : pagesCount;
+                })
                 .compose(makeLoaderSingle(ID_LOADER_ORG_MEMBER_COUNT, force))
                 .subscribe(count -> {
                     OverviewRow membersRow = mContentView.findViewById(R.id.members_row);

@@ -87,7 +87,8 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
             IssueEventType.HeadRefForcePushed, IssueEventType.CommentDeleted,
             IssueEventType.ReviewRequested, IssueEventType.ReviewRequestRemoved,
             IssueEventType.ConvertToDraft, IssueEventType.ReadyForReview,
-            IssueEventType.ReviewDismissed, IssueEventType.CrossReferenced
+            IssueEventType.ReviewDismissed, IssueEventType.CrossReferenced,
+            IssueEventType.Commented
     );
 
     protected View mListHeaderView;
@@ -470,7 +471,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
 
     @Override
     public Single<List<Reaction>> loadReactionDetails(ReactionBar.Item item, boolean bypassCache) {
-        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getIssueReactions(mRepoOwner, mRepoName, mIssue.number(), page));
     }
@@ -500,7 +501,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
     @Override
     public Single<List<Reaction>> loadReactionDetails(final GitHubCommentBase comment,
             boolean bypassCache) {
-        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache);
+        final ReactionService service = ServiceFactory.get(ReactionService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getIssueCommentReactions(mRepoOwner, mRepoName, comment.id(), page));
     }

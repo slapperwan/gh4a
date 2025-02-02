@@ -40,6 +40,8 @@ import io.reactivex.subjects.BehaviorSubject;
 import retrofit2.Response;
 
 public class ApiHelpers {
+    public static final int MAX_PAGE_SIZE = 100;
+
     public interface IssueState {
         String OPEN = "open";
         String CLOSED = "closed";
@@ -229,6 +231,12 @@ public class ApiHelpers {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static int getTotalPagesCount(Page<?> page) {
+        // When all items of a paginated list fit in a single page,
+        // GitHub API responses do not include pagination details
+        return page.last() != null ? page.last() : 1;
     }
 
     public static <T> T throwOnFailure(Response<T> response) throws ApiRequestException {

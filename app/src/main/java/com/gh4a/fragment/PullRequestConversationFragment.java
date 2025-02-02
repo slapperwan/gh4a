@@ -192,21 +192,16 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
     protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
         final int issueNumber = mIssue.number();
         final IssueTimelineService timelineService =
-                ServiceFactory.get(IssueTimelineService.class, bypassCache);
-        final IssueCommentService commentService =
-                ServiceFactory.get(IssueCommentService.class, bypassCache);
+                ServiceFactory.get(IssueTimelineService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         final PullRequestReviewService reviewService =
-                ServiceFactory.get(PullRequestReviewService.class, bypassCache);
+                ServiceFactory.get(PullRequestReviewService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
         final PullRequestReviewCommentService prCommentService =
-                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache);
+                ServiceFactory.get(PullRequestReviewCommentService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
 
-        Single<List<TimelineItem>> issueCommentsSingle = ApiHelpers.PageIterator
-                .toSingle(page -> commentService.getIssueComments(mRepoOwner, mRepoName, issueNumber, page))
-                .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
-        Single<List<TimelineItem>> eventsSingle = ApiHelpers.PageIterator
+        Single<List<TimelineItem>> timelineItemsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> timelineService.getTimeline(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
-                .compose(RxUtils.mapList(TimelineItem.TimelineEvent::new));
+                .compose(RxUtils.mapList(TimelineItem::fromIssueEvent));
 
         Single<List<Review>> reviewsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> reviewService.getReviews(mRepoOwner, mRepoName, issueNumber, page))
@@ -293,14 +288,12 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
                         .compose(RxUtils.mapList(TimelineItem.TimelineComment::new));
 
         return Single.zip(
-                issueCommentsSingle.subscribeOn(Schedulers.io()),
-                eventsSingle.subscribeOn(Schedulers.io()),
+                timelineItemsSingle.subscribeOn(Schedulers.io()),
                 reviewItemsSingle.subscribeOn(Schedulers.io()),
                 prCommentsWithoutReviewSingle.subscribeOn(Schedulers.io()),
-                (comments, events, reviewItems, commentsWithoutReview) -> {
+                (timelineItems, reviewItems, commentsWithoutReview) -> {
             ArrayList<TimelineItem> result = new ArrayList<>();
-            result.addAll(comments);
-            result.addAll(events);
+            result.addAll(timelineItems);
             result.addAll(reviewItems);
             result.addAll(commentsWithoutReview);
             Collections.sort(result, TimelineItem.COMPARATOR);
@@ -444,7 +437,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
         CommitStatusBox commitStatusBox = mListHeaderView.findViewById(R.id.commit_status_box);
         commitStatusBox.setVisibility(View.VISIBLE);
 
-        RepositoryStatusService repoService = ServiceFactory.get(RepositoryStatusService.class, force);
+        RepositoryStatusService repoService = ServiceFactory.get(RepositoryStatusService.class, force, ApiHelpers.MAX_PAGE_SIZE);
         String sha = mPullRequest.head().sha();
 
         Single<List<Status>> statusSingle = ApiHelpers.PageIterator

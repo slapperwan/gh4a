@@ -118,6 +118,10 @@ public class ServiceFactory {
         return get(serviceClass, bypassCache, null, null, null);
     }
 
+    public static <S> S get(Class<S> serviceClass, boolean bypassCache, Integer pageSize) {
+        return get(serviceClass, bypassCache, null, null, pageSize);
+    }
+
     public static <S> S get(Class<S> serviceClass, boolean bypassCache, String acceptHeader,
             String token, Integer pageSize) {
         String key = makeKey(serviceClass, bypassCache, acceptHeader, token, pageSize);
@@ -157,7 +161,7 @@ public class ServiceFactory {
                         requestBuilder.header("Authorization",
                                 Credentials.basic(BuildConfig.CLIENT_ID, BuildConfig.CLIENT_SECRET));
                     }
-                    if (pageSize != null) {
+                    if (pageSize != null && original.url().queryParameterNames().contains("page")) {
                         requestBuilder.url(original.url().newBuilder()
                                 .addQueryParameter("per_page", String.valueOf(pageSize))
                                 .build());
