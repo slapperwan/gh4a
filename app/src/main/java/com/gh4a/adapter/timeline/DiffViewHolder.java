@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -13,7 +12,6 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.text.style.LineBackgroundSpan;
-import android.text.style.TypefaceSpan;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
@@ -94,7 +92,19 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
         mFileTextView.setClickable(isClickable);
         mFileTextView.setTextColor(isClickable ? mAccentColor : mSecondaryTextColor);
 
-        String[] lines = comment.diffChunk().split("\n");
+        String diffHunk = comment.diffChunk();
+        if (diffHunk.isEmpty()) {
+            mDiffHunkTextView.setVisibility(View.GONE);
+        } else {
+            mDiffHunkTextView.setVisibility(View.VISIBLE);
+            mDiffHunkTextView.setText(buildFormattedDiffText(item, diffHunk));
+            mDiffHunkTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                    mInitialDiffTextSize * getDiffSizeMultiplier());
+        }
+    }
+
+    private SpannableStringBuilder buildFormattedDiffText(TimelineItem.Diff item, String diffHunk) {
+        String[] lines = diffHunk.split("\n");
 
         int leftLine = 0;
         int rightLine = 0;
@@ -141,7 +151,7 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
 
             int lineNumberLength = builder.length() - spanStart;
 
-            builder.append(" ").append(lines[i]).append(" ");
+            builder.append(lines[i]).append(" ");
             if (i < lines.length - 1) {
                 builder.append("\n");
             }
@@ -159,15 +169,8 @@ class DiffViewHolder extends TimelineItemAdapter.TimelineItemViewHolder<Timeline
             DiffLineSpan span = new DiffLineSpan(backgroundColor, lineNumberBackgroundColor, mPadding, i == start,
                     i == lines.length - 1, lineNumberLength);
             builder.setSpan(span, spanStart, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-            // We want to make only the line numbers monospaced, and the rest of the line normal for compactness reasons
-            builder.setSpan(new TypefaceSpan("normal"),
-                    spanStart + lineNumberLength, builder.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
-        mDiffHunkTextView.setTypeface(Typeface.MONOSPACE);
-        mDiffHunkTextView.setText(builder);
-        mDiffHunkTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                mInitialDiffTextSize * getDiffSizeMultiplier());
+        return builder;
     }
 
     private float getDiffSizeMultiplier() {

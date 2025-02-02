@@ -194,8 +194,12 @@ table tr td :last-child,table tr th :last-child {
     margin-bottom: 0;
 }
 
-img {
+img, video {
     height: auto;
+    max-width: 100%;
+}
+
+.wp-video {  /* Prevents videos from overflowing in GitHub blog articles */
     max-width: 100%;
 }
 

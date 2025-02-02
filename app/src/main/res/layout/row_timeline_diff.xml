@@ -34,7 +34,8 @@
             android:paddingBottom="@dimen/code_diff_padding"
             android:paddingTop="@dimen/code_diff_padding"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="13sp"
+            android:textSize="12.5sp"
+            android:textScaleX="0.95"
             android:textIsSelectable="true"
             app:needsLinkHandling="true"
             tools:text="+Diff lines\n+Are cool" />

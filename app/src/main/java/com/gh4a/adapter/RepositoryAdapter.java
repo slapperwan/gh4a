@@ -51,8 +51,7 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
 
         if (!StringUtils.isBlank(repository.description())) {
             holder.tvDesc.setVisibility(View.VISIBLE);
-            holder.tvDesc.setText(
-                    EmojiParser.parseToUnicode(StringUtils.doTeaser(repository.description())));
+            holder.tvDesc.setText(EmojiParser.parseToUnicode(repository.description()));
         } else {
             holder.tvDesc.setVisibility(View.GONE);
         }

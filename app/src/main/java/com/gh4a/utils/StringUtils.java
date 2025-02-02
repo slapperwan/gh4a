@@ -54,35 +54,6 @@ public class StringUtils {
         return val == null || val.trim().isEmpty();
     }
 
-    /**
-     * Do teaser.
-     *
-     * @param text the text
-     * @return the string
-     */
-    public static String doTeaser(String text) {
-        if (isBlank(text)) {
-            return "";
-        }
-
-        int indexNewLine = text.indexOf("\n");
-        int indexDot = text.indexOf(". ");
-
-        if (indexDot != -1 && indexNewLine != -1) {
-            if (indexDot > indexNewLine) {
-                text = text.substring(0, indexNewLine);
-            } else {
-                text = text.substring(0, indexDot + 1);
-            }
-        } else if (indexDot != -1) {
-            text = text.substring(0, indexDot + 1);
-        } else if (indexNewLine != -1) {
-            text = text.substring(0, indexNewLine);
-        }
-
-        return text;
-    }
-
     public static String getFirstLine(String input) {
         if (input == null) {
             return null;
