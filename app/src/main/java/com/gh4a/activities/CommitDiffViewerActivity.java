@@ -110,7 +110,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
 
         return service.createCommitCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), request)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.add_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(this, R.string.add_reaction_error));
     }
 
     @Override
@@ -119,6 +119,6 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
         final ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deleteCommitCommentReaction(mRepoOwner, mRepoName, comment.comment.id(), reactionId)
                 .map(ApiHelpers::mapToTrueOnSuccess)
-                .compose(RxUtils.wrapWithRetrySnackbar(this, R.string.remove_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(this, R.string.remove_reaction_error));
     }
 }
