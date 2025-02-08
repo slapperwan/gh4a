@@ -3,6 +3,7 @@ package com.gh4a;
 import android.content.Context;
 import android.util.Log;
 
+import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.core.ByteArrayResponseConverterFactory;
 import com.meisolsson.githubsdk.core.GitHubPaginationInterceptor;
 import com.meisolsson.githubsdk.core.ServiceGenerator;
@@ -120,6 +121,10 @@ public class ServiceFactory {
 
     public static <S> S get(Class<S> serviceClass, boolean bypassCache, Integer pageSize) {
         return get(serviceClass, bypassCache, null, null, pageSize);
+    }
+
+    public static <S> S getForFullPagedLists(Class<S> serviceClass, boolean bypassCache) {
+        return get(serviceClass, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
     }
 
     public static <S> S get(Class<S> serviceClass, boolean bypassCache, String acceptHeader,

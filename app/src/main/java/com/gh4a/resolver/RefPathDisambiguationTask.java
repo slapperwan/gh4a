@@ -130,10 +130,8 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
                     slashPos > 0 ? mRefAndPath.substring(slashPos + 1) : "")));
         }
 
-        final RepositoryBranchService branchService =
-                ServiceFactory.get(RepositoryBranchService.class, false, ApiHelpers.MAX_PAGE_SIZE);
-        final RepositoryService repoService =
-                ServiceFactory.get(RepositoryService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+        var branchService = ServiceFactory.getForFullPagedLists(RepositoryBranchService.class, false);
+        var repoService = ServiceFactory.getForFullPagedLists(RepositoryService.class, false);
 
         // then look for matching branches
         return ApiHelpers.PageIterator

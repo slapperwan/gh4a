@@ -121,7 +121,7 @@ public class PullRequestFilesFragment extends CommitFragment {
     }
 
     private void loadFiles(boolean force) {
-        final PullRequestService service = ServiceFactory.get(PullRequestService.class, force, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(PullRequestService.class, force);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestFiles(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
@@ -133,8 +133,7 @@ public class PullRequestFilesFragment extends CommitFragment {
     }
 
     private void loadComments(boolean force) {
-        final PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class, force, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(PullRequestReviewCommentService.class, force);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))

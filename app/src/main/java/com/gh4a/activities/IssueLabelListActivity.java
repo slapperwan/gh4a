@@ -330,7 +330,7 @@ public class IssueLabelListActivity extends BaseActivity implements
     }
 
     private void loadLabels(boolean force) {
-        final IssueLabelService service = ServiceFactory.get(IssueLabelService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(IssueLabelService.class, false);
         ApiHelpers.PageIterator
                 .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
                 .compose(RxUtils.mapList(IssueLabelAdapter.EditableLabel::new))

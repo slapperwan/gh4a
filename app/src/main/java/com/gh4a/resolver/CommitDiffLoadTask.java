@@ -60,8 +60,7 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
 
     @Override
     protected Single<List<GitComment>> getComments() throws ApiRequestException {
-        final RepositoryCommentService service =
-                ServiceFactory.get(RepositoryCommentService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(RepositoryCommentService.class, false);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mSha, page));
     }

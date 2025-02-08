@@ -53,8 +53,7 @@ public class CommitCommentLoadTask extends UrlLoadTask {
             String repoOwner, String repoName, String commitSha,
             IntentUtils.InitialCommentMarker marker) {
         RepositoryCommitService commitService = ServiceFactory.get(RepositoryCommitService.class, false);
-        RepositoryCommentService commentService =
-                ServiceFactory.get(RepositoryCommentService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+        var commentService = ServiceFactory.getForFullPagedLists(RepositoryCommentService.class, false);
 
         Single<Commit> commitSingle = commitService.getCommit(repoOwner, repoName, commitSha)
                 .map(ApiHelpers::throwOnFailure);

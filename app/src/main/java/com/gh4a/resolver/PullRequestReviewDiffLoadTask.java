@@ -37,8 +37,7 @@ public class PullRequestReviewDiffLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        final PullRequestReviewCommentService service =
-                ServiceFactory.get(PullRequestReviewCommentService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(PullRequestReviewCommentService.class, false);
         final PullRequestReviewService reviewService =
                 ServiceFactory.get(PullRequestReviewService.class, false);
         long diffCommentId = Long.parseLong(mDiffId.fileHash);

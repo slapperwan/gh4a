@@ -50,13 +50,11 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
 
     @Override
     protected Single<Optional<Intent>> getSingle() {
-        PullRequestService service = ServiceFactory.get(PullRequestService.class, false, ApiHelpers.MAX_PAGE_SIZE);
-        Single<PullRequest> pullRequestSingle = service.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
+        var prService = ServiceFactory.getForFullPagedLists(PullRequestService.class, false);
+        Single<PullRequest> pullRequestSingle = prService.getPullRequest(mRepoOwner, mRepoName, mPullRequestNumber)
                 .map(ApiHelpers::throwOnFailure);
 
-        final PullRequestReviewCommentService commentService =
-                ServiceFactory.get(PullRequestReviewCommentService.class, false, ApiHelpers.MAX_PAGE_SIZE);
-
+        var commentService = ServiceFactory.getForFullPagedLists(PullRequestReviewCommentService.class, false);
         Single<List<ReviewComment>> commentsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getPullRequestComments(
                         mRepoOwner, mRepoName, mPullRequestNumber, page))
@@ -64,7 +62,7 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
                 .cache(); // single is used multiple times -> avoid refetching data
 
         Single<List<GitHubFile>> filesSingle = ApiHelpers.PageIterator
-                .toSingle(page -> service.getPullRequestFiles(mRepoOwner, mRepoName, mPullRequestNumber, page));
+                .toSingle(page -> prService.getPullRequestFiles(mRepoOwner, mRepoName, mPullRequestNumber, page));
 
         return commentsSingle
                 .compose(RxUtils.filterAndMapToFirst(c -> mMarker.matches(c.id(), c.createdAt())))

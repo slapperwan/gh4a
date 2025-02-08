@@ -232,8 +232,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
 
     @Override
     protected Single<List<GitComment>> onCreateDataSingle(boolean bypassCache) {
-        final RepositoryCommentService service =
-                ServiceFactory.get(RepositoryCommentService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(RepositoryCommentService.class, bypassCache);
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mObjectSha, page))

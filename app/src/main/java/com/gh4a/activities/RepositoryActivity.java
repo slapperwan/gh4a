@@ -376,10 +376,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         if (mBranches != null) {
             showRefSelectionDialog();
         } else {
-            final RepositoryBranchService branchService =
-                    ServiceFactory.get(RepositoryBranchService.class, false, ApiHelpers.MAX_PAGE_SIZE);
-            final RepositoryService repoService =
-                    ServiceFactory.get(RepositoryService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+            var branchService = ServiceFactory.getForFullPagedLists(RepositoryBranchService.class, false);
+            var repoService = ServiceFactory.getForFullPagedLists(RepositoryService.class, false);
 
             Single<List<Branch>> branchSingle = ApiHelpers.PageIterator
                     .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page))

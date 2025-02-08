@@ -57,8 +57,7 @@ public class SingleFactory {
 
     public static Single<NotificationListLoadResult> getNotifications(boolean all,
             boolean participating, boolean bypassCache) {
-        final NotificationService service =
-                ServiceFactory.get(NotificationService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(NotificationService.class, bypassCache);
         final Map<String, Object> options = new HashMap<>();
         options.put("all", all);
         options.put("participating", participating);
