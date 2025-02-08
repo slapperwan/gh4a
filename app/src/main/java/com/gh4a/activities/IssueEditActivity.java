@@ -544,7 +544,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadLabels(OnLabelsLoaded callback) {
-        final IssueLabelService service = ServiceFactory.get(IssueLabelService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(IssueLabelService.class, false);
         if (mLabelSingle == null) {
             mLabelSingle = ApiHelpers.PageIterator
                     .toSingle(page -> service.getRepositoryLabels(mRepoOwner, mRepoName, page))
@@ -557,7 +557,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadMilestones(OnMilestonesLoaded callback) {
-        final IssueMilestoneService service = ServiceFactory.get(IssueMilestoneService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(IssueMilestoneService.class, false);
         if (mMilestoneSingle == null) {
             mMilestoneSingle = ApiHelpers.PageIterator
                     .toSingle(page -> service
@@ -571,8 +571,7 @@ public class IssueEditActivity extends BasePagerActivity implements
     }
 
     private void loadPotentialAssignees(OnAssigneesLoaded callback) {
-        final RepositoryCollaboratorService service =
-                ServiceFactory.get(RepositoryCollaboratorService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(RepositoryCollaboratorService.class, false);
 
         if (mAssigneeSingle == null) {
             mAssigneeSingle = ApiHelpers.PageIterator

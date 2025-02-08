@@ -52,8 +52,7 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
             int pullRequestNumber, IntentUtils.InitialCommentMarker marker) {
         final PullRequestReviewService reviewService =
                 ServiceFactory.get(PullRequestReviewService.class, false);
-        final PullRequestReviewCommentService commentService =
-                ServiceFactory.get(PullRequestReviewCommentService.class, false, ApiHelpers.MAX_PAGE_SIZE);
+        var commentService = ServiceFactory.getForFullPagedLists(PullRequestReviewCommentService.class, false);
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getPullRequestComments(

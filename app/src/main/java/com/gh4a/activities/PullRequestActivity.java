@@ -541,7 +541,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
 
     private void loadPendingReview(boolean force) {
         String ownLogin = Gh4Application.get().getAuthLogin();
-        PullRequestReviewService service = ServiceFactory.get(PullRequestReviewService.class, force, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(PullRequestReviewService.class, force);
 
         ApiHelpers.PageIterator
                 .first(page -> service.getReviews(mRepoOwner, mRepoName, mPullRequestNumber, page),

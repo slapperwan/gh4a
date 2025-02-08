@@ -19,8 +19,6 @@ import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.service.issues.IssueCommentService;
 import com.meisolsson.githubsdk.service.issues.IssueTimelineService;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Single;
@@ -74,8 +72,7 @@ public class IssueFragment extends IssueFragmentBase {
     @Override
     protected Single<List<TimelineItem>> onCreateDataSingle(boolean bypassCache) {
         final int issueNumber = mIssue.number();
-        final IssueTimelineService timelineService =
-                ServiceFactory.get(IssueTimelineService.class, bypassCache, ApiHelpers.MAX_PAGE_SIZE);
+        var timelineService = ServiceFactory.getForFullPagedLists(IssueTimelineService.class, bypassCache);
 
         return ApiHelpers.PageIterator
                 .toSingle(page -> timelineService.getTimeline(mRepoOwner, mRepoName, issueNumber, page))

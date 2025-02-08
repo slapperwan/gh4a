@@ -382,7 +382,7 @@ public class UserFragment extends LoadingFragmentBase implements
             return;
         }
 
-        final OrganizationService service = ServiceFactory.get(OrganizationService.class, force, ApiHelpers.MAX_PAGE_SIZE);
+        var service = ServiceFactory.getForFullPagedLists(OrganizationService.class, force);
         ApiHelpers.PageIterator
                 .toSingle(page -> mIsSelf
                         ? service.getMyOrganizations(page)
