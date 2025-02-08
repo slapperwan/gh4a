@@ -5,7 +5,6 @@ import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
 
 import android.net.Uri;
-import android.text.TextUtils;
 import android.util.Pair;
 
 import com.gh4a.ApiRequestException;
@@ -18,7 +17,6 @@ import com.meisolsson.githubsdk.model.Branch;
 import com.meisolsson.githubsdk.service.repositories.RepositoryBranchService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
-import java.util.List;
 import java.util.regex.Pattern;
 
 import io.reactivex.Single;
@@ -98,23 +96,6 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
                 });
     }
 
-    private Single<Optional<Pair<String, String>>> matchBranch(Single<List<Branch>> input) {
-        return input.map(branches -> {
-            for (Branch branch : branches) {
-                if (TextUtils.equals(mRefAndPath, branch.name())) {
-                    return Optional.of(Pair.create(branch.name(), null));
-                } else {
-                    String nameWithSlash = branch.name() + "/";
-                    if (mRefAndPath.startsWith(nameWithSlash)) {
-                        return Optional.of(Pair.create(branch.name(),
-                                mRefAndPath.substring(nameWithSlash.length())));
-                    }
-                }
-            }
-            return Optional.absent();
-        });
-    }
-
     // returns ref, path
     private Single<Optional<Pair<String, String>>> resolveRefAndPath() throws ApiRequestException {
         // first check whether the path redirects to HEAD
@@ -135,11 +116,25 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
 
         // then look for matching branches
         return ApiHelpers.PageIterator
-                .toSingle(page -> branchService.getBranches(mRepoOwner, mRepoName, page))
-                .compose(this::matchBranch)
+                .first(page -> branchService.getBranches(mRepoOwner, mRepoName, page), this::matchesUrlPath)
                 // and tags after that
                 .flatMap(result -> result.orOptionalSingle(() -> ApiHelpers.PageIterator
-                        .toSingle(page -> repoService.getTags(mRepoOwner, mRepoName, page))
-                        .compose(this::matchBranch)));
+                        .first(page -> repoService.getTags(mRepoOwner, mRepoName, page), this::matchesUrlPath)))
+                .map(this::determineRefAndPathFromFoundRef);
+    }
+
+    private boolean matchesUrlPath(Branch ref) {
+        return mRefAndPath.equals(ref.name()) || mRefAndPath.startsWith(ref.name() + "/");
+    }
+
+    private Optional<Pair<String, String>> determineRefAndPathFromFoundRef(Optional<Branch> foundRef) {
+        return foundRef.map(ref -> {
+            if (mRefAndPath.equals(ref.name())) {
+                return Pair.create(ref.name(), null);
+            } else {
+                String refNameWithSlash = ref.name() + "/";
+                return Pair.create(ref.name(), mRefAndPath.substring(refNameWithSlash.length()));
+            }
+        });
     }
 }
