@@ -187,7 +187,11 @@ public class StringUtils {
         return sourceText.replace("&lt;", "<")
                 .replace("&gt;", ">")
                 .replace("&amp;", "&")
-                .replace("&#8217;", "’")
-                .replace("&#8211;", "–");
+                .replaceAll("&(lsquo|#8216);", "‘")
+                .replaceAll("&(rsquo|#8217);", "’")
+                .replaceAll("&(ldquo|#8220);", "“")
+                .replaceAll("&(rdquo|#8221);", "”")
+                .replaceAll("&(ndash|#8211);", "–")
+                .replaceAll("&(mdash|#8212);", "—");
     }
 }
