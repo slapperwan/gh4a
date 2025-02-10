@@ -38,12 +38,16 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
 import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.Page;
 import com.meisolsson.githubsdk.model.Repository;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
 import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.Optional;
 
+import io.reactivex.Maybe;
 import io.reactivex.Single;
 import retrofit2.Response;
 
@@ -57,6 +61,8 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
     private String mRepoName;
     private String mRef;
     private String mFilePath;
+    private boolean mFollowRenames;
+    private RenameFollowData mRenameFollowData;
 
     private CommitAdapter mAdapter;
     private ContextSelectionCallback mCallback;
@@ -83,6 +89,13 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
         f.setArguments(args);
 
         return f;
+    }
+
+    public void setFollowFileRenames(boolean followRenames) {
+        if (mFollowRenames != followRenames) {
+            mFollowRenames = followRenames;
+            onRefresh();
+        }
     }
 
     @Override
@@ -155,7 +168,29 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
     protected Single<Response<Page<Commit>>> loadPage(int page, boolean bypassCache) {
         final RepositoryCommitService service =
                 ServiceFactory.get(RepositoryCommitService.class, bypassCache);
-        return service.getCommits(mRepoOwner, mRepoName, mRef, mFilePath, page)
+        final String ref = mRenameFollowData != null ? mRenameFollowData.ref : mRef;
+        final String filePath = mRenameFollowData != null ? mRenameFollowData.fileName : mFilePath;
+
+        return service.getCommits(mRepoOwner, mRepoName, ref, filePath, page)
+                .flatMap(response -> {
+                    Page<Commit> commits = response.isSuccessful() ? response.body() : null;
+                    if (commits != null && commits.next() == null && mFollowRenames) {
+                        final List<Commit> items = commits.items();
+                        final Commit last = items.get(items.size() - 1);
+                        return determineFollowData(last, filePath, service)
+                                .map(data -> {
+                                    mRenameFollowData = data;
+                                    return Response.success(Page.<Commit>builder()
+                                            .items(items)
+                                            .next(1)
+                                            .prev(commits.prev())
+                                            .build());
+                                })
+                                .defaultIfEmpty(response)
+                                .toSingle();
+                    }
+                    return Single.just(response);
+                })
                 .map(response -> {
                     // 409 is returned for empty repos
                     if (response.code() == HttpURLConnection.HTTP_CONFLICT) {
@@ -163,5 +198,41 @@ public class CommitListFragment extends PagedDataBaseFragment<Commit> {
                     }
                     return response;
                 });
+    }
+
+    @Override
+    protected void resetSubject() {
+        super.resetSubject();
+        mRenameFollowData = null;
+    }
+
+    private Maybe<RenameFollowData> determineFollowData(
+            Commit commit, String currentFileName, RepositoryCommitService service) {
+        return service.getCommit(mRepoOwner, mRepoName, commit.sha())
+                .filter(Response::isSuccessful)
+                .map(Response::body)
+                .map(actualCommit -> {
+                    List<GitHubFile> files = actualCommit != null ? actualCommit.files() : null;
+                    List<Commit> parents = actualCommit != null ? actualCommit.parents() : null;
+                    if (files == null || parents == null || parents.isEmpty()) {
+                        return Optional.<RenameFollowData>empty();
+                    }
+                    return files.stream()
+                            .filter(f -> currentFileName.equals(f.filename()) && f.previousFilename() != null)
+                            .findFirst()
+                            .map(f -> {
+                                RenameFollowData data = new RenameFollowData();
+                                data.fileName = f.previousFilename();
+                                data.ref = parents.get(0).sha();
+                                return data;
+                            });
+                })
+                .filter(Optional::isPresent)
+                .map(Optional::get);
+    }
+
+    private static class RenameFollowData {
+        String ref;
+        String fileName;
     }
 }
