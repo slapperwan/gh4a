@@ -21,12 +21,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
@@ -52,7 +54,7 @@ public class RxUtils {
                     return Optional.of(item);
                 }
             }
-            return Optional.absent();
+            return Optional.empty();
         });
     }
 
@@ -182,14 +184,22 @@ public class RxUtils {
         };
     }
 
+    public static <T> Single<Optional<T>> toSingleOrFallback(Optional<T> opt, Supplier<Single<Optional<T>>> fallbackSupplier) {
+        return opt.isPresent() ? Single.just(opt) : fallbackSupplier.get();
+    }
+
+    public static <T, R> Single<Optional<R>> mapToSingle(Optional<T> opt, Function<T, Single<R>> mapper) {
+        return opt.isPresent() ? mapper.apply(opt.get()).map(Optional::of) : Single.just(Optional.empty());
+    }
+
     public static <T> Single<Response<Page<T>>> searchPageAdapter(Single<Response<SearchPage<T>>> upstream) {
         return searchPageAdapter(upstream, item -> item);
     }
 
-    public static <U, D> Single<Response<Page<D>>> searchPageAdapter(Single<Response<SearchPage<U>>> upstream, Optional.Mapper<U, D> mapper) {
+    public static <U, D> Single<Response<Page<D>>> searchPageAdapter(Single<Response<SearchPage<U>>> upstream, Function<U, D> mapper) {
         return upstream.map(response -> {
             if (response.isSuccessful()) {
-                return Response.success(new ApiHelpers.SearchPageAdapter<U, D>(response.body(), mapper));
+                return Response.success(new ApiHelpers.SearchPageAdapter(response.body(), mapper));
             }
             return Response.error(response.errorBody(), response.raw());
         });

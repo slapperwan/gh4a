@@ -41,7 +41,6 @@ import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.ClientErrorResponse;
 import com.meisolsson.githubsdk.model.Content;
@@ -50,6 +49,7 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import io.reactivex.Single;
 
@@ -354,7 +354,7 @@ public class FileViewerActivity extends WebViewerActivity
                             for (ClientErrorResponse.FieldError fe : errors) {
                                 if (fe.reason() == ClientErrorResponse.FieldError.Reason.TooLarge) {
                                     openUnsuitableFileAndFinish();
-                                    return Single.just(Optional.absent());
+                                    return Single.just(Optional.empty());
                                 }
                             }
                         }

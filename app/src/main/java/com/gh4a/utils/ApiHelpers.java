@@ -32,6 +32,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -307,9 +309,9 @@ public class ApiHelpers {
 
     public static class SearchPageAdapter<U, D> extends Page<D> {
         private final SearchPage<U> mPage;
-        private final Optional.Mapper<U, D> mMapper;
+        private final Function<U, D> mMapper;
 
-        public SearchPageAdapter(SearchPage<U> page, Optional.Mapper<U, D> mapper) {
+        public SearchPageAdapter(SearchPage<U> page, Function<U, D> mapper) {
             mPage = page;
             mMapper = mapper;
         }
@@ -347,7 +349,7 @@ public class ApiHelpers {
             }
             ArrayList<D> result = new ArrayList<>();
             for (U item : items) {
-                result.add(mMapper.map(item));
+                result.add(mMapper.apply(item));
             }
             return result;
         }
@@ -369,7 +371,7 @@ public class ApiHelpers {
                         return producer.getPage(page.get())
                                 .toObservable()
                                 .compose(PageIterator::evaluateError)
-                                .doOnNext(resultPage -> pageControl.onNext(Optional.ofWithNull(resultPage.next())))
+                                .doOnNext(resultPage -> pageControl.onNext(Optional.ofNullable(resultPage.next())))
                                 .map(responsePage -> responsePage.items());
                     })
                     .toList()
@@ -401,11 +403,11 @@ public class ApiHelpers {
                                     }
                                     return Pair.create((T) null, resultPage.next());
                                 })
-                                .doOnNext(resultOrNextPage -> pageControl.onNext(Optional.ofWithNull(resultOrNextPage.second)))
-                                .map(resultOrNextPage -> Optional.ofWithNull(resultOrNextPage.first));
+                                .doOnNext(resultOrNextPage -> pageControl.onNext(Optional.ofNullable(resultOrNextPage.second)))
+                                .map(resultOrNextPage -> Optional.ofNullable(resultOrNextPage.first));
                     })
                     .filter(opt -> opt.isPresent())
-                    .first(Optional.absent());
+                    .first(Optional.empty());
         }
 
         private static <T> Observable<Page<T>> evaluateError(Observable<Response<Page<T>>> upstream) {

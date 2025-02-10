@@ -9,12 +9,12 @@ import androidx.fragment.app.FragmentActivity;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.PositionalCommentBase;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.reactivex.Single;
 
@@ -38,7 +38,7 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
                         f -> ApiHelpers.md5(f.filename()).equalsIgnoreCase(mDiffId.fileHash)));
         return Single.zip(getSha(), fileSingle, (sha, fileOpt) -> {
             final Intent intent;
-            GitHubFile file = fileOpt.orNull();
+            GitHubFile file = fileOpt.orElse(null);
             if (file != null && FileUtils.isImage(file.filename())) {
                 intent = FileViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                         sha, file.filename());

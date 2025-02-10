@@ -47,7 +47,6 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.HtmlUtils;
 import com.gh4a.utils.HttpImageGetter;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.utils.UiUtils;
@@ -66,6 +65,7 @@ import com.vdurmont.emoji.EmojiParser;
 
 import java.net.HttpURLConnection;
 import java.util.Locale;
+import java.util.Optional;
 
 import io.reactivex.Single;
 import retrofit2.Response;
@@ -409,7 +409,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
         service.getReadmeHtml(repoOwner, repoName, mRef)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Optional::of)
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<String>absent()))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<String>empty()))
                 .map(htmlOpt -> {
                     if (htmlOpt.isPresent()) {
                         String html = HtmlUtils.rewriteRelativeUrls(htmlOpt.get(),
@@ -417,7 +417,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
                         mImageGetter.encode(context, id, html);
                         return Optional.of(html);
                     }
-                    return Optional.<String>absent();
+                    return Optional.<String>empty();
                 })
                 .compose(makeLoaderSingle(ID_LOADER_README, force))
                 .doOnSubscribe(disposable -> {

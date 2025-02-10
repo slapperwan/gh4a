@@ -10,8 +10,9 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.activities.ReviewActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
+
+import java.util.Optional;
 
 import io.reactivex.Single;
 

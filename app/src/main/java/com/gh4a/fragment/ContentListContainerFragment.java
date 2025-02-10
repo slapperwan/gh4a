@@ -22,7 +22,6 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.PathBreadcrumbs;
@@ -41,6 +40,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 
@@ -323,13 +323,13 @@ public class ContentListContainerFragment extends Fragment implements
         service.getContentsRaw(repoOwner, repoName, ".gitmodules", mSelectedRef)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Optional::of)
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<byte[]>absent()))
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<byte[]>empty()))
                 .map(this::parseModuleMap)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .compose(mRxLoader.makeSingleTransformer(ID_LOADER_MODULEMAP, true))
                 .subscribe(resultOpt -> {
-                    mGitModuleMap = resultOpt.orNull();
+                    mGitModuleMap = resultOpt.orElse(null);
                     if (mContentListFragment != null) {
                         mContentListFragment.onSubModuleNamesChanged(getSubModuleNames(mContentListFragment));
                     }
@@ -337,9 +337,9 @@ public class ContentListContainerFragment extends Fragment implements
     }
 
     private Optional<Map<String, String>> parseModuleMap(Optional<byte[]> inputOpt) {
-        String input = inputOpt.map(bytes -> new String(bytes)).orNull();
+        String input = inputOpt.map(bytes -> new String(bytes)).orElse(null);
         if (StringUtils.isBlank(input)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         Map<String, String> result = new HashMap<>();
         String pendingPath = null;

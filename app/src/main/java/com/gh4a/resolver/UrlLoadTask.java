@@ -13,8 +13,9 @@ import android.util.Log;
 import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.UiUtils;
+
+import java.util.Optional;
 
 import io.reactivex.Single;
 
@@ -62,7 +63,7 @@ public abstract class UrlLoadTask extends AsyncTask<Void, Void, Optional<Intent>
             return getSingle().blockingGet();
         } catch (Exception e) {
             Log.e(Gh4Application.LOG_TAG, "Failure during intent resolving", e);
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
