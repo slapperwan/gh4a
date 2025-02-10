@@ -3,22 +3,26 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.gh4a.R;
 import com.gh4a.fragment.CommitListFragment;
 import com.meisolsson.githubsdk.model.Commit;
+import com.meisolsson.githubsdk.model.ContentType;
 
 public class CommitHistoryActivity extends FragmentContainerActivity implements
         CommitListFragment.ContextSelectionCallback {
     public static Intent makeIntent(Context context, String repoOwner, String repoName,
-                                    String ref, String path, boolean supportBaseSelection) {
+                                    String ref, String path, ContentType type,
+                                    boolean supportBaseSelection) {
         return new Intent(context, CommitHistoryActivity.class)
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName)
                 .putExtra("ref", ref)
                 .putExtra("path", path)
+                .putExtra("type", type)
                 .putExtra("base_selectable", supportBaseSelection);
     }
 
@@ -26,6 +30,7 @@ public class CommitHistoryActivity extends FragmentContainerActivity implements
     private String mRepoName;
     private String mRef;
     private String mFilePath;
+    private ContentType mType;
     private boolean mSupportBaseSelection;
 
     @Nullable
@@ -47,12 +52,13 @@ public class CommitHistoryActivity extends FragmentContainerActivity implements
         mRepoName = extras.getString("repo");
         mRef = extras.getString("ref");
         mFilePath = extras.getString("path");
+        mType = (ContentType) extras.getSerializable("type");
         mSupportBaseSelection = extras.getBoolean("base_selectable");
     }
 
     @Override
     protected Fragment onCreateFragment() {
-        return CommitListFragment.newInstance(mRepoOwner, mRepoName, mRef, mFilePath);
+        return CommitListFragment.newInstance(mRepoOwner, mRepoName, mRef, mFilePath, mType);
     }
 
     @Override
