@@ -552,7 +552,7 @@ public class PullRequestActivity extends BaseFragmentPagerActivity implements
                     supportInvalidateOptionsMenu();
                 })
                 .subscribe(result -> {
-                    mPendingReview = result.orNull();
+                    mPendingReview = result.orElse(null);
                     mPendingReviewLoaded = true;
                     supportInvalidateOptionsMenu();
                 }, this::handleLoadFailure);

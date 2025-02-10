@@ -13,7 +13,6 @@ import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubFile;
 import com.meisolsson.githubsdk.model.PullRequest;
@@ -22,6 +21,7 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentSer
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
 import java.util.List;
+import java.util.Optional;
 
 import io.reactivex.Single;
 
@@ -92,7 +92,7 @@ public class PullRequestDiffCommentLoadTask extends UrlLoadTask {
                                     mRepoOwner, mRepoName, mPullRequestNumber, mPage, mMarker)));
                         }
                     }
-                    return Single.just(Optional.absent());
+                    return Single.just(Optional.empty());
                 });
     }
 }

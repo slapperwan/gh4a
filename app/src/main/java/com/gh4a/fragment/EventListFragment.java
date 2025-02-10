@@ -48,7 +48,6 @@ import com.gh4a.resolver.PullRequestReviewCommentLoadTask;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.DownloadUtils;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.ContextMenuAwareRecyclerView;
 import com.meisolsson.githubsdk.model.Download;
@@ -82,6 +81,7 @@ import com.meisolsson.githubsdk.model.payload.ReleasePayload;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import io.reactivex.Single;
 

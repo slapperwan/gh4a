@@ -12,11 +12,12 @@ import com.gh4a.ServiceFactory;
 import com.gh4a.activities.FileViewerActivity;
 import com.gh4a.activities.RepositoryActivity;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.Optional;
+import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Branch;
 import com.meisolsson.githubsdk.service.repositories.RepositoryBranchService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import io.reactivex.Single;
@@ -64,7 +65,7 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
         return resolveRefAndPath()
                 .map(refAndPathOpt -> {
                     if (!refAndPathOpt.isPresent()) {
-                        return Optional.absent();
+                        return Optional.empty();
                     }
                     Pair<String, String> refAndPath = refAndPathOpt.get();
                     if (mGoToFileViewer && refAndPath.second != null) {
@@ -92,7 +93,7 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
                                 mRepoOwner, mRepoName, refAndPath.first,
                                 refAndPath.second, mInitialPage));
                     }
-                    return Optional.absent();
+                    return Optional.empty();
                 });
     }
 
@@ -118,7 +119,7 @@ public class RefPathDisambiguationTask extends UrlLoadTask {
         return ApiHelpers.PageIterator
                 .first(page -> branchService.getBranches(mRepoOwner, mRepoName, page), this::matchesUrlPath)
                 // and tags after that
-                .flatMap(result -> result.orOptionalSingle(() -> ApiHelpers.PageIterator
+                .flatMap(result -> RxUtils.toSingleOrFallback(result, () -> ApiHelpers.PageIterator
                         .first(page -> repoService.getTags(mRepoOwner, mRepoName, page), this::matchesUrlPath)))
                 .map(this::determineRefAndPathFromFoundRef);
     }

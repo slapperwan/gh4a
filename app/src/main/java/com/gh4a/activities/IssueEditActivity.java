@@ -57,7 +57,6 @@ import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.SingleFactory;
 import com.gh4a.utils.UiUtils;
@@ -83,6 +82,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -595,8 +595,8 @@ public class IssueEditActivity extends BasePagerActivity implements
 
     private void loadIssueTemplates() {
         registerTemporarySubscription(getIssueTemplatesSingle("/.github")
-                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplatesSingle("")))
-                .flatMap(opt -> opt.orOptionalSingle(() -> getIssueTemplatesSingle("/docs")))
+                .flatMap(opt -> RxUtils.toSingleOrFallback(opt, () -> getIssueTemplatesSingle("")))
+                .flatMap(opt -> RxUtils.toSingleOrFallback(opt, () -> getIssueTemplatesSingle("/docs")))
                 .compose(RxUtils.wrapWithProgressDialog(this, R.string.loading_msg))
                 .subscribe(result -> {
                     if (result.isPresent() && !result.get().isEmpty()) {
@@ -665,7 +665,7 @@ public class IssueEditActivity extends BasePagerActivity implements
         return ApiHelpers.PageIterator
                 .first(page -> service.getDirectoryContents(mRepoOwner, mRepoName, path, null, page),
                         c -> c.name().toLowerCase(Locale.US).startsWith("issue_template"))
-                .flatMap(contentOpt -> contentOpt.flatMap(content -> {
+                .flatMap(contentOpt -> RxUtils.mapToSingle(contentOpt, content -> {
                     if (content.type() == ContentType.Directory) {
                         return ApiHelpers.PageIterator
                                 .toSingle(page -> service.getDirectoryContents(mRepoOwner, mRepoName, content.path(), null, page));
@@ -682,7 +682,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                     }
                     return files;
                 }))
-                .flatMap(contentsOpt -> contentsOpt.flatMap(contents -> {
+                .flatMap(contentsOpt -> RxUtils.mapToSingle(contentsOpt, contents -> {
                     List<Single<IssueTemplate>> result = new ArrayList<>();
                     for (Content c : contents) {
                         result.add(parseTemplate(service, c));
@@ -692,7 +692,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                             .toList();
                 }))
                 .compose(RxUtils::doInBackground)
-                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.absent()));
+                .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.empty()));
     }
 
     private Single<IssueTemplate> parseTemplate(RepositoryContentService service, Content content) {

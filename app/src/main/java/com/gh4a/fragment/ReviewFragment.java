@@ -26,7 +26,6 @@ import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.EditorBottomSheet;
 
@@ -47,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
@@ -184,7 +184,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
         Single<Optional<List<GitHubFile>>> filesSingle = hasCommentsSingle
                 .flatMap(hasComments -> {
                     if (!hasComments) {
-                        return Single.just(Optional.absent());
+                        return Single.just(Optional.empty());
                     }
                     return ApiHelpers.PageIterator
                             .toSingle(page -> prService.getPullRequestFiles(
@@ -195,7 +195,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
         Single<Optional<List<ReviewComment>>> commentsSingle = hasCommentsSingle
                 .flatMap(hasComments -> {
                     if (!hasComments) {
-                        return Single.just(Optional.absent());
+                        return Single.just(Optional.empty());
                     }
                     return ApiHelpers.PageIterator
                             .toSingle(page -> commentService.getPullRequestComments(

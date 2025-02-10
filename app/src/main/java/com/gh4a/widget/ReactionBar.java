@@ -33,7 +33,6 @@ import com.gh4a.R;
 import com.gh4a.activities.UserActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.UiUtils;
 import com.meisolsson.githubsdk.model.Reaction;
@@ -44,6 +43,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import io.reactivex.Single;
 
@@ -443,7 +443,7 @@ public class ReactionBar extends HorizontalScrollView implements View.OnClickLis
                     .map(Optional::of);
         } else {
             resultSingle = callback.deleteReaction(item, id)
-                    .map(response -> Optional.absent());
+                    .map(response -> Optional.empty());
         }
 
         return resultSingle

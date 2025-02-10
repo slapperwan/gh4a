@@ -33,7 +33,6 @@ import com.gh4a.model.StatusWrapper;
 import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.gh4a.widget.CommitStatusBox;
 import com.gh4a.widget.PullRequestBranchInfoView;
@@ -67,6 +66,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import androidx.annotation.AttrRes;
@@ -497,15 +497,15 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
         PullRequestMarker head = mPullRequest.head();
         Repository repo = head.repo();
         Single<Optional<GitReference>> refSingle = repo == null
-                ? Single.just(Optional.absent())
+                ? Single.just(Optional.empty())
                 : service.getGitReference(repo.owner().login(), repo.name(), head.ref())
                         .map(ApiHelpers::throwOnFailure)
                         .map(Optional::of)
-                        .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<GitReference>absent()))
+                        .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<GitReference>empty()))
                         .compose(makeLoaderSingle(ID_LOADER_HEAD_REF, force));
 
         refSingle.subscribe(refOpt -> {
-            mHeadReference = refOpt.orNull();
+            mHeadReference = refOpt.orElse(null);
             mHasLoadedHeadReference = true;
             getActivity().invalidateOptionsMenu();
             bindSpecialViews(mListHeaderView);

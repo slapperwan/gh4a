@@ -8,9 +8,10 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.gh4a.ServiceFactory;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.Optional;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.service.users.UserService;
+
+import java.util.Optional;
 
 import io.reactivex.Single;
 

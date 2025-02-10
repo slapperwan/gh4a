@@ -12,7 +12,6 @@ import com.gh4a.activities.ReviewActivity;
 import com.gh4a.model.TimelineItem;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
-import com.gh4a.utils.Optional;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.Review;
 import com.meisolsson.githubsdk.model.ReviewComment;
@@ -21,6 +20,7 @@ import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import io.reactivex.Single;
 
@@ -82,7 +82,7 @@ public class PullRequestReviewCommentLoadTask extends UrlLoadTask {
                                     .map(Optional::of);
                         }
                     }
-                    return Single.just(Optional.<Review>absent());
+                    return Single.just(Optional.<Review>empty());
                 })
                 .map(reviewOpt -> reviewOpt.map(review -> ReviewActivity.makeIntent(context,
                         repoOwner, repoName, pullRequestNumber, review, marker)));
