@@ -247,7 +247,7 @@ public class FileViewerActivity extends WebViewerActivity
                 return true;
             case MENU_ITEM_HISTORY:
                 startActivity(CommitHistoryActivity.makeIntent(this,
-                        mRepoOwner, mRepoName, mRef, mPath, false));
+                        mRepoOwner, mRepoName, mRef, mPath, mContent != null ? mContent.type() : null, false));
                 return true;
             case R.id.view_raw:
                 mViewRawText = !mViewRawText;

@@ -84,6 +84,7 @@
     <string name="no_browser_found">The link could not be opened: no browser was found on your device</string>
     <string name="link_copied">Link copied</string>
     <string name="wrap_lines">Wrap lines</string>
+    <string name="follow_renames">Follow renames</string>
     <string name="unknown">unknown</string>
     <string name="history">History</string>
     <string name="download">Download</string>

@@ -190,7 +190,7 @@ public class ContentListFragment extends ListDataBaseFragment<Content> implement
             case R.id.history:
                 Intent intent = CommitHistoryActivity.makeIntent(getActivity(),
                         mRepository.owner().login(), mRepository.name(),
-                        mRef, contents.path(), true);
+                        mRef, contents.path(), contents.type(), true);
                 mFileHistoryLauncher.launch(intent);
                 return true;
             case R.id.download:
