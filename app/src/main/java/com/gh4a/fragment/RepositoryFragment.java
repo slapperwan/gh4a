@@ -62,7 +62,6 @@ import com.meisolsson.githubsdk.service.activity.WatchingService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
 import com.meisolsson.githubsdk.service.search.SearchService;
 import com.gh4a.widget.OverviewRow;
-import com.vdurmont.emoji.EmojiParser;
 
 import java.net.HttpURLConnection;
 import java.util.Locale;
@@ -321,7 +320,7 @@ public class RepositoryFragment extends LoadingFragmentBase implements
             if (stringId != 0) {
                 view.setText(getString(stringId, text));
             } else {
-                view.setText(EmojiParser.parseToUnicode(text));
+                view.setText(StringUtils.replaceEmojiAliases(text));
             }
             view.setVisibility(View.VISIBLE);
         } else {

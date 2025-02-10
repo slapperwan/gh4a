@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 import com.gh4a.R;
 import com.gh4a.model.Trend;
-import com.vdurmont.emoji.EmojiParser;
+import com.gh4a.utils.StringUtils;
 
 public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
     private final @StringRes int mStarsTemplate;
@@ -56,7 +56,7 @@ public class TrendAdapter extends RootAdapter<Trend, TrendAdapter.ViewHolder> {
         holder.tvTitle.setText(title);
 
         String desc = trend.getDescription();
-        holder.tvDesc.setText(desc != null ? EmojiParser.parseToUnicode(desc) : null);
+        holder.tvDesc.setText(StringUtils.replaceEmojiAliases(desc));
 
         String lang = trend.getLanguage();
         if (TextUtils.isEmpty(lang)) {

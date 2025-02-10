@@ -50,7 +50,6 @@ import com.meisolsson.githubsdk.service.organizations.OrganizationMemberService;
 import com.meisolsson.githubsdk.service.organizations.OrganizationService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryService;
 import com.meisolsson.githubsdk.service.users.UserFollowerService;
-import com.vdurmont.emoji.EmojiParser;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -206,7 +205,7 @@ public class UserFragment extends LoadingFragmentBase implements
         fillTextView(R.id.tv_website, mUser.blog());
         fillTextView(R.id.tv_company, mUser.company());
         fillTextView(R.id.tv_location, mUser.location());
-        fillTextView(R.id.tv_bio, mUser.bio() != null ? EmojiParser.parseToUnicode(mUser.bio()) : null);
+        fillTextView(R.id.tv_bio, StringUtils.replaceEmojiAliases(mUser.bio()));
     }
 
     private static int orZero(Integer count) {
@@ -275,7 +274,7 @@ public class UserFragment extends LoadingFragmentBase implements
                 TextView tvDesc = rowView.findViewById(R.id.tv_desc);
                 if (!StringUtils.isBlank(repo.description())) {
                     tvDesc.setVisibility(View.VISIBLE);
-                    tvDesc.setText(EmojiParser.parseToUnicode(repo.description()));
+                    tvDesc.setText(StringUtils.replaceEmojiAliases(repo.description()));
                 } else {
                     tvDesc.setVisibility(View.GONE);
                 }

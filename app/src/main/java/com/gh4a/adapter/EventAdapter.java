@@ -69,7 +69,6 @@ import com.meisolsson.githubsdk.model.payload.PullRequestReviewPayload;
 import com.meisolsson.githubsdk.model.payload.PushPayload;
 import com.meisolsson.githubsdk.model.payload.ReleasePayload;
 import com.meisolsson.githubsdk.model.payload.TeamAddPayload;
-import com.vdurmont.emoji.EmojiParser;
 
 import java.util.List;
 
@@ -138,7 +137,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                 CommitCommentPayload payload = (CommitCommentPayload) event.payload();
                 GitComment comment = payload.comment();
                 if (comment != null) {
-                    return EmojiParser.parseToUnicode(comment.body());
+                    return StringUtils.replaceEmojiAliases(comment.body());
                 }
                 break;
             }
@@ -186,7 +185,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
             case IssueCommentEvent: {
                 IssueCommentPayload payload = (IssueCommentPayload) event.payload();
                 if (payload != null && payload.comment() != null) {
-                    return EmojiParser.parseToUnicode(payload.comment().body());
+                    return StringUtils.replaceEmojiAliases(payload.comment().body());
                 }
                 break;
             }
@@ -216,7 +215,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                 Review review = payload.review();
                 String body = review.body();
                 if (body != null) {
-                    return EmojiParser.parseToUnicode(review.body());
+                    return StringUtils.replaceEmojiAliases(review.body());
                 }
                 break;
             }
@@ -225,7 +224,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                         (PullRequestReviewCommentPayload) event.payload();
                 ReviewComment comment = payload.comment();
                 if (comment != null) {
-                    return EmojiParser.parseToUnicode(comment.body());
+                    return StringUtils.replaceEmojiAliases(comment.body());
                 }
                 break;
             }
@@ -258,7 +257,8 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                                 ssb.length() - sha.length(), ssb.length(), 0);
 
                         ssb.append(" ");
-                        ssb.append(StringUtils.getFirstLine(EmojiParser.parseToUnicode(commit.message())));
+                        ssb.append(StringUtils.getFirstLine(
+                                StringUtils.replaceEmojiAliases(commit.message())));
                         ssb.setSpan(new EllipsizeLineSpan(i == (count - 1) ? 0 : bottomMargin),
                                 lastLength, ssb.length(), 0);
                     }

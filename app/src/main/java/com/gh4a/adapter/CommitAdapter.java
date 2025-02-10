@@ -34,7 +34,6 @@ import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.git.GitUser;
-import com.vdurmont.emoji.EmojiParser;
 
 public class CommitAdapter extends RootAdapter<Commit, CommitAdapter.ViewHolder> {
     public CommitAdapter(Context context) {
@@ -67,7 +66,7 @@ public class CommitAdapter extends RootAdapter<Commit, CommitAdapter.ViewHolder>
         if (pos > 0) {
             message = message.substring(0, pos);
         }
-        message = EmojiParser.parseToUnicode(message);
+        message = StringUtils.replaceEmojiAliases(message);
 
         holder.tvDesc.setText(message);
         holder.tvSha.setText(commit.sha().substring(0, 10));
