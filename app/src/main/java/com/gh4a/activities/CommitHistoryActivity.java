@@ -3,6 +3,10 @@ package com.gh4a.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -27,6 +31,7 @@ public class CommitHistoryActivity extends FragmentContainerActivity implements
     private String mRef;
     private String mFilePath;
     private boolean mSupportBaseSelection;
+    private boolean mFollowRenames;
 
     @Nullable
     @Override
@@ -52,12 +57,45 @@ public class CommitHistoryActivity extends FragmentContainerActivity implements
 
     @Override
     protected Fragment onCreateFragment() {
-        return CommitListFragment.newInstance(mRepoOwner, mRepoName, mRef, mFilePath);
+        CommitListFragment f = CommitListFragment.newInstance(mRepoOwner, mRepoName, mRef, mFilePath);
+        f.setFollowFileRenames(mFollowRenames);
+        return f;
     }
 
     @Override
     protected Intent navigateUp() {
         return RepositoryActivity.makeIntent(this, mRepoOwner, mRepoName, mRef);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.commit_history_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem followItem = menu.findItem(R.id.follow_renames);
+        if (followItem != null) {
+            followItem.setChecked(mFollowRenames);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.follow_renames) {
+            mFollowRenames = !mFollowRenames;
+            item.setChecked(mFollowRenames);
+            CommitListFragment f = (CommitListFragment) getFragment();
+            if (f != null) {
+                f.setFollowFileRenames(mFollowRenames);
+            }
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
