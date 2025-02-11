@@ -31,6 +31,9 @@ import android.widget.TextView;
 import com.gh4a.Gh4Application;
 import com.meisolsson.githubsdk.model.User;
 
+import net.fellbaum.jemoji.Emoji;
+import net.fellbaum.jemoji.EmojiManager;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -193,5 +196,13 @@ public class StringUtils {
                 .replaceAll("&(rdquo|#8221);", "”")
                 .replaceAll("&(ndash|#8211);", "–")
                 .replaceAll("&(mdash|#8212);", "—");
+    }
+
+    public static String replaceEmojiAliases(String input) {
+        return EmojiManager.replaceAliases(input, (alias, emojis) -> emojis.stream()
+                .filter(emoji -> emoji.getGithubAliases().contains(alias))
+                .findFirst()
+                .map(Emoji::getEmoji)
+                .orElse(alias));
     }
 }

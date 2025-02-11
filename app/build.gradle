@@ -99,9 +99,7 @@ dependencies {
     implementation 'com.github.castorflex.smoothprogressbar:library:1.3.0'
     implementation 'org.ccil.cowan.tagsoup:tagsoup:1.2.1'
     implementation 'com.github.pluscubed:recycler-fast-scroll:3de76812553a77bfd25d3aea0a0af4d96516c3e3@aar'
-    implementation('com.vdurmont:emoji-java:5.1.1') {
-        exclude group: 'org.json', module : 'json'
-    }
+    implementation 'net.fellbaum:jemoji:1.7.0'
     implementation 'com.github.Tunous:MarkdownEdit:1.0.0'
     implementation 'com.github.qoqa:traceur:2.2.12'
     testImplementation 'junit:junit:4.13.2'
