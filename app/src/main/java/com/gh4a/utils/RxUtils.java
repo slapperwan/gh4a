@@ -1,7 +1,7 @@
 package com.gh4a.utils;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -117,7 +117,7 @@ public class RxUtils {
         return upstream -> upstream
                 .compose(RxUtils::doInBackground)
                 .compose(wrapWithProgressDialog(activity, dialogMessageResId))
-                .compose(wrapWithRetrySnackbar(rootLayout, errorMessage));
+                .compose(wrapWithErrorSnackbar(activity, rootLayout, errorMessage));
     }
 
     public static <T> SingleTransformer<T, T> wrapWithProgressDialog(final FragmentActivity activity,
@@ -150,24 +150,27 @@ public class RxUtils {
         };
     }
 
-    public static <T> SingleTransformer<T, T> wrapWithRetrySnackbar(BaseActivity activity, @StringRes int errorMessageResId) {
-        return wrapWithRetrySnackbar(activity.getRootLayout(), activity.getString(errorMessageResId));
+    public static <T> SingleTransformer<T, T> wrapWithErrorSnackbar(BaseActivity activity, @StringRes int errorMessageResId) {
+        return wrapWithErrorSnackbar(activity, activity.getRootLayout(), activity.getString(errorMessageResId));
     }
 
-    public static <T> SingleTransformer<T, T> wrapWithRetrySnackbar(
+    public static <T> SingleTransformer<T, T> wrapWithErrorSnackbar(Context context,
             final CoordinatorLayout rootLayout, final String errorMessage) {
-        return new SingleTransformer<T, T>() {
+        return new SingleTransformer<>() {
             @Override
             public SingleSource<T> apply(Single<T> upstream) {
-                return upstream
-                        .retryWhen(errorFlow -> errorFlow.flatMap(error -> showSnackbar(error)));
+                return upstream.retryWhen(errorFlow -> errorFlow.flatMap(this::showErrorSnackbar));
             }
 
-            @SuppressLint("ShowToast")
-            private Publisher<Integer> showSnackbar(Throwable error) {
+            private Publisher<Integer> showErrorSnackbar(Throwable error) {
+                boolean isGitHubApiError = error instanceof ApiRequestException;
+                String snackbarText = isGitHubApiError
+                        ? context.getString(R.string.snackbar_detailed_github_error, errorMessage, error.getMessage())
+                        : context.getString(R.string.snackbar_generic_error, errorMessage);
+
                 final PublishProcessor<Integer> retryProcessor = PublishProcessor.create();
-                Snackbar.make(rootLayout, errorMessage, Snackbar.LENGTH_LONG)
-                        .addCallback(new Snackbar.BaseCallback<Snackbar>() {
+                var snackbar = Snackbar.make(rootLayout, snackbarText, Snackbar.LENGTH_LONG)
+                        .addCallback(new Snackbar.BaseCallback<>() {
                             @Override
                             public void onDismissed(Snackbar snackbar, int event) {
                                 // Propagate error if opportunity to retry isn't used, either
@@ -177,8 +180,17 @@ public class RxUtils {
                                 }
                             }
                         })
-                        .setAction(R.string.retry, view -> retryProcessor.onNext(0))
-                        .show();
+                        .setTextMaxLines(3)
+                        .setAction(R.string.retry, view -> retryProcessor.onNext(0));
+
+                if (isGitHubApiError) {
+                    snackbar
+                        .setDuration(Snackbar.LENGTH_INDEFINITE)
+                        .setAction(
+                            R.string.snackbar_copy_error_action,
+                            view -> IntentUtils.copyToClipboard(context, "GitHub error", error.getMessage()));
+                }
+                snackbar.show();
                 return retryProcessor;
             }
         };

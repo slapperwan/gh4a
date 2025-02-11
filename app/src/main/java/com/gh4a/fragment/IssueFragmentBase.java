@@ -487,7 +487,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createIssueReaction(mRepoOwner, mRepoName, mIssue.number(), request)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils.wrapWithRetrySnackbar(getBaseActivity(), R.string.add_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(getBaseActivity(), R.string.add_reaction_error));
     }
 
     @Override
@@ -495,7 +495,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deleteIssueReaction(mRepoOwner, mRepoName, mIssue.number(), reactionId)
                 .map(ApiHelpers::mapToTrueOnSuccess)
-                .compose(RxUtils.wrapWithRetrySnackbar(getBaseActivity(), R.string.remove_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(getBaseActivity(), R.string.remove_reaction_error));
     }
 
     @Override
@@ -512,7 +512,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         ReactionRequest request = ReactionRequest.builder().content(content).build();
         return service.createIssueCommentReaction(mRepoOwner, mRepoName, comment.id(), request)
                 .map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils.wrapWithRetrySnackbar(getBaseActivity(), R.string.add_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(getBaseActivity(), R.string.add_reaction_error));
     }
 
     @Override
@@ -520,7 +520,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         ReactionService service = ServiceFactory.get(ReactionService.class, false);
         return service.deleteIssueCommentReaction(mRepoOwner, mRepoName, comment.id(), reactionId)
                 .map(ApiHelpers::mapToTrueOnSuccess)
-                .compose(RxUtils.wrapWithRetrySnackbar(getBaseActivity(), R.string.remove_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(getBaseActivity(), R.string.remove_reaction_error));
     }
 
     @Override
