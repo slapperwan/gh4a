@@ -59,9 +59,12 @@ import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import static android.graphics.Paint.Style.FILL;
@@ -271,6 +274,8 @@ public class HtmlUtils {
         };
         private static final float SMALL_TEXT_SIZE = 0.8f;
 
+        private static final int REPLY_MARKER_COLOR = 0xffdddddd;
+
         private final float mDividerHeight;
         private final float mDisplayTextScaling;
         private final int mBulletMargin;
@@ -282,7 +287,7 @@ public class HtmlUtils {
         private final String mSource;
         private final XMLReader mReader;
         private final SpannableStringBuilder mSpannableStringBuilder;
-        private final android.text.Html.ImageGetter mImageGetter;
+        private final ImageGetter mImageGetter;
 
         private static Pattern sTextAlignPattern;
         private static Pattern sForegroundColorPattern;
@@ -321,7 +326,7 @@ public class HtmlUtils {
         }
 
         public HtmlToSpannedConverter(Context context, String source,
-                android.text.Html.ImageGetter imageGetter, Parser parser) {
+                ImageGetter imageGetter, Parser parser) {
             final Resources res = context.getResources();
             mDividerHeight = res.getDimension(R.dimen.divider_span_height);
             mDisplayTextScaling = res.getDisplayMetrics().scaledDensity;
@@ -618,7 +623,7 @@ public class HtmlUtils {
 
         private void startBlockElement(Attributes attributes, int newlines) {
             appendNewlines(newlines);
-            start(new Newline(newlines));
+            start(new BlockElement(newlines, getBlockElementTypeFor(attributes)));
 
             String style = attributes.getValue("", "style");
             if (style != null) {
@@ -637,16 +642,45 @@ public class HtmlUtils {
         }
 
         private void endBlockElement() {
-            Newline n = getLast(Newline.class);
-            if (n != null) {
-                appendNewlines(n.mNumNewlines);
-                mSpannableStringBuilder.removeSpan(n);
+            BlockElement block = getLast(BlockElement.class);
+            if (block != null) {
+                appendNewlines(block.mNumNewlines);
+                end(BlockElement.class, getSpansForBlockElementType(block.mType));
             }
 
             Alignment a = getLast(Alignment.class);
             if (a != null) {
                 setSpanFromMark(a, new AlignmentSpan.Standard(a.mAlignment));
             }
+        }
+
+        @NonNull
+        private BlockElement.Type getBlockElementTypeFor(Attributes attributes) {
+            String classAttribute = Optional.ofNullable(attributes.getValue("class")).orElse("");
+
+            /*
+             * GitHub's Markdown alerts are rendered as <div>s with ad hoc styling, as in the following example:
+             * <div class="markdown-alert markdown-alert-note" dir="auto">
+             *   <p class="markdown-alert-title" dir="auto"> [title] </p>
+             *   <p dir="auto"> [content] </p>
+             * </div>
+             */
+            var cssClasses = Arrays.asList(classAttribute.split(" "));
+            if (cssClasses.contains("markdown-alert")) {
+                return BlockElement.Type.Alert;
+            } else if (cssClasses.contains("markdown-alert-title")) {
+                return BlockElement.Type.AlertTitle;
+            } else {
+                return BlockElement.Type.Generic;
+            }
+        }
+
+        private Object[] getSpansForBlockElementType(@NonNull BlockElement.Type type) {
+            return switch (type) {
+                case Alert -> new Object[] { new ReplySpan(mReplyMargin, mReplyMarkerSize, REPLY_MARKER_COLOR) };
+                case AlertTitle -> new Object[] { new StyleSpan(Typeface.BOLD_ITALIC) };
+                case Generic -> new Object[0];
+            };
         }
 
         private void handleBr() {
@@ -680,7 +714,7 @@ public class HtmlUtils {
 
         private void endBlockquote() {
             endBlockElement();
-            end(Blockquote.class, new ReplySpan(mReplyMargin, mReplyMarkerSize, 0xffdddddd));
+            end(Blockquote.class, new ReplySpan(mReplyMargin, mReplyMarkerSize, REPLY_MARKER_COLOR));
         }
 
         private void startHeading(Attributes attributes, int level) {
@@ -1078,11 +1112,19 @@ public class HtmlUtils {
             }
         }
 
-        private static class Newline {
-            private final int mNumNewlines;
+        private static class BlockElement {
+            enum Type {
+                Alert,
+                AlertTitle,
+                Generic
+            }
 
-            public Newline(int numNewlines) {
+            private final int mNumNewlines;
+            private final Type mType;
+
+            public BlockElement(int numNewlines, @NonNull Type type) {
                 mNumNewlines = numNewlines;
+                mType = type;
             }
         }
 
