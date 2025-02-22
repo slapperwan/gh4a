@@ -501,6 +501,8 @@ public class HtmlUtils {
                 startImg(attributes, mImageGetter);
             } else if (tag.equalsIgnoreCase("video")) {
                 appendVideoLink(attributes.getValue("src"));
+            } else if (tag.equalsIgnoreCase("table")) {
+                appendNewlines(2);
             } else if (tag.equalsIgnoreCase("th")) {
                 start(new Bold());
             } else if (tag.equalsIgnoreCase("td")) {
@@ -576,6 +578,8 @@ public class HtmlUtils {
                     Character.toLowerCase(tag.charAt(0)) == 'h' &&
                     tag.charAt(1) >= '1' && tag.charAt(1) <= '6') {
                 endHeading();
+            } else if (tag.equalsIgnoreCase("table")) {
+                appendNewlines(2);
             } else if (tag.equalsIgnoreCase("tr")) {
                 mSpannableStringBuilder.append('\n');
                 Code codeMark = getLast(Code.class);
