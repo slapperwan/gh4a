@@ -364,7 +364,7 @@ public class HtmlUtils {
                 int end = mSpannableStringBuilder.getSpanEnd(span);
 
                 mSpannableStringBuilder.removeSpan(span);
-                mSpannableStringBuilder.setSpan(span.mActualSpan, start, end,
+                mSpannableStringBuilder.setSpan(span.actualSpan(), start, end,
                         Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
             }
 
@@ -644,13 +644,13 @@ public class HtmlUtils {
         private void endBlockElement() {
             BlockElement block = getLast(BlockElement.class);
             if (block != null) {
-                appendNewlines(block.mNumNewlines);
-                end(BlockElement.class, getSpansForBlockElementType(block.mType));
+                appendNewlines(block.numNewlines());
+                end(BlockElement.class, getSpansForBlockElementType(block.type()));
             }
 
             Alignment a = getLast(Alignment.class);
             if (a != null) {
-                setSpanFromMark(a, new AlignmentSpan.Standard(a.mAlignment));
+                setSpanFromMark(a, new AlignmentSpan.Standard(a.alignment()));
             }
         }
 
@@ -727,7 +727,7 @@ public class HtmlUtils {
             // Their ranges should not include the newlines at the end
             Heading h = getLast(Heading.class);
             if (h != null) {
-                setSpanFromMark(h, new RelativeSizeSpan(HEADING_SIZES[h.mLevel]),
+                setSpanFromMark(h, new RelativeSizeSpan(HEADING_SIZES[h.level()]),
                         new StyleSpan(Typeface.BOLD));
             }
 
@@ -768,7 +768,7 @@ public class HtmlUtils {
 
         private void endCodeSnippetLine(Code codeMark) {
             mSpannableStringBuilder.removeSpan(getLast(Pre.class));
-            setSpanFromMark(codeMark, new TypefaceSpan("monospace"), new CodeBlockSpan(codeMark.mColor));
+            setSpanFromMark(codeMark, new TypefaceSpan("monospace"), new CodeBlockSpan(codeMark.color()));
         }
 
         private <T> T getLast(Class<T> kind) {
@@ -848,12 +848,12 @@ public class HtmlUtils {
 
             Background b = getLast(Background.class);
             if (b != null) {
-                setSpanFromMark(b, new BackgroundColorSpan(b.mBackgroundColor));
+                setSpanFromMark(b, new BackgroundColorSpan(b.backgroundColor()));
             }
 
             Foreground f = getLast(Foreground.class);
             if (f != null) {
-                setSpanFromMark(f, new ForegroundColorSpan(f.mForegroundColor));
+                setSpanFromMark(f, new ForegroundColorSpan(f.foregroundColor()));
             }
         }
 
@@ -899,12 +899,12 @@ public class HtmlUtils {
         private void endFont() {
             Font font = getLast(Font.class);
             if (font != null) {
-                setSpanFromMark(font, new TypefaceSpan(font.mFace));
+                setSpanFromMark(font, new TypefaceSpan(font.face()));
             }
 
             Foreground foreground = getLast(Foreground.class);
             if (foreground != null) {
-                setSpanFromMark(foreground, new ForegroundColorSpan(foreground.mForegroundColor));
+                setSpanFromMark(foreground, new ForegroundColorSpan(foreground.foregroundColor()));
             }
         }
 
@@ -916,8 +916,8 @@ public class HtmlUtils {
         private void endA() {
             Href h = getLast(Href.class);
             if (h != null) {
-                if (h.mHref != null) {
-                    setSpanFromMark(h, new LinkSpan(h.mHref));
+                if (h.href() != null) {
+                    setSpanFromMark(h, new LinkSpan(h.href()));
                 }
             }
         }
@@ -1022,23 +1022,25 @@ public class HtmlUtils {
         private static class Super { }
         private static class Sub { }
         private static class Pre { }
+        private record Font(String face) { }
+        private record Href(String href) { }
+        private record Foreground(int foregroundColor) { }
+        private record Background(int backgroundColor) { }
+        private record Heading(int level) { }
+        private record Alignment(Layout.Alignment alignment) { }
+        private record NeedsReversingSpan(Object actualSpan) { }
 
-        private static class NeedsReversingSpan {
-            public final Object mActualSpan;
-            public NeedsReversingSpan(Object actualSpan) {
-                mActualSpan = actualSpan;
+        private record Code(int color) {
+            public Code() {
+                this(0);
             }
         }
 
-        private static class Code {
-            private final int mColor;
-
-            public Code() {
-                mColor = 0;
-            }
-
-            public Code(int color) {
-                mColor = color;
+        private record BlockElement(int numNewlines, @NonNull BlockElement.Type type) {
+            enum Type {
+                Alert,
+                AlertTitle,
+                Generic
             }
         }
 
@@ -1069,70 +1071,6 @@ public class HtmlUtils {
                 if (list != null) {
                     list.mPosition = position + 1;
                 }
-            }
-        }
-
-        private static class Font {
-            public final String mFace;
-
-            public Font(String face) {
-                mFace = face;
-            }
-        }
-
-        private static class Href {
-            public final String mHref;
-
-            public Href(String href) {
-                mHref = href;
-            }
-        }
-
-        private static class Foreground {
-            private final int mForegroundColor;
-
-            public Foreground(int foregroundColor) {
-                mForegroundColor = foregroundColor;
-            }
-        }
-
-        private static class Background {
-            private final int mBackgroundColor;
-
-            public Background(int backgroundColor) {
-                mBackgroundColor = backgroundColor;
-            }
-        }
-
-        private static class Heading {
-            private final int mLevel;
-
-            public Heading(int level) {
-                mLevel = level;
-            }
-        }
-
-        private static class BlockElement {
-            enum Type {
-                Alert,
-                AlertTitle,
-                Generic
-            }
-
-            private final int mNumNewlines;
-            private final Type mType;
-
-            public BlockElement(int numNewlines, @NonNull Type type) {
-                mNumNewlines = numNewlines;
-                mType = type;
-            }
-        }
-
-        private static class Alignment {
-            private final Layout.Alignment mAlignment;
-
-            public Alignment(Layout.Alignment alignment) {
-                mAlignment = alignment;
             }
         }
     }
