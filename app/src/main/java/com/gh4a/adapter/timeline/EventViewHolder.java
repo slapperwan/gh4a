@@ -103,7 +103,8 @@ class EventViewHolder
             case Milestoned, Demilestoned -> R.drawable.issue_event_milestone;
             case Renamed -> R.drawable.issue_event_renamed;
             case CommentDeleted, ReviewDismissed -> R.drawable.timeline_event_dismissed_deleted;
-            case HeadRefDeleted, HeadRefRestored, HeadRefForcePushed, ConvertToDraft ->
+            case HeadRefDeleted, HeadRefRestored, HeadRefForcePushed, ConvertToDraft,
+                 AutoMergeEnabled, AutoSquashEnabled, AutoRebaseEnabled, AutoMergeDisabled ->
                     R.drawable.timeline_event_branch;
             case ReviewRequested, ReadyForReview -> R.drawable.timeline_event_review;
             case ReviewRequestRemoved -> R.drawable.timeline_event_review_request_removed;
@@ -240,6 +241,10 @@ class EventViewHolder
             case HeadRefDeleted -> textResId = R.string.pull_request_event_ref_deleted;
             case HeadRefRestored -> textResId = R.string.pull_request_event_ref_restored;
             case HeadRefForcePushed -> textResId = R.string.pull_request_event_ref_force_pushed;
+            case AutoMergeDisabled -> textResId = R.string.pull_request_event_auto_merge_disabled;
+            case AutoMergeEnabled -> textResId = R.string.pull_request_event_auto_merge_enabled;
+            case AutoSquashEnabled -> textResId = R.string.pull_request_event_auto_squash_enabled;
+            case AutoRebaseEnabled -> textResId = R.string.pull_request_event_auto_rebase_enabled;
             case CommentDeleted -> textResId = R.string.pull_request_event_comment_deleted;
             case ConvertToDraft -> textResId = R.string.pull_request_event_convert_to_draft;
             case ReadyForReview -> textResId = R.string.pull_request_event_ready_for_review;
