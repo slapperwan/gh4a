@@ -335,6 +335,10 @@
     <string name="pull_request_event_ref_deleted">[b]%1$s[/b] deleted the pull request branch [time]</string>
     <string name="pull_request_event_ref_restored">[b]%1$s[/b] restored the pull request branch [time]</string>
     <string name="pull_request_event_ref_force_pushed">[b]%1$s[/b] force-pushed the pull request branch [time]</string>
+    <string name="pull_request_event_auto_merge_disabled">[b]%1$s[/b] disabled auto-merge [time]</string>
+    <string name="pull_request_event_auto_merge_enabled">[b]%1$s[/b] enabled auto-merge [time]</string>
+    <string name="pull_request_event_auto_rebase_enabled">[b]%1$s[/b] enabled auto-merge (rebase) [time]</string>
+    <string name="pull_request_event_auto_squash_enabled">[b]%1$s[/b] enabled auto-merge (squash) [time]</string>
     <string name="pull_request_event_comment_deleted">[b]%1$s[/b] deleted a comment [time]</string>
     <string name="pull_request_event_convert_to_draft">[b]%1$s[/b] marked this pull request as draft [time]</string>
     <string name="pull_request_event_ready_for_review">[b]%1$s[/b] marked this pull request as ready for review [time]</string>
