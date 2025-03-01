@@ -89,41 +89,27 @@ class EventViewHolder
     }
 
     private Integer getEventIcon(IssueEvent event) {
-        switch (event.event()) {
-            case Closed:
-                return mIsPullRequest || event.stateReason() == IssueStateReason.NotPlanned
-                        ? R.drawable.issue_event_closed
-                        : R.drawable.issue_event_closed_completed;
-            case Reopened: return R.drawable.issue_event_reopened;
-            case Merged: return R.drawable.issue_event_merged;
-            case Referenced: return R.drawable.issue_event_referenced;
-            case Assigned:
-            case Unassigned:
-                return R.drawable.issue_event_person;
-            case Labeled:
-            case Unlabeled:
-                return R.drawable.issue_event_label;
-            case Locked: return R.drawable.issue_event_locked;
-            case Unlocked: return R.drawable.issue_event_unlocked;
-            case Milestoned:
-            case Demilestoned:
-                return R.drawable.issue_event_milestone;
-            case Renamed: return R.drawable.issue_event_renamed;
-            case CommentDeleted:
-            case ReviewDismissed:
-                return R.drawable.timeline_event_dismissed_deleted;
-            case HeadRefDeleted:
-            case HeadRefRestored:
-            case HeadRefForcePushed:
-            case ConvertToDraft:
-                return R.drawable.timeline_event_branch;
-            case ReviewRequested:
-            case ReadyForReview:
-                return R.drawable.timeline_event_review;
-            case ReviewRequestRemoved: return R.drawable.timeline_event_review_request_removed;
-            case CrossReferenced: return R.drawable.timeline_event_cross_referenced;
-        }
-        return null;
+        return switch (event.event()) {
+            case Closed -> mIsPullRequest || event.stateReason() == IssueStateReason.NotPlanned
+                    ? R.drawable.issue_event_closed
+                    : R.drawable.issue_event_closed_completed;
+            case Reopened -> R.drawable.issue_event_reopened;
+            case Merged -> R.drawable.issue_event_merged;
+            case Referenced -> R.drawable.issue_event_referenced;
+            case Assigned, Unassigned -> R.drawable.issue_event_person;
+            case Labeled, Unlabeled -> R.drawable.issue_event_label;
+            case Locked -> R.drawable.issue_event_locked;
+            case Unlocked -> R.drawable.issue_event_unlocked;
+            case Milestoned, Demilestoned -> R.drawable.issue_event_milestone;
+            case Renamed -> R.drawable.issue_event_renamed;
+            case CommentDeleted, ReviewDismissed -> R.drawable.timeline_event_dismissed_deleted;
+            case HeadRefDeleted, HeadRefRestored, HeadRefForcePushed, ConvertToDraft ->
+                    R.drawable.timeline_event_branch;
+            case ReviewRequested, ReadyForReview -> R.drawable.timeline_event_review;
+            case ReviewRequestRemoved -> R.drawable.timeline_event_review_request_removed;
+            case CrossReferenced -> R.drawable.timeline_event_cross_referenced;
+            default -> null;
+        };
     }
 
     private CharSequence formatEvent(final IssueEvent event, final User user) {
@@ -133,7 +119,7 @@ class EventViewHolder
         String commitUrl = event.commitUrl();
 
         switch (event.event()) {
-            case Closed:
+            case Closed -> {
                 if (mIsPullRequest) {
                     textResId = commitId != null
                             ? R.string.pull_request_event_closed_with_commit
@@ -149,18 +135,18 @@ class EventViewHolder
                                 : R.string.issue_event_closed_completed;
                     }
                 }
-                break;
-            case Reopened:
+            }
+            case Reopened -> {
                 textResId = mIsPullRequest
                         ? R.string.pull_request_event_reopened
                         : R.string.issue_event_reopened;
-                break;
-            case Merged:
+            }
+            case Merged -> {
                 textResId = commitId != null
                         ? R.string.pull_request_event_merged_with_commit
                         : R.string.pull_request_event_merged;
-                break;
-            case Referenced:
+            }
+            case Referenced -> {
                 if (mIsPullRequest) {
                     textResId = commitId != null
                             ? R.string.pull_request_event_referenced_with_commit
@@ -170,9 +156,8 @@ class EventViewHolder
                             ? R.string.issue_event_referenced_with_commit
                             : R.string.issue_event_referenced;
                 }
-                break;
-            case Assigned:
-            case Unassigned: {
+            }
+            case Assigned, Unassigned -> {
                 boolean isAssign = event.event() == IssueEventType.Assigned;
                 String actorLogin = user != null ? user.login() : null;
                 String assigneeLogin = event.assignee() != null ? event.assignee().login() : null;
@@ -192,41 +177,31 @@ class EventViewHolder
                             getUserLoginWithBotSuffix(user),
                             getUserLoginWithBotSuffix(event.assignee()));
                 }
-                break;
             }
-            case Labeled:
-                textResId = R.string.issue_event_labeled;
-                break;
-            case Unlabeled:
-                textResId = R.string.issue_event_unlabeled;
-                break;
-            case Locked:
+            case Labeled -> textResId = R.string.issue_event_labeled;
+            case Unlabeled -> textResId = R.string.issue_event_unlabeled;
+            case Locked -> {
                 if (event.lockReason() == null) {
                     textResId = R.string.issue_event_locked;
                 } else {
                     textBase = mContext.getString(R.string.issue_event_locked_with_reason,
-                        getUserLoginWithBotSuffix(user), event.lockReason());
+                            getUserLoginWithBotSuffix(user), event.lockReason());
                 }
-                break;
-            case Unlocked:
-                textResId = R.string.issue_event_unlocked;
-                break;
-            case Milestoned:
-            case Demilestoned:
+            }
+            case Unlocked -> textResId = R.string.issue_event_unlocked;
+            case Milestoned, Demilestoned -> {
                 textResId = event.event() == IssueEventType.Milestoned
                         ? R.string.issue_event_milestoned
                         : R.string.issue_event_demilestoned;
                 textBase = mContext.getString(textResId,
                         getUserLoginWithBotSuffix(user), event.milestone().title());
-                break;
-            case Renamed: {
+            }
+            case Renamed -> {
                 Rename rename = event.rename();
                 textBase = mContext.getString(R.string.issue_event_renamed,
                         getUserLoginWithBotSuffix(user), rename.from(), rename.to());
-                break;
             }
-            case ReviewRequested:
-            case ReviewRequestRemoved: {
+            case ReviewRequested, ReviewRequestRemoved -> {
                 if (event.requestedTeam() != null) {
                     @StringRes int stringResId = event.event() == IssueEventType.ReviewRequested
                             ? R.string.pull_request_event_team_review_requested
@@ -251,9 +226,8 @@ class EventViewHolder
                     textBase = mContext.getString(stringResId,
                             getUserLoginWithBotSuffix(event.reviewRequester()), reviewerNames);
                 }
-                break;
             }
-            case ReviewDismissed:
+            case ReviewDismissed -> {
                 String dismissalCommitId = event.dismissedReview().dismissalCommitId();
                 if (dismissalCommitId != null) {
                     commitId = dismissalCommitId;
@@ -262,32 +236,21 @@ class EventViewHolder
                 } else {
                     textResId = R.string.pull_request_event_review_dismissed;
                 }
-                break;
-            case HeadRefDeleted:
-                textResId = R.string.pull_request_event_ref_deleted;
-                break;
-            case HeadRefRestored:
-                textResId = R.string.pull_request_event_ref_restored;
-                break;
-            case HeadRefForcePushed:
-                textResId = R.string.pull_request_event_ref_force_pushed;
-                break;
-            case CommentDeleted:
-                textResId = R.string.pull_request_event_comment_deleted;
-                break;
-            case ConvertToDraft:
-                textResId = R.string.pull_request_event_convert_to_draft;
-                break;
-            case ReadyForReview:
-                textResId = R.string.pull_request_event_ready_for_review;
-                break;
-            case CrossReferenced:
+            }
+            case HeadRefDeleted -> textResId = R.string.pull_request_event_ref_deleted;
+            case HeadRefRestored -> textResId = R.string.pull_request_event_ref_restored;
+            case HeadRefForcePushed -> textResId = R.string.pull_request_event_ref_force_pushed;
+            case CommentDeleted -> textResId = R.string.pull_request_event_comment_deleted;
+            case ConvertToDraft -> textResId = R.string.pull_request_event_convert_to_draft;
+            case ReadyForReview -> textResId = R.string.pull_request_event_ready_for_review;
+            case CrossReferenced -> {
                 textResId = mIsPullRequest
                         ? R.string.pull_request_event_mentioned
                         : R.string.issue_event_mentioned;
-                break;
-            default:
+            }
+            default -> {
                 return null;
+            }
         }
 
         if (textBase == null) {
