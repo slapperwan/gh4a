@@ -39,6 +39,8 @@ import com.gh4a.widget.PullRequestBranchInfoView;
 import com.meisolsson.githubsdk.model.CheckRun;
 import com.meisolsson.githubsdk.model.GitHubCommentBase;
 import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.IssueEvent;
+import com.meisolsson.githubsdk.model.IssueEventType;
 import com.meisolsson.githubsdk.model.IssueState;
 import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.model.PullRequestMarker;
@@ -198,6 +200,7 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
         Single<List<TimelineItem>> timelineItemsSingle = ApiHelpers.PageIterator
                 .toSingle(page -> timelineService.getTimeline(mRepoOwner, mRepoName, issueNumber, page))
                 .compose(RxUtils.filter(event -> INTERESTING_EVENTS.contains(event.event())))
+                .map(this::removeRedundantClosedEvent)
                 .compose(RxUtils.mapList(TimelineItem::fromIssueEvent));
 
         Single<List<Review>> reviewsSingle = ApiHelpers.PageIterator
@@ -296,6 +299,23 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
             Collections.sort(result, TimelineItem.COMPARATOR);
             return result;
         });
+    }
+
+    // The GitHub timeline API always returns a "closed" event after a "merged" one, which we don't want
+    // to display (as GH does on their website) because it doesn't make much sense from a user perspective:
+    // a user either closes or merges a PR, not both at the same time.
+    private List<IssueEvent> removeRedundantClosedEvent(List<IssueEvent> timelineEvents) {
+        int mergedEventIndex = timelineEvents.stream()
+                .map(IssueEvent::event).toList()
+                .indexOf(IssueEventType.Merged);
+
+        if (mergedEventIndex != -1) {
+            timelineEvents
+                .subList(mergedEventIndex, timelineEvents.size())
+                .removeIf(event -> event.event() == IssueEventType.Closed);
+        }
+
+        return timelineEvents;
     }
 
     @Override
