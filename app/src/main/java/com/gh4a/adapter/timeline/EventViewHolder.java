@@ -109,7 +109,7 @@ class EventViewHolder
             case AddedToMergeQueue, RemovedFromMergeQueue -> R.drawable.timeline_event_merge_queue;
             case ReviewRequested, ReadyForReview -> R.drawable.timeline_event_review;
             case ReviewRequestRemoved -> R.drawable.timeline_event_review_request_removed;
-            case CrossReferenced -> R.drawable.timeline_event_cross_referenced;
+            case CrossReferenced, Transferred -> R.drawable.timeline_event_cross_referenced;
             default -> null;
         };
     }
@@ -203,6 +203,7 @@ class EventViewHolder
                 textBase = mContext.getString(R.string.issue_event_renamed,
                         getUserLoginWithBotSuffix(user), rename.from(), rename.to());
             }
+            case Transferred -> textResId = R.string.issue_event_transferred;
             case ReviewRequested, ReviewRequestRemoved -> {
                 if (event.requestedTeam() != null) {
                     @StringRes int stringResId = event.event() == IssueEventType.ReviewRequested

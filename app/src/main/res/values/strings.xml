@@ -311,6 +311,7 @@
     <string name="issue_event_locked_with_reason">[b]%1$s[/b] locked as [b]%2$s[/b] and limited conversation to collaborators [time]</string>
     <string name="issue_event_unlocked">[b]%1$s[/b] unlocked this conversation [time]</string>
     <string name="issue_event_mentioned">[b]%1$s[/b] mentioned this issue in [b][source][/b] [time]</string>
+    <string name="issue_event_transferred">[b]%1$s[/b] transferred this issue from another repository [time]</string>
 
     <!-- Pull request events -->
     <string name="pull_request_event_closed">[b]%1$s[/b] closed this pull request [time]</string>
