@@ -339,6 +339,8 @@
     <string name="pull_request_event_auto_merge_enabled">[b]%1$s[/b] enabled auto-merge [time]</string>
     <string name="pull_request_event_auto_rebase_enabled">[b]%1$s[/b] enabled auto-merge (rebase) [time]</string>
     <string name="pull_request_event_auto_squash_enabled">[b]%1$s[/b] enabled auto-merge (squash) [time]</string>
+    <string name="pull_request_event_added_to_merge_queue">[b]%1$s[/b] added this pull request to the merge queue [time]</string>
+    <string name="pull_request_event_removed_from_merge_queue">[b]%1$s[/b] removed this pull request from the merge queue [time]</string>
     <string name="pull_request_event_comment_deleted">[b]%1$s[/b] deleted a comment [time]</string>
     <string name="pull_request_event_convert_to_draft">[b]%1$s[/b] marked this pull request as draft [time]</string>
     <string name="pull_request_event_ready_for_review">[b]%1$s[/b] marked this pull request as ready for review [time]</string>
