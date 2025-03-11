@@ -227,9 +227,6 @@ public class IntentUtils {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT);
-        }
         intent.putExtra(EXTRA_NEW_TASK, true);
         context.startActivity(intent);
     }
