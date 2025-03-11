@@ -289,6 +289,11 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
     }
 
     @Override
+    public boolean displayDetachAction() {
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Uri url = IntentUtils.createBaseUriForRepo(mRepoOwner, mRepoName).build();
         switch (item.getItemId()) {
