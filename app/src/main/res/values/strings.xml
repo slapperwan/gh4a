@@ -54,8 +54,8 @@
     <string name="add_comment">Add comment</string>
     <string name="add_reaction">Add reaction</string>
     <string name="remove_reaction">Remove reaction</string>
-    <string name="add_reaction_error">Adding reaction failed.</string>
-    <string name="remove_reaction_error">Removing reaction failed.</string>
+    <string name="add_reaction_error">Adding reaction failed</string>
+    <string name="remove_reaction_error">Removing reaction failed</string>
     <string name="edit">Edit</string>
     <string name="members">Members</string>
     <string name="open">Open</string>
@@ -68,6 +68,11 @@
     <string name="load_failure_explanation_dmca">This repository was taken down for legal reasons.\nPlease see %1$s for details.</string>
     <string name="load_failure_explanation_parsing">There was an error while parsing GitHub\'s response. You can use the button below to report this issue to the app developers.</string>
     <string name="load_failure_explanation_with_reason">Loading the data from GitHub failed. GitHub told us the following reason:\n%1$s</string>
+    <string name="snackbar_network_error">%1$s. Please check your internet connection.</string>
+    <string name="snackbar_application_error">%1$s. You can copy the error log to provide more details when reporting the issue to the app developers.</string>
+    <string name="snackbar_github_api_error">%1$s: %2$s</string>
+    <string name="snackbar_copy_error_msg_action">Copy error message</string>
+    <string name="snackbar_copy_error_log_action">Copy error log</string>
     <string name="issue_reported">The issue has been reported. Thank you!</string>
     <string name="find_next">Find next</string>
     <string name="find_previous">Find previous</string>
@@ -360,8 +365,8 @@
     <string name="commit_comment_hint">Comment on this commit</string>
     <string name="commit_details">Committed by [b]%1$s[/b] %2$s</string>
     <string name="commit_comment_dialog_title">Comment on line -%1$d +%2$d</string>
-    <string name="error_delete_commit_comment">Deletion of commit comment failed.</string>
-    <string name="error_delete_comment">Comment deletion failed.</string>
+    <string name="error_delete_commit_comment">Deletion of commit comment failed</string>
+    <string name="error_delete_comment">Comment deletion failed</string>
     <string name="commit_use_as_ref">Select as branch reference</string>
 
     <!-- Release -->
@@ -388,8 +393,8 @@
     <string name="issue_loading_template_hint">Loading issue body template\u2026</string>
     <string name="issue_error_title">Please enter a title</string>
     <string name="issue_edit_title">Edit Issue #%1$d</string>
-    <string name="issue_error_close">Closing issue #%1$d failed.</string>
-    <string name="issue_error_reopen">Reopening issue #%1$d failed.</string>
+    <string name="issue_error_close">Closing issue #%1$d failed</string>
+    <string name="issue_error_reopen">Reopening issue #%1$d failed</string>
     <string name="issue_sort_order">Sort order</string>
     <string name="issue_sort_created_asc">Oldest</string>
     <string name="issue_sort_created_desc">Newest</string>
@@ -403,15 +408,15 @@
     <string name="issue_labels">Labels</string>
     <string name="issue_milestones">Milestones</string>
     <string name="issue_dialog_delete_message">Do you really want to delete %1$s?</string>
-    <string name="issue_error_comment">Comment creation failed.</string>
-    <string name="issue_error_create">Issue creation failed.</string>
-    <string name="issue_error_edit">Editing issue #%1$d failed.</string>
+    <string name="issue_error_comment">Comment creation failed</string>
+    <string name="issue_error_create">Issue creation failed</string>
+    <string name="issue_error_edit">Editing issue #%1$d failed</string>
     <string name="issue_error_create_label">Creation of label \'%1$s\' failed</string>
     <string name="issue_error_edit_label">Editing label \'%1$s\' failed</string>
     <string name="issue_error_delete_label">Deletion of label \'%1$s\' failed</string>
-    <string name="issue_error_create_milestone">Creation of milestone \'%1$s\' failed.</string>
-    <string name="issue_error_edit_milestone">Editing milestone \'%1$s\' failed.</string>
-    <string name="issue_error_delete_milestone">Deletion of milestone failed.</string>
+    <string name="issue_error_create_milestone">Creation of milestone \'%1$s\' failed</string>
+    <string name="issue_error_edit_milestone">Editing milestone \'%1$s\' failed</string>
+    <string name="issue_error_delete_milestone">Deletion of milestone failed</string>
     <string name="issue_error_milestone_title">Please enter a title</string>
     <string name="issue_label_new">New Label</string>
     <string name="issue_milestone_new">New Milestone</string>
@@ -420,8 +425,8 @@
     <string name="issue_milestone_closed_issues">%d closed</string>
     <string name="issue_milestone_close_message">Do you really want to close this milestone?</string>
     <string name="issue_milestone_reopen_message">Do you really want to reopen this milestone?</string>
-    <string name="issue_milestone_close_error">Closing milestone failed.</string>
-    <string name="issue_milestone_reopen_error">Reopening milestone failed.</string>
+    <string name="issue_milestone_close_error">Closing milestone failed</string>
+    <string name="issue_milestone_reopen_error">Reopening milestone failed</string>
     <string name="issue_filter">Filter</string>
     <string name="issue_filter_by_label">Filter by label</string>
     <string name="issue_filter_by_milestone">Filter by milestone</string>
@@ -466,7 +471,7 @@
     <string name="pull_request_close">Close</string>
     <string name="pull_request_merge">Merge</string>
     <string name="pull_request_merged">Merged</string>
-    <string name="pull_error_merge">Merging pull request #%1$d failed.</string>
+    <string name="pull_error_merge">Merging pull request #%1$d failed</string>
     <string name="pull_message_dialog_title">Merge pull request #%1$d</string>
     <string name="pull_merge_title_description">Merge commit title</string>
     <string name="pull_merge_title_helper">Leave this empty to use the default title provided by GitHub.</string>
@@ -501,9 +506,9 @@
     <string name="pull_request_review_body">Review Summary</string>
     <string name="pull_request_review_description">Leave a comment about this review below.</string>
     <string name="pull_request_review_button_affirm">Comment</string>
-    <string name="pull_request_review_error">Adding review to pull request #%1$d failed.</string>
+    <string name="pull_request_review_error">Adding review to pull request #%1$d failed</string>
     <string name="pull_request_review_changes">Review</string>
-    <string name="review_create_error">Review creation failed.</string>
+    <string name="review_create_error">Review creation failed</string>
 
     <!-- Object -->
     <string name="object_view_file_at">View file @ %1$s</string>
