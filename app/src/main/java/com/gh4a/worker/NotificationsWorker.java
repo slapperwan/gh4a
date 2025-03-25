@@ -375,19 +375,16 @@ public class NotificationsWorker extends Worker {
         nm.notify(0, builder.build());
     }
 
-    private String determineNotificationTypeLabel(NotificationThread n) {
+    private String determineNotificationTypeLabel(NotificationThread notification) {
         final Resources res = getApplicationContext().getResources();
-        switch (n.subject().type()) {
-            case NotificationAdapter.SUBJECT_COMMIT:
-                return res.getString(R.string.notification_subject_commit);
-            case NotificationAdapter.SUBJECT_ISSUE:
-                return res.getString(R.string.notification_subject_issue);
-            case NotificationAdapter.SUBJECT_PULL_REQUEST:
-                return res.getString(R.string.notification_subject_pr);
-            case NotificationAdapter.SUBJECT_RELEASE:
-                return res.getString(R.string.notification_subject_release);
-        }
-        return n.subject().type();
+        return switch (notification.subject().type()) {
+            case NotificationAdapter.SUBJECT_COMMIT -> res.getString(R.string.notification_subject_commit);
+            case NotificationAdapter.SUBJECT_ISSUE -> res.getString(R.string.notification_subject_issue);
+            case NotificationAdapter.SUBJECT_PULL_REQUEST -> res.getString(R.string.notification_subject_pr);
+            case NotificationAdapter.SUBJECT_RELEASE -> res.getString(R.string.notification_subject_release);
+            case NotificationAdapter.SUBJECT_DISCUSSION -> res.getString(R.string.notification_subject_discussion);
+            default -> notification.subject().type();
+        };
     }
 
     private NotificationCompat.Builder makeBaseBuilder() {
