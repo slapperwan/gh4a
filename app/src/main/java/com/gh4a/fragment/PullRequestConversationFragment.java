@@ -516,13 +516,13 @@ public class PullRequestConversationFragment extends IssueFragmentBase {
 
         PullRequestMarker head = mPullRequest.head();
         Repository repo = head.repo();
-        Single<Optional<GitReference>> refSingle = repo == null
-                ? Single.just(Optional.empty())
-                : service.getGitReference(repo.owner().login(), repo.name(), head.ref())
+        Single<Optional<GitReference>> refSingle = repo != null && repo.owner() != null
+                ? service.getGitReference(repo.owner().login(), repo.name(), head.ref())
                         .map(ApiHelpers::throwOnFailure)
                         .map(Optional::of)
-                        .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<GitReference>empty()))
-                        .compose(makeLoaderSingle(ID_LOADER_HEAD_REF, force));
+                        .compose(RxUtils.mapFailureToValue(HttpURLConnection.HTTP_NOT_FOUND, Optional.<GitReference> empty()))
+                        .compose(makeLoaderSingle(ID_LOADER_HEAD_REF, force))
+                : Single.just(Optional.empty());
 
         refSingle.subscribe(refOpt -> {
             mHeadReference = refOpt.orElse(null);
