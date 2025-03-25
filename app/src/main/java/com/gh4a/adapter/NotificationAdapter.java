@@ -30,6 +30,7 @@ public class NotificationAdapter extends
     public static final String SUBJECT_PULL_REQUEST = "PullRequest";
     public static final String SUBJECT_COMMIT = "Commit";
     public static final String SUBJECT_RELEASE = "Release";
+    public static final String SUBJECT_DISCUSSION = "Discussion";
 
     public interface OnNotificationActionCallback {
         void markAsRead(NotificationHolder notificationHolder);
@@ -174,17 +175,14 @@ public class NotificationAdapter extends
     }
 
     private int getIconResId(String subjectType) {
-        if (SUBJECT_ISSUE.equals(subjectType)) {
-            return R.drawable.issue;
-        } else if (SUBJECT_PULL_REQUEST.equals(subjectType)) {
-            return R.drawable.pull_request;
-        } else if (SUBJECT_COMMIT.equals(subjectType)) {
-            return R.drawable.commit;
-        } else if (SUBJECT_RELEASE.equals(subjectType)) {
-            return R.drawable.release;
-        } else {
-            return 0;
-        }
+        return switch (subjectType) {
+            case SUBJECT_ISSUE -> R.drawable.issue;
+            case SUBJECT_PULL_REQUEST -> R.drawable.pull_request;
+            case SUBJECT_COMMIT -> R.drawable.commit;
+            case SUBJECT_RELEASE -> R.drawable.release;
+            case SUBJECT_DISCUSSION -> R.drawable.discussion;
+            default -> 0;
+        };
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
