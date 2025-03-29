@@ -29,7 +29,6 @@ import com.gh4a.R;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.Repository;
-import com.vdurmont.emoji.EmojiParser;
 
 import java.util.Locale;
 
@@ -51,7 +50,7 @@ public class RepositoryAdapter extends RootAdapter<Repository, RepositoryAdapter
 
         if (!StringUtils.isBlank(repository.description())) {
             holder.tvDesc.setVisibility(View.VISIBLE);
-            holder.tvDesc.setText(EmojiParser.parseToUnicode(repository.description()));
+            holder.tvDesc.setText(StringUtils.replaceEmojiAliases(repository.description()));
         } else {
             holder.tvDesc.setVisibility(View.GONE);
         }
