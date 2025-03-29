@@ -433,7 +433,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
                 ? service.createPullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.id(), request)
                 : service.createIssueCommentReaction(mRepoOwner, mRepoName, comment.id(), request);
         return responseSingle.map(ApiHelpers::throwOnFailure)
-                .compose(RxUtils.wrapWithRetrySnackbar(getBaseActivity(), R.string.add_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(getBaseActivity(), R.string.add_reaction_error));
     }
 
     @Override
@@ -443,7 +443,7 @@ public class ReviewFragment extends ListDataBaseFragment<TimelineItem> implement
                 ? service.deletePullRequestReviewCommentReaction(mRepoOwner, mRepoName, comment.id(), reactionId)
                 : service.deleteIssueCommentReaction(mRepoOwner, mRepoName, comment.id(), reactionId);
         return responseSingle.map(ApiHelpers::mapToTrueOnSuccess)
-                .compose(RxUtils.wrapWithRetrySnackbar(getBaseActivity(), R.string.remove_reaction_error));
+                .compose(RxUtils.wrapWithErrorSnackbar(getBaseActivity(), R.string.remove_reaction_error));
     }
 
     @Override

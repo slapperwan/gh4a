@@ -1,10 +1,13 @@
 package com.gh4a.utils;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.annotation.StringRes;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+
 import com.google.android.material.snackbar.Snackbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
@@ -17,6 +20,7 @@ import com.meisolsson.githubsdk.model.SearchPage;
 
 import org.reactivestreams.Publisher;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -117,7 +121,7 @@ public class RxUtils {
         return upstream -> upstream
                 .compose(RxUtils::doInBackground)
                 .compose(wrapWithProgressDialog(activity, dialogMessageResId))
-                .compose(wrapWithRetrySnackbar(rootLayout, errorMessage));
+                .compose(wrapWithErrorSnackbar(activity, rootLayout, errorMessage));
     }
 
     public static <T> SingleTransformer<T, T> wrapWithProgressDialog(final FragmentActivity activity,
@@ -150,24 +154,23 @@ public class RxUtils {
         };
     }
 
-    public static <T> SingleTransformer<T, T> wrapWithRetrySnackbar(BaseActivity activity, @StringRes int errorMessageResId) {
-        return wrapWithRetrySnackbar(activity.getRootLayout(), activity.getString(errorMessageResId));
+    public static <T> SingleTransformer<T, T> wrapWithErrorSnackbar(BaseActivity activity, @StringRes int errorMessageResId) {
+        return wrapWithErrorSnackbar(activity, activity.getRootLayout(), activity.getString(errorMessageResId));
     }
 
-    public static <T> SingleTransformer<T, T> wrapWithRetrySnackbar(
+    public static <T> SingleTransformer<T, T> wrapWithErrorSnackbar(Context context,
             final CoordinatorLayout rootLayout, final String errorMessage) {
-        return new SingleTransformer<T, T>() {
+        return new SingleTransformer<>() {
             @Override
             public SingleSource<T> apply(Single<T> upstream) {
-                return upstream
-                        .retryWhen(errorFlow -> errorFlow.flatMap(error -> showSnackbar(error)));
+                return upstream.retryWhen(errorFlow -> errorFlow.flatMap(this::showErrorSnackbar));
             }
 
-            @SuppressLint("ShowToast")
-            private Publisher<Integer> showSnackbar(Throwable error) {
+            private Publisher<Integer> showErrorSnackbar(Throwable error) {
                 final PublishProcessor<Integer> retryProcessor = PublishProcessor.create();
-                Snackbar.make(rootLayout, errorMessage, Snackbar.LENGTH_LONG)
-                        .addCallback(new Snackbar.BaseCallback<Snackbar>() {
+
+                var snackbar = Snackbar.make(rootLayout, "", Snackbar.LENGTH_LONG)
+                        .addCallback(new Snackbar.BaseCallback<>() {
                             @Override
                             public void onDismissed(Snackbar snackbar, int event) {
                                 // Propagate error if opportunity to retry isn't used, either
@@ -177,9 +180,35 @@ public class RxUtils {
                                 }
                             }
                         })
-                        .setAction(R.string.retry, view -> retryProcessor.onNext(0))
-                        .show();
+                        .setTextMaxLines(3);
+
+                setSnackBarContentForError(snackbar, error, retryProcessor);
+                snackbar.show();
                 return retryProcessor;
+            }
+
+            private void setSnackBarContentForError(Snackbar snackbar, Throwable error, PublishProcessor<Integer> retryProcessor) {
+                final int LONG_ERROR_SNACKBAR_DURATION_MS = 8000;
+                if (error instanceof IOException) {
+                    snackbar.setText(context.getString(R.string.snackbar_network_error, errorMessage))
+                            .setAction(R.string.retry, view -> retryProcessor.onNext(0));
+                } else if (error instanceof ApiRequestException) {
+                    snackbar
+                        .setText(context.getString(R.string.snackbar_github_api_error, errorMessage, error.getMessage()))
+                        .setDuration(LONG_ERROR_SNACKBAR_DURATION_MS)
+                        .setAction(
+                            R.string.snackbar_copy_error_msg_action,
+                            view -> IntentUtils.copyToClipboard(context, "GitHub error", error.getMessage())
+                        );
+                } else {
+                    snackbar
+                        .setText(context.getString(R.string.snackbar_application_error, errorMessage))
+                        .setDuration(LONG_ERROR_SNACKBAR_DURATION_MS)
+                        .setAction(
+                            R.string.snackbar_copy_error_log_action,
+                            view -> IntentUtils.copyToClipboard(context, "OctoDroid error", Log.getStackTraceString(error))
+                        );
+                }
             }
         };
     }
