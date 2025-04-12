@@ -11,7 +11,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -244,41 +243,39 @@ public class IntentUtils {
         intent.removeExtra(compressedDataKey(key));
     }
 
-    public static void putCompressedArrayListExtra(Intent intent, String key, ArrayList<?> list, int thresholdBytes) {
-        Parcel parcel = Parcel.obtain();
-        parcel.writeList(list);
-        byte[] compressedData = compressDataIfNeeded(parcel.marshall(), thresholdBytes);
-        parcel.recycle();
-
-        if (compressedData != null) {
-            intent.putExtra(compressedDataKey(key), compressedData);
-        } else {
-            intent.putExtra(key, list);
-        }
+    public static void putCompressedArrayListExtra(Intent intent, String key,
+            ArrayList<? extends Parcelable> list, int thresholdBytes) {
+        Bundle extras = intent.getExtras();
+        Bundle updatedExtras = extras != null ? extras : new Bundle();
+        putArrayListToBundleCompressed(updatedExtras, key, list, thresholdBytes);
+        intent.replaceExtras(updatedExtras);
     }
 
     public static <T extends Parcelable> ArrayList<T> getCompressedArrayListExtra(Intent intent, String key) {
-        Bundle extras = intent.getExtras();
-        ArrayList<T> result = readCompressedDataIfPresent(extras, key, Parcel::readArrayList);
-        if (result == null) {
-            result = extras.getParcelableArrayList(key);
-        }
-        return result;
+        return readCompressedArrayListFromBundle(intent.getExtras(), key);
     }
 
     public static void putCompressedParcelableExtra(Intent intent, String key,
             Parcelable parcelable, int thresholdBytes) {
-        byte[] compressedData = compressParcelableIfNeeded(parcelable, thresholdBytes);
+        Bundle extras = intent.getExtras();
+        Bundle updatedExtras = extras != null ? extras : new Bundle();
+        putParcelableToBundleCompressed(updatedExtras, key, parcelable, thresholdBytes);
+        intent.replaceExtras(updatedExtras);
+    }
+
+    public static void putArrayListToBundleCompressed(Bundle bundle, String key,
+            ArrayList<? extends Parcelable> list, int thresholdBytes) {
+        byte[] compressedData = compressDataIfNeeded(list, thresholdBytes);
         if (compressedData != null) {
-            intent.putExtra(compressedDataKey(key), compressedData);
+            bundle.putByteArray(compressedDataKey(key), compressedData);
         } else {
-            intent.putExtra(key, parcelable);
+            bundle.putParcelableArrayList(key, list);
         }
     }
 
     public static void putParcelableToBundleCompressed(Bundle bundle, String key,
             Parcelable parcelable, int thresholdBytes) {
-        byte[] compressedData = compressParcelableIfNeeded(parcelable, thresholdBytes);
+        byte[] compressedData = compressDataIfNeeded(parcelable, thresholdBytes);
         if (compressedData != null) {
             bundle.putByteArray(compressedDataKey(key), compressedData);
         } else {
@@ -287,22 +284,30 @@ public class IntentUtils {
     }
 
     public static <T extends Parcelable> T readCompressedParcelableFromBundle(Bundle bundle, String key) {
-        T result = readCompressedDataIfPresent(bundle, key, Parcel::readParcelable);
+        T result = readCompressedDataIfPresent(bundle, key);
         if (result == null) {
             result = bundle.getParcelable(key);
         }
         return result;
     }
 
-    private static byte[] compressParcelableIfNeeded(Parcelable parcelable, int thresholdBytes) {
+    public static <T extends Parcelable> ArrayList<T> readCompressedArrayListFromBundle(Bundle bundle, String key) {
+        ArrayList<T> result = readCompressedDataIfPresent(bundle, key);
+        if (result == null) {
+            result = bundle.getParcelableArrayList(key);
+        }
+        return result;
+    }
+
+    private static byte[] compressDataIfNeeded(Object data, int thresholdBytes) {
         Parcel parcel = Parcel.obtain();
-        parcel.writeParcelable(parcelable, 0);
-        byte[] compressedData = compressDataIfNeeded(parcel.marshall(), thresholdBytes);
+        parcel.writeValue(data);
+        byte[] compressedData = compressParceledDataIfNeeded(parcel.marshall(), thresholdBytes);
         parcel.recycle();
         return compressedData;
     }
 
-    private static byte[] compressDataIfNeeded(byte[] dataToCompress, int thresholdBytes) {
+    private static byte[] compressParceledDataIfNeeded(byte[] dataToCompress, int thresholdBytes) {
         byte[] compressedData = null;
         if (dataToCompress.length > thresholdBytes) {
             try (ByteArrayOutputStream baos = new ByteArrayOutputStream(dataToCompress.length);
@@ -316,8 +321,7 @@ public class IntentUtils {
         return compressedData;
     }
 
-    private static <T> T readCompressedDataIfPresent(Bundle bundle, String key,
-            CompressedParcelReader<T> reader) {
+    private static <T> T readCompressedDataIfPresent(Bundle bundle, String key) {
         byte[] uncompressedData = null;
         if (bundle.containsKey(compressedDataKey(key))) {
             byte[] compressedData = bundle.getByteArray(compressedDataKey(key));
@@ -336,7 +340,7 @@ public class IntentUtils {
             Parcel parcel = Parcel.obtain();
             parcel.unmarshall(uncompressedData, 0, uncompressedData.length);
             parcel.setDataPosition(0);
-            T result = reader.readFromParcel(parcel, FileUtils.class.getClassLoader());
+            T result = (T) parcel.readValue(IntentUtils.class.getClassLoader());
             parcel.recycle();
             return result;
         }
@@ -345,10 +349,6 @@ public class IntentUtils {
 
     private static String compressedDataKey(String key) {
         return key + "_compressed";
-    }
-
-    private interface CompressedParcelReader<T> {
-        T readFromParcel(Parcel parcel, ClassLoader loader);
     }
 
     public static class InitialCommentMarker implements Parcelable {

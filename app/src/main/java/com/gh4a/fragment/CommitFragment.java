@@ -51,11 +51,12 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         args.putString("owner", repoOwner);
         args.putString("repo", repoName);
         args.putString("sha", commitSha);
-        // Commit objects can be huge, depending on the number of patches attached to it.
+        // Commits can be huge, depending on the number of patches attached to it,
+        // and can potentially have a very high number of comments.
         // In order to avoid TransactionTooLargeExceptions being thrown when the activity we're
-        // attached to is recreated, store the data in compressed form
-        IntentUtils.putParcelableToBundleCompressed(args, "commit", commit, 100000);
-        args.putParcelableArrayList("comments", new ArrayList<>(comments));
+        // attached to is stopped, store the data in compressed form.
+        IntentUtils.putParcelableToBundleCompressed(args, "commit", commit, 100_000);
+        IntentUtils.putArrayListToBundleCompressed(args, "comments", new ArrayList<>(comments), 100_000);
         f.setArguments(args);
         return f;
     }
@@ -88,7 +89,7 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         mRepoName = args.getString("repo");
         mObjectSha = args.getString("sha");
         mCommit = IntentUtils.readCompressedParcelableFromBundle(args, "commit");
-        mComments = args.getParcelableArrayList("comments");
+        mComments = IntentUtils.readCompressedArrayListFromBundle(args, "comments");
     }
 
     @Override
