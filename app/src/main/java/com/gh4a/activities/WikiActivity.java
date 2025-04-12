@@ -30,7 +30,7 @@ public class WikiActivity extends WebViewerActivity {
                 .putExtra("owner", repoOwner)
                 .putExtra("repo", repoName);
         // Avoid TransactionTooLargeExceptions on activity launch when page content is too big
-        IntentUtils.putCompressedParcelableExtra(intent, "page_feed", feed, 800_000);
+        IntentUtils.putCompressedExtra(intent, "page_feed", feed);
         return intent;
     }
 
@@ -62,7 +62,7 @@ public class WikiActivity extends WebViewerActivity {
         super.onInitExtras(extras);
         mUserLogin = extras.getString("owner");
         mRepoName = extras.getString("repo");
-        mWikiPageFeed = IntentUtils.readCompressedParcelableFromBundle(extras, "page_feed");
+        mWikiPageFeed = IntentUtils.readCompressedValueFromBundle(extras, "page_feed");
     }
 
     @Override

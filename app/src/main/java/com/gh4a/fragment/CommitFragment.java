@@ -55,8 +55,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         // and can potentially have a very high number of comments.
         // In order to avoid TransactionTooLargeExceptions being thrown when the activity we're
         // attached to is stopped, store the data in compressed form.
-        IntentUtils.putParcelableToBundleCompressed(args, "commit", commit, 100_000);
-        IntentUtils.putArrayListToBundleCompressed(args, "comments", new ArrayList<>(comments), 100_000);
+        IntentUtils.putCompressedValueToBundle(args, "commit", commit);
+        IntentUtils.putCompressedValueToBundle(args, "comments", comments);
         f.setArguments(args);
         return f;
     }
@@ -88,8 +88,8 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
         mRepoOwner = args.getString("owner");
         mRepoName = args.getString("repo");
         mObjectSha = args.getString("sha");
-        mCommit = IntentUtils.readCompressedParcelableFromBundle(args, "commit");
-        mComments = IntentUtils.readCompressedArrayListFromBundle(args, "comments");
+        mCommit = IntentUtils.readCompressedValueFromBundle(args, "commit");
+        mComments = IntentUtils.readCompressedValueFromBundle(args, "comments");
     }
 
     @Override

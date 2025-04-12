@@ -24,14 +24,16 @@ import com.gh4a.fragment.SettingsFragment;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -234,121 +236,69 @@ public class IntentUtils {
         return intent != null && intent.getBooleanExtra(EXTRA_NEW_TASK, false);
     }
 
-    public static boolean hasCompressedExtra(Intent intent, String key) {
-        return intent.hasExtra(key) || intent.hasExtra(compressedDataKey(key));
-    }
-
-    public static void removeCompressedExtra(Intent intent, String key) {
-        intent.removeExtra(key);
-        intent.removeExtra(compressedDataKey(key));
-    }
-
-    public static void putCompressedArrayListExtra(Intent intent, String key,
-            ArrayList<? extends Parcelable> list, int thresholdBytes) {
+    public static void putCompressedExtra(Intent intent, String key, Object object) {
         Bundle extras = intent.getExtras();
         Bundle updatedExtras = extras != null ? extras : new Bundle();
-        putArrayListToBundleCompressed(updatedExtras, key, list, thresholdBytes);
+        putCompressedValueToBundle(updatedExtras, key, object);
         intent.replaceExtras(updatedExtras);
     }
 
-    public static <T extends Parcelable> ArrayList<T> getCompressedArrayListExtra(Intent intent, String key) {
-        return readCompressedArrayListFromBundle(intent.getExtras(), key);
-    }
-
-    public static void putCompressedParcelableExtra(Intent intent, String key,
-            Parcelable parcelable, int thresholdBytes) {
+    public static <T> T getCompressedExtra(Intent intent, String key) {
         Bundle extras = intent.getExtras();
-        Bundle updatedExtras = extras != null ? extras : new Bundle();
-        putParcelableToBundleCompressed(updatedExtras, key, parcelable, thresholdBytes);
-        intent.replaceExtras(updatedExtras);
-    }
-
-    public static void putArrayListToBundleCompressed(Bundle bundle, String key,
-            ArrayList<? extends Parcelable> list, int thresholdBytes) {
-        byte[] compressedData = compressDataIfNeeded(list, thresholdBytes);
-        if (compressedData != null) {
-            bundle.putByteArray(compressedDataKey(key), compressedData);
-        } else {
-            bundle.putParcelableArrayList(key, list);
+        if (extras == null) {
+            return null;
         }
+        return readCompressedValueFromBundle(extras, key);
     }
 
-    public static void putParcelableToBundleCompressed(Bundle bundle, String key,
-            Parcelable parcelable, int thresholdBytes) {
-        byte[] compressedData = compressDataIfNeeded(parcelable, thresholdBytes);
-        if (compressedData != null) {
-            bundle.putByteArray(compressedDataKey(key), compressedData);
-        } else {
-            bundle.putParcelable(key, parcelable);
-        }
-    }
-
-    public static <T extends Parcelable> T readCompressedParcelableFromBundle(Bundle bundle, String key) {
-        T result = readCompressedDataIfPresent(bundle, key);
-        if (result == null) {
-            result = bundle.getParcelable(key);
-        }
-        return result;
-    }
-
-    public static <T extends Parcelable> ArrayList<T> readCompressedArrayListFromBundle(Bundle bundle, String key) {
-        ArrayList<T> result = readCompressedDataIfPresent(bundle, key);
-        if (result == null) {
-            result = bundle.getParcelableArrayList(key);
-        }
-        return result;
-    }
-
-    private static byte[] compressDataIfNeeded(Object data, int thresholdBytes) {
+    public static void putCompressedValueToBundle(Bundle bundle, String key, Object value) {
         Parcel parcel = Parcel.obtain();
-        parcel.writeValue(data);
-        byte[] compressedData = compressParceledDataIfNeeded(parcel.marshall(), thresholdBytes);
+        parcel.writeValue(value);
+        byte[] compressedData = compressBytes(parcel.marshall());
         parcel.recycle();
-        return compressedData;
+        bundle.putByteArray(key, compressedData);
     }
 
-    private static byte[] compressParceledDataIfNeeded(byte[] dataToCompress, int thresholdBytes) {
-        byte[] compressedData = null;
-        if (dataToCompress.length > thresholdBytes) {
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream(dataToCompress.length);
-                 GZIPOutputStream gzos = new GZIPOutputStream(baos)) {
-                gzos.write(dataToCompress);
-                gzos.close();
-                compressedData = baos.toByteArray();
-            } catch (IOException ignored) {
+    public static <T> T readCompressedValueFromBundle(Bundle bundle, String key) {
+        byte[] compressedData = bundle.getByteArray(key);
+        if (compressedData == null) {
+            return null;
+        }
+
+        byte[] uncompressedData = uncompressBytes(compressedData);
+        Parcel parcel = Parcel.obtain();
+        parcel.unmarshall(uncompressedData, 0, uncompressedData.length);
+        parcel.setDataPosition(0);
+        T value = (T) parcel.readValue(IntentUtils.class.getClassLoader());
+        parcel.recycle();
+        return value;
+    }
+
+    private static byte[] compressBytes(@NonNull byte[] dataToCompress) {
+        int compressionLevel = 3;  // on a 1-9 scale, best compromise for speed without giving up too much on size
+        try (var byteOutputStream = new ByteArrayOutputStream();
+             var deflaterStream = new DeflaterOutputStream(byteOutputStream, new Deflater(compressionLevel))) {
+            deflaterStream.write(dataToCompress);
+            deflaterStream.close();
+            return byteOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    private static byte[] uncompressBytes(@NonNull byte[] compressedData) {
+        try (var byteInputStream = new ByteArrayInputStream(compressedData);
+             var byteOutputStream = new ByteArrayOutputStream();
+             var inflaterStream = new InflaterInputStream(byteInputStream)) {
+            byte[] buffer = new byte[2048];
+            int readBytes;
+            while ((readBytes = inflaterStream.read(buffer)) != -1) {
+                byteOutputStream.write(buffer, 0, readBytes);
             }
+            return byteOutputStream.toByteArray();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
-        return compressedData;
-    }
-
-    private static <T> T readCompressedDataIfPresent(Bundle bundle, String key) {
-        byte[] uncompressedData = null;
-        if (bundle.containsKey(compressedDataKey(key))) {
-            byte[] compressedData = bundle.getByteArray(compressedDataKey(key));
-            try (ByteArrayInputStream bais = new ByteArrayInputStream(compressedData);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    GZIPInputStream gzis = new GZIPInputStream(bais)) {
-                byte[] buffer = new byte[2048];
-                int len;
-                while ((len = gzis.read(buffer)) != -1) {
-                    baos.write(buffer, 0, len);
-                }
-                uncompressedData = baos.toByteArray();
-            } catch (IOException ignored) {}
-        }
-        if (uncompressedData != null) {
-            Parcel parcel = Parcel.obtain();
-            parcel.unmarshall(uncompressedData, 0, uncompressedData.length);
-            parcel.setDataPosition(0);
-            T result = (T) parcel.readValue(IntentUtils.class.getClassLoader());
-            parcel.recycle();
-            return result;
-        }
-        return null;
-    }
-
-    private static String compressedDataKey(String key) {
-        return key + "_compressed";
     }
 
     public static class InitialCommentMarker implements Parcelable {

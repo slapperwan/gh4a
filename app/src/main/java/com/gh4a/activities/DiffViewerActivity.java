@@ -74,7 +74,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
             // When there are lots of comments containing a huge amount of text, the extras bundle may
             // become too large, causing a TransactionTooLargeException when launching the activity.
             // In order to avoid this problem, we store the data in compressed form
-            IntentUtils.putCompressedArrayListExtra(intent, "comments", new ArrayList<>(comments), 500_000);
+            IntentUtils.putCompressedExtra(intent, "comments", comments);
         }
         return intent;
     }
@@ -227,7 +227,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
     @Override
     protected boolean canSwipeToRefresh() {
         // no need for pull-to-refresh if everything was passed in the intent extras
-        return !IntentUtils.hasCompressedExtra(getIntent(), "comments");
+        return !getIntent().hasExtra("comments");
     }
 
     @Override
@@ -481,7 +481,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     private void refresh() {
         // Make sure we load the comments from remote, as we now know they've changed
-        IntentUtils.removeCompressedExtra(getIntent(), "comments");
+        getIntent().removeExtra("comments");
 
         // Make sure our callers are aware of the change
         setResult(RESULT_OK);
@@ -513,7 +513,7 @@ public abstract class DiffViewerActivity<C extends PositionalCommentBase> extend
 
     private void loadComments(boolean useIntentExtraIfPresent, boolean force) {
         List<C> intentComments = useIntentExtraIfPresent
-                ? IntentUtils.getCompressedArrayListExtra(getIntent(), "comments") : null;
+                ? IntentUtils.getCompressedExtra(getIntent(), "comments") : null;
         Single<List<C>> commentsSingle = intentComments != null
                 ? Single.just(intentComments)
                 : getCommentsSingle(force).compose(makeLoaderSingle(ID_LOADER_COMMENTS, force));
