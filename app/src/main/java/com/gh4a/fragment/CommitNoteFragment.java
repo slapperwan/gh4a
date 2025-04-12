@@ -37,22 +37,19 @@ import java.util.Set;
 
 import io.reactivex.Single;
 
+import static java.util.stream.Collectors.toCollection;
+
 public class CommitNoteFragment extends ListDataBaseFragment<GitComment> implements
         CommitNoteAdapter.OnCommentAction<GitComment>, ConfirmationDialogFragment.Callback,
         EditorBottomSheet.Callback, EditorBottomSheet.Listener {
 
-    public static CommitNoteFragment newInstance(String repoOwner, String repoName,
-            String commitSha, Commit commit,
+    public static CommitNoteFragment newInstance(String repoOwner, String repoName, String commitSha, Commit commit,
             List<GitComment> allComments, IntentUtils.InitialCommentMarker initialComment) {
         CommitNoteFragment f = new CommitNoteFragment();
 
-        ArrayList<GitComment> comments = new ArrayList<>();
-        // we're only interested in unpositional comments
-        for (GitComment comment : allComments) {
-            if (comment.position() == null) {
-                comments.add(comment);
-            }
-        }
+        ArrayList<GitComment> nonPositionalComments = allComments.stream()
+                .filter(comment -> comment.position() == null)
+                .collect(toCollection(ArrayList::new));
 
         Bundle args = new Bundle();
         args.putString("owner", repoOwner);
@@ -60,9 +57,11 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
         args.putString("sha", commitSha);
         args.putParcelable("commit_author", commit.author());
         args.putParcelable("committer", commit.committer());
-        args.putParcelableArrayList("comments", comments);
         args.putParcelable("initial_comment", initialComment);
-
+        // Commits can potentially have a very high number of comments.
+        // In order to avoid TransactionTooLargeExceptions being thrown when the activity we're
+        // attached to is stopped, store them in compressed form.
+        IntentUtils.putArrayListToBundleCompressed(args, "comments", nonPositionalComments, 100_000);
         f.setArguments(args);
         return f;
     }
@@ -241,7 +240,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
 
     @Override
     protected List<GitComment> onGetInitialData() {
-        List<GitComment> comments = getArguments().getParcelableArrayList("comments");
+        List<GitComment> comments = IntentUtils.readCompressedArrayListFromBundle(getArguments(), "comments");
         return comments != null && !comments.isEmpty() ? comments : null;
     }
 
