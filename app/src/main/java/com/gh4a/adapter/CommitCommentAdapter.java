@@ -53,11 +53,11 @@ import java.util.Set;
 
 import io.reactivex.Single;
 
-public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter.ViewHolder>
+public class CommitCommentAdapter extends RootAdapter<GitComment, CommitCommentAdapter.ViewHolder>
         implements ReactionBar.Callback, ReactionBar.ReactionDetailsCache.Listener {
-    public interface OnCommentAction<T> {
-        void editComment(T comment);
-        void deleteComment(T comment);
+    public interface OnCommentAction {
+        void editComment(GitComment comment);
+        void deleteComment(GitComment comment);
         void quoteText(CharSequence text);
         void addText(CharSequence text);
     }
@@ -96,7 +96,7 @@ public class CommitNoteAdapter extends RootAdapter<GitComment, CommitNoteAdapter
         }
     };
 
-    public CommitNoteAdapter(Context context, String repoOwner, String repoName,
+    public CommitCommentAdapter(Context context, String repoOwner, String repoName,
             OnCommentAction actionCallback) {
         super(context);
         mImageGetter = new HttpImageGetter(context);

@@ -30,7 +30,7 @@ import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.fragment.CommitFragment;
-import com.gh4a.fragment.CommitNoteFragment;
+import com.gh4a.fragment.CommitCommentsFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
 import com.gh4a.widget.BottomSheetCompatibleScrollingViewBehavior;
@@ -42,7 +42,7 @@ import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 import java.util.List;
 
 public class CommitActivity extends BaseFragmentPagerActivity implements
-        CommitFragment.CommentUpdateListener, CommitNoteFragment.CommentUpdateListener {
+        CommitFragment.CommentUpdateListener, CommitCommentsFragment.CommentUpdateListener {
     public static Intent makeIntent(Context context, String repoOwner, String repoName, String sha) {
         return makeIntent(context, repoOwner, repoName, -1, sha, null);
     }
@@ -138,7 +138,7 @@ public class CommitActivity extends BaseFragmentPagerActivity implements
     @Override
     protected Fragment makeFragment(int position) {
         if (position == 1) {
-            Fragment f = CommitNoteFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
+            Fragment f = CommitCommentsFragment.newInstance(mRepoOwner, mRepoName, mObjectSha,
                     mCommit, mComments, mInitialComment);
             mInitialComment = null;
             return f;

@@ -18,7 +18,7 @@ import com.gh4a.Gh4Application;
 import com.gh4a.R;
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.EditCommitCommentActivity;
-import com.gh4a.adapter.CommitNoteAdapter;
+import com.gh4a.adapter.CommitCommentAdapter;
 import com.gh4a.adapter.RootAdapter;
 import com.gh4a.utils.ActivityResultHelpers;
 import com.gh4a.utils.ApiHelpers;
@@ -39,13 +39,13 @@ import io.reactivex.Single;
 
 import static java.util.stream.Collectors.toCollection;
 
-public class CommitNoteFragment extends ListDataBaseFragment<GitComment> implements
-        CommitNoteAdapter.OnCommentAction<GitComment>, ConfirmationDialogFragment.Callback,
+public class CommitCommentsFragment extends ListDataBaseFragment<GitComment> implements
+        CommitCommentAdapter.OnCommentAction, ConfirmationDialogFragment.Callback,
         EditorBottomSheet.Callback, EditorBottomSheet.Listener {
 
-    public static CommitNoteFragment newInstance(String repoOwner, String repoName, String commitSha, Commit commit,
+    public static CommitCommentsFragment newInstance(String repoOwner, String repoName, String commitSha, Commit commit,
             List<GitComment> allComments, IntentUtils.InitialCommentMarker initialComment) {
-        CommitNoteFragment f = new CommitNoteFragment();
+        CommitCommentsFragment f = new CommitCommentsFragment();
 
         ArrayList<GitComment> nonPositionalComments = allComments.stream()
                 .filter(comment -> comment.position() == null)
@@ -77,7 +77,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
     private User mCommitter;
     private IntentUtils.InitialCommentMarker mInitialComment;
 
-    private CommitNoteAdapter mAdapter;
+    private CommitCommentAdapter mAdapter;
     private EditorBottomSheet mBottomSheet;
 
     private final ActivityResultLauncher<Intent> mEditLauncher = registerForActivityResult(
@@ -197,7 +197,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
 
     @Override
     protected RootAdapter<GitComment, ? extends RecyclerView.ViewHolder> onCreateAdapter() {
-        mAdapter = new CommitNoteAdapter(getActivity(), mRepoOwner, mRepoName, this);
+        mAdapter = new CommitCommentAdapter(getActivity(), mRepoOwner, mRepoName, this);
         return mAdapter;
     }
 
