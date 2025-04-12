@@ -61,7 +61,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
         // Commits can potentially have a very high number of comments.
         // In order to avoid TransactionTooLargeExceptions being thrown when the activity we're
         // attached to is stopped, store them in compressed form.
-        IntentUtils.putArrayListToBundleCompressed(args, "comments", nonPositionalComments, 100_000);
+        IntentUtils.putCompressedValueToBundle(args, "comments", nonPositionalComments);
         f.setArguments(args);
         return f;
     }
@@ -240,7 +240,7 @@ public class CommitNoteFragment extends ListDataBaseFragment<GitComment> impleme
 
     @Override
     protected List<GitComment> onGetInitialData() {
-        List<GitComment> comments = IntentUtils.readCompressedArrayListFromBundle(getArguments(), "comments");
+        List<GitComment> comments = IntentUtils.readCompressedValueFromBundle(getArguments(), "comments");
         return comments != null && !comments.isEmpty() ? comments : null;
     }
 
