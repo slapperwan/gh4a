@@ -30,7 +30,6 @@ import com.meisolsson.githubsdk.model.IssueStateReason;
 import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Rename;
 import com.meisolsson.githubsdk.model.User;
-import com.vdurmont.emoji.EmojiParser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -308,7 +307,7 @@ class EventViewHolder
     private void replaceLabelPlaceholder(SpannableStringBuilder text, Label label) {
         int pos = text.toString().indexOf("[label]");
         if (label != null && pos >= 0) {
-            String labelName = EmojiParser.parseToUnicode(label.name());
+            String labelName = StringUtils.replaceEmojiAliases(label.name());
             int length = labelName.length();
             text.replace(pos, pos + 7, labelName);
             text.setSpan(new IssueLabelSpan(mContext, label, false), pos, pos + length, 0);
