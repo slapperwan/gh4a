@@ -484,7 +484,7 @@ public class LinkParserTest {
     public void pullRequestLink_withDiffMarker__loadsDiff() {
         LinkParser.ParseResult result =
                 parseLink("https://github.com/slapperwan/gh4a/pull/665/files" +
-                        "#diff-38f43208e0c158ca7b78e175b8846bc6");
+                        "#diff-67060ff8c94bbee9421c7bcbed9c9ac8f69d93c26ffc59b26f15fb31982023a0");
         PullRequestDiffLoadTask loadTask =
                 assertThatLoadTaskIs(result.loadTask, PullRequestDiffLoadTask.class);
         assertThat("User name is incorrect", loadTask.mRepoOwner, is("slapperwan"));
@@ -492,7 +492,7 @@ public class LinkParserTest {
         DiffHighlightId diffId = loadTask.mDiffId;
         assertThat("Diff id is missing", diffId, is(notNullValue()));
         assertThat("File hash is incorrect", diffId.fileHash,
-                is("38f43208e0c158ca7b78e175b8846bc6"));
+                is("67060ff8c94bbee9421c7bcbed9c9ac8f69d93c26ffc59b26f15fb31982023a0"));
         assertThat("Start line is set", diffId.startLine, is(-1));
         assertThat("End line is set", diffId.endLine, is(-1));
         assertThat("Is right line", diffId.right, is(false));
@@ -502,7 +502,7 @@ public class LinkParserTest {
     public void pullRequestLink_withDiffMarker_andLeftNumber__loadsDiff() {
         LinkParser.ParseResult result =
                 parseLink("https://github.com/slapperwan/gh4a/pull/665/files" +
-                        "#diff-38f43208e0c158ca7b78e175b8846bc6L24");
+                        "#diff-67060ff8c94bbee9421c7bcbed9c9ac8f69d93c26ffc59b26f15fb31982023a0L24");
         PullRequestDiffLoadTask loadTask =
                 assertThatLoadTaskIs(result.loadTask, PullRequestDiffLoadTask.class);
         assertThat("User name is incorrect", loadTask.mRepoOwner, is("slapperwan"));
@@ -510,7 +510,7 @@ public class LinkParserTest {
         DiffHighlightId diffId = loadTask.mDiffId;
         assertThat("Diff id is missing", diffId, is(notNullValue()));
         assertThat("File hash is incorrect", diffId.fileHash,
-                is("38f43208e0c158ca7b78e175b8846bc6"));
+                is("67060ff8c94bbee9421c7bcbed9c9ac8f69d93c26ffc59b26f15fb31982023a0"));
         assertThat("Start line is incorrect", diffId.startLine, is(24));
         assertThat("End line is incorrect", diffId.endLine, is(24));
         assertThat("Is right line", diffId.right, is(false));
@@ -520,7 +520,7 @@ public class LinkParserTest {
     public void pullRequestLink_withDiffMarker_andLineRange__loadsDiff() {
         LinkParser.ParseResult result =
                 parseLink("https://github.com/slapperwan/gh4a/pull/665/files" +
-                        "#diff-38f43208e0c158ca7b78e175b8846bc6L24-L26");
+                        "#diff-67060ff8c94bbee9421c7bcbed9c9ac8f69d93c26ffc59b26f15fb31982023a0L24-L26");
         PullRequestDiffLoadTask loadTask =
                 assertThatLoadTaskIs(result.loadTask, PullRequestDiffLoadTask.class);
         assertThat("User name is incorrect", loadTask.mRepoOwner, is("slapperwan"));
@@ -528,7 +528,7 @@ public class LinkParserTest {
         DiffHighlightId diffId = loadTask.mDiffId;
         assertThat("Diff id is missing", diffId, is(notNullValue()));
         assertThat("File hash is incorrect", diffId.fileHash,
-                is("38f43208e0c158ca7b78e175b8846bc6"));
+                is("67060ff8c94bbee9421c7bcbed9c9ac8f69d93c26ffc59b26f15fb31982023a0"));
         assertThat("Start line is incorrect", diffId.startLine, is(24));
         assertThat("End line is incorrect", diffId.endLine, is(26));
         assertThat("Is right line", diffId.right, is(false));
@@ -538,7 +538,7 @@ public class LinkParserTest {
     public void pullRequestLink_withDiffMarker_andInvalidNumber__opensPullRequest() {
         LinkParser.ParseResult result =
                 parseLink("https://github.com/slapperwan/gh4a/pull/665/files" +
-                        "#diff-38f43208e0c158ca7b78e175b8846bc6LA3");
+                        "#diff-67060ff8c94bbee9421c7bcbed9c9ac8f69d93c26ffc59b26f15fb31982023a0LA3");
         assertRedirectsTo(result, PullRequestActivity.class);
         Bundle extras = result.intent.getExtras();
         assertThat("Extras are missing", extras, is(notNullValue()));
@@ -555,7 +555,7 @@ public class LinkParserTest {
     public void pullRequestLink_withDiffMarker_andRightNumber__loadsDiff() {
         LinkParser.ParseResult result =
                 parseLink("https://github.com/slapperwan/gh4a/pull/665/files" +
-                        "#diff-38f43208e0c158ca7b78e175b8846bc6R24");
+                        "#diff-67060ff8c94bbee9421c7bcbed9c9ac8f69d93c26ffc59b26f15fb31982023a0R24");
         PullRequestDiffLoadTask loadTask =
                 assertThatLoadTaskIs(result.loadTask, PullRequestDiffLoadTask.class);
         assertThat("User name is incorrect", loadTask.mRepoOwner, is("slapperwan"));
@@ -563,27 +563,10 @@ public class LinkParserTest {
         DiffHighlightId diffId = loadTask.mDiffId;
         assertThat("Diff id is missing", diffId, is(notNullValue()));
         assertThat("File hash is incorrect", diffId.fileHash,
-                is("38f43208e0c158ca7b78e175b8846bc6"));
+                is("67060ff8c94bbee9421c7bcbed9c9ac8f69d93c26ffc59b26f15fb31982023a0"));
         assertThat("Start line is incorrect", diffId.startLine, is(24));
         assertThat("End line is incorrect", diffId.endLine, is(24));
         assertThat("Is not right line", diffId.right, is(true));
-    }
-
-    @Test
-    public void pullRequestLink_withDiffMarker_andIncorrectHash__loadsDiff() {
-        LinkParser.ParseResult result =
-                parseLink("https://github.com/slapperwan/gh4a/pull/665/files" +
-                        "#diff-38f43208e0c158ca7b78e1");
-        assertRedirectsTo(result, PullRequestActivity.class);
-        Bundle extras = result.intent.getExtras();
-        assertThat("Extras are missing", extras, is(notNullValue()));
-        assertThat("User name is incorrect", extras.getString("owner"), is("slapperwan"));
-        assertThat("Repo name is incorrect", extras.getString("repo"), is("gh4a"));
-        assertThat("Pull request number is incorrect", extras.getInt("number"), is(665));
-        assertThat("Initial page is incorrect", extras.getInt("initial_page"),
-                is(PullRequestActivity.PAGE_FILES));
-        assertThat("Comment marker is set", extras.getParcelable("initial_comment"),
-                is(nullValue()));
     }
 
     @Test

@@ -317,9 +317,7 @@ public class LinkParser {
             return null;
         }
 
-        DiffHighlightId diffId =
-                extractDiffId(uri.getFragment(), "diff-", true);
-
+        DiffHighlightId diffId = extractDiffId(uri.getFragment(), "diff-");
         if (diffId != null) {
             return new ParseResult(new PullRequestDiffLoadTask(activity, uri, user, repo, diffId,
                     pullRequestNumber));
@@ -336,23 +334,20 @@ public class LinkParser {
         }
 
         IntentUtils.InitialCommentMarker reviewMarker =
-                generateInitialCommentMarkerWithoutFallback(uri.getFragment(),
-                        "pullrequestreview-");
+                generateInitialCommentMarkerWithoutFallback(uri.getFragment(), "pullrequestreview-");
         if (reviewMarker != null) {
             return new ParseResult(new PullRequestReviewLoadTask(activity, uri, user, repo,
                     pullRequestNumber, reviewMarker));
         }
 
         IntentUtils.InitialCommentMarker reviewCommentMarker =
-                generateInitialCommentMarkerWithoutFallback(uri.getFragment(),
-                        "discussion_r");
+                generateInitialCommentMarkerWithoutFallback(uri.getFragment(), "discussion_r");
         if (reviewCommentMarker != null) {
             return new ParseResult(new PullRequestReviewCommentLoadTask(activity, uri, user, repo,
                     pullRequestNumber, reviewCommentMarker));
         }
 
-        DiffHighlightId reviewDiffHunkId =
-                extractDiffId(uri.getFragment(), "discussion-diff-", false);
+        DiffHighlightId reviewDiffHunkId = extractDiffId(uri.getFragment(), "discussion-diff-");
         if (reviewDiffHunkId != null) {
             return new ParseResult(new PullRequestReviewDiffLoadTask(activity, uri, user, repo,
                     reviewDiffHunkId, pullRequestNumber));
@@ -384,8 +379,7 @@ public class LinkParser {
         if (StringUtils.isBlank(id)) {
             return null;
         }
-        DiffHighlightId diffId =
-                extractDiffId(uri.getFragment(), "diff-", true);
+        DiffHighlightId diffId = extractDiffId(uri.getFragment(), "diff-");
         if (diffId != null) {
             return new ParseResult(new CommitDiffLoadTask(activity, uri, user, repo, diffId, id));
         }
@@ -445,8 +439,7 @@ public class LinkParser {
         return initialCommentMarker != null ? initialCommentMarker : fallback;
     }
 
-    private static DiffHighlightId extractDiffId(String fragment, String prefix,
-            boolean isMd5Hash) {
+    private static DiffHighlightId extractDiffId(String fragment, String prefix) {
         if (fragment == null || !fragment.startsWith(prefix)) {
             return null;
         }
@@ -461,9 +454,6 @@ public class LinkParser {
         String fileHash = typePos > 0
                 ? fragment.substring(prefix.length(), typePos)
                 : fragment.substring(prefix.length());
-        if (isMd5Hash && fileHash.length() != 32) { // MD5 hash length
-            return null;
-        }
         if (typePos < 0) {
             return new DiffHighlightId(fileHash, -1, -1, false);
         }
@@ -473,10 +463,10 @@ public class LinkParser {
             String linePart = fragment.substring(typePos + 1);
             int startLine, endLine, dashPos = linePart.indexOf("-" + type);
             if (dashPos > 0) {
-                startLine = Integer.valueOf(linePart.substring(0, dashPos));
-                endLine = Integer.valueOf(linePart.substring(dashPos + 2));
+                startLine = Integer.parseInt(linePart.substring(0, dashPos));
+                endLine = Integer.parseInt(linePart.substring(dashPos + 2));
             } else {
-                startLine = Integer.valueOf(linePart);
+                startLine = Integer.parseInt(linePart);
                 endLine = startLine;
             }
             return new DiffHighlightId(fileHash, startLine, endLine, right);
