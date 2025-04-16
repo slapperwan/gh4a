@@ -215,13 +215,12 @@ public class ApiHelpers {
         return Pair.create(urlParts[4], urlParts[5]);
     }
 
-    private final static char[] HEX_CHARS = "0123456789ABCDEF".toCharArray();
+    private final static char[] HEX_CHARS = "0123456789abcdef".toCharArray();
 
-    public static String md5(String input) {
+    public static String sha256Of(String input) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            digest.update(input.getBytes());
-            byte[] messageDigest = digest.digest();
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] messageDigest = digest.digest(input.getBytes());
             char[] hexChars = new char[messageDigest.length * 2];
             for ( int i = 0; i < messageDigest.length; i++ ) {
                 int b = messageDigest[i] & 0xFF;

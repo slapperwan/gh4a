@@ -35,7 +35,7 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
     protected Single<Optional<Intent>> getSingle() {
         Single<Optional<GitHubFile>> fileSingle = getFiles()
                 .compose(RxUtils.filterAndMapToFirst(
-                        f -> ApiHelpers.md5(f.filename()).equalsIgnoreCase(mDiffId.fileHash)));
+                        f -> ApiHelpers.sha256Of(f.filename()).equalsIgnoreCase(mDiffId.fileHash)));
         return Single.zip(getSha(), fileSingle, (sha, fileOpt) -> {
             final Intent intent;
             GitHubFile file = fileOpt.orElse(null);

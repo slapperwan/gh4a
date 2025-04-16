@@ -60,7 +60,7 @@ public class CommitDiffViewerActivity extends DiffViewerActivity<GitComment> {
         if (replyId > 0L) {
             builder.fragment("commitcomment-" + replyId);
         } else {
-            builder.fragment("diff-" + ApiHelpers.md5(mPath) + lineId);
+            builder.fragment("diff-" + ApiHelpers.sha256Of(mPath) + lineId);
         }
         return builder.build();
     }
