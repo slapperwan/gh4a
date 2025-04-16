@@ -4,24 +4,20 @@ import android.content.Intent;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 import androidx.fragment.app.FragmentActivity;
 
 import com.gh4a.ServiceFactory;
 import com.gh4a.activities.PullRequestActivity;
 import com.gh4a.activities.PullRequestDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
-import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubFile;
-import com.meisolsson.githubsdk.model.ReviewComment;
-import com.meisolsson.githubsdk.service.pull_request.PullRequestReviewCommentService;
 import com.meisolsson.githubsdk.service.pull_request.PullRequestService;
 
 import java.util.List;
 
 import io.reactivex.Single;
 
-public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
+public class PullRequestDiffLoadTask extends DiffLoadTask {
     private final int mPullRequestNumber;
     private final int mPage;
 
@@ -33,11 +29,10 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
     }
 
     @Override
-    protected @NonNull Intent getLaunchIntent(String sha, @NonNull GitHubFile file,
-                           List<ReviewComment> comments, DiffHighlightId diffId) {
+    protected @NonNull Intent getLaunchIntent(String sha, @NonNull GitHubFile file, DiffHighlightId diffId) {
         return PullRequestDiffViewerActivity.makeIntent(mActivity, mRepoOwner,
                 mRepoName, mPullRequestNumber, sha, file.filename(), file.patch(),
-                comments, -1, diffId.startLine, diffId.endLine, diffId.right, null);
+                null, -1, diffId.startLine, diffId.endLine, diffId.right, null);
     }
 
     @NonNull
@@ -60,14 +55,5 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
         var service = ServiceFactory.getForFullPagedLists(PullRequestService.class, false);
         return ApiHelpers.PageIterator
                 .toSingle(page -> service.getPullRequestFiles(mRepoOwner, mRepoName, mPullRequestNumber, page));
-    }
-
-    @Override
-    protected Single<List<ReviewComment>> getComments() {
-        var service = ServiceFactory.getForFullPagedLists(PullRequestReviewCommentService.class, false);
-        return ApiHelpers.PageIterator
-                .toSingle(page -> service.getPullRequestComments(
-                        mRepoOwner, mRepoName, mPullRequestNumber, page))
-                .compose(RxUtils.filter(c -> c.position() != null));
     }
 }

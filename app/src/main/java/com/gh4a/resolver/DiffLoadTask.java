@@ -11,14 +11,13 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.FileUtils;
 import com.gh4a.utils.RxUtils;
 import com.meisolsson.githubsdk.model.GitHubFile;
-import com.meisolsson.githubsdk.model.PositionalCommentBase;
 
 import java.util.List;
 import java.util.Optional;
 
 import io.reactivex.Single;
 
-public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlLoadTask {
+public abstract class DiffLoadTask extends UrlLoadTask {
     protected final String mRepoOwner;
     protected final String mRepoName;
     protected final DiffHighlightId mDiffId;
@@ -43,7 +42,7 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
                 intent = FileViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
                         sha, file.filename());
             } else if (file != null) {
-                intent = getLaunchIntent(sha, file, getComments().blockingGet(), mDiffId);
+                intent = getLaunchIntent(sha, file, mDiffId);
             } else {
                 intent = getFallbackIntent(sha);
             }
@@ -53,8 +52,6 @@ public abstract class DiffLoadTask<C extends PositionalCommentBase> extends UrlL
 
     protected abstract Single<List<GitHubFile>> getFiles();
     protected abstract Single<String> getSha();
-    protected abstract Single<List<C>> getComments();
-    protected abstract @NonNull Intent getLaunchIntent(String sha, @NonNull GitHubFile file,
-            List<C> comments, DiffHighlightId diffId);
+    protected abstract @NonNull Intent getLaunchIntent(String sha, @NonNull GitHubFile file, DiffHighlightId diffId);
     protected abstract @NonNull Intent getFallbackIntent(String sha);
 }

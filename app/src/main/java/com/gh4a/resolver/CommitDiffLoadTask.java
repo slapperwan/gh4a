@@ -14,15 +14,13 @@ import com.gh4a.activities.CommitDiffViewerActivity;
 import com.gh4a.utils.ApiHelpers;
 import com.meisolsson.githubsdk.model.Commit;
 import com.meisolsson.githubsdk.model.GitHubFile;
-import com.meisolsson.githubsdk.model.git.GitComment;
-import com.meisolsson.githubsdk.service.repositories.RepositoryCommentService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCommitService;
 
 import java.util.List;
 
 import io.reactivex.Single;
 
-public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
+public class CommitDiffLoadTask extends DiffLoadTask {
     @VisibleForTesting
     protected final String mSha;
 
@@ -33,10 +31,9 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
     }
 
     @Override
-    protected @NonNull Intent getLaunchIntent(String sha, @NonNull GitHubFile file,
-            List<GitComment> comments, DiffHighlightId diffId) {
+    protected @NonNull Intent getLaunchIntent(String sha, @NonNull GitHubFile file, DiffHighlightId diffId) {
         return CommitDiffViewerActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                sha, file.filename(), file.patch(), comments, diffId.startLine,
+                sha, file.filename(), file.patch(), null, diffId.startLine,
                 diffId.endLine, diffId.right, null);
     }
 
@@ -56,12 +53,5 @@ public class CommitDiffLoadTask extends DiffLoadTask<GitComment> {
         return service.getCommit(mRepoOwner, mRepoName, mSha)
                 .map(ApiHelpers::throwOnFailure)
                 .map(Commit::files);
-    }
-
-    @Override
-    protected Single<List<GitComment>> getComments() throws ApiRequestException {
-        var service = ServiceFactory.getForFullPagedLists(RepositoryCommentService.class, false);
-        return ApiHelpers.PageIterator
-                .toSingle(page -> service.getCommitComments(mRepoOwner, mRepoName, mSha, page));
     }
 }
