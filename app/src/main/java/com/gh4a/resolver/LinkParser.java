@@ -317,14 +317,14 @@ public class LinkParser {
             return null;
         }
 
+        String target = parts.size() >= 5 ? parts.get(4) : null;
+        int page = parsePullRequestPage(target);
+
         DiffHighlightId diffId = extractDiffId(uri.getFragment(), "diff-");
         if (diffId != null) {
             return new ParseResult(new PullRequestDiffLoadTask(activity, uri, user, repo, diffId,
-                    pullRequestNumber));
+                    pullRequestNumber, page));
         }
-
-        String target = parts.size() >= 5 ? parts.get(4) : null;
-        int page = parsePullRequestPage(target);
 
         IntentUtils.InitialCommentMarker initialDiffComment =
                 generateInitialCommentMarkerWithoutFallback(uri.getFragment(), "r");

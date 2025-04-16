@@ -22,13 +22,14 @@ import java.util.List;
 import io.reactivex.Single;
 
 public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
-    @VisibleForTesting
-    protected final int mPullRequestNumber;
+    private final int mPullRequestNumber;
+    private final int mPage;
 
     public PullRequestDiffLoadTask(FragmentActivity activity, Uri urlToResolve,
-            String repoOwner, String repoName, DiffHighlightId diffId, int pullRequestNumber) {
+            String repoOwner, String repoName, DiffHighlightId diffId, int pullRequestNumber, int page) {
         super(activity, urlToResolve, repoOwner, repoName, diffId);
         mPullRequestNumber = pullRequestNumber;
+        mPage = page;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class PullRequestDiffLoadTask extends DiffLoadTask<ReviewComment> {
     @Override
     protected Intent getFallbackIntent(String sha) {
         return PullRequestActivity.makeIntent(mActivity, mRepoOwner, mRepoName,
-                mPullRequestNumber);
+                mPullRequestNumber, mPage, null);
     }
 
     @Override
