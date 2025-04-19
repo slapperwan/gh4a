@@ -646,6 +646,21 @@ public class LinkParserTest {
     }
 
     @Test
+    public void commitLink_withCommentMarker__opensCommitActivity() {
+        LinkParser.ParseResult result =
+                parseLink("https://github.com/slapperwan/gh4a/commit/commitSha#commitcomment-155241730");
+        assertRedirectsTo(result, CommitActivity.class);
+        Bundle extras = result.intent.getExtras();
+        assertThat("Extras are missing", extras, is(notNullValue()));
+        assertThat("User name is incorrect", extras.getString("owner"), is("slapperwan"));
+        assertThat("Repo name is incorrect", extras.getString("repo"), is("gh4a"));
+        assertThat("Commit sha is incorrect", extras.getString("sha"), is("commitSha"));
+        IntentUtils.InitialCommentMarker commentMarker = extras.getParcelable("initial_comment");
+        assertThat("Comment marker is missing", commentMarker, is(notNullValue()));
+        assertThat("Comment id is incorrect", commentMarker.commentId, is(155241730L));
+    }
+
+    @Test
     public void commitLink_withDiffMarker__loadsCommitDiff() {
         LinkParser.ParseResult result =
                 parseLink("https://github.com/slapperwan/gh4a/commit/" +
@@ -667,9 +682,9 @@ public class LinkParserTest {
     }
 
     @Test
-    public void commitLink_withCommentMarker__opensCommitActivity() {
+    public void commitLink_withDiffCommentMarker__loadsCommitDiff() {
         LinkParser.ParseResult result =
-                parseLink("https://github.com/slapperwan/gh4a/commit/commitSha#commitcomment-12");
+                parseLink("https://github.com/slapperwan/gh4a/commit/commitSha#r24675412");
         CommitCommentLoadTask loadTask =
                 assertThatLoadTaskIs(result.loadTask, CommitCommentLoadTask.class);
         assertThat("User name is incorrect", loadTask.mRepoOwner, is("slapperwan"));
@@ -677,7 +692,7 @@ public class LinkParserTest {
         assertThat("Commit sha is incorrect", loadTask.mCommitSha, is("commitSha"));
         IntentUtils.InitialCommentMarker commentMarker = loadTask.mMarker;
         assertThat("Comment marker is missing", commentMarker, is(notNullValue()));
-        assertThat("Comment id is incorrect", commentMarker.commentId, is(12L));
+        assertThat("Comment id is incorrect", commentMarker.commentId, is(24675412L));
     }
 
     @Test

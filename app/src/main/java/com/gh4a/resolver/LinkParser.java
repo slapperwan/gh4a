@@ -384,10 +384,16 @@ public class LinkParser {
             return new ParseResult(new CommitDiffLoadTask(activity, uri, user, repo, diffId, id));
         }
 
-        IntentUtils.InitialCommentMarker initialComment = generateInitialCommentMarker(
-                uri.getFragment(), "commitcomment-", initialCommentFallback);
+        IntentUtils.InitialCommentMarker initialComment =
+                generateInitialCommentMarker(uri.getFragment(), "commitcomment-", initialCommentFallback);
         if (initialComment != null) {
-            return new ParseResult(new CommitCommentLoadTask(activity, uri, user, repo, id, initialComment));
+            return new ParseResult(CommitActivity.makeIntent(activity, user, repo, id, initialComment));
+        }
+
+        IntentUtils.InitialCommentMarker initialDiffComment =
+                generateInitialCommentMarker(uri.getFragment(), "r", initialCommentFallback);
+        if (initialDiffComment != null) {
+            return new ParseResult(new CommitCommentLoadTask(activity, uri, user, repo, id, initialDiffComment));
         }
         return new ParseResult(CommitActivity.makeIntent(activity, user, repo, id, null));
     }
