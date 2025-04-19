@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 
 public class CommitCommentLoadTask extends UrlLoadTask {
     @VisibleForTesting
@@ -56,9 +57,12 @@ public class CommitCommentLoadTask extends UrlLoadTask {
         var commentService = ServiceFactory.getForFullPagedLists(RepositoryCommentService.class, false);
 
         Single<Commit> commitSingle = commitService.getCommit(repoOwner, repoName, commitSha)
-                .map(ApiHelpers::throwOnFailure);
+                .map(ApiHelpers::throwOnFailure)
+                .subscribeOn(Schedulers.io())
+                .cache(); // single is used multiple times -> avoid refetching data
         Single<List<GitComment>> commentSingle = ApiHelpers.PageIterator
                 .toSingle(page -> commentService.getCommitComments(repoOwner, repoName, commitSha, page))
+                .subscribeOn(Schedulers.io())
                 .cache(); // single is used multiple times -> avoid refetching data
 
         Single<Optional<GitHubFile>> fileSingle = commentSingle
