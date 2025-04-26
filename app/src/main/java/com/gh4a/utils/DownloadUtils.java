@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -37,22 +38,26 @@ public class DownloadUtils {
 
     public static void enqueueDownloadWithPermissionCheck(final BaseActivity activity,
             final ReleaseAsset asset) {
-        final ActivityCompat.OnRequestPermissionsResultCallback cb =
-                (requestCode, permissions, grantResults) -> {
-                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        enqueueDownload(activity, asset);
-                    }
-                };
-        activity.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, cb,
-                R.string.download_permission_rationale);
+        handleDownloadPermissionCheck(activity, () -> enqueueDownload(activity, asset));
     }
 
     public static void enqueueDownloadWithPermissionCheck(final BaseActivity activity,
             final String url, final String mimeType, final String fileName, final String description) {
+        handleDownloadPermissionCheck(activity,
+                () -> enqueueDownload(activity, url, fileName, description, mimeType, null, false));
+    }
+
+    private static void handleDownloadPermissionCheck(final BaseActivity activity, Runnable func) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // API 29+ doesn't require WRITE_EXTERNAL_STORAGE permission anymore,
+            // since we're writing to a pre-defined public directory only
+            func.run();
+            return;
+        }
         final ActivityCompat.OnRequestPermissionsResultCallback cb =
                 (requestCode, permissions, grantResults) -> {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        enqueueDownload(activity, url, fileName, description, mimeType, null, false);
+                        func.run();
                     }
                 };
         activity.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, cb,
