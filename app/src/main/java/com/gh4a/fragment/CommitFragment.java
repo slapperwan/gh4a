@@ -37,7 +37,6 @@ import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.git.GitComment;
 import com.meisolsson.githubsdk.model.git.GitCommit;
 import com.meisolsson.githubsdk.model.git.GitUser;
-import com.vdurmont.emoji.EmojiParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,16 +138,14 @@ public class CommitFragment extends LoadingFragmentBase implements OnClickListen
 
         String message = mCommit.commit().message();
         int pos = message.indexOf('\n');
-        String title = pos > 0 ? message.substring(0, pos) : message;
-        title = EmojiParser.parseToUnicode(title);
+        String title = StringUtils.replaceEmojiAliases(
+                pos > 0 ? message.substring(0, pos) : message);
         int length = message.length();
         while (pos > 0 && pos < length && Character.isWhitespace(message.charAt(pos))) {
             pos++;
         }
-        message = pos > 0 && pos < length ? message.substring(pos) : null;
-        if (message != null) {
-            message = EmojiParser.parseToUnicode(message);
-        }
+        message = StringUtils.replaceEmojiAliases(
+                pos > 0 && pos < length ? message.substring(pos) : null);
 
         tvTitle.setText(title);
         tvMessage.setText(message);

@@ -25,7 +25,6 @@ import android.widget.TextView;
 import com.gh4a.R;
 import com.gh4a.widget.IssueLabelSpan;
 import com.meisolsson.githubsdk.model.Label;
-import com.vdurmont.emoji.EmojiParser;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -321,7 +320,7 @@ public class UiUtils {
         for (Label label : labels) {
             int pos = builder.length();
             IssueLabelSpan span = new IssueLabelSpan(context, label, true);
-            String labelName = EmojiParser.parseToUnicode(label.name());
+            String labelName = StringUtils.replaceEmojiAliases(label.name());
             builder.append(labelName);
             builder.setSpan(span, pos, pos + labelName.length(), 0);
         }

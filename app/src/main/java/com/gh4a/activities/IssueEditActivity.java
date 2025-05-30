@@ -30,6 +30,7 @@ import androidx.annotation.Nullable;
 
 import com.gh4a.adapter.ItemsWithDescriptionAdapter;
 import com.gh4a.utils.ActivityResultHelpers;
+import com.gh4a.utils.StringUtils;
 import com.google.android.material.appbar.AppBarLayout;
 
 import androidx.appcompat.view.ContextThemeWrapper;
@@ -74,7 +75,6 @@ import com.meisolsson.githubsdk.service.issues.IssueMilestoneService;
 import com.meisolsson.githubsdk.service.issues.IssueService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryCollaboratorService;
 import com.meisolsson.githubsdk.service.repositories.RepositoryContentService;
-import com.vdurmont.emoji.EmojiParser;
 
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -991,7 +991,7 @@ public class IssueEditActivity extends BasePagerActivity implements
                 viewColor.setBackgroundColor(ApiHelpers.colorForLabel(label));
 
                 final TextView tvLabel = rowView.findViewById(R.id.tv_title);
-                tvLabel.setText(EmojiParser.parseToUnicode(label.name()));
+                tvLabel.setText(StringUtils.replaceEmojiAliases(label.name()));
                 tvLabel.setOnClickListener(clickListener);
                 tvLabel.setTag(label);
 
