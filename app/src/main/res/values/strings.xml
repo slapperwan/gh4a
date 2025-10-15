@@ -237,6 +237,8 @@
     <string name="event_issues_open_title">Opened issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_close_title">Closed issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_reopen_title">Reopened issue [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_issues_label_title">Added label [label] to issue [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_issues_unlabel_title">Removed label [label] from issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_delete_branch_title">Deleted branch [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_delete_tag_title">Deleted tag [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_pr_open_title">Opened pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
@@ -244,6 +246,8 @@
     <string name="event_pr_merge_title">Merged pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pr_reopen_title">Reopened pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pr_update_title">Updated pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_pr_label_title">Added label [label] to pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_pr_unlabel_title">Removed label [label] from pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pull_request_review_comment_title">Commented on pull request [b]%1$d[/b] in [b]%2$s[/b]</string>
     <string name="event_member_title">Added [b]%1$s[/b] to [b]%2$s[/b]</string>
     <string name="event_download_title">Uploaded a file to [b]%1$s[/b]</string>

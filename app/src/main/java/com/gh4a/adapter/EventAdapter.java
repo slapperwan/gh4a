@@ -19,6 +19,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Typeface;
+
+import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -41,6 +43,7 @@ import com.meisolsson.githubsdk.model.GitHubEvent;
 import com.meisolsson.githubsdk.model.GitHubEventType;
 import com.meisolsson.githubsdk.model.GitHubWikiPage;
 import com.meisolsson.githubsdk.model.Issue;
+import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.PullRequest;
 import com.meisolsson.githubsdk.model.ReferenceType;
 import com.meisolsson.githubsdk.model.Release;
@@ -96,7 +99,11 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
 
         holder.tvActor.setText(ApiHelpers.getUserLoginWithType(mContext, actor));
 
-        StringUtils.applyBoldTagsAndSetText(holder.tvTitle, formatTitle(event));
+        SpannableStringBuilder title = StringUtils.applyBoldTags(formatTitle(event));
+        Label labelInTitle = extractLabelForTitle(event);
+        StringUtils.replaceLabelPlaceholder(mContext, title, labelInTitle);
+        holder.tvTitle.setText(title);
+
         holder.tvCreatedAt.setText(StringUtils.formatRelativeTime(
                 mContext, event.createdAt(), false));
 
@@ -402,6 +409,8 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                     case Opened: resId = R.string.event_issues_open_title; break;
                     case Closed: resId = R.string.event_issues_close_title; break;
                     case Reopened: resId = R.string.event_issues_reopen_title; break;
+                    case Labeled: resId = R.string.event_issues_label_title; break;
+                    case Unlabeled: resId = R.string.event_issues_unlabel_title; break;
                     default: return "";
                 }
                 return res.getString(resId, payload.issue().number(),
@@ -431,6 +440,12 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                         resId = pr.merged()
                                 ? R.string.event_pr_merge_title
                                 : R.string.event_pr_close_title;
+                        break;
+                    case Labeled:
+                        resId = R.string.event_pr_label_title;
+                        break;
+                    case Unlabeled:
+                        resId = R.string.event_pr_unlabel_title;
                         break;
                     case Reopened:
                         resId = R.string.event_pr_reopen_title;
@@ -502,6 +517,16 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
         }
 
         return "";
+    }
+
+    private static Label extractLabelForTitle(GitHubEvent event) {
+        switch (event.type()) {
+            case IssuesEvent:
+                return ((IssuesPayload) event.payload()).label();
+            case PullRequestEvent:
+                return ((PullRequestPayload) event.payload()).label();
+        }
+        return null;
     }
 
     public static boolean hasInvalidPayload(GitHubEvent event) {

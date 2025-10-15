@@ -29,7 +29,10 @@ import android.util.Base64;
 import android.widget.TextView;
 
 import com.gh4a.Gh4Application;
+import com.gh4a.widget.IssueLabelSpan;
+import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.User;
+import com.vdurmont.emoji.EmojiParser;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -127,6 +130,17 @@ public class StringUtils {
             }
         }
         return ssb;
+    }
+
+    public static void replaceLabelPlaceholder(Context context, SpannableStringBuilder text,
+                                               Label label) {
+        int pos = text.toString().indexOf("[label]");
+        if (label != null && pos >= 0) {
+            String labelName = EmojiParser.parseToUnicode(label.name());
+            int length = labelName.length();
+            text.replace(pos, pos + 7, labelName);
+            text.setSpan(new IssueLabelSpan(context, label, false), pos, pos + length, 0);
+        }
     }
 
     public static void addUserTypeSpan(Context context, SpannableStringBuilder builder,

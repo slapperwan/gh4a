@@ -268,7 +268,7 @@ class EventViewHolder
 
         SpannableStringBuilder text = StringUtils.applyBoldTags(textBase);
         replaceCommitPlaceholder(text, commitId, commitUrl);
-        replaceLabelPlaceholder(text, event.label());
+        StringUtils.replaceLabelPlaceholder(mContext, text, event.label());
         replaceBotPlaceholder(text);
         replaceSourcePlaceholder(text, event.source());
         replaceTimePlaceholder(text, event.createdAt());
@@ -303,16 +303,6 @@ class EventViewHolder
         text.setSpan(new IntentSpan(mContext, context ->
                 CommitActivity.makeIntent(context, finalRepoOwner, finalRepoName, commitId)), pos, pos + commitText.length(), 0);
         text.setSpan(new TypefaceSpan("monospace"), pos, pos + commitText.length(), 0);
-    }
-
-    private void replaceLabelPlaceholder(SpannableStringBuilder text, Label label) {
-        int pos = text.toString().indexOf("[label]");
-        if (label != null && pos >= 0) {
-            String labelName = EmojiParser.parseToUnicode(label.name());
-            int length = labelName.length();
-            text.replace(pos, pos + 7, labelName);
-            text.setSpan(new IssueLabelSpan(mContext, label, false), pos, pos + length, 0);
-        }
     }
 
     private void replaceBotPlaceholder(SpannableStringBuilder text) {
