@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,6 +45,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import androidx.appcompat.view.ContextThemeWrapper;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.shape.MaterialShapeDrawable;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -127,8 +127,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private ActivityCompat.OnRequestPermissionsResultCallback mPendingPermissionCb;
 
-    private final List<ColorDrawable> mHeaderDrawables = new ArrayList<>();
-    private final List<ColorDrawable> mStatusBarDrawables = new ArrayList<>();
+    private final List<MaterialShapeDrawable> mHeaderDrawables = new ArrayList<>();
+    private final List<MaterialShapeDrawable> mStatusBarDrawables = new ArrayList<>();
     private final int[] mProgressColors = new int[2];
     private Animator mHeaderTransition;
     private final Handler mHandler = new Handler();
@@ -327,11 +327,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
     protected void setHeaderColor(int color, int statusBarColor) {
         cancelHeaderTransition();
 
-        for (ColorDrawable d : mHeaderDrawables) {
-            d.setColor(color);
+        for (MaterialShapeDrawable d : mHeaderDrawables) {
+            d.setTint(color);
         }
-        for (ColorDrawable d : mStatusBarDrawables) {
-            d.setColor(statusBarColor);
+        for (MaterialShapeDrawable d : mStatusBarDrawables) {
+            d.setTint(statusBarColor);
         }
         mProgressColors[0] = color;
         mProgressColors[1] = statusBarColor;
@@ -345,11 +345,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
         int color = UiUtils.resolveColor(this, colorAttrId);
         int statusBarColor = UiUtils.resolveColor(this, statusBarColorAttrId);
 
-        for (ColorDrawable d : mHeaderDrawables) {
-            animators.add(createColorTransition(d, color));
+        for (MaterialShapeDrawable d : mHeaderDrawables) {
+            animators.add(createTintTransition(d, color));
         }
-        for (ColorDrawable d : mStatusBarDrawables) {
-            animators.add(createColorTransition(d, statusBarColor));
+        for (MaterialShapeDrawable d : mStatusBarDrawables) {
+            animators.add(createTintTransition(d, statusBarColor));
         }
 
         final ValueAnimator progressAnimator1 = ValueAnimator.ofInt(mProgressColors[0], color);
@@ -730,14 +730,15 @@ public abstract class BaseActivity extends AppCompatActivity implements
         assignBackground(mHeader, primaryColor);
 
         int primaryDarkColor = UiUtils.resolveColor(this, androidx.appcompat.R.attr.colorPrimaryDark);
-        ColorDrawable d = new ColorDrawable(primaryDarkColor);
+        MaterialShapeDrawable d = MaterialShapeDrawable.createWithElevationOverlay(this);
+        d.setTint(primaryDarkColor);
         mDrawerLayout.setStatusBarBackground(d);
         mStatusBarDrawables.add(d);
     }
 
-    private ObjectAnimator createColorTransition(ColorDrawable drawable, int color) {
+    private ObjectAnimator createTintTransition(MaterialShapeDrawable drawable, int color) {
         final ObjectAnimator animation = ObjectAnimator.ofInt(drawable,
-                "color", drawable.getColor(), color);
+                "tint", drawable.getTintList().getDefaultColor(), color);
         animation.setEvaluator(new ArgbEvaluator());
         return animation;
     }
@@ -746,7 +747,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (view == null) {
             return;
         }
-        ColorDrawable background = new ColorDrawable(color);
+        MaterialShapeDrawable background = MaterialShapeDrawable.createWithElevationOverlay(this);
+        background.setTint(color);
         view.setBackground(background);
         mHeaderDrawables.add(background);
     }
