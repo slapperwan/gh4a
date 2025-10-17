@@ -200,7 +200,14 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
 
             case IssuesEvent: {
                 IssuesPayload payload = (IssuesPayload) event.payload();
-                return payload.issue().title();
+                String desc = payload.issue().title();
+                if (payload.action() == IssuesPayload.Action.Assigned) {
+                    return StringUtils.applyBoldTags(res.getString(
+                            R.string.event_issue_assigned_desc,
+                            desc != null ? desc : "", payload.assignee().login()));
+                } else {
+                    return desc;
+                }
             }
 
             case PublicEvent:
@@ -411,6 +418,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                     case Reopened: resId = R.string.event_issues_reopen_title; break;
                     case Labeled: resId = R.string.event_issues_label_title; break;
                     case Unlabeled: resId = R.string.event_issues_unlabel_title; break;
+                    case Assigned: resId = R.string.event_issues_assign_title; break;
                     default: return "";
                 }
                 return res.getString(resId, payload.issue().number(),
