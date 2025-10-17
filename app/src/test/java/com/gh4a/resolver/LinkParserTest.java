@@ -143,6 +143,14 @@ public class LinkParserTest {
     }
 
     @Test
+    public void dashboardFeedLink__opensHomeActivity_onNewsFeedSection() {
+        LinkParser.ParseResult result = parseLink("https://github.com/dashboard-feed");
+        assertRedirectsTo(result, HomeActivity.class);
+        Bundle extras = result.intent.getExtras();
+        assertThat("Redirected to wrong HomeActivity section", extras.getString("initial_page"), is("newsfeed"));
+    }
+
+    @Test
     public void blogLink__opensBlogListActivity() {
         assertRedirectsTo(parseLink("https://github.com/blog"), BlogListActivity.class);
         assertRedirectsTo(parseLink("https://blog.github.com"), BlogListActivity.class);
