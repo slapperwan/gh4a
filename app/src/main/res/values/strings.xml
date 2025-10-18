@@ -459,7 +459,9 @@
     <string name="reopen_issue_confirm">Do you really want to reopen this issue?</string>
     <string name="close_issue_dialog_title">Close issue as\u2026</string>
     <string name="issue_reason_not_planned">Not planned</string>
-    <string name="issue_reason_not_planned_description">Won\'t fix, duplicate, stale</string>
+    <string name="issue_reason_not_planned_description">Won\'t fix, can\'t reproduce, stale</string>
+    <string name="issue_reason_duplicate">Duplicate</string>
+    <string name="issue_reason_duplicate_description">Duplicate of another issue</string>
     <string name="issue_reason_completed">Completed</string>
     <string name="issue_reason_completed_description">Done, closed, fixed, resolved</string>
     <string name="close_issue">Close issue</string>

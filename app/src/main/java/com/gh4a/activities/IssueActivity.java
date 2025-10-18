@@ -65,7 +65,7 @@ import com.meisolsson.githubsdk.model.IssueStateReason;
 import com.meisolsson.githubsdk.model.request.issue.IssueRequest;
 import com.meisolsson.githubsdk.service.issues.IssueService;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class IssueActivity extends BaseActivity implements
@@ -433,22 +433,26 @@ public class IssueActivity extends BaseActivity implements
         @NonNull
         @Override
         public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-            var reasonItems = new ArrayList<ItemsWithDescriptionAdapter.Item>();
-            reasonItems.add(new ItemsWithDescriptionAdapter.Item(
+            var choiceItems = List.of(
+                    new ItemsWithDescriptionAdapter.Item(
                             getString(R.string.issue_reason_completed),
-                            getString(R.string.issue_reason_completed_description)));
-            reasonItems.add(new ItemsWithDescriptionAdapter.Item(
+                            getString(R.string.issue_reason_completed_description)),
+                    new ItemsWithDescriptionAdapter.Item(
                             getString(R.string.issue_reason_not_planned),
-                            getString(R.string.issue_reason_not_planned_description)));
+                            getString(R.string.issue_reason_not_planned_description)),
+                    new ItemsWithDescriptionAdapter.Item(
+                            getString(R.string.issue_reason_duplicate),
+                            getString(R.string.issue_reason_duplicate_description))
+            );
+            var reasonForItems = List.of(IssueStateReason.Completed, IssueStateReason.NotPlanned, IssueStateReason.Duplicate);
 
             IssueActivity activity = (IssueActivity) requireActivity();
             return new AlertDialog.Builder(activity)
                     .setTitle(R.string.close_issue_dialog_title)
                     .setAdapter(
-                        new ItemsWithDescriptionAdapter(activity, reasonItems),
+                        new ItemsWithDescriptionAdapter(activity, choiceItems),
                         (dialog, itemIndex) -> {
-                            var closeReason = itemIndex == 0 ? IssueStateReason.Completed : IssueStateReason.NotPlanned;
-                            activity.closeIssue(closeReason);
+                            activity.closeIssue(reasonForItems.get(itemIndex));
                         }
                     )
                     .setNegativeButton(R.string.cancel, null)
