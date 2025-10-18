@@ -307,6 +307,8 @@
     <string name="issue_event_closed_completed_with_commit">[b]%1$s[/b] closed this issue as completed in [commit] [time]</string>
     <string name="issue_event_closed_not_planned">[b]%1$s[/b] closed this issue as not planned [time]</string>
     <string name="issue_event_closed_not_planned_with_commit">[b]%1$s[/b] closed this issue as not planned in [commit] [time]</string>
+    <string name="issue_event_closed_duplicate">[b]%1$s[/b] closed this issue as duplicate [time]</string>
+    <string name="issue_event_closed_duplicate_with_commit">[b]%1$s[/b] closed this issue as duplicate in [commit] [time]</string>
     <string name="issue_event_reopened">[b]%1$s[/b] reopened this issue [time]</string>
     <string name="issue_event_referenced">[b]%1$s[/b] referenced this issue [time]</string>
     <string name="issue_event_referenced_with_commit">[b]%1$s[/b] referenced this issue in commit [commit] [time]</string>
