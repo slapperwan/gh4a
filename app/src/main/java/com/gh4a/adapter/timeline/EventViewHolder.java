@@ -20,17 +20,13 @@ import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.AvatarHandler;
 import com.gh4a.utils.StringUtils;
 import com.gh4a.widget.IntentSpan;
-import com.gh4a.widget.IssueLabelSpan;
 import com.gh4a.widget.TimestampToastSpan;
 
 import com.meisolsson.githubsdk.model.Issue;
 import com.meisolsson.githubsdk.model.IssueEvent;
 import com.meisolsson.githubsdk.model.IssueEventType;
-import com.meisolsson.githubsdk.model.IssueStateReason;
-import com.meisolsson.githubsdk.model.Label;
 import com.meisolsson.githubsdk.model.Rename;
 import com.meisolsson.githubsdk.model.User;
-import com.vdurmont.emoji.EmojiParser;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,9 +86,15 @@ class EventViewHolder
 
     private Integer getEventIcon(IssueEvent event) {
         return switch (event.event()) {
-            case Closed -> mIsPullRequest || event.stateReason() == IssueStateReason.NotPlanned
-                    ? R.drawable.issue_event_closed
-                    : R.drawable.issue_event_closed_completed;
+            case Closed -> {
+                if (mIsPullRequest) {
+                    yield R.drawable.issue_event_closed;
+                }
+                yield switch (event.stateReason()) {
+                    case NotPlanned, Duplicate -> R.drawable.issue_event_closed;
+                    case null, default -> R.drawable.issue_event_closed_completed;
+                };
+            }
             case Reopened -> R.drawable.issue_event_reopened;
             case Merged -> R.drawable.issue_event_merged;
             case Referenced -> R.drawable.issue_event_referenced;
@@ -127,15 +129,17 @@ class EventViewHolder
                             ? R.string.pull_request_event_closed_with_commit
                             : R.string.pull_request_event_closed;
                 } else {
-                    if (event.stateReason() == IssueStateReason.NotPlanned) {
-                        textResId = commitId != null
+                    textResId = switch (event.stateReason()) {
+                        case NotPlanned -> commitId != null
                                 ? R.string.issue_event_closed_not_planned_with_commit
                                 : R.string.issue_event_closed_not_planned;
-                    } else {
-                        textResId = commitId != null
+                        case Duplicate -> commitId != null
+                                ? R.string.issue_event_closed_duplicate_with_commit
+                                : R.string.issue_event_closed_duplicate;
+                        case null, default -> commitId != null
                                 ? R.string.issue_event_closed_completed_with_commit
                                 : R.string.issue_event_closed_completed;
-                    }
+                    };
                 }
             }
             case Reopened -> {
