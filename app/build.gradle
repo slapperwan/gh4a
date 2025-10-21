@@ -91,7 +91,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
     implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
     implementation 'com.github.maniac103:rxloader:master-SNAPSHOT'
-    implementation 'com.github.maniac103:githubsdk:0.7.0.19'
+    implementation 'com.github.maniac103:githubsdk:0.7.0.20'
     implementation 'com.larswerkman:HoloColorPicker:1.5@aar'
     implementation 'com.caverock:androidsvg-aar:1.4'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.29'
