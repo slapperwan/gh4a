@@ -74,6 +74,7 @@ import com.meisolsson.githubsdk.model.payload.ReleasePayload;
 import com.meisolsson.githubsdk.model.payload.TeamAddPayload;
 import com.vdurmont.emoji.EmojiParser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventViewHolder> {
@@ -201,10 +202,9 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
             case IssuesEvent: {
                 IssuesPayload payload = (IssuesPayload) event.payload();
                 String desc = payload.issue().title();
-                if (payload.action() == IssuesPayload.Action.Assigned) {
-                    return StringUtils.applyBoldTags(res.getString(
-                            R.string.event_issue_assigned_desc,
-                            desc != null ? desc : "", payload.assignee().login()));
+                if (payload.action() == IssuesPayload.Action.Assigned ||
+                        payload.action() == IssuesPayload.Action.Unassigned) {
+                    return formatAssignmentDesc(res, desc, payload.assignees());
                 } else {
                     return desc;
                 }
@@ -216,10 +216,14 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
             case PullRequestEvent: {
                 PullRequestPayload payload = (PullRequestPayload) event.payload();
                 PullRequest pullRequest = payload.pullRequest();
+                String title = pullRequest.title();
 
-                if (!StringUtils.isBlank(pullRequest.title())) {
+                if (payload.action() == PullRequestPayload.Action.Assigned ||
+                        payload.action() == PullRequestPayload.Action.Unassigned) {
+                    return formatAssignmentDesc(res, title, payload.assignees());
+                } else if (!StringUtils.isBlank(title)) {
                     return res.getString(R.string.event_pull_request_desc,
-                            pullRequest.title(), pullRequest.commits(),
+                            title, pullRequest.commits(),
                             pullRequest.additions(), pullRequest.deletions());
                 }
                 break;
@@ -314,6 +318,27 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
         }
 
         return null;
+    }
+
+    private CharSequence formatAssignmentDesc(Resources res, String desc, List<User> assignees) {
+        List<String> assigneeNames = new ArrayList<>();
+        if (assignees != null) {
+            for (User assignee : assignees) {
+                if (assignee.login() != null) {
+                    assigneeNames.add(assignee.login());
+                }
+            }
+        }
+        String assigneeText = assigneeNames.isEmpty()
+                ? res.getString(R.string.event_issue_unassigned_desc)
+                : res.getString(R.string.event_issue_assigned_desc, TextUtils.join(", ", assigneeNames));
+        final String finalDesc;
+        if (TextUtils.isEmpty(desc)) {
+            finalDesc = assigneeText;
+        } else {
+            finalDesc = desc + "\n" + assigneeText;
+        }
+        return StringUtils.applyBoldTags(finalDesc);
     }
 
     private String formatTitle(GitHubEvent event) {
@@ -419,6 +444,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                     case Labeled: resId = R.string.event_issues_label_title; break;
                     case Unlabeled: resId = R.string.event_issues_unlabel_title; break;
                     case Assigned: resId = R.string.event_issues_assign_title; break;
+                    case Unassigned: resId = R.string.event_issues_unassign_title; break;
                     default: return "";
                 }
                 return res.getString(resId, payload.issue().number(),
@@ -454,6 +480,12 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                         break;
                     case Unlabeled:
                         resId = R.string.event_pr_unlabel_title;
+                        break;
+                    case Assigned:
+                        resId = R.string.event_pr_assign_title;
+                        break;
+                    case Unassigned:
+                        resId = R.string.event_pr_unassign_title;
                         break;
                     case Reopened:
                         resId = R.string.event_pr_reopen_title;

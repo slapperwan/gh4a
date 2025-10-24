@@ -238,6 +238,7 @@
     <string name="event_issues_close_title">Closed issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_reopen_title">Reopened issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_assign_title">Assigned issue [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_issues_unassign_title">Unassigned issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_label_title">Added label [label] to issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_issues_unlabel_title">Removed label [label] from issue [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_delete_branch_title">Deleted branch [b]%1$s[/b] at [b]%2$s[/b]</string>
@@ -247,6 +248,8 @@
     <string name="event_pr_merge_title">Merged pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pr_reopen_title">Reopened pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pr_update_title">Updated pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_pr_assign_title">Assigned pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_pr_unassign_title">Unassigned pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pr_label_title">Added label [label] to pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pr_unlabel_title">Removed label [label] from pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pull_request_review_comment_title">Commented on pull request [b]%1$d[/b] in [b]%2$s[/b]</string>
@@ -260,7 +263,8 @@
     <string name="event_team_repo_add">Added the repository [b]%1$s[/b] to the team [b]%2$s[/b]</string>
     <string name="event_review_title">Created a review on pull request [b]%1$d[/b] in [b]%2$s[/b]</string>
 
-    <string name="event_issue_assigned_desc">%1$s\n\nNew assignee is [b]%2$s[/b]</string>
+    <string name="event_issue_assigned_desc">Issue is now assigned to [b]%1$s[/b]</string>
+    <string name="event_issue_unassigned_desc">Issue is now unassigned</string>
     <string name="event_pull_request_desc">%1$s\n%2$d commits with %3$d additions and %4$d deletions</string>
     <string name="event_follow_desc">%1$s has %2$d repositories and %3$d followers</string>
     <string name="event_fork_desc">Forked repository is at %1$s</string>
