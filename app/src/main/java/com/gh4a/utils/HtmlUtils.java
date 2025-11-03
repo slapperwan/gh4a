@@ -233,7 +233,7 @@ public class HtmlUtils {
      * @param imageGetter
      * @return html
      */
-    public static CharSequence encode(final Context context, final String html,
+    public static CharSequence encodeHtml(final Context context, final String html,
                                       final ImageGetter imageGetter) {
         if (TextUtils.isEmpty(html))
             return "";
