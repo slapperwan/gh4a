@@ -471,9 +471,7 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                         resId = R.string.event_pr_open_title;
                         break;
                     case Closed:
-                        resId = pr.merged()
-                                ? R.string.event_pr_merge_title
-                                : R.string.event_pr_close_title;
+                        resId = R.string.event_pr_close_title;
                         break;
                     case Labeled:
                         resId = R.string.event_pr_label_title;
@@ -492,6 +490,9 @@ public class EventAdapter extends RootAdapter<GitHubEvent, EventAdapter.EventVie
                         break;
                     case Synchronized:
                         resId = R.string.event_pr_update_title;
+                        break;
+                    case Merged:
+                        resId = R.string.event_pr_merge_title;
                         break;
                     default:
                         return "";

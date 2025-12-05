@@ -245,7 +245,7 @@
     <string name="event_delete_tag_title">Deleted tag [b]%1$s[/b] at [b]%2$s[/b]</string>
     <string name="event_pr_open_title">Opened pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pr_close_title">Closed pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
-    <string name="event_pr_merge_title">Merged pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
+    <string name="event_pr_merge_title">Pull request [b]%1$d[/b] on [b]%2$s was merged[/b]</string>
     <string name="event_pr_reopen_title">Reopened pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pr_update_title">Updated pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
     <string name="event_pr_assign_title">Assigned pull request [b]%1$d[/b] on [b]%2$s[/b]</string>
