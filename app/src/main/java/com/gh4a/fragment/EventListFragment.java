@@ -134,21 +134,13 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             return;
         }
 
-        GitHubEvent.RepoIdentifier eventRepo = event.repo();
-        String repoOwner = "";
-        String repoName = "";
+        Pair<String, String> repoOwnerAndName = parseRepoIdentifierToOwnerAndName(event.repo());
+        String repoOwner = repoOwnerAndName != null ? repoOwnerAndName.first : "";
+        String repoName = repoOwnerAndName != null ? repoOwnerAndName.second : "";
         Intent intent = null;
         Single<Optional<Intent>> intentSingle = null;
 
-        if (eventRepo != null) {
-            String[] repoNamePart = eventRepo.repoWithUserName().split("/");
-            if (repoNamePart.length == 2) {
-                repoOwner = repoNamePart[0];
-                repoName = repoNamePart[1];
-            }
-        }
-
-        if (Arrays.binarySearch(REPO_EVENTS, event.type()) >= 0 && eventRepo == null) {
+        if (Arrays.binarySearch(REPO_EVENTS, event.type()) >= 0 && repoOwnerAndName == null) {
             Toast.makeText(getActivity(), R.string.repo_not_found_toast, Toast.LENGTH_LONG).show();
             return;
         }
@@ -354,28 +346,27 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             return;
         }
 
-        GitHubEvent.RepoIdentifier eventRepo = event.repo();
-        String[] repoNamePart = eventRepo.repoWithUserName().split("/");
-        String repoOwner = repoNamePart.length == 2 ? repoNamePart[0] : null;
-        String repoName = repoNamePart.length == 2 ? repoNamePart[1] : null;
+        Pair<String, String> repoOwnerAndName = parseRepoIdentifierToOwnerAndName(event.repo());
+        String repoOwner = repoOwnerAndName != null ? repoOwnerAndName.first : null;
+        String repoName = repoOwnerAndName != null ? repoOwnerAndName.second : null;
 
         menu.setHeaderTitle(R.string.go_to);
 
         /* Common menu */
         menu.add(getString(R.string.menu_user, event.actor().login()))
                 .setIntent(UserActivity.makeIntent(getActivity(), event.actor()));
-        if (repoOwner != null) {
-            menu.add(getString(R.string.menu_repo, repoOwner + "/" + repoName))
+        if (repoOwnerAndName != null) {
+            menu.add(getString(R.string.menu_repo, event.repo().repoWithUserName()))
                     .setIntent(RepositoryActivity.makeIntent(getActivity(), repoOwner, repoName));
         }
 
         switch (event.type()) {
             case CommitCommentEvent:
-                if (repoOwner != null) {
+                if (repoOwnerAndName != null) {
                     CommitCommentPayload payload = (CommitCommentPayload) event.payload();
                     String sha = payload.comment().commitId();
                     menu.add(getString(R.string.menu_commit, sha.substring(0, 7)))
-                            .setIntent(CommitActivity.makeIntent(getActivity(), repoOwner, repoName, sha));
+                            .setIntent(CommitActivity.makeIntent(getActivity(), repoOwnerAndName.first, repoOwnerAndName.second, sha));
                 }
                 break;
 
@@ -449,7 +440,7 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             }
 
             case PushEvent: {
-                if (repoOwner != null) {
+                if (repoOwnerAndName != null) {
                     PushPayload payload = (PushPayload) event.payload();
                     menu.add(getString(R.string.menu_compare, payload.head().substring(0, 7)))
                             .setIntent(CompareActivity.makeIntent(getActivity(), repoOwner, repoName,
@@ -531,23 +522,23 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
             Map<PushIdentifier, Single<Response<CommitCompare>>> pushSingles = new HashMap<>();
 
             for (GitHubEvent event : responsePage.items()) {
-                GitHubEvent.RepoIdentifier eventRepo = event.repo();
-                String[] repoNamePart = eventRepo != null
-                        ? eventRepo.repoWithUserName().split("/") : null;
-                if (repoNamePart == null || repoNamePart.length != 2) {
+                Pair<String, String> repoOwnerAndName =
+                        parseRepoIdentifierToOwnerAndName(event.repo());
+                if (repoOwnerAndName == null) {
                     continue;
                 }
                 if (event.type() == GitHubEventType.PullRequestEvent) {
                     PullRequestPayload payload = (PullRequestPayload) event.payload();
                     Single<Response<PullRequest>> prSingle = prService.getPullRequest(
-                            repoNamePart[0], repoNamePart[1], payload.number());
-                    prSingles.put(new PrIdentifier(eventRepo, payload.number()), prSingle);
+                            repoOwnerAndName.first, repoOwnerAndName.second, payload.number());
+                    prSingles.put(new PrIdentifier(event.repo(), payload.number()), prSingle);
                 } else if (event.type() == GitHubEventType.PushEvent) {
                     PushPayload payload = (PushPayload) event.payload();
                     Single<Response<CommitCompare>> pushSingle = commitService.compareCommits(
-                            repoNamePart[0], repoNamePart[1], payload.before(), payload.head());
-                    pushSingles.put(new PushIdentifier(eventRepo, payload.before(), payload.head()),
-                            pushSingle);
+                            repoOwnerAndName.first, repoOwnerAndName.second,
+                            payload.before(), payload.head());
+                    pushSingles.put(new PushIdentifier(event.repo(),
+                            payload.before(), payload.head()), pushSingle);
                 }
             }
 
@@ -628,6 +619,21 @@ public abstract class EventListFragment extends PagedDataBaseFragment<GitHubEven
                 return Response.success(newPage);
             });
         });
+    }
+
+    private static Pair<String, String> parseRepoIdentifierToOwnerAndName(GitHubEvent.RepoIdentifier identifier) {
+        if (identifier == null) {
+            return null;
+        }
+        String repoWithUserName = identifier.repoWithUserName();
+        if (repoWithUserName == null) {
+            return null;
+        }
+        String[] parts = repoWithUserName.split("/");
+        if (parts.length != 2) {
+            return null;
+        }
+        return Pair.create(parts[0], parts[1]);
     }
 
     protected abstract Single<Response<Page<GitHubEvent>>> loadRawPage(int page, boolean bypassCache);
