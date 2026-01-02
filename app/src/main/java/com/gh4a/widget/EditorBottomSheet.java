@@ -367,6 +367,13 @@ public class EditorBottomSheet extends FrameLayout implements View.OnClickListen
         return mBasicEditor.getText();
     }
 
+    public Editable getText() {
+        if (isInAdvancedMode()) {
+            return mAdvancedEditor.getText();
+        }
+        return mBasicEditor.getText();
+    }
+
     private void setAdvancedEditorVisible(boolean visible) {
         mAdvancedEditorContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
         mBasicEditorScrollView.setVisibility(visible ? View.GONE : View.VISIBLE);

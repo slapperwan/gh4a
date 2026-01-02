@@ -17,6 +17,7 @@ package com.gh4a.fragment;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -72,6 +73,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.Single;
 import retrofit2.Response;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineItem> implements
         View.OnClickListener, TimelineItemAdapter.OnCommentAction,
@@ -232,11 +235,20 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         super.onRefresh();
     }
 
+    private SharedPreferences spGen;
+
+    private boolean isSend;
+
     @Override
     public void onResume() {
         super.onResume();
         mImageGetter.resume();
         mAdapter.resume();
+        spGen = getActivity().getSharedPreferences("IssueFragmentBase", MODE_PRIVATE);
+        if(spGen.getString("editRepoOwner", "").equals(mRepoOwner) && spGen.getString("editRepoName", "").equals(mRepoName)) {
+            addText(spGen.getString("editMessage", ""));
+        }
+        isSend = false;
     }
 
     @Override
@@ -244,6 +256,15 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         super.onPause();
         mImageGetter.pause();
         mAdapter.pause();
+        SharedPreferences.Editor spGenEditor = spGen.edit();
+        spGenEditor.putString("editRepoOwner", mRepoOwner);
+        spGenEditor.putString("editRepoName", mRepoName);
+        if (isSend) {
+            spGenEditor.putString("editMessage", "");
+        } else {
+            spGenEditor.putString("editMessage", mBottomSheet.getText().toString());
+        }
+        spGenEditor.commit();
     }
 
     @Override
@@ -575,6 +596,7 @@ public abstract class IssueFragmentBase extends ListDataBaseFragment<TimelineIte
         // reload comments
         if (isAdded()) {
             reloadEvents(false);
+            isSend = true;
         }
         getActivity().setResult(Activity.RESULT_OK);
     }
