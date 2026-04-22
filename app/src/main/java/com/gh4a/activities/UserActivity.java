@@ -5,10 +5,12 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
 import androidx.fragment.app.Fragment;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.R;
@@ -18,10 +20,13 @@ import com.gh4a.fragment.PublicEventListFragment;
 import com.gh4a.fragment.UserFragment;
 import com.gh4a.utils.ApiHelpers;
 import com.gh4a.utils.IntentUtils;
+import com.gh4a.utils.RxUtils;
 import com.gh4a.utils.StringUtils;
 import com.meisolsson.githubsdk.model.User;
 import com.meisolsson.githubsdk.model.UserType;
 import com.meisolsson.githubsdk.service.users.UserService;
+
+import io.reactivex.Single;
 
 public class UserActivity extends BaseFragmentPagerActivity {
     public static Intent makeIntent(Context context, User user) {
@@ -45,6 +50,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
     private String mUserLogin;
     private User mUser;
     private UserFragment mUserFragment;
+    private Boolean mIsBookmarked;
 
     private static final int ID_LOADER_USER = 0;
 
@@ -57,6 +63,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
         super.onCreate(savedInstanceState);
 
         setContentShown(false);
+        refreshBookmarkState();
         loadUser(false);
     }
 
@@ -83,6 +90,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
     @Override
     public void onRefresh() {
         mUser = null;
+        mIsBookmarked = null;
         setContentShown(false);
         invalidateTabs();
         invalidateOptionsMenu();
@@ -129,10 +137,8 @@ public class UserActivity extends BaseFragmentPagerActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem bookmarkAction = menu.findItem(R.id.bookmark);
         if (bookmarkAction != null) {
-            String url = "https://github.com/" + mUserLogin;
-            bookmarkAction.setTitle(BookmarksProvider.hasBookmarked(this, url)
-                    ? R.string.remove_bookmark
-                    : R.string.bookmark);
+            bookmarkAction.setTitle(mIsBookmarked != null && mIsBookmarked
+                    ? R.string.remove_bookmark : R.string.bookmark);
             bookmarkAction.setVisible(mUser != null);
         }
 
@@ -160,17 +166,45 @@ public class UserActivity extends BaseFragmentPagerActivity {
                 return true;
             case R.id.bookmark: {
                 String urlString = url.toString();
-                if (BookmarksProvider.hasBookmarked(this, urlString)) {
-                    BookmarksProvider.removeBookmark(this, urlString);
-                } else {
-                    BookmarksProvider.saveBookmark(this, mUserLogin,
-                            BookmarksProvider.Columns.TYPE_USER,
-                            urlString, mUser.name(), true);
-                }
+                String userName = mUser != null ? mUser.name() : null;
+                registerTemporarySubscription(Single.fromCallable(() -> {
+                    boolean hasBookmarked = BookmarksProvider.hasBookmarked(this, urlString);
+                    boolean success = hasBookmarked
+                            ? BookmarksProvider.removeBookmarkInternal(this, urlString)
+                            : BookmarksProvider.saveBookmarkInternal(this, mUserLogin,
+                                    BookmarksProvider.Columns.TYPE_USER, urlString, userName);
+                    return new Pair<>(success, !hasBookmarked);
+                }).compose(RxUtils::doInBackground).subscribe(result -> {
+                    if (result.first) {
+                        Toast.makeText(this,
+                                result.second ? R.string.bookmark_saved : R.string.bookmark_removed,
+                                result.second ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT)
+                                .show();
+                        mIsBookmarked = result.second;
+                        invalidateOptionsMenu();
+                    } else {
+                        refreshBookmarkState();
+                    }
+                }, e -> handleActionFailure("Toggling bookmark failed", e)));
                 return true;
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshBookmarkState() {
+        String url = mUserLogin != null ? "https://github.com/" + mUserLogin : null;
+        if (url == null) {
+            return;
+        }
+
+        registerTemporarySubscription(Single.fromCallable(() ->
+                BookmarksProvider.hasBookmarked(this, url))
+                .compose(RxUtils::doInBackground)
+                .subscribe(bookmarked -> {
+                    mIsBookmarked = bookmarked;
+                    invalidateOptionsMenu();
+                }, e -> handleActionFailure("Loading bookmark state failed", e)));
     }
 
     private void loadUser(boolean force) {
@@ -182,6 +216,7 @@ public class UserActivity extends BaseFragmentPagerActivity {
                     mUser = result;
                     invalidateTabs();
                     setContentShown(true);
+                    refreshBookmarkState();
                     invalidateOptionsMenu();
                 }, this::handleLoadFailure);
     }
