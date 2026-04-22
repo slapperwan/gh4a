@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gh4a.BaseFragmentPagerActivity;
 import com.gh4a.R;
@@ -101,6 +102,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
     private List<Branch> mBranches;
     private List<Branch> mTags;
     private String mSelectedRef;
+    private Boolean mIsBookmarked;
 
     private RepositoryFragment mRepositoryFragment;
     private ContentListContainerFragment mContentListFragment;
@@ -157,6 +159,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
 
         mActionBar.setSubtitle(getCurrentRef());
         invalidateFragments();
+        refreshBookmarkState();
     }
 
     private String getCurrentRef() {
@@ -239,6 +242,7 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         mContentListFragment = null;
         mActivityFragment = null;
         mRepository = null;
+        mIsBookmarked = null;
         mBranches = null;
         mTags = null;
         clearRefDependentFragments();
@@ -274,9 +278,8 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
         } else {
             MenuItem bookmarkAction = menu.findItem(R.id.bookmark);
             if (bookmarkAction != null) {
-                bookmarkAction.setTitle(BookmarksProvider.hasBookmarked(this, getBookmarkUrl())
-                        ? R.string.remove_bookmark
-                        : R.string.bookmark);
+                bookmarkAction.setTitle(mIsBookmarked != null && mIsBookmarked
+                        ? R.string.remove_bookmark : R.string.bookmark);
             }
         }
 
@@ -311,15 +314,32 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
                 startActivity(SearchActivity.makeIntent(this, initialSearch,
                         SearchActivity.SEARCH_TYPE_CODE, false));
                 return true;
-            case R.id.bookmark:
+            case R.id.bookmark: {
                 String bookmarkUrl = getBookmarkUrl();
-                if (BookmarksProvider.hasBookmarked(this, bookmarkUrl)) {
-                    BookmarksProvider.removeBookmark(this, bookmarkUrl);
-                } else {
-                    BookmarksProvider.saveBookmark(this, mActionBar.getTitle().toString(),
-                            BookmarksProvider.Columns.TYPE_REPO, bookmarkUrl, getCurrentRef(), true);
-                }
+                String bookmarkName = mActionBar != null
+                        ? mActionBar.getTitle().toString() : mRepoOwner + "/" + mRepoName;
+                String currentRef = getCurrentRef();
+                registerTemporarySubscription(Single.fromCallable(() -> {
+                    boolean hasBookmarked = BookmarksProvider.hasBookmarked(this, bookmarkUrl);
+                    boolean success = hasBookmarked
+                            ? BookmarksProvider.removeBookmarkInternal(this, bookmarkUrl)
+                            : BookmarksProvider.saveBookmarkInternal(this, bookmarkName,
+                                    BookmarksProvider.Columns.TYPE_REPO, bookmarkUrl, currentRef);
+                    return new Pair<>(success, !hasBookmarked);
+                }).compose(RxUtils::doInBackground).subscribe(result -> {
+                    if (result.first) {
+                        Toast.makeText(this,
+                                result.second ? R.string.bookmark_saved : R.string.bookmark_removed,
+                                result.second ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT)
+                                .show();
+                        mIsBookmarked = result.second;
+                        supportInvalidateOptionsMenu();
+                    } else {
+                        refreshBookmarkState();
+                    }
+                }, e -> handleActionFailure("Toggling bookmark failed", e)));
                 return true;
+            }
             case R.id.zip_download: {
                 final String zipUrl = Uri.parse(mRepository.url())
                         .buildUpon()
@@ -332,6 +352,21 @@ public class RepositoryActivity extends BaseFragmentPagerActivity implements
             }
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refreshBookmarkState() {
+        if (mRepository == null) {
+            return;
+        }
+
+        String bookmarkUrl = getBookmarkUrl();
+        registerTemporarySubscription(Single.fromCallable(() ->
+                BookmarksProvider.hasBookmarked(this, bookmarkUrl))
+                .compose(RxUtils::doInBackground)
+                .subscribe(bookmarked -> {
+                    mIsBookmarked = bookmarked;
+                    supportInvalidateOptionsMenu();
+                }, e -> handleActionFailure("Loading bookmark state failed", e)));
     }
 
     private void showRefSelectionDialog() {

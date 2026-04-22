@@ -53,6 +53,14 @@ public class BookmarksProvider extends ContentProvider {
     // url must be resolvable by BrowseFilter!
     public static void saveBookmark(Context context, String name, int type, String url,
             String extraData, boolean showToast) {
+        boolean saved = saveBookmarkInternal(context, name, type, url, extraData);
+        if (saved && showToast) {
+            Toast.makeText(context, R.string.bookmark_saved, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public static boolean saveBookmarkInternal(Context context, String name, int type, String url,
+            String extraData) {
         ContentResolver cr = context.getContentResolver();
 
         ContentValues cv = new ContentValues();
@@ -62,9 +70,7 @@ public class BookmarksProvider extends ContentProvider {
         cv.put(BookmarksProvider.Columns.EXTRA, extraData);
         cv.put(BookmarksProvider.Columns.ORDER_ID, getNextOrderId(cr));
 
-        if (cr.insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null && showToast) {
-            Toast.makeText(context, R.string.bookmark_saved, Toast.LENGTH_LONG).show();
-        }
+        return cr.insert(BookmarksProvider.Columns.CONTENT_URI, cv) != null;
     }
 
     private static int getNextOrderId(ContentResolver cr) {
@@ -83,12 +89,16 @@ public class BookmarksProvider extends ContentProvider {
     }
 
     public static void removeBookmark(Context context, String url) {
+        if (removeBookmarkInternal(context, url)) {
+            Toast.makeText(context, R.string.bookmark_removed, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static boolean removeBookmarkInternal(Context context, String url) {
         int removedRows = context.getContentResolver().delete(Columns.CONTENT_URI,
                 Columns.URI + " = ?",
                 new String[] { url });
-        if (removedRows > 0) {
-            Toast.makeText(context, R.string.bookmark_removed, Toast.LENGTH_SHORT).show();
-        }
+        return removedRows > 0;
     }
 
     public static boolean hasBookmarked(Context context, String url) {
